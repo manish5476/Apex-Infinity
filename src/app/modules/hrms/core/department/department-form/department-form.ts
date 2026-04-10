@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, inject, signal, computed, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of, catchError, map, Subject } from 'rxjs';
@@ -18,7 +18,7 @@ import { takeUntil } from "rxjs/operators";
 @Component({
   selector: 'app-department-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, CardModule, SelectModule, DatePickerModule, ToggleSwitchModule],
+  imports: [ReactiveFormsModule, CardModule, SelectModule, DatePickerModule, ToggleSwitchModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="app-fullscreen-wrapper fade-in">

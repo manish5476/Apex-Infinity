@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal, ViewChild, ChangeDetectionStrategy, Input, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 
 // PrimeNG Imports
@@ -22,13 +22,12 @@ import { takeUntil } from "rxjs/operators";
   selector: 'app-bulk-customer',
   standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
     ButtonModule,
     ToastModule,
     ToolbarModule,
     AppSharedGrid
-  ],
+],
   template: `
     <div class="bulk-page-container fade-in" [class.is-dialog]="isDialog()">
       <div class="themed-card">

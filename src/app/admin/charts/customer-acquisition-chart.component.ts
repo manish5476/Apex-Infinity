@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Subject, takeUntil } from 'rxjs';
 import { Chart, registerables } from 'chart.js';
 import { ChartService } from '../chart.service';
@@ -9,7 +9,7 @@ Chart.register(...registerables);
 @Component({
   selector: 'app-customer-acquisition-chart',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   template: `
     <div class="chart-card">
       <div class="card-header">
@@ -28,43 +28,55 @@ Chart.register(...registerables);
           </div>
         </div>
         <!-- KPI row -->
-        <div class="kpi-chips" *ngIf="!isLoading && !hasError">
-          <div class="kpi-chip accent">
-            <span class="kpi-label">Total Customers</span>
-            <span class="kpi-value">{{ totalCustomers }}</span>
+        @if (!isLoading && !hasError) {
+          <div class="kpi-chips">
+            <div class="kpi-chip accent">
+              <span class="kpi-label">Total Customers</span>
+              <span class="kpi-value">{{ totalCustomers }}</span>
+            </div>
+            <div class="kpi-chip">
+              <span class="kpi-label">Peak Month</span>
+              <span class="kpi-value">{{ peakMonth }}</span>
+            </div>
           </div>
-          <div class="kpi-chip">
-            <span class="kpi-label">Peak Month</span>
-            <span class="kpi-value">{{ peakMonth }}</span>
-          </div>
+        }
+      </div>
+    
+      @if (isLoading) {
+        <div class="state-overlay">
+          <div class="spinner"></div><span>Loading...</span>
         </div>
-      </div>
-
-      <div class="state-overlay" *ngIf="isLoading">
-        <div class="spinner"></div><span>Loading...</span>
-      </div>
-      <div class="state-overlay error" *ngIf="hasError && !isLoading">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-        </svg>
-        <span>Failed to load</span>
-        <button class="retry-btn" (click)="loadData()">Retry</button>
-      </div>
-
-      <div class="chart-area" *ngIf="!isLoading && !hasError">
-        <canvas #acqCanvas></canvas>
-      </div>
-
+      }
+      @if (hasError && !isLoading) {
+        <div class="state-overlay error">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <span>Failed to load</span>
+          <button class="retry-btn" (click)="loadData()">Retry</button>
+        </div>
+      }
+    
+      @if (!isLoading && !hasError) {
+        <div class="chart-area">
+          <canvas #acqCanvas></canvas>
+        </div>
+      }
+    
       <!-- Monthly Breakdown mini -->
-      <div class="monthly-strip" *ngIf="!isLoading && !hasError && monthlyNew.length">
-        <div class="month-cell" *ngFor="let m of monthlyNew; let i = index"
-          [class.has-data]="m.value > 0" [title]="m.label + ': ' + m.value">
-          <div class="month-bar" [style.height.%]="m.pct" [style.background]="m.value > 0 ? '#FFA726' : 'var(--border-primary)'"></div>
-          <span class="month-label">{{ m.label.slice(0,1) }}</span>
+      @if (!isLoading && !hasError && monthlyNew.length) {
+        <div class="monthly-strip">
+          @for (m of monthlyNew; track m; let i = $index) {
+            <div class="month-cell"
+              [class.has-data]="m.value > 0" [title]="m.label + ': ' + m.value">
+              <div class="month-bar" [style.height.%]="m.pct" [style.background]="m.value > 0 ? '#FFA726' : 'var(--border-primary)'"></div>
+              <span class="month-label">{{ m.label.slice(0,1) }}</span>
+            </div>
+          }
         </div>
-      </div>
+      }
     </div>
-  `,
+    `,
   styles: [`
     .chart-card {
       background: var(--bg-secondary);

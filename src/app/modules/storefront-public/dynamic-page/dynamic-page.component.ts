@@ -1,6 +1,6 @@
 // src/app/modules/storefront-public/dynamic-page/dynamic-page.component.ts
 import { Component, OnInit, inject, signal, isDevMode, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { Title, Meta } from '@angular/platform-browser';
 import { combineLatest, Subject } from 'rxjs';
@@ -34,17 +34,26 @@ import { takeUntil } from "rxjs/operators";
   selector: 'app-dynamic-page',
   standalone: true,
   imports: [
-    CommonModule, RouterModule,
-    HeroBannerComponent, ProductSliderComponent,
-    CategoryGridComponent, ProductGridComponent,
-    FeatureGridComponent, TextContentComponent,
-    ContactFormComponent, VideoHeroComponent,
-    SplitContentComponent, TestimonialSliderComponent,
-    LogoCloudComponent, NewsletterSignupComponent,
-    StatsCounterComponent, PricingTableComponent,
-    CountdownTimerComponent, FaqAccordionComponent,
-    BlogFeedComponent, MapLocationsComponent
-  ],
+    RouterModule,
+    HeroBannerComponent,
+    ProductSliderComponent,
+    CategoryGridComponent,
+    ProductGridComponent,
+    FeatureGridComponent,
+    TextContentComponent,
+    ContactFormComponent,
+    VideoHeroComponent,
+    SplitContentComponent,
+    TestimonialSliderComponent,
+    LogoCloudComponent,
+    NewsletterSignupComponent,
+    StatsCounterComponent,
+    PricingTableComponent,
+    CountdownTimerComponent,
+    FaqAccordionComponent,
+    BlogFeedComponent,
+    MapLocationsComponent
+],
   templateUrl: './dynamic-page.component.html',
   styles: [`
     :host {

@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -24,7 +24,7 @@ import { Textarea } from 'primeng/textarea';
 @Component({
   selector: 'app-payment-form',
   standalone: true,
-  imports: [CommonModule,ReactiveFormsModule,ToastModule,ButtonModule,InputTextModule,InputNumberModule,DatePickerModule, Textarea, SelectModule,DividerModule  ],
+  imports: [ReactiveFormsModule, ToastModule, ButtonModule, InputTextModule, InputNumberModule, DatePickerModule, Textarea, SelectModule, DividerModule],
   templateUrl: './payment-form.html',
   styleUrls: ['./payment-form.scss']
 })

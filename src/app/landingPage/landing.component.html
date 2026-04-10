@@ -1,6 +1,6 @@
 <!-- ═══════════════════════════════════════════════════
-     APEX INFINITY — LANDING PAGE
-     ═══════════════════════════════════════════════════ -->
+APEX INFINITY — LANDING PAGE
+═══════════════════════════════════════════════════ -->
 <div class="lp">
 
   <!-- ── NAVBAR ─────────────────────────────────────── -->
@@ -14,7 +14,7 @@
 
       <div class="nav__links">
         @for (link of navLinks; track link) {
-        <a class="nav__link" href="#{{ link.toLowerCase() }}">{{ link }}</a>
+          <a class="nav__link" href="#{{ link.toLowerCase() }}">{{ link }}</a>
         }
       </div>
 
@@ -40,7 +40,7 @@
     </div>
     <nav class="mob-drawer__links">
       @for (link of navLinks; track link) {
-      <a href="#{{ link.toLowerCase() }}" (click)="toggleMobileMenu()">{{ link }}</a>
+        <a href="#{{ link.toLowerCase() }}" (click)="toggleMobileMenu()">{{ link }}</a>
       }
     </nav>
     <div class="mob-drawer__actions">
@@ -84,10 +84,10 @@
 
         <div class="hero__stats">
           @for (stat of heroData().stats; track stat.label) {
-          <div class="hero__stat">
-            <span class="hero__stat-val">{{ stat.value }}</span>
-            <span class="hero__stat-label">{{ stat.label }}</span>
-          </div>
+            <div class="hero__stat">
+              <span class="hero__stat-val">{{ stat.value }}</span>
+              <span class="hero__stat-label">{{ stat.label }}</span>
+            </div>
           }
         </div>
       </div>
@@ -111,7 +111,7 @@
             <div class="dash-mock__sidebar">
               <div class="dm-s-logo">∞</div>
               @for (i of [1,2,3,4,5,6]; track i) {
-              <div class="dm-s-item" [class.dm-s-item--active]="i === 1"></div>
+                <div class="dm-s-item" [class.dm-s-item--active]="i === 1"></div>
               }
             </div>
 
@@ -141,7 +141,7 @@
                 <div class="dm-chart__label">Monthly Revenue</div>
                 <div class="dm-chart__bars">
                   @for (h of [45,60,38,72,55,80,65,90,70,85,95,88]; track h) {
-                  <div class="dm-chart__bar" [style.height.%]="h"></div>
+                    <div class="dm-chart__bar" [style.height.%]="h"></div>
                   }
                 </div>
               </div>
@@ -149,11 +149,11 @@
               <!-- Table preview -->
               <div class="dm-table">
                 @for (i of [1,2,3]; track i) {
-                <div class="dm-table__row">
-                  <div class="dm-table__cell dm-table__cell--wide"></div>
-                  <div class="dm-table__cell"></div>
-                  <div class="dm-table__cell dm-table__cell--badge"></div>
-                </div>
+                  <div class="dm-table__row">
+                    <div class="dm-table__cell dm-table__cell--wide"></div>
+                    <div class="dm-table__cell"></div>
+                    <div class="dm-table__cell dm-table__cell--badge"></div>
+                  </div>
                 }
               </div>
             </div>
@@ -185,7 +185,7 @@
     <p class="trust__label">Powering next-gen enterprises across India</p>
     <div class="trust__logos">
       @for (icon of ['pi-google','pi-amazon','pi-microsoft','pi-apple','pi-discord','pi-slack']; track icon) {
-      <i class="pi {{ icon }} trust__logo"></i>
+        <i class="pi {{ icon }} trust__logo"></i>
       }
     </div>
   </div>
@@ -202,13 +202,13 @@
 
       <div class="problems__grid">
         @for (p of problems(); track p.title; let i = $index) {
-        <div class="problem-card reveal" [style.animation-delay.ms]="i * 80">
-          <div class="problem-card__icon">
-            <i class="pi {{ p.icon }}"></i>
+          <div class="problem-card reveal" [style.animation-delay.ms]="i * 80">
+            <div class="problem-card__icon">
+              <i class="pi {{ p.icon }}"></i>
+            </div>
+            <h3 class="problem-card__title">{{ p.title }}</h3>
+            <p class="problem-card__desc">{{ p.desc }}</p>
           </div>
-          <h3 class="problem-card__title">{{ p.title }}</h3>
-          <p class="problem-card__desc">{{ p.desc }}</p>
-        </div>
         }
       </div>
     </div>
@@ -227,12 +227,14 @@
         <!-- Tab list -->
         <div class="features__tabs reveal">
           @for (feat of features(); track feat.id; let i = $index) {
-          <button class="feature-tab" [class.feature-tab--active]="activeFeatureIdx() === i"
-            [style.--tab-color]="feat.color" (click)="setFeature(i)">
-            <i class="pi {{ feat.icon }} feature-tab__icon"></i>
-            <span class="feature-tab__text">{{ feat.category }}</span>
-            <div class="feature-tab__progress" *ngIf="activeFeatureIdx() === i"></div>
-          </button>
+            <button class="feature-tab" [class.feature-tab--active]="activeFeatureIdx() === i"
+              [style.--tab-color]="feat.color" (click)="setFeature(i)">
+              <i class="pi {{ feat.icon }} feature-tab__icon"></i>
+              <span class="feature-tab__text">{{ feat.category }}</span>
+              @if (activeFeatureIdx() === i) {
+                <div class="feature-tab__progress"></div>
+              }
+            </button>
           }
         </div>
 
@@ -249,21 +251,21 @@
 
               <ul class="feature-panel__points">
                 @for (pt of getActiveFeature().points; track pt) {
-                <li>
-                  <span class="feature-panel__check" [style.background]="getActiveFeature().color + '22'"
+                  <li>
+                    <span class="feature-panel__check" [style.background]="getActiveFeature().color + '22'"
                     [style.color]="getActiveFeature().color">✓</span>
-                  {{ pt }}
-                </li>
+                    {{ pt }}
+                  </li>
                 }
               </ul>
 
               @if (getActiveFeature().metric) {
-              <div class="feature-panel__metric">
-                <span class="feature-panel__metric-label">{{ getActiveFeature().metric!.label }}</span>
-                <span class="feature-panel__metric-val" [style.color]="getActiveFeature().color">
-                  {{ getActiveFeature().metric!.value }}
-                </span>
-              </div>
+                <div class="feature-panel__metric">
+                  <span class="feature-panel__metric-label">{{ getActiveFeature().metric!.label }}</span>
+                  <span class="feature-panel__metric-val" [style.color]="getActiveFeature().color">
+                    {{ getActiveFeature().metric!.value }}
+                  </span>
+                </div>
               }
             </div>
 
@@ -332,23 +334,23 @@
 
       <div class="pricing__grid">
         @for (plan of pricingPlans(); track plan.name; let i = $index) {
-        <div class="price-card reveal" [class.price-card--popular]="plan.popular" [style.animation-delay.ms]="i * 100">
-          @if (plan.popular) {
-          <div class="price-card__ribbon">Most Popular</div>
-          }
-          <div class="price-card__name">{{ plan.name }}</div>
-          <div class="price-card__price">
-            {{ plan.price }}<span class="price-card__period">{{ plan.period }}</span>
-          </div>
-          <ul class="price-card__features">
-            @for (f of plan.features; track f) {
-            <li><span class="price-card__check">✓</span> {{ f }}</li>
+          <div class="price-card reveal" [class.price-card--popular]="plan.popular" [style.animation-delay.ms]="i * 100">
+            @if (plan.popular) {
+              <div class="price-card__ribbon">Most Popular</div>
             }
-          </ul>
-          <button class="btn w-full" [class.btn--primary]="plan.popular" [class.btn--outline]="!plan.popular">
-            {{ plan.cta }}
-          </button>
-        </div>
+            <div class="price-card__name">{{ plan.name }}</div>
+            <div class="price-card__price">
+              {{ plan.price }}<span class="price-card__period">{{ plan.period }}</span>
+            </div>
+            <ul class="price-card__features">
+              @for (f of plan.features; track f) {
+                <li><span class="price-card__check">✓</span> {{ f }}</li>
+              }
+            </ul>
+            <button class="btn w-full" [class.btn--primary]="plan.popular" [class.btn--outline]="!plan.popular">
+              {{ plan.cta }}
+            </button>
+          </div>
         }
       </div>
     </div>
@@ -364,19 +366,19 @@
 
       <div class="testimonials__grid">
         @for (t of testimonials(); track t.name; let i = $index) {
-        <div class="testi-card reveal" [style.animation-delay.ms]="i * 100">
-          <div class="testi-card__quote">"</div>
-          <p class="testi-card__text">{{ t.quote }}</p>
-          <div class="testi-card__author">
-            <div class="testi-card__avatar" [style.background]="t.color + '22'" [style.color]="t.color">
-              {{ t.initials }}
-            </div>
-            <div>
-              <div class="testi-card__name">{{ t.name }}</div>
-              <div class="testi-card__role">{{ t.role }}</div>
+          <div class="testi-card reveal" [style.animation-delay.ms]="i * 100">
+            <div class="testi-card__quote">"</div>
+            <p class="testi-card__text">{{ t.quote }}</p>
+            <div class="testi-card__author">
+              <div class="testi-card__avatar" [style.background]="t.color + '22'" [style.color]="t.color">
+                {{ t.initials }}
+              </div>
+              <div>
+                <div class="testi-card__name">{{ t.name }}</div>
+                <div class="testi-card__role">{{ t.role }}</div>
+              </div>
             </div>
           </div>
-        </div>
         }
       </div>
     </div>
@@ -392,15 +394,15 @@
 
       <div class="faq__list">
         @for (item of faqs(); track item.q; let i = $index) {
-        <div class="faq-item reveal" [class.faq-item--open]="activeAccordionIdx() === i">
-          <button class="faq-item__btn" (click)="toggleAccordion(i)">
-            <span>{{ item.q }}</span>
-            <span class="faq-item__chevron">{{ activeAccordionIdx() === i ? '−' : '+' }}</span>
-          </button>
-          @if (activeAccordionIdx() === i) {
-          <div class="faq-item__body">{{ item.a }}</div>
-          }
-        </div>
+          <div class="faq-item reveal" [class.faq-item--open]="activeAccordionIdx() === i">
+            <button class="faq-item__btn" (click)="toggleAccordion(i)">
+              <span>{{ item.q }}</span>
+              <span class="faq-item__chevron">{{ activeAccordionIdx() === i ? '−' : '+' }}</span>
+            </button>
+            @if (activeAccordionIdx() === i) {
+              <div class="faq-item__body">{{ item.a }}</div>
+            }
+          </div>
         }
       </div>
     </div>

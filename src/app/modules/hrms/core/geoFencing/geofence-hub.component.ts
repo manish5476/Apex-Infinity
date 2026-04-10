@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { catchError, finalize, forkJoin, of, Subject } from 'rxjs';
 
@@ -28,20 +28,19 @@ import { takeUntil } from "rxjs/operators";
   selector: 'app-geofence-hub',
   standalone: true,
   imports: [
-    CommonModule, 
-    CardModule, 
-    ButtonModule, 
-    TagModule, 
+    CardModule,
+    ButtonModule,
+    TagModule,
     TabsModule,
-    SkeletonModule, 
-    TooltipModule, 
-    ConfirmDialogModule, 
-    IconFieldModule, 
-    InputIconModule, 
+    SkeletonModule,
+    TooltipModule,
+    ConfirmDialogModule,
+    IconFieldModule,
+    InputIconModule,
     InputTextModule,
     ToastModule,
     AgShareGrid
-  ],
+],
   providers: [MessageService, ConfirmationService, DatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `

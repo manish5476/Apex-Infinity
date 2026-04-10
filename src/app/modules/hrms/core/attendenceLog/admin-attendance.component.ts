@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { catchError, finalize, forkJoin, of, Subject } from 'rxjs';
 
@@ -32,26 +32,25 @@ import { takeUntil } from "rxjs/operators";
   selector: 'app-admin-attendance',
   standalone: true,
   imports: [
-    CommonModule, 
-    ReactiveFormsModule, 
+    ReactiveFormsModule,
     FormsModule,
-    CardModule, 
+    CardModule,
     ButtonModule,
-    TagModule, 
-    DialogModule, 
+    TagModule,
+    DialogModule,
     DatePickerModule,
     SelectModule,
-    SkeletonModule, 
-    TooltipModule, 
-    AvatarModule, 
+    SkeletonModule,
+    TooltipModule,
+    AvatarModule,
     ConfirmDialogModule,
-    IconFieldModule, 
-    InputIconModule, 
+    IconFieldModule,
+    InputIconModule,
     InputTextModule,
     ToastModule,
     InputTextModule,
     AgShareGrid
-  ],
+],
   providers: [MessageService, ConfirmationService, DatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `

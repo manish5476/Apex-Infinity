@@ -3,12 +3,12 @@
   <div #mapStage id="map-stage" class="absolute inset-0 z-0 fade-in-map"></div>
 
   @if(!map && locations.length > 0){
-  <div class="absolute inset-0 z-10 flex items-center justify-center bg-[#0a0a0f] z-[50]">
-    <div class="flex flex-col items-center gap-4">
-      <div class="w-10 h-10 border-2 border-rose-500 border-t-transparent rounded-full animate-spin"></div>
-      <p class="text-xs text-gray-500 uppercase tracking-widest">Initializing Map...</p>
+    <div class="absolute inset-0 z-10 flex items-center justify-center bg-[#0a0a0f] z-[50]">
+      <div class="flex flex-col items-center gap-4">
+        <div class="w-10 h-10 border-2 border-rose-500 border-t-transparent rounded-full animate-spin"></div>
+        <p class="text-xs text-gray-500 uppercase tracking-widest">Initializing Map...</p>
+      </div>
     </div>
-  </div>
   }
 
   <div class="absolute top-6 right-6 z-[60] flex gap-2">
@@ -52,137 +52,145 @@
           [ngClass]="currentStyle === 'light' 
             ? 'bg-white/80 border-gray-300 text-slate-800 placeholder-gray-500 focus:border-rose-500' 
             : 'bg-white/10 border-white/10 text-white placeholder-white/50 focus:bg-white/20 focus:border-rose-500/50'" />
-        <i class="pi pi-search absolute left-4 top-1/2 -translate-y-1/2 transition-colors"
+          <i class="pi pi-search absolute left-4 top-1/2 -translate-y-1/2 transition-colors"
           [ngClass]="currentStyle === 'light' ? 'text-gray-500' : 'text-white/50'"></i>
+        </div>
+
       </div>
-
     </div>
-  </div>
 
-  <div
-    class="absolute bottom-0 left-0 w-full z-30 pb-8 pt-24 bg-gradient-to-t pointer-events-none transition-colors duration-500"
-    [ngClass]="currentStyle === 'light' ? 'from-white via-white/80' : 'from-[#0a0a0f] via-[#0a0a0f]/95'">
+    <div
+      class="absolute bottom-0 left-0 w-full z-30 pb-8 pt-24 bg-gradient-to-t pointer-events-none transition-colors duration-500"
+      [ngClass]="currentStyle === 'light' ? 'from-white via-white/80' : 'from-[#0a0a0f] via-[#0a0a0f]/95'">
 
-    <div class="relative pointer-events-auto">
+      <div class="relative pointer-events-auto">
 
-      <button *ngIf="filteredLocations.length > 1" (click)="scrollCards(-1)"
-        class="absolute left-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full backdrop-blur-md border flex items-center justify-center hover:scale-110 transition-all hidden md:flex shadow-lg"
-        [ngClass]="currentStyle === 'light' ? 'bg-white text-slate-700 border-gray-200' : 'bg-white/10 text-white border-white/10'">
-        <i class="pi pi-chevron-left"></i>
-      </button>
+        @if (filteredLocations.length > 1) {
+          <button (click)="scrollCards(-1)"
+            class="absolute left-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full backdrop-blur-md border flex items-center justify-center hover:scale-110 transition-all hidden md:flex shadow-lg"
+            [ngClass]="currentStyle === 'light' ? 'bg-white text-slate-700 border-gray-200' : 'bg-white/10 text-white border-white/10'">
+            <i class="pi pi-chevron-left"></i>
+          </button>
+        }
 
-      <button *ngIf="filteredLocations.length > 1" (click)="scrollCards(1)"
-        class="absolute right-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full backdrop-blur-md border flex items-center justify-center hover:scale-110 transition-all hidden md:flex shadow-lg"
-        [ngClass]="currentStyle === 'light' ? 'bg-white text-slate-700 border-gray-200' : 'bg-white/10 text-white border-white/10'">
-        <i class="pi pi-chevron-right"></i>
-      </button>
+        @if (filteredLocations.length > 1) {
+          <button (click)="scrollCards(1)"
+            class="absolute right-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full backdrop-blur-md border flex items-center justify-center hover:scale-110 transition-all hidden md:flex shadow-lg"
+            [ngClass]="currentStyle === 'light' ? 'bg-white text-slate-700 border-gray-200' : 'bg-white/10 text-white border-white/10'">
+            <i class="pi pi-chevron-right"></i>
+          </button>
+        }
 
-      <div #cardsContainer
-        class="flex gap-6 overflow-x-auto px-6 md:px-16 pb-4 scroll-smooth custom-scrollbar snap-x snap-mandatory">
+        <div #cardsContainer
+          class="flex gap-6 overflow-x-auto px-6 md:px-16 pb-4 scroll-smooth custom-scrollbar snap-x snap-mandatory">
 
-        @for (loc of filteredLocations; track loc._id) {
-        <div [id]="'card-' + loc._id" (click)="selectLocation(loc)"
-          class="group/card relative flex-shrink-0 w-[85vw] md:w-[380px] snap-center cursor-pointer transition-all duration-500"
+          @for (loc of filteredLocations; track loc._id) {
+            <div [id]="'card-' + loc._id" (click)="selectLocation(loc)"
+              class="group/card relative flex-shrink-0 w-[85vw] md:w-[380px] snap-center cursor-pointer transition-all duration-500"
           [ngClass]="{
               'scale-100 opacity-100 z-10': selectedBranch?._id === loc._id,
               'scale-95 opacity-70 hover:opacity-100': selectedBranch?._id !== loc._id
             }">
 
-          <div
-            class="relative backdrop-blur-xl border rounded-2xl p-5 overflow-hidden transition-all duration-300 hover:shadow-2xl"
+              <div
+                class="relative backdrop-blur-xl border rounded-2xl p-5 overflow-hidden transition-all duration-300 hover:shadow-2xl"
             [ngClass]="currentStyle === 'light' 
                    ? 'bg-white/95 border-gray-200 shadow-md text-slate-800' 
                    : 'bg-[#1a1a20]/90 border-white/10 text-white'">
 
-            <div *ngIf="selectedBranch?._id === loc._id"
-              class="absolute -inset-1 bg-gradient-to-r from-rose-500/30 to-purple-500/30 blur-xl opacity-60"></div>
+                @if (selectedBranch?._id === loc._id) {
+                  <div
+                  class="absolute -inset-1 bg-gradient-to-r from-rose-500/30 to-purple-500/30 blur-xl opacity-60"></div>
+                }
 
-            <div class="relative z-10">
-              <div class="flex justify-between items-start mb-3">
-                <h3 class="text-lg font-bold">{{ loc.name }}</h3>
-                <span *ngIf="loc.isMainBranch"
-                  class="bg-amber-500/10 text-amber-500 border border-amber-500/20 text-[10px] font-bold uppercase px-2 py-0.5 rounded">HQ</span>
-              </div>
+                <div class="relative z-10">
+                  <div class="flex justify-between items-start mb-3">
+                    <h3 class="text-lg font-bold">{{ loc.name }}</h3>
+                    @if (loc.isMainBranch) {
+                      <span
+                      class="bg-amber-500/10 text-amber-500 border border-amber-500/20 text-[10px] font-bold uppercase px-2 py-0.5 rounded">HQ</span>
+                    }
+                  </div>
 
-              <p class="text-sm flex items-center gap-1 mb-4"
-                [ngClass]="currentStyle === 'light' ? 'text-slate-500' : 'text-slate-400'">
-                <i class="pi pi-map-marker text-rose-500"></i> {{ loc.address.city }}, {{ loc.address.state }}
-              </p>
+                  <p class="text-sm flex items-center gap-1 mb-4"
+                    [ngClass]="currentStyle === 'light' ? 'text-slate-500' : 'text-slate-400'">
+                    <i class="pi pi-map-marker text-rose-500"></i> {{ loc.address.city }}, {{ loc.address.state }}
+                  </p>
 
-              <div class="flex items-center justify-between border-t pt-3"
-                [ngClass]="currentStyle === 'light' ? 'border-gray-100' : 'border-white/10'">
-                <span class="text-xs font-mono"
-                  [ngClass]="currentStyle === 'light' ? 'text-slate-400' : 'text-slate-500'">{{ loc.phoneNumber || 'No
-                  Contact' }}</span>
+                  <div class="flex items-center justify-between border-t pt-3"
+                    [ngClass]="currentStyle === 'light' ? 'border-gray-100' : 'border-white/10'">
+                    <span class="text-xs font-mono"
+                      [ngClass]="currentStyle === 'light' ? 'text-slate-400' : 'text-slate-500'">{{ loc.phoneNumber || 'No
+                    Contact' }}</span>
 
-                <button (click)="$event.stopPropagation(); getDirections(loc)"
-                  class="w-8 h-8 rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-md"
-                  [ngClass]="currentStyle === 'light' ? 'bg-slate-900 text-white' : 'bg-white text-black'">
-                  <i class="pi pi-directions text-xs font-bold"></i>
-                </button>
+                    <button (click)="$event.stopPropagation(); getDirections(loc)"
+                      class="w-8 h-8 rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-md"
+                      [ngClass]="currentStyle === 'light' ? 'bg-slate-900 text-white' : 'bg-white text-black'">
+                      <i class="pi pi-directions text-xs font-bold"></i>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-        }
+          }
 
+        </div>
       </div>
     </div>
-  </div>
 
-</section>
-<!-- <section class="relative w-full h-[90vh] bg-[#0a0a0f] rounded-2xl overflow-hidden group/luxury-map font-sans">
-  
+  </section>
+  <!-- <section class="relative w-full h-[90vh] bg-[#0a0a0f] rounded-2xl overflow-hidden group/luxury-map font-sans">
+
   <div #mapStage id="map-stage" class="absolute inset-0 z-0 fade-in-map"></div>
-  
+
   <div *ngIf="!map && locations.length > 0" class="absolute inset-0 z-10 flex items-center justify-center bg-[#0a0a0f] z-[100]">
     <div class="flex flex-col items-center gap-4">
-        <div class="w-10 h-10 border-2 border-rose-500 border-t-transparent rounded-full animate-spin"></div>
-        <p class="text-xs text-gray-500 uppercase tracking-widest">Loading Map...</p>
+      <div class="w-10 h-10 border-2 border-rose-500 border-t-transparent rounded-full animate-spin"></div>
+      <p class="text-xs text-gray-500 uppercase tracking-widest">Loading Map...</p>
     </div>
   </div>
 
   <div *ngIf="!map && locations.length === 0" class="absolute inset-0 z-10 flex items-center justify-center bg-[#0a0a0f] z-[100]">
     <p class="text-white text-sm">No location data available.</p>
   </div>
-  
+
   <div class="absolute top-6 right-6 z-30 flex gap-2">
-    <button 
-        (click)="setMapStyle('dark')" 
-        class="h-8 px-3 rounded-lg text-xs font-bold uppercase tracking-wider border transition-all"
-        [ngClass]="currentStyle === 'dark' ? 'bg-rose-600 border-rose-600 text-white shadow-lg shadow-rose-900/50' : 'bg-black/40 border-white/10 text-gray-400 backdrop-blur-md hover:bg-black/60'">
-        Dark
+    <button
+      (click)="setMapStyle('dark')"
+      class="h-8 px-3 rounded-lg text-xs font-bold uppercase tracking-wider border transition-all"
+      [ngClass]="currentStyle === 'dark' ? 'bg-rose-600 border-rose-600 text-white shadow-lg shadow-rose-900/50' : 'bg-black/40 border-white/10 text-gray-400 backdrop-blur-md hover:bg-black/60'">
+      Dark
     </button>
-    <button 
-        (click)="setMapStyle('light')" 
-        class="h-8 px-3 rounded-lg text-xs font-bold uppercase tracking-wider border transition-all"
-        [ngClass]="currentStyle === 'light' ? 'bg-white border-white text-black shadow-lg' : 'bg-black/40 border-white/10 text-gray-400 backdrop-blur-md hover:bg-black/60'">
-        Light
+    <button
+      (click)="setMapStyle('light')"
+      class="h-8 px-3 rounded-lg text-xs font-bold uppercase tracking-wider border transition-all"
+      [ngClass]="currentStyle === 'light' ? 'bg-white border-white text-black shadow-lg' : 'bg-black/40 border-white/10 text-gray-400 backdrop-blur-md hover:bg-black/60'">
+      Light
     </button>
-    <button 
-        (click)="setMapStyle('satellite')" 
-        class="h-8 px-3 rounded-lg text-xs font-bold uppercase tracking-wider border transition-all"
-        [ngClass]="currentStyle === 'satellite' ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-900/50' : 'bg-black/40 border-white/10 text-gray-400 backdrop-blur-md hover:bg-black/60'">
-        Sat
+    <button
+      (click)="setMapStyle('satellite')"
+      class="h-8 px-3 rounded-lg text-xs font-bold uppercase tracking-wider border transition-all"
+      [ngClass]="currentStyle === 'satellite' ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-900/50' : 'bg-black/40 border-white/10 text-gray-400 backdrop-blur-md hover:bg-black/60'">
+      Sat
     </button>
   </div>
 
   <div class="absolute top-6 left-6 md:left-12 z-20 w-full pr-12 pointer-events-none">
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pointer-events-auto">
-            <div>
+      <div>
         <h2 class="font-serif text-3xl md:text-4xl font-bold tracking-tight transition-colors duration-500"
-            [ngClass]="currentStyle === 'light' ? 'text-slate-900' : 'text-white'">
+          [ngClass]="currentStyle === 'light' ? 'text-slate-900' : 'text-white'">
           {{ config.title || 'Global Presence' }}
         </h2>
         <div class="flex items-center gap-3 mt-2">
           <span class="w-10 h-[2px] bg-gradient-to-r from-rose-500 to-pink-500"></span>
           <p class="text-sm font-semibold uppercase tracking-[0.2em] transition-colors duration-500"
-             [ngClass]="currentStyle === 'light' ? 'text-rose-600' : 'text-rose-300'">
+            [ngClass]="currentStyle === 'light' ? 'text-rose-600' : 'text-rose-300'">
             {{ filteredLocations.length }} Exclusive Locations
           </p>
         </div>
       </div>
-      
+
       <div class="relative w-full max-w-md">
         <input
           [(ngModel)]="searchQuery"
@@ -193,116 +201,116 @@
           [ngClass]="currentStyle === 'light' 
             ? 'bg-white/80 border-gray-200 text-slate-800 placeholder-gray-400 focus:border-rose-500' 
             : 'bg-white/10 border-white/10 text-white placeholder-white/50 focus:bg-white/20 focus:border-rose-500/50'"
-        />
-        <i class="pi pi-search absolute left-4 top-1/2 -translate-y-1/2 transition-colors"
-           [ngClass]="currentStyle === 'light' ? 'text-gray-400' : 'text-white/50'"></i>
-        <button *ngIf="searchQuery" (click)="clearSearch()" class="absolute right-4 top-1/2 -translate-y-1/2 hover:text-rose-500 transition-colors"
-                [ngClass]="currentStyle === 'light' ? 'text-gray-400' : 'text-white/50'">
-          <i class="pi pi-times"></i>
-        </button>
+          />
+          <i class="pi pi-search absolute left-4 top-1/2 -translate-y-1/2 transition-colors"
+          [ngClass]="currentStyle === 'light' ? 'text-gray-400' : 'text-white/50'"></i>
+          <button *ngIf="searchQuery" (click)="clearSearch()" class="absolute right-4 top-1/2 -translate-y-1/2 hover:text-rose-500 transition-colors"
+            [ngClass]="currentStyle === 'light' ? 'text-gray-400' : 'text-white/50'">
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+
       </div>
-
     </div>
-  </div>
-  
-  <div class="absolute bottom-0 left-0 w-full z-30 pb-8 pt-24 bg-gradient-to-t pointer-events-none transition-colors duration-500"
-       [ngClass]="currentStyle === 'light' ? 'from-white via-white/95' : 'from-[#0a0a0f] via-[#0a0a0f]/95'">
-    
-    <div class="relative pointer-events-auto">
-      
-      <button *ngIf="filteredLocations.length > 1" (click)="scrollCards(-1)" 
-              class="absolute left-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full backdrop-blur-md border flex items-center justify-center hover:bg-rose-500 hover:border-rose-500 hover:text-white transition-all hidden md:flex"
-              [ngClass]="currentStyle === 'light' ? 'bg-white/80 border-gray-200 text-slate-600' : 'bg-white/10 border-white/10 text-white'">
-        <i class="pi pi-chevron-left"></i>
-      </button>
-      
-      <button *ngIf="filteredLocations.length > 1" (click)="scrollCards(1)" 
-              class="absolute right-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full backdrop-blur-md border flex items-center justify-center hover:bg-rose-500 hover:border-rose-500 hover:text-white transition-all hidden md:flex"
-              [ngClass]="currentStyle === 'light' ? 'bg-white/80 border-gray-200 text-slate-600' : 'bg-white/10 border-white/10 text-white'">
-        <i class="pi pi-chevron-right"></i>
-      </button>
 
-      <div #cardsContainer class="flex gap-6 overflow-x-auto px-6 md:px-16 pb-4 scroll-smooth custom-scrollbar snap-x snap-mandatory">
-        
-        @for (loc of filteredLocations; track loc._id) {
-          <div 
-            [id]="'card-' + loc._id"
-            (click)="selectLocation(loc)"
-            class="group/card relative flex-shrink-0 w-[85vw] md:w-[400px] snap-center cursor-pointer transition-all duration-500"
+    <div class="absolute bottom-0 left-0 w-full z-30 pb-8 pt-24 bg-gradient-to-t pointer-events-none transition-colors duration-500"
+      [ngClass]="currentStyle === 'light' ? 'from-white via-white/95' : 'from-[#0a0a0f] via-[#0a0a0f]/95'">
+
+      <div class="relative pointer-events-auto">
+
+        <button *ngIf="filteredLocations.length > 1" (click)="scrollCards(-1)"
+          class="absolute left-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full backdrop-blur-md border flex items-center justify-center hover:bg-rose-500 hover:border-rose-500 hover:text-white transition-all hidden md:flex"
+          [ngClass]="currentStyle === 'light' ? 'bg-white/80 border-gray-200 text-slate-600' : 'bg-white/10 border-white/10 text-white'">
+          <i class="pi pi-chevron-left"></i>
+        </button>
+
+        <button *ngIf="filteredLocations.length > 1" (click)="scrollCards(1)"
+          class="absolute right-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full backdrop-blur-md border flex items-center justify-center hover:bg-rose-500 hover:border-rose-500 hover:text-white transition-all hidden md:flex"
+          [ngClass]="currentStyle === 'light' ? 'bg-white/80 border-gray-200 text-slate-600' : 'bg-white/10 border-white/10 text-white'">
+          <i class="pi pi-chevron-right"></i>
+        </button>
+
+        <div #cardsContainer class="flex gap-6 overflow-x-auto px-6 md:px-16 pb-4 scroll-smooth custom-scrollbar snap-x snap-mandatory">
+
+          @for (loc of filteredLocations; track loc._id) {
+            <div
+              [id]="'card-' + loc._id"
+              (click)="selectLocation(loc)"
+              class="group/card relative flex-shrink-0 w-[85vw] md:w-[400px] snap-center cursor-pointer transition-all duration-500"
             [ngClass]="{
               'scale-100 opacity-100 z-10': selectedBranch?._id === loc._id,
               'scale-95 opacity-60 hover:opacity-90': selectedBranch?._id !== loc._id
             }">
-            
-            <div class="relative backdrop-blur-xl border rounded-2xl p-6 overflow-hidden transition-all duration-300 hover:shadow-xl"
+
+              <div class="relative backdrop-blur-xl border rounded-2xl p-6 overflow-hidden transition-all duration-300 hover:shadow-xl"
                  [ngClass]="currentStyle === 'light' 
                    ? 'bg-white/90 border-gray-200 shadow-sm hover:border-rose-500/30 text-slate-800' 
                    : 'bg-[#1a1a20]/80 border-white/10 hover:border-rose-500/30 text-white'">
-              
-              <div *ngIf="selectedBranch?._id === loc._id" class="absolute -inset-1 bg-gradient-to-r from-rose-500/20 to-purple-500/20 blur-xl opacity-50"></div>
-              
-              <div class="relative z-10">
-                <div class="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 class="text-xl font-bold mb-1">{{ loc.name }}</h3>
-                    <p class="text-sm flex items-center gap-1"
-                       [ngClass]="currentStyle === 'light' ? 'text-gray-500' : 'text-gray-400'">
-                      <i class="pi pi-map-marker text-rose-500"></i> {{ loc.address.city }}, {{ loc.address.state }}
-                    </p>
-                  </div>
-                  <span *ngIf="loc.isMainBranch" class="bg-amber-500/10 text-amber-500 border border-amber-500/20 text-[10px] font-bold uppercase px-2 py-1 rounded">HQ</span>
-                </div>
 
-                <div class="grid grid-cols-2 gap-4 mb-6 border-t pt-4"
-                     [ngClass]="currentStyle === 'light' ? 'border-gray-100' : 'border-white/5'">
-                  <div>
-                    <p class="text-xs uppercase tracking-wide mb-1" [ngClass]="currentStyle === 'light' ? 'text-gray-400' : 'text-gray-500'">Contact</p>
-                    <p class="text-sm">{{ loc.phoneNumber || 'N/A' }}</p>
-                  </div>
-                  <div>
-                    <p class="text-xs uppercase tracking-wide mb-1" [ngClass]="currentStyle === 'light' ? 'text-gray-400' : 'text-gray-500'">Hours</p>
-                    <p class="text-sm text-emerald-500">{{ loc.openingHours || '09:00 - 18:00' }}</p>
-                  </div>
-                </div>
+                <div *ngIf="selectedBranch?._id === loc._id" class="absolute -inset-1 bg-gradient-to-r from-rose-500/20 to-purple-500/20 blur-xl opacity-50"></div>
 
-                <div class="flex items-center justify-between">
-                  <div class="flex gap-2">
-                    @for(tag of loc.features?.slice(0,2); track tag) {
-                      <span class="text-[10px] px-2 py-1 rounded border"
-                            [ngClass]="currentStyle === 'light' ? 'bg-gray-100 border-gray-200 text-gray-500' : 'bg-white/5 border-white/5 text-gray-400'">{{ tag }}</span>
-                    }
+                <div class="relative z-10">
+                  <div class="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 class="text-xl font-bold mb-1">{{ loc.name }}</h3>
+                      <p class="text-sm flex items-center gap-1"
+                        [ngClass]="currentStyle === 'light' ? 'text-gray-500' : 'text-gray-400'">
+                        <i class="pi pi-map-marker text-rose-500"></i> {{ loc.address.city }}, {{ loc.address.state }}
+                      </p>
+                    </div>
+                    <span *ngIf="loc.isMainBranch" class="bg-amber-500/10 text-amber-500 border border-amber-500/20 text-[10px] font-bold uppercase px-2 py-1 rounded">HQ</span>
                   </div>
-                  <button 
-                    (click)="$event.stopPropagation(); getDirections(loc)"
-                    class="w-10 h-10 rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-lg"
-                    [ngClass]="currentStyle === 'light' ? 'bg-slate-900 text-white' : 'bg-white text-black'">
-                    <i class="pi pi-directions font-bold"></i>
-                  </button>
+
+                  <div class="grid grid-cols-2 gap-4 mb-6 border-t pt-4"
+                    [ngClass]="currentStyle === 'light' ? 'border-gray-100' : 'border-white/5'">
+                    <div>
+                      <p class="text-xs uppercase tracking-wide mb-1" [ngClass]="currentStyle === 'light' ? 'text-gray-400' : 'text-gray-500'">Contact</p>
+                      <p class="text-sm">{{ loc.phoneNumber || 'N/A' }}</p>
+                    </div>
+                    <div>
+                      <p class="text-xs uppercase tracking-wide mb-1" [ngClass]="currentStyle === 'light' ? 'text-gray-400' : 'text-gray-500'">Hours</p>
+                      <p class="text-sm text-emerald-500">{{ loc.openingHours || '09:00 - 18:00' }}</p>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center justify-between">
+                    <div class="flex gap-2">
+                      @for(tag of loc.features?.slice(0,2); track tag) {
+                        <span class="text-[10px] px-2 py-1 rounded border"
+                        [ngClass]="currentStyle === 'light' ? 'bg-gray-100 border-gray-200 text-gray-500' : 'bg-white/5 border-white/5 text-gray-400'">{{ tag }}</span>
+                      }
+                    </div>
+                    <button
+                      (click)="$event.stopPropagation(); getDirections(loc)"
+                      class="w-10 h-10 rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-lg"
+                      [ngClass]="currentStyle === 'light' ? 'bg-slate-900 text-white' : 'bg-white text-black'">
+                      <i class="pi pi-directions font-bold"></i>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        }
+          }
 
+        </div>
       </div>
     </div>
-  </div>
 
-</section> -->
+  </section> -->
 
-<!-- <section class="relative w-full h-[90vh] bg-[#0a0a0f] rounded-2xl overflow-hidden group/luxury-map font-sans">
-  
+  <!-- <section class="relative w-full h-[90vh] bg-[#0a0a0f] rounded-2xl overflow-hidden group/luxury-map font-sans">
+
   <div #mapStage id="map-stage" class="absolute inset-0 z-0 fade-in-map"></div>
-  
+
   <div *ngIf="!map" class="absolute inset-0 z-10 flex items-center justify-center bg-[#0a0a0f]">
     <div class="w-10 h-10 border-2 border-rose-500 border-t-transparent rounded-full animate-spin"></div>
   </div>
-  
+
   <div class="absolute top-0 left-0 right-0 h-48 bg-gradient-to-b from-[#0a0a0f] via-[#0a0a0f]/80 to-transparent pointer-events-none z-10"></div>
-  
+
   <div class="absolute top-6 left-6 md:left-12 z-20 w-full pr-12 pointer-events-none">
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pointer-events-auto">
-      
+
       <div>
         <h2 class="font-serif text-3xl md:text-4xl text-white font-bold tracking-tight">
           {{ config.title || 'Global Presence' }}
@@ -314,7 +322,7 @@
           </p>
         </div>
       </div>
-      
+
       <div class="relative w-full max-w-md">
         <input
           [(ngModel)]="searchQuery"
@@ -322,120 +330,120 @@
           type="text"
           placeholder="Search city, state, or branch..."
           class="w-full bg-white/10 backdrop-blur-xl border border-white/10 rounded-full py-3 px-6 pl-12 text-white placeholder-white/50 focus:outline-none focus:bg-white/20 focus:border-rose-500/50 transition-all shadow-lg"
-        />
-        <i class="pi pi-search absolute left-4 top-1/2 -translate-y-1/2 text-white/50"></i>
-        <button *ngIf="searchQuery" (click)="clearSearch()" class="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white">
-          <i class="pi pi-times"></i>
-        </button>
+          />
+          <i class="pi pi-search absolute left-4 top-1/2 -translate-y-1/2 text-white/50"></i>
+          <button *ngIf="searchQuery" (click)="clearSearch()" class="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white">
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+
       </div>
-
     </div>
-  </div>
-  
-  <div class="absolute bottom-0 left-0 w-full z-30 pb-8 pt-24 bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/95 to-transparent pointer-events-none">
-    
-    <div class="relative pointer-events-auto">
-      
-      <button *ngIf="filteredLocations.length > 1" (click)="scrollCards(-1)" class="absolute left-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white flex items-center justify-center hover:bg-rose-500 hover:border-rose-500 transition-all hidden md:flex">
-        <i class="pi pi-chevron-left"></i>
-      </button>
-      
-      <button *ngIf="filteredLocations.length > 1" (click)="scrollCards(1)" class="absolute right-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white flex items-center justify-center hover:bg-rose-500 hover:border-rose-500 transition-all hidden md:flex">
-        <i class="pi pi-chevron-right"></i>
-      </button>
 
-      <div #cardsContainer class="flex gap-6 overflow-x-auto px-6 md:px-16 pb-4 scroll-smooth custom-scrollbar snap-x snap-mandatory">
-        
-        @for (loc of filteredLocations; track loc._id) {
-          <div 
-            [id]="'card-' + loc._id"
-            (click)="selectLocation(loc)"
-            class="group/card relative flex-shrink-0 w-[85vw] md:w-[400px] snap-center cursor-pointer transition-all duration-500"
+    <div class="absolute bottom-0 left-0 w-full z-30 pb-8 pt-24 bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/95 to-transparent pointer-events-none">
+
+      <div class="relative pointer-events-auto">
+
+        <button *ngIf="filteredLocations.length > 1" (click)="scrollCards(-1)" class="absolute left-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white flex items-center justify-center hover:bg-rose-500 hover:border-rose-500 transition-all hidden md:flex">
+          <i class="pi pi-chevron-left"></i>
+        </button>
+
+        <button *ngIf="filteredLocations.length > 1" (click)="scrollCards(1)" class="absolute right-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white flex items-center justify-center hover:bg-rose-500 hover:border-rose-500 transition-all hidden md:flex">
+          <i class="pi pi-chevron-right"></i>
+        </button>
+
+        <div #cardsContainer class="flex gap-6 overflow-x-auto px-6 md:px-16 pb-4 scroll-smooth custom-scrollbar snap-x snap-mandatory">
+
+          @for (loc of filteredLocations; track loc._id) {
+            <div
+              [id]="'card-' + loc._id"
+              (click)="selectLocation(loc)"
+              class="group/card relative flex-shrink-0 w-[85vw] md:w-[400px] snap-center cursor-pointer transition-all duration-500"
             [ngClass]="{
               'scale-100 opacity-100 z-10': selectedBranch?._id === loc._id,
               'scale-95 opacity-60 hover:opacity-90': selectedBranch?._id !== loc._id
             }">
-            
-            <div class="relative bg-[#1a1a20]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 overflow-hidden hover:border-rose-500/30 transition-all duration-300">
-              
-              <div *ngIf="selectedBranch?._id === loc._id" class="absolute -inset-1 bg-gradient-to-r from-rose-500/20 to-purple-500/20 blur-xl opacity-50"></div>
-              
-              <div class="relative z-10">
-                <div class="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 class="text-xl font-bold text-white mb-1">{{ loc.name }}</h3>
-                    <p class="text-sm text-gray-400 flex items-center gap-1">
-                      <i class="pi pi-map-marker text-rose-500"></i> {{ loc.address.city }}, {{ loc.address.state }}
-                    </p>
-                  </div>
-                  
-                  <span *ngIf="loc.isMainBranch" class="bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] font-bold uppercase px-2 py-1 rounded">
-                    HQ
-                  </span>
-                </div>
 
-                <div class="grid grid-cols-2 gap-4 mb-6 border-t border-white/5 pt-4">
-                  <div>
-                    <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Contact</p>
-                    <p class="text-sm text-gray-300">{{ loc.phoneNumber || 'N/A' }}</p>
-                  </div>
-                  <div>
-                    <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Hours</p>
-                    <p class="text-sm text-emerald-400">{{ loc.openingHours || '09:00 - 18:00' }}</p>
-                  </div>
-                </div>
+              <div class="relative bg-[#1a1a20]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 overflow-hidden hover:border-rose-500/30 transition-all duration-300">
 
-                <div class="flex items-center justify-between">
-                  <div class="flex gap-2">
-                    @for(tag of loc.features?.slice(0,2); track tag) {
-                      <span class="text-[10px] bg-white/5 text-gray-400 px-2 py-1 rounded border border-white/5">{{ tag }}</span>
-                    }
+                <div *ngIf="selectedBranch?._id === loc._id" class="absolute -inset-1 bg-gradient-to-r from-rose-500/20 to-purple-500/20 blur-xl opacity-50"></div>
+
+                <div class="relative z-10">
+                  <div class="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 class="text-xl font-bold text-white mb-1">{{ loc.name }}</h3>
+                      <p class="text-sm text-gray-400 flex items-center gap-1">
+                        <i class="pi pi-map-marker text-rose-500"></i> {{ loc.address.city }}, {{ loc.address.state }}
+                      </p>
+                    </div>
+
+                    <span *ngIf="loc.isMainBranch" class="bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] font-bold uppercase px-2 py-1 rounded">
+                      HQ
+                    </span>
                   </div>
-                  
-                  <button 
-                    (click)="$event.stopPropagation(); getDirections(loc)"
-                    class="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center hover:scale-110 transition-transform shadow-lg shadow-white/10">
-                    <i class="pi pi-directions font-bold"></i>
-                  </button>
+
+                  <div class="grid grid-cols-2 gap-4 mb-6 border-t border-white/5 pt-4">
+                    <div>
+                      <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Contact</p>
+                      <p class="text-sm text-gray-300">{{ loc.phoneNumber || 'N/A' }}</p>
+                    </div>
+                    <div>
+                      <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Hours</p>
+                      <p class="text-sm text-emerald-400">{{ loc.openingHours || '09:00 - 18:00' }}</p>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center justify-between">
+                    <div class="flex gap-2">
+                      @for(tag of loc.features?.slice(0,2); track tag) {
+                        <span class="text-[10px] bg-white/5 text-gray-400 px-2 py-1 rounded border border-white/5">{{ tag }}</span>
+                      }
+                    </div>
+
+                    <button
+                      (click)="$event.stopPropagation(); getDirections(loc)"
+                      class="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center hover:scale-110 transition-transform shadow-lg shadow-white/10">
+                      <i class="pi pi-directions font-bold"></i>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        }
+          }
 
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="absolute top-6 right-6 z-20 hidden lg:block">
-    <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4 flex gap-6">
-      <div class="text-center px-2">
-        <p class="text-2xl font-bold text-white">{{ locations.length }}</p>
-        <p class="text-[10px] text-gray-400 uppercase tracking-wider">Locations</p>
-      </div>
-      <div class="w-px bg-white/10 h-10 my-auto"></div>
-      <div class="text-center px-2">
-        <p class="text-2xl font-bold text-white">Global</p>
-        <p class="text-[10px] text-gray-400 uppercase tracking-wider">Reach</p>
+    <div class="absolute top-6 right-6 z-20 hidden lg:block">
+      <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4 flex gap-6">
+        <div class="text-center px-2">
+          <p class="text-2xl font-bold text-white">{{ locations.length }}</p>
+          <p class="text-[10px] text-gray-400 uppercase tracking-wider">Locations</p>
+        </div>
+        <div class="w-px bg-white/10 h-10 my-auto"></div>
+        <div class="text-center px-2">
+          <p class="text-2xl font-bold text-white">Global</p>
+          <p class="text-[10px] text-gray-400 uppercase tracking-wider">Reach</p>
+        </div>
       </div>
     </div>
-  </div>
 
-</section> -->
+  </section> -->
 
-<!-- <section class="relative w-full h-[90vh] bg-[#0a0a0f] rounded-2xl overflow-hidden group/luxury-map font-sans">
-  
+  <!-- <section class="relative w-full h-[90vh] bg-[#0a0a0f] rounded-2xl overflow-hidden group/luxury-map font-sans">
+
   <div #mapStage id="map-stage" class="absolute inset-0 z-0"></div>
-  
+
   <div *ngIf="!map" class="absolute inset-0 z-10 flex items-center justify-center bg-[#0a0a0f]">
     <div class="w-10 h-10 border-2 border-rose-500 border-t-transparent rounded-full animate-spin"></div>
   </div>
-  
+
   <div class="absolute top-0 left-0 right-0 h-48 bg-gradient-to-b from-[#0a0a0f] via-[#0a0a0f]/80 to-transparent pointer-events-none z-10"></div>
-  
+
   <div class="absolute top-6 left-6 md:left-12 z-20 w-full pr-12 pointer-events-none">
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pointer-events-auto">
-      
+
       <div>
         <h2 class="font-serif text-3xl md:text-4xl text-white font-bold tracking-tight">
           {{ config.title || 'Global Presence' }}
@@ -447,7 +455,7 @@
           </p>
         </div>
       </div>
-      
+
       <div class="relative w-full max-w-md">
         <input
           [(ngModel)]="searchQuery"
@@ -455,114 +463,114 @@
           type="text"
           placeholder="Search city, state, or branch..."
           class="w-full bg-white/10 backdrop-blur-xl border border-white/10 rounded-full py-3 px-6 pl-12 text-white placeholder-white/50 focus:outline-none focus:bg-white/20 focus:border-rose-500/50 transition-all shadow-lg"
-        />
-        <i class="pi pi-search absolute left-4 top-1/2 -translate-y-1/2 text-white/50"></i>
-        <button *ngIf="searchQuery" (click)="clearSearch()" class="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white">
-          <i class="pi pi-times"></i>
-        </button>
+          />
+          <i class="pi pi-search absolute left-4 top-1/2 -translate-y-1/2 text-white/50"></i>
+          <button *ngIf="searchQuery" (click)="clearSearch()" class="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white">
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+
       </div>
-
     </div>
-  </div>
-  
-  <div class="absolute bottom-0 left-0 w-full z-30 pb-8 pt-24 bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/95 to-transparent pointer-events-none">
-    
-    <div class="relative pointer-events-auto">
-      
-      <button *ngIf="filteredLocations.length > 1" (click)="scrollCards(-1)" class="absolute left-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white flex items-center justify-center hover:bg-rose-500 hover:border-rose-500 transition-all hidden md:flex">
-        <i class="pi pi-chevron-left"></i>
-      </button>
-      
-      <button *ngIf="filteredLocations.length > 1" (click)="scrollCards(1)" class="absolute right-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white flex items-center justify-center hover:bg-rose-500 hover:border-rose-500 transition-all hidden md:flex">
-        <i class="pi pi-chevron-right"></i>
-      </button>
 
-      <div #cardsContainer class="flex gap-6 overflow-x-auto px-6 md:px-16 pb-4 scroll-smooth custom-scrollbar snap-x snap-mandatory">
-        
-        @for (loc of filteredLocations; track loc._id) {
-          <div 
-            [id]="'card-' + loc._id"
-            (click)="selectLocation(loc)"
-            class="group/card relative flex-shrink-0 w-[85vw] md:w-[400px] snap-center cursor-pointer transition-all duration-500"
+    <div class="absolute bottom-0 left-0 w-full z-30 pb-8 pt-24 bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/95 to-transparent pointer-events-none">
+
+      <div class="relative pointer-events-auto">
+
+        <button *ngIf="filteredLocations.length > 1" (click)="scrollCards(-1)" class="absolute left-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white flex items-center justify-center hover:bg-rose-500 hover:border-rose-500 transition-all hidden md:flex">
+          <i class="pi pi-chevron-left"></i>
+        </button>
+
+        <button *ngIf="filteredLocations.length > 1" (click)="scrollCards(1)" class="absolute right-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white flex items-center justify-center hover:bg-rose-500 hover:border-rose-500 transition-all hidden md:flex">
+          <i class="pi pi-chevron-right"></i>
+        </button>
+
+        <div #cardsContainer class="flex gap-6 overflow-x-auto px-6 md:px-16 pb-4 scroll-smooth custom-scrollbar snap-x snap-mandatory">
+
+          @for (loc of filteredLocations; track loc._id) {
+            <div
+              [id]="'card-' + loc._id"
+              (click)="selectLocation(loc)"
+              class="group/card relative flex-shrink-0 w-[85vw] md:w-[400px] snap-center cursor-pointer transition-all duration-500"
             [ngClass]="{
               'scale-100 opacity-100 z-10': selectedBranch?._id === loc._id,
               'scale-95 opacity-60 hover:opacity-90': selectedBranch?._id !== loc._id
             }">
-            
-            <div class="relative bg-[#1a1a20]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 overflow-hidden hover:border-rose-500/30 transition-all duration-300">
-              
-              <div *ngIf="selectedBranch?._id === loc._id" class="absolute -inset-1 bg-gradient-to-r from-rose-500/20 to-purple-500/20 blur-xl opacity-50"></div>
-              
-              <div class="relative z-10">
-                <div class="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 class="text-xl font-bold text-white mb-1">{{ loc.name }}</h3>
-                    <p class="text-sm text-gray-400 flex items-center gap-1">
-                      <i class="pi pi-map-marker text-rose-500"></i> {{ loc.address.city }}, {{ loc.address.state }}
-                    </p>
-                  </div>
-                  
-                  <span *ngIf="loc.isMainBranch" class="bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] font-bold uppercase px-2 py-1 rounded">
-                    HQ
-                  </span>
-                </div>
 
-                <div class="grid grid-cols-2 gap-4 mb-6 border-t border-white/5 pt-4">
-                  <div>
-                    <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Contact</p>
-                    <p class="text-sm text-gray-300">{{ loc.phoneNumber || 'N/A' }}</p>
-                  </div>
-                  <div>
-                    <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Hours</p>
-                    <p class="text-sm text-emerald-400">{{ loc.openingHours || '09:00 - 18:00' }}</p>
-                  </div>
-                </div>
+              <div class="relative bg-[#1a1a20]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 overflow-hidden hover:border-rose-500/30 transition-all duration-300">
 
-                <div class="flex items-center justify-between">
-                  <div class="flex gap-2">
-                    @for(tag of loc.features?.slice(0,2); track tag) {
-                      <span class="text-[10px] bg-white/5 text-gray-400 px-2 py-1 rounded border border-white/5">{{ tag }}</span>
-                    }
+                <div *ngIf="selectedBranch?._id === loc._id" class="absolute -inset-1 bg-gradient-to-r from-rose-500/20 to-purple-500/20 blur-xl opacity-50"></div>
+
+                <div class="relative z-10">
+                  <div class="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 class="text-xl font-bold text-white mb-1">{{ loc.name }}</h3>
+                      <p class="text-sm text-gray-400 flex items-center gap-1">
+                        <i class="pi pi-map-marker text-rose-500"></i> {{ loc.address.city }}, {{ loc.address.state }}
+                      </p>
+                    </div>
+
+                    <span *ngIf="loc.isMainBranch" class="bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] font-bold uppercase px-2 py-1 rounded">
+                      HQ
+                    </span>
                   </div>
-                  
-                  <button 
-                    (click)="$event.stopPropagation(); getDirections(loc)"
-                    class="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center hover:scale-110 transition-transform shadow-lg shadow-white/10">
-                    <i class="pi pi-directions font-bold"></i>
-                  </button>
+
+                  <div class="grid grid-cols-2 gap-4 mb-6 border-t border-white/5 pt-4">
+                    <div>
+                      <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Contact</p>
+                      <p class="text-sm text-gray-300">{{ loc.phoneNumber || 'N/A' }}</p>
+                    </div>
+                    <div>
+                      <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Hours</p>
+                      <p class="text-sm text-emerald-400">{{ loc.openingHours || '09:00 - 18:00' }}</p>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center justify-between">
+                    <div class="flex gap-2">
+                      @for(tag of loc.features?.slice(0,2); track tag) {
+                        <span class="text-[10px] bg-white/5 text-gray-400 px-2 py-1 rounded border border-white/5">{{ tag }}</span>
+                      }
+                    </div>
+
+                    <button
+                      (click)="$event.stopPropagation(); getDirections(loc)"
+                      class="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center hover:scale-110 transition-transform shadow-lg shadow-white/10">
+                      <i class="pi pi-directions font-bold"></i>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        }
+          }
 
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="absolute top-6 right-6 z-20 hidden lg:block">
-    <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4 flex gap-6">
-      <div class="text-center px-2">
-        <p class="text-2xl font-bold text-white">{{ locations.length }}</p>
-        <p class="text-[10px] text-gray-400 uppercase tracking-wider">Locations</p>
-      </div>
-      <div class="w-px bg-white/10 h-10 my-auto"></div>
-      <div class="text-center px-2">
-        <p class="text-2xl font-bold text-white">Global</p>
-        <p class="text-[10px] text-gray-400 uppercase tracking-wider">Reach</p>
+    <div class="absolute top-6 right-6 z-20 hidden lg:block">
+      <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4 flex gap-6">
+        <div class="text-center px-2">
+          <p class="text-2xl font-bold text-white">{{ locations.length }}</p>
+          <p class="text-[10px] text-gray-400 uppercase tracking-wider">Locations</p>
+        </div>
+        <div class="w-px bg-white/10 h-10 my-auto"></div>
+        <div class="text-center px-2">
+          <p class="text-2xl font-bold text-white">Global</p>
+          <p class="text-[10px] text-gray-400 uppercase tracking-wider">Reach</p>
+        </div>
       </div>
     </div>
-  </div>
 
-</section> -->
+  </section> -->
 
-<!-- <section class="relative w-full h-[85vh] bg-[#1a1a1a] rounded-lg overflow-hidden group">
+  <!-- <section class="relative w-full h-[85vh] bg-[#1a1a1a] rounded-lg overflow-hidden group">
 
-  
+
   <div id="map-stage" class="absolute inset-0 z-0 opacity-0 animate-fade-in"></div>
 
   <div class="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-[#0f1216]/90 to-transparent pointer-events-none z-10"></div>
-  
+
   <div class="absolute top-8 left-6 md:left-12 z-20 pointer-events-none">
     <h2 class="font-serif text-3xl md:text-4xl text-white font-bold tracking-tight drop-shadow-lg">
       {{ config.title || 'Our Presence' }}
@@ -576,18 +584,18 @@
   </div>
 
   <div class="absolute bottom-0 left-0 w-full z-30 pb-8 pt-12 bg-gradient-to-t from-[#0f1216] via-[#0f1216]/80 to-transparent">
-    
-    <div #cardsContainer 
-         class="flex gap-6 overflow-x-auto px-6 md:px-12 pb-4 scroll-smooth no-scrollbar snap-x snap-mandatory">
-      
+
+    <div #cardsContainer
+      class="flex gap-6 overflow-x-auto px-6 md:px-12 pb-4 scroll-smooth no-scrollbar snap-x snap-mandatory">
+
       @for (loc of locations; track loc._id) {
         <div [id]="'card-' + loc._id"
-             (click)="selectLocation(loc)"
-             class="relative flex-shrink-0 w-[85vw] md:w-[380px] snap-center cursor-pointer group/card transition-all duration-500"
-             [ngClass]="selectedBranch === loc ? 'scale-100 opacity-100' : 'scale-95 opacity-70 hover:opacity-100'">
-          
+          (click)="selectLocation(loc)"
+          class="relative flex-shrink-0 w-[85vw] md:w-[380px] snap-center cursor-pointer group/card transition-all duration-500"
+          [ngClass]="selectedBranch === loc ? 'scale-100 opacity-100' : 'scale-95 opacity-70 hover:opacity-100'">
+
           <div class="relative bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl p-6 overflow-hidden hover:bg-white/15 transition-colors">
-            
+
             <div *ngIf="selectedBranch === loc" class="absolute inset-0 border-2 border-rose-500/50 rounded-2xl pointer-events-none"></div>
 
             <div class="flex justify-between items-start mb-4">
@@ -597,8 +605,8 @@
                   Headquarters
                 </span>
               </div>
-              <button (click)="$event.stopPropagation(); getDirections(loc)" 
-                      class="w-10 h-10 rounded-full bg-white text-slate-900 flex items-center justify-center hover:scale-110 transition-transform shadow-lg">
+              <button (click)="$event.stopPropagation(); getDirections(loc)"
+                class="w-10 h-10 rounded-full bg-white text-slate-900 flex items-center justify-center hover:scale-110 transition-transform shadow-lg">
                 <i class="pi pi-arrow-up-right text-lg font-bold"></i>
               </button>
             </div>

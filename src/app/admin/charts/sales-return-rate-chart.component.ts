@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ChartModule } from 'primeng/chart';
 import { TooltipModule } from 'primeng/tooltip';
 import { Subject, takeUntil } from 'rxjs';
@@ -8,7 +8,7 @@ import { ChartService } from '../chart.service';
 @Component({
   selector: 'app-sales-return-rate-chart',
   standalone: true,
-  imports: [CommonModule, ChartModule, TooltipModule],
+  imports: [ChartModule, TooltipModule],
   template: `
 <div class="srr-root">
   <div class="ambient" aria-hidden="true">

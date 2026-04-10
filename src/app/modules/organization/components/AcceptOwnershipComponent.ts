@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 
@@ -16,7 +16,7 @@ import { takeUntil } from "rxjs/operators";
 @Component({
   selector: 'app-accept-ownership',
   standalone: true,
-  imports: [CommonModule, ButtonModule, CardModule, ToastModule, ProgressSpinnerModule],
+  imports: [ButtonModule, CardModule, ToastModule, ProgressSpinnerModule],
   providers: [MessageService],
   template: `
     <div class="accept-container">

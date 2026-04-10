@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, ChangeDetectionStrategy, inject, signal, ViewChild, ElementRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
@@ -31,13 +31,12 @@ import { InputIconModule } from 'primeng/inputicon';
   selector: 'app-geofence-form',
   standalone: true,
   imports: [
-    CommonModule, 
-    ReactiveFormsModule, 
-    CardModule, 
+    ReactiveFormsModule,
+    CardModule,
     ButtonModule,
-    InputTextModule, 
-    SelectModule, 
-    InputNumberModule, 
+    InputTextModule,
+    SelectModule,
+    InputNumberModule,
     ToggleSwitchModule,
     SliderModule,
     SkeletonModule,
@@ -45,7 +44,7 @@ import { InputIconModule } from 'primeng/inputicon';
     TooltipModule,
     IconFieldModule,
     InputIconModule
-  ],
+],
   providers: [MessageService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `

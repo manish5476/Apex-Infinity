@@ -7,7 +7,7 @@ import {
   computed,
   signal,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { AgGridAngular } from 'ag-grid-angular';
 
 import { ColDef, GridApi, GridReadyEvent, GridOptions, ColumnResizedEvent, RowSelectionOptions, CellClickedEvent, BodyScrollEndEvent, AllCommunityModule, ModuleRegistry, themeQuartz, Theme, } from 'ag-grid-community';
@@ -71,7 +71,7 @@ export interface ActionColumnConfig {
 @Component({
   selector: 'app-ag-share-grid',
   standalone: true,
-  imports: [CommonModule, AgGridAngular, ExcelExportDialogComponent, HasPermissionDirective],
+  imports: [AgGridAngular, ExcelExportDialogComponent, HasPermissionDirective],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
 
@@ -79,14 +79,13 @@ export interface ActionColumnConfig {
     <div class="shared-grid-root">
       @if (enableExcelExport()) {
         <div class="grid-top-bar">
-          <ng-container *ngIf="excelExportPermission(); else noPermExport">
+          @if (excelExportPermission()) {
             <ng-container *hasPermission="excelExportPermission()!">
               <app-excel-export-dialog [data]="$any(data() ?? [])"></app-excel-export-dialog>
             </ng-container>
-          </ng-container>
-          <ng-template #noPermExport>
+          } @else {
             <app-excel-export-dialog [data]="$any(data() ?? [])"></app-excel-export-dialog>
-          </ng-template>
+          }
         </div>
       }
       <ag-grid-angular
@@ -101,13 +100,13 @@ export interface ActionColumnConfig {
         [gridOptions]="gridOptions"
         [rowSelection]="selectionOptions"
         (gridReady)="onGridReady($event)"
-   (columnResized)="onColumnResized($event)"     (cellClicked)="onCellClicked($event)"
+        (columnResized)="onColumnResized($event)"     (cellClicked)="onCellClicked($event)"
         (cellValueChanged)="onCellValueChanged($event)"
         (selectionChanged)="onSelectionChanged()"
         (bodyScrollEnd)="onBodyScrollEnd($event)">
       </ag-grid-angular>
     </div>
-  `,
+    `,
 
   styles: [`
     :host {

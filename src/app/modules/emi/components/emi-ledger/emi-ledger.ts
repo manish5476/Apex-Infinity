@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit, inject, signal, effect, ViewChild, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
@@ -22,7 +22,6 @@ import { takeUntil } from "rxjs/operators";
   selector: 'app-emi-ledger',
   standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
     RouterModule,
     ButtonModule,
@@ -30,7 +29,7 @@ import { takeUntil } from "rxjs/operators";
     SelectModule,
     ToastModule,
     AgShareGrid
-  ],
+],
   providers: [EmiService],
   templateUrl: './emi-ledger.html',
   styleUrl: './emi-ledger.scss',

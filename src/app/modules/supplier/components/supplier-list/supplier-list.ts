@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { GridApi } from 'ag-grid-community';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
@@ -20,9 +20,7 @@ import { takeUntil } from "rxjs/operators";
 @Component({
   selector: 'app-supplier-list',
   standalone: true,
-  imports: [CommonModule,SelectModule,FormsModule,ButtonModule,InputTextModule,RouterModule,Toast,AgShareGrid,
-    HasPermissionDirective
-  ],
+  imports: [SelectModule, FormsModule, ButtonModule, InputTextModule, RouterModule, Toast, AgShareGrid, HasPermissionDirective],
   templateUrl: './supplier-list.html',
   styleUrl: './supplier-list.scss',
 })

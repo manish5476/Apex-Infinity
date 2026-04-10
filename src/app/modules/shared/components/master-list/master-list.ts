@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal, effect, ChangeDetectionStrategy, ViewChild, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { ConfirmationService } from 'primeng/api';
 
@@ -47,7 +47,6 @@ export interface Master {
   selector: 'app-master-list',
   standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
     ButtonModule,
     ToastModule,
@@ -59,129 +58,132 @@ export interface Master {
     DialogModule,
     SelectModule,
     AppSharedGrid
-  ],
+],
   providers: [ConfirmationService],
   template: `
     <div class="master-page-container">
       <div class="themed-card master-card">
-        
+    
         <!-- TOOLBAR -->
         <p-toolbar styleClass="master-toolbar">
           <div class="p-toolbar-group-start gap-3">
             <h2 class="section-heading m-0">Master Data</h2>
-            
+    
             <p-iconfield iconPosition="left">
               <!-- <p-inputicon styleClass="pi pi-search"></p-inputicon> -->
-              <input pInputText type="text" (input)="onQuickFilter($event)" 
-                     placeholder="Search..." class="p-inputtext-sm w-64" />
-            </p-iconfield>
-          </div>
-
-          <div class="p-toolbar-group-end flex gap-2">
-            
-            <!-- Bulk Actions for Selection -->
-             <div *ngIf="selectedRows().length > 0" class="flex gap-2 mr-2 border-r pr-2 border-gray-300">
-                <p-button 
-                   label="Delete ({{selectedRows().length}})" 
-                   icon="pi pi-trash" 
-                   severity="danger" 
-                   (click)="confirmBulkDelete()">
-                </p-button>
-             </div>
-
-             <!-- Bulk Edit Toggle -->
-             <div class="flex gap-2 mr-2">
-                <p-button 
-                  *ngIf="!isBulkEditing()"
-                  label="Bulk Edit" 
-                  icon="pi pi-pencil" 
-                  [text]="true"
-                  (click)="toggleBulkEdit()">
-                </p-button>
-
-                <ng-container *ngIf="isBulkEditing()">
+              <input pInputText type="text" (input)="onQuickFilter($event)"
+                placeholder="Search..." class="p-inputtext-sm w-64" />
+              </p-iconfield>
+            </div>
+    
+            <div class="p-toolbar-group-end flex gap-2">
+    
+              <!-- Bulk Actions for Selection -->
+              @if (selectedRows().length > 0) {
+                <div class="flex gap-2 mr-2 border-r pr-2 border-gray-300">
+                  <p-button
+                    label="Delete ({{selectedRows().length}})"
+                    icon="pi pi-trash"
+                    severity="danger"
+                    (click)="confirmBulkDelete()">
+                  </p-button>
+                </div>
+              }
+    
+              <!-- Bulk Edit Toggle -->
+              <div class="flex gap-2 mr-2">
+                @if (!isBulkEditing()) {
+                  <p-button
+                    label="Bulk Edit"
+                    icon="pi pi-pencil"
+                    [text]="true"
+                    (click)="toggleBulkEdit()">
+                  </p-button>
+                }
+    
+                @if (isBulkEditing()) {
                   <p-button label="Cancel" icon="pi pi-times" severity="secondary" [text]="true" (click)="cancelBulkEdit()"></p-button>
                   <p-button label="Save All" icon="pi pi-check" (click)="saveBulkEdit()"></p-button>
-                </ng-container>
-             </div>
-
-             <div class="stats mr-4 align-content-center">
-              <span class="text-sm text-gray-500">Total: {{ masters().length }}</span>
+                }
+              </div>
+    
+              <div class="stats mr-4 align-content-center">
+                <span class="text-sm text-gray-500">Total: {{ masters().length }}</span>
+              </div>
+    
+              <!-- Bulk Import Button -->
+              <p-button label="Import" icon="pi pi-upload" styleClass="p-button-outlined"
+              (click)="openBulkDialog()"></p-button>
+    
+              <p-button icon="pi pi-refresh" styleClass="p-button-text"
+              (click)="loadMasters()" [loading]="loading()"></p-button>
+    
+              <!-- ADD NEW: Calls Grid Method directly -->
+              <p-button label="Add New" icon="pi pi-plus" (click)="onAddNew()"></p-button>
             </div>
-            
-            <!-- Bulk Import Button -->
-            <p-button label="Import" icon="pi pi-upload" styleClass="p-button-outlined" 
-                      (click)="openBulkDialog()"></p-button>
-
-            <p-button icon="pi pi-refresh" styleClass="p-button-text" 
-                      (click)="loadMasters()" [loading]="loading()"></p-button>
-            
-            <!-- ADD NEW: Calls Grid Method directly -->
-            <p-button label="Add New" icon="pi pi-plus" (click)="onAddNew()"></p-button>
+          </p-toolbar>
+    
+          <!-- MAIN DATA GRID -->
+          <div class="master-grid-wrapper" style="height: calc(100vh - 200px);">
+            <app-shared-grid
+              #mainGrid
+              [columns]="columns"
+              [data]="masters()"
+              [selectionMode]="'multiple'"
+              [showActions]="true"
+              (gridEvent)="onGridEvent($event)">
+            </app-shared-grid>
           </div>
-        </p-toolbar>
-
-        <!-- MAIN DATA GRID -->
-        <div class="master-grid-wrapper" style="height: calc(100vh - 200px);">
-          <app-shared-grid
-            #mainGrid
-            [columns]="columns"
-            [data]="masters()"
-            [selectionMode]="'multiple'"
-            [showActions]="true"
-            (gridEvent)="onGridEvent($event)">
-          </app-shared-grid>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- BULK ENTRY DIALOG (Import) -->
-    <p-dialog header="Bulk Import" [(visible)]="isBulkDialogVisible" [modal]="true" 
-              [style]="{ width: '95vw', height: '90vh' }" [draggable]="false" [resizable]="false"
-              [maximizable]="true">
-      
-      <div class="flex flex-col h-full gap-2">
-        <div class="bg-blue-50 p-3 rounded-md text-sm text-blue-700 mb-2 border border-blue-100 flex items-center">
-          <i class="pi pi-info-circle mr-2"></i>
-          <span>
-            Enter details below. <b>Name</b> and <b>Type</b> are required. 
-            Rows without a Name will be ignored.
-          </span>
-        </div>
-
-        <!-- Reusing AppSharedGrid for Bulk Entry -->
-        <div class="flex-1 overflow-hidden border rounded-md">
-           <app-shared-grid
-            #bulkGrid
-            [columns]="columns"
-            [data]="bulkData()"
-            [selectionMode]="'multiple'"
-            [showActions]="true"
-            (gridEvent)="onBulkGridEvent($event)">
-          </app-shared-grid>
+    
         </div>
       </div>
-      
-      <ng-template pTemplate="footer">
-        <div class="flex justify-between w-full">
+    
+      <!-- BULK ENTRY DIALOG (Import) -->
+      <p-dialog header="Bulk Import" [(visible)]="isBulkDialogVisible" [modal]="true"
+        [style]="{ width: '95vw', height: '90vh' }" [draggable]="false" [resizable]="false"
+        [maximizable]="true">
+    
+        <div class="flex flex-col h-full gap-2">
+          <div class="bg-blue-50 p-3 rounded-md text-sm text-blue-700 mb-2 border border-blue-100 flex items-center">
+            <i class="pi pi-info-circle mr-2"></i>
+            <span>
+              Enter details below. <b>Name</b> and <b>Type</b> are required.
+              Rows without a Name will be ignored.
+            </span>
+          </div>
+    
+          <!-- Reusing AppSharedGrid for Bulk Entry -->
+          <div class="flex-1 overflow-hidden border rounded-md">
+            <app-shared-grid
+              #bulkGrid
+              [columns]="columns"
+              [data]="bulkData()"
+              [selectionMode]="'multiple'"
+              [showActions]="true"
+              (gridEvent)="onBulkGridEvent($event)">
+            </app-shared-grid>
+          </div>
+        </div>
+    
+        <ng-template pTemplate="footer">
+          <div class="flex justify-between w-full">
             <!-- Left Side: Add Row Button -->
-            <p-button label="Add Empty Row" icon="pi pi-plus" [text]="true" severity="secondary" 
-                      (click)="addBulkRow()"></p-button>
-
+            <p-button label="Add Empty Row" icon="pi pi-plus" [text]="true" severity="secondary"
+            (click)="addBulkRow()"></p-button>
+    
             <!-- Right Side: Actions -->
             <div class="flex gap-2">
-                <p-button label="Cancel" icon="pi pi-times" [text]="true" (click)="isBulkDialogVisible = false"></p-button>
-                <p-button label="Create All" icon="pi pi-check" [loading]="isBulkSaving" 
-                          (click)="saveBulkImport()"></p-button>
+              <p-button label="Cancel" icon="pi pi-times" [text]="true" (click)="isBulkDialogVisible = false"></p-button>
+              <p-button label="Create All" icon="pi pi-check" [loading]="isBulkSaving"
+              (click)="saveBulkImport()"></p-button>
             </div>
-        </div>
-      </ng-template>
-    </p-dialog>
-
-    <p-toast></p-toast> 
-    <p-confirmDialog></p-confirmDialog>
-  `,
+          </div>
+        </ng-template>
+      </p-dialog>
+    
+      <p-toast></p-toast>
+      <p-confirmDialog></p-confirmDialog>
+    `,
   styleUrls: ['./master-list.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })

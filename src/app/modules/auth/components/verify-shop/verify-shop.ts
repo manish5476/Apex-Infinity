@@ -1,5 +1,5 @@
 import { Component, inject, signal, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ToastModule } from 'primeng/toast';
@@ -13,7 +13,7 @@ import { takeUntil } from "rxjs/operators";
 @Component({
   selector: 'app-verify-shop',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ToastModule, InputTextModule, ButtonModule, RouterLink],
+  imports: [ReactiveFormsModule, ToastModule, InputTextModule, ButtonModule, RouterLink],
   providers: [AppMessageService],
   templateUrl: './verify-shop.html',
   styleUrl: './verify-shop.scss'

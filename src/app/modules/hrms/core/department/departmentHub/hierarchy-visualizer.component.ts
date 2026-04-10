@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { OrganizationChartModule } from 'primeng/organizationchart';
 import { TreeNode } from 'primeng/api';
 import { AvatarModule } from 'primeng/avatar';
@@ -7,7 +7,7 @@ import { AvatarModule } from 'primeng/avatar';
 @Component({
   selector: 'app-hierarchy-visualizer',
   standalone: true,
-  imports: [CommonModule, OrganizationChartModule, AvatarModule],
+  imports: [OrganizationChartModule, AvatarModule],
   template: `
     <div class="premium-card hierarchy-card">
       <div class="card-header">

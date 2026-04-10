@@ -35,29 +35,31 @@ Chart.register(...registerables);
   </div>
 
   <!-- Loading -->
-  <div class="state-overlay" *ngIf="isLoading">
-    <div class="spinner"></div>
-    <span>Loading...</span>
-  </div>
+  @if (isLoading) {
+    <div class="state-overlay">
+      <div class="spinner"></div>
+      <span>Loading...</span>
+    </div>
+  }
 
   <!-- Error -->
-  <div class="state-overlay error" *ngIf="hasError && !isLoading">
-    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-    </svg>
-    <span>Failed to load data</span>
-    <button class="retry-btn" (click)="loadData()">Retry</button>
-  </div>
+  @if (hasError && !isLoading) {
+    <div class="state-overlay error">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span>Failed to load data</span>
+      <button class="retry-btn" (click)="loadData()">Retry</button>
+    </div>
+  }
 
   <!-- Content -->
-  <ng-container *ngIf="!isLoading && !hasError">
-
+  @if (!isLoading && !hasError) {
     <!-- Total Badge -->
     <div class="total-badge">
       <span class="total-label">Total Revenue</span>
       <span class="total-value">₹{{ totalRevenue | number }}</span>
     </div>
-
     <!-- Charts -->
     <div class="chart-area" [class.hidden]="activeTab !== 'pie'">
       <canvas #pieCanvas></canvas>
@@ -65,17 +67,19 @@ Chart.register(...registerables);
     <div class="chart-area" [class.hidden]="activeTab !== 'trend'">
       <canvas #trendCanvas></canvas>
     </div>
-
     <!-- Meta Table -->
-    <div class="meta-list" *ngIf="activeTab === 'pie' && metaList.length">
-      <div class="meta-row" *ngFor="let item of metaList">
-        <span class="meta-label">{{ item.label | titlecase }}</span>
-        <span class="meta-count">{{ item.count }} txns</span>
-        <span class="meta-value">₹{{ item.value | number }}</span>
+    @if (activeTab === 'pie' && metaList.length) {
+      <div class="meta-list">
+        @for (item of metaList; track item) {
+          <div class="meta-row">
+            <span class="meta-label">{{ item.label | titlecase }}</span>
+            <span class="meta-count">{{ item.count }} txns</span>
+            <span class="meta-value">₹{{ item.value | number }}</span>
+          </div>
+        }
       </div>
-    </div>
-
-  </ng-container>
+    }
+  }
 </div>
 `,
   styles: `@use 'sass:color';

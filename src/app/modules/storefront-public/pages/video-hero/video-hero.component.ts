@@ -1,6 +1,6 @@
 // video-hero.component.ts
 import { Component, Input, signal, computed, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterModule } from '@angular/router';
 
 export interface VideoHeroConfig {
@@ -19,7 +19,7 @@ const HEIGHT_MAP: Record<string, string> = { medium: '65vh', large: '85vh', scre
 @Component({
   selector: 'app-video-hero',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [RouterModule],
   template: `
     <section class="vh-root" [style.min-height]="height()">
 

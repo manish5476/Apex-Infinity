@@ -3,13 +3,13 @@
 // ════════════════════════════════════════════════════════════════════════════
 
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ColumnConfig, ExcelExportComponent, ExcelExportConfig } from './excel-export';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, ExcelExportComponent],
+  imports: [ExcelExportComponent],
   template: `
     <div style="padding: 2rem; font-family: Segoe UI, sans-serif;">
       <h2>Invoice Register</h2>

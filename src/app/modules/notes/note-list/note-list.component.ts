@@ -1,6 +1,6 @@
 import { MessageService } from "primeng/api";
 import { Component, inject, signal, effect, computed, ViewEncapsulation, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterModule, Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
@@ -21,7 +21,7 @@ type FilterType = 'all' | 'favorites' | 'shared' | 'shared-by-me' | 'recent' | '
 @Component({
   selector: 'app-note-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, NoteCardComponent, SharedNoteCardComponent, RecentActivityComponent, CalendarViewComponent, HasPermissionDirective],
+  imports: [RouterModule, ReactiveFormsModule, NoteCardComponent, SharedNoteCardComponent, RecentActivityComponent, CalendarViewComponent, HasPermissionDirective],
   encapsulation: ViewEncapsulation.None,
   templateUrl: './note-list.component.html',
   styleUrl: './note-list.component.scss'

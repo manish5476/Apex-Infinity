@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { FormsModule } from '@angular/forms';
 
@@ -26,8 +26,6 @@ import { takeUntil } from "rxjs/operators";
   selector: 'app-sessions',
   standalone: true,
   imports: [
-    CommonModule,
-
     FormsModule,
     ButtonModule,
     DialogModule,
@@ -36,8 +34,8 @@ import { takeUntil } from "rxjs/operators";
     ConfirmDialogModule,
     AgShareGrid,
     SelectModule,
-    InputTextModule,
-  ],
+    InputTextModule
+],
   providers: [ConfirmationService, MessageService],
   templateUrl: './sessions.html',
   styleUrl: './sessions.scss',

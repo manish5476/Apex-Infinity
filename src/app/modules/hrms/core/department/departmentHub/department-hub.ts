@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
-import { CommonModule, DecimalPipe } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import { forkJoin, of, Subject } from 'rxjs';
 import { catchError, map, takeUntil } from 'rxjs/operators';
 
@@ -21,9 +21,13 @@ import { AppMessageService } from '@core/services/message.service';
   selector: 'app-department-hub',
   standalone: true,
   imports: [
-    CommonModule,  TabsModule, SkeletonModule, TooltipModule,
-    HierarchyVisualizerComponent, DirectoryExplorerComponent, WorkforceStatsComponent
-  ],
+    TabsModule,
+    SkeletonModule,
+    TooltipModule,
+    HierarchyVisualizerComponent,
+    DirectoryExplorerComponent,
+    WorkforceStatsComponent
+],
   providers: [MessageService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `

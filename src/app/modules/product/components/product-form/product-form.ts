@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal, computed, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { finalize, switchMap, takeUntil } from 'rxjs/operators';
@@ -25,7 +25,7 @@ import { ChipsComponent } from '../../../shared/components/chips.component';
 @Component({
   selector: 'app-product-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, ButtonModule, ToggleButtonModule, InputTextModule, InputNumberModule, CheckboxModule, TextareaModule, SelectModule, DividerModule, ChipsComponent],
+  imports: [ReactiveFormsModule, RouterModule, ButtonModule, ToggleButtonModule, InputTextModule, InputNumberModule, CheckboxModule, TextareaModule, SelectModule, DividerModule, ChipsComponent],
   templateUrl: './product-form.html',
   styleUrls: ['./product-form.scss']
 })

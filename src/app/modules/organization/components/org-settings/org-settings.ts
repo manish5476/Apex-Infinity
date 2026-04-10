@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { forkJoin, Subject } from 'rxjs';
@@ -31,7 +31,6 @@ import { UserListComponent } from '../../../user/user-list/user-list'; // Assumi
   selector: 'app-org-settings',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     RouterModule,
     FormsModule,
@@ -48,7 +47,7 @@ import { UserListComponent } from '../../../user/user-list/user-list'; // Assumi
     ToastModule,
     DividerModule,
     TooltipModule
-  ],
+],
   providers: [ConfirmationService],
   templateUrl: './org-settings.html',
   styleUrl: './org-settings.scss',

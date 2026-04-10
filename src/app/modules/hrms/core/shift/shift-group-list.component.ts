@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit, inject, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 
@@ -14,11 +14,10 @@ import { takeUntil } from "rxjs/operators";
   selector: 'app-shift-group-list',
   standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
     RouterModule,
     AgShareGrid
-  ],
+],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="list-page-container fade-in">

@@ -10,12 +10,12 @@ import {
   HostListener,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'app-simple-editor',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

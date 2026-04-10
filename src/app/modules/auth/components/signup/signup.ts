@@ -5,7 +5,7 @@
 
 
 import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { ToastModule } from 'primeng/toast';
@@ -21,13 +21,12 @@ import { takeUntil } from "rxjs/operators";
   selector: 'app-signup',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     RouterModule,
     ToastModule,
     PasswordModule,
-    CheckboxModule,
-  ],
+    CheckboxModule
+],
   templateUrl: './signup.html',
   styleUrl: './signup.scss',
   providers: [AppMessageService]

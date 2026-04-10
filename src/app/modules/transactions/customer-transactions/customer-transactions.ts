@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit, inject, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ActivatedRoute } from '@angular/router'; // Import ActivatedRoute
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { FormsModule } from '@angular/forms';
@@ -16,9 +16,14 @@ import { AgShareGrid } from '../../shared/components/ag-shared-grid';
   selector: 'app-customer-transactions',
   standalone: true,
   imports: [
-    CommonModule, SelectModule, FormsModule,
-    ButtonModule, InputTextModule, Toast, DatePickerModule, AgShareGrid
-  ],
+    SelectModule,
+    FormsModule,
+    ButtonModule,
+    InputTextModule,
+    Toast,
+    DatePickerModule,
+    AgShareGrid
+],
   templateUrl: './customer-transactions.html',
   styleUrl: './customer-transactions.scss',
 })

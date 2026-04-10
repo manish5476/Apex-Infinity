@@ -1,7 +1,7 @@
 
 
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Subject, takeUntil } from 'rxjs';
 import { Chart, registerables } from 'chart.js';
 import { ChartService } from '../chart.service';
@@ -11,7 +11,7 @@ Chart.register(...registerables);
 @Component({
   selector: 'app-branch-radar-chart',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
 template: `<div class="chart-card branch-radar-card">
 
   <!-- Header -->
@@ -32,43 +32,51 @@ template: `<div class="chart-card branch-radar-card">
   </div>
 
   <!-- Loading -->
-  <div class="state-overlay" *ngIf="isLoading">
-    <div class="spinner"></div>
-    <span>Loading...</span>
-  </div>
+  @if (isLoading) {
+    <div class="state-overlay">
+      <div class="spinner"></div>
+      <span>Loading...</span>
+    </div>
+  }
 
   <!-- Error -->
-  <div class="state-overlay error" *ngIf="hasError && !isLoading">
-    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-    </svg>
-    <span>Failed to load data</span>
-    <button class="retry-btn" (click)="loadData()">Retry</button>
-  </div>
+  @if (hasError && !isLoading) {
+    <div class="state-overlay error">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span>Failed to load data</span>
+      <button class="retry-btn" (click)="loadData()">Retry</button>
+    </div>
+  }
 
   <!-- Content -->
-  <ng-container *ngIf="!isLoading && !hasError">
-
+  @if (!isLoading && !hasError) {
     <!-- Branch Legends -->
-    <div class="branch-legends" *ngIf="branchSummaries.length">
-      <div class="legend-chip" *ngFor="let b of branchSummaries">
-        <span class="legend-dot" [style.background]="b.color"></span>
-        <span class="legend-name">{{ b.label }}</span>
-        <span class="legend-score">{{ b.avg }}<small>avg</small></span>
+    @if (branchSummaries.length) {
+      <div class="branch-legends">
+        @for (b of branchSummaries; track b) {
+          <div class="legend-chip">
+            <span class="legend-dot" [style.background]="b.color"></span>
+            <span class="legend-name">{{ b.label }}</span>
+            <span class="legend-score">{{ b.avg }}<small>avg</small></span>
+          </div>
+        }
       </div>
-    </div>
-
+    }
     <!-- Radar Chart -->
     <div class="chart-area">
       <canvas #radarCanvas></canvas>
     </div>
-
     <!-- Axis Descriptions -->
-    <div class="axis-pills" *ngIf="chartData">
-      <span class="axis-pill" *ngFor="let label of chartData.labels">{{ label }}</span>
-    </div>
-
-  </ng-container>
+    @if (chartData) {
+      <div class="axis-pills">
+        @for (label of chartData.labels; track label) {
+          <span class="axis-pill">{{ label }}</span>
+        }
+      </div>
+    }
+  }
 </div>`,
 styles:`.chart-card {
   background: var(--bg-secondary);

@@ -23,79 +23,78 @@
   </div>
 
   <!-- ─────────── ANALYTICS STRIP ─────────── -->
-  <div class="analytics-strip" *ngIf="emiAnalytics()">
-
-    <!-- Outstanding -->
-    <div class="stat-card stat-card--primary">
-      <div class="stat-card__icon">
-        <i class="pi pi-indian-rupee"></i>
-      </div>
-      <div class="stat-card__body">
-        <span class="stat-card__label">Total Outstanding</span>
-        <span class="stat-card__value">{{ common.formatCurrency(emiAnalytics().totalOutstanding) }}</span>
-      </div>
-    </div>
-
-    <!-- Plan Overview -->
-    <div class="stat-card stat-card--plans">
-      <div class="stat-card__icon">
-        <i class="pi pi-list-check"></i>
-      </div>
-      <div class="stat-card__body">
-        <span class="stat-card__label">EMI Plans</span>
-        <div class="plan-badges">
-          <span class="badge badge--active">
-            <span class="badge__dot"></span>
-            {{ emiAnalytics().active }} Active
-          </span>
-          <span class="badge badge--done">
-            <span class="badge__dot"></span>
-            {{ emiAnalytics().completed }} Done
-          </span>
-          <span class="badge badge--late" [class.badge--late-alert]="emiAnalytics().defaulted > 0">
-            <span class="badge__dot"></span>
-            {{ emiAnalytics().defaulted }} Late
-          </span>
+  @if (emiAnalytics()) {
+    <div class="analytics-strip">
+      <!-- Outstanding -->
+      <div class="stat-card stat-card--primary">
+        <div class="stat-card__icon">
+          <i class="pi pi-indian-rupee"></i>
+        </div>
+        <div class="stat-card__body">
+          <span class="stat-card__label">Total Outstanding</span>
+          <span class="stat-card__value">{{ common.formatCurrency(emiAnalytics().totalOutstanding) }}</span>
         </div>
       </div>
-    </div>
-
-    <!-- Installment Progress -->
-    <div class="stat-card stat-card--progress">
-      <div class="stat-card__icon">
-        <i class="pi pi-chart-pie"></i>
-      </div>
-      <div class="stat-card__body" style="flex:1;min-width:0">
-        <div class="stat-card__label-row">
-          <span class="stat-card__label">Installments Paid</span>
-          <span class="stat-card__pct">{{ installmentPct(emiAnalytics()).toFixed(1) }}%</span>
+      <!-- Plan Overview -->
+      <div class="stat-card stat-card--plans">
+        <div class="stat-card__icon">
+          <i class="pi pi-list-check"></i>
         </div>
-        <span class="stat-card__value stat-card__value--sm">
-          {{ emiAnalytics().installments.paid }}
-          <span class="stat-card__value-total">/ {{ installmentTotal(emiAnalytics()) }}</span>
-        </span>
-        <div class="progress-track">
-          <div class="progress-fill" [style.width.%]="installmentPct(emiAnalytics())">
+        <div class="stat-card__body">
+          <span class="stat-card__label">EMI Plans</span>
+          <div class="plan-badges">
+            <span class="badge badge--active">
+              <span class="badge__dot"></span>
+              {{ emiAnalytics().active }} Active
+            </span>
+            <span class="badge badge--done">
+              <span class="badge__dot"></span>
+              {{ emiAnalytics().completed }} Done
+            </span>
+            <span class="badge badge--late" [class.badge--late-alert]="emiAnalytics().defaulted > 0">
+              <span class="badge__dot"></span>
+              {{ emiAnalytics().defaulted }} Late
+            </span>
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- Overdue -->
-    <div class="stat-card stat-card--overdue" [class.stat-card--alert]="emiAnalytics().installments.overdue > 0">
-      <div class="stat-card__icon">
-        <i class="pi pi-exclamation-triangle"></i>
+      <!-- Installment Progress -->
+      <div class="stat-card stat-card--progress">
+        <div class="stat-card__icon">
+          <i class="pi pi-chart-pie"></i>
+        </div>
+        <div class="stat-card__body" style="flex:1;min-width:0">
+          <div class="stat-card__label-row">
+            <span class="stat-card__label">Installments Paid</span>
+            <span class="stat-card__pct">{{ installmentPct(emiAnalytics()).toFixed(1) }}%</span>
+          </div>
+          <span class="stat-card__value stat-card__value--sm">
+            {{ emiAnalytics().installments.paid }}
+            <span class="stat-card__value-total">/ {{ installmentTotal(emiAnalytics()) }}</span>
+          </span>
+          <div class="progress-track">
+            <div class="progress-fill" [style.width.%]="installmentPct(emiAnalytics())">
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="stat-card__body">
-        <span class="stat-card__label">Overdue</span>
-        <span class="stat-card__value">{{ emiAnalytics().installments.overdue }}</span>
-        <span class="stat-card__sub" *ngIf="emiAnalytics().installments.overdue > 0">
-          installments pending
-        </span>
+      <!-- Overdue -->
+      <div class="stat-card stat-card--overdue" [class.stat-card--alert]="emiAnalytics().installments.overdue > 0">
+        <div class="stat-card__icon">
+          <i class="pi pi-exclamation-triangle"></i>
+        </div>
+        <div class="stat-card__body">
+          <span class="stat-card__label">Overdue</span>
+          <span class="stat-card__value">{{ emiAnalytics().installments.overdue }}</span>
+          @if (emiAnalytics().installments.overdue > 0) {
+            <span class="stat-card__sub">
+              installments pending
+            </span>
+          }
+        </div>
       </div>
     </div>
-
-  </div>
+  }
 
   <!-- ─────────── FILTER BAR ─────────── -->
   <div class="filter-bar">

@@ -12,7 +12,7 @@ Chart.register(...registerables);
   imports: [CommonModule],
   template: `
     <div class="chart-card">
-
+    
       <!-- Header -->
       <div class="card-header">
         <div class="card-title-group">
@@ -28,23 +28,26 @@ Chart.register(...registerables);
           </div>
         </div>
       </div>
-
+    
       <!-- Loading -->
-      <div class="state-overlay" *ngIf="isLoading">
-        <div class="spinner"></div><span>Loading...</span>
-      </div>
-
+      @if (isLoading) {
+        <div class="state-overlay">
+          <div class="spinner"></div><span>Loading...</span>
+        </div>
+      }
+    
       <!-- Error -->
-      <div class="state-overlay error" *ngIf="hasError && !isLoading">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-        </svg>
-        <span>Failed to load</span>
-        <button class="retry-btn" (click)="loadData()">Retry</button>
-      </div>
-
-      <ng-container *ngIf="!isLoading && !hasError && data">
-
+      @if (hasError && !isLoading) {
+        <div class="state-overlay error">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <span>Failed to load</span>
+          <button class="retry-btn" (click)="loadData()">Retry</button>
+        </div>
+      }
+    
+      @if (!isLoading && !hasError && data) {
         <!-- KPI Row -->
         <div class="kpi-row">
           <div class="kpi-card primary">
@@ -58,7 +61,6 @@ Chart.register(...registerables);
               <span class="kpi-value">₹{{ data.summary.totalPortfolioValue | number }}</span>
             </div>
           </div>
-
           <div class="kpi-card" [class.danger]="data.summary.overdueInstallments > 0">
             <div class="kpi-icon overdue">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -70,7 +72,6 @@ Chart.register(...registerables);
               <span class="kpi-value overdue-val">{{ data.summary.overdueInstallments }}</span>
             </div>
           </div>
-
           <div class="kpi-card" [class.danger]="data.summary.overdueAmount > 0">
             <div class="kpi-icon overdue">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -84,7 +85,6 @@ Chart.register(...registerables);
             </div>
           </div>
         </div>
-
         <!-- Chart + Legend row -->
         <div class="chart-row">
           <!-- Doughnut -->
@@ -96,41 +96,48 @@ Chart.register(...registerables);
               <span class="centre-label">Contracts</span>
             </div>
           </div>
-
           <!-- Status breakdown list -->
           <div class="breakdown-list">
-            <div class="breakdown-item" *ngFor="let item of metaList">
-              <div class="bi-dot" [style.background]="item.color"></div>
-              <div class="bi-info">
-                <span class="bi-label">{{ item.label | titlecase }}</span>
-                <span class="bi-count">{{ item.count }} contracts</span>
+            @for (item of metaList; track item) {
+              <div class="breakdown-item">
+                <div class="bi-dot" [style.background]="item.color"></div>
+                <div class="bi-info">
+                  <span class="bi-label">{{ item.label | titlecase }}</span>
+                  <span class="bi-count">{{ item.count }} contracts</span>
+                </div>
+                <div class="bi-amount">₹{{ item.totalAmount | number }}</div>
               </div>
-              <div class="bi-amount">₹{{ item.totalAmount | number }}</div>
-            </div>
+            }
           </div>
         </div>
-
         <!-- Health Banner -->
         <div class="health-banner" [class.good]="data.summary.overdueInstallments === 0" [class.warn]="data.summary.overdueInstallments > 0">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            *ngIf="data.summary.overdueInstallments === 0">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-            <polyline points="22 4 12 14.01 9 11.01"/>
-          </svg>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            *ngIf="data.summary.overdueInstallments > 0">
-            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-          </svg>
-          <span *ngIf="data.summary.overdueInstallments === 0">Portfolio is healthy — no overdue instalments</span>
-          <span *ngIf="data.summary.overdueInstallments > 0">
-            {{ data.summary.overdueInstallments }} overdue instalment(s) totalling ₹{{ data.summary.overdueAmount | number }}
-          </span>
+          @if (data.summary.overdueInstallments === 0) {
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              >
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+          }
+          @if (data.summary.overdueInstallments > 0) {
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              >
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          }
+          @if (data.summary.overdueInstallments === 0) {
+            <span>Portfolio is healthy — no overdue instalments</span>
+          }
+          @if (data.summary.overdueInstallments > 0) {
+            <span>
+              {{ data.summary.overdueInstallments }} overdue instalment(s) totalling ₹{{ data.summary.overdueAmount | number }}
+            </span>
+          }
         </div>
-
-      </ng-container>
+      }
     </div>
-  `,
+    `,
   styles: [`
     .chart-card {
       background: var(--bg-secondary);

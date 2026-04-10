@@ -7,7 +7,7 @@ import {
   signal,
   ViewEncapsulation,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { AgGridAngular } from 'ag-grid-angular';
 import {
   GridApi,
@@ -56,22 +56,21 @@ export type SharedGridEvent<T> =
   selector: 'app-shared-grid',
   standalone: true,
   imports: [
-    CommonModule,
     AgGridAngular,
     ButtonModule,
     TooltipModule,
     ExcelExportDialogComponent,
-    HasPermissionDirective,
-  ],
+    HasPermissionDirective
+],
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
   template: `
     <div class="shared-grid-container">
-
+    
       <!-- ══ TOOLBAR ══════════════════════════════════════ -->
       @if (showActions() || selectionMode()) {
         <div class="grid-toolbar">
-
+    
           <div class="toolbar-left">
             <button
               pButton
@@ -84,7 +83,7 @@ export type SharedGridEvent<T> =
               pTooltip="Add a new row"
               tooltipPosition="bottom"
             ></button>
-
+    
             @if (selectedCount() > 0) {
               <div class="selection-chip">
                 <i class="pi pi-check-circle"></i>
@@ -92,24 +91,23 @@ export type SharedGridEvent<T> =
               </div>
             }
           </div>
-
+    
           <div class="toolbar-right">
-
+    
             @if (enableExcelExport()) {
-              <ng-container *ngIf="excelExportPermission(); else noPermExport">
+              @if (excelExportPermission()) {
                 <ng-container *hasPermission="excelExportPermission()!">
                   <app-excel-export-dialog [data]="data() ?? []"></app-excel-export-dialog>
                   <span class="toolbar-divider"></span>
                 </ng-container>
-              </ng-container>
-              <ng-template #noPermExport>
+              } @else {
                 <app-excel-export-dialog [data]="data() ?? []"></app-excel-export-dialog>
                 <span class="toolbar-divider"></span>
-              </ng-template>
+              }
             }
-
+    
             @if (!isBulkEditing()) {
-
+    
               <button
                 pButton
                 label="Edit"
@@ -123,10 +121,10 @@ export type SharedGridEvent<T> =
                 pTooltip="Edit selected rows"
                 tooltipPosition="bottom"
               ></button>
-
+    
               @if (selectedCount() > 0) {
                 <span class="toolbar-divider"></span>
-
+    
                 <button
                   pButton
                   label="Delete"
@@ -140,14 +138,14 @@ export type SharedGridEvent<T> =
                   tooltipPosition="bottom"
                 ></button>
               }
-
+    
             } @else {
-
+    
               <span class="editing-label">
                 <i class="pi pi-pencil"></i>
                 Editing {{ editingIds().size }} {{ editingIds().size === 1 ? 'row' : 'rows' }}
               </span>
-
+    
               <button
                 pButton
                 label="Cancel"
@@ -158,7 +156,7 @@ export type SharedGridEvent<T> =
                 styleClass="premium-btn btn-secondary"
                 (click)="cancelBulkEdit()"
               ></button>
-
+    
               <button
                 pButton
                 label="Save All"
@@ -169,11 +167,11 @@ export type SharedGridEvent<T> =
                 (click)="saveBulkEdit()"
               ></button>
             }
-
+    
           </div>
         </div>
       }
-
+    
       <!-- ══ GRID ═════════════════════════════════════════ -->
       <div class="grid-body">
         <ag-grid-angular
@@ -188,9 +186,9 @@ export type SharedGridEvent<T> =
           (selectionChanged)="onSelectionChanged()"
         ></ag-grid-angular>
       </div>
-
+    
     </div>
-  `,
+    `,
   styles: [`
 
     /* ══════════════════════════════════════════════════════

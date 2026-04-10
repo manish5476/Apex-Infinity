@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit, effect, inject, signal, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { finalize, takeUntil } from 'rxjs/operators';
@@ -14,7 +14,7 @@ import { Subject } from "rxjs";
 @Component({
   selector: 'app-department-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, AgShareGrid],
+  imports: [FormsModule, RouterModule, AgShareGrid],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="list-page-container fade-in">

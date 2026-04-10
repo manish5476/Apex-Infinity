@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal, effect, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
@@ -26,7 +26,6 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
   selector: 'app-supplier-form',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     RouterModule,
     ToastModule,
@@ -35,9 +34,10 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
     CheckboxModule,
     DividerModule,
     InputNumberModule,
-    MultiSelectModule,AutoCompleteModule,
-    SelectModule,
-  ],
+    MultiSelectModule,
+    AutoCompleteModule,
+    SelectModule
+],
   templateUrl: './supplier-form.html',
   styleUrls: ['./supplier-form.scss']
 })

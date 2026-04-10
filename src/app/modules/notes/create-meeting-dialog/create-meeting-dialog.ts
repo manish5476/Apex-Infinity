@@ -1,5 +1,5 @@
 import { Component, inject, signal, computed, ViewEncapsulation, ChangeDetectorRef, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, FormsModule } from '@angular/forms';
 import { DynamicDialogRef } from 'primeng/dynamicdialog';
 import { DatePickerModule } from 'primeng/datepicker';
@@ -19,16 +19,15 @@ import { takeUntil } from "rxjs/operators";
   selector: 'app-create-meeting-dialog',
   standalone: true,
   imports: [
-    CommonModule, 
-    ReactiveFormsModule, 
+    ReactiveFormsModule,
     FormsModule,
-    DatePickerModule, 
-    SelectModule, 
-    TextareaModule, 
-    InputTextModule, 
+    DatePickerModule,
+    SelectModule,
+    TextareaModule,
+    InputTextModule,
     ButtonModule,
     CheckboxModule
-  ],
+],
   encapsulation: ViewEncapsulation.None,
   templateUrl: './create-meeting-dialog.html',
   styleUrl:'./create-meeting-dialog.scss'

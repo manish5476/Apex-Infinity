@@ -36,16 +36,16 @@ import { takeUntil } from "rxjs/operators";
   template: `
     <p-toast position="top-right"></p-toast>
     <p-confirmDialog styleClass="premium-confirm-dialog"></p-confirmDialog>
-
+    
     <div class="page-wrapper fade-in">
-      
+    
       @if (isLoading()) {
         <div class="flex-col gap-4">
           <p-skeleton height="120px" borderRadius="12px"></p-skeleton>
           <p-skeleton height="500px" borderRadius="12px"></p-skeleton>
         </div>
       } @else if (machine(); as dev) {
-        
+    
         <header class="dashboard-header slide-down mb-5">
           <div class="header-left flex-align gap-4">
             <p-button icon="pi pi-arrow-left" [text]="true" [rounded]="true" size="large" styleClass="back-btn" (onClick)="onBack()"></p-button>
@@ -66,7 +66,7 @@ import { takeUntil } from "rxjs/operators";
             <p-button icon="pi pi-trash" [text]="true" [rounded]="true" severity="danger" pTooltip="Delete Device" (onClick)="deleteDevice()"></p-button>
           </div>
         </header>
-
+    
         <div class="grid-3 mb-5 slide-down" style="animation-delay: 0.1s">
           <p-card styleClass="premium-card p-3">
             <div class="flex-between">
@@ -88,25 +88,31 @@ import { takeUntil } from "rxjs/operators";
           </p-card>
           <p-card styleClass="premium-card p-3">
             <div class="flex-col gap-1">
-               <span class="text-xs text-tertiary uppercase font-bold tracking-wide">Capabilities</span>
-               <div class="flex-align flex-wrap gap-2 mt-2">
-                 <p-tag *ngIf="dev.capabilities?.faceRecognition" value="Face" severity="info"></p-tag>
-                 <p-tag *ngIf="dev.capabilities?.fingerprint" value="Fingerprint" severity="info"></p-tag>
-                 <p-tag *ngIf="dev.capabilities?.rfid" value="RFID" severity="info"></p-tag>
-               </div>
+              <span class="text-xs text-tertiary uppercase font-bold tracking-wide">Capabilities</span>
+              <div class="flex-align flex-wrap gap-2 mt-2">
+                @if (dev.capabilities?.faceRecognition) {
+                  <p-tag value="Face" severity="info"></p-tag>
+                }
+                @if (dev.capabilities?.fingerprint) {
+                  <p-tag value="Fingerprint" severity="info"></p-tag>
+                }
+                @if (dev.capabilities?.rfid) {
+                  <p-tag value="RFID" severity="info"></p-tag>
+                }
+              </div>
             </div>
           </p-card>
         </div>
-
+    
         <p-card styleClass="premium-card glass-card workspace-card slide-down" styleClass="animation-delay: 0.2s">
           <p-tabs value="0">
             <p-tablist styleClass="hub-tablist">
               <p-tab value="0"><div class="tab-label"><i class="pi pi-users"></i> User Mapping</div></p-tab>
               <p-tab value="1"><div class="tab-label"><i class="pi pi-list"></i> Raw Device Logs</div></p-tab>
             </p-tablist>
-
+    
             <p-tabpanels styleClass="hub-tabpanels p-0">
-              
+    
               <p-tabpanel value="0">
                 <div class="panel-inner p-4">
                   <div class="flex-between mb-4 bg-primary-light p-3 border-radius-md manish-border-1 surface-border">
@@ -116,11 +122,11 @@ import { takeUntil } from "rxjs/operators";
                     </div>
                     <p-button label="Save Mappings" icon="pi pi-save" styleClass="p-button-primary" [loading]="isMapping()" (onClick)="saveBulkMappings()"></p-button>
                   </div>
-
-                  <p-table 
-                    [value]="unmappedUsers()" 
-                    [paginator]="true" 
-                    [rows]="10" 
+    
+                  <p-table
+                    [value]="unmappedUsers()"
+                    [paginator]="true"
+                    [rows]="10"
                     responsiveLayout="scroll"
                     styleClass="premium-table border-round-xl manish-border-1 surface-border">
                     <ng-template pTemplate="header">
@@ -151,13 +157,13 @@ import { takeUntil } from "rxjs/operators";
                   </p-table>
                 </div>
               </p-tabpanel>
-
+    
               <p-tabpanel value="1">
                 <div class="panel-inner p-4">
-                  <p-table 
-                    [value]="deviceLogs()" 
-                    [paginator]="true" 
-                    [rows]="10" 
+                  <p-table
+                    [value]="deviceLogs()"
+                    [paginator]="true"
+                    [rows]="10"
                     responsiveLayout="scroll"
                     styleClass="premium-table border-round-xl manish-border-1 surface-border">
                     <ng-template pTemplate="header">
@@ -174,7 +180,7 @@ import { takeUntil } from "rxjs/operators";
                         <td class="font-mono text-sm text-secondary font-bold">{{ log.timestamp | date:'dd MMM yyyy, HH:mm:ss' }}</td>
                         <td class="font-bold text-primary-color">{{ log.user?.name || 'Unknown User' }}</td>
                         <td class="capitalize font-bold flex-align gap-2">
-                          <i class="pi" [ngClass]="log.type.includes('in') ? 'pi-sign-in text-success' : 'pi-sign-out text-error'"></i> 
+                          <i class="pi" [ngClass]="log.type.includes('in') ? 'pi-sign-in text-success' : 'pi-sign-out text-error'"></i>
                           {{ log.type.replace('_', ' ') }}
                         </td>
                         <td class="text-center font-mono" [ngClass]="{'text-success': log.biometricData?.confidence > 80, 'text-warning': log.biometricData?.confidence <= 80}">
@@ -191,13 +197,13 @@ import { takeUntil } from "rxjs/operators";
                   </p-table>
                 </div>
               </p-tabpanel>
-
+    
             </p-tabpanels>
           </p-tabs>
         </p-card>
       }
     </div>
-
+    
     <p-dialog header="New API Key Generated" [(visible)]="displayKeyModal" [modal]="true" [closable]="false" [style]="{width: '450px'}" styleClass="premium-dialog">
       <div class="text-center mb-4">
         <i class="pi pi-exclamation-triangle text-warning text-5xl mb-3"></i>
@@ -214,7 +220,7 @@ import { takeUntil } from "rxjs/operators";
         <p-button label="Acknowledge & Close" styleClass="p-button-primary" (onClick)="displayKeyModal = false"></p-button>
       </div>
     </p-dialog>
-  `,
+    `,
   styles: [`
     :host { display: block; width: 100%; min-height: 100vh; background-color: var(--bg-primary); color: var(--text-primary); font-family: var(--font-body); }
     .page-wrapper { padding: var(--spacing-2xl) var(--spacing-3xl); max-width: 1400px; margin: 0 auto; }

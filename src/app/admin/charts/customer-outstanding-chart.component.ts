@@ -11,7 +11,7 @@ Chart.register(...registerables);
   standalone: true,
   imports: [CommonModule],
   template: `<div class="chart-card customer-outstanding-card">
-  
+
   <!-- Header -->
   <div class="card-header">
     <div class="card-title-group">
@@ -31,47 +31,55 @@ Chart.register(...registerables);
   </div>
 
   <!-- Loading -->
-  <div class="state-overlay" *ngIf="isLoading">
-    <div class="spinner"></div>
-    <span>Loading balances...</span>
-  </div>
+  @if (isLoading) {
+    <div class="state-overlay">
+      <div class="spinner"></div>
+      <span>Loading balances...</span>
+    </div>
+  }
 
   <!-- Error -->
-  <div class="state-overlay error" *ngIf="hasError && !isLoading">
-    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-    </svg>
-    <span>Failed to load data</span>
-    <button class="retry-btn" (click)="loadData()">Retry</button>
-  </div>
+  @if (hasError && !isLoading) {
+    <div class="state-overlay error">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span>Failed to load data</span>
+      <button class="retry-btn" (click)="loadData()">Retry</button>
+    </div>
+  }
 
   <!-- Content -->
-  <ng-container *ngIf="!isLoading && !hasError">
+  @if (!isLoading && !hasError) {
     <!-- Summary Badge -->
     <div class="total-badge">
       <span class="total-label">Total Outstanding</span>
       <span class="total-value">₹{{ totalAmount | number:'1.0-0' }}</span>
     </div>
-
     <!-- Chart Area -->
     <div class="chart-area">
       <canvas #chartCanvas></canvas>
     </div>
-
     <!-- Meta List -->
-    <div class="meta-list" *ngIf="metaList.length">
-      <div class="meta-row" *ngFor="let item of metaList">
-        <div class="meta-info">
-          <span class="meta-label">{{ item.name }}</span>
-          <span class="meta-sub">{{ item.phone || 'No phone' }}</span>
-        </div>
-        <div class="meta-stats">
-          <span class="meta-value">₹{{ item.outstandingBalance | number:'1.0-0' }}</span>
-          <span class="meta-limit" *ngIf="item.creditLimit">Limit: ₹{{ item.creditLimit | number:'1.0-0' }}</span>
-        </div>
+    @if (metaList.length) {
+      <div class="meta-list">
+        @for (item of metaList; track item) {
+          <div class="meta-row">
+            <div class="meta-info">
+              <span class="meta-label">{{ item.name }}</span>
+              <span class="meta-sub">{{ item.phone || 'No phone' }}</span>
+            </div>
+            <div class="meta-stats">
+              <span class="meta-value">₹{{ item.outstandingBalance | number:'1.0-0' }}</span>
+              @if (item.creditLimit) {
+                <span class="meta-limit">Limit: ₹{{ item.creditLimit | number:'1.0-0' }}</span>
+              }
+            </div>
+          </div>
+        }
       </div>
-    </div>
-  </ng-container>
+    }
+  }
 </div>
 `,
   styles: [`

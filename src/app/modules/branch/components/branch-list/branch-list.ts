@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit, inject, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
@@ -21,7 +21,6 @@ import { takeUntil } from "rxjs/operators";
   selector: 'app-branch-list',
   standalone: true,
   imports: [
-    CommonModule,
     SelectModule,
     FormsModule,
     ButtonModule,
@@ -30,7 +29,7 @@ import { takeUntil } from "rxjs/operators";
     Toast,
     AgShareGrid,
     HasPermissionDirective
-  ],
+],
   templateUrl: './branch-list.html',
   styleUrl: './branch-list.scss',
 })

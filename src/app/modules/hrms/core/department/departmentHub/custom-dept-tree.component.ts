@@ -1,12 +1,12 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-custom-dept-tree',
   standalone: true,
-  imports: [CommonModule, TagModule, TooltipModule],
+  imports: [TagModule, TooltipModule],
   template: `
     <div class="tree-container">
       @for (node of nodes; track node._id) {

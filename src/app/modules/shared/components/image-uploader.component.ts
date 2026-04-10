@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Output, inject, signal, Input, OnInit, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { finalize, takeUntil } from 'rxjs/operators';
 import { Observable, of, Subject } from 'rxjs';
 
@@ -14,11 +14,10 @@ import { AppMessageService } from '../../../core/services/message.service';
   selector: 'app-image-uploader',
   standalone: true,
   imports: [
-    CommonModule,
     ProgressSpinnerModule,
     ToastModule,
     ButtonModule
-  ],
+],
   template: `
     <div class="uploader-wrapper" [class.is-dialog]="isDialog()">
       <!-- Header (Only if in Dialog) -->

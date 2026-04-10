@@ -1,5 +1,5 @@
 import { Component, inject, signal, computed, ChangeDetectorRef, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
 import { SelectModule } from 'primeng/select';
@@ -14,7 +14,7 @@ import { takeUntil } from "rxjs/operators";
 @Component({
   selector: 'app-user-export-dialog',
   standalone: true,
-  imports: [CommonModule, FormsModule, SelectModule, ButtonModule],
+  imports: [FormsModule, SelectModule, ButtonModule],
   templateUrl: './user-export-dialog.component.html',
   styleUrl: './user-export-dialog.component.scss'
 })

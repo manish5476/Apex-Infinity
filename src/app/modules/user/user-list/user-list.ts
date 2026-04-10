@@ -1,6 +1,6 @@
 
 import { ChangeDetectorRef, Component, OnInit, effect, inject, signal, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 
@@ -28,7 +28,6 @@ import { takeUntil } from "rxjs/operators";
   selector: 'app-user-list',
   standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
     RouterModule,
     SelectModule,
@@ -38,7 +37,7 @@ import { takeUntil } from "rxjs/operators";
     ConfirmDialogModule,
     AgShareGrid,
     HasPermissionDirective
-  ],
+],
   providers: [UserManagementService, ConfirmationService],
   templateUrl: './user-list.html',
   styleUrl: './user-list.scss'

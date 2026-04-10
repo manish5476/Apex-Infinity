@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, computed, ChangeDetectorRef, inject, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { TabsModule } from 'primeng/tabs'; 
 import { ButtonModule } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -20,14 +20,13 @@ import { takeUntil } from "rxjs/operators";
   selector: 'app-time-analytics',
   standalone: true,
   imports: [
-    CommonModule, 
-    TabsModule, 
-    ButtonModule, 
-    ProgressSpinnerModule, 
+    TabsModule,
+    ButtonModule,
+    ProgressSpinnerModule,
     TooltipModule,
     AgShareGrid,
-    UniversalFilterComponent // <--- Imported
-  ],
+    UniversalFilterComponent
+],
   template: `
     <div class="time-container">
 

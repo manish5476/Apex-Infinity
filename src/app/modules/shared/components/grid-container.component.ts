@@ -1,34 +1,36 @@
 import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'app-grid-container',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   template: `
     <div class="grid-page-layout">
-      
+    
       <header class="grid-page-header">
         <div class="header-left">
           <h1 class="page-title">{{ title }}</h1>
-          <p *ngIf="subtitle" class="page-subtitle">{{ subtitle }}</p>
+          @if (subtitle) {
+            <p class="page-subtitle">{{ subtitle }}</p>
+          }
         </div>
-        
+    
         <div class="header-actions">
           <ng-content select="[header-actions]"></ng-content>
         </div>
       </header>
-
+    
       <section class="grid-filter-bar">
         <ng-content select="[filters]"></ng-content>
       </section>
-
+    
       <div class="grid-body-wrapper">
         <ng-content select="[grid-content]"></ng-content>
       </div>
-
+    
     </div>
-  `,
+    `,
   styles: [`
     :host {
       display: block;

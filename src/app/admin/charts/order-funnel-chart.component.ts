@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Subject, takeUntil } from 'rxjs';
 import { Chart, registerables } from 'chart.js';
 import { ChartService } from '../chart.service';
@@ -9,7 +9,7 @@ Chart.register(...registerables);
 @Component({
   selector: 'app-order-funnel-chart',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   template: `
     <div class="chart-card">
       <div class="card-header">
@@ -25,49 +25,56 @@ Chart.register(...registerables);
           </div>
         </div>
       </div>
-
-      <div class="state-overlay" *ngIf="isLoading">
-        <div class="spinner"></div><span>Loading...</span>
-      </div>
-      <div class="state-overlay error" *ngIf="hasError && !isLoading">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-        </svg>
-        <span>Failed to load</span>
-        <button class="retry-btn" (click)="loadData()">Retry</button>
-      </div>
-
-      <ng-container *ngIf="!isLoading && !hasError && chartData">
+    
+      @if (isLoading) {
+        <div class="state-overlay">
+          <div class="spinner"></div><span>Loading...</span>
+        </div>
+      }
+      @if (hasError && !isLoading) {
+        <div class="state-overlay error">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <span>Failed to load</span>
+          <button class="retry-btn" (click)="loadData()">Retry</button>
+        </div>
+      }
+    
+      @if (!isLoading && !hasError && chartData) {
         <!-- Funnel Bars -->
         <div class="funnel-list">
-          <div class="funnel-step" *ngFor="let step of funnelSteps; let i = index">
-            <div class="step-meta">
-              <div class="step-dot" [style.background]="step.color"></div>
-              <span class="step-label">{{ step.label }}</span>
-              <span class="step-value">{{ step.value }}</span>
-              <span class="step-pct">{{ step.pct }}%</span>
-            </div>
-            <div class="step-bar-track">
-              <div class="step-bar-fill"
-                [style.width]="step.pct + '%'"
-                [style.background]="step.color">
+          @for (step of funnelSteps; track step; let i = $index) {
+            <div class="funnel-step">
+              <div class="step-meta">
+                <div class="step-dot" [style.background]="step.color"></div>
+                <span class="step-label">{{ step.label }}</span>
+                <span class="step-value">{{ step.value }}</span>
+                <span class="step-pct">{{ step.pct }}%</span>
               </div>
+              <div class="step-bar-track">
+                <div class="step-bar-fill"
+                  [style.width]="step.pct + '%'"
+                  [style.background]="step.color">
+                </div>
+              </div>
+              @if (i < funnelSteps.length - 1) {
+                <div class="step-arrow">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/>
+                  </svg>
+                </div>
+              }
             </div>
-            <div class="step-arrow" *ngIf="i < funnelSteps.length - 1">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/>
-              </svg>
-            </div>
-          </div>
+          }
         </div>
-
         <!-- Doughnut -->
         <div class="chart-area">
           <canvas #funnelCanvas></canvas>
         </div>
-      </ng-container>
+      }
     </div>
-  `,
+    `,
   styles: [`
     .chart-card {
       background: var(--bg-secondary);

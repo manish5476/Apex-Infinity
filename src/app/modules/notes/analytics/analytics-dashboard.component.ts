@@ -1,5 +1,5 @@
 import { Component, inject, signal, OnInit, ViewEncapsulation, ElementRef, ViewChild, computed, ChangeDetectorRef, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { NoteService } from '../../../core/services/notes.service'; // Adjust path if needed
 import { AppMessageService } from '../../../core/services/message.service';
 import { Subject } from "rxjs";
@@ -8,7 +8,7 @@ import { takeUntil } from "rxjs/operators";
 @Component({
   selector: 'app-analytics-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   encapsulation: ViewEncapsulation.None,
   template: `
     <div class="analytics-container custom-scrollbar">

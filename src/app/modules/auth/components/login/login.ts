@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AutoCompleteModule } from 'primeng/autocomplete';
@@ -18,7 +18,6 @@ import { takeUntil } from "rxjs/operators";
   selector: 'app-login',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     RouterModule,
     ToastModule,
@@ -26,7 +25,7 @@ import { takeUntil } from "rxjs/operators";
     CheckboxModule,
     AutoCompleteModule,
     ConfirmDialogModule
-  ],
+],
   templateUrl: './login.html',
   styleUrl: './login.scss',
   providers: [AppMessageService]

@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { switchMap, of, debounceTime, distinctUntilChanged } from 'rxjs'; // <--- NEW: Required for chaining requests
@@ -27,7 +27,7 @@ import { AvatarModule } from 'primeng/avatar';
 @Component({
   selector: 'app-customer-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, InputTextModule, FileUploadModule, ButtonModule, CheckboxModule, CardModule, InputNumberModule, DividerModule, ToastModule, SelectModule, TextareaModule, SkeletonModule, AvatarModule],
+  imports: [ReactiveFormsModule, RouterModule, InputTextModule, FileUploadModule, ButtonModule, CheckboxModule, CardModule, InputNumberModule, DividerModule, ToastModule, SelectModule, TextareaModule, SkeletonModule, AvatarModule],
   providers: [CustomerService],
   templateUrl: './customer-form.html',
   styleUrls: ['./customer-form.scss']

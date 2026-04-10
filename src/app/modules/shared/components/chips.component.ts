@@ -1,11 +1,11 @@
 import { Component, Input, forwardRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { NG_VALUE_ACCESSOR, ControlValueAccessor, FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-chips',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   template: `
     <div class="chips-container">
       @for (tag of tags; track $index; let i = $index) {

@@ -5,7 +5,7 @@ import {
   ChangeDetectorRef,
   inject,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ICellRendererAngularComp } from 'ag-grid-angular';
 import { TooltipModule } from 'primeng/tooltip';
 
@@ -18,7 +18,7 @@ import { TooltipModule } from 'primeng/tooltip';
 @Component({
   selector: 'app-shared-action-btn',
   standalone: true,
-  imports: [CommonModule, TooltipModule],
+  imports: [TooltipModule],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `

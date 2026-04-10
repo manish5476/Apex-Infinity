@@ -1,13 +1,13 @@
 // src/app/modules/storefront-public/components/footer-simple/footer-simple.component.ts
 import { Component, Input, inject, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterModule } from '@angular/router';
 import { StorefrontStateService } from '@core/services/storefront-state.service';
 
 @Component({
   selector: 'app-footer-simple',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [RouterModule],
   templateUrl: './footer-simple.component.html',
   styleUrls: ['./footer-simple.component.scss']
 })

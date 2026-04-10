@@ -1,11 +1,11 @@
-import { CommonModule, Location } from '@angular/common';
+import { Location } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-unauthorized',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [RouterModule],
   template: `
     <div class="unauthorized-page">
       <div class="glass-card">

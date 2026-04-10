@@ -39,9 +39,9 @@ import { AppMessageService } from '@core/services/message.service';
   template: `
     <p-toast position="top-right"></p-toast>
     <p-confirmDialog styleClass="premium-confirm-dialog"></p-confirmDialog>
-
+    
     <div class="page-wrapper fade-in">
-      
+    
       @if (isLoading()) {
         <div class="header-skeleton mb-4">
           <div class="flex-align gap-3">
@@ -53,7 +53,7 @@ import { AppMessageService } from '@core/services/message.service';
           </div>
           <p-skeleton width="8rem" height="2.5rem"></p-skeleton>
         </div>
-        
+    
         <div class="bento-grid">
           <div class="span-2"><p-skeleton height="100%" borderRadius="16px"></p-skeleton></div>
           <div><p-skeleton height="16rem" borderRadius="16px"></p-skeleton></div>
@@ -63,28 +63,28 @@ import { AppMessageService } from '@core/services/message.service';
           <div class="span-3"><p-skeleton height="24rem" borderRadius="16px"></p-skeleton></div>
         </div>
       }
-
+    
       @if (dept(); as data) {
-        
+    
         <header class="dashboard-header slide-down">
           <div class="header-left">
-            <p-button 
-              icon="pi pi-arrow-left" 
-              [text]="true" 
-              [rounded]="true" 
+            <p-button
+              icon="pi pi-arrow-left"
+              [text]="true"
+              [rounded]="true"
               size="large"
               styleClass="back-btn"
-              (onClick)="onBack()" 
-              pTooltip="Back to Directory" 
+              (onClick)="onBack()"
+              pTooltip="Back to Directory"
               tooltipPosition="bottom">
             </p-button>
-            
+    
             <div class="header-titles">
               <div class="title-row">
                 <div class="icon-brand"><i class="pi pi-building"></i></div>
                 <h1 class="page-title">{{ data.name }}</h1>
-                <p-tag 
-                  [severity]="data.isActive ? 'success' : 'danger'" 
+                <p-tag
+                  [severity]="data.isActive ? 'success' : 'danger'"
                   [value]="data.isActive ? 'Active' : 'Inactive'"
                   [rounded]="true"
                   styleClass="ml-2 px-3 font-bold">
@@ -97,32 +97,32 @@ import { AppMessageService } from '@core/services/message.service';
               </div>
             </div>
           </div>
-          
+    
           <div class="header-right flex-align gap-3">
-            <p-button 
-              [icon]="data.isActive ? 'pi pi-ban' : 'pi pi-check-circle'" 
-              [label]="data.isActive ? 'Deactivate' : 'Activate'" 
+            <p-button
+              [icon]="data.isActive ? 'pi pi-ban' : 'pi pi-check-circle'"
+              [label]="data.isActive ? 'Deactivate' : 'Activate'"
               [severity]="data.isActive ? 'danger' : 'success'"
               [outlined]="true"
               (onClick)="toggleStatus()">
             </p-button>
-            
-            <p-button 
-              icon="pi pi-pencil" 
-              label="Edit Details" 
+    
+            <p-button
+              icon="pi pi-pencil"
+              label="Edit Details"
               (onClick)="onEditDepartment()">
             </p-button>
           </div>
         </header>
-
+    
         <main class="dashboard-content mt-5">
           <div class="bento-grid">
-            
+    
             <p-card header="Department Overview" styleClass="grid-card span-2 card-anim-1">
               <p class="text-secondary mb-4 description-text">
                 {{ data.description || 'No detailed description has been provided for this department yet.' }}
               </p>
-              
+    
               <div class="inner-grid-2 mt-auto">
                 <div class="info-group bg-surface p-4 border-radius-lg border-subtle">
                   <span class="info-label"><i class="pi pi-sitemap mr-1"></i> Organization ID</span>
@@ -134,7 +134,7 @@ import { AppMessageService } from '@core/services/message.service';
                 </div>
               </div>
             </p-card>
-
+    
             <p-card header="Leadership" styleClass="grid-card card-anim-2">
               <div class="flex-col gap-4">
                 <div class="user-profile shadow-sm">
@@ -142,21 +142,25 @@ import { AppMessageService } from '@core/services/message.service';
                   <div class="user-details">
                     <span class="info-label text-primary">Head of Department</span>
                     <span class="info-value font-bold">{{ data.headOfDepartment?.name || 'Unassigned' }}</span>
-                    <a href="mailto:{{ data.headOfDepartment?.email }}" class="text-xs link-style" *ngIf="data.headOfDepartment?.email">{{ data.headOfDepartment?.email }}</a>
+                    @if (data.headOfDepartment?.email) {
+                      <a href="mailto:{{ data.headOfDepartment?.email }}" class="text-xs link-style">{{ data.headOfDepartment?.email }}</a>
+                    }
                   </div>
                 </div>
-
+    
                 <div class="user-profile shadow-sm">
                   <p-avatar [label]="getInitials(data.assistantHOD?.name)" size="large" shape="circle" [style]="{'background-color': 'var(--bg-secondary)', 'color': 'var(--text-secondary)', 'font-weight': 'bold'}"></p-avatar>
                   <div class="user-details">
                     <span class="info-label">Assistant HOD</span>
                     <span class="info-value font-bold">{{ data.assistantHOD?.name || 'Unassigned' }}</span>
-                    <a href="mailto:{{ data.assistantHOD?.email }}" class="text-xs link-style" *ngIf="data.assistantHOD?.email">{{ data.assistantHOD?.email }}</a>
+                    @if (data.assistantHOD?.email) {
+                      <a href="mailto:{{ data.assistantHOD?.email }}" class="text-xs link-style">{{ data.assistantHOD?.email }}</a>
+                    }
                   </div>
                 </div>
               </div>
             </p-card>
-
+    
             <p-card header="Operations & Budget" styleClass="grid-card card-anim-3">
               <div class="flex-col gap-4">
                 <div class="inner-grid-2">
@@ -169,24 +173,24 @@ import { AppMessageService } from '@core/services/message.service';
                     <span class="badge-mono mt-1">{{ data.budgetCode || 'N/A' }}</span>
                   </div>
                 </div>
-
+    
                 <div class="divider-subtle"></div>
-
+    
                 <div class="info-group">
                   <div class="flex-between mb-2">
                     <span class="info-label">Headcount Utilization</span>
                     <span class="info-label font-bold text-primary">{{ data.employeeCount || 0 }} / {{ data.maxStrength || 0 }}</span>
                   </div>
-                  <p-progressBar 
-                    [value]="getUtilization(data.employeeCount, data.maxStrength)" 
-                    [showValue]="false" 
+                  <p-progressBar
+                    [value]="getUtilization(data.employeeCount, data.maxStrength)"
+                    [showValue]="false"
                     [style]="{'height': '8px', 'border-radius': '4px'}"
                     [color]="getUtilizationColor(data.employeeCount, data.maxStrength)">
                   </p-progressBar>
                 </div>
               </div>
             </p-card>
-
+    
             <p-card header="Contact Information" styleClass="grid-card card-anim-4">
               <div class="flex-col gap-4">
                 <div class="contact-item">
@@ -196,7 +200,7 @@ import { AppMessageService } from '@core/services/message.service';
                     <a href="mailto:{{ data.contactEmail }}" class="info-value link-style font-medium">{{ data.contactEmail || 'N/A' }}</a>
                   </div>
                 </div>
-                
+    
                 <div class="contact-item">
                   <div class="icon-wrapper bg-success-light text-success"><i class="pi pi-phone"></i></div>
                   <div class="info-group">
@@ -204,7 +208,7 @@ import { AppMessageService } from '@core/services/message.service';
                     <span class="info-value font-medium">{{ data.contactPhone || 'N/A' }}</span>
                   </div>
                 </div>
-                
+    
                 <div class="contact-item">
                   <div class="icon-wrapper bg-primary-light text-primary"><i class="pi pi-building"></i></div>
                   <div class="info-group">
@@ -214,7 +218,7 @@ import { AppMessageService } from '@core/services/message.service';
                 </div>
               </div>
             </p-card>
-
+    
             <p-card header="System Metadata" styleClass="grid-card card-anim-5">
               <div class="flex-col gap-4">
                 <div class="inner-grid-2">
@@ -227,9 +231,9 @@ import { AppMessageService } from '@core/services/message.service';
                     <span class="info-value font-medium mt-1">{{ data.metadata?.region || 'N/A' }}</span>
                   </div>
                 </div>
-
+    
                 <div class="divider-subtle"></div>
-                
+    
                 <div class="inner-grid-2">
                   <div class="info-group">
                     <span class="info-label">Created By</span>
@@ -248,12 +252,12 @@ import { AppMessageService } from '@core/services/message.service';
                 </div>
               </div>
             </p-card>
-
+    
             <p-card header="Team Members & Workforce" styleClass="grid-card span-3 card-anim-6 table-card-override">
               @if (employees().length > 0) {
                 <div class="list-grid-wrapper p-4">
-                  <app-ag-share-grid 
-                    [columns]="gridColumns" 
+                  <app-ag-share-grid
+                    [columns]="gridColumns"
                     [data]="employees()"
                     selectionMode="single">
                   </app-ag-share-grid>
@@ -266,12 +270,12 @@ import { AppMessageService } from '@core/services/message.service';
                 </div>
               }
             </p-card>
-
+    
           </div>
         </main>
       }
     </div>
-  `,
+    `,
   styles: [`
     /* --------------------------------------------------------------------------
        GLOBAL & VARIABLES

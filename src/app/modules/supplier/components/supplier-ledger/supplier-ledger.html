@@ -1,10 +1,10 @@
 <div class="ledger-container">
 
   @if (loading()) {
-  <div class="loader-wrapper">
-    <p-progressSpinner strokeWidth="4"></p-progressSpinner>
-    <span class="loader-text">Loading Supplier Data...</span>
-  </div>
+    <div class="loader-wrapper">
+      <p-progressSpinner strokeWidth="4"></p-progressSpinner>
+      <span class="loader-text">Loading Supplier Data...</span>
+    </div>
   }
 
   @else if (dashboardData(); as data) {
@@ -16,9 +16,15 @@
       <div class="info">
         <h2 class="company-name">{{ data.profile.companyName }}</h2>
         <div class="meta-tags">
-          <span *ngIf="data.profile.gstNumber"><i class="pi pi-receipt"></i> GST: {{ data.profile.gstNumber }}</span>
-          <span *ngIf="data.profile.phone"><i class="pi pi-phone"></i> {{ data.profile.phone }}</span>
-          <span *ngIf="data.profile.email"><i class="pi pi-envelope"></i> {{ data.profile.email }}</span>
+          @if (data.profile.gstNumber) {
+            <span><i class="pi pi-receipt"></i> GST: {{ data.profile.gstNumber }}</span>
+          }
+          @if (data.profile.phone) {
+            <span><i class="pi pi-phone"></i> {{ data.profile.phone }}</span>
+          }
+          @if (data.profile.email) {
+            <span><i class="pi pi-envelope"></i> {{ data.profile.email }}</span>
+          }
         </div>
       </div>
     </div>
@@ -81,7 +87,7 @@
             <td class="text-right">{{ inv.balanceAmount | currency:'INR' }}</td>
             <td>
               <p-tag [severity]="inv.paymentStatus === 'paid' ? 'success' : 'warn'"
-                [value]="inv.paymentStatus | uppercase"></p-tag>
+              [value]="inv.paymentStatus | uppercase"></p-tag>
             </td>
           </tr>
         </ng-template>
@@ -123,5 +129,5 @@
     </div>
 
   </div>
-  }
+}
 </div>

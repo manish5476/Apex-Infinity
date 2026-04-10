@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, ChangeDetectionStrategy, signal, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
@@ -20,14 +20,13 @@ import { SelectModule } from 'primeng/select';
   selector: 'app-shift-list',
   standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
     RouterModule,
     ButtonModule,
     SelectModule,
     InputTextModule,
     AgShareGrid
-  ],
+],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="list-page-container fade-in">

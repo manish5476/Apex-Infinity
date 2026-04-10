@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit, inject, signal, computed, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { debounceTime, distinctUntilChanged, finalize, takeUntil } from 'rxjs/operators';
@@ -76,7 +76,6 @@ export class ActionButtonsRenderer {
   selector: 'app-sales-return-list',
   standalone: true,
   imports: [
-    CommonModule,
     SelectModule,
     FormsModule,
     ReactiveFormsModule,
@@ -89,7 +88,7 @@ export class ActionButtonsRenderer {
     DatePickerModule,
     HasPermissionDirective,
     DynamicDialogModule
-  ],
+],
   templateUrl: './sales-return-list.html',
   styleUrl: './sales-return-list.scss',
   providers: [DialogService]

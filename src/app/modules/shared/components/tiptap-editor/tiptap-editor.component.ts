@@ -14,7 +14,7 @@ import {
   signal
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -27,7 +27,7 @@ import TaskItem from '@tiptap/extension-task-item';
 @Component({
   selector: 'app-tiptap-editor',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './tiptap-editor.component.html',
   styleUrls: ['./tiptap-editor.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

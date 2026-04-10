@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { ChartModule } from 'primeng/chart';
 import { TooltipModule } from 'primeng/tooltip';
@@ -9,7 +9,7 @@ import { ChartService } from '../chart.service';
 @Component({
   selector: 'app-gross-profit-trend-chart',
   standalone: true,
-  imports: [CommonModule, FormsModule, ChartModule, TooltipModule],
+  imports: [FormsModule, ChartModule, TooltipModule],
   template: `
 <div class="gp-root">
 

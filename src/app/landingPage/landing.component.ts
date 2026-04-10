@@ -2,7 +2,7 @@ import {
   Component, OnInit, AfterViewInit, OnDestroy,
   HostListener, signal, ViewEncapsulation, ChangeDetectionStrategy
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterModule } from '@angular/router';
 
 export interface FeatureDetail {
@@ -20,7 +20,7 @@ export interface FeatureDetail {
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [RouterModule],
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.scss'],
   encapsulation: ViewEncapsulation.None,
