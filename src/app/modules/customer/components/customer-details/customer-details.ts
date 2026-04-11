@@ -288,12 +288,93 @@ export class CustomerDetails implements OnInit, OnDestroy {
       { field: 'balanceAmount', headerName: 'Due', width: 140, type: 'rightAligned', valueFormatter: (p: any) => this.common.formatCurrency(p.value), cellStyle: (p: any) => ({ color: p.value > 0 ? '#dc2626' : '#059669', fontWeight: '700', fontFamily: 'monospace' }) }
     ];
 
-    this.paymentColumns = [
-      { field: 'paymentDate', headerName: 'Date', width: 120, valueFormatter: (p: any) => p.value ? new Date(p.value).toLocaleDateString('en-IN') : '' },
-      { field: 'paymentMethod', headerName: 'Method', width: 120, valueFormatter: (p: any) => (p.value || '').toUpperCase() },
-      { field: 'transactionId', headerName: 'Reference', width: 160, cellStyle: { fontFamily: 'monospace', color: 'var(--text-secondary)' } },
-      { field: 'amount', headerName: 'Amount', width: 140, type: 'rightAligned', valueFormatter: (p: any) => this.common.formatCurrency(p.value), cellStyle: { color: '#059669', fontWeight: '800', fontFamily: 'monospace' } }
-    ];
+this.paymentColumns = [
+  { 
+    field: 'paymentDate', 
+    headerName: 'Date', 
+    width: 130, 
+    pinned: 'left',
+    valueFormatter: (p: any) => p.value ? new Date(p.value).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '',
+    cellClass: 'text-secondary font-medium'
+  },
+  {
+    headerName: 'Reference & Source',
+    children: [
+      { 
+        field: 'invoiceId.invoiceNumber', 
+        headerName: 'Invoice No.', 
+        width: 160,
+        valueGetter: (p: any) => p.data.invoiceId?.invoiceNumber || 'Advance Payment',
+        cellRenderer: (p: any) => `
+          <div class="flex-align gap-2">
+            <i class="pi ${p.value === 'Advance Payment' ? 'pi-star-fill text-warning' : 'pi-file-text text-info'}" style="font-size: 10px"></i>
+            <span class="font-bold">${p.value}</span>
+          </div>
+        `
+      },
+      { 
+        field: 'referenceNumber', 
+        headerName: 'Ref #', 
+        width: 140,
+        cellClass: 'font-mono text-xs text-tertiary',
+        valueFormatter: (p: any) => p.value || p.data._id.slice(-8).toUpperCase()
+      }
+    ]
+  },
+  { 
+    field: 'paymentMethod', 
+    headerName: 'Method', 
+    width: 130,
+    cellRenderer: (p: any) => {
+      const method = (p.value || 'other').toLowerCase();
+      const icons: any = { cash: 'pi-money-bill', cheque: 'pi-id-card', upi: 'pi-mobile', card: 'pi-credit-card' };
+      return `
+        <div class="method-badge badge-${method}">
+          <i class="pi ${icons[method] || 'pi-wallet'}"></i>
+          <span>${method.toUpperCase()}</span>
+        </div>
+      `;
+    }
+  },
+  { 
+    field: 'allocationStatus', 
+    headerName: 'Allocation', 
+    width: 140,
+    cellRenderer: (p: any) => {
+      const status = p.value || 'unallocated';
+      const isFull = status === 'fully_allocated';
+      return `
+        <div class="status-pill status-${isFull ? 'success' : 'warning'}">
+          <span class="dot"></span>
+          ${status.replace('_', ' ')}
+        </div>
+      `;
+    }
+  },
+  { 
+    field: 'amount', 
+    headerName: 'Amount', 
+    width: 150, 
+    pinned: 'right',
+    type: 'rightAligned', 
+    cellClass: 'font-mono font-bold text-lg',
+    valueFormatter: (p: any) => this.common.formatCurrency(p.value),
+    cellStyle: (p: any) => ({
+      color: 'var(--color-success-dark, #059669)',
+      background: 'color-mix(in srgb, var(--color-success) 5%, transparent)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'flex-end',
+      paddingRight: '16px'
+    })
+  }
+];
+    // this.paymentColumns = [
+    //   { field: 'paymentDate', headerName: 'Date', width: 120, valueFormatter: (p: any) => p.value ? new Date(p.value).toLocaleDateString('en-IN') : '' },
+    //   { field: 'paymentMethod', headerName: 'Method', width: 120, valueFormatter: (p: any) => (p.value || '').toUpperCase() },
+    //   { field: 'transactionId', headerName: 'Reference', width: 160, cellStyle: { fontFamily: 'monospace', color: 'var(--text-secondary)' } },
+    //   { field: 'amount', headerName: 'Amount', width: 140, type: 'rightAligned', valueFormatter: (p: any) => this.common.formatCurrency(p.value), cellStyle: { color: '#059669', fontWeight: '800', fontFamily: 'monospace' } }
+    // ];
   }
 
   private statusBadgeRenderer(val: string): string {
