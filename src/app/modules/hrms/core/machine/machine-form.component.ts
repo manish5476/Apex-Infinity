@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of, catchError, map, Subject } from 'rxjs';
@@ -17,7 +17,7 @@ import { takeUntil } from "rxjs/operators";
 @Component({
   selector: 'app-machine-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ToggleSwitchModule, SelectModule, ButtonModule, InputTextModule],
+  imports: [ReactiveFormsModule, ToggleSwitchModule, SelectModule, ButtonModule, InputTextModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="app-fullscreen-wrapper fade-in">

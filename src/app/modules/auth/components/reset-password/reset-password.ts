@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ToastModule } from 'primeng/toast';
@@ -13,7 +13,7 @@ import { takeUntil } from "rxjs/operators";
 @Component({
   selector: 'app-reset-password',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ToastModule, PasswordModule, ButtonModule, RouterLink],
+  imports: [ReactiveFormsModule, ToastModule, PasswordModule, ButtonModule, RouterLink],
   providers: [AppMessageService],
   templateUrl: './reset-password.html',
   styleUrl: './reset-password.scss'

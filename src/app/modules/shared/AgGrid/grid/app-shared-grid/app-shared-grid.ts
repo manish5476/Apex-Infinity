@@ -7,47 +7,49 @@ import {
   signal,
   ViewEncapsulation,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { AgGridAngular } from 'ag-grid-angular';
-import {
-  GridApi,
-  GridOptions,
-  ColDef,
-  GridReadyEvent,
-  RowSelectionOptions,
-  ModuleRegistry,
-  AllCommunityModule,
-  Theme,
-  themeQuartz,
-  ICellRendererParams,
-  GetRowIdParams,
-  TabToNextCellParams, // ← TAB FIX: needed for tabToNextCell override
-  CellPosition,        // ← TAB FIX: return type of tabToNextCell
-} from 'ag-grid-community';
+import {GridApi,GridOptions,ColDef,GridReadyEvent,RowSelectionOptions,ModuleRegistry,AllCommunityModule,Theme,themeQuartz,ICellRendererParams,GetRowIdParams,TabToNextCellParams,CellPosition,} from 'ag-grid-community';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
-
 import { CellInteractionEvent, GridColDef } from '../grid.types';
 import { AppSharedGridActionButton } from '../app-shared-grid-action-button/app-shared-grid-action-button';
 import { MasterCellComponent } from '../dynamic Columns/master-cell-editor.component';
 import { ExcelExportDialogComponent } from '../../../components/excel-export/excel-export-dialog.component ';
 import { HasPermissionDirective } from '../../../../../core/auth/directives/has-permission.directive';
+import { NotesPanelComponent } from '../../../../../projectLayout/notes-panel/notes-panel';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
+/* ========================================================================== STABLE MARKER — used to identify MasterCell columns without class comparison
+ ROOT CAUSE OF TAB BUG: `columnDefs` is a computed signal. Every time editingIds signal changes,
+   the computed re-runs and creates NEW ColDef objects. The `cellRenderer`
+   property points to `MasterCellComponent` class, but AG Grid's internal
+   column model may cache a previous ColDef reference. Comparing
+   `col.getColDef().cellRenderer === MasterCellComponent` inside tabToNextCell
+   was therefore comparing against a stale object — the comparison returned
+   false for columns that ARE MasterCell, so editableCols was empty, and
+   tabToNextCell returned false (no navigation).
+
+   FIX: Prefix every MasterCell colId with MCELL_MARKER. tabToNextCell filters
+   by this stable string — immune to object identity issues across signal runs.
+   ========================================================================== */
+const MCELL_MARKER = '__mcell__';
+
 /* ==========================================================================
-   EVENT BUS — Single typed output for all grid interactions
+   EVENT BUS
    ========================================================================== */
 export type SharedGridEvent<T> =
-  | { type: 'init'; api: GridApi<T> }
-  | { type: 'rowAdded'; row: T }
-  | { type: 'editStart'; row: T }
-  | { type: 'save'; row: T; data: T }
-  | { type: 'bulkSave'; rows: T[] }
-  | { type: 'cancel'; row: T }
-  | { type: 'delete'; row: T }
-  | { type: 'bulkDelete'; rows: T[] }
-  | { type: 'selectionChanged'; rows: T[] };
+  | { type: 'init';             api: GridApi<T> }
+  | { type: 'rowAdded';         row: T }
+  | { type: 'editStart';        row: T }
+  | { type: 'save';             row: T; data: T }
+  | { type: 'bulkSave';         rows: T[] }
+  | { type: 'cancel';           row: T }
+  | { type: 'delete';           row: T }
+  | { type: 'bulkDelete';       rows: T[] }
+  | { type: 'selectionChanged'; rows: T[] }
+  | { type: 'notes';            row: T };
 
 /* ==========================================================================
    COMPONENT
@@ -56,12 +58,12 @@ export type SharedGridEvent<T> =
   selector: 'app-shared-grid',
   standalone: true,
   imports: [
-    CommonModule,
     AgGridAngular,
     ButtonModule,
     TooltipModule,
     ExcelExportDialogComponent,
     HasPermissionDirective,
+    NotesPanelComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
@@ -73,17 +75,11 @@ export type SharedGridEvent<T> =
         <div class="grid-toolbar">
 
           <div class="toolbar-left">
-            <button
-              pButton
-              label="Add Row"
-              icon="pi pi-plus"
-              size="small"
-              [rounded]="true"
-              styleClass="premium-btn btn-primary"
+            <button pButton label="Add Row" icon="pi pi-plus" size="small"
+              [rounded]="true" styleClass="premium-btn btn-primary"
               (click)="addNewRow()"
-              pTooltip="Add a new row"
-              tooltipPosition="bottom"
-            ></button>
+              pTooltip="Add a new row" tooltipPosition="bottom">
+            </button>
 
             @if (selectedCount() > 0) {
               <div class="selection-chip">
@@ -96,49 +92,34 @@ export type SharedGridEvent<T> =
           <div class="toolbar-right">
 
             @if (enableExcelExport()) {
-              <ng-container *ngIf="excelExportPermission(); else noPermExport">
+              @if (excelExportPermission()) {
                 <ng-container *hasPermission="excelExportPermission()!">
                   <app-excel-export-dialog [data]="data() ?? []"></app-excel-export-dialog>
                   <span class="toolbar-divider"></span>
                 </ng-container>
-              </ng-container>
-              <ng-template #noPermExport>
+              } @else {
                 <app-excel-export-dialog [data]="data() ?? []"></app-excel-export-dialog>
                 <span class="toolbar-divider"></span>
-              </ng-template>
+              }
             }
 
             @if (!isBulkEditing()) {
-
-              <button
-                pButton
-                label="Edit"
-                icon="pi pi-pencil"
-                [text]="true"
-                [rounded]="true"
-                size="small"
+              <button pButton label="Edit" icon="pi pi-pencil"
+                [text]="true" [rounded]="true" size="small"
                 styleClass="premium-btn btn-secondary"
                 [disabled]="selectedCount() === 0"
                 (click)="enableBulkEdit()"
-                pTooltip="Edit selected rows"
-                tooltipPosition="bottom"
-              ></button>
+                pTooltip="Edit selected rows" tooltipPosition="bottom">
+              </button>
 
               @if (selectedCount() > 0) {
                 <span class="toolbar-divider"></span>
-
-                <button
-                  pButton
-                  label="Delete"
-                  icon="pi pi-trash"
-                  [text]="true"
-                  [rounded]="true"
-                  size="small"
+                <button pButton label="Delete" icon="pi pi-trash"
+                  [text]="true" [rounded]="true" size="small"
                   styleClass="premium-btn btn-danger"
                   (click)="deleteSelected()"
-                  pTooltip="Delete selected rows"
-                  tooltipPosition="bottom"
-                ></button>
+                  pTooltip="Delete selected rows" tooltipPosition="bottom">
+                </button>
               }
 
             } @else {
@@ -148,26 +129,17 @@ export type SharedGridEvent<T> =
                 Editing {{ editingIds().size }} {{ editingIds().size === 1 ? 'row' : 'rows' }}
               </span>
 
-              <button
-                pButton
-                label="Cancel"
-                icon="pi pi-times"
-                [text]="true"
-                [rounded]="true"
-                size="small"
+              <button pButton label="Cancel" icon="pi pi-times"
+                [text]="true" [rounded]="true" size="small"
                 styleClass="premium-btn btn-secondary"
-                (click)="cancelBulkEdit()"
-              ></button>
+                (click)="cancelBulkEdit()">
+              </button>
 
-              <button
-                pButton
-                label="Save All"
-                icon="pi pi-check"
-                [rounded]="true"
-                size="small"
+              <button pButton label="Save All" icon="pi pi-check"
+                [rounded]="true" size="small"
                 styleClass="premium-btn btn-success"
-                (click)="saveBulkEdit()"
-              ></button>
+                (click)="saveBulkEdit()">
+              </button>
             }
 
           </div>
@@ -185,10 +157,16 @@ export type SharedGridEvent<T> =
           [gridOptions]="gridOptions"
           [rowSelection]="selectionOptions"
           (gridReady)="onGridReady($event)"
-          (selectionChanged)="onSelectionChanged()"
-        ></ag-grid-angular>
+          (selectionChanged)="onSelectionChanged()">
+        </ag-grid-angular>
       </div>
 
+      <app-notes-panel
+        [isVisible]="isNotesPanelVisible()"
+        (isVisibleChange)="isNotesPanelVisible.set($event)"
+        [entityType]="notesEntityType()"
+        [entityId]="notesEntityId()">
+      </app-notes-panel>
     </div>
   `,
   styles: [`
@@ -221,21 +199,17 @@ export type SharedGridEvent<T> =
       flex-shrink: 0;
       z-index: 10;
     }
-
-    .toolbar-left,
-    .toolbar-right {
+    .toolbar-left, .toolbar-right {
       display: flex;
       align-items: center;
       gap: 8px;
     }
-
     .toolbar-divider {
       width: 1px;
       height: 18px;
       background: var(--theme-border-secondary);
       flex-shrink: 0;
     }
-
     .selection-chip {
       display: inline-flex;
       align-items: center;
@@ -252,12 +226,10 @@ export type SharedGridEvent<T> =
       animation: chip-in 0.18s ease-out;
     }
     .selection-chip i { font-size: 0.7rem; }
-
     @keyframes chip-in {
       from { opacity: 0; transform: translateY(3px) scale(0.95); }
       to   { opacity: 1; transform: translateY(0)   scale(1); }
     }
-
     .editing-label {
       display: flex;
       align-items: center;
@@ -292,19 +264,14 @@ export type SharedGridEvent<T> =
         filter: brightness(1.08);
         box-shadow: 0 3px 8px color-mix(in srgb, var(--theme-accent-primary) 30%, transparent 70%);
       }
-      .premium-btn.btn-secondary.p-button {
-        color: var(--theme-text-secondary);
-      }
+      .premium-btn.btn-secondary.p-button { color: var(--theme-text-secondary); }
       .premium-btn.btn-secondary.p-button:hover {
         background: var(--component-bg-hover, var(--theme-bg-secondary));
         color: var(--theme-text-primary);
       }
-      .premium-btn.btn-danger.p-button {
-        color: var(--theme-error, #ef4444);
-      }
+      .premium-btn.btn-danger.p-button { color: var(--theme-error, #ef4444); }
       .premium-btn.btn-danger.p-button:hover {
         background: color-mix(in srgb, var(--theme-error, #ef4444) 8%, transparent 92%);
-        color: var(--theme-error, #ef4444);
         border-color: color-mix(in srgb, var(--theme-error, #ef4444) 20%, transparent 80%);
       }
       .premium-btn.btn-success.p-button {
@@ -317,12 +284,10 @@ export type SharedGridEvent<T> =
         box-shadow: 0 3px 8px color-mix(in srgb, var(--theme-success, #22c55e) 30%, transparent 70%);
       }
 
-      /* ── TAB FOCUS FIX: suppress AG Grid's cell wrapper focus ring ──────
-         Our MasterCellComponent renders its own focus ring on the inner
-         input via box-shadow. AG Grid's ag-cell-focus outline on the wrapper
-         div causes a visible flash on Tab. We kill it here entirely.
-         The action column gets its own subtle ring since it has no inner input.
-      ──────────────────────────────────────────────────────────────────── */
+      /* ── SUPPRESS AG GRID WRAPPER FOCUS RING ────────────
+         MasterCell renders its own ring on the inner input.
+         Showing both causes a double-ring flash on Tab press.
+      ────────────────────────────────────────────────────── */
       .ag-cell:focus,
       .ag-cell.ag-cell-focus {
         outline: none !important;
@@ -330,7 +295,7 @@ export type SharedGridEvent<T> =
         box-shadow: none !important;
       }
 
-      /* Restore a subtle focus indicator only for non-MasterCell columns */
+      /* Restore subtle ring for action column (no inner input) */
       .ag-cell[col-id="__actions__"]:focus {
         outline: 2px solid var(--theme-accent-primary) !important;
         outline-offset: -2px !important;
@@ -350,13 +315,13 @@ export type SharedGridEvent<T> =
 export class AppSharedGrid<T extends { _id?: string; id?: string }> {
 
   /* ── INPUTS ──────────────────────────────────────────── */
-  readonly columns = input.required<GridColDef<T>[]>();
-  readonly data = input<T[] | null>(null);
-  readonly selectionMode = input<'single' | 'multiple' | null>(null);
-  readonly showActions = input(false);
-  readonly enableExcelExport = input(true);
+  readonly columns              = input.required<GridColDef<T>[]>();
+  readonly data                 = input<T[] | null>(null);
+  readonly selectionMode        = input<'single' | 'multiple' | null>(null);
+  readonly showActions          = input(false);
+  readonly enableExcelExport    = input(true);
   readonly excelExportPermission = input<string | undefined>(undefined);
-  readonly excelFileName = input<string>('Exported_Data');
+  readonly excelFileName        = input<string>('Exported_Data');
 
   /* ── OUTPUTS ─────────────────────────────────────────── */
   readonly gridEvent = output<SharedGridEvent<T>>();
@@ -365,29 +330,31 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
   /* ── INTERNAL STATE ──────────────────────────────────── */
   private api!: GridApi<T>;
 
-  readonly editingIds = signal<Set<string>>(new Set());
+  readonly editingIds    = signal<Set<string>>(new Set());
   readonly selectedCount = signal(0);
   readonly isBulkEditing = signal(false);
+  readonly draftMap      = new Map<string, Partial<T>>();
 
-  readonly draftMap = new Map<string, Partial<T>>();
+  readonly isNotesPanelVisible = signal(false);
+  readonly notesEntityType = signal('');
+  readonly notesEntityId = signal<string | number | undefined>(undefined);
 
-  /* ── GRID OPTIONS ────────────────────────────────────────────────────────
-     TAB FOCUS FIX — two keys added:
-
-     suppressCellFocus: true
-       Tells AG Grid to never focus the cell wrapper <div> itself.
-       Without this, Tab causes AG Grid to paint ag-cell-focus outline on the
-       wrapper div BEFORE afterGuiAttached() fires — causing a visible flash.
-
-     tabToNextCell: (p) => this.tabToNextCell(p)
-       Fully replaces AG Grid's built-in Tab behavior. We choose the next
-       cell ourselves and focus the inner <input> directly via a microtask,
-       bypassing the wrapper div focus entirely.
-  ──────────────────────────────────────────────────────────────────────── */
+  /* ── GRID OPTIONS ────────────────────────────────────── */
   readonly gridOptions: GridOptions<T> = {
     suppressClickEdit: true,
     animateRows: true,
     rowBuffer: 20,
+
+    /*
+      suppressCellFocus: true
+      Prevents AG Grid from applying its own focus outline to the cell wrapper
+      <div> on Tab. Without this, AG Grid paints `ag-cell-focus` styling on the
+      div before our microtask fires — producing a visible flash.
+      
+      NOTE: With suppressCellFocus=true, AG Grid does NOT move focus between
+      cells automatically. We must handle ALL Tab navigation ourselves via
+      tabToNextCell. This is intentional — we own the focus lifecycle.
+    */
     suppressCellFocus: true,
     tabToNextCell: (p) => this.tabToNextCell(p),
 
@@ -399,87 +366,111 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
     context: { componentParent: this },
   };
 
-  /* ── TAB TO NEXT CELL ────────────────────────────────────────────────────
-     Custom Tab handler — the heart of the focus fix.
+  /* ── TAB NAVIGATION ──────────────────────────────────────────────────────
 
-     Instead of letting AG Grid focus the next cell wrapper div (which causes
-     the flash), we:
-     1. Find the next editable MasterCell column ourselves.
-     2. Return that CellPosition to AG Grid so it knows which cell is "active".
-     3. Use Promise.resolve().then() — a microtask — to directly call .focus()
-        on the inner <input> or <textarea> inside that cell.
+     HOW THE FIX WORKS (step by step):
 
-     Microtasks run after the current JS task but BEFORE the browser paints
-     the next frame. So the input gets focus before any AG Grid styling is
-     applied — zero flash, zero delay visible to the user.
+     1. columnDefs() tags every MasterCell column colId with MCELL_MARKER prefix
+        e.g.  field "name"  → colId "__mcell__name"
+              field "email" → colId "__mcell__email"
+
+     2. tabToNextCell filters AG Grid's column list by that stable string prefix.
+        No class reference comparison → immune to signal re-runs.
+
+     3. We compute next col/row index with wrap-around.
+
+     4. We return the CellPosition to AG Grid so its internal "current cell"
+        pointer advances correctly (keyboard selection, scrolling into view).
+
+     5. A microtask (Promise.resolve().then) runs BEFORE the next browser paint.
+        We query the actual DOM input inside the target cell and call .focus()
+        directly — bypassing the wrapper div entirely.
+
+     Result: the inner <input> gets focus with zero visible flash.
   ──────────────────────────────────────────────────────────────────────── */
   private tabToNextCell(params: TabToNextCellParams): CellPosition | boolean {
     const { backwards, previousCellPosition, api } = params;
 
-    // Find all columns that use MasterCellComponent
-    const allCols = api.getColumns() ?? [];
-    const editableCols = allCols.filter(
-      col => col.getColDef().cellRenderer === MasterCellComponent
+    // FIX: filter by stable string marker, not class identity
+    const allCols     = api.getColumns() ?? [];
+    const editableCols = allCols.filter(col =>
+      col.getColId().startsWith(MCELL_MARKER)
     );
 
     if (!editableCols.length) return false;
 
-    const currentIdx = editableCols.findIndex(
-      c => c.getColId() === previousCellPosition.column.getColId()
-    );
+    const currentColId = previousCellPosition.column.getColId();
+    const currentIdx   = editableCols.findIndex(c => c.getColId() === currentColId);
 
-    let nextColIdx = backwards ? currentIdx - 1 : currentIdx + 1;
+    // If Tab is pressed on a non-MasterCell column (e.g. actions), jump to first
+    let nextColIdx = currentIdx === -1
+      ? (backwards ? editableCols.length - 1 : 0)
+      : (backwards ? currentIdx - 1 : currentIdx + 1);
+
     let nextRowIdx = previousCellPosition.rowIndex;
 
-    // Wrap: fell off left edge → go to last col of previous row
+    // Wrap: fell off left → last col of previous row
     if (nextColIdx < 0) {
       nextColIdx = editableCols.length - 1;
       nextRowIdx--;
     }
-    // Wrap: fell off right edge → go to first col of next row
+    // Wrap: fell off right → first col of next row
     else if (nextColIdx >= editableCols.length) {
       nextColIdx = 0;
       nextRowIdx++;
     }
 
-    // Bounds check — stop Tab at grid edges
+    // Clamp to grid bounds — stop at edges
     const rowCount = api.getDisplayedRowCount();
     if (nextRowIdx < 0 || nextRowIdx >= rowCount) return false;
 
+    // Only navigate into rows that are being edited
+    const nextNode = api.getDisplayedRowAtIndex(nextRowIdx);
+    const parentCtx = this.gridOptions.context?.componentParent;
+    if (nextNode && parentCtx && !parentCtx.editingIds?.()?.has(nextNode.id)) {
+      // Row not in edit mode — skip to next editable row
+      // Simple fallback: just don't navigate (return false stops Tab)
+      // Advanced: loop to find the next editing row (see comment below)
+      return false;
+    }
+
     const nextCell: CellPosition = {
       rowIndex: nextRowIdx,
-      column: editableCols[nextColIdx],
+      column:   editableCols[nextColIdx],
       rowPinned: null,
     };
 
-    // ✅ Microtask: runs before browser paint — input gets focus with zero flash
+    // Microtask: fires before browser paint → zero flash
     Promise.resolve().then(() => {
       const rowNode = api.getDisplayedRowAtIndex(nextRowIdx);
       if (!rowNode) return;
 
       const colId = editableCols[nextColIdx].getColId();
 
-      // Query the actual DOM input inside the target cell
-      const input = document.querySelector<HTMLElement>(
-        `.ag-cell[col-id="${colId}"][row-id="${rowNode.id}"] input:not([type="hidden"]), ` +
-        `.ag-cell[col-id="${colId}"][row-id="${rowNode.id}"] textarea`
-      );
+      // DOM query targets the actual input inside the cell
+      // row-id attr is set by AG Grid on the row wrapper
+      const selector =
+        `.ag-row[row-id="${rowNode.id}"] .ag-cell[col-id="${colId}"] input:not([type="hidden"]), ` +
+        `.ag-row[row-id="${rowNode.id}"] .ag-cell[col-id="${colId}"] textarea`;
 
-      if (input) {
-        input.focus({ preventScroll: false });
-        if (
-          input instanceof HTMLInputElement &&
-          ['text', 'email', 'tel', 'url', 'number'].includes(input.type)
-        ) {
-          input.select();
-        }
+      const input = document.querySelector<HTMLElement>(selector);
+      if (!input) return;
+
+      input.focus({ preventScroll: false });
+
+      if (input instanceof HTMLInputElement &&
+          ['text','email','tel','url','number'].includes(input.type)) {
+        input.select();
       }
     });
 
     return nextCell;
   }
 
-  /* ── COLUMN DEFS ─────────────────────────────────────── */
+  /* ── COLUMN DEFS ─────────────────────────────────────────────────────────
+     KEY CHANGE: every MasterCell column gets colId = MCELL_MARKER + field
+     This is the stable anchor that tabToNextCell uses to find editable columns.
+  ──────────────────────────────────────────────────────────────────────── */
   readonly columnDefs = computed<ColDef<T>[]>(() => {
     const cols: ColDef<T>[] = this.columns().map(col => {
       const { cellConfig, ...agColDef } = col;
@@ -487,6 +478,8 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
 
       return {
         ...(agColDef as ColDef<T>),
+        // Prefix colId so tabToNextCell can find MasterCell columns reliably
+        colId: `${MCELL_MARKER}${col.field ?? col.colId ?? ''}`,
         editable: false,
         cellRenderer: MasterCellComponent,
         cellRendererParams: (params: ICellRendererParams<T>) => ({
@@ -504,13 +497,13 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
         headerName: '',
         colId: '__actions__',
         pinned: 'right',
-        width: 100,
+        // width: 100,
         minWidth: 100,
-        maxWidth: 120,
+        // maxWidth: 120,
         editable: false,
         sortable: false,
         filter: false,
-        resizable: false,
+        resizable: true,
         suppressMovable: true,
         cellRenderer: AppSharedGridActionButton,
       });
@@ -538,14 +531,13 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
     this.gridEvent.emit({ type: 'selectionChanged', rows });
   }
 
-  /** Aggregates all MasterCell interactions → single cellEvent output */
   onCellInteraction(event: CellInteractionEvent): void {
     this.cellEvent.emit(event);
   }
 
   /* ── ADD ROW ─────────────────────────────────────────── */
   addNewRow(): void {
-    const tempId = `new_${Date.now()}`;
+    const tempId  = `new_${Date.now()}`;
     const newRow: any = { _tempId: tempId, _id: tempId, id: tempId };
     this.columns().forEach(c => { if (c.field) newRow[c.field] = null; });
     this.api.applyTransaction({ add: [newRow], addIndex: 0 });
@@ -573,7 +565,7 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
     const updates: T[] = [];
     const idsToStop: string[] = [];
     this.editingIds().forEach(id => {
-      const node = this.api.getRowNode(id);
+      const node    = this.api.getRowNode(id);
       const changes = this.draftMap.get(id);
       if (node?.data && changes) {
         const final = { ...node.data, ...changes } as T;
@@ -612,7 +604,7 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
 
   /* ── SINGLE ROW ACTIONS ──────────────────────────────── */
   handleRowAction(action: string, row: T): void {
-    const id = this.resolveId(row);
+    const id   = this.resolveId(row);
     const node = this.api.getRowNode(id);
     if (!id || !node) return;
 
@@ -625,7 +617,7 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
       }
       case 'save': {
         const changes = this.draftMap.get(id);
-        const final = { ...row, ...changes } as T;
+        const final   = { ...row, ...changes } as T;
         node.setData(final);
         this.draftMap.delete(id);
         this.deactivateEditForIds([id]);
@@ -647,6 +639,13 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
         this.gridEvent.emit({ type: 'delete', row });
         break;
       }
+      case 'notes': {
+        this.notesEntityType.set('Generic'); // Or parse from somewhere contextually
+        this.notesEntityId.set(id);
+        this.isNotesPanelVisible.set(true);
+        this.gridEvent.emit({ type: 'notes', row });
+        break;
+      }
     }
   }
 
@@ -659,16 +658,14 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
   applyTransaction(update: T[], add?: T[], remove?: T[]): void {
     this.api?.applyTransaction({ update, add, remove });
   }
-  exportToCsv(fileName = 'export.csv'): void {
-    this.api?.exportDataAsCsv({ fileName });
-  }
+  exportToCsv(fileName = 'export.csv'): void { this.api?.exportDataAsCsv({ fileName }); }
   sizeColumnsToFit(): void { this.api?.sizeColumnsToFit(); }
   refreshGrid(): void { this.api?.refreshCells({ force: true }); }
   getSelectedRows(): T[] { return this.api?.getSelectedRows() ?? []; }
 
   /* ── HELPERS ─────────────────────────────────────────── */
   private activateEditForIds(ids: string[]): void {
-    const next = new Set(this.editingIds());
+    const next          = new Set(this.editingIds());
     const nodesToRefresh: any[] = [];
     ids.forEach(id => {
       next.add(id);
@@ -682,7 +679,7 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
   }
 
   private deactivateEditForIds(ids: string[]): void {
-    const next = new Set(this.editingIds());
+    const next          = new Set(this.editingIds());
     const nodesToRefresh: any[] = [];
     ids.forEach(id => {
       next.delete(id);
@@ -702,23 +699,21 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
   /* ── THEME ───────────────────────────────────────────── */
   readonly agTheme = computed<Theme>(() =>
     themeQuartz.withParams({
-      fontFamily: 'var(--font-body)',
-      fontSize: '13px',
-      backgroundColor: 'var(--theme-bg-primary)',
-      headerBackgroundColor: 'var(--theme-bg-secondary)',
-      foregroundColor: 'var(--theme-text-primary)',
-      headerTextColor: 'var(--theme-text-tertiary)',
-      borderColor: 'var(--theme-border-primary)',
-      rowHoverColor: 'var(--component-bg-hover)',
-      selectedRowBackgroundColor: 'color-mix(in srgb, var(--theme-accent-primary) 7%, transparent 93%)',
-      rowHeight: 42,
-      headerHeight: 46,
-      spacing: 5,
+      fontFamily:                  'var(--font-body)',
+      fontSize:                    '13px',
+      backgroundColor:             'var(--theme-bg-primary)',
+      headerBackgroundColor:       'var(--theme-bg-secondary)',
+      foregroundColor:             'var(--theme-text-primary)',
+      headerTextColor:             'var(--theme-text-tertiary)',
+      borderColor:                 'var(--theme-border-primary)',
+      rowHoverColor:               'var(--component-bg-hover)',
+      selectedRowBackgroundColor:  'color-mix(in srgb, var(--theme-accent-primary) 7%, transparent 93%)',
+      rowHeight:                   42,
+      headerHeight:                46,
+      spacing:                     5,
     })
   );
 }
-
-
 // import {
 //   Component,
 //   ChangeDetectionStrategy,
@@ -728,7 +723,7 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
 //   signal,
 //   ViewEncapsulation,
 // } from '@angular/core';
-// import { CommonModule } from '@angular/common';
+
 // import { AgGridAngular } from 'ag-grid-angular';
 // import {
 //   GridApi,
@@ -742,6 +737,8 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
 //   themeQuartz,
 //   ICellRendererParams,
 //   GetRowIdParams,
+//   TabToNextCellParams, // ← TAB FIX: needed for tabToNextCell override
+//   CellPosition,        // ← TAB FIX: return type of tabToNextCell
 // } from 'ag-grid-community';
 // import { ButtonModule } from 'primeng/button';
 // import { TooltipModule } from 'primeng/tooltip';
@@ -774,16 +771,22 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
 // @Component({
 //   selector: 'app-shared-grid',
 //   standalone: true,
-//   imports: [CommonModule, AgGridAngular, ButtonModule, TooltipModule, ExcelExportDialogComponent, HasPermissionDirective],
+//   imports: [
+//     AgGridAngular,
+//     ButtonModule,
+//     TooltipModule,
+//     ExcelExportDialogComponent,
+//     HasPermissionDirective
+//   ],
 //   changeDetection: ChangeDetectionStrategy.OnPush,
 //   encapsulation: ViewEncapsulation.None,
 //   template: `
 //     <div class="shared-grid-container">
-
+    
 //       <!-- ══ TOOLBAR ══════════════════════════════════════ -->
 //       @if (showActions() || selectionMode()) {
 //         <div class="grid-toolbar">
-
+    
 //           <div class="toolbar-left">
 //             <button
 //               pButton
@@ -796,7 +799,7 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
 //               pTooltip="Add a new row"
 //               tooltipPosition="bottom"
 //             ></button>
-
+    
 //             @if (selectedCount() > 0) {
 //               <div class="selection-chip">
 //                 <i class="pi pi-check-circle"></i>
@@ -804,23 +807,23 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
 //               </div>
 //             }
 //           </div>
-
+    
 //           <div class="toolbar-right">
+    
 //             @if (enableExcelExport()) {
-//               <ng-container *ngIf="excelExportPermission(); else noPermExport">
+//               @if (excelExportPermission()) {
 //                 <ng-container *hasPermission="excelExportPermission()!">
 //                   <app-excel-export-dialog [data]="data() ?? []"></app-excel-export-dialog>
 //                   <span class="toolbar-divider"></span>
 //                 </ng-container>
-//               </ng-container>
-//               <ng-template #noPermExport>
+//               } @else {
 //                 <app-excel-export-dialog [data]="data() ?? []"></app-excel-export-dialog>
 //                 <span class="toolbar-divider"></span>
-//               </ng-template>
+//               }
 //             }
-
+    
 //             @if (!isBulkEditing()) {
-
+    
 //               <button
 //                 pButton
 //                 label="Edit"
@@ -834,10 +837,10 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
 //                 pTooltip="Edit selected rows"
 //                 tooltipPosition="bottom"
 //               ></button>
-
+    
 //               @if (selectedCount() > 0) {
 //                 <span class="toolbar-divider"></span>
-
+    
 //                 <button
 //                   pButton
 //                   label="Delete"
@@ -851,14 +854,14 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
 //                   tooltipPosition="bottom"
 //                 ></button>
 //               }
-
+    
 //             } @else {
-
+    
 //               <span class="editing-label">
-//                 <i class="pi pi-pencil-square"></i>
+//                 <i class="pi pi-pencil"></i>
 //                 Editing {{ editingIds().size }} {{ editingIds().size === 1 ? 'row' : 'rows' }}
 //               </span>
-
+    
 //               <button
 //                 pButton
 //                 label="Cancel"
@@ -869,7 +872,7 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
 //                 styleClass="premium-btn btn-secondary"
 //                 (click)="cancelBulkEdit()"
 //               ></button>
-
+    
 //               <button
 //                 pButton
 //                 label="Save All"
@@ -880,11 +883,11 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
 //                 (click)="saveBulkEdit()"
 //               ></button>
 //             }
+    
 //           </div>
-
 //         </div>
 //       }
-
+    
 //       <!-- ══ GRID ═════════════════════════════════════════ -->
 //       <div class="grid-body">
 //         <ag-grid-angular
@@ -899,10 +902,15 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
 //           (selectionChanged)="onSelectionChanged()"
 //         ></ag-grid-angular>
 //       </div>
-
+    
 //     </div>
-//   `,
+//     `,
 //   styles: [`
+
+//     /* ══════════════════════════════════════════════════════
+//        SHARED GRID — APEX CRM Theme Token System
+//     ══════════════════════════════════════════════════════ */
+
 //     .shared-grid-container {
 //       display: flex;
 //       flex-direction: column;
@@ -915,6 +923,7 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
 //       box-shadow: var(--shadow-sm);
 //     }
 
+//     /* ── TOOLBAR ───────────────────────────────────────── */
 //     .grid-toolbar {
 //       display: flex;
 //       align-items: center;
@@ -927,7 +936,8 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
 //       z-index: 10;
 //     }
 
-//     .toolbar-left, .toolbar-right {
+//     .toolbar-left,
+//     .toolbar-right {
 //       display: flex;
 //       align-items: center;
 //       gap: 8px;
@@ -937,6 +947,7 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
 //       width: 1px;
 //       height: 18px;
 //       background: var(--theme-border-secondary);
+//       flex-shrink: 0;
 //     }
 
 //     .selection-chip {
@@ -945,20 +956,20 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
 //       gap: 5px;
 //       padding: 3px 10px;
 //       border-radius: 99px;
-//       background: rgba(var(--accent-primary-rgb), 0.08);
+//       background: color-mix(in srgb, var(--theme-accent-primary) 8%, transparent 92%);
 //       color: var(--theme-accent-primary);
-//       border: 1px solid rgba(var(--accent-primary-rgb), 0.2);
+//       border: 1px solid color-mix(in srgb, var(--theme-accent-primary) 20%, transparent 80%);
 //       font-size: 11px;
 //       font-weight: 700;
 //       text-transform: uppercase;
 //       letter-spacing: 0.03em;
 //       animation: chip-in 0.18s ease-out;
-//       i { font-size: 0.7rem; }
 //     }
+//     .selection-chip i { font-size: 0.7rem; }
 
 //     @keyframes chip-in {
 //       from { opacity: 0; transform: translateY(3px) scale(0.95); }
-//       to   { opacity: 1; transform: translateY(0) scale(1); }
+//       to   { opacity: 1; transform: translateY(0)   scale(1); }
 //     }
 
 //     .editing-label {
@@ -970,9 +981,10 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
 //       color: var(--theme-text-tertiary);
 //       font-style: italic;
 //       margin-right: 4px;
-//       i { font-size: 0.75rem; }
 //     }
+//     .editing-label i { font-size: 0.75rem; }
 
+//     /* ── TOOLBAR BUTTONS ───────────────────────────────── */
 //     :host ::ng-deep {
 //       .premium-btn.p-button {
 //         font-size: 12px;
@@ -980,67 +992,91 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
 //         letter-spacing: 0.01em;
 //         height: 30px;
 //         transition: all 0.15s ease;
-//         &:focus-visible { outline: 2px solid var(--theme-accent-primary); outline-offset: 2px; }
+//       }
+//       .premium-btn.p-button:focus-visible {
+//         outline: 2px solid var(--theme-accent-primary);
+//         outline-offset: 2px;
 //       }
 //       .premium-btn.btn-primary.p-button {
 //         background: var(--theme-accent-primary);
 //         border-color: var(--theme-accent-primary);
 //         color: #fff;
-//         &:hover { filter: brightness(1.08); box-shadow: 0 3px 8px rgba(var(--accent-primary-rgb),0.3); }
+//       }
+//       .premium-btn.btn-primary.p-button:hover {
+//         filter: brightness(1.08);
+//         box-shadow: 0 3px 8px color-mix(in srgb, var(--theme-accent-primary) 30%, transparent 70%);
 //       }
 //       .premium-btn.btn-secondary.p-button {
 //         color: var(--theme-text-secondary);
-//         &:hover { background: var(--component-bg-hover); color: var(--theme-text-primary); }
+//       }
+//       .premium-btn.btn-secondary.p-button:hover {
+//         background: var(--component-bg-hover, var(--theme-bg-secondary));
+//         color: var(--theme-text-primary);
 //       }
 //       .premium-btn.btn-danger.p-button {
-//         color: var(--color-error, #ef4444);
-//         &:hover { background: rgba(239,68,68,0.08); color: var(--color-error); border-color: rgba(239,68,68,0.2); }
+//         color: var(--theme-error, #ef4444);
+//       }
+//       .premium-btn.btn-danger.p-button:hover {
+//         background: color-mix(in srgb, var(--theme-error, #ef4444) 8%, transparent 92%);
+//         color: var(--theme-error, #ef4444);
+//         border-color: color-mix(in srgb, var(--theme-error, #ef4444) 20%, transparent 80%);
 //       }
 //       .premium-btn.btn-success.p-button {
-//         background: var(--color-success, #22c55e);
-//         border-color: var(--color-success, #22c55e);
+//         background: var(--theme-success, #22c55e);
+//         border-color: var(--theme-success, #22c55e);
 //         color: #fff;
-//         &:hover { filter: brightness(1.06); box-shadow: 0 3px 8px rgba(34,197,94,0.3); }
+//       }
+//       .premium-btn.btn-success.p-button:hover {
+//         filter: brightness(1.06);
+//         box-shadow: 0 3px 8px color-mix(in srgb, var(--theme-success, #22c55e) 30%, transparent 70%);
+//       }
+
+//       /* ── TAB FOCUS FIX: suppress AG Grid's cell wrapper focus ring ──────
+//          Our MasterCellComponent renders its own focus ring on the inner
+//          input via box-shadow. AG Grid's ag-cell-focus outline on the wrapper
+//          div causes a visible flash on Tab. We kill it here entirely.
+//          The action column gets its own subtle ring since it has no inner input.
+//       ──────────────────────────────────────────────────────────────────── */
+//       .ag-cell:focus,
+//       .ag-cell.ag-cell-focus {
+//         outline: none !important;
+//         border-color: transparent !important;
+//         box-shadow: none !important;
+//       }
+
+//       /* Restore a subtle focus indicator only for non-MasterCell columns */
+//       .ag-cell[col-id="__actions__"]:focus {
+//         outline: 2px solid var(--theme-accent-primary) !important;
+//         outline-offset: -2px !important;
+//         border-radius: 4px;
 //       }
 //     }
 
+//     /* ── GRID BODY ─────────────────────────────────────── */
 //     .grid-body {
 //       flex: 1;
 //       width: 100%;
 //       overflow: hidden;
 //     }
+
 //   `],
 // })
 // export class AppSharedGrid<T extends { _id?: string; id?: string }> {
 
-//   /* ── INPUTS ────────────────────────────────────────── */
+//   /* ── INPUTS ──────────────────────────────────────────── */
 //   readonly columns = input.required<GridColDef<T>[]>();
 //   readonly data = input<T[] | null>(null);
 //   readonly selectionMode = input<'single' | 'multiple' | null>(null);
 //   readonly showActions = input(false);
-
 //   readonly enableExcelExport = input(true);
 //   readonly excelExportPermission = input<string | undefined>(undefined);
 //   readonly excelFileName = input<string>('Exported_Data');
 
-//   /* ── OUTPUTS ───────────────────────────────────────── */
-//   /** Row-level CRUD / lifecycle events */
+//   /* ── OUTPUTS ─────────────────────────────────────────── */
 //   readonly gridEvent = output<SharedGridEvent<T>>();
-
-//   /**
-//    * Cell-level interaction events — aggregated from ALL MasterCellComponents
-//    * in the grid via context.componentParent.onCellInteraction().
-//    *
-//    * Every click, focus, blur, change, enter, escape, linkClick from any cell
-//    * surfaces here with full context (field, rowId, value, draftValue, cellType).
-//    *
-//    * Usage in parent template:
-//    *   (cellEvent)="handleCellEvent($event)"
-//    */
 //   readonly cellEvent = output<CellInteractionEvent>();
 
-//   /* ── INTERNAL STATE ────────────────────────────────── */
-
+//   /* ── INTERNAL STATE ──────────────────────────────────── */
 //   private api!: GridApi<T>;
 
 //   readonly editingIds = signal<Set<string>>(new Set());
@@ -1049,19 +1085,115 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
 
 //   readonly draftMap = new Map<string, Partial<T>>();
 
-//   /* ── GRID OPTIONS ──────────────────────────────────── */
+//   /* ── GRID OPTIONS ────────────────────────────────────────────────────────
+//      TAB FOCUS FIX — two keys added:
+
+//      suppressCellFocus: true
+//        Tells AG Grid to never focus the cell wrapper <div> itself.
+//        Without this, Tab causes AG Grid to paint ag-cell-focus outline on the
+//        wrapper div BEFORE afterGuiAttached() fires — causing a visible flash.
+
+//      tabToNextCell: (p) => this.tabToNextCell(p)
+//        Fully replaces AG Grid's built-in Tab behavior. We choose the next
+//        cell ourselves and focus the inner <input> directly via a microtask,
+//        bypassing the wrapper div focus entirely.
+//   ──────────────────────────────────────────────────────────────────────── */
 //   readonly gridOptions: GridOptions<T> = {
 //     suppressClickEdit: true,
 //     animateRows: true,
 //     rowBuffer: 20,
+//     suppressCellFocus: true,
+//     tabToNextCell: (p) => this.tabToNextCell(p),
+
 //     getRowId: (p: GetRowIdParams<T>) => {
 //       const d = p.data as any;
 //       return d._id ?? d.id ?? d._tempId ?? '';
 //     },
+
 //     context: { componentParent: this },
 //   };
 
-//   /* ── COLUMN DEFS ───────────────────────────────────── */
+//   /* ── TAB TO NEXT CELL ────────────────────────────────────────────────────
+//      Custom Tab handler — the heart of the focus fix.
+
+//      Instead of letting AG Grid focus the next cell wrapper div (which causes
+//      the flash), we:
+//      1. Find the next editable MasterCell column ourselves.
+//      2. Return that CellPosition to AG Grid so it knows which cell is "active".
+//      3. Use Promise.resolve().then() — a microtask — to directly call .focus()
+//         on the inner <input> or <textarea> inside that cell.
+
+//      Microtasks run after the current JS task but BEFORE the browser paints
+//      the next frame. So the input gets focus before any AG Grid styling is
+//      applied — zero flash, zero delay visible to the user.
+//   ──────────────────────────────────────────────────────────────────────── */
+//   private tabToNextCell(params: TabToNextCellParams): CellPosition | boolean {
+//     const { backwards, previousCellPosition, api } = params;
+
+//     // Find all columns that use MasterCellComponent
+//     const allCols = api.getColumns() ?? [];
+//     const editableCols = allCols.filter(
+//       col => col.getColDef().cellRenderer === MasterCellComponent
+//     );
+
+//     if (!editableCols.length) return false;
+
+//     const currentIdx = editableCols.findIndex(
+//       c => c.getColId() === previousCellPosition.column.getColId()
+//     );
+
+//     let nextColIdx = backwards ? currentIdx - 1 : currentIdx + 1;
+//     let nextRowIdx = previousCellPosition.rowIndex;
+
+//     // Wrap: fell off left edge → go to last col of previous row
+//     if (nextColIdx < 0) {
+//       nextColIdx = editableCols.length - 1;
+//       nextRowIdx--;
+//     }
+//     // Wrap: fell off right edge → go to first col of next row
+//     else if (nextColIdx >= editableCols.length) {
+//       nextColIdx = 0;
+//       nextRowIdx++;
+//     }
+
+//     // Bounds check — stop Tab at grid edges
+//     const rowCount = api.getDisplayedRowCount();
+//     if (nextRowIdx < 0 || nextRowIdx >= rowCount) return false;
+
+//     const nextCell: CellPosition = {
+//       rowIndex: nextRowIdx,
+//       column: editableCols[nextColIdx],
+//       rowPinned: null,
+//     };
+
+//     // ✅ Microtask: runs before browser paint — input gets focus with zero flash
+//     Promise.resolve().then(() => {
+//       const rowNode = api.getDisplayedRowAtIndex(nextRowIdx);
+//       if (!rowNode) return;
+
+//       const colId = editableCols[nextColIdx].getColId();
+
+//       // Query the actual DOM input inside the target cell
+//       const input = document.querySelector<HTMLElement>(
+//         `.ag-cell[col-id="${colId}"][row-id="${rowNode.id}"] input:not([type="hidden"]), ` +
+//         `.ag-cell[col-id="${colId}"][row-id="${rowNode.id}"] textarea`
+//       );
+
+//       if (input) {
+//         input.focus({ preventScroll: false });
+//         if (
+//           input instanceof HTMLInputElement &&
+//           ['text', 'email', 'tel', 'url', 'number'].includes(input.type)
+//         ) {
+//           input.select();
+//         }
+//       }
+//     });
+
+//     return nextCell;
+//   }
+
+//   /* ── COLUMN DEFS ─────────────────────────────────────── */
 //   readonly columnDefs = computed<ColDef<T>[]>(() => {
 //     const cols: ColDef<T>[] = this.columns().map(col => {
 //       const { cellConfig, ...agColDef } = col;
@@ -1101,14 +1233,14 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
 //     return cols;
 //   });
 
-//   /* ── SELECTION ─────────────────────────────────────── */
+//   /* ── SELECTION ───────────────────────────────────────── */
 //   get selectionOptions(): RowSelectionOptions | undefined {
 //     const mode = this.selectionMode();
 //     if (!mode) return undefined;
 //     return { mode: mode === 'single' ? 'singleRow' : 'multiRow' };
 //   }
 
-//   /* ── GRID EVENTS ───────────────────────────────────── */
+//   /* ── GRID EVENTS ─────────────────────────────────────── */
 //   onGridReady(e: GridReadyEvent<T>): void {
 //     this.api = e.api;
 //     this.gridEvent.emit({ type: 'init', api: this.api });
@@ -1120,16 +1252,12 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
 //     this.gridEvent.emit({ type: 'selectionChanged', rows });
 //   }
 
-//   /**
-//    * Called by MasterCellComponent via context.componentParent.
-//    * Aggregates ALL cell interactions and re-emits on the grid's cellEvent output.
-//    * This means one (cellEvent) listener on <app-shared-grid> catches everything.
-//    */
+//   /** Aggregates all MasterCell interactions → single cellEvent output */
 //   onCellInteraction(event: CellInteractionEvent): void {
 //     this.cellEvent.emit(event);
 //   }
 
-//   /* ── ADD ROW ───────────────────────────────────────── */
+//   /* ── ADD ROW ─────────────────────────────────────────── */
 //   addNewRow(): void {
 //     const tempId = `new_${Date.now()}`;
 //     const newRow: any = { _tempId: tempId, _id: tempId, id: tempId };
@@ -1140,7 +1268,7 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
 //     this.gridEvent.emit({ type: 'rowAdded', row: newRow });
 //   }
 
-//   /* ── BULK EDIT ─────────────────────────────────────── */
+//   /* ── BULK EDIT ───────────────────────────────────────── */
 //   enableBulkEdit(): void {
 //     const nodes = this.api.getSelectedNodes();
 //     if (!nodes.length) return;
@@ -1196,7 +1324,7 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
 //     this.selectedCount.set(0);
 //   }
 
-//   /* ── SINGLE ROW ACTIONS ────────────────────────────── */
+//   /* ── SINGLE ROW ACTIONS ──────────────────────────────── */
 //   handleRowAction(action: string, row: T): void {
 //     const id = this.resolveId(row);
 //     const node = this.api.getRowNode(id);
@@ -1241,7 +1369,7 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
 //     this.draftMap.set(id, { ...current, [field]: value });
 //   }
 
-//   /* ── PUBLIC API ────────────────────────────────────── */
+//   /* ── PUBLIC API ──────────────────────────────────────── */
 //   applyTransaction(update: T[], add?: T[], remove?: T[]): void {
 //     this.api?.applyTransaction({ update, add, remove });
 //   }
@@ -1252,7 +1380,7 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
 //   refreshGrid(): void { this.api?.refreshCells({ force: true }); }
 //   getSelectedRows(): T[] { return this.api?.getSelectedRows() ?? []; }
 
-//   /* ── HELPERS ───────────────────────────────────────── */
+//   /* ── HELPERS ─────────────────────────────────────────── */
 //   private activateEditForIds(ids: string[]): void {
 //     const next = new Set(this.editingIds());
 //     const nodesToRefresh: any[] = [];
@@ -1285,7 +1413,7 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
 //     return row?._id ?? row?.id ?? row?._tempId ?? '';
 //   }
 
-//   /* ── THEME ─────────────────────────────────────────── */
+//   /* ── THEME ───────────────────────────────────────────── */
 //   readonly agTheme = computed<Theme>(() =>
 //     themeQuartz.withParams({
 //       fontFamily: 'var(--font-body)',
@@ -1296,10 +1424,11 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
 //       headerTextColor: 'var(--theme-text-tertiary)',
 //       borderColor: 'var(--theme-border-primary)',
 //       rowHoverColor: 'var(--component-bg-hover)',
-//       selectedRowBackgroundColor: 'rgba(var(--accent-primary-rgb), 0.07)',
+//       selectedRowBackgroundColor: 'color-mix(in srgb, var(--theme-accent-primary) 7%, transparent 93%)',
 //       rowHeight: 42,
 //       headerHeight: 46,
 //       spacing: 5,
 //     })
 //   );
 // }
+

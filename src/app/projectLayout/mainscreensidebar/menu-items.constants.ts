@@ -18,6 +18,7 @@ export const SIDEBAR_MENU: MenuItem[] = [
     label: 'Overview',
     icon: 'pi pi-home',
     items: [
+      { label: 'Create Dashboard', icon: 'pi pi-plus-circle', routerLink: ['/create-dashboard'] },
       { label: 'Dashboard', icon: 'pi pi-chart-line', routerLink: ['/dashboard'], permissions: [PERMISSIONS.DASHBOARD.VIEW] },
       { label: 'Team Chat', icon: 'pi pi-comments', routerLink: ['/chat'], permissions: [PERMISSIONS.CHAT.READ] },
       { label: 'My Notes', icon: 'pi pi-book', routerLink: ['/notes'], permissions: [PERMISSIONS.NOTE.READ] },
@@ -145,8 +146,8 @@ export const SIDEBAR_MENU: MenuItem[] = [
           { label: 'All Invoices', icon: 'pi pi-list', routerLink: ['/invoices'], permissions: [PERMISSIONS.INVOICE.READ] },
           { label: 'Scan Invoice', icon: 'pi pi-plus', routerLink: ['/invoices/PosInvoiceComponent'], permissions: [PERMISSIONS.INVOICE.CREATE] },
           { label: 'Create Invoice', icon: 'pi pi-plus', routerLink: ['/invoices/create'], permissions: [PERMISSIONS.INVOICE.CREATE] },
-          { label: 'Profit Dashboard (Old)', icon: 'pi pi-chart-pie', routerLink: ['/invoices/ProfitDashboardComponent'], permissions: [PERMISSIONS.REPORT.PROFIT] },
-          { label: 'Profit Dashboard (New)', icon: 'pi pi-file-excel', routerLink: ['/invoices/profitDashboardNew'], permissions: [PERMISSIONS.REPORT.PROFIT] },
+          // { label: 'Profit Dashboard (Old)', icon: 'pi pi-chart-pie', routerLink: ['/invoices/ProfitDashboardComponent'], permissions: [PERMISSIONS.REPORT.PROFIT] },
+          { label: 'Profit Dashboard ', icon: 'pi pi-file-excel', routerLink: ['/invoices/profitDashboardNew'], permissions: [PERMISSIONS.REPORT.PROFIT] },
           { label: 'Profit Summary', icon: 'pi pi-file-excel', routerLink: ['/invoices/ProfitSummaryComponent'], permissions: [PERMISSIONS.REPORT.PROFIT] },
           { label: 'Advanced Analysis', icon: 'pi pi-chart-bar', routerLink: ['/invoices/AdvancedProfitAnalysisComponent'], permissions: [PERMISSIONS.REPORT.PROFIT] },
         ]

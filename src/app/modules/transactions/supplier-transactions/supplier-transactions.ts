@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit, inject, Input, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ActivatedRoute } from '@angular/router';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { FormsModule } from '@angular/forms';
@@ -20,7 +20,6 @@ import { CommonMethodService } from '../../../core/utils/common-method.service';
   selector: 'app-supplier-transactions',
   standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
     ButtonModule,
     InputTextModule,
@@ -29,7 +28,7 @@ import { CommonMethodService } from '../../../core/utils/common-method.service';
     SelectModule,
     TooltipModule,
     AgShareGrid
-  ],
+],
   templateUrl: './supplier-transactions.html',
   styleUrl: './supplier-transactions.scss',
 })

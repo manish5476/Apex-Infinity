@@ -11,7 +11,9 @@
       </div>
 
       <div class="flow-line">
-        <div class="moving-dot" *ngIf="fromCtrl?.value && toCtrl?.value"></div>
+        @if (fromCtrl?.value && toCtrl?.value) {
+          <div class="moving-dot"></div>
+        }
       </div>
 
       <div class="node" [class.active]="toCtrl?.value">
@@ -25,14 +27,14 @@
     <div class="form-grid">
       <div class="field-group">
         <span class="p-float-label">
-          <p-select 
-            formControlName="fromBranchId" 
-            [options]="branches" 
-            optionLabel="name" 
+          <p-select
+            formControlName="fromBranchId"
+            [options]="branches"
+            optionLabel="name"
             optionValue="_id"
-            [style]="{'width':'100%'}" 
-            appendTo="body" 
-            [filter]="true" 
+            [style]="{'width':'100%'}"
+            appendTo="body"
+            [filter]="true"
             filterBy="name"
             inputId="from-branch">
           </p-select>
@@ -47,14 +49,14 @@
 
       <div class="field-group">
         <span class="p-float-label">
-          <p-select 
-            formControlName="toBranchId" 
-            [options]="branches" 
-            optionLabel="name" 
+          <p-select
+            formControlName="toBranchId"
+            [options]="branches"
+            optionLabel="name"
             optionValue="_id"
-            [style]="{'width':'100%'}" 
-            appendTo="body" 
-            [filter]="true" 
+            [style]="{'width':'100%'}"
+            appendTo="body"
+            [filter]="true"
             filterBy="name"
             inputId="to-branch">
           </p-select>
@@ -73,15 +75,15 @@
     <div class="form-grid">
       <div class="field-group">
         <span class="p-float-label">
-          <p-inputNumber 
-            formControlName="quantity" 
-            mode="decimal" 
-            [min]="1" 
+          <p-inputNumber
+            formControlName="quantity"
+            mode="decimal"
+            [min]="1"
             [showButtons]="true"
-            buttonLayout="horizontal" 
-            incrementButtonIcon="pi pi-plus" 
+            buttonLayout="horizontal"
+            incrementButtonIcon="pi pi-plus"
             decrementButtonIcon="pi pi-minus"
-            styleClass="w-full" 
+            styleClass="w-full"
             [style]="{'width':'100%'}"
             inputId="qty-input">
           </p-inputNumber>
@@ -94,10 +96,10 @@
 
       <div class="field-group">
         <span class="p-float-label">
-          <textarea 
-            pInputTextarea 
-            formControlName="description" 
-            rows="1" 
+          <textarea
+            pInputTextarea
+            formControlName="description"
+            rows="1"
             inputId="desc-input"
             class="w-full"
             style="width: 100%; resize: none; height: 46px;">
@@ -108,16 +110,16 @@
     </div>
 
     <div class="dialog-footer">
-      <p-button 
-        label="Cancel" 
-        [text]="true" 
-        severity="secondary" 
+      <p-button
+        label="Cancel"
+        [text]="true"
+        severity="secondary"
         (onClick)="onCancel()">
       </p-button>
-      <p-button 
-        label="Confirm Transfer" 
-        type="submit" 
-        [loading]="loading" 
+      <p-button
+        label="Confirm Transfer"
+        type="submit"
+        [loading]="loading"
         [disabled]="transferForm.invalid"
         icon="pi pi-arrow-right-arrow-left">
       </p-button>

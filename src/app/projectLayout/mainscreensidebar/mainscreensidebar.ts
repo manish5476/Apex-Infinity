@@ -1,5 +1,5 @@
 import { Component, inject, HostBinding, OnInit, HostListener, ViewChild, ElementRef, effect, signal, computed, untracked, DestroyRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { LayoutService } from '../layout.service';
@@ -19,7 +19,7 @@ interface FlatMenuItem {
 @Component({
   selector: 'app-mainscreen-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterModule, DialogModule], // ✅ FIX 1 Applied
+  imports: [RouterModule, DialogModule], // ✅ FIX 1 Applied
   templateUrl: './mainscreensidebar.html',
   styleUrl: './mainscreensidebar.scss'
 })

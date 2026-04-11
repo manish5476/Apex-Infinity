@@ -16,7 +16,7 @@ import { DatePicker } from "primeng/datepicker";
 import { Select } from "primeng/select";
 import { FormsModule } from '@angular/forms';
 import { Toast } from "primeng/toast";
-import { CommonModule } from '@angular/common';
+
 import { CommonMethodService } from '../../../core/utils/common-method.service';
 import { AgShareGrid, SharedGridEvent } from "../../shared/components/ag-shared-grid";
 import { Subject } from "rxjs";
@@ -24,7 +24,7 @@ import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-logs',
-  imports: [Button, DatePicker, Select, FormsModule,  CommonModule, Toast, AgShareGrid],
+  imports: [Button, DatePicker, Select, FormsModule, Toast, AgShareGrid],
   templateUrl: './logs.html',
   styleUrl: './logs.scss',
 })

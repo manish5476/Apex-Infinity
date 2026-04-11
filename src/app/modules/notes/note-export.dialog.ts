@@ -1,6 +1,6 @@
 import { MessageService } from "primeng/api";
 import { ChangeDetectorRef, Component, inject, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
 import { NoteService } from '../../core/services/notes.service';
@@ -12,7 +12,7 @@ import { takeUntil } from "rxjs/operators";
 @Component({
   selector: 'app-note-export-dialog',
   standalone: true,
-  imports: [CommonModule, FormsModule, DatePickerModule],
+  imports: [FormsModule, DatePickerModule],
   template: `
     <div class="export-container">
       

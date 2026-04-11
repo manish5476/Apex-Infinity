@@ -5,7 +5,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { ChangeDetectionStrategy, Component, OnInit, inject, } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { TabService } from '../Service/tab.service';
@@ -31,7 +31,7 @@ const NAV_ITEMS: NavItem[] = [
 @Component({
   selector: 'apex-shell',
   standalone: true,
-  imports: [CommonModule, TabStripComponent, TabOutletComponent],
+  imports: [TabStripComponent, TabOutletComponent],
   template: `
     <div class="shell">
 

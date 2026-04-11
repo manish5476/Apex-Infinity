@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit, effect, inject, signal, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { GridApi } from 'ag-grid-community';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
@@ -23,7 +23,6 @@ import { takeUntil } from "rxjs/operators";
   selector: 'app-payment-list',
   standalone: true,
   imports: [
-    CommonModule,
     SelectModule,
     FormsModule,
     ButtonModule,
@@ -32,7 +31,7 @@ import { takeUntil } from "rxjs/operators";
     Toast,
     AgShareGrid,
     HasPermissionDirective
-  ],
+],
   templateUrl: './payment-list.html',
   styleUrl: './payment-list.scss',
 })

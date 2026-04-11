@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, finalize, of, Subject } from 'rxjs';
@@ -28,21 +28,20 @@ import { takeUntil } from "rxjs/operators";
   selector: 'app-shift-group-form',
   standalone: true,
   imports: [
-    CommonModule, 
-    ReactiveFormsModule, 
-    CardModule, 
+    ReactiveFormsModule,
+    CardModule,
     ButtonModule,
-    InputTextModule, 
-    TextareaModule, 
-    SelectModule, 
+    InputTextModule,
+    TextareaModule,
+    SelectModule,
     MultiSelectModule,
-    DatePickerModule, 
-    ToastModule, 
-    SkeletonModule, 
+    DatePickerModule,
+    ToastModule,
+    SkeletonModule,
     InputNumberModule,
     IconFieldModule,
     InputIconModule
-  ],
+],
   providers: [MessageService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `

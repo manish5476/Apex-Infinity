@@ -1,0 +1,78 @@
+<p-drawer [(visible)]="isVisible" (onHide)="closePanel()" position="right" [baseZIndex]="10000"
+  styleClass="context-notes-sidebar" [modal]="false">
+
+  <ng-template pTemplate="header">
+    <div class="sidebar-header">
+      <div class="icon-circle">
+        <i class="pi pi-book"></i>
+      </div>
+      <div class="header-text">
+        <h3>Contextual Notes</h3>
+        <span class="subtitle">{{ notes().length }} entries recorded</span>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="content">
+    <div class="notes-container">
+      <div class="note-input-section">
+        <div class="input-wrapper">
+          <textarea [(ngModel)]="newNoteText" placeholder="Write a note..." rows="3" class="note-textarea"></textarea>
+
+          <div class="note-actions">
+            <button class="importance-btn" [class.active]="isImportantNewNote()"
+              (click)="isImportantNewNote.set(!isImportantNewNote())" type="button">
+              <i class="pi" [ngClass]="isImportantNewNote() ? 'pi-star-fill' : 'pi-star'"></i>
+              <span>{{ isImportantNewNote() ? 'Important' : 'Standard' }}</span>
+            </button>
+
+            <button class="btn-save-note" (click)="addNote()" [disabled]="!newNoteText().trim()">
+              <span>Save Note</span>
+              <i class="pi pi-send"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="list-container">
+        @if (isLoading()) {
+        <div class="loading-state">
+          <div class="skeleton-loader"></div>
+          <span>Refreshing journal...</span>
+        </div>
+        }
+
+        @if (!isLoading()) {
+        <div class="notes-list">
+          @if (notes().length === 0) {
+          <div class="empty-state">
+            <i class="pi pi-inbox"></i>
+            <p>No notes attached to this record.</p>
+          </div>
+          }
+
+          @for (note of notes(); track note) {
+          <div class="note-item" [class.important]="note.isImportant">
+            <div class="note-header">
+              <div class="user-info">
+                <div class="avatar">{{ note.createdBy.charAt(0) }}</div>
+                <span class="user-name">{{ note.createdBy }}</span>
+              </div>
+              <span class="timestamp">{{ note.timestamp | date:'MMM d, h:mm a' }}</span>
+            </div>
+            <div class="note-body">
+              <p>{{ note.content }}</p>
+            </div>
+            @if (note.isImportant) {
+            <div class="important-badge">
+              <i class="pi pi-star-fill"></i>
+            </div>
+            }
+          </div>
+          }
+        </div>
+        }
+      </div>
+    </div>
+  </ng-template>
+</p-drawer>

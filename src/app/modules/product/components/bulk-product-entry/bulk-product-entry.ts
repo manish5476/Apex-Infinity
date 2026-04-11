@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, OnChanges, SimpleChanges, inject, signal, computed, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { finalize, forkJoin, Subject } from 'rxjs';
 
@@ -24,7 +24,7 @@ import { takeUntil } from "rxjs/operators";
 @Component({
   selector: 'app-bulk-product-entry',
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonModule, ToastModule, ToolbarModule, AutoCompleteModule, AppSharedGrid],
+  imports: [FormsModule, ButtonModule, ToastModule, ToolbarModule, AutoCompleteModule, AppSharedGrid],
   providers: [MessageService],
   templateUrl: './bulk-product-entry.html',
   styleUrls: ['./bulk-product-entry.scss'],

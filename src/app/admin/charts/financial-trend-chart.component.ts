@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { ChartModule } from 'primeng/chart';
 import { TooltipModule } from 'primeng/tooltip';
@@ -17,7 +17,7 @@ interface SummaryKpi {
 @Component({
   selector: 'app-financial-trend-chart',
   standalone: true,
-  imports: [CommonModule, FormsModule, ChartModule, TooltipModule],
+  imports: [FormsModule, ChartModule, TooltipModule],
   template: `
 <div class="ft-root">
 

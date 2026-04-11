@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal, computed, ChangeDetectorRef, OnDestroy } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 
@@ -35,11 +35,23 @@ import { takeUntil } from "rxjs/operators";
   selector: 'app-emi-details',
   standalone: true,
   imports: [
-    CommonModule, RouterModule, ReactiveFormsModule, ButtonModule, TagModule, 
-    CardModule, DividerModule, ProgressBarModule, DialogModule, InputNumberModule, 
-    InputTextModule, SelectModule, ToastModule, ConfirmDialogModule, SkeletonModule, 
-    AgShareGrid, HasPermissionDirective
-  ],
+    RouterModule,
+    ReactiveFormsModule,
+    ButtonModule,
+    TagModule,
+    CardModule,
+    DividerModule,
+    ProgressBarModule,
+    DialogModule,
+    InputNumberModule,
+    InputTextModule,
+    SelectModule,
+    ToastModule,
+    ConfirmDialogModule,
+    SkeletonModule,
+    AgShareGrid,
+    HasPermissionDirective
+],
   providers: [ConfirmationService, DatePipe],
   templateUrl: './emi-details.html',
   styleUrl: './emi-details.scss'

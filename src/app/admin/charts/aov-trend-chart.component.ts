@@ -25,34 +25,42 @@ Chart.register(...registerables);
           </div>
         </div>
         <!-- KPI chips -->
-        <div class="kpi-chips" *ngIf="!isLoading && !hasError">
-          <div class="kpi-chip">
-            <span class="kpi-label">Peak AOV</span>
-            <span class="kpi-value">₹{{ peakAov | number }}</span>
+        @if (!isLoading && !hasError) {
+          <div class="kpi-chips">
+            <div class="kpi-chip">
+              <span class="kpi-label">Peak AOV</span>
+              <span class="kpi-value">₹{{ peakAov | number }}</span>
+            </div>
+            <div class="kpi-chip">
+              <span class="kpi-label">Total Orders</span>
+              <span class="kpi-value">{{ totalOrders }}</span>
+            </div>
           </div>
-          <div class="kpi-chip">
-            <span class="kpi-label">Total Orders</span>
-            <span class="kpi-value">{{ totalOrders }}</span>
-          </div>
+        }
+      </div>
+    
+      @if (isLoading) {
+        <div class="state-overlay">
+          <div class="spinner"></div><span>Loading...</span>
         </div>
-      </div>
-
-      <div class="state-overlay" *ngIf="isLoading">
-        <div class="spinner"></div><span>Loading...</span>
-      </div>
-      <div class="state-overlay error" *ngIf="hasError && !isLoading">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-        </svg>
-        <span>Failed to load</span>
-        <button class="retry-btn" (click)="loadData()">Retry</button>
-      </div>
-
-      <div class="chart-area" *ngIf="!isLoading && !hasError">
-        <canvas #aovCanvas></canvas>
-      </div>
+      }
+      @if (hasError && !isLoading) {
+        <div class="state-overlay error">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <span>Failed to load</span>
+          <button class="retry-btn" (click)="loadData()">Retry</button>
+        </div>
+      }
+    
+      @if (!isLoading && !hasError) {
+        <div class="chart-area">
+          <canvas #aovCanvas></canvas>
+        </div>
+      }
     </div>
-  `,
+    `,
   styles: [`
     .chart-card {
       background: var(--bg-secondary);

@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit, effect, inject, signal, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { GridApi } from 'ag-grid-community';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
@@ -23,7 +23,7 @@ import { takeUntil } from "rxjs/operators";
 @Component({
   selector: 'app-purchase-list',
   standalone: true,
-  imports: [ CommonModule, SelectModule, FormsModule, ButtonModule, InputTextModule, DatePickerModule, RouterModule, AgShareGrid, HasPermissionDirective, ToastModule ],
+  imports: [SelectModule, FormsModule, ButtonModule, InputTextModule, DatePickerModule, RouterModule, AgShareGrid, HasPermissionDirective, ToastModule],
   templateUrl: './purchase-list.html',
   styleUrl: './purchase-list.scss',
 })

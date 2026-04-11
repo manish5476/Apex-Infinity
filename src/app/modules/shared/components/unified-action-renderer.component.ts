@@ -4,7 +4,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ICellRendererAngularComp } from 'ag-grid-angular';
 import { ICellRendererParams } from 'ag-grid-community';
 import { DialogService } from 'primeng/dynamicdialog';
@@ -62,7 +62,7 @@ interface UnifiedActionParams extends ICellRendererParams {
 @Component({
   selector: 'app-unified-action-renderer',
   standalone: true,
-  imports: [CommonModule, TooltipModule],
+  imports: [TooltipModule],
   providers: [DialogService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `

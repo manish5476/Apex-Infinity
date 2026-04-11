@@ -1,7 +1,7 @@
 import { Message } from "./../../../../chat/chat.component/chat.models";
 
 import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { of, Subject } from 'rxjs';
@@ -26,17 +26,16 @@ import { AppMessageService } from "@core/services/message.service";
   selector: 'app-shift-validator',
   standalone: true,
   imports: [
-    CommonModule, 
     ReactiveFormsModule,
-    CardModule, 
-    SelectModule, 
-    DatePicker, 
+    CardModule,
+    SelectModule,
+    DatePicker,
     ButtonModule,
-    TagModule, 
-    ToastModule, 
-    DividerModule, 
+    TagModule,
+    ToastModule,
+    DividerModule,
     ProgressSpinnerModule
-  ],
+],
   providers: [MessageService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `

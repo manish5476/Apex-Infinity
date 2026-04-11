@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { TooltipModule } from 'primeng/tooltip'; 
 import { DialogService } from 'primeng/dynamicdialog';
 import { ICellRendererAngularComp } from 'ag-grid-angular';
@@ -10,7 +10,7 @@ import { Permission } from '@core/auth/permissions.constants';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, TooltipModule], 
+  imports: [TooltipModule], 
   providers: [DialogService],
   template: `
     @if (canExpand()) {

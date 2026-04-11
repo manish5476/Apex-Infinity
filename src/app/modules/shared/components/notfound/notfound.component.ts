@@ -1,11 +1,11 @@
 import { Component } from "@angular/core";
 import { RouterModule } from "@angular/router";
-import { CommonModule } from "@angular/common";
+
 
 @Component({
   selector: "app-notfound",
   standalone: true,
-  imports: [RouterModule, CommonModule],
+  imports: [RouterModule],
   template: `
     <div class="not-found-container">
       

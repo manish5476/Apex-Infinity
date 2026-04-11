@@ -6,7 +6,7 @@ import {
   inject,
 } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { trigger, transition, style, animate, state } from '@angular/animations';
 
 import { TabService } from '../Service/tab.service';
@@ -14,7 +14,7 @@ import { TabService } from '../Service/tab.service';
 @Component({
   selector: 'apex-tab-outlet',
   standalone: true,
-  imports: [CommonModule, RouterOutlet],
+  imports: [RouterOutlet],
   template: `
     <div class="tab-outlet">
       @if (tabService.tabCount() === 0) {

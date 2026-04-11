@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject, ChangeDetectorRef, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TooltipModule } from 'primeng/tooltip';
 import { AdminAnalyticsService } from '../admin-analytics.service';
@@ -15,9 +15,11 @@ import { takeUntil } from "rxjs/operators";
   selector: 'app-customer-ltv-analysis',
   standalone: true,
   imports: [
-    CommonModule, ProgressSpinnerModule, TooltipModule,
-    AgShareGrid, UniversalFilterComponent
-  ],
+    ProgressSpinnerModule,
+    TooltipModule,
+    AgShareGrid,
+    UniversalFilterComponent
+],
   template: `
 <div class="ltv-root">
 

@@ -13,7 +13,7 @@ import { takeUntil } from "rxjs/operators";
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="app-fullscreen-wrapper fade-in">
-      
+    
       <header class="dashboard-header glass-header">
         <div class="header-left">
           <button class="icon-btn back-btn" type="button" (click)="goBack()" title="Go Back">
@@ -24,17 +24,17 @@ import { takeUntil } from "rxjs/operators";
             <p class="page-subtitle">Organizational reporting structure and levels.</p>
           </div>
         </div>
-        
+    
         <div class="header-right">
           <button class="icon-btn" (click)="loadHierarchy()" title="Refresh Hierarchy" [class.spinning]="isLoading()">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
           </button>
         </div>
       </header>
-
+    
       <main class="dashboard-content">
         <div class="grid-card tree-card card-anim-1">
-          
+    
           @if (isLoading()) {
             <div class="loading-state-full">
               <div class="spinner"></div>
@@ -49,16 +49,16 @@ import { takeUntil } from "rxjs/operators";
               <ng-container *ngTemplateOutlet="recursiveTree; context:{ $implicit: hierarchyTree() }"></ng-container>
             </div>
           }
-
+    
         </div>
       </main>
     </div>
-
+    
     <ng-template #recursiveTree let-nodes>
       <div class="tree-node-list">
         @for (node of nodes; track node._id) {
           <div class="tree-node">
-            
+    
             <div class="node-content">
               <div class="node-header">
                 <div class="node-title-group">
@@ -72,12 +72,14 @@ import { takeUntil } from "rxjs/operators";
               </div>
               <div class="node-footer">
                 <span class="node-family">{{ node.jobFamily || 'General' }}</span>
-                <span class="node-children-count" *ngIf="node.children?.length">
-                  {{ node.children.length }} Direct Report(s)
-                </span>
+                @if (node.children?.length) {
+                  <span class="node-children-count">
+                    {{ node.children.length }} Direct Report(s)
+                  </span>
+                }
               </div>
             </div>
-
+    
             @if (node.children && node.children.length > 0) {
               <div class="tree-children">
                 <ng-container *ngTemplateOutlet="recursiveTree; context:{ $implicit: node.children }"></ng-container>
@@ -87,7 +89,7 @@ import { takeUntil } from "rxjs/operators";
         }
       </div>
     </ng-template>
-  `,
+    `,
   styles: [`
     /* Standard Layout */
     :host { display: block; width: 100%; height: 100vh; background-color: var(--bg-primary); font-family: var(--font-body); color: var(--text-primary); overflow: hidden; }

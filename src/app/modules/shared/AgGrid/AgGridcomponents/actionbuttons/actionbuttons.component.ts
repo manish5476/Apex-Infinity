@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { ICellRendererAngularComp } from 'ag-grid-angular';
 import { ICellRendererParams } from 'ag-grid-community';
-import { CommonModule } from '@angular/common';
+
 import { PermissionService } from '@core/auth/services/permission.service';
 import { Permission } from '@core/auth/permissions.constants';
 
@@ -15,55 +15,59 @@ interface ActionbuttonsCellRendererParams extends ICellRendererParams {
 @Component({
   selector: 'app-actionbuttons',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   template: `
     <div class="flex items-center justify-center space-x-2 h-full">
-      <ng-container *ngIf="isEditing">
+      @if (isEditing) {
         <!-- Save Button -->
-        <button
-          *ngIf="canEdit()"
-          (click)="onSaveClick($event)"
-          class="text-green-600 hover:text-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 rounded-full w-6 h-6 flex items-center justify-center"
-          title="Save"
-          aria-label="Save row changes"
-        >
-          <i class="pi pi-check text-sm"></i>
-        </button>
+        @if (canEdit()) {
+          <button
+            (click)="onSaveClick($event)"
+            class="text-green-600 hover:text-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 rounded-full w-6 h-6 flex items-center justify-center"
+            title="Save"
+            aria-label="Save row changes"
+            >
+            <i class="pi pi-check text-sm"></i>
+          </button>
+        }
         <!-- Cancel Button -->
-        <button
-          *ngIf="canEdit()"
-          (click)="onCancelClick($event)"
-          class="text-gray-600 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 rounded-full w-6 h-6 flex items-center justify-center"
-          title="Cancel"
-          aria-label="Cancel row changes"
-        >
-        <i class="pi pi-times text-sm"></i>
-        </button>
-      </ng-container>
-      <ng-container *ngIf="!isEditing">
+        @if (canEdit()) {
+          <button
+            (click)="onCancelClick($event)"
+            class="text-gray-600 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 rounded-full w-6 h-6 flex items-center justify-center"
+            title="Cancel"
+            aria-label="Cancel row changes"
+            >
+            <i class="pi pi-times text-sm"></i>
+          </button>
+        }
+      }
+      @if (!isEditing) {
         <!-- Edit Button -->
-        <button
-          *ngIf="params.data && canEdit()"
-          (click)="onEditClick($event)"
-          class="text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-full w-6 h-6 flex items-center justify-center"
-          title="Edit"
-          aria-label="Edit row"
-        >
-          <i class="pi pi-pencil text-sm"></i>
-        </button>
+        @if (params.data && canEdit()) {
+          <button
+            (click)="onEditClick($event)"
+            class="text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-full w-6 h-6 flex items-center justify-center"
+            title="Edit"
+            aria-label="Edit row"
+            >
+            <i class="pi pi-pencil text-sm"></i>
+          </button>
+        }
         <!-- Delete Button -->
-        <button
-          *ngIf="params.data && canDelete()"
-          (click)="onDeleteClick($event)"
-          class="text-red-600 hover:text-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 rounded-full w-6 h-6 flex items-center justify-center"
-          title="Delete"
-          aria-label="Delete row"
-        >
-          <i class="pi pi-trash text-sm"></i>
-        </button>
-      </ng-container>
+        @if (params.data && canDelete()) {
+          <button
+            (click)="onDeleteClick($event)"
+            class="text-red-600 hover:text-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 rounded-full w-6 h-6 flex items-center justify-center"
+            title="Delete"
+            aria-label="Delete row"
+            >
+            <i class="pi pi-trash text-sm"></i>
+          </button>
+        }
+      }
     </div>
-  `,
+    `,
   styles: [`
     :host {
       display: flex;

@@ -2,7 +2,7 @@ import {
   Component, EventEmitter, Input, Output,
   OnInit, OnDestroy, inject, ViewChild, signal
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
@@ -48,13 +48,21 @@ export interface ThemeGroup {
   selector: 'app-mainscreen-header',
   standalone: true,
   imports: [
-    CommonModule, TieredMenuModule, FormsModule, RouterModule,
-    AvatarModule, ButtonModule, TooltipModule, ToggleButtonModule,
-    PopoverModule, NotificationBellComponent, HasPermissionDirective,
-    SliderModule, DialogModule,
+    TieredMenuModule,
+    FormsModule,
+    RouterModule,
+    AvatarModule,
+    ButtonModule,
+    TooltipModule,
+    ToggleButtonModule,
+    PopoverModule,
+    NotificationBellComponent,
+    HasPermissionDirective,
+    SliderModule,
+    DialogModule,
     AnnouncementList,
     TabStripComponent
-  ],
+],
   templateUrl: './mainscreen-header.html',
   styleUrl: './mainscreen-header.scss',
 })

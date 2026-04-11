@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, computed, inject, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TooltipModule } from 'primeng/tooltip';
 import { ButtonModule } from 'primeng/button';
@@ -23,12 +23,11 @@ interface PeakData {
   selector: 'app-peak-hours-analysis',
   standalone: true,
   imports: [
-    CommonModule, 
-    ProgressSpinnerModule, 
-    TooltipModule, 
+    ProgressSpinnerModule,
+    TooltipModule,
     ButtonModule,
-    UniversalFilterComponent // <--- Imported
-  ],
+    UniversalFilterComponent
+],
   template: `
     <div class="peak-container">
 

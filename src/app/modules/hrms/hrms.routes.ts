@@ -201,4 +201,4 @@ export const HRMS_ROUTES: Routes = [
       { path: 'edit/:id', component: HolidayFormComponent, data: { tabLabel: 'Edit Holiday', tabIcon: 'pi pi-pencil' } }
     ]
   }
-];
+];

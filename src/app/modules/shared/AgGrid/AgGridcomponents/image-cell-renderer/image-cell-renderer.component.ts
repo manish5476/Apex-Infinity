@@ -1,5 +1,5 @@
 import { Component, Input, HostListener, OnDestroy, ChangeDetectorRef, ElementRef, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ICellRendererAngularComp } from 'ag-grid-angular';
 import { ICellRendererParams } from 'ag-grid-community';
 
@@ -19,16 +19,17 @@ import { ImageViewerDirective } from '../../../directives/image-viewer.directive
   selector: 'app-image-cell-renderer',
   standalone: true,
   imports: [
-    CommonModule, ImageViewerDirective,
-    AvatarModule, FormsModule,
-    TooltipModule, 
-    DialogModule, 
-    ButtonModule, 
+    ImageViewerDirective,
+    AvatarModule,
+    FormsModule,
+    TooltipModule,
+    DialogModule,
+    ButtonModule,
     SkeletonModule,
     ImageModule,
     RippleModule,
     SliderModule
-  ],
+],
   templateUrl: './image-cell-renderer.component.html',
   styleUrls: ['./image-cell-renderer.component.scss']
 })

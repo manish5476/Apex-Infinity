@@ -24,7 +24,9 @@
         styleClass="premium-btn btn-primary" [disabled]="selectedCount() === 0" (click)="enableBulkEdit()">
       </p-button>
 
-      <div class="divider-vertical" *ngIf="selectedCount() > 0"></div>
+      @if (selectedCount() > 0) {
+        <div class="divider-vertical"></div>
+      }
 
       <p-button label="Delete" icon="pi pi-trash" [text]="true" [rounded]="true" size="small"
         styleClass="premium-btn btn-danger" [disabled]="selectedCount() === 0" (click)="deleteSelected()">

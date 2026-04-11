@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, inject, signal, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize, Subject } from 'rxjs';
 
@@ -17,13 +17,12 @@ import { takeUntil } from "rxjs/operators";
   selector: 'app-shift-calculator',
   standalone: true,
   imports: [
-    CommonModule, 
     ReactiveFormsModule,
     CardModule,
     ButtonModule,
     DatePicker,
     InputNumberModule
-  ],
+],
   providers: [DatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `

@@ -37,49 +37,54 @@ Chart.register(...registerables);
   </div>
 
   <!-- Loading -->
-  <div class="state-overlay" *ngIf="isLoading">
-    <div class="spinner"></div>
-    <span>Loading...</span>
-  </div>
+  @if (isLoading) {
+    <div class="state-overlay">
+      <div class="spinner"></div>
+      <span>Loading...</span>
+    </div>
+  }
 
   <!-- Error -->
-  <div class="state-overlay error" *ngIf="hasError && !isLoading">
-    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-    </svg>
-    <span>Failed to load data</span>
-    <button class="retry-btn" (click)="loadData()">Retry</button>
-  </div>
+  @if (hasError && !isLoading) {
+    <div class="state-overlay error">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span>Failed to load data</span>
+      <button class="retry-btn" (click)="loadData()">Retry</button>
+    </div>
+  }
 
   <!-- Content -->
-  <ng-container *ngIf="!isLoading && !hasError">
-
+  @if (!isLoading && !hasError) {
     <!-- Bar Chart -->
     <div class="chart-area">
       <canvas #barCanvas></canvas>
     </div>
-
     <!-- Meta Table -->
-    <div class="meta-table" *ngIf="metaList.length">
-      <div class="meta-header">
-        <span class="col-rank">#</span>
-        <span class="col-name">Product</span>
-        <span class="col-units">Units</span>
-        <span class="col-revenue">Revenue</span>
+    @if (metaList.length) {
+      <div class="meta-table">
+        <div class="meta-header">
+          <span class="col-rank">#</span>
+          <span class="col-name">Product</span>
+          <span class="col-units">Units</span>
+          <span class="col-revenue">Revenue</span>
+        </div>
+        @for (item of metaList; track item; let i = $index) {
+          <div class="meta-row">
+            <span class="col-rank">
+              <span class="rank-num" [class.gold]="i === 0" [class.silver]="i === 1" [class.bronze]="i === 2">
+                {{ i + 1 }}
+              </span>
+            </span>
+            <span class="col-name" [title]="item.label">{{ item.label }}</span>
+            <span class="col-units">{{ item.value }}</span>
+            <span class="col-revenue">₹{{ item.revenue | number }}</span>
+          </div>
+        }
       </div>
-      <div class="meta-row" *ngFor="let item of metaList; let i = index">
-        <span class="col-rank">
-          <span class="rank-num" [class.gold]="i === 0" [class.silver]="i === 1" [class.bronze]="i === 2">
-            {{ i + 1 }}
-          </span>
-        </span>
-        <span class="col-name" [title]="item.label">{{ item.label }}</span>
-        <span class="col-units">{{ item.value }}</span>
-        <span class="col-revenue">₹{{ item.revenue | number }}</span>
-      </div>
-    </div>
-
-  </ng-container>
+    }
+  }
 </div>`,
   styles: `.chart-card {
   background: var(--bg-secondary);

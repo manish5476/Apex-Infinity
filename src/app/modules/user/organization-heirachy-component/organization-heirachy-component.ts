@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal, WritableSignal, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { UserManagementService } from '../user-management.service';
 import { catchError, map, of, Subject } from 'rxjs';
 
@@ -27,7 +27,7 @@ interface OrgUser {
 @Component({
   selector: 'app-org-hierarchy',
   standalone: true,
-  imports: [CommonModule, OrganizationChartModule, SkeletonModule, TooltipModule, BadgeModule],
+  imports: [OrganizationChartModule, SkeletonModule, TooltipModule, BadgeModule],
   templateUrl: './organization-heirachy-component.html',
   styleUrls: ['./organization-heirachy-component.scss']
 })

@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit, effect, inject, signal, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { GridApi } from 'ag-grid-community';
 import { FormsModule } from '@angular/forms';
 import { AutoCompleteCompleteEvent, AutoCompleteModule } from 'primeng/autocomplete';
@@ -28,7 +28,6 @@ import { takeUntil } from "rxjs/operators";
   selector: 'app-customer-list',
   standalone: true,
   imports: [
-    CommonModule,
     SelectModule,
     AutoCompleteModule,
     FormsModule,
@@ -39,7 +38,7 @@ import { takeUntil } from "rxjs/operators";
     Toast,
     AgShareGrid,
     HasPermissionDirective
-  ],
+],
   providers: [CustomerService, ConfirmationService],
   templateUrl: './customer-list.html',
   styleUrl: './customer-list.scss',

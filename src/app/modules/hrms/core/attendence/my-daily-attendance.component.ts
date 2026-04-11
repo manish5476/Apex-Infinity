@@ -42,17 +42,17 @@ import { AppMessageService } from '@core/services/message.service';
           </div>
         </div>
         <div class="header-right">
-          <p-datepicker 
-            [(ngModel)]="selectedMonth" 
-            view="month" 
-            dateFormat="MM yy" 
-            [readonlyInput]="true" 
+          <p-datepicker
+            [(ngModel)]="selectedMonth"
+            view="month"
+            dateFormat="MM yy"
+            [readonlyInput]="true"
             (onSelect)="loadMyAttendance()"
             styleClass="premium-datepicker w-15rem">
           </p-datepicker>
         </div>
       </header>
-
+    
       @if (isLoading()) {
         <div class="flex-col gap-4">
           <div class="grid-4"><p-skeleton height="100px" borderRadius="12px"></p-skeleton><p-skeleton height="100px" borderRadius="12px"></p-skeleton><p-skeleton height="100px" borderRadius="12px"></p-skeleton><p-skeleton height="100px" borderRadius="12px"></p-skeleton></div>
@@ -79,14 +79,14 @@ import { AppMessageService } from '@core/services/message.service';
             </p-card>
           </div>
         }
-
+    
         <p-card styleClass="premium-card glass-card slide-down" styleClass="animation-delay: 0.2s">
-          <p-table 
-            [value]="records()" 
-            [rows]="31" 
+          <p-table
+            [value]="records()"
+            [rows]="31"
             responsiveLayout="scroll"
             styleClass="premium-table border-round-xl manish-border-1 surface-border">
-            
+    
             <ng-template pTemplate="header">
               <tr>
                 <th>Date</th>
@@ -97,54 +97,67 @@ import { AppMessageService } from '@core/services/message.service';
                 <th class="text-right">Action</th>
               </tr>
             </ng-template>
-
+    
             <ng-template pTemplate="body" let-record>
               <tr class="table-row-hover">
                 <td>
                   <div class="flex-col gap-1">
                     <span class="font-bold text-primary-color">{{ record.date | date:'EEE, dd MMM' }}</span>
-                    <span class="text-xs text-secondary" *ngIf="record.shiftId">Shift: {{ record.scheduledInTime }} - {{ record.scheduledOutTime }}</span>
+                    @if (record.shiftId) {
+                      <span class="text-xs text-secondary">Shift: {{ record.scheduledInTime }} - {{ record.scheduledOutTime }}</span>
+                    }
                   </div>
                 </td>
-                
+    
                 <td [ngClass]="{'text-error font-bold': record.isLate}">
                   {{ record.firstIn ? (record.firstIn | date:'HH:mm') : '--:--' }}
-                  <i *ngIf="record.isLate" class="pi pi-exclamation-circle text-xs ml-1" pTooltip="Late Arrival"></i>
+                  @if (record.isLate) {
+                    <i class="pi pi-exclamation-circle text-xs ml-1" pTooltip="Late Arrival"></i>
+                  }
                 </td>
-                
+    
                 <td [ngClass]="{'text-warning font-bold': record.isEarlyDeparture}">
                   {{ record.lastOut ? (record.lastOut | date:'HH:mm') : '--:--' }}
-                  <i *ngIf="record.isEarlyDeparture" class="pi pi-info-circle text-xs ml-1" pTooltip="Early Departure"></i>
+                  @if (record.isEarlyDeparture) {
+                    <i class="pi pi-info-circle text-xs ml-1" pTooltip="Early Departure"></i>
+                  }
                 </td>
-                
+    
                 <td class="text-center">
                   <div class="flex-col align-center">
                     <span class="font-bold text-lg" [ngClass]="{'text-success': record.totalWorkHours >= 8}">{{ record.netWorkHours | number:'1.1-1' }}h</span>
-                    <span *ngIf="record.overtimeHours > 0" class="text-xs text-primary font-bold">+{{ record.overtimeHours }}h OT</span>
+                    @if (record.overtimeHours > 0) {
+                      <span class="text-xs text-primary font-bold">+{{ record.overtimeHours }}h OT</span>
+                    }
                   </div>
                 </td>
-                
+    
                 <td>
                   <div class="flex-align gap-2 flex-wrap">
                     <p-tag [severity]="getStatusSeverity(record.status)" [value]="record.status | uppercase"></p-tag>
-                    <p-tag *ngIf="record.isHalfDay" severity="warn" value="HALF DAY" styleClass="text-xs"></p-tag>
-                    <p-tag *ngIf="record.isRegularized" severity="info" value="REGULARIZED" styleClass="text-xs"></p-tag>
+                    @if (record.isHalfDay) {
+                      <p-tag severity="warn" value="HALF DAY" styleClass="text-xs"></p-tag>
+                    }
+                    @if (record.isRegularized) {
+                      <p-tag severity="info" value="REGULARIZED" styleClass="text-xs"></p-tag>
+                    }
                   </div>
                 </td>
-                
+    
                 <td class="text-right">
-                  <p-button 
-                    *ngIf="canRegularize(record)" 
-                    label="Regularize" 
-                    icon="pi pi-sliders-h" 
-                    [outlined]="true" 
-                    size="small"
-                    (onClick)="openRegularizeDialog(record)">
-                  </p-button>
+                  @if (canRegularize(record)) {
+                    <p-button
+                      label="Regularize"
+                      icon="pi pi-sliders-h"
+                      [outlined]="true"
+                      size="small"
+                      (onClick)="openRegularizeDialog(record)">
+                    </p-button>
+                  }
                 </td>
               </tr>
             </ng-template>
-
+    
             <ng-template pTemplate="emptymessage">
               <tr><td colspan="6" class="text-center py-6 text-secondary">No attendance records found for this month.</td></tr>
             </ng-template>
@@ -152,10 +165,10 @@ import { AppMessageService } from '@core/services/message.service';
         </p-card>
       }
     </div>
-
+    
     <p-dialog header="Request Attendance Regularization" [(visible)]="displayRegularize" [modal]="true" [style]="{width: '450px'}" styleClass="premium-dialog">
       <p class="text-sm text-secondary mb-4">Request a manual correction to your attendance record for <b>{{ selectedRecord?.date | date:'dd MMM yyyy' }}</b>.</p>
-      
+    
       <form [formGroup]="regForm" class="flex-col gap-4">
         <div class="grid-2 gap-4">
           <div class="input-group">
@@ -167,19 +180,19 @@ import { AppMessageService } from '@core/services/message.service';
             <p-datepicker formControlName="lastOut" [timeOnly]="true" hourFormat="24" appendTo="body" styleClass="w-full premium-datepicker"></p-datepicker>
           </div>
         </div>
-
+    
         <div class="input-group">
           <label class="info-label">Reason for Request <span class="text-error">*</span></label>
           <textarea pInputTextarea formControlName="reason" rows="3" class="w-full premium-input" placeholder="e.g. Forgot to punch out, machine error, client meeting..."></textarea>
         </div>
-
+    
         <div class="flex-align justify-end gap-3 mt-4 pt-4 border-top">
           <p-button label="Cancel" [text]="true" severity="secondary" (onClick)="displayRegularize = false"></p-button>
           <p-button label="Submit Request" icon="pi pi-send" type="submit" [loading]="isSubmitting()" [disabled]="regForm.invalid" styleClass="p-button-primary" (onClick)="submitRegularization()"></p-button>
         </div>
       </form>
     </p-dialog>
-  `,
+    `,
   styles: [`
     /* Same comprehensive CSS structure as established previously */
     :host { display: block; width: 100%; min-height: 100vh; background-color: var(--bg-primary); color: var(--text-primary); font-family: var(--font-body); }

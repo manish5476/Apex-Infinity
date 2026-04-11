@@ -3,10 +3,10 @@
 <div class="kyc-container">
 
   @if (loading()) {
-  <div class="loader-wrapper">
-    <p-progressSpinner strokeWidth="4"></p-progressSpinner>
-    <span class="loader-text">Loading Documents...</span>
-  </div>
+    <div class="loader-wrapper">
+      <p-progressSpinner strokeWidth="4"></p-progressSpinner>
+      <span class="loader-text">Loading Documents...</span>
+    </div>
   }
 
   @else {
@@ -25,60 +25,64 @@
         <div class="file-input-wrapper" [class.has-file]="selectedFile">
           <input type="file" id="kycFileInput" (change)="onFileSelected($event)" accept=".pdf,.jpg,.jpeg,.png"
             class="hidden-input" />
-          <label for="kycFileInput" class="file-label">
-            <i class="pi" [ngClass]="selectedFile ? 'pi-file-check text-success' : 'pi-cloud-upload text-tertiary'"></i>
-            <span class="file-name">{{ selectedFile ? selectedFile.name : 'Click to browse files' }}</span>
-            <span class="file-size" *ngIf="selectedFile">({{ (selectedFile.size / 1024 / 1024) | number:'1.2-2' }}
-              MB)</span>
-          </label>
-          <i *ngIf="selectedFile" class="pi pi-times clear-icon" (click)="clearSelection()" pTooltip="Remove file"></i>
-        </div>
-      </div>
-
-      <div class="action-group">
-        <p-button label="Upload" icon="pi pi-upload" [loading]="uploading()"
-          [disabled]="!selectedFile || !selectedDocType" (onClick)="uploadDocument()"
-          styleClass="p-button-primary mt-auto">
-        </p-button>
-      </div>
-    </div>
-  </div>
-
-  <div class="documents-section mt-6">
-    <h3 class="section-title border-b pb-2 mb-4">Uploaded Documents ({{ documents().length }})</h3>
-
-    @if (documents().length === 0) {
-    <div class="empty-state">
-      <i class="pi pi-folder-open empty-icon"></i>
-      <p>No KYC documents uploaded yet.</p>
-    </div>
-    }
-
-    @else {
-    <div class="doc-grid">
-      @for (doc of documents(); track doc._id; let i = $index) {
-      <div class="doc-card">
-        <div class="doc-icon">
-          <i class="pi" [ngClass]="doc.url.includes('.pdf') ? 'pi-file-pdf text-error' : 'pi-image text-primary'"></i>
-        </div>
-        <div class="doc-info">
-          <h4 class="doc-type">{{ doc.docType | uppercase | slice:0:20 }}</h4>
-          <p class="doc-date">Uploaded: {{ doc.uploadedAt | date:'mediumDate' }}</p>
-          <div class="mt-2">
-            <p-tag [severity]="doc.verified ? 'success' : 'warn'"
-              [value]="doc.verified ? 'VERIFIED' : 'PENDING'"></p-tag>
+            <label for="kycFileInput" class="file-label">
+              <i class="pi" [ngClass]="selectedFile ? 'pi-file-check text-success' : 'pi-cloud-upload text-tertiary'"></i>
+              <span class="file-name">{{ selectedFile ? selectedFile.name : 'Click to browse files' }}</span>
+              @if (selectedFile) {
+                <span class="file-size">({{ (selectedFile.size / 1024 / 1024) | number:'1.2-2' }}
+                MB)</span>
+              }
+            </label>
+            @if (selectedFile) {
+              <i class="pi pi-times clear-icon" (click)="clearSelection()" pTooltip="Remove file"></i>
+            }
           </div>
         </div>
-        <div class="doc-actions">
-          <p-button icon="pi pi-eye" styleClass="p-button-rounded p-button-text p-button-secondary" pTooltip="View"
-            (onClick)="viewDocument(doc.url)"></p-button>
-          <p-button icon="pi pi-trash" styleClass="p-button-rounded p-button-text p-button-danger" pTooltip="Delete"
-            (onClick)="deleteDocument(i)"></p-button>
+
+        <div class="action-group">
+          <p-button label="Upload" icon="pi pi-upload" [loading]="uploading()"
+            [disabled]="!selectedFile || !selectedDocType" (onClick)="uploadDocument()"
+            styleClass="p-button-primary mt-auto">
+          </p-button>
         </div>
       </div>
-      }
     </div>
+
+    <div class="documents-section mt-6">
+      <h3 class="section-title border-b pb-2 mb-4">Uploaded Documents ({{ documents().length }})</h3>
+
+      @if (documents().length === 0) {
+        <div class="empty-state">
+          <i class="pi pi-folder-open empty-icon"></i>
+          <p>No KYC documents uploaded yet.</p>
+        </div>
+      }
+
+      @else {
+      <div class="doc-grid">
+        @for (doc of documents(); track doc._id; let i = $index) {
+          <div class="doc-card">
+            <div class="doc-icon">
+              <i class="pi" [ngClass]="doc.url.includes('.pdf') ? 'pi-file-pdf text-error' : 'pi-image text-primary'"></i>
+            </div>
+            <div class="doc-info">
+              <h4 class="doc-type">{{ doc.docType | uppercase | slice:0:20 }}</h4>
+              <p class="doc-date">Uploaded: {{ doc.uploadedAt | date:'mediumDate' }}</p>
+              <div class="mt-2">
+                <p-tag [severity]="doc.verified ? 'success' : 'warn'"
+                [value]="doc.verified ? 'VERIFIED' : 'PENDING'"></p-tag>
+              </div>
+            </div>
+            <div class="doc-actions">
+              <p-button icon="pi pi-eye" styleClass="p-button-rounded p-button-text p-button-secondary" pTooltip="View"
+              (onClick)="viewDocument(doc.url)"></p-button>
+              <p-button icon="pi pi-trash" styleClass="p-button-rounded p-button-text p-button-danger" pTooltip="Delete"
+              (onClick)="deleteDocument(i)"></p-button>
+            </div>
+          </div>
+        }
+      </div>
     }
   </div>
-  }
+}
 </div>

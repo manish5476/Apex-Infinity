@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit, inject, signal, computed, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { debounceTime, distinctUntilChanged, finalize, takeUntil } from 'rxjs/operators';
@@ -25,7 +25,7 @@ import { Subject } from "rxjs";
 @Component({
   selector: 'app-sales-list',
   standalone: true,
-  imports: [CommonModule, SelectModule, FormsModule, ReactiveFormsModule, ButtonModule, InputTextModule, RouterModule, TooltipModule, AgShareGrid, ToastModule, HasPermissionDirective],
+  imports: [SelectModule, FormsModule, ReactiveFormsModule, ButtonModule, InputTextModule, RouterModule, TooltipModule, AgShareGrid, ToastModule, HasPermissionDirective],
   templateUrl: './sales-list.html',
   styleUrl: './sales-list.scss',
 })

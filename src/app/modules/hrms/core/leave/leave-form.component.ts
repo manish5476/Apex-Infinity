@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
@@ -25,10 +25,17 @@ import { AppMessageService } from '@core/services/message.service';
   selector: 'app-leave-form',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule, CardModule, ButtonModule,
-    SelectModule, DatePickerModule, InputTextModule, TextareaModule,
-    FileUploadModule, ToastModule, SkeletonModule
-  ],
+    ReactiveFormsModule,
+    CardModule,
+    ButtonModule,
+    SelectModule,
+    DatePickerModule,
+    InputTextModule,
+    TextareaModule,
+    FileUploadModule,
+    ToastModule,
+    SkeletonModule
+],
   providers: [MessageService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `

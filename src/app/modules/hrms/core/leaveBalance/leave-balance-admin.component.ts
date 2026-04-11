@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { catchError, finalize, forkJoin, of, Subject } from 'rxjs';
 
@@ -32,11 +32,24 @@ import { takeUntil } from "rxjs/operators";
   selector: 'app-leave-balance-admin',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule, TabsModule, TableModule, CardModule, FormsModule,
-    ButtonModule, TagModule, SkeletonModule, AvatarModule, TooltipModule,
-    DialogModule, InputTextModule, InputNumberModule, SelectModule,
-    CheckboxModule, ChartModule, ProgressBarModule
-  ],
+    ReactiveFormsModule,
+    TabsModule,
+    TableModule,
+    CardModule,
+    FormsModule,
+    ButtonModule,
+    TagModule,
+    SkeletonModule,
+    AvatarModule,
+    TooltipModule,
+    DialogModule,
+    InputTextModule,
+    InputNumberModule,
+    SelectModule,
+    CheckboxModule,
+    ChartModule,
+    ProgressBarModule
+],
   providers: [MessageService, ConfirmationService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `

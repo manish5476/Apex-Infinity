@@ -26,12 +26,12 @@ export const INVOICE_ROUTES: Routes = [
     canActivate: [TabRouterGuard, permissionGuard],
     data: { tabLabel: 'Profit Summary', tabIcon: 'pi pi-file-excel', permissions: [PERMISSIONS.REPORT.PROFIT] }
   },
-  {
-    path: 'ProfitDashboardComponent',
-    component: ProfitDashboardComponent,
-    canActivate: [TabRouterGuard, permissionGuard],
-    data: { tabLabel: 'Profit Center', tabIcon: 'pi pi-chart-pie', permissions: [PERMISSIONS.REPORT.PROFIT] }
-  },
+  // {
+  //   path: 'ProfitDashboardComponent',
+  //   component: ProfitDashboardComponent,
+  //   canActivate: [TabRouterGuard, permissionGuard],
+  //   data: { tabLabel: 'Profit Center', tabIcon: 'pi pi-chart-pie', permissions: [PERMISSIONS.REPORT.PROFIT] }
+  // },
   {
     path: 'profitDashboardNew',
     component: ProfitDashboardComponentNew,
@@ -68,4 +68,4 @@ export const INVOICE_ROUTES: Routes = [
     canActivate: [TabRouterGuard, permissionGuard],
     data: { tabLabel: 'Edit Invoice', tabIcon: 'pi pi-pencil', permissions: [PERMISSIONS.INVOICE.UPDATE] }
   },
-];
+];

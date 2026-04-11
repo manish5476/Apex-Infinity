@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject, ChangeDetectorRef, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { AdminAnalyticsService } from '../admin-analytics.service';
@@ -14,9 +14,11 @@ import { takeUntil } from "rxjs/operators";
   selector: 'app-customer-intelligence',
   standalone: true,
   imports: [
-    CommonModule, TooltipModule, ProgressSpinnerModule,
-    AgShareGrid, UniversalFilterComponent
-  ],
+    TooltipModule,
+    ProgressSpinnerModule,
+    AgShareGrid,
+    UniversalFilterComponent
+],
   template: `
 <div class="ci-root">
 

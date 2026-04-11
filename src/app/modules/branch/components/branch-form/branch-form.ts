@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { finalize, switchMap, takeUntil } from 'rxjs/operators';
@@ -27,7 +27,6 @@ import { LocationPickerComponent } from '../../components/location-picker/locati
   selector: 'app-branch-form',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     ToastModule,
     ButtonModule,
@@ -36,8 +35,8 @@ import { LocationPickerComponent } from '../../components/location-picker/locati
     SelectModule,
     DividerModule,
     InputNumberModule,
-    LocationPickerComponent 
-  ],
+    LocationPickerComponent
+],
   templateUrl: './branch-form.html',
   styleUrls: ['./branch-form.scss']
 })

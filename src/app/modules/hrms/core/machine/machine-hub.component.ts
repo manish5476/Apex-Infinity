@@ -35,7 +35,7 @@ import { takeUntil } from "rxjs/operators";
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="page-wrapper fade-in">
-      
+    
       <header class="dashboard-header slide-down mb-4">
         <div class="header-left">
           <div class="icon-brand bg-primary text-white shadow-md"><i class="pi pi-server"></i></div>
@@ -49,7 +49,7 @@ import { takeUntil } from "rxjs/operators";
           <p-button label="Register Device" icon="pi pi-plus" styleClass="p-button-primary" (onClick)="onAddMachine()"></p-button>
         </div>
       </header>
-
+    
       @if (isLoading()) {
         <div class="grid-4 mb-4">
           <p-skeleton height="100px" borderRadius="12px"></p-skeleton>
@@ -59,7 +59,7 @@ import { takeUntil } from "rxjs/operators";
         </div>
         <p-skeleton height="400px" borderRadius="12px"></p-skeleton>
       } @else {
-        
+    
         @if (analytics(); as a) {
           <div class="grid-4 mb-4 slide-down" styleClass="animation-delay: 0.1s">
             <p-card styleClass="stat-card border-left-primary">
@@ -86,19 +86,19 @@ import { takeUntil } from "rxjs/operators";
             </p-card>
           </div>
         }
-
+    
         <p-card styleClass="premium-card glass-card slide-down" styleClass="animation-delay: 0.2s">
-          <p-table 
+          <p-table
             #dt
-            [value]="machines()" 
+            [value]="machines()"
             [(selection)]="selectedMachines"
             dataKey="_id"
-            [paginator]="true" 
-            [rows]="10" 
+            [paginator]="true"
+            [rows]="10"
             [globalFilterFields]="['name', 'serialNumber', 'ipAddress', 'model']"
             responsiveLayout="scroll"
             styleClass="premium-table border-round-xl manish-border-1 surface-border">
-            
+    
             <ng-template pTemplate="caption">
               <div class="table-toolbar flex-between p-3 bg-surface border-bottom">
                 <div class="flex-align gap-3">
@@ -113,7 +113,7 @@ import { takeUntil } from "rxjs/operators";
                 </p-iconField>
               </div>
             </ng-template>
-
+    
             <ng-template pTemplate="header">
               <tr>
                 <th styleClass="width: 3rem"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
@@ -124,7 +124,7 @@ import { takeUntil } from "rxjs/operators";
                 <th class="text-right">Manage</th>
               </tr>
             </ng-template>
-
+    
             <ng-template pTemplate="body" let-machine>
               <tr class="table-row-hover">
                 <td><p-tableCheckbox [value]="machine"></p-tableCheckbox></td>
@@ -138,7 +138,9 @@ import { takeUntil } from "rxjs/operators";
                 </td>
                 <td>
                   <div class="flex-col gap-1">
-                    <span class="font-mono text-sm text-secondary">{{ machine.ipAddress || 'DHCP' }}<span *ngIf="machine.port">:{{ machine.port }}</span></span>
+                    <span class="font-mono text-sm text-secondary">{{ machine.ipAddress || 'DHCP' }}@if (machine.port) {
+                      <span>:{{ machine.port }}</span>
+                    }</span>
                     <span class="text-xs text-tertiary uppercase font-bold">{{ machine.connectionProtocol }}</span>
                   </div>
                 </td>
@@ -152,9 +154,15 @@ import { takeUntil } from "rxjs/operators";
                 </td>
                 <td>
                   <div class="flex-col gap-1 text-sm text-secondary font-medium">
-                    <span *ngIf="machine.lastSyncAt"><i class="pi pi-clock text-xs text-tertiary mr-1"></i> {{ machine.lastSyncAt | date:'dd MMM, HH:mm' }}</span>
-                    <span *ngIf="!machine.lastSyncAt" class="text-tertiary italic">Never synced</span>
-                    <span class="text-xs text-tertiary" *ngIf="machine.lastPingAt">Ping: {{ machine.lastPingAt | date:'HH:mm:ss' }}</span>
+                    @if (machine.lastSyncAt) {
+                      <span><i class="pi pi-clock text-xs text-tertiary mr-1"></i> {{ machine.lastSyncAt | date:'dd MMM, HH:mm' }}</span>
+                    }
+                    @if (!machine.lastSyncAt) {
+                      <span class="text-tertiary italic">Never synced</span>
+                    }
+                    @if (machine.lastPingAt) {
+                      <span class="text-xs text-tertiary">Ping: {{ machine.lastPingAt | date:'HH:mm:ss' }}</span>
+                    }
                   </div>
                 </td>
                 <td class="text-right">
@@ -169,14 +177,14 @@ import { takeUntil } from "rxjs/operators";
         </p-card>
       }
     </div>
-
+    
     <p-dialog header="Bulk Device Status Update" [(visible)]="displayBulkDialog" [modal]="true" [style]="{width: '400px'}" styleClass="premium-dialog">
       <p class="text-sm text-secondary mb-4">Change the administrative status for <b>{{ selectedMachines.length }}</b> selected devices.</p>
       <div class="flex-col gap-4">
         <div class="input-group">
           <label class="info-label">New Status</label>
           <p-select [(ngModel)]="bulkStatus" [options]="statusOptions" placeholder="Select Status" appendTo="body" styleClass="w-full premium-select" [filter]="true" filterBy="label"></p-select>
-
+    
         </div>
         <div class="flex-align justify-end gap-3 pt-4 border-top mt-2">
           <p-button label="Cancel" [text]="true" severity="secondary" (onClick)="displayBulkDialog = false"></p-button>
@@ -184,7 +192,7 @@ import { takeUntil } from "rxjs/operators";
         </div>
       </div>
     </p-dialog>
-  `,
+    `,
   styles: [`
     :host { display: block; width: 100%; min-height: 100vh; background-color: var(--bg-primary); color: var(--text-primary); font-family: var(--font-body); }
     .page-wrapper { padding: var(--spacing-2xl) var(--spacing-3xl); max-width: 1500px; margin: 0 auto; }

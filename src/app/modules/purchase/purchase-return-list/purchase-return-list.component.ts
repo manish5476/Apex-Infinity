@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router } from '@angular/router';
 
 // Components
@@ -12,7 +12,7 @@ import { takeUntil } from "rxjs/operators";
 @Component({
   selector: 'app-purchase-return-list',
   standalone: true,
-  imports: [CommonModule, AgShareGrid],
+  imports: [AgShareGrid],
   template: `
     <div class="list-page-container">
       <div class="themed-card mb-4 p-4 flex justify-between items-center">

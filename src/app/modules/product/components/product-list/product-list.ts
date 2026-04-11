@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit, effect, inject, signal, ViewChild, ElementRef, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
@@ -26,7 +26,6 @@ import { takeUntil } from "rxjs/operators";
   selector: 'app-product-list',
   standalone: true,
   imports: [
-    CommonModule,
     SelectModule,
     FormsModule,
     ButtonModule,
@@ -37,7 +36,7 @@ import { takeUntil } from "rxjs/operators";
     BulkProductEntry,
     HasPermissionDirective,
     ConfirmDialogModule
-  ],
+],
   providers: [ConfirmationService],
   templateUrl: './product-list.html',
   styleUrl: './product-list.scss',

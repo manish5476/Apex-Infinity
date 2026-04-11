@@ -11,31 +11,33 @@ import { PricingTableConfig } from '@core/models/storefront.model';
   template: `
     <section class="section-root" [ngStyle]="sectionStyle()">
       <div class="container-wrapper">
-        
-        <div class="header-group" *ngIf="cfg().title">
-          <h2 class="section-title animate-in">{{ cfg().title }}</h2>
-          <div class="divider-pill animate-in delay-1"></div>
-        </div>
-
+    
+        @if (cfg().title) {
+          <div class="header-group">
+            <h2 class="section-title animate-in">{{ cfg().title }}</h2>
+            <div class="divider-pill animate-in delay-1"></div>
+          </div>
+        }
+    
         <div class="pricing-grid">
-          
+    
           @for (plan of cfg().plans; track $index) {
-            <div class="pricing-card animate-in delay-1" 
-                 [class.is-popular]="plan.isPopular">
-              
+            <div class="pricing-card animate-in delay-1"
+              [class.is-popular]="plan.isPopular">
+    
               @if (plan.isPopular) {
                 <div class="popular-badge">Most Popular</div>
               }
-
+    
               <div class="card-header">
                 <h3 class="plan-name">{{ plan.name }}</h3>
-                
+    
                 <div class="price-box">
                   <span class="price-amount">{{ plan.price }}</span>
                   <span class="price-period">{{ plan.period }}</span>
                 </div>
               </div>
-
+    
               <ul class="features-list">
                 @for (feature of parseFeatures(plan.features); track $index) {
                   <li class="feature-item">
@@ -44,21 +46,21 @@ import { PricingTableConfig } from '@core/models/storefront.model';
                   </li>
                 }
               </ul>
-
-              <a [routerLink]="getLink(plan.ctaLink)" 
-                 [attr.href]="isExternal(plan.ctaLink) ? plan.ctaLink : null"
-                 [target]="isExternal(plan.ctaLink) ? '_blank' : '_self'"
-                 class="cta-btn">
+    
+              <a [routerLink]="getLink(plan.ctaLink)"
+                [attr.href]="isExternal(plan.ctaLink) ? plan.ctaLink : null"
+                [target]="isExternal(plan.ctaLink) ? '_blank' : '_self'"
+                class="cta-btn">
                 {{ plan.ctaText || 'Select Plan' }}
               </a>
-
+    
             </div>
           }
-
+    
         </div>
       </div>
     </section>
-  `,
+    `,
   styleUrls: ['./pricing-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })

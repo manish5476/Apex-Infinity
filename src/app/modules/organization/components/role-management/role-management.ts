@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { ConfirmationService } from 'primeng/api';
 
@@ -43,7 +43,6 @@ export interface Permission {
   selector: 'app-role-management',
   standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
     ButtonModule,
     DialogModule,
@@ -55,7 +54,7 @@ export interface Permission {
     DividerModule,
     CheckboxModule,
     AgShareGrid
-  ],
+],
   providers: [ConfirmationService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './role-management.html',

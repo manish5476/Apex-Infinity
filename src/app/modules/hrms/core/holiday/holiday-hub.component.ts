@@ -38,9 +38,9 @@ import { AppMessageService } from '@core/services/message.service';
   template: `
     <p-toast position="top-right"></p-toast>
     <p-confirmDialog styleClass="premium-confirm-dialog"></p-confirmDialog>
-
+    
     <div class="page-wrapper fade-in">
-      
+    
       <header class="dashboard-header slide-down mb-5">
         <div class="header-left">
           <div class="icon-brand bg-primary text-white shadow-md"><i class="pi pi-calendar"></i></div>
@@ -51,12 +51,12 @@ import { AppMessageService } from '@core/services/message.service';
         </div>
         <div class="header-right flex-align gap-3">
           <p-select [options]="years" [(ngModel)]="selectedYear" (onChange)="loadYearData()" styleClass="premium-select font-bold" [filter]="true" filterBy="label"></p-select>
-
+    
           <p-button icon="pi pi-copy" label="Copy Previous Year" severity="secondary" [outlined]="true" (onClick)="displayCopyDialog = true"></p-button>
           <p-button icon="pi pi-plus" label="Add Holiday" styleClass="p-button-primary" (onClick)="onAdd()"></p-button>
         </div>
       </header>
-
+    
       @if (isLoading()) {
         <div class="grid-layout-top mb-4">
           <div class="grid-2 gap-4"><p-skeleton height="120px" borderRadius="12px"></p-skeleton><p-skeleton height="120px" borderRadius="12px"></p-skeleton></div>
@@ -64,9 +64,9 @@ import { AppMessageService } from '@core/services/message.service';
         </div>
         <p-skeleton height="500px" borderRadius="12px"></p-skeleton>
       } @else {
-        
+    
         <div class="grid-layout-top mb-5 slide-down" style="animation-delay: 0.1s">
-          
+    
           <div class="grid-2 gap-4 h-full">
             <p-card styleClass="premium-card h-full border-left-primary">
               <span class="text-xs text-tertiary uppercase font-bold tracking-wide">Total Holidays ({{ selectedYear }})</span>
@@ -83,7 +83,7 @@ import { AppMessageService } from '@core/services/message.service';
               </div>
             </p-card>
           </div>
-
+    
           <p-card styleClass="premium-card bg-surface manish-border-1 surface-border h-full">
             <div class="flex-between mb-3 border-bottom pb-2">
               <h3 class="m-0 text-primary-color font-heading text-lg"><i class="pi pi-bell text-warning mr-2"></i> Approaching Next</h3>
@@ -108,17 +108,17 @@ import { AppMessageService } from '@core/services/message.service';
             }
           </p-card>
         </div>
-
+    
         <p-card styleClass="premium-card glass-card workspace-card slide-down" styleClass="animation-delay: 0.2s">
-          <p-table 
+          <p-table
             #dt
-            [value]="holidays()" 
-            [paginator]="true" 
-            [rows]="15" 
+            [value]="holidays()"
+            [paginator]="true"
+            [rows]="15"
             [globalFilterFields]="['name', 'holidayType']"
             responsiveLayout="scroll"
             styleClass="premium-table border-round-xl manish-border-1 surface-border">
-            
+    
             <ng-template pTemplate="caption">
               <div class="flex-between p-3 bg-surface border-bottom">
                 <div class="flex-align gap-3">
@@ -131,7 +131,7 @@ import { AppMessageService } from '@core/services/message.service';
                 </p-iconField>
               </div>
             </ng-template>
-
+    
             <ng-template pTemplate="header">
               <tr>
                 <th>Date & Day</th>
@@ -141,7 +141,7 @@ import { AppMessageService } from '@core/services/message.service';
                 <th class="text-right">Actions</th>
               </tr>
             </ng-template>
-
+    
             <ng-template pTemplate="body" let-holiday>
               <tr class="table-row-hover" [ngClass]="{'opacity-60': !holiday.isActive}">
                 <td>
@@ -153,7 +153,9 @@ import { AppMessageService } from '@core/services/message.service';
                 <td>
                   <div class="flex-col gap-1">
                     <span class="font-bold text-primary-color">{{ holiday.name }}</span>
-                    <span *ngIf="holiday.isOptional" class="badge-mono-sm w-max bg-warning-light text-warning border-warning">Restricted / Optional</span>
+                    @if (holiday.isOptional) {
+                      <span class="badge-mono-sm w-max bg-warning-light text-warning border-warning">Restricted / Optional</span>
+                    }
                   </div>
                 </td>
                 <td>
@@ -162,7 +164,9 @@ import { AppMessageService } from '@core/services/message.service';
                 <td>
                   <div class="flex-col gap-1 text-sm font-medium">
                     <span class="flex-align gap-2 text-secondary"><i class="pi pi-map-marker text-tertiary"></i> {{ holiday.branchId ? 'Specific Branch' : 'All Branches' }}</span>
-                    <span class="flex-align gap-2 text-secondary" *ngIf="!holiday.applicableTo?.allEmployees"><i class="pi pi-users text-tertiary"></i> Specific Groups</span>
+                    @if (!holiday.applicableTo?.allEmployees) {
+                      <span class="flex-align gap-2 text-secondary"><i class="pi pi-users text-tertiary"></i> Specific Groups</span>
+                    }
                   </div>
                 </td>
                 <td class="text-right">
@@ -171,7 +175,7 @@ import { AppMessageService } from '@core/services/message.service';
                 </td>
               </tr>
             </ng-template>
-            
+    
             <ng-template pTemplate="emptymessage">
               <tr><td colspan="5" class="text-center py-6 text-secondary">No holidays defined for {{ selectedYear }}. Use 'Copy Previous Year' or add a new one.</td></tr>
             </ng-template>
@@ -179,20 +183,20 @@ import { AppMessageService } from '@core/services/message.service';
         </p-card>
       }
     </div>
-
+    
     <p-dialog header="Clone Holiday Calendar" [(visible)]="displayCopyDialog" [modal]="true" [style]="{width: '400px'}" styleClass="premium-dialog">
       <p class="text-sm text-secondary mb-4">Quickly populate the new year by copying existing holidays. You can edit specific dates after cloning.</p>
-      
+    
       <div class="flex-col gap-4">
         <div class="input-group">
           <label class="info-label">Source Year (Copy From)</label>
           <p-select [(ngModel)]="copyFromYear" [options]="years" appendTo="body" styleClass="w-full premium-select" [filter]="true" filterBy="label"></p-select>
-
+    
         </div>
         <div class="input-group">
           <label class="info-label">Target Year (Copy To)</label>
           <p-select [(ngModel)]="copyToYear" [options]="years" appendTo="body" styleClass="w-full premium-select" [filter]="true" filterBy="label"></p-select>
-
+    
         </div>
         <div class="flex-align justify-end gap-3 mt-4 pt-4 border-top">
           <p-button label="Cancel" [text]="true" severity="secondary" (onClick)="displayCopyDialog = false"></p-button>
@@ -200,7 +204,7 @@ import { AppMessageService } from '@core/services/message.service';
         </div>
       </div>
     </p-dialog>
-  `,
+    `,
   styles: [`
     :host { display: block; width: 100%; min-height: 100vh; background-color: var(--bg-primary); color: var(--text-primary); font-family: var(--font-body); }
     .page-wrapper { padding: var(--spacing-2xl) var(--spacing-3xl); max-width: 1400px; margin: 0 auto; }

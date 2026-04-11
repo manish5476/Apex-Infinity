@@ -5,7 +5,7 @@ import {
   inject,
   signal,
   ViewEncapsulation, OnDestroy } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -25,7 +25,6 @@ import { takeUntil } from "rxjs/operators";
   selector: 'app-admin-note-list',
   standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
     RouterModule,
     ButtonModule,
@@ -34,14 +33,14 @@ import { takeUntil } from "rxjs/operators";
     ToastModule,
     ConfirmDialogModule,
     DatePicker,
-    AgShareGrid,
-  ],
+    AgShareGrid
+],
   providers: [ConfirmationService, DatePipe],
   encapsulation: ViewEncapsulation.None,
   template: `
     <p-toast></p-toast>
     <p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
-
+    
     <div class="list-page-container">
       <div class="themed-card list-content-area">
         <div class="se-filter-bar">
@@ -58,10 +57,10 @@ import { takeUntil } from "rxjs/operators";
               (onChange)="applyFilters()"
               appendTo="body"
               styleClass="w-full"
-            >
+              >
             </p-select>
           </div>
-
+    
           <div class="se-filter-field">
             <label for="status">Status</label>
             <p-select
@@ -75,10 +74,10 @@ import { takeUntil } from "rxjs/operators";
               (onChange)="applyFilters()"
               appendTo="body"
               styleClass="w-full"
-            >
+              >
             </p-select>
           </div>
-
+    
           <div class="se-filter-field">
             <label for="priority">Priority</label>
             <p-select
@@ -92,10 +91,10 @@ import { takeUntil } from "rxjs/operators";
               (onChange)="applyFilters()"
               appendTo="body"
               styleClass="w-full"
-            >
+              >
             </p-select>
           </div>
-
+    
           <div class="se-filter-field" style="min-width: 240px;">
             <label>Created Date Range</label>
             <p-datepicker
@@ -109,10 +108,10 @@ import { takeUntil } from "rxjs/operators";
               [showButtonBar]="true"
               appendTo="body"
               styleClass="w-full"
-            >
+              >
             </p-datepicker>
           </div>
-
+    
           <div class="se-filter-field" style="flex-grow: 1;">
             <label for="search">Search</label>
             <span class="p-input-icon-left w-full">
@@ -126,36 +125,38 @@ import { takeUntil } from "rxjs/operators";
                 (blur)="applyFilters()"
                 placeholder="Search title, content, tags..."
                 class="w-full"
-              />
-            </span>
+                />
+              </span>
+            </div>
+    
+            <div class="se-filter-actions">
+              <button
+                pButton
+                label="Reset"
+                icon="pi pi-refresh"
+                class="p-button-outlined p-button-secondary"
+                (click)="resetFilters()"
+              ></button>
+            </div>
           </div>
-
-          <div class="se-filter-actions">
-            <button
-              pButton
-              label="Reset"
-              icon="pi pi-refresh"
-              class="p-button-outlined p-button-secondary"
-              (click)="resetFilters()"
-            ></button>
-          </div>
-        </div>
-        <div class="list-grid-wrapper">
-          <app-ag-share-grid
-            [columns]="columnDefs"
-            [data]="rowData"
-            selectionMode="single"
-            (gridEvent)="onGridEvent($event)"
-          >
-          </app-ag-share-grid>
-
-          <div *ngIf="isLoading" class="grid-loading-overlay">
-            <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+          <div class="list-grid-wrapper">
+            <app-ag-share-grid
+              [columns]="columnDefs"
+              [data]="rowData"
+              selectionMode="single"
+              (gridEvent)="onGridEvent($event)"
+              >
+            </app-ag-share-grid>
+    
+            @if (isLoading) {
+              <div class="grid-loading-overlay">
+                <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+              </div>
+            }
           </div>
         </div>
       </div>
-    </div>
-  `,
+    `,
   styles: [
     `
       :host {

@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, OnDestroy, computed, signal, HostListener, ElementRef } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription, finalize, forkJoin } from 'rxjs';
 
@@ -30,9 +30,14 @@ import { SocketConnectionService } from '@core/services/socket/socket-connection
   selector: 'app-chat',
   standalone: true,
   imports: [
-    CommonModule, FormsModule, ToastModule, ChatSidebarComponent,
-    ChatHeaderComponent, ChatMessagesComponent, ChatComposerComponent, ChatModalsComponent
-  ],
+    FormsModule,
+    ToastModule,
+    ChatSidebarComponent,
+    ChatHeaderComponent,
+    ChatMessagesComponent,
+    ChatComposerComponent,
+    ChatModalsComponent
+],
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss']
 })

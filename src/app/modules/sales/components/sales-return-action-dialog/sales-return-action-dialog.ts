@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { finalize, takeUntil } from 'rxjs/operators';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
@@ -13,10 +13,9 @@ import { Subject } from "rxjs";
   selector: 'app-sales-return-action-dialog',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     FormsModule
-  ],
+],
   template: `
     <div class="action-dialog-wrapper">
       

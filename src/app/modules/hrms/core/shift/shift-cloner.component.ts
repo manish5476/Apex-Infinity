@@ -1,6 +1,6 @@
 import { Message } from "./../../../../chat/chat.component/chat.models";
 import { Component, OnInit, ChangeDetectionStrategy, inject, signal, Input, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
@@ -22,14 +22,13 @@ import { AppMessageService } from '@core/services/message.service';
   selector: 'app-shift-cloner',
   standalone: true,
   imports: [
-    CommonModule, 
     ReactiveFormsModule,
-    CardModule, 
-    SelectModule, 
+    CardModule,
+    SelectModule,
     ButtonModule,
-    ToastModule, 
+    ToastModule,
     TagModule
-  ],
+],
   providers: [MessageService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `

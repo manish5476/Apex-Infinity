@@ -1,5 +1,5 @@
 import { Component, HostListener, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterOutlet } from '@angular/router';
 import { LayoutService } from '../layout.service';
 import { MainscreenHeader } from '../mainscreen-header/mainscreen-header';
@@ -9,7 +9,7 @@ import { Toast } from "primeng/toast";
 @Component({
   selector: 'app-main-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, MainscreenHeader, Mainscreensidebar, Toast, TabStripComponent],
+  imports: [RouterOutlet, MainscreenHeader, Mainscreensidebar, Toast, TabStripComponent],
   templateUrl: './main-dashboard.html',
   styleUrl: './main-dashboard.scss'
 })

@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal, ChangeDetectorRef, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ProductService } from '../../services/product-service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
@@ -12,7 +12,7 @@ import { takeUntil } from "rxjs/operators";
 @Component({
   selector: 'app-low-stock-report',
   standalone: true,
-  imports: [CommonModule, AgShareGrid, ButtonModule, RouterModule],
+  imports: [AgShareGrid, ButtonModule, RouterModule],
   templateUrl: './low-stock-report.html',
   styleUrls: ['./low-stock-report.scss']
 })

@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject, ChangeDetectorRef, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -15,9 +15,12 @@ import { takeUntil } from "rxjs/operators";
   selector: 'app-system-audit-alerts',
   standalone: true,
   imports: [
-    CommonModule, TagModule, TooltipModule, ProgressSpinnerModule,
-    AgShareGrid, UniversalFilterComponent
-  ],
+    TagModule,
+    TooltipModule,
+    ProgressSpinnerModule,
+    AgShareGrid,
+    UniversalFilterComponent
+],
   template: `
 <div class="audit-root">
 

@@ -1,6 +1,6 @@
 import { AppMessageService } from './../../../../core/services/message.service';
 import { Component, OnInit, inject, signal, ChangeDetectorRef, OnDestroy } from '@angular/core';
-import { CommonModule, DecimalPipe } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 // Services
 import { AccountService } from '../../accounts';
 import { MessageService } from 'primeng/api';
@@ -14,7 +14,7 @@ import { takeUntil } from "rxjs/operators";
 @Component({
   selector: 'app-account-list',
   standalone: true,
-  imports: [CommonModule, AgShareGrid],
+  imports: [AgShareGrid],
   providers: [MessageService, DecimalPipe],
   templateUrl: './account-list.html',
   styleUrls: ['./account-list.scss']

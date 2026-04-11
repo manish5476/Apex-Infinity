@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
@@ -22,15 +22,15 @@ import { EmiService } from '../../services/emi-service';
   selector: 'app-emi-form',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     ToastModule,
     ButtonModule,
     InputTextModule,
     InputNumberModule,
     DatePicker,
-    DividerModule, RouterModule
-  ],
+    DividerModule,
+    RouterModule
+],
   templateUrl: './emi-form.html',
   styleUrls: ['./emi-form.scss']
 })

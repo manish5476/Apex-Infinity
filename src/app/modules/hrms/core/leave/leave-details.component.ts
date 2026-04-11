@@ -33,13 +33,13 @@ import { AppMessageService } from '@core/services/message.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <p-confirmDialog styleClass="premium-confirm-dialog"></p-confirmDialog>
-
+    
     <div class="page-wrapper fade-in">
       @if (isLoading()) {
         <p-skeleton width="100%" height="200px" styleClass="mb-4"></p-skeleton>
         <p-skeleton width="100%" height="400px"></p-skeleton>
       } @else if (request(); as req) {
-        
+    
         <header class="dashboard-header slide-down mb-5">
           <div class="header-left">
             <p-button icon="pi pi-arrow-left" [text]="true" [rounded]="true" size="large" styleClass="back-btn" (onClick)="onBack()"></p-button>
@@ -51,21 +51,23 @@ import { AppMessageService } from '@core/services/message.service';
               <p class="page-subtitle mt-1">Request ID: <span class="badge-mono-sm">{{ req.leaveRequestId }}</span> • Applied on {{ req.appliedAt | date:'mediumDate' }}</p>
             </div>
           </div>
-          
+    
           <div class="header-right flex-align gap-2">
-            <p-button *ngIf="req.status === 'pending'" label="Cancel Request" icon="pi pi-times" severity="danger" [outlined]="true" (onClick)="onCancelRequest()"></p-button>
-            
-            <ng-container *ngIf="req.status === 'pending'">
+            @if (req.status === 'pending') {
+              <p-button label="Cancel Request" icon="pi pi-times" severity="danger" [outlined]="true" (onClick)="onCancelRequest()"></p-button>
+            }
+    
+            @if (req.status === 'pending') {
               <p-button label="Escalate" icon="pi pi-arrow-up-right" severity="secondary" [outlined]="true" (onClick)="showDialog('escalate')"></p-button>
               <p-button label="Reject" icon="pi pi-ban" severity="danger" (onClick)="showDialog('reject')"></p-button>
               <p-button label="Approve" icon="pi pi-check" severity="success" (onClick)="showDialog('approve')"></p-button>
-            </ng-container>
+            }
           </div>
         </header>
-
+    
         <div class="grid-layout">
           <div class="flex-col gap-4">
-            
+    
             <p-card styleClass="premium-card glass-card slide-down" styleClass="animation-delay: 0.1s">
               <h3 class="font-heading text-lg m-0 mb-4 border-bottom pb-3"><i class="pi pi-file text-primary mr-2"></i> Leave Specifics</h3>
               <div class="grid-2 gap-4">
@@ -91,29 +93,29 @@ import { AppMessageService } from '@core/services/message.service';
                 </div>
               </div>
             </p-card>
-
+    
             <p-card styleClass="premium-card glass-card slide-down" styleClass="animation-delay: 0.15s">
-               <h3 class="font-heading text-lg m-0 mb-4 border-bottom pb-3"><i class="pi pi-users text-primary mr-2"></i> Work & Contact</h3>
-               <div class="grid-2 gap-4">
-                 <div class="info-group">
-                    <span class="info-label text-tertiary">Handover To</span>
-                    <span class="font-medium mt-1">{{ req.handoverTo?.name || 'N/A' }}</span>
-                 </div>
-                 <div class="info-group">
-                    <span class="info-label text-tertiary">Emergency Contact</span>
-                    <span class="font-medium mt-1">{{ req.emergencyContact?.name || 'N/A' }} <span class="text-xs text-secondary">({{ req.emergencyContact?.phone }})</span></span>
-                 </div>
-                 <div class="info-group span-2">
-                    <span class="info-label text-tertiary">Handover Notes</span>
-                    <p class="m-0 text-secondary mt-1 text-sm">{{ req.handoverNotes || 'No specific instructions provided.' }}</p>
-                 </div>
-               </div>
+              <h3 class="font-heading text-lg m-0 mb-4 border-bottom pb-3"><i class="pi pi-users text-primary mr-2"></i> Work & Contact</h3>
+              <div class="grid-2 gap-4">
+                <div class="info-group">
+                  <span class="info-label text-tertiary">Handover To</span>
+                  <span class="font-medium mt-1">{{ req.handoverTo?.name || 'N/A' }}</span>
+                </div>
+                <div class="info-group">
+                  <span class="info-label text-tertiary">Emergency Contact</span>
+                  <span class="font-medium mt-1">{{ req.emergencyContact?.name || 'N/A' }} <span class="text-xs text-secondary">({{ req.emergencyContact?.phone }})</span></span>
+                </div>
+                <div class="info-group span-2">
+                  <span class="info-label text-tertiary">Handover Notes</span>
+                  <p class="m-0 text-secondary mt-1 text-sm">{{ req.handoverNotes || 'No specific instructions provided.' }}</p>
+                </div>
+              </div>
             </p-card>
-
+    
           </div>
-
+    
           <div class="flex-col gap-4">
-            
+    
             <p-card styleClass="premium-card glass-card slide-down" styleClass="animation-delay: 0.2s">
               <h3 class="font-heading text-lg m-0 mb-4"><i class="pi pi-chart-pie text-primary mr-2"></i> Impact on Balance</h3>
               <div class="balance-impact bg-surface p-3 border-radius-md flex-between">
@@ -122,10 +124,10 @@ import { AppMessageService } from '@core/services/message.service';
                 <div class="flex-col text-center"><span class="text-xs text-tertiary uppercase">Remaining</span><span class="font-bold text-xl text-primary">{{ req.balanceSnapshot?.after[req.leaveType] || 0 }}</span></div>
               </div>
             </p-card>
-
+    
             <p-card styleClass="premium-card glass-card slide-down" styleClass="animation-delay: 0.25s">
               <h3 class="font-heading text-lg m-0 mb-4"><i class="pi pi-sitemap text-primary mr-2"></i> Approval Workflow</h3>
-              
+    
               <p-timeline [value]="getTimelineEvents(req)" align="alternate" styleClass="customized-timeline">
                 <ng-template pTemplate="marker" let-event>
                   <span class="custom-marker p-shadow-2" [ngStyle]="{'background-color': event.color}">
@@ -137,39 +139,43 @@ import { AppMessageService } from '@core/services/message.service';
                     <div class="font-bold text-sm">{{ event.status }}</div>
                     <div class="text-xs text-tertiary">{{ event.date | date:'dd MMM, HH:mm' }}</div>
                     <div class="text-xs text-secondary mt-1">{{ event.person }}</div>
-                    <div *ngIf="event.comment" class="mt-1 text-xs italic opacity-80 bg-surface p-1 border-radius-sm">"{{ event.comment }}"</div>
+                    @if (event.comment) {
+                      <div class="mt-1 text-xs italic opacity-80 bg-surface p-1 border-radius-sm">"{{ event.comment }}"</div>
+                    }
                   </div>
                 </ng-template>
               </p-timeline>
             </p-card>
-
+    
           </div>
         </div>
       }
     </div>
-
+    
     <p-dialog [header]="actionDialog.title" [(visible)]="displayActionDialog" [modal]="true" [style]="{width: '400px'}" styleClass="premium-dialog">
       <form [formGroup]="actionForm" class="flex-col gap-4 mt-2">
-        
+    
         <p class="m-0 text-secondary text-sm">{{ actionDialog.message }}</p>
-
-        <div *ngIf="actionType === 'escalate'" class="input-group">
-          <label class="info-label">Escalate To <span class="text-error">*</span></label>
-          <p-select formControlName="escalateTo" [options]="managers" optionLabel="name" optionValue="id" [filter]="true" filterBy="name" styleClass="w-full premium-select" appendTo="body"></p-select>
-        </div>
-
+    
+        @if (actionType === 'escalate') {
+          <div class="input-group">
+            <label class="info-label">Escalate To <span class="text-error">*</span></label>
+            <p-select formControlName="escalateTo" [options]="managers" optionLabel="name" optionValue="id" [filter]="true" filterBy="name" styleClass="w-full premium-select" appendTo="body"></p-select>
+          </div>
+        }
+    
         <div class="input-group">
           <label class="info-label">{{ actionType === 'reject' || actionType === 'escalate' ? 'Reason (Required)' : 'Comments (Optional)' }}</label>
           <textarea pInputTextarea formControlName="comments" rows="3" class="w-full premium-input"></textarea>
         </div>
-
+    
         <div class="flex-align justify-end gap-2 pt-3 border-top mt-2">
           <p-button label="Cancel" [text]="true" severity="secondary" (onClick)="displayActionDialog = false"></p-button>
           <p-button [label]="actionDialog.btnLabel" [severity]="actionDialog.btnSeverity" [loading]="isProcessing()" [disabled]="actionForm.invalid" (onClick)="submitAction()"></p-button>
         </div>
       </form>
     </p-dialog>
-  `,
+    `,
   styles: [`
     :host { display: block; font-family: var(--font-body); color: var(--text-primary); }
     .page-wrapper { padding: var(--spacing-2xl) var(--spacing-3xl); max-width: 1400px; margin: 0 auto; }

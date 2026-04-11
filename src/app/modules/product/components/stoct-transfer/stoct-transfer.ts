@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl } from '@angular/forms';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { ButtonModule } from 'primeng/button';
@@ -16,7 +16,7 @@ import { takeUntil } from "rxjs/operators";
 @Component({
   selector: 'app-stock-transfer',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ButtonModule, InputNumberModule, FloatLabelModule, SelectModule, InputTextModule],
+  imports: [ReactiveFormsModule, ButtonModule, InputNumberModule, FloatLabelModule, SelectModule, InputTextModule],
   templateUrl: './stoct-transfer.html',
   styleUrls: ['./stoct-transfer.scss'],
 })

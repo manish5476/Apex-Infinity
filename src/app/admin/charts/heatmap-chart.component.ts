@@ -1,12 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Subject, takeUntil } from 'rxjs';
 import { ChartService } from '../chart.service';
 
 @Component({
   selector: 'app-heatmap-chart',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   template: `
     <div class="chart-card">
       <div class="card-header">
@@ -25,49 +25,61 @@ import { ChartService } from '../chart.service';
         <div class="legend-scale">
           <span class="legend-label">Low</span>
           <div class="legend-cells">
-            <div class="legend-cell" *ngFor="let s of legendSteps" [style.background]="getCellColor(s, maxVal)"></div>
+            @for (s of legendSteps; track s) {
+              <div class="legend-cell" [style.background]="getCellColor(s, maxVal)"></div>
+            }
           </div>
           <span class="legend-label">High</span>
         </div>
       </div>
-
-      <div class="state-overlay" *ngIf="isLoading">
-        <div class="spinner"></div><span>Loading...</span>
-      </div>
-      <div class="state-overlay error" *ngIf="hasError && !isLoading">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-        </svg>
-        <span>Failed to load</span>
-        <button class="retry-btn" (click)="loadData()">Retry</button>
-      </div>
-
-      <ng-container *ngIf="!isLoading && !hasError && chartData">
+    
+      @if (isLoading) {
+        <div class="state-overlay">
+          <div class="spinner"></div><span>Loading...</span>
+        </div>
+      }
+      @if (hasError && !isLoading) {
+        <div class="state-overlay error">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <span>Failed to load</span>
+          <button class="retry-btn" (click)="loadData()">Retry</button>
+        </div>
+      }
+    
+      @if (!isLoading && !hasError && chartData) {
         <div class="heatmap-wrapper">
           <!-- Y labels -->
           <div class="y-labels">
-            <div class="y-label" *ngFor="let d of chartData.yLabels">{{ d }}</div>
+            @for (d of chartData.yLabels; track d) {
+              <div class="y-label">{{ d }}</div>
+            }
           </div>
           <!-- Grid -->
           <div class="heatmap-grid">
             <!-- X labels -->
             <div class="x-labels">
-              <span class="x-label" *ngFor="let h of chartData.xLabels; let i = index"
-                [style.display]="i % 3 === 0 ? '' : 'invisible'">
-                {{ i % 3 === 0 ? h : '' }}
-              </span>
+              @for (h of chartData.xLabels; track h; let i = $index) {
+                <span class="x-label"
+                  [style.display]="i % 3 === 0 ? '' : 'invisible'">
+                  {{ i % 3 === 0 ? h : '' }}
+                </span>
+              }
             </div>
             <!-- Rows -->
-            <div class="heatmap-row" *ngFor="let row of chartData.series">
-              <div class="heatmap-cell"
-                *ngFor="let val of row.data; let hi = index"
-                [style.background]="getCellColor(val, maxVal)"
-                [title]="row.name + ' ' + chartData.xLabels[hi] + ': ' + val">
+            @for (row of chartData.series; track row) {
+              <div class="heatmap-row">
+                @for (val of row.data; track val; let hi = $index) {
+                  <div class="heatmap-cell"
+                    [style.background]="getCellColor(val, maxVal)"
+                    [title]="row.name + ' ' + chartData.xLabels[hi] + ': ' + val">
+                  </div>
+                }
               </div>
-            </div>
+            }
           </div>
         </div>
-
         <!-- Summary -->
         <div class="summary-row">
           <div class="summary-chip">
@@ -83,9 +95,9 @@ import { ChartService } from '../chart.service';
             <span class="chip-value">{{ peakDay }}</span>
           </div>
         </div>
-      </ng-container>
+      }
     </div>
-  `,
+    `,
   styles: [`
     .chart-card {
       background: var(--bg-secondary);

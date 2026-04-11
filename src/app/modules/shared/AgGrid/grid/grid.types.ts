@@ -303,6 +303,10 @@ export interface GridColDef<T = any> extends ColDef<T> {
    * When omitted, AG Grid renders the cell natively.
    */
   cellConfig?: CellConfig;
+
+  /** Allows nesting for column groups without needing ColGroupDef unions */
+  children?: GridColDef<T>[];
+  marryChildren?: boolean;
 }
 
 

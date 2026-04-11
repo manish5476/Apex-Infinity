@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal, effect, ChangeDetectionStrategy, ViewChild, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { ConfirmationService } from 'primeng/api';
 
@@ -24,6 +24,7 @@ import { AppSharedGrid, SharedGridEvent } from "../../AgGrid/grid/app-shared-gri
 import { GridColDef } from "../../AgGrid/grid/grid.types";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
+import { AppSharedGridActionButton } from '../../AgGrid/grid/app-shared-grid-action-button/app-shared-grid-action-button';
 
 // --- Interface based on Mongoose Schema ---
 export interface Master {
@@ -47,7 +48,6 @@ export interface Master {
   selector: 'app-master-list',
   standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
     ButtonModule,
     ToastModule,
@@ -64,129 +64,132 @@ export interface Master {
   template: `
     <div class="master-page-container">
       <div class="themed-card master-card">
-        
+    
         <!-- TOOLBAR -->
         <p-toolbar styleClass="master-toolbar">
           <div class="p-toolbar-group-start gap-3">
             <h2 class="section-heading m-0">Master Data</h2>
-            
+    
             <p-iconfield iconPosition="left">
               <!-- <p-inputicon styleClass="pi pi-search"></p-inputicon> -->
-              <input pInputText type="text" (input)="onQuickFilter($event)" 
-                     placeholder="Search..." class="p-inputtext-sm w-64" />
-            </p-iconfield>
-          </div>
-
-          <div class="p-toolbar-group-end flex gap-2">
-            
-            <!-- Bulk Actions for Selection -->
-             <div *ngIf="selectedRows().length > 0" class="flex gap-2 mr-2 border-r pr-2 border-gray-300">
-                <p-button 
-                   label="Delete ({{selectedRows().length}})" 
-                   icon="pi pi-trash" 
-                   severity="danger" 
-                   (click)="confirmBulkDelete()">
-                </p-button>
-             </div>
-
-             <!-- Bulk Edit Toggle -->
-             <div class="flex gap-2 mr-2">
-                <p-button 
-                  *ngIf="!isBulkEditing()"
-                  label="Bulk Edit" 
-                  icon="pi pi-pencil" 
-                  [text]="true"
-                  (click)="toggleBulkEdit()">
-                </p-button>
-
-                <ng-container *ngIf="isBulkEditing()">
+              <input pInputText type="text" (input)="onQuickFilter($event)"
+                placeholder="Search..." class="p-inputtext-sm w-64" />
+              </p-iconfield>
+            </div>
+    
+            <div class="p-toolbar-group-end flex gap-2">
+    
+              <!-- Bulk Actions for Selection -->
+              @if (selectedRows().length > 0) {
+                <div class="flex gap-2 mr-2 border-r pr-2 border-gray-300">
+                  <p-button
+                    label="Delete ({{selectedRows().length}})"
+                    icon="pi pi-trash"
+                    severity="danger"
+                    (click)="confirmBulkDelete()">
+                  </p-button>
+                </div>
+              }
+    
+              <!-- Bulk Edit Toggle -->
+              <div class="flex gap-2 mr-2">
+                @if (!isBulkEditing()) {
+                  <p-button
+                    label="Bulk Edit"
+                    icon="pi pi-pencil"
+                    [text]="true"
+                    (click)="toggleBulkEdit()">
+                  </p-button>
+                }
+    
+                @if (isBulkEditing()) {
                   <p-button label="Cancel" icon="pi pi-times" severity="secondary" [text]="true" (click)="cancelBulkEdit()"></p-button>
                   <p-button label="Save All" icon="pi pi-check" (click)="saveBulkEdit()"></p-button>
-                </ng-container>
-             </div>
-
-             <div class="stats mr-4 align-content-center">
-              <span class="text-sm text-gray-500">Total: {{ masters().length }}</span>
+                }
+              </div>
+    
+              <div class="stats mr-4 align-content-center">
+                <span class="text-sm text-gray-500">Total: {{ masters().length }}</span>
+              </div>
+    
+              <!-- Bulk Import Button -->
+              <p-button label="Import" icon="pi pi-upload" styleClass="p-button-outlined"
+              (click)="openBulkDialog()"></p-button>
+    
+              <p-button icon="pi pi-refresh" styleClass="p-button-text"
+              (click)="loadMasters()" [loading]="loading()"></p-button>
+    
+              <!-- ADD NEW: Calls Grid Method directly -->
+              <p-button label="Add New" icon="pi pi-plus" (click)="onAddNew()"></p-button>
             </div>
-            
-            <!-- Bulk Import Button -->
-            <p-button label="Import" icon="pi pi-upload" styleClass="p-button-outlined" 
-                      (click)="openBulkDialog()"></p-button>
-
-            <p-button icon="pi pi-refresh" styleClass="p-button-text" 
-                      (click)="loadMasters()" [loading]="loading()"></p-button>
-            
-            <!-- ADD NEW: Calls Grid Method directly -->
-            <p-button label="Add New" icon="pi pi-plus" (click)="onAddNew()"></p-button>
+          </p-toolbar>
+    
+          <!-- MAIN DATA GRID -->
+          <div class="master-grid-wrapper" style="height: calc(100vh - 200px);">
+            <app-shared-grid
+              #mainGrid
+              [columns]="columns"
+              [data]="masters()"
+              [selectionMode]="'multiple'"
+              [showActions]="true"
+              (gridEvent)="onGridEvent($event)">
+            </app-shared-grid>
           </div>
-        </p-toolbar>
-
-        <!-- MAIN DATA GRID -->
-        <div class="master-grid-wrapper" style="height: calc(100vh - 200px);">
-          <app-shared-grid
-            #mainGrid
-            [columns]="columns"
-            [data]="masters()"
-            [selectionMode]="'multiple'"
-            [showActions]="true"
-            (gridEvent)="onGridEvent($event)">
-          </app-shared-grid>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- BULK ENTRY DIALOG (Import) -->
-    <p-dialog header="Bulk Import" [(visible)]="isBulkDialogVisible" [modal]="true" 
-              [style]="{ width: '95vw', height: '90vh' }" [draggable]="false" [resizable]="false"
-              [maximizable]="true">
-      
-      <div class="flex flex-col h-full gap-2">
-        <div class="bg-blue-50 p-3 rounded-md text-sm text-blue-700 mb-2 border border-blue-100 flex items-center">
-          <i class="pi pi-info-circle mr-2"></i>
-          <span>
-            Enter details below. <b>Name</b> and <b>Type</b> are required. 
-            Rows without a Name will be ignored.
-          </span>
-        </div>
-
-        <!-- Reusing AppSharedGrid for Bulk Entry -->
-        <div class="flex-1 overflow-hidden border rounded-md">
-           <app-shared-grid
-            #bulkGrid
-            [columns]="columns"
-            [data]="bulkData()"
-            [selectionMode]="'multiple'"
-            [showActions]="true"
-            (gridEvent)="onBulkGridEvent($event)">
-          </app-shared-grid>
+    
         </div>
       </div>
-      
-      <ng-template pTemplate="footer">
-        <div class="flex justify-between w-full">
+    
+      <!-- BULK ENTRY DIALOG (Import) -->
+      <p-dialog header="Bulk Import" [(visible)]="isBulkDialogVisible" [modal]="true"
+        [style]="{ width: '95vw', height: '90vh' }" [draggable]="false" [resizable]="false"
+        [maximizable]="true">
+    
+        <div class="flex flex-col h-full gap-2">
+          <div class="bg-blue-50 p-3 rounded-md text-sm text-blue-700 mb-2 border border-blue-100 flex items-center">
+            <i class="pi pi-info-circle mr-2"></i>
+            <span>
+              Enter details below. <b>Name</b> and <b>Type</b> are required.
+              Rows without a Name will be ignored.
+            </span>
+          </div>
+    
+          <!-- Reusing AppSharedGrid for Bulk Entry -->
+          <div class="flex-1 overflow-hidden border rounded-md">
+            <app-shared-grid
+              #bulkGrid
+              [columns]="columns"
+              [data]="bulkData()"
+              [selectionMode]="'multiple'"
+              [showActions]="true"
+              (gridEvent)="onBulkGridEvent($event)">
+            </app-shared-grid>
+          </div>
+        </div>
+    
+        <ng-template pTemplate="footer">
+          <div class="flex justify-between w-full">
             <!-- Left Side: Add Row Button -->
-            <p-button label="Add Empty Row" icon="pi pi-plus" [text]="true" severity="secondary" 
-                      (click)="addBulkRow()"></p-button>
-
+            <p-button label="Add Empty Row" icon="pi pi-plus" [text]="true" severity="secondary"
+            (click)="addBulkRow()"></p-button>
+    
             <!-- Right Side: Actions -->
             <div class="flex gap-2">
-                <p-button label="Cancel" icon="pi pi-times" [text]="true" (click)="isBulkDialogVisible = false"></p-button>
-                <p-button label="Create All" icon="pi pi-check" [loading]="isBulkSaving" 
-                          (click)="saveBulkImport()"></p-button>
+              <p-button label="Cancel" icon="pi pi-times" [text]="true" (click)="isBulkDialogVisible = false"></p-button>
+              <p-button label="Create All" icon="pi pi-check" [loading]="isBulkSaving"
+              (click)="saveBulkImport()"></p-button>
             </div>
-        </div>
-      </ng-template>
-    </p-dialog>
-
-    <p-toast></p-toast> 
-    <p-confirmDialog></p-confirmDialog>
-  `,
+          </div>
+        </ng-template>
+      </p-dialog>
+    
+      <p-toast></p-toast>
+      <p-confirmDialog></p-confirmDialog>
+    `,
   styleUrls: ['./master-list.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MasterList implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   // --- Services ---
   private masterService = inject(MasterService);
   private appMessage = inject(AppMessageService);
@@ -221,60 +224,204 @@ export class MasterList implements OnInit, OnDestroy {
     { label: 'tag', value: 'tag' }
   ];
 
-  // --- Grid Definition ---
+  // Define this within your MasterList class
+  // columns: GridColDef<Master>[] = [
+  //   {
+  //     headerName: 'Identity & Type',
+  //     marryChildren: true,
+  //     children: [
+  //       {
+  //         field: 'type',
+  //         headerName: 'Type',
+  //         width: 140,
+  //         pinned: 'left',
+  //         filter: 'agSetColumnFilter',
+  //         cellConfig: {
+  //           type: 'select',
+  //           options: this.masterTypes,
+  //         },
+  //         // Premium Badge Rendering using your theme tokens
+  //         cellRenderer: (params: any) => {
+  //           if (!params.value) return '';
+  //           const val = params.value.toLowerCase();
+  //           return `
+  //           <div class="type-badge-container">
+  //             <span class="type-badge badge-${val}">
+  //               ${params.value}
+  //             </span>
+  //           </div>
+  //         `;
+  //         }
+  //       },
+  //       {
+  //         field: 'name',
+  //         headerName: 'Display Name',
+  //         flex: 1,
+  //         minWidth: 200,
+  //         pinned: 'left',
+  //         cellClass: 'font-weight-bold text-primary-color',
+  //         cellConfig: {
+  //           type: 'text',
+  //           placeholder: 'e.g. Premium Electronics'
+  //         }
+  //       }
+  //     ]
+  //   },
+  //   {
+  //     headerName: 'Assets & Media',
+  //     children: [
+  //       {
+  //         field: 'imageUrl',
+  //         headerName: 'Visual',
+  //         width: 100,
+  //         sortable: false,
+  //         filter: false,
+  //         cellRenderer: (params: any) => {
+  //           const url = params.value;
+  //           if (url) {
+  //             return `<div class="grid-media-wrapper"><img src="${url}" class="grid-img-thumb" /></div>`;
+  //           }
+  //           return `<div class="grid-media-placeholder"><i class="pi pi-image"></i></div>`;
+  //         },
+  //         cellConfig: { type: 'text', placeholder: 'Image URL' }
+  //       },
+  //       {
+  //         field: 'code',
+  //         headerName: 'System Code',
+  //         width: 120,
+  //         valueFormatter: (params) => params.value ? params.value.toUpperCase() : '-',
+  //         cellClass: 'font-mono text-xs',
+  //         cellConfig: { type: 'text', placeholder: 'UNIT-001' }
+  //       }
+  //     ]
+  //   },
+  //   {
+  //     headerName: 'Operational Status',
+  //     children: [
+  //       {
+  //         field: 'isActive',
+  //         headerName: 'Availability',
+  //         width: 130,
+  //         cellConfig: { type: 'boolean' },
+  //         cellRenderer: (params: any) => {
+  //           const state = params.value ? 'active' : 'inactive';
+  //           const label = params.value ? 'Live' : 'Draft';
+  //           return `
+  //           <div class="status-pill status-${state}">
+  //             <span class="status-dot"></span>
+  //             <span class="status-label">${label}</span>
+  //           </div>
+  //         `;
+  //         }
+  //       },
+  //       {
+  //         field: 'metadata.isFeatured',
+  //         headerName: 'Featured',
+  //         width: 110,
+  //         valueGetter: (p) => p.data?.metadata?.isFeatured,
+  //         cellConfig: { type: 'boolean' },
+  //         // Simple star toggle renderer
+  //         cellRenderer: (params: any) => {
+  //           const color = params.value ? '#eab308' : 'var(--text-tertiary)';
+  //           const icon = params.value ? 'pi-star-fill' : 'pi-star';
+  //           return `<div style="text-align: center; color: ${color}"><i class="pi ${icon}"></i></div>`;
+  //         }
+  //       }
+  //     ]
+  //   },
+  //   {
+  //     field: 'description',
+  //     headerName: 'Notes & Context',
+  //     width: 250,
+  //     cellClass: 'text-muted-sm',
+  //     cellConfig: { type: 'text', placeholder: 'Add a description...' }
+  //   }
+  // ];
   columns: GridColDef<Master>[] = [
     {
       field: 'type',
       headerName: 'Type',
-      width: 130,
+      width: 150,
+      pinned: 'left',
       cellConfig: {
         type: 'select',
-        placeholder: 'Select Type',
         options: this.masterTypes,
         optionLabel: 'label',
-        optionValue: 'value'
+        optionValue: 'value',
+        selectAsBadge: true, // MasterCell renders this as a semantic badge
+        placeholder: 'Select Type'
       }
     },
     {
       field: 'name',
-      headerName: 'Name',
+      headerName: 'Master Name',
       flex: 1,
-      minWidth: 150,
-      cellConfig: { type: 'text', placeholder: 'Enter Name (Required)' }
+      minWidth: 200,
+      pinned: 'left',
+      cellConfig: {
+        type: 'text',
+        placeholder: 'Enter name...',
+        truncateAt: 40
+      }
     },
     {
       field: 'imageUrl',
-      headerName: 'Image URL',
-      width: 150,
-      cellConfig: { type: 'text', placeholder: 'https://example.com/img.png' }
+      headerName: 'Media',
+      width: 120,
+      cellConfig: {
+        type: 'avatar', // MasterCell renders image or initials
+        labelField: 'name'
+      }
     },
     {
       field: 'code',
       headerName: 'Code',
-      width: 100,
-      cellConfig: { type: 'text', placeholder: 'CODE' }
+      width: 120,
+      cellConfig: {
+        type: 'text',
+        placeholder: 'CODE-001'
+      }
     },
     {
       field: 'isActive',
-      headerName: 'Active',
-      width: 90,
-      cellConfig: { type: 'boolean' }
+      headerName: 'Status',
+      width: 120,
+      cellConfig: {
+        type: 'boolean' // MasterCell renders as Yes/No chips
+      }
     },
     {
       field: 'metadata.isFeatured',
       headerName: 'Featured',
-      width: 90,
+      width: 110,
       valueGetter: (p) => p.data?.metadata?.isFeatured,
-      cellConfig: { type: 'boolean' }
+      cellConfig: {
+        type: 'boolean'
+      }
     },
     {
       field: 'description',
       headerName: 'Description',
-      width: 200,
-      cellConfig: { type: 'text', placeholder: 'Optional description' }
-    }
+      width: 250,
+      cellConfig: {
+        type: 'textarea',
+        rows: 2,
+        placeholder: 'Internal notes...'
+      }
+    },
+    // {
+    //   headerName: 'Actions',
+    //   width: 180,
+    //   pinned: 'right',
+    //   sortable: false,
+    //   filter: false,
+    //   resizable: false,
+    //   cellClass: 'action-column-cell',
+    //   cellRenderer: AppSharedGridActionButton,
+    //   cellRendererParams: {
+    //   }
+    // }
   ];
-
   constructor() {
     effect(() => { });
   }
@@ -586,8 +733,8 @@ export class MasterList implements OnInit, OnDestroy {
     return `${slug}-${random}`;
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

@@ -3,7 +3,7 @@ import {
   Component, Input, HostListener,
   signal, inject, OnInit, OnDestroy, computed
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { filter, Subject, takeUntil } from 'rxjs';
 import { StorefrontStateService } from '@core/services/storefront-state.service';
@@ -11,7 +11,7 @@ import { StorefrontStateService } from '@core/services/storefront-state.service'
 @Component({
   selector: 'app-navbar-simple',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [RouterModule],
   template: `
     <header
       class="fixed top-0 left-0 right-0 z-[100] flex justify-center pointer-events-none transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { ICellRendererAngularComp } from 'ag-grid-angular';
 import { ICellRendererParams } from 'ag-grid-community';
@@ -8,7 +8,7 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
 @Component({
   selector: 'app-grid-toggle-renderer',
   standalone: true,
-  imports: [CommonModule, FormsModule, ToggleSwitchModule],
+  imports: [FormsModule, ToggleSwitchModule],
   template: `
     <div class="flex align-center justify-center w-full h-full p-1">
       <p-toggleswitch 

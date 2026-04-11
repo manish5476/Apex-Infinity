@@ -1,19 +1,21 @@
-<p-toast></p-toast> 
+<p-toast></p-toast>
 
 <div class="customer-wrapper">
   <section class="customer-container">
-    
+
     <div class="customer-form-panel">
       <form [formGroup]="emiForm" (ngSubmit)="onSubmit()" class="customer-form-layout">
 
         <!-- 1. STICKY HEADER -->
         <div class="customer-form-header">
           <h1 class="form-title">{{ formTitle() }}</h1>
-          <p class="form-subtitle" *ngIf="invoice">
-            For Invoice: <strong>{{ invoice?.invoiceNumber }}</strong> 
-            <span class="text-gray-400 mx-2">|</span> 
-            Customer: <strong>{{ invoice?.customerId?.name }}</strong>
-          </p>
+          @if (invoice) {
+            <p class="form-subtitle">
+              For Invoice: <strong>{{ invoice?.invoiceNumber }}</strong>
+              <span class="text-gray-400 mx-2">|</span>
+              Customer: <strong>{{ invoice?.customerId?.name }}</strong>
+            </p>
+          }
         </div>
 
         <!-- 2. SCROLLABLE BODY -->
@@ -24,7 +26,7 @@
             <h4 class="section-title">Loan Calculation</h4>
             <!-- Changed to grid-4 to fit the extra field neatly -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              
+
               <div class="form-group">
                 <label>Total Invoice</label>
                 <p-inputNumber formControlName="totalAmount" mode="decimal" [minFractionDigits]="2" prefix="₹ " styleClass="w-full"></p-inputNumber>
@@ -34,7 +36,7 @@
                 <label class="text-green-600">Already Paid</label>
                 <p-inputNumber formControlName="alreadyPaid" mode="decimal" [minFractionDigits]="2" prefix="₹ " styleClass="w-full"></p-inputNumber>
               </div>
-              
+
               <div class="form-group">
                 <label>New Down Payment</label>
                 <p-inputNumber formControlName="downPayment" mode="decimal" [minFractionDigits]="2" prefix="₹ " styleClass="w-full"></p-inputNumber>
@@ -49,12 +51,12 @@
 
             </div>
           </section>
-          
+
           <p-divider></p-divider>
 
           <!-- EMI Plan Details -->
           <section class="form-section">
-             <h4 class="section-title">Plan Configuration</h4>
+            <h4 class="section-title">Plan Configuration</h4>
             <div class="form-grid-3">
               <div class="form-group">
                 <label>Number of Installments <span class="req">*</span></label>
@@ -72,7 +74,7 @@
               </div>
             </div>
           </section>
-          
+
           <!-- Hidden fields -->
           <input type="hidden" formControlName="invoiceId" />
           <input type="hidden" formControlName="customerId" />
@@ -83,16 +85,16 @@
         <!-- 3. STICKY FOOTER -->
         <div class="customer-form-footer">
           <div class="form-actions">
-            <p-button 
-              label="Cancel" 
-              icon="pi pi-times" 
+            <p-button
+              label="Cancel"
+              icon="pi pi-times"
               styleClass="p-button-text p-button-secondary"
               (onClick)="router.navigate(['/invoice'])">
             </p-button>
-            <p-button 
-              label="Generate Plan" 
-              icon="pi pi-check" 
-              type="submit" 
+            <p-button
+              label="Generate Plan"
+              icon="pi pi-check"
+              type="submit"
               [loading]="isSubmitting()"
               styleClass="px-6">
             </p-button>

@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, ChangeDetectorRef, inject, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -26,14 +26,13 @@ interface PeakHour {
   selector: 'app-operational-metrics',
   standalone: true,
   imports: [
-    CommonModule,
     ButtonModule,
     TooltipModule,
     ProgressSpinnerModule,
     TagModule,
     AgShareGrid,
     UniversalFilterComponent
-  ],
+],
   template: `
     <div class="metrics-container">
 

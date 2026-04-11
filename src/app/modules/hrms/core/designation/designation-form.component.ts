@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of, catchError, map, Subject } from 'rxjs';
@@ -21,10 +21,15 @@ import { takeUntil } from "rxjs/operators";
   selector: 'app-designation-form',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule, MultiSelectModule,
-    CardModule, SelectModule, TextareaModule, InputTextModule, InputNumberModule,
+    ReactiveFormsModule,
+    MultiSelectModule,
+    CardModule,
+    SelectModule,
+    TextareaModule,
+    InputTextModule,
+    InputNumberModule,
     ToggleSwitchModule
-  ],
+],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="app-fullscreen-wrapper fade-in">

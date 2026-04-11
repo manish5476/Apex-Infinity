@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Subject, takeUntil } from 'rxjs';
 import { Chart, registerables } from 'chart.js';
 import { ChartService } from '../chart.service';
@@ -12,10 +12,10 @@ type FilterType = 'all' | 'critical' | 'low' | 'healthy';
 @Component({
   selector: 'app-inventory-health-chart',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   template: `
     <div class="chart-card">
-
+    
       <!-- Header -->
       <div class="card-header">
         <div class="card-title-group">
@@ -31,50 +31,53 @@ type FilterType = 'all' | 'critical' | 'low' | 'healthy';
             <p class="card-subtitle">Stock status across branches</p>
           </div>
         </div>
-
+    
         <!-- Status Filters -->
-        <div class="filter-pills" *ngIf="!isLoading && !hasError">
-          <button class="filter-pill all" [class.active]="activeFilter === 'all'" (click)="setFilter('all')">
-            All <span class="pill-count">{{ counts.all }}</span>
-          </button>
-          <button class="filter-pill critical" [class.active]="activeFilter === 'critical'" (click)="setFilter('critical')">
-            Critical <span class="pill-count">{{ counts.critical }}</span>
-          </button>
-          <button class="filter-pill low" [class.active]="activeFilter === 'low'" (click)="setFilter('low')">
-            Low <span class="pill-count">{{ counts.low }}</span>
-          </button>
-          <button class="filter-pill healthy" [class.active]="activeFilter === 'healthy'" (click)="setFilter('healthy')">
-            Healthy <span class="pill-count">{{ counts.healthy }}</span>
-          </button>
-        </div>
+        @if (!isLoading && !hasError) {
+          <div class="filter-pills">
+            <button class="filter-pill all" [class.active]="activeFilter === 'all'" (click)="setFilter('all')">
+              All <span class="pill-count">{{ counts.all }}</span>
+            </button>
+            <button class="filter-pill critical" [class.active]="activeFilter === 'critical'" (click)="setFilter('critical')">
+              Critical <span class="pill-count">{{ counts.critical }}</span>
+            </button>
+            <button class="filter-pill low" [class.active]="activeFilter === 'low'" (click)="setFilter('low')">
+              Low <span class="pill-count">{{ counts.low }}</span>
+            </button>
+            <button class="filter-pill healthy" [class.active]="activeFilter === 'healthy'" (click)="setFilter('healthy')">
+              Healthy <span class="pill-count">{{ counts.healthy }}</span>
+            </button>
+          </div>
+        }
       </div>
-
+    
       <!-- Loading -->
-      <div class="state-overlay" *ngIf="isLoading">
-        <div class="spinner"></div><span>Loading...</span>
-      </div>
-
+      @if (isLoading) {
+        <div class="state-overlay">
+          <div class="spinner"></div><span>Loading...</span>
+        </div>
+      }
+    
       <!-- Error -->
-      <div class="state-overlay error" *ngIf="hasError && !isLoading">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-        </svg>
-        <span>Failed to load</span>
-        <button class="retry-btn" (click)="loadData()">Retry</button>
-      </div>
-
-      <ng-container *ngIf="!isLoading && !hasError">
-
+      @if (hasError && !isLoading) {
+        <div class="state-overlay error">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <span>Failed to load</span>
+          <button class="retry-btn" (click)="loadData()">Retry</button>
+        </div>
+      }
+    
+      @if (!isLoading && !hasError) {
         <!-- Stacked Bar Chart -->
         <div class="chart-area">
           <canvas #invCanvas></canvas>
         </div>
-
         <!-- Divider -->
         <div class="section-divider">
           <span class="section-label">Item Details</span>
         </div>
-
         <!-- Search -->
         <div class="search-bar">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -82,7 +85,6 @@ type FilterType = 'all' | 'critical' | 'low' | 'healthy';
           </svg>
           <input type="text" placeholder="Search items..." [(ngModel)]="searchTerm" (input)="filterItems()" />
         </div>
-
         <!-- Items Table -->
         <div class="items-table">
           <div class="table-header">
@@ -92,66 +94,63 @@ type FilterType = 'all' | 'critical' | 'low' | 'healthy';
             <span class="col-qty">Qty</span>
             <span class="col-reorder">Reorder</span>
           </div>
-
           <div class="table-body">
-            <div class="table-row" *ngFor="let item of displayedItems"
-              [class.critical]="item.isCritical"
-              [class.low]="!item.isCritical && item.isLow"
-              [class.healthy]="!item.isCritical && !item.isLow">
-
-              <span class="col-status">
-                <span class="status-badge" [class.critical]="item.isCritical" [class.low]="!item.isCritical && item.isLow" [class.healthy]="!item.isCritical && !item.isLow">
-                  {{ item.isCritical ? 'Critical' : item.isLow ? 'Low' : 'Healthy' }}
+            @for (item of displayedItems; track item) {
+              <div class="table-row"
+                [class.critical]="item.isCritical"
+                [class.low]="!item.isCritical && item.isLow"
+                [class.healthy]="!item.isCritical && !item.isLow">
+                <span class="col-status">
+                  <span class="status-badge" [class.critical]="item.isCritical" [class.low]="!item.isCritical && item.isLow" [class.healthy]="!item.isCritical && !item.isLow">
+                    {{ item.isCritical ? 'Critical' : item.isLow ? 'Low' : 'Healthy' }}
+                  </span>
                 </span>
-              </span>
-
-              <span class="col-name" [title]="item.name">{{ item.name }}</span>
-
-              <span class="col-sku">
-                <code>{{ item.sku || '—' }}</code>
-              </span>
-
-              <span class="col-qty">
-                <span class="qty-badge" [class.zero]="item.quantity === 0">{{ item.quantity }}</span>
-              </span>
-
-              <span class="col-reorder">
-                <div class="reorder-track">
-                  <div class="reorder-fill"
-                    [style.width]="getQtyPct(item) + '%'"
-                    [class.critical]="item.isCritical"
-                    [class.low]="!item.isCritical && item.isLow"
-                    [class.healthy]="!item.isCritical && !item.isLow">
+                <span class="col-name" [title]="item.name">{{ item.name }}</span>
+                <span class="col-sku">
+                  <code>{{ item.sku || '—' }}</code>
+                </span>
+                <span class="col-qty">
+                  <span class="qty-badge" [class.zero]="item.quantity === 0">{{ item.quantity }}</span>
+                </span>
+                <span class="col-reorder">
+                  <div class="reorder-track">
+                    <div class="reorder-fill"
+                      [style.width]="getQtyPct(item) + '%'"
+                      [class.critical]="item.isCritical"
+                      [class.low]="!item.isCritical && item.isLow"
+                      [class.healthy]="!item.isCritical && !item.isLow">
+                    </div>
                   </div>
-                </div>
-                <span class="reorder-val">{{ item.reorderLevel }}</span>
-              </span>
-            </div>
-
+                  <span class="reorder-val">{{ item.reorderLevel }}</span>
+                </span>
+              </div>
+            }
             <!-- Empty state -->
-            <div class="empty-state" *ngIf="displayedItems.length === 0">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-              </svg>
-              <span>No items match your search</span>
-            </div>
+            @if (displayedItems.length === 0) {
+              <div class="empty-state">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <span>No items match your search</span>
+              </div>
+            }
           </div>
         </div>
-
         <!-- Pagination -->
-        <div class="pagination" *ngIf="totalPages > 1">
-          <button class="page-btn" [disabled]="currentPage === 0" (click)="prevPage()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-          </button>
-          <span class="page-info">{{ currentPage + 1 }} / {{ totalPages }}</span>
-          <button class="page-btn" [disabled]="currentPage >= totalPages - 1" (click)="nextPage()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-          </button>
-        </div>
-
-      </ng-container>
+        @if (totalPages > 1) {
+          <div class="pagination">
+            <button class="page-btn" [disabled]="currentPage === 0" (click)="prevPage()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <span class="page-info">{{ currentPage + 1 }} / {{ totalPages }}</span>
+            <button class="page-btn" [disabled]="currentPage >= totalPages - 1" (click)="nextPage()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        }
+      }
     </div>
-  `,
+    `,
   styles: [`
     .chart-card {
       background: var(--bg-secondary);

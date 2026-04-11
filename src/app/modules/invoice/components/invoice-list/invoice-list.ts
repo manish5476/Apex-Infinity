@@ -1,6 +1,6 @@
 
 import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation, effect, inject, signal, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { GridApi, ITooltipParams } from 'ag-grid-community';
 import { ITooltipAngularComp } from 'ag-grid-angular';
 import { FormsModule } from '@angular/forms';
@@ -33,7 +33,6 @@ import { Subject } from "rxjs";
   selector: 'app-invoice-list',
   standalone: true,
   imports: [
-    CommonModule,
     SelectModule,
     FormsModule,
     ButtonModule,
@@ -43,7 +42,7 @@ import { Subject } from "rxjs";
     DatePickerModule,
     AgShareGrid,
     HasPermissionDirective
-  ],
+],
   templateUrl: './invoice-list.html',
   styleUrl: './invoice-list.scss',
   encapsulation: ViewEncapsulation.None

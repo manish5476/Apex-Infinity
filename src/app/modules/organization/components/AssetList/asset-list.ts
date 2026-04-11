@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { finalize, Subject } from 'rxjs';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
@@ -23,7 +23,6 @@ import { takeUntil } from "rxjs/operators";
   selector: 'app-asset-list',
   standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
     ButtonModule,
     SelectModule,
@@ -31,7 +30,7 @@ import { takeUntil } from "rxjs/operators";
     ToastModule,
     ConfirmDialogModule,
     AgShareGrid
-  ],
+],
   providers: [ConfirmationService],
   templateUrl: './asset-list.html',
   styleUrl: './asset-list.scss',

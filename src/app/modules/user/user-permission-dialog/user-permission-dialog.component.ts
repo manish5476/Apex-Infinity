@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal, computed, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
 import { ButtonModule } from 'primeng/button';
@@ -22,7 +22,7 @@ interface PermissionItem {
 @Component({
   selector: 'app-user-permission-dialog',
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonModule, InputTextModule, SelectButtonModule, TooltipModule],
+  imports: [FormsModule, ButtonModule, InputTextModule, SelectButtonModule, TooltipModule],
   templateUrl: './user-permission-dialog.component.html',
   styleUrl: './user-permission-dialog.component.scss'
 })
