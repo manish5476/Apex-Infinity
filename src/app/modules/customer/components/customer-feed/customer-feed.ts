@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnDestroy, signal } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CustomerService } from '../../services/customer-service';
 import { Subject } from "rxjs";
@@ -9,6 +9,7 @@ import { TooltipModule } from 'primeng/tooltip';
   selector: 'app-customer-feed',
   standalone: true,
   imports: [CommonModule, TooltipModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="feed-card premium-card">
       <!-- ════════ HEADER ════════ -->
@@ -17,17 +18,17 @@ import { TooltipModule } from 'primeng/tooltip';
           <div class="header-icon"><i class="pi pi-history"></i></div>
           <h3>Customer Activity Feed</h3>
         </div>
-        <div class="badge-mono">{{ feedItems.length }} Activities</div>
+        <div class="badge-mono">{{ feedItems().length }} Activities</div>
       </div>
 
       <!-- ════════ SCROLLABLE CONTENT ════════ -->
       <div class="feed-body">
-        @if (loading) {
+        @if (loading()) {
           <div class="feed-loading">
             <i class="pi pi-spin pi-spinner"></i>
             <span>Synchronizing history...</span>
           </div>
-        } @else if (feedItems.length === 0) {
+        } @else if (feedItems().length === 0) {
           <div class="empty-state">
             <div class="empty-glyph"><i class="pi pi-inbox"></i></div>
             <p>No recent activity found for this account.</p>
@@ -36,7 +37,7 @@ import { TooltipModule } from 'primeng/tooltip';
           <!-- This area handles the scrolling -->
           <div class="feed-scroll-area custom-scrollbar">
             <div class="timeline-container">
-              @for (item of feedItems; track item.id || $index; let i = $index) {
+              @for (item of feedItems(); track item.id || $index; let i = $index) {
                 <div class="timeline-item reveal" [style.--delay]="(i * 50) + 'ms'">
                   
                   <!-- Left Side: Icon & Line -->
@@ -300,26 +301,28 @@ import { TooltipModule } from 'primeng/tooltip';
 })
 export class CustomerFeedComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
-  @Input() customerId!: string;
-  feedItems: any[] = [];
-  loading = false;
-
-  constructor(private customerService: CustomerService) { }
-
-  ngOnInit(): void {
-    if (this.customerId) {
-      this.loadFeed();
+  
+  @Input({ required: true }) set customerId(id: string) {
+    if (id) {
+      this.loadFeed(id);
     }
   }
 
-  loadFeed() {
-    this.loading = true;
-    this.customerService.getCustomerFeed(this.customerId).pipe(takeUntil(this.destroy$)).subscribe({
+  feedItems = signal<any[]>([]);
+  loading = signal(false);
+
+  constructor(private customerService: CustomerService) { }
+
+  ngOnInit(): void { }
+
+  loadFeed(id: string) {
+    this.loading.set(true);
+    this.customerService.getCustomerFeed(id).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
-        this.feedItems = res.data.feed;
-        this.loading = false;
+        this.feedItems.set(res.data.feed);
+        this.loading.set(false);
       },
-      error: () => this.loading = false
+      error: () => this.loading.set(false)
     });
   }
 
@@ -351,65 +354,3 @@ export class CustomerFeedComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 }
-// import { Component, Input, OnInit, OnDestroy } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-// import { CustomerService } from '../../services/customer-service';
-// import { Subject } from "rxjs";
-// import { takeUntil } from "rxjs/operators";
-
-// @Component({
-//   selector: 'app-customer-feed',
-//   standalone: true,
-//   imports: [CommonModule],
-//   templateUrl: './customer-feed.html',
-//   styleUrls: ['./customer-feed.scss']
-// })
-// export class CustomerFeedComponent implements OnInit, OnDestroy {
-//     private readonly destroy$ = new Subject<void>();
-//   @Input() customerId!: string;
-//   feedItems: any[] = [];
-//   loading = false;
-
-//   constructor(private customerService: CustomerService) { }
-
-//   ngOnInit(): void {
-//     if (this.customerId) {
-//       this.loadFeed();
-//     }
-//   }
-
-//   loadFeed() {
-//     this.loading = true;
-//     this.customerService.getCustomerFeed(this.customerId).pipe(takeUntil(this.destroy$)).subscribe({
-//       next: (res) => {
-//         this.feedItems = res.data.feed;
-//         this.loading = false;
-//       },
-//       error: () => this.loading = false
-//     });
-//   }
-
-//   // Helper for dynamic Icon Backgrounds based on activity type
-//   getIconBg(type: string): string {
-//     switch (type) {
-//       case 'payment': return 'bg-success/10 text-success';
-//       case 'invoice': return 'bg-info/10 text-info';
-//       case 'note': return 'bg-warning/10 text-warning';
-//       default: return 'bg-base-200 text-base-content';
-//     }
-//   }
-
-//   // Helper for Status Badge colors
-//   getStatusClass(status: string): string {
-//     const s = status.toLowerCase();
-//     if (s === 'completed' || s === 'issued') return 'badge-success';
-//     if (s === 'pending') return 'badge-warning';
-//     if (s === 'cancelled') return 'badge-error';
-//     return 'badge-ghost';
-//   }
-
-//     ngOnDestroy(): void {
-//         this.destroy$.next();
-//         this.destroy$.complete();
-//     }
-// }

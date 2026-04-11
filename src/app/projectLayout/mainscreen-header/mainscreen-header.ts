@@ -62,7 +62,7 @@ export interface ThemeGroup {
     DialogModule,
     AnnouncementList,
     TabStripComponent
-],
+  ],
   templateUrl: './mainscreen-header.html',
   styleUrl: './mainscreen-header.scss',
 })
@@ -112,13 +112,10 @@ export class MainscreenHeader implements OnInit, OnDestroy {
     { id: 3, title: 'System Update', message: 'Scheduled maintenance in 30 minutes', time: '3 hours ago', read: true, type: 'warning' },
     { id: 4, title: 'New Message', message: 'You have a new message from Sarah', time: '5 hours ago', read: true, type: 'info' },
   ];
-
   // ── Lifecycle ───────────────────────────────────────────────────────────────
-
   ngOnInit() {
     this.organizeThemes();
     this.mobileMenuItems = SIDEBAR_MENU;
-
     this.authService.currentUser$
       .pipe(takeUntil(this.destroy$))
       .subscribe(u => this.currentUser = u);
@@ -132,7 +129,6 @@ export class MainscreenHeader implements OnInit, OnDestroy {
           this.recentNotifications = this.mockNotifications.filter(m => !m.read);
         }
       });
-
     this.themeService.settings$
       .pipe(takeUntil(this.destroy$))
       .subscribe((s: ThemeSettings) => {
