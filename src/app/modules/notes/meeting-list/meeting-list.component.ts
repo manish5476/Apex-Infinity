@@ -1,7 +1,6 @@
 import { Component, inject, signal, computed, ViewEncapsulation, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe, TitleCasePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DialogService } from 'primeng/dynamicdialog';
 import { DatePickerModule } from 'primeng/datepicker';
@@ -66,7 +65,7 @@ export class MeetingListComponent implements OnDestroy {
   ];
 
   // --- Computed ---
-  currentUser = toSignal(this.authService.currentUser$);
+  currentUser = this.authService.currentUser;
 
   filteredMeetings = computed(() => {
     const filter = this.activeFilter();

@@ -1,22 +1,27 @@
-import { Injectable, Inject, PLATFORM_ID, inject, Injector, signal, OnDestroy } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID, inject, Injector, signal, computed, OnDestroy } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, throwError, firstValueFrom, of, Subject } from 'rxjs';
-import { tap, catchError, map, switchMap, finalize, shareReplay, takeUntil } from 'rxjs/operators';
+import { Observable, throwError, firstValueFrom, of, Subject } from 'rxjs';
+import { tap, catchError, switchMap, finalize, shareReplay, takeUntil } from 'rxjs/operators';
 import { AppMessageService } from '../../../core/services/message.service';
 import { ApiService } from '../../../core/services/api';
 import { OrganizationService } from './../../organization/organization.service';
-
-
 import { User, Session, LoginResponse, SignupResponse, VerifyTokenResponse } from './auth.types';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService implements OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   private readonly TOKEN_KEY = 'apex_auth_token';
   private readonly USER_KEY = 'apex_current_user';
   private readonly REMEMBER_ME_KEY = 'apex_remember_me';
-  private currentUserSubject: BehaviorSubject<User | null>;
+  /** Source of truth for the logged-in user — use `currentUser()` in new code. */
+  private readonly _currentUser = signal<User | null>(null);
+  /** Readonly signal; templates and services can depend on this for OnPush-friendly updates. */
+  readonly currentUser = this._currentUser.asReadonly();
+  /** Signal: whether a user is logged in (prefer this over `isAuthenticated$` in new code). */
+  readonly isAuthenticated = computed(() => !!this._currentUser());
+  /** Observable mirror of `currentUser` for legacy `subscribe` / `async` usage. */
   public currentUser$: Observable<User | null>;
   public isAuthenticated$: Observable<boolean>;
   private apiService = inject(ApiService);
@@ -39,18 +44,17 @@ export class AuthService implements OnDestroy {
     }
   }
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
-    this.currentUserSubject = new BehaviorSubject<User | null>(null);
-    this.currentUser$ = this.currentUserSubject.asObservable();
-    this.isAuthenticated$ = this.currentUser$.pipe(map((user: any) => !!user));
+    this.currentUser$ = toObservable(this._currentUser);
+    this.isAuthenticated$ = toObservable(this.isAuthenticated);
   }
 
   async initializeFromStorage(): Promise<void> {
     const token = this.getToken();
     const user = this.getItem<any>(this.USER_KEY);
-    
+
     if (token && user) {
       this._token = token;
-      this.currentUserSubject.next(user);
+      this._currentUser.set(user);
 
       try {
         // 1. Verify token validity with backend
@@ -69,14 +73,14 @@ export class AuthService implements OnDestroy {
     const user = response.data?.user;
     const token = response.token;
     if (!token || !user) return;
-    this._token = token; // ✅ Update internal state
+    this._token = token;
     this.setItem(this.TOKEN_KEY, token);
     this.setItem(this.USER_KEY, user);
     this.setItem('orgSlug', response.data.organization?.uniqueShopId?.trim());
     if (rememberMe) {
       this.setItem(this.REMEMBER_ME_KEY, 'true');
     }
-    this.currentUserSubject.next(user);
+    this._currentUser.set(user);
     // this.refreshPermissions().subscribe(); // Removed to rely on direct data 
     this.messageService.handleSuccess(response, user.status === 'approved' ? 'Welcome back!' : 'Account pending approval');
     if (user.status === 'approved') {
@@ -141,7 +145,7 @@ export class AuthService implements OnDestroy {
     }
 
     this._token = null; // ✅ Kill the token state
-    this.currentUserSubject.next(null); // ✅ Triggers app.component socket disconnect
+    this._currentUser.set(null); // ✅ Triggers app.component socket disconnect
 
     const target = (returnUrl && !returnUrl.includes('/auth/')) ?
       ['/auth/login', { queryParams: { returnUrl } }] :
@@ -214,7 +218,7 @@ export class AuthService implements OnDestroy {
       tap((res: any) => {
         if (res.data?.user) {
           this.setItem(this.USER_KEY, res.data.user);
-          this.currentUserSubject.next(res.data.user);
+          this._currentUser.set(res.data.user);
         }
       }),
       catchError(err => {
@@ -306,7 +310,7 @@ export class AuthService implements OnDestroy {
         if (currentUser) {
           currentUser.emailVerified = true;
           this.setItem(this.USER_KEY, currentUser);
-          this.currentUserSubject.next(currentUser);
+          this._currentUser.set(currentUser);
         }
         this.messageService.showSuccess('Your email has been verified successfully.');
       }),
@@ -376,7 +380,7 @@ export class AuthService implements OnDestroy {
   }
 
   public getCurrentUser(): User | null {
-    return this.currentUserSubject.value;
+    return this._currentUser();
   }
 
   public getToken(): string | null {
@@ -384,11 +388,11 @@ export class AuthService implements OnDestroy {
   }
 
   public get currentUserValue(): any | null {
-    return this.currentUserSubject.value;
+    return this._currentUser();
   }
 
   public isLoggedIn(): boolean {
-    return !!this.currentUserSubject.value;
+    return !!this._currentUser();
   }
 
   public getOrganizationSlug(): string | null {
@@ -434,7 +438,7 @@ export class AuthService implements OnDestroy {
             permissions: res.data.permissions ?? user.permissions ?? []
           };
           this.setItem(this.USER_KEY, updated);
-          this.currentUserSubject.next(updated);
+          this._currentUser.set(updated);
         }
       }),
       catchError((err) => {
@@ -451,7 +455,7 @@ export class AuthService implements OnDestroy {
   //       if (user && res.data) {
   //         user.role = { ...user.role, permissions: res.data };
   //         this.setItem(this.USER_KEY, user);
-  //         this.currentUserSubject.next({ ...user });
+  //         this._currentUser.set({ ...user });
   //       }
   //     }
   //   });
@@ -465,12 +469,12 @@ export class AuthService implements OnDestroy {
         ...preferences
       } as any;
       this.setItem(this.USER_KEY, user);
-      this.currentUserSubject.next({ ...user });
+      this._currentUser.set({ ...user });
     }
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

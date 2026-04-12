@@ -1,4 +1,14 @@
-import { ChangeDetectorRef, Component, OnInit, effect, inject, signal, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  effect,
+  inject,
+  signal,
+  ViewChild,
+  ElementRef,
+  OnDestroy,
+} from '@angular/core';
 
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { FormsModule } from '@angular/forms';
@@ -40,10 +50,10 @@ import { takeUntil } from "rxjs/operators";
   providers: [ConfirmationService],
   templateUrl: './product-list.html',
   styleUrl: './product-list.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductListComponent implements OnInit, OnDestroy {
     private readonly destroy$ = new Subject<void>();
-  private cdr = inject(ChangeDetectorRef);
   private productService = inject(ProductService);
   private messageService = inject(AppMessageService);
   private masterList = inject(MasterListService);
@@ -53,27 +63,31 @@ export class ProductListComponent implements OnInit, OnDestroy {
 
   PERMISSIONS = PERMISSIONS;
 
-  public selectedRows: any
+  selectedRows = signal<any[]>([]);
   private gridApi!: GridApi;
   private currentPage = 1;
-  private isLoading = false;
   private totalCount = 0;
   private pageSize = 50;
-  public bulkDialogVisible: boolean = false
+  bulkDialogVisible = signal(false);
   @ViewChild('fileInput') fileInput!: ElementRef;
-  data: any[] = [];
-  column: any = [];
+  data = signal<any[]>([]);
+  column = signal<any[]>([]);
   rowSelectionMode: any = 'single';
+  isLoading = signal(false);
 
   brandOptions = signal<any[]>([]);
   categoryOptions = signal<any[]>([]);
 
-  productFilter = {
-    name: null,
-    sku: null,
-    brand: null,
-    category: null,
-  };
+  productFilter = signal({
+    name: null as string | null,
+    sku: null as string | null,
+    brand: null as string | null,
+    category: null as string | null,
+  });
+
+  patchProductFilter(key: 'name' | 'sku' | 'brand' | 'category', value: any) {
+    this.productFilter.update((f) => ({ ...f, [key]: value }));
+  }
 
   constructor() {
     effect(() => {
@@ -92,22 +106,22 @@ export class ProductListComponent implements OnInit, OnDestroy {
   }
 
   resetFilters() {
-    this.productFilter = { name: null, sku: null, brand: null, category: null };
+    this.productFilter.set({ name: null, sku: null, brand: null, category: null });
     this.getData(true);
   }
 
   getData(isReset: boolean = false) {
-    if (this.isLoading) return;
-    this.isLoading = true;
+    if (this.isLoading()) return;
+    this.isLoading.set(true);
 
     if (isReset) {
       this.currentPage = 1;
-      this.data = [];
+      this.data.set([]);
       this.totalCount = 0;
     }
 
     const filterParams = {
-      ...this.productFilter,
+      ...this.productFilter(),
       page: this.currentPage,
       limit: this.pageSize,
     };
@@ -115,8 +129,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
     this.productService.getAllProducts(filterParams)
       .pipe(
         finalize(() => {
-          this.isLoading = false;
-          this.cdr.markForCheck();
+          this.isLoading.set(false);
         }), takeUntil(this.destroy$)
       )
       .subscribe({
@@ -136,13 +149,15 @@ export class ProductListComponent implements OnInit, OnDestroy {
           }
 
           // 3. UPDATE LOCAL STATE
-          this.data = [...this.data, ...newData];
+          const base = isReset ? [] : this.data();
+          const merged = [...base, ...newData];
+          this.data.set(merged);
 
           // 4. UPDATE GRID
           if (this.gridApi) {
             if (isReset) {
               // If resetting, replace all data
-              this.gridApi.setGridOption('rowData', this.data);
+              this.gridApi.setGridOption('rowData', merged);
             } else {
               // If appending (scrolling), just add new rows
               this.gridApi.applyTransaction({ add: newData });
@@ -159,7 +174,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
   }
 
   onScrolledToBottom(event: any) {
-    if (!this.isLoading && this.data.length < this.totalCount) {
+    if (!this.isLoading() && this.data().length < this.totalCount) {
       this.getData(false);
     }
   }
@@ -181,14 +196,15 @@ export class ProductListComponent implements OnInit, OnDestroy {
       this.onScrolledToBottom(event)
     }
     if (event.type === 'selectionChanged') {
-      this.selectedRows = event.rows
+      this.selectedRows.set(event.rows ?? []);
     }
   }
 
   deleteProduct() {
-    if (!this.selectedRows || this.selectedRows.length !== 1) return;
-    const productId = this.selectedRows[0]._id;
-    const productName = this.selectedRows[0].name;
+    const rows = this.selectedRows();
+    if (!rows?.length || rows.length !== 1) return;
+    const productId = rows[0]._id;
+    const productName = rows[0].name;
 
     this.confirmationService.confirm({
       message: `Are you sure you want to delete ${productName}?`,
@@ -198,7 +214,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
         this.productService.deleteProductById(productId).pipe(takeUntil(this.destroy$)).subscribe({
           next: () => {
             this.messageService.showSuccess('Product deleted successfully');
-            this.selectedRows = [];
+            this.selectedRows.set([]);
             this.getData(true);
           },
           error: (err) => this.messageService.handleHttpError(err)
@@ -208,26 +224,27 @@ export class ProductListComponent implements OnInit, OnDestroy {
   }
 
   triggerUpload() {
-    if (this.selectedRows && this.selectedRows.length === 1) {
+    const rows = this.selectedRows();
+    if (rows?.length === 1) {
       this.fileInput.nativeElement.click();
     }
   }
 
   onFileSelected(event: any) {
     const files = event.target.files;
-    if (!files?.length || !this.selectedRows || this.selectedRows.length !== 1) return;
+    const rows = this.selectedRows();
+    if (!files?.length || rows.length !== 1) return;
 
-    const productId = this.selectedRows[0]._id;
+    const productId = rows[0]._id;
     const formData = new FormData();
     for (let i = 0; i < files.length; i++) {
       formData.append('photos', files[i]);
     }
 
-    this.isLoading = true;
+    this.isLoading.set(true);
     this.productService.uploadProductFile(productId, formData)
       .pipe(finalize(() => {
-        this.isLoading = false;
-        this.cdr.markForCheck();
+        this.isLoading.set(false);
       }), takeUntil(this.destroy$))
       .subscribe({
         next: (res: any) => {
@@ -240,7 +257,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
       });
   }
   getColumn(): void {
-    this.column = [
+    this.column.set([
       // ═══════════════════════════════════════════════════════
       // GROUP 1 — PRODUCT DETAILS
       // ═══════════════════════════════════════════════════════
@@ -440,9 +457,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
           }
         ]
       }
-    ];
-
-    this.cdr.detectChanges();
+    ]);
   }
 
   // getColumn(): void {

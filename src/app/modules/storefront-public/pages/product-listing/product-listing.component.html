@@ -8,7 +8,7 @@
           <input
             type="text"
             placeholder="Search products, brands..."
-            [value]="filters.search"
+            [value]="filters().search"
             (input)="onSearchInput($event)" />
         </div>
       </div>
@@ -17,8 +17,8 @@
           <span class="text-label">Sort by:</span>
           <p-select
             [options]="sortOptions"
-            [(ngModel)]="filters.sort"
-            (onChange)="applyFilter('sort', $event.value)"
+            [ngModel]="filters().sort"
+            (ngModelChange)="applyFilter('sort', $event)"
             optionLabel="label"
             optionValue="value"
             appendTo="body"
@@ -60,27 +60,27 @@
     @if (activeFilterCount() > 0) {
       <div class="active-filters-bar" @fadeIn>
         <div class="filter-pills">
-          @if (filters.category) {
+          @if (filters().category) {
             <span class="pill" (click)="applyFilter('category', null)">
               Category Active <i class="pi pi-times"></i>
             </span>
           }
-          @if (filters.brand) {
+          @if (filters().brand) {
             <span class="pill" (click)="applyFilter('brand', null)">
               Brand Active <i class="pi pi-times"></i>
             </span>
           }
-          @if (filters.minPrice || filters.maxPrice) {
+          @if (filters().minPrice != null || filters().maxPrice != null) {
             <span class="pill" (click)="applyFilter('minPrice', null); applyFilter('maxPrice', null)">
               Price Range <i class="pi pi-times"></i>
             </span>
           }
-          @if (filters.inStock) {
+          @if (filters().inStock) {
             <span class="pill" (click)="applyFilter('inStock', false)">
               In Stock Only <i class="pi pi-times"></i>
             </span>
           }
-          @if (filters.tags) {
+          @if (filters().tags) {
             <span class="pill" (click)="applyFilter('tags', null)">
               Tags Active <i class="pi pi-times"></i>
             </span>
@@ -96,12 +96,12 @@
           <div class="widget">
             <h3>Categories</h3>
             <div class="cat-list">
-              <div class="cat-row" [class.active]="!filters.category" (click)="applyFilter('category', null)">
+              <div class="cat-row" [class.active]="!filters().category" (click)="applyFilter('category', null)">
                 <span class="label">All Categories</span>
                 <i class="pi pi-angle-right"></i>
               </div>
               @for (cat of categories(); track cat.id) {
-                <div class="cat-row" [class.active]="filters.category === cat.id" (click)="applyFilter('category', cat.id)">
+                <div class="cat-row" [class.active]="filters().category === cat.id" (click)="applyFilter('category', cat.id)">
                   @if(cat.image) { <img [src]="cat.image" class="cat-thumb"> }
                   <span class="label">{{ cat.name }}</span>
                 </div>
@@ -112,12 +112,12 @@
             <div class="widget">
               <h3>Brands</h3>
               <div class="cat-list">
-                <div class="cat-row" [class.active]="!filters.brand" (click)="applyFilter('brand', null)">
+                <div class="cat-row" [class.active]="!filters().brand" (click)="applyFilter('brand', null)">
                   <span class="label">All Brands</span>
                   <i class="pi pi-angle-right"></i>
                 </div>
                 @for (brand of brands(); track brand.id) {
-                  <div class="cat-row" [class.active]="filters.brand === brand.id" (click)="applyFilter('brand', brand.id)">
+                  <div class="cat-row" [class.active]="filters().brand === brand.id" (click)="applyFilter('brand', brand.id)">
                     <span class="label">{{ brand.name }}</span>
                   </div>
                 }
@@ -128,7 +128,8 @@
             <h3>Price Range</h3>
             <div class="px-2 mb-3 mt-2">
               <p-slider
-                [(ngModel)]="rangeValues"
+                [ngModel]="rangeValues()"
+                (ngModelChange)="rangeValues.set($event)"
                 [min]="priceLimits().min"
                 [max]="priceLimits().max"
                 [range]="true"
@@ -139,12 +140,12 @@
             <div class="price-inputs">
               <div class="input-group">
                 <span>₹</span>
-                <input type="number" [(ngModel)]="rangeValues[0]" (change)="onPriceChange({values: rangeValues})">
+                <input type="number" [ngModel]="rangeValues()[0]" (ngModelChange)="patchRangeEnd(0, +$event)">
               </div>
               <span class="dash">—</span>
               <div class="input-group">
                 <span>₹</span>
-                <input type="number" [(ngModel)]="rangeValues[1]" (change)="onPriceChange({values: rangeValues})">
+                <input type="number" [ngModel]="rangeValues()[1]" (ngModelChange)="patchRangeEnd(1, +$event)">
               </div>
             </div>
           </div>
@@ -153,7 +154,7 @@
               <h3>Trending Tags</h3>
               <div class="tags-cloud">
                 @for (tag of tags(); track tag) {
-                  <button class="tag-chip" [class.active]="filters.tags?.includes(tag)" (click)="toggleTag(tag)" pRipple>
+                  <button class="tag-chip" [class.active]="filters().tags?.includes(tag)" (click)="toggleTag(tag)" pRipple>
                     {{ tag }}
                   </button>
                 }
@@ -162,7 +163,7 @@
           }
           <div class="widget">
             <div class="stock-toggle">
-              <p-checkbox [(ngModel)]="filters.inStock" [binary]="true" inputId="stock_desk" (onChange)="applyFilter('inStock', filters.inStock)"></p-checkbox>
+              <p-checkbox [ngModel]="filters().inStock" (ngModelChange)="applyFilter('inStock', $event)" [binary]="true" inputId="stock_desk"></p-checkbox>
               <label for="stock_desk">Show In Stock Only</label>
             </div>
           </div>
@@ -200,7 +201,7 @@
             @for (product of products(); track product.id) {
               <app-product-card
                 [product]="product"
-                [orgSlug]="orgSlug"
+                [orgSlug]="orgSlug()"
                 [layout]="viewMode()">
               </app-product-card>
             }
@@ -220,7 +221,8 @@
     </div>
   </div>
   <p-drawer
-    [(visible)]="showMobileFilters"
+    [visible]="showMobileFilters()"
+    (visibleChange)="showMobileFilters.set($event)"
     position="bottom"
     styleClass="expert-bottom-sheet"
     [modal]="true"
@@ -238,10 +240,10 @@
         <h4 class="section-title">Sort By</h4>
         <div class="sort-options-grid">
           @for (opt of sortOptions; track opt.value) {
-            <div class="sort-card" [class.selected]="filters.sort === opt.value" (click)="applyFilter('sort', opt.value)">
+            <div class="sort-card" [class.selected]="filters().sort === opt.value" (click)="applyFilter('sort', opt.value)">
               <i [class]="opt.icon"></i>
               <span>{{ opt.label }}</span>
-              @if (filters.sort === opt.value) { <i class="pi pi-check-circle check"></i> }
+              @if (filters().sort === opt.value) { <i class="pi pi-check-circle check"></i> }
             </div>
           }
         </div>
@@ -249,11 +251,11 @@
       <div class="sheet-section">
         <h4 class="section-title">Categories</h4>
         <div class="mobile-cat-scroll">
-          <div class="mobile-cat-chip" [class.active]="!filters.category" (click)="applyFilter('category', null)">
+          <div class="mobile-cat-chip" [class.active]="!filters().category" (click)="applyFilter('category', null)">
             All
           </div>
           @for (cat of categories(); track cat.id) {
-            <div class="mobile-cat-chip" [class.active]="filters.category === cat.id" (click)="applyFilter('category', cat.id)">
+            <div class="mobile-cat-chip" [class.active]="filters().category === cat.id" (click)="applyFilter('category', cat.id)">
               {{ cat.name }}
             </div>
           }
@@ -263,11 +265,11 @@
         <div class="sheet-section">
           <h4 class="section-title">Brands</h4>
           <div class="mobile-cat-scroll">
-            <div class="mobile-cat-chip" [class.active]="!filters.brand" (click)="applyFilter('brand', null)">
+            <div class="mobile-cat-chip" [class.active]="!filters().brand" (click)="applyFilter('brand', null)">
               All
             </div>
             @for (brand of brands(); track brand.id) {
-              <div class="mobile-cat-chip" [class.active]="filters.brand === brand.id" (click)="applyFilter('brand', brand.id)">
+              <div class="mobile-cat-chip" [class.active]="filters().brand === brand.id" (click)="applyFilter('brand', brand.id)">
                 {{ brand.name }}
               </div>
             }
@@ -277,9 +279,9 @@
       <div class="sheet-section">
         <h4 class="section-title">Price Range</h4>
         <div class="price-row flex gap-4 items-center">
-          <input pInputText type="number" placeholder="Min" class="w-full" [(ngModel)]="rangeValues[0]" (change)="onPriceChange({values: rangeValues})">
+          <input pInputText type="number" placeholder="Min" class="w-full" [ngModel]="rangeValues()[0]" (ngModelChange)="patchRangeEnd(0, +$event)">
           <span class="divider font-bold text-gray-500">to</span>
-          <input pInputText type="number" placeholder="Max" class="w-full" [(ngModel)]="rangeValues[1]" (change)="onPriceChange({values: rangeValues})">
+          <input pInputText type="number" placeholder="Max" class="w-full" [ngModel]="rangeValues()[1]" (ngModelChange)="patchRangeEnd(1, +$event)">
         </div>
       </div>
       @if (tags().length > 0) {
@@ -287,7 +289,7 @@
           <h4 class="section-title">Tags</h4>
           <div class="tags-grid">
             @for (tag of tags(); track tag) {
-              <div class="mobile-tag" [class.active]="filters.tags?.includes(tag)" (click)="toggleTag(tag)">
+              <div class="mobile-tag" [class.active]="filters().tags?.includes(tag)" (click)="toggleTag(tag)">
                 {{ tag }}
               </div>
             }
@@ -297,7 +299,7 @@
       <div class="sheet-section">
         <div class="flex align-items-center justify-content-between p-3 surface-ground border-round shadow-1">
           <label class="font-bold text-lg">In Stock Only</label>
-          <p-checkbox [(ngModel)]="filters.inStock" [binary]="true" (onChange)="applyFilter('inStock', filters.inStock)"></p-checkbox>
+          <p-checkbox [ngModel]="filters().inStock" (ngModelChange)="applyFilter('inStock', $event)" [binary]="true"></p-checkbox>
         </div>
       </div>
     </div>
@@ -324,7 +326,7 @@
           <input 
             type="text" 
             placeholder="Search products, brands..." 
-            [value]="filters.search"
+            [value]="filters().search"
             (input)="onSearchInput($event)" />
         </div>
       </div>
@@ -377,27 +379,27 @@
     @if (activeFilterCount() > 0) {
       <div class="active-filters-bar" @fadeIn>
         <div class="filter-pills">
-          @if (filters.category) {
+          @if (filters().category) {
             <span class="pill" (click)="applyFilter('category', null)">
               Category Active <i class="pi pi-times"></i>
             </span>
           }
-          @if (filters.brand) {
+          @if (filters().brand) {
             <span class="pill" (click)="applyFilter('brand', null)">
               Brand Active <i class="pi pi-times"></i>
             </span>
           }
-          @if (filters.minPrice || filters.maxPrice) {
+          @if (filters().minPrice != null || filters().maxPrice != null) {
             <span class="pill" (click)="applyFilter('minPrice', null); applyFilter('maxPrice', null)">
               Price Range <i class="pi pi-times"></i>
             </span>
           }
-          @if (filters.inStock) {
+          @if (filters().inStock) {
             <span class="pill" (click)="applyFilter('inStock', false)">
               In Stock Only <i class="pi pi-times"></i>
             </span>
           }
-          @if (filters.tags) {
+          @if (filters().tags) {
             <span class="pill" (click)="applyFilter('tags', null)">
               Tags Active <i class="pi pi-times"></i>
             </span>
@@ -415,12 +417,12 @@
           <div class="widget">
             <h3>Categories</h3>
             <div class="cat-list">
-              <div class="cat-row" [class.active]="!filters.category" (click)="applyFilter('category', null)">
+              <div class="cat-row" [class.active]="!filters().category" (click)="applyFilter('category', null)">
                 <span class="label">All Categories</span>
                 <i class="pi pi-angle-right"></i>
               </div>
               @for (cat of categories(); track cat.id) {
-                <div class="cat-row" [class.active]="filters.category === cat.id" (click)="applyFilter('category', cat.id)">
+                <div class="cat-row" [class.active]="filters().category === cat.id" (click)="applyFilter('category', cat.id)">
                   @if(cat.image) { <img [src]="cat.image" class="cat-thumb"> }
                   <span class="label">{{ cat.name }}</span>
                 </div>
@@ -432,12 +434,12 @@
             <div class="widget">
               <h3>Brands</h3>
               <div class="cat-list">
-                <div class="cat-row" [class.active]="!filters.brand" (click)="applyFilter('brand', null)">
+                <div class="cat-row" [class.active]="!filters().brand" (click)="applyFilter('brand', null)">
                   <span class="label">All Brands</span>
                   <i class="pi pi-angle-right"></i>
                 </div>
                 @for (brand of brands(); track brand.id) {
-                  <div class="cat-row" [class.active]="filters.brand === brand.id" (click)="applyFilter('brand', brand.id)">
+                  <div class="cat-row" [class.active]="filters().brand === brand.id" (click)="applyFilter('brand', brand.id)">
                     <span class="label">{{ brand.name }}</span>
                   </div>
                 }
@@ -475,7 +477,7 @@
               <h3>Trending Tags</h3>
               <div class="tags-cloud">
                 @for (tag of tags(); track tag) {
-                  <button class="tag-chip" [class.active]="filters.tags?.includes(tag)" (click)="toggleTag(tag)" pRipple>
+                  <button class="tag-chip" [class.active]="filters().tags?.includes(tag)" (click)="toggleTag(tag)" pRipple>
                     {{ tag }}
                   </button>
                 }
@@ -485,7 +487,7 @@
 
           <div class="widget">
             <div class="stock-toggle">
-              <p-checkbox [(ngModel)]="filters.inStock" [binary]="true" inputId="stock_desk" (onChange)="applyFilter('inStock', filters.inStock)"></p-checkbox>
+              <p-checkbox [ngModel]="filters().inStock" (ngModelChange)="applyFilter('inStock', $event)" [binary]="true" inputId="stock_desk"></p-checkbox>
               <label for="stock_desk">Show In Stock Only</label>
             </div>
           </div>
@@ -527,7 +529,7 @@
             @for (product of products(); track product.id) {
               <app-product-card 
                 [product]="product" 
-                [orgSlug]="orgSlug" 
+                [orgSlug]="orgSlug()" 
                 [layout]="viewMode()">
               </app-product-card>
             }
@@ -573,10 +575,10 @@
         <h4 class="section-title">Sort By</h4>
         <div class="sort-options-grid">
           @for (opt of sortOptions; track opt.value) {
-            <div class="sort-card" [class.selected]="filters.sort === opt.value" (click)="applyFilter('sort', opt.value)">
+            <div class="sort-card" [class.selected]="filters().sort === opt.value" (click)="applyFilter('sort', opt.value)">
               <i [class]="opt.icon"></i>
               <span>{{ opt.label }}</span>
-              @if (filters.sort === opt.value) { <i class="pi pi-check-circle check"></i> }
+              @if (filters().sort === opt.value) { <i class="pi pi-check-circle check"></i> }
             </div>
           }
         </div>
@@ -585,11 +587,11 @@
       <div class="sheet-section">
         <h4 class="section-title">Categories</h4>
         <div class="mobile-cat-scroll">
-          <div class="mobile-cat-chip" [class.active]="!filters.category" (click)="applyFilter('category', null)">
+          <div class="mobile-cat-chip" [class.active]="!filters().category" (click)="applyFilter('category', null)">
             All
           </div>
           @for (cat of categories(); track cat.id) {
-            <div class="mobile-cat-chip" [class.active]="filters.category === cat.id" (click)="applyFilter('category', cat.id)">
+            <div class="mobile-cat-chip" [class.active]="filters().category === cat.id" (click)="applyFilter('category', cat.id)">
               {{ cat.name }}
             </div>
           }
@@ -600,11 +602,11 @@
         <div class="sheet-section">
           <h4 class="section-title">Brands</h4>
           <div class="mobile-cat-scroll">
-            <div class="mobile-cat-chip" [class.active]="!filters.brand" (click)="applyFilter('brand', null)">
+            <div class="mobile-cat-chip" [class.active]="!filters().brand" (click)="applyFilter('brand', null)">
               All
             </div>
             @for (brand of brands(); track brand.id) {
-              <div class="mobile-cat-chip" [class.active]="filters.brand === brand.id" (click)="applyFilter('brand', brand.id)">
+              <div class="mobile-cat-chip" [class.active]="filters().brand === brand.id" (click)="applyFilter('brand', brand.id)">
                 {{ brand.name }}
               </div>
             }
@@ -626,7 +628,7 @@
           <h4 class="section-title">Tags</h4>
           <div class="tags-grid">
             @for (tag of tags(); track tag) {
-              <div class="mobile-tag" [class.active]="filters.tags?.includes(tag)" (click)="toggleTag(tag)">
+              <div class="mobile-tag" [class.active]="filters().tags?.includes(tag)" (click)="toggleTag(tag)">
                 {{ tag }}
               </div>
             }
@@ -637,7 +639,7 @@
       <div class="sheet-section">
         <div class="flex align-items-center justify-content-between p-3 surface-ground border-round">
           <label class="font-bold">In Stock Only</label>
-          <p-checkbox [(ngModel)]="filters.inStock" [binary]="true" (onChange)="applyFilter('inStock', filters.inStock)"></p-checkbox>
+          <p-checkbox [ngModel]="filters().inStock" (ngModelChange)="applyFilter('inStock', $event)" [binary]="true"></p-checkbox>
         </div>
       </div>
     </div>

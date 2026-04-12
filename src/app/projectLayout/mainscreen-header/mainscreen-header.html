@@ -65,23 +65,23 @@
     </button>
 
     <!-- Profile pill -->
-    @if (currentUser) {
+    @if (currentUser()) {
     <p-popover #profilePopover styleClass="apex-profile-popover" appendTo="body">
       <div class="profile-panel">
 
         <!-- ── Panel Head ── -->
         <div class="profile-panel-head">
           <a routerLink="/user/profile" (click)="closeProfilePanel()" class="avatar-link">
-            <p-avatar [label]="getInitials(currentUser?.name)" shape="circle" size="xlarge"
+            <p-avatar [label]="getInitials(currentUser()?.name)" shape="circle" size="xlarge"
               [style]="{'background':'rgba(255,255,255,0.15)','color':'#fff','font-weight':'700','font-size':'1.1rem'}">
             </p-avatar>
           </a>
           <div class="profile-meta">
-            <h3 class="profile-name">{{ currentUser?.name }}</h3>
-            <p class="profile-email">{{ currentUser?.email }}</p>
+            <h3 class="profile-name">{{ currentUser()?.name }}</h3>
+            <p class="profile-email">{{ currentUser()?.email }}</p>
             <div class="profile-chips">
               <span class="chip chip--role">
-                <i class="pi pi-shield"></i> {{ currentUser?.role?.name || 'Admin' }}
+                <i class="pi pi-shield"></i> {{ displayRoleName() }}
               </span>
               <span class="chip chip--online">
                 <i class="pi pi-circle-fill"></i> Online
@@ -216,12 +216,12 @@
     </p-popover>
 
     <button class="profile-pill" (click)="profilePopover.toggle($event)" pTooltip="Account" tooltipPosition="bottom">
-      <p-avatar [label]="getInitials(currentUser?.name)" shape="circle" size="normal"
+      <p-avatar [label]="getInitials(currentUser()?.name)" shape="circle" size="normal"
         [style]="{'background':'var(--accent-primary)','color':'#fff','font-weight':'600'}">
       </p-avatar>
       <div class="pill-meta">
-        <span class="pill-name">{{ currentUser?.name }}</span>
-        <span class="pill-role">{{ currentUser?.role?.name || 'Admin' }}</span>
+        <span class="pill-name">{{ currentUser()?.name }}</span>
+        <span class="pill-role">{{ displayRoleName() }}</span>
       </div>
       <i class="pi pi-chevron-down pill-caret"></i>
     </button>

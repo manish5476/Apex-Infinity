@@ -1,4 +1,4 @@
-import { Injectable, inject, OnDestroy } from '@angular/core';
+import { Injectable, inject, OnDestroy, effect } from '@angular/core';
 import { BehaviorSubject, Subscription, Subject } from 'rxjs';
 import { SocketConnectionService } from './socket/socket-connection.service';
 import { AuthService } from '../../modules/auth/services/auth-service';
@@ -116,7 +116,16 @@ export class ThemeService implements OnDestroy {
     ThemeFontLoader.preloadThemes(['theme-light', 'theme-dark', initialSettings.lightThemeClass]);
     this.applyTheme(initialSettings);
     this.setupSocketListener();
-    this.listenToUserChanges();
+    effect(() => {
+      const user = this.authService.currentUser();
+      if (user?.preferences?.theme) {
+        const isDark = user.preferences.theme === 'dark';
+        const current = this.settingsSubject.value;
+        if (current.isDarkMode !== isDark) {
+          this.updateSettings({ ...current, isDarkMode: isDark }, false);
+        }
+      }
+    });
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -139,18 +148,6 @@ export class ThemeService implements OnDestroy {
 
       if (JSON.stringify(newSettings) !== JSON.stringify(current)) {
         this.updateSettings(newSettings, false);
-      }
-    });
-  }
-
-  private listenToUserChanges() {
-    this.authService.currentUser$.pipe(takeUntil(this.destroy$)).subscribe(user => {
-      if (user?.preferences?.theme) {
-        const isDark = user.preferences.theme === 'dark';
-        const current = this.settingsSubject.value;
-        if (current.isDarkMode !== isDark) {
-          this.updateSettings({ ...current, isDarkMode: isDark }, false);
-        }
       }
     });
   }

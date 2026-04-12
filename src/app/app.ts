@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, effect } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialog } from "primeng/confirmdialog";
@@ -36,30 +36,28 @@ export class App implements OnInit, OnDestroy {
   private readonly tabKeyboardService = inject(TabKeyboardService);
   private destroy$ = new Subject<void>();
 
+  constructor() {
+    effect(() => {
+      const user = this.auth.currentUser();
+      const token = this.auth.authTokenData;
+      if (user && user._id && user.organizationId && token) {
+        this.socketService.connect(token, user.organizationId, user._id);
+        this.loadNotifications();
+      } else {
+        this.socketService.disconnect();
+      }
+    });
+  }
+
   ngOnInit() {
     // Set default theme as requested
     this.themeService.setLightTheme('theme-aurora');
     this.tabKeyboardService.init();
     this.masterList.initFromCache();
-    this.setupAuthListener();
+    this.setupForceLogoutListener();
   }
 
-  private setupAuthListener(): void {
-    this.auth.currentUser$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (user) => {
-          const token = this.auth.authTokenData;
-          if (user && user._id && user.organizationId && token) {
-            this.socketService.connect(token, user.organizationId, user._id);
-            this.loadNotifications();
-          } else {
-            this.socketService.disconnect();
-          }
-        },
-        error: (err) => this.messageService.handleHttpError(err)
-      });
-
+  private setupForceLogoutListener(): void {
     this.socketService.forceLogout$
       .pipe(takeUntil(this.destroy$))
       .subscribe({
