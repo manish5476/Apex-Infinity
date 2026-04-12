@@ -2,80 +2,103 @@
 
 <div class="app-container h-full">
 
-  <!-- Standard Header -->
+  <!-- Header -->
   <div class="container-header">
     <div class="flex align-center gap-3">
-      <div class="icon-box bg-primary-light text-primary border-round p-2 flex align-center justify-center">
-        <i class="pi pi-dollar text-xl"></i>
+      <div class="icon-box">
+        <i class="pi pi-dollar"></i>
       </div>
       <div class="header-titles">
         <h2 class="container-title">Payments Ledger</h2>
-        <p class="container-subtitle">Track inflows, outflows, and reconciliation status.</p>
+        <p class="container-subtitle">Track inflows, outflows and reconciliation status</p>
       </div>
     </div>
-
     <div class="header-actions">
-      <p-button *hasPermission="PERMISSIONS.PAYMENT.CREATE" label="Record Payment" icon="pi pi-plus" routerLink="create"
-        styleClass="p-button-primary">
+      <p-button *hasPermission="PERMISSIONS.PAYMENT.CREATE" label="Record Payment" icon="pi pi-plus"
+        routerLink="create">
       </p-button>
     </div>
   </div>
 
-  <div class="container-body flex flex-col h-full gap-4">
+  <div class="container-body flex flex-col gap-3 h-full">
 
+    <!-- Stats strip -->
+    <div class="stats-strip">
+      <div class="stat-card">
+        <span class="stat-label">Total records</span>
+        <span class="stat-val">{{ totalCount() }}</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Total inflow</span>
+        <span class="stat-val inflow">{{ totalInflow() | currency:'INR':'symbol':'1.0-0' }}</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Total outflow</span>
+        <span class="stat-val outflow">{{ totalOutflow() | currency:'INR':'symbol':'1.0-0' }}</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Completed / Pending</span>
+        <span class="stat-val">{{ completedCount() }} <em>/ {{ pendingCount() }}</em></span>
+      </div>
+    </div>
+
+    <!-- Filter panel -->
     <div class="app-filter-panel">
 
       <div class="filter-field">
-        <label for="type">Payment Type</label>
-        <p-select appendTo="body" (onChange)="applyFilters()" id="type" [options]="typeOptions"
-          [(ngModel)]="paymentFilter.type" [showClear]="true" placeholder="Inflow / Outflow" styleClass="w-full"
-          [filter]="true" filterBy="label">
+        <label for="type">Payment type</label>
+        <p-select appendTo="body" id="type" [options]="typeOptions" [ngModel]="filter().type"
+          (ngModelChange)="patchFilter({ type: $event }); applyFilters()" [showClear]="true"
+          placeholder="Inflow / Outflow" styleClass="w-full">
         </p-select>
       </div>
 
       <div class="filter-field">
         <label for="customer">Customer</label>
-        <p-select appendTo="body" (onChange)="applyFilters()" id="customer" [options]="customerOptions()"
-          [(ngModel)]="paymentFilter.customerId" [filter]="true" filterBy="name" optionLabel="name" optionValue="_id"
-          [showClear]="true" placeholder="Select Customer" styleClass="w-full">
+        <p-select appendTo="body" id="customer" [options]="customerOptions()" [ngModel]="filter().customerId"
+          (ngModelChange)="patchFilter({ customerId: $event }); applyFilters()" optionLabel="name" optionValue="_id"
+          [filter]="true" filterBy="name" [showClear]="true" placeholder="Select customer" styleClass="w-full">
         </p-select>
       </div>
 
       <div class="filter-field">
         <label for="supplier">Supplier</label>
-        <p-select appendTo="body" (onChange)="applyFilters()" id="supplier" [options]="supplierOptions()"
-          [(ngModel)]="paymentFilter.supplierId" [filter]="true" filterBy="name" optionLabel="name" optionValue="_id"
-          [showClear]="true" placeholder="Select Supplier" styleClass="w-full">
+        <p-select appendTo="body" id="supplier" [options]="supplierOptions()" [ngModel]="filter().supplierId"
+          (ngModelChange)="patchFilter({ supplierId: $event }); applyFilters()" optionLabel="name" optionValue="_id"
+          [filter]="true" filterBy="name" [showClear]="true" placeholder="Select supplier" styleClass="w-full">
         </p-select>
       </div>
 
       <div class="filter-field">
-        <label for="paymentMethod">Payment Method</label>
-        <p-select appendTo="body" (onChange)="applyFilters()" id="paymentMethod" [options]="paymentMethodOptions"
-          [(ngModel)]="paymentFilter.paymentMethod" [showClear]="true" placeholder="Select Method" styleClass="w-full"
-          [filter]="true" filterBy="label">
+        <label for="paymentMethod">Method</label>
+        <p-select appendTo="body" id="paymentMethod" [options]="paymentMethodOptions" [ngModel]="filter().paymentMethod"
+          (ngModelChange)="patchFilter({ paymentMethod: $event }); applyFilters()" [showClear]="true"
+          placeholder="Select method" styleClass="w-full">
         </p-select>
       </div>
 
       <div class="filter-field">
         <label for="status">Status</label>
-        <p-select appendTo="body" (onChange)="applyFilters()" id="status" [options]="statusOptions"
-          [(ngModel)]="paymentFilter.status" [showClear]="true" placeholder="Select Status" styleClass="w-full"
-          [filter]="true" filterBy="label">
+        <p-select appendTo="body" id="status" [options]="statusOptions" [ngModel]="filter().status"
+          (ngModelChange)="patchFilter({ status: $event }); applyFilters()" [showClear]="true"
+          placeholder="Select status" styleClass="w-full">
         </p-select>
       </div>
 
       <div class="filter-actions">
         <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined p-button-secondary"
-          (onClick)="resetFilters()"></p-button>
+          (onClick)="resetFilters()">
+        </p-button>
       </div>
+
     </div>
 
-    <div class="flex-1 min-h-0 manish-border-1 border-secondary border-round overflow-hidden">
-      <app-ag-share-grid [columns]="column" [data]="data" [actionColumn]="paymentActionColumn" selectionMode="multiple"
-        (gridEvent)="eventFromGrid($event)" style="height: 100%; width: 100%; display: block;">
+    <!-- Grid -->
+    <div class="flex-1 min-h-0 border-round overflow-hidden" style="border: 0.5px solid var(--border-secondary)">
+      <app-ag-share-grid [columns]="column()" [data]="data()" [actionColumn]="paymentActionColumn"
+        selectionMode="multiple" (gridEvent)="eventFromGrid($event)" style="height:100%;width:100%;display:block;">
       </app-ag-share-grid>
     </div>
 
   </div>
-</div>
+</div>

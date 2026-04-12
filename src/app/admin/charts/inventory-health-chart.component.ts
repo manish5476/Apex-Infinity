@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { signal, Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 
 import { Subject, takeUntil } from 'rxjs';
 import { Chart, registerables } from 'chart.js';
@@ -33,18 +33,18 @@ type FilterType = 'all' | 'critical' | 'low' | 'healthy';
         </div>
     
         <!-- Status Filters -->
-        @if (!isLoading && !hasError) {
+        @if (!isLoading() && !hasError()) {
           <div class="filter-pills">
-            <button class="filter-pill all" [class.active]="activeFilter === 'all'" (click)="setFilter('all')">
+            <button class="filter-pill all" [class.active]="activeFilter() === 'all'" (click)="setFilter('all')">
               All <span class="pill-count">{{ counts.all }}</span>
             </button>
-            <button class="filter-pill critical" [class.active]="activeFilter === 'critical'" (click)="setFilter('critical')">
+            <button class="filter-pill critical" [class.active]="activeFilter() === 'critical'" (click)="setFilter('critical')">
               Critical <span class="pill-count">{{ counts.critical }}</span>
             </button>
-            <button class="filter-pill low" [class.active]="activeFilter === 'low'" (click)="setFilter('low')">
+            <button class="filter-pill low" [class.active]="activeFilter() === 'low'" (click)="setFilter('low')">
               Low <span class="pill-count">{{ counts.low }}</span>
             </button>
-            <button class="filter-pill healthy" [class.active]="activeFilter === 'healthy'" (click)="setFilter('healthy')">
+            <button class="filter-pill healthy" [class.active]="activeFilter() === 'healthy'" (click)="setFilter('healthy')">
               Healthy <span class="pill-count">{{ counts.healthy }}</span>
             </button>
           </div>
@@ -52,14 +52,14 @@ type FilterType = 'all' | 'critical' | 'low' | 'healthy';
       </div>
     
       <!-- Loading -->
-      @if (isLoading) {
+      @if (isLoading()) {
         <div class="state-overlay">
           <div class="spinner"></div><span>Loading...</span>
         </div>
       }
     
       <!-- Error -->
-      @if (hasError && !isLoading) {
+      @if (hasError() && !isLoading()) {
         <div class="state-overlay error">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
@@ -69,7 +69,7 @@ type FilterType = 'all' | 'critical' | 'low' | 'healthy';
         </div>
       }
     
-      @if (!isLoading && !hasError) {
+      @if (!isLoading() && !hasError()) {
         <!-- Stacked Bar Chart -->
         <div class="chart-area">
           <canvas #invCanvas></canvas>
@@ -83,7 +83,7 @@ type FilterType = 'all' | 'critical' | 'low' | 'healthy';
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
-          <input type="text" placeholder="Search items..." [(ngModel)]="searchTerm" (input)="filterItems()" />
+          <input type="text" placeholder="Search items..." [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" (input)="filterItems()" />
         </div>
         <!-- Items Table -->
         <div class="items-table">
@@ -95,7 +95,7 @@ type FilterType = 'all' | 'critical' | 'low' | 'healthy';
             <span class="col-reorder">Reorder</span>
           </div>
           <div class="table-body">
-            @for (item of displayedItems; track item) {
+            @for (item of displayedItems(); track item) {
               <div class="table-row"
                 [class.critical]="item.isCritical"
                 [class.low]="!item.isCritical && item.isLow"
@@ -126,7 +126,7 @@ type FilterType = 'all' | 'critical' | 'low' | 'healthy';
               </div>
             }
             <!-- Empty state -->
-            @if (displayedItems.length === 0) {
+            @if (displayedItems().length === 0) {
               <div class="empty-state">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                   <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
@@ -137,13 +137,13 @@ type FilterType = 'all' | 'critical' | 'low' | 'healthy';
           </div>
         </div>
         <!-- Pagination -->
-        @if (totalPages > 1) {
+        @if (totalPages() > 1) {
           <div class="pagination">
-            <button class="page-btn" [disabled]="currentPage === 0" (click)="prevPage()">
+            <button class="page-btn" [disabled]="currentPage() === 0" (click)="prevPage()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
             </button>
-            <span class="page-info">{{ currentPage + 1 }} / {{ totalPages }}</span>
-            <button class="page-btn" [disabled]="currentPage >= totalPages - 1" (click)="nextPage()">
+            <span class="page-info">{{ currentPage() + 1 }} / {{ totalPages() }}</span>
+            <button class="page-btn" [disabled]="currentPage() >= totalPages() - 1" (click)="nextPage()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
           </div>
@@ -328,18 +328,18 @@ export class InventoryHealthChartComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private chart?: Chart;
 
-  isLoading = true;
-  hasError = false;
+  isLoading = signal(true);
+  hasError = signal(false);
 
-  allItems: any[] = [];
-  filteredItems: any[] = [];
-  displayedItems: any[] = [];
+  allItems = signal<any[]>([]);
+  filteredItems = signal<any[]>([]);
+  displayedItems = signal<any[]>([]);
 
-  activeFilter: FilterType = 'all';
-  searchTerm = '';
-  currentPage = 0;
-  pageSize = 8;
-  totalPages = 0;
+  activeFilter = signal<FilterType>('all');
+  searchTerm = signal('');
+  currentPage = signal(0);
+  pageSize = signal(8);
+  totalPages = signal(0);
 
   counts = { all: 0, critical: 0, low: 0, healthy: 0 };
 
@@ -348,8 +348,8 @@ export class InventoryHealthChartComponent implements OnInit, OnDestroy {
   ngOnInit(): void { this.loadData(); }
 
   loadData(): void {
-    this.isLoading = true;
-    this.hasError = false;
+    this.isLoading.set(true);
+    this.hasError.set(false);
     this.chartService.getInventoryHealth()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -357,55 +357,55 @@ export class InventoryHealthChartComponent implements OnInit, OnDestroy {
           const data = res.data;
           // Deduplicate items by _id+branchId
           const seen = new Set<string>();
-          this.allItems = (data.items || []).filter((item: any) => {
+          this.allItems.set((data.items || []).filter((item: any) => {
             const key = `${item._id}-${item.branchId}`;
             if (seen.has(key)) return false;
             seen.add(key);
             return true;
-          });
+          }));
           this.computeCounts();
           this.filterItems();
-          this.isLoading = false;
+          this.isLoading.set(false);
           setTimeout(() => this.renderChart(data.chart), 50);
         },
-        error: () => { this.isLoading = false; this.hasError = true; }
+        error: () => { this.isLoading.set(false); this.hasError.set(true); }
       });
   }
 
   computeCounts(): void {
-    this.counts.all = this.allItems.length;
-    this.counts.critical = this.allItems.filter(i => i.isCritical).length;
-    this.counts.low = this.allItems.filter(i => !i.isCritical && i.isLow).length;
-    this.counts.healthy = this.allItems.filter(i => !i.isCritical && !i.isLow).length;
+    this.counts.all = this.allItems().length;
+    this.counts.critical = this.allItems().filter(i => i.isCritical).length;
+    this.counts.low = this.allItems().filter(i => !i.isCritical && i.isLow).length;
+    this.counts.healthy = this.allItems().filter(i => !i.isCritical && !i.isLow).length;
   }
 
   setFilter(f: FilterType): void {
-    this.activeFilter = f;
-    this.currentPage = 0;
+    this.activeFilter.set(f);
+    this.currentPage.set(0);
     this.filterItems();
   }
 
   filterItems(): void {
-    let items = [...this.allItems];
-    if (this.activeFilter === 'critical') items = items.filter(i => i.isCritical);
-    else if (this.activeFilter === 'low') items = items.filter(i => !i.isCritical && i.isLow);
-    else if (this.activeFilter === 'healthy') items = items.filter(i => !i.isCritical && !i.isLow);
-    if (this.searchTerm.trim()) {
-      const q = this.searchTerm.toLowerCase();
+    let items = [...this.allItems()];
+    if (this.activeFilter() === 'critical') items = items.filter(i => i.isCritical);
+    else if (this.activeFilter() === 'low') items = items.filter(i => !i.isCritical && i.isLow);
+    else if (this.activeFilter() === 'healthy') items = items.filter(i => !i.isCritical && !i.isLow);
+    if (this.searchTerm().trim()) {
+      const q = this.searchTerm().toLowerCase();
       items = items.filter(i => i.name.toLowerCase().includes(q) || (i.sku || '').toLowerCase().includes(q));
     }
-    this.filteredItems = items;
-    this.totalPages = Math.ceil(items.length / this.pageSize);
+    this.filteredItems.set(items);
+    this.totalPages.set(Math.ceil(items.length / this.pageSize()));
     this.paginate();
   }
 
   paginate(): void {
-    const start = this.currentPage * this.pageSize;
-    this.displayedItems = this.filteredItems.slice(start, start + this.pageSize);
+    const start = this.currentPage() * this.pageSize();
+    this.displayedItems.set(this.filteredItems().slice(start, start + this.pageSize()));
   }
 
-  prevPage(): void { if (this.currentPage > 0) { this.currentPage--; this.paginate(); } }
-  nextPage(): void { if (this.currentPage < this.totalPages - 1) { this.currentPage++; this.paginate(); } }
+  prevPage(): void { if (this.currentPage() > 0) { this.currentPage.update(p => p - 1); this.paginate(); } }
+  nextPage(): void { if (this.currentPage() < this.totalPages() - 1) { this.currentPage.update(p => p + 1); this.paginate(); } }
 
   getQtyPct(item: any): number {
     if (!item.reorderLevel) return 0;

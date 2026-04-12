@@ -1,324 +1,381 @@
-import { Component, inject, signal, computed, OnInit, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
+import {
+  Component, inject, signal, computed,
+  OnInit, ChangeDetectionStrategy, OnDestroy
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+
 import { NoteService } from '../../../core/services/notes.service';
 import { AppMessageService } from '../../../core/services/message.service';
-import {
-  Note, NoteActivity, AssetAttachment, ChecklistItem
-} from '../../../core/models/note.types';
-import { TiptapEditorComponent } from '../../shared/components/tiptap-editor/tiptap-editor.component';
-import { generateHTML } from '@tiptap/core';
-import StarterKit from '@tiptap/starter-kit';
-import Link from '@tiptap/extension-link';
-import Underline from '@tiptap/extension-underline';
-import TaskList from '@tiptap/extension-task-list';
-import TaskItem from '@tiptap/extension-task-item';
+import { Note, NoteActivity, AssetAttachment, ChecklistItem } from '../../../core/models/note.types';
 import { DatePickerModule } from 'primeng/datepicker';
-import { Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
+import { ButtonModule } from 'primeng/button';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-note-detail',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, DatePickerModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, DatePickerModule, ButtonModule, TooltipModule],
   templateUrl: './note-detail.component.html',
   styleUrls: ['./note-detail.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NoteDetailComponent implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private noteService = inject(NoteService);
-  private messageServic = inject(AppMessageService);
+  private messageService = inject(AppMessageService);
   private fb = inject(FormBuilder);
 
-  // --- State ---
+  // ── State ──────────────────────────────────────────────────────────────────
   note = signal<Note | null>(null);
   activityLog = signal<NoteActivity[]>([]);
   isLoading = signal(true);
   isSaving = signal(false);
   isEditing = signal(false);
 
-  // --- Computed ---
-  isTrash = computed(() => this.note()?.isDeleted || false);
+  // ── Computed ───────────────────────────────────────────────────────────────
+  isTrash = computed(() => this.note()?.isDeleted ?? false);
   isArchived = computed(() => this.note()?.status === 'archived');
 
   progress = computed(() => {
     const n = this.note();
     if (!n?.checklist?.length) return 0;
-    const completed = n.checklist.filter(s => s.completed).length;
-    return Math.round((completed / n.checklist.length) * 100);
+    const done = n.checklist.filter(s => s.completed).length;
+    return Math.round((done / n.checklist.length) * 100);
   });
 
-  // --- Forms ---
+  /** Number of completed checklist items — exposed for the template (arrow fns not allowed in templates) */
+  completedItemsCount = computed(() => {
+    const n = this.note();
+    if (!n?.checklist?.length) return 0;
+    return n.checklist.filter(s => s.completed).length;
+  });
+
+  // ── Form ───────────────────────────────────────────────────────────────────
   editForm = this.fb.group({
     title: ['', Validators.required],
-    content: ['', Validators.required],
+    content: [''],
     priority: ['medium'],
+    status: ['open'],
     tags: [''],
-    startDate: [null as string | null | Date],
-    dueDate: [null as string | null | Date]
+    startDate: [null as string | Date | null],
+    dueDate: [null as string | Date | null]
   });
 
-
-  constructor() { }
-
-  ngOnInit() {
-    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
-      const id = params.get('id');
-      if (id) {
-        this.isEditing.set(false);
-        this.fetchNote(id);
-        this.fetchHistory(id);
-      }
-    });
+  // ── Lifecycle ──────────────────────────────────────────────────────────────
+  ngOnInit(): void {
+    this.route.paramMap
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(params => {
+        const id = params.get('id');
+        if (id) {
+          this.isEditing.set(false);
+          // fetchNote already includes activityLog in the response —
+          // do NOT call fetchHistory here or the log will be fetched twice.
+          this.fetchNote(id);
+        }
+      });
   }
 
-  /** Converts Tiptap JSON content (or raw HTML string) → safe HTML for [innerHTML] */
-  getContentHtml(content: any): string {
-    if (!content) return '';
-    // Already an HTML string
-    if (typeof content === 'string') {
-      if (content.startsWith('<') || content === '') return content;
-      try {
-        const json = JSON.parse(content);
-        return generateHTML(json, [
-          StarterKit, Link, Underline,
-          TaskList, TaskItem.configure({ nested: true })
-        ]);
-      } catch {
-        return content;
-      }
-    }
-    // Already a JSON object
-    if (typeof content === 'object') {
-      try {
-        return generateHTML(content, [
-          StarterKit, Link, Underline,
-          TaskList, TaskItem.configure({ nested: true })
-        ]);
-      } catch {
-        return '';
-      }
-    }
-    return '';
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
-  // Helper to safely get initials
-  getInitials(name?: string): string {
-    return name ? name.charAt(0).toUpperCase() : '?';
+  // ── Fetch ──────────────────────────────────────────────────────────────────
+  fetchNote(id: string): void {
+    this.isLoading.set(true);
+    this.noteService.getNoteById(id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: res => {
+          const note = res.data.note;
+          this.note.set(note);
+          this.patchForm(note);
+
+          // Prefer the dedicated activityLog (full actor objects, changes detail).
+          // Fall back to the embedded note.activityLog (older format: { user, timestamp })
+          // and normalize it into the NoteActivity shape so the template works uniformly.
+          const dedicated: NoteActivity[] = Array.isArray(res.data.activityLog)
+            ? res.data.activityLog : [];
+
+          if (dedicated.length) {
+            this.activityLog.set(dedicated);
+          } else {
+            const embedded: any[] = Array.isArray((note as any).activityLog)
+              ? (note as any).activityLog : [];
+            // Normalize embedded shape { action, user, timestamp } → NoteActivity shape
+            const normalized: NoteActivity[] = embedded.map(e => ({
+              _id: e._id ?? e.timestamp,
+              organizationId: note.organizationId,
+              actor: typeof e.actor === 'object'
+                ? e.actor
+                : { _id: e.user ?? '', name: e.user ?? 'User' } as any,
+              action: e.action,
+              changes: e.changes,
+              createdAt: e.createdAt ?? e.timestamp,
+            }));
+            this.activityLog.set(normalized);
+          }
+
+          this.isLoading.set(false);
+        },
+        error: err => {
+          this.isLoading.set(false);
+          this.messageService.handleHttpError(err);
+          this.router.navigate(['/notes']);
+        }
+      });
   }
 
-  patchForm(note: any) {
-    const formatDate = (dateVal?: string | Date) => {
-      if (!dateVal) return null;
-      try {
-        return new Date(dateVal).toISOString().split('T')[0];
-      } catch (e) {
-        return null;
-      }
+  fetchHistory(id: string): void {
+    this.noteService.getNoteHistory(id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        // Guard: API may return undefined / null — always store an array
+        next: res => {
+          this.activityLog.set(Array.isArray(res.data?.activityLog) ? res.data.activityLog : []);
+        },
+        error: err => this.messageService.handleHttpError(err)
+      });
+  }
+
+  // ── Form helpers ───────────────────────────────────────────────────────────
+  patchForm(note: Note): void {
+    const toDateStr = (v?: string | Date | null) => {
+      if (!v) return null;
+      try { return new Date(v).toISOString().split('T')[0]; } catch { return null; }
     };
 
     this.editForm.patchValue({
       title: note.title,
-      content: note.content,
+      content: note.content ?? '',
       priority: note.priority,
-      tags: note.tags?.join(', ') || '',
-      startDate: formatDate(note.startDate),
-      dueDate: formatDate(note.dueDate)
+      status: note.status,
+      tags: note.tags?.join(', ') ?? '',
+      startDate: toDateStr(note.startDate),
+      dueDate: toDateStr(note.dueDate)
     });
   }
 
-  // --- Linking ---
-  openLinkDialog() {
-    const id = prompt('Enter Note ID to link (Mock Dialog):');
-    if (id && this.note()) {
-      this.noteService.linkNote(this.note()!._id, id).pipe(takeUntil(this.destroy$)).subscribe(res => this.note.set(res.data.note));
-    }
-  }
-
-  unlinkNote(targetId: string) {
-    if (!confirm('Remove link?') || !this.note()) return;
-    this.noteService.unlinkNote(this.note()!._id, targetId).pipe(takeUntil(this.destroy$)).subscribe(res => this.note.set(res.data.note));
-  }
-
-  // --- General ---
-
-  convertToTask() {
-    if (!this.note()) return;
-    this.noteService.convertToTask(this.note()!._id).pipe(takeUntil(this.destroy$)).subscribe(res => this.note.set(res.data.note));
-  }
-
-  downloadAttachment(file: any) {
-    if (file.url) window.open(file.url, '_blank');
-  }
-  // ----------------------------------------------------------------------------------
-  fetchNote(id: string) {
-    this.isLoading.set(true);
-    this.noteService.getNoteById(id).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (res) => {
-        this.note.set(res.data.note);
-        this.patchForm(res.data.note);
-        this.isLoading.set(false);
-      },
-      error: (err) => {
-        this.isLoading.set(false);
-        this.messageServic.handleHttpError(err);
-        this.router.navigate(['/notes']);
-      }
-    });
-  }
-
-  fetchHistory(id: string) {
-    this.noteService.getNoteHistory(id).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (res) => this.activityLog.set(res.data.activityLog),
-      error: (err) => this.messageServic.handleHttpError(err)
-    });
-  }
-
-  // --- Actions ---
-  toggleEdit() {
+  // ── Edit / Save ────────────────────────────────────────────────────────────
+  toggleEdit(): void {
     if (this.isEditing() && this.note()) {
       this.patchForm(this.note()!);
     }
     this.isEditing.update(v => !v);
   }
 
-  saveChanges() {
+  saveChanges(): void {
     if (this.editForm.invalid || !this.note()) {
       this.editForm.markAllAsTouched();
-      this.messageServic.showWarn('Validation Error: Please correct the highlighted fields.');
+      this.messageService.showWarn('Please fill in all required fields.');
       return;
     }
     this.isSaving.set(true);
 
-    const rawTags = this.editForm.get('tags')?.value || '';
-    const formVals = this.editForm.value;
+    const v = this.editForm.value;
+    const toISO = (d: any) =>
+      d instanceof Date ? d.toISOString().split('T')[0] : d ?? null;
 
-    const updates = {
-      ...formVals,
-      tags: rawTags.split(',').map((t: string) => t.trim()).filter(Boolean),
-      startDate: formVals.startDate instanceof Date ? formVals.startDate.toISOString().split('T')[0] : formVals.startDate,
-      dueDate: formVals.dueDate instanceof Date ? formVals.dueDate.toISOString().split('T')[0] : formVals.dueDate
+    const payload = {
+      title: v.title,
+      content: v.content,
+      priority: v.priority,
+      status: v.status,
+      tags: (v.tags ?? '').split(',').map((t: string) => t.trim()).filter(Boolean),
+      startDate: toISO(v.startDate),
+      dueDate: toISO(v.dueDate)
     };
 
-
-    this.noteService.updateNote(this.note()!._id, updates).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (res) => {
-        this.note.set(res.data.note);
-        this.isEditing.set(false);
-        this.isSaving.set(false);
-        this.messageServic.showSuccess('Note updated successfully.');
-        this.fetchHistory(res.data.note._id);
-      },
-      error: (err) => {
-        this.isSaving.set(false);
-        this.messageServic.handleHttpError(err);
-      }
-    });
-  }
-
-  // --- Checklist ---
-  addSubtask(input: HTMLInputElement) {
-    const val = input.value.trim();
-    if (!val || !this.note()) return;
-    this.noteService.addChecklistItem(this.note()!._id, val).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (res) => {
-        this.note.set(res.data.note);
-        this.messageServic.showSuccess('Item added to checklist.');
-        input.value = '';
-      },
-      error: (err) => this.messageServic.handleHttpError(err)
-    });
-  }
-
-  toggleSubtask(item: ChecklistItem) {
-    if (!this.note() || !item._id) return;
-    this.noteService.toggleChecklistItem(this.note()!._id, item._id, !item.completed).pipe(takeUntil(this.destroy$))
+    this.noteService.updateNote(this.note()!._id, payload)
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (res) => this.note.set(res.data.note),
-        error: (err) => this.messageServic.handleHttpError(err)
+        next: res => {
+          this.note.set(res.data.note);
+          this.isEditing.set(false);
+          this.isSaving.set(false);
+          this.messageService.showSuccess('Note updated successfully.');
+          // Re-fetch the full note so activityLog is refreshed in one call
+          this.fetchNote(res.data.note._id);
+        },
+        error: err => {
+          this.isSaving.set(false);
+          this.messageService.handleHttpError(err);
+        }
       });
   }
 
-  deleteSubtask(id: string) {
-    if (!this.note()) return;
-    this.noteService.removeChecklistItem(this.note()!._id, id).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (res: any) => {
-        this.note.set(res.data.note);
-        this.messageServic.showSuccess('Item removed from checklist.');
-      },
-      error: (err: any) => this.messageServic.handleHttpError(err)
-    });
+  /** Friendly label for a field name from the activityLog changes */
+  fieldLabel(field: string): string {
+    const map: Record<string, string> = {
+      title: 'Title', content: 'Content', status: 'Status', priority: 'Priority',
+      startDate: 'Start Date', dueDate: 'Due Date', tags: 'Tags',
+      assignees: 'Assignees', visibility: 'Visibility'
+    };
+    return map[field] ?? field;
   }
 
-  // --- General Actions ---
-  duplicateNote() {
-    if (!this.note()) return;
-    this.noteService.duplicateNote(this.note()!._id).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (res) => {
-        this.messageServic.showSuccess('Note duplicated.');
-        this.router.navigate(['/notes', res.data.note._id]);
-      },
-      error: (err) => this.messageServic.handleHttpError(err)
-    });
+  /** Format activity log change values — renders ISO dates nicely, else returns value as string */
+  formatChangeValue(val: any): string {
+    if (val === null || val === undefined) return '—';
+    if (typeof val === 'string' && /^\d{4}-\d{2}-\d{2}/.test(val)) {
+      try {
+        return new Date(val).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+      } catch { /* fall through */ }
+    }
+    if (Array.isArray(val)) return val.join(', ') || '(empty)';
+    return String(val);
+  }
+  getInitials(name?: string): string {
+    if (!name?.trim()) return '?';
+    return name.trim().split(' ')
+      .slice(0, 2)
+      .map(w => w[0].toUpperCase())
+      .join('');
   }
 
-  archiveNote() {
-    if (!this.note()) return;
-    this.noteService.archiveNote(this.note()!._id).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (res) => {
-        this.note.set(res.data.note);
-        this.messageServic.showSuccess('Note moved to archive.');
-      },
-      error: (err) => this.messageServic.handleHttpError(err)
-    });
+  downloadAttachment(file: AssetAttachment): void {
+    if ((file as any).url) window.open((file as any).url, '_blank');
   }
 
-  restoreNote() {
+  // ── Checklist ──────────────────────────────────────────────────────────────
+  addSubtask(input: HTMLInputElement): void {
+    const val = input.value.trim();
+    if (!val || !this.note()) return;
+    this.noteService.addChecklistItem(this.note()!._id, val)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: res => {
+          this.note.set(res.data.note);
+          input.value = '';
+        },
+        error: err => this.messageService.handleHttpError(err)
+      });
+  }
+
+  toggleSubtask(item: ChecklistItem): void {
+    if (!this.note() || !item._id) return;
+    this.noteService.toggleChecklistItem(this.note()!._id, item._id, !item.completed)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: res => this.note.set(res.data.note),
+        error: err => this.messageService.handleHttpError(err)
+      });
+  }
+
+  deleteSubtask(id: string): void {
     if (!this.note()) return;
-    const isTrash = this.isTrash();
-    const request$ = isTrash
+    this.noteService.removeChecklistItem(this.note()!._id, id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res: any) => this.note.set(res.data.note),
+        error: (err: any) => this.messageService.handleHttpError(err)
+      });
+  }
+
+  // ── Linking ────────────────────────────────────────────────────────────────
+  openLinkDialog(): void {
+    const id = prompt('Enter Note ID to link:');
+    if (id && this.note()) {
+      this.noteService.linkNote(this.note()!._id, id)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(res => this.note.set(res.data.note));
+    }
+  }
+
+  unlinkNote(targetId: string): void {
+    if (!confirm('Remove this link?') || !this.note()) return;
+    this.noteService.unlinkNote(this.note()!._id, targetId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(res => this.note.set(res.data.note));
+  }
+
+  // ── Actions ────────────────────────────────────────────────────────────────
+  duplicateNote(): void {
+    if (!this.note()) return;
+    this.noteService.duplicateNote(this.note()!._id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: res => {
+          this.messageService.showSuccess('Note duplicated.');
+          this.router.navigate(['/notes', res.data.note._id]);
+        },
+        error: err => this.messageService.handleHttpError(err)
+      });
+  }
+
+  archiveNote(): void {
+    if (!this.note()) return;
+    this.noteService.archiveNote(this.note()!._id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: res => {
+          this.note.set(res.data.note);
+          this.messageService.showSuccess('Note archived.');
+        },
+        error: err => this.messageService.handleHttpError(err)
+      });
+  }
+
+  restoreNote(): void {
+    if (!this.note()) return;
+    const req$ = this.isTrash()
       ? this.noteService.restoreFromTrash(this.note()!._id)
       : this.noteService.restoreNote(this.note()!._id);
 
-    request$.pipe(takeUntil(this.destroy$)).subscribe({
-      next: (res) => {
+    req$.pipe(takeUntil(this.destroy$)).subscribe({
+      next: res => {
         this.note.set(res.data.note);
-        this.messageServic.showSuccess('Note restored successfully.');
+        this.messageService.showSuccess('Note restored.');
       },
-      error: (err) => this.messageServic.handleHttpError(err)
+      error: err => this.messageService.handleHttpError(err)
     });
   }
 
-  deleteNote() {
-    if (!this.note() || !this.note()?._id) return;
-    const noteId = this.note()!._id;
+  deleteNote(): void {
+    if (!this.note()?._id) return;
+    const id = this.note()!._id;
 
     if (this.isTrash()) {
-      if (!confirm('Permanently delete this note? This action cannot be undone.')) return;
-      this.noteService.hardDeleteNote(noteId).pipe(takeUntil(this.destroy$)).subscribe({
-        next: () => {
-          this.messageServic.showSuccess('Note permanently deleted.');
-          this.router.navigate(['/notes']);
-        },
-        error: (err) => this.messageServic.handleHttpError(err)
-      });
+      if (!confirm('Permanently delete this note? This cannot be undone.')) return;
+      this.noteService.hardDeleteNote(id)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.messageService.showSuccess('Note permanently deleted.');
+            this.router.navigate(['/notes']);
+          },
+          error: err => this.messageService.handleHttpError(err)
+        });
     } else {
-      this.noteService.deleteNote(noteId).pipe(takeUntil(this.destroy$)).subscribe({
-        next: () => {
-          this.messageServic.showSuccess('Note moved to trash.');
-          this.router.navigate(['/notes']);
-        },
-        error: (err) => this.messageServic.handleHttpError(err)
-      });
+      this.noteService.deleteNote(id)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.messageService.showSuccess('Note moved to trash.');
+            this.router.navigate(['/notes']);
+          },
+          error: err => this.messageService.handleHttpError(err)
+        });
     }
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  convertToTask(): void {
+    if (!this.note()) return;
+    this.noteService.convertToTask(this.note()!._id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: res => {
+          this.note.set(res.data.note);
+          this.messageService.showSuccess('Converted to task.');
+        },
+        error: err => this.messageService.handleHttpError(err)
+      });
+  }
 }

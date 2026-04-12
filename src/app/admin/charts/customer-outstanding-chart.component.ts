@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { signal, Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { Chart, registerables } from 'chart.js';
@@ -31,7 +31,7 @@ Chart.register(...registerables);
   </div>
 
   <!-- Loading -->
-  @if (isLoading) {
+  @if (isLoading()) {
     <div class="state-overlay">
       <div class="spinner"></div>
       <span>Loading balances...</span>
@@ -39,7 +39,7 @@ Chart.register(...registerables);
   }
 
   <!-- Error -->
-  @if (hasError && !isLoading) {
+  @if (hasError() && !isLoading()) {
     <div class="state-overlay error">
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
         <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
@@ -50,20 +50,20 @@ Chart.register(...registerables);
   }
 
   <!-- Content -->
-  @if (!isLoading && !hasError) {
+  @if (!isLoading() && !hasError()) {
     <!-- Summary Badge -->
     <div class="total-badge">
       <span class="total-label">Total Outstanding</span>
-      <span class="total-value">₹{{ totalAmount | number:'1.0-0' }}</span>
+      <span class="total-value">₹{{ totalAmount() | number:'1.0-0' }}</span>
     </div>
     <!-- Chart Area -->
     <div class="chart-area">
       <canvas #chartCanvas></canvas>
     </div>
     <!-- Meta List -->
-    @if (metaList.length) {
+    @if (metaList().length) {
       <div class="meta-list">
-        @for (item of metaList; track item) {
+        @for (item of metaList(); track item) {
           <div class="meta-row">
             <div class="meta-info">
               <span class="meta-label">{{ item.name }}</span>
@@ -179,11 +179,11 @@ export class CustomerOutstandingChartComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private chart?: Chart;
 
-  isLoading = true;
-  hasError = false;
-  metaList: any[] = [];
-  totalAmount = 0;
-  chartData: any = null;
+  isLoading = signal(true);
+  hasError = signal(false);
+  metaList = signal<any[]>([]);
+  totalAmount = signal(0);
+  chartData = signal<any>(null);
 
   constructor(private chartService: ChartService) { }
 
@@ -192,36 +192,36 @@ export class CustomerOutstandingChartComponent implements OnInit, OnDestroy {
   }
 
   loadData(): void {
-    this.isLoading = true;
-    this.hasError = false;
+    this.isLoading.set(true);
+    this.hasError.set(false);
 
     this.chartService.getCustomerOutstanding({ limit: 10 })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
-          this.chartData = res.data;
-          this.metaList = res.data._meta || [];
-          this.totalAmount = this.metaList.reduce((sum: number, m: any) => sum + (m.outstandingBalance || 0), 0);
-          this.isLoading = false;
+          this.chartData.set(res.data);
+          this.metaList.set(res.data._meta || []);
+          this.totalAmount.set(this.metaList().reduce((sum: number, m: any) => sum + (m.outstandingBalance || 0), 0));
+          this.isLoading.set(false);
           setTimeout(() => this.renderChart(), 50);
         },
         error: () => {
-          this.isLoading = false;
-          this.hasError = true;
+          this.isLoading.set(false);
+          this.hasError.set(true);
         }
       });
   }
 
   renderChart(): void {
-    if (!this.chartCanvas || !this.chartData) return;
+    if (!this.chartCanvas || !this.chartData()) return;
     this.chart?.destroy();
 
     const ctx = this.chartCanvas.nativeElement.getContext('2d')!;
     this.chart = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: this.chartData.labels,
-        datasets: this.chartData.datasets.map((ds: any) => ({
+        labels: this.chartData().labels,
+        datasets: this.chartData().datasets.map((ds: any) => ({
           ...ds,
           borderRadius: 4,
           maxBarThickness: 32,

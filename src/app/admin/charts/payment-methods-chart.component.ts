@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { signal, Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { Chart, registerables } from 'chart.js';
@@ -29,13 +29,13 @@ Chart.register(...registerables);
 
     <!-- Tab Toggle -->
     <div class="tab-toggle">
-      <button class="tab-btn" [class.active]="activeTab === 'pie'" (click)="setTab('pie')">Split</button>
-      <button class="tab-btn" [class.active]="activeTab === 'trend'" (click)="setTab('trend')">Trend</button>
+      <button class="tab-btn" [class.active]="activeTab() === 'pie'" (click)="setTab('pie')">Split</button>
+      <button class="tab-btn" [class.active]="activeTab() === 'trend'" (click)="setTab('trend')">Trend</button>
     </div>
   </div>
 
   <!-- Loading -->
-  @if (isLoading) {
+  @if (isLoading()) {
     <div class="state-overlay">
       <div class="spinner"></div>
       <span>Loading...</span>
@@ -43,7 +43,7 @@ Chart.register(...registerables);
   }
 
   <!-- Error -->
-  @if (hasError && !isLoading) {
+  @if (hasError() && !isLoading()) {
     <div class="state-overlay error">
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
         <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
@@ -54,23 +54,23 @@ Chart.register(...registerables);
   }
 
   <!-- Content -->
-  @if (!isLoading && !hasError) {
+  @if (!isLoading() && !hasError()) {
     <!-- Total Badge -->
     <div class="total-badge">
       <span class="total-label">Total Revenue</span>
-      <span class="total-value">₹{{ totalRevenue | number }}</span>
+      <span class="total-value">₹{{ totalRevenue() | number }}</span>
     </div>
     <!-- Charts -->
-    <div class="chart-area" [class.hidden]="activeTab !== 'pie'">
+    <div class="chart-area" [class.hidden]="activeTab() !== 'pie'">
       <canvas #pieCanvas></canvas>
     </div>
-    <div class="chart-area" [class.hidden]="activeTab !== 'trend'">
+    <div class="chart-area" [class.hidden]="activeTab() !== 'trend'">
       <canvas #trendCanvas></canvas>
     </div>
     <!-- Meta Table -->
-    @if (activeTab === 'pie' && metaList.length) {
+    @if (activeTab() === 'pie' && metaList().length) {
       <div class="meta-list">
-        @for (item of metaList; track item) {
+        @for (item of metaList(); track item) {
           <div class="meta-row">
             <span class="meta-label">{{ item.label | titlecase }}</span>
             <span class="meta-count">{{ item.count }} txns</span>
@@ -305,14 +305,14 @@ export class PaymentMethodsChartComponent implements OnInit, OnDestroy {
   private pieChart?: Chart;
   private trendChart?: Chart;
 
-  isLoading = true;
-  hasError = false;
-  activeTab: 'pie' | 'trend' = 'pie';
+  isLoading = signal(true);
+  hasError = signal(false);
+  activeTab = signal<'pie' | 'trend'>('pie');
 
-  pieData: any = null;
-  trendData: any = null;
-  metaList: any[] = [];
-  totalRevenue = 0;
+  pieData = signal<any>(null);
+  trendData = signal<any>(null);
+  metaList = signal<any[]>([]);
+  totalRevenue = signal(0);
 
   constructor(private chartService: ChartService) { }
 
@@ -321,23 +321,23 @@ export class PaymentMethodsChartComponent implements OnInit, OnDestroy {
   }
 
   loadData(): void {
-    this.isLoading = true;
-    this.hasError = false;
+    this.isLoading.set(true);
+    this.hasError.set(false);
 
     this.chartService.getPaymentMethodBreakdown()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
-          this.pieData = res.data.pie;
-          this.trendData = res.data.trend;
-          this.metaList = res.data.pie._meta || [];
-          this.totalRevenue = this.metaList.reduce((sum: number, m: any) => sum + m.value, 0);
-          this.isLoading = false;
+          this.pieData.set(res.data.pie);
+          this.trendData.set(res.data.trend);
+          this.metaList.set(res.data.pie._meta || []);
+          this.totalRevenue.set(this.metaList().reduce((sum: number, m: any) => sum + m.value, 0));
+          this.isLoading.set(false);
           setTimeout(() => this.renderCharts(), 50);
         },
         error: () => {
-          this.isLoading = false;
-          this.hasError = true;
+          this.isLoading.set(false);
+          this.hasError.set(true);
         }
       });
   }
@@ -348,14 +348,14 @@ export class PaymentMethodsChartComponent implements OnInit, OnDestroy {
   }
 
   renderPie(): void {
-    if (!this.pieCanvas || !this.pieData) return;
+    if (!this.pieCanvas || !this.pieData()) return;
     this.pieChart?.destroy();
     const ctx = this.pieCanvas.nativeElement.getContext('2d')!;
     this.pieChart = new Chart(ctx, {
       type: 'doughnut',
       data: {
-        labels: this.pieData.labels,
-        datasets: this.pieData.datasets.map((ds: any) => ({
+        labels: this.pieData().labels,
+        datasets: this.pieData().datasets.map((ds: any) => ({
           ...ds,
           borderWidth: 2,
           borderColor: 'var(--bg-primary, #fff)',
@@ -392,14 +392,14 @@ export class PaymentMethodsChartComponent implements OnInit, OnDestroy {
   }
 
   renderTrend(): void {
-    if (!this.trendCanvas || !this.trendData) return;
+    if (!this.trendCanvas || !this.trendData()) return;
     this.trendChart?.destroy();
     const ctx = this.trendCanvas.nativeElement.getContext('2d')!;
     this.trendChart = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: this.trendData.labels,
-        datasets: this.trendData.datasets.map((ds: any) => ({
+        labels: this.trendData().labels,
+        datasets: this.trendData().datasets.map((ds: any) => ({
           ...ds,
           borderRadius: 4,
           borderSkipped: false
@@ -450,7 +450,7 @@ export class PaymentMethodsChartComponent implements OnInit, OnDestroy {
   }
 
   setTab(tab: 'pie' | 'trend'): void {
-    this.activeTab = tab;
+    this.activeTab.set(tab);
     setTimeout(() => {
       if (tab === 'pie') this.renderPie();
       else this.renderTrend();

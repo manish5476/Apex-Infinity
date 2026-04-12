@@ -59,7 +59,7 @@ interface SummaryKpi {
         <label class="control-label">View</label>
         <div class="seg-control">
           @for (iv of intervals; track iv.value) {
-            <button class="seg-btn" [class.active]="selectedInterval === iv.value"
+            <button class="seg-btn" [class.active]="selectedInterval() === iv.value"
                     (click)="onIntervalChange(iv.value)">{{ iv.label }}</button>
           }
         </div>
@@ -515,7 +515,7 @@ export class FinancialTrendChartComponent implements OnInit, OnDestroy {
     { label: 'Monthly', value: 'month' },
     { label: 'Quarterly', value: 'quarter' },
   ];
-  selectedInterval = 'month';
+  selectedInterval = signal('month');
 
   // Dataset visibility toggles (data-colors intentionally fixed)
   datasetToggles = [
@@ -538,7 +538,7 @@ export class FinancialTrendChartComponent implements OnInit, OnDestroy {
   });
 
   periodLabel = computed(() => {
-    return `${this.selectedYear} · ${this.intervals.find(i => i.value === this.selectedInterval)?.label
+    return `${this.selectedYear} · ${this.intervals.find(i => i.value === this.selectedInterval())?.label
       }`;
   });
 
@@ -579,7 +579,7 @@ export class FinancialTrendChartComponent implements OnInit, OnDestroy {
 
 
   onIntervalChange(iv: string): void {
-    this.selectedInterval = iv;
+    this.selectedInterval.set(iv);
     this.loadData();
   }
 
@@ -592,7 +592,7 @@ export class FinancialTrendChartComponent implements OnInit, OnDestroy {
   loadData(): void {
     this.loading.set(true);
     this.chartService
-      .getFinancialTrend({ year: this.selectedYear, interval: this.selectedInterval as any })
+      .getFinancialTrend({ year: this.selectedYear, interval: this.selectedInterval() as any })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {

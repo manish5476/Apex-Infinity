@@ -5,3 +5,43 @@
   overflow: hidden;
 }
 
+.stats-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+
+  .stat-card {
+    background: var(--bg-secondary);
+    border-radius: var(--ui-border-radius);
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .stat-label {
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+  }
+
+  .stat-val {
+    font-size: 18px;
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+
+    em {
+      font-style: normal;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    &.inflow {
+      color: var(--color-success);
+    }
+
+    &.outflow {
+      color: var(--color-error);
+    }
+  }
+}

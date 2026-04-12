@@ -25,11 +25,11 @@
 
     <!-- Filter Panel -->
     <div class="app-filter-panel" [formGroup]="filterForm">
-      
+
       <div class="filter-field">
         <label>Branch</label>
-        <p-select appendTo="body" [options]="branchOptions()" formControlName="branchId" placeholder="All Branches" [showClear]="true"
-          styleClass="w-full" (onChange)="applyFilters()" [filter]="true" filterBy="label">
+        <p-select appendTo="body" [options]="branchOptions()" formControlName="branchId" placeholder="All Branches"
+          [showClear]="true" styleClass="w-full" (onChange)="applyFilters()" [filter]="true" filterBy="label">
         </p-select>
       </div>
 
@@ -42,42 +42,43 @@
       </div>
 
       @if (!isReportView) {
-        @if (currentTab() === 'all') {
-          <div class="filter-field search-field" style="flex: 1.5">
-            <label>Search</label>
-            <input pInputText formControlName="search" placeholder="Ref #, Detail..." (keyup.enter)="applyFilters()"
-              class="w-full" />
-          </div>
-          <div class="filter-field">
-            <label>Account</label>
-            <p-select appendTo="body" [options]="accountOptions()" formControlName="accountId" placeholder="Select Account" [showClear]="true"
-              styleClass="w-full" (onChange)="applyFilters()" [filter]="true" filterBy="label"></p-select>
-          </div>
-          <div class="filter-field">
-            <label>Type</label>
-            <p-select appendTo="body" formControlName="txnType"
-              [options]="[{label:'Debit', value:'debit'}, {label:'Credit', value:'credit'}]" placeholder="All Types"
-              [showClear]="true" styleClass="w-full"
-              (onChange)="applyFilters()" [filter]="true" filterBy="label"></p-select>
-          </div>
-        }
+      @if (currentTab() === 'all') {
+      <div class="filter-field search-field" style="flex: 1.5">
+        <label>Search</label>
+        <input pInputText formControlName="search" placeholder="Ref #, Detail..." (keyup.enter)="applyFilters()"
+          class="w-full" />
+      </div>
+      <div class="filter-field">
+        <label>Account</label>
+        <p-select appendTo="body" [options]="accountOptions()" formControlName="accountId" placeholder="Select Account"
+          [showClear]="true" styleClass="w-full" (onChange)="applyFilters()" [filter]="true"
+          filterBy="label"></p-select>
+      </div>
+      <div class="filter-field">
+        <label>Type</label>
+        <p-select appendTo="body" formControlName="txnType"
+          [options]="[{label:'Debit', value:'debit'}, {label:'Credit', value:'credit'}]" placeholder="All Types"
+          [showClear]="true" styleClass="w-full" (onChange)="applyFilters()" [filter]="true"
+          filterBy="label"></p-select>
+      </div>
+      }
 
-        @if (currentTab() === 'customer') {
-          <div class="filter-field" style="flex: 2">
-            <label>Customer</label>
-            <p-select appendTo="body" [options]="customerOptions()" formControlName="customerId" placeholder="Select Customer"
-              [filter]="true" [showClear]="true" styleClass="w-full"
-              (onChange)="applyFilters()"></p-select>
-          </div>
-        }
-        @if (currentTab() === 'supplier') {
-          <div class="filter-field" style="flex: 2">
-            <label>Supplier</label>
-            <p-select appendTo="body" [options]="supplierOptions()" formControlName="supplierId" placeholder="Select Supplier"
-              [filter]="true" [showClear]="true" styleClass="w-full"
-              (onChange)="applyFilters()"></p-select>
-          </div>
-        }
+      @if (currentTab() === 'customer') {
+      <div class="filter-field" style="flex: 2">
+        <label>Customer</label>
+        <p-select appendTo="body" [options]="customerOptions()" formControlName="customerId"
+          placeholder="Select Customer" [filter]="true" [showClear]="true" styleClass="w-full"
+          (onChange)="applyFilters()"></p-select>
+      </div>
+      }
+      @if (currentTab() === 'supplier') {
+      <div class="filter-field" style="flex: 2">
+        <label>Supplier</label>
+        <p-select appendTo="body" [options]="supplierOptions()" formControlName="supplierId"
+          placeholder="Select Supplier" [filter]="true" [showClear]="true" styleClass="w-full"
+          (onChange)="applyFilters()"></p-select>
+      </div>
+      }
       }
 
       <div class="filter-actions">
@@ -103,191 +104,264 @@
 
     <!-- Main Content Area -->
     <div class="flex-1 min-h-0 overflow-auto">
-      
+
       @if (isLoading() && !gridData().length && !reportData()) {
-        <div class="p-4 flex flex-col gap-3">
-          <p-skeleton width="100%" height="40px"></p-skeleton>
-          <p-skeleton width="100%" height="40px"></p-skeleton>
-          <p-skeleton width="100%" height="40px"></p-skeleton>
-          <p-skeleton width="100%" height="40px"></p-skeleton>
-        </div>
+      <div class="p-4 flex flex-col gap-3">
+        <p-skeleton width="100%" height="40px"></p-skeleton>
+        <p-skeleton width="100%" height="40px"></p-skeleton>
+        <p-skeleton width="100%" height="40px"></p-skeleton>
+        <p-skeleton width="100%" height="40px"></p-skeleton>
+      </div>
       }
 
       @else if (!isReportView) {
-        
-        @if (isEntityView && entityDetails()) {
-          <div class="entity-summary-ribbon manish-border-1 border-secondary border-round p-3 mb-4 flex justify-between align-center bg-primary-light-subtle">
-            <div>
-              <h3 class="text-xl font-bold m-0 text-primary">{{ entityDetails().details.name || entityDetails().details.companyName }}</h3>
-              <p class="text-sm text-secondary m-0"><i class="pi pi-phone mr-1"></i> {{ entityDetails().details.phone || 'N/A' }}</p>
-            </div>
-            <div class="flex gap-6 align-center">
-              <div class="text-right">
-                <label class="block text-xs uppercase font-bold text-secondary mb-1">Opening</label>
-                <span class="text-base font-semibold">{{ common.formatCurrency(entityDetails().openingBalance) }}</span>
-              </div>
-              <div class="h-2rem border-left-1 border-secondary"></div>
-              <div class="text-right">
-                <label class="block text-xs uppercase font-bold text-secondary mb-1">Closing / Outstanding</label>
-                <span class="text-base font-bold text-primary">{{ common.formatCurrency(entityDetails().closingBalance) }}</span>
-              </div>
-            </div>
-          </div>
-        }
 
-        <div class="grid-container h-full flex flex-col">
-          <div class="flex-1 min-h-0 manish-border-1 border-secondary border-round overflow-hidden">
-            @if ( (currentTab() === 'customer' && !filterForm.value.customerId) || (currentTab() === 'supplier' &&
-            !filterForm.value.supplierId) ) {
-              <div class="empty-state-placeholder flex flex-col align-center justify-center h-full p-8 text-center opacity-40">
-                <i class="pi pi-search text-6xl mb-4"></i>
-                <p class="text-lg">Please select a {{ currentTab() }} to view ledger history.</p>
-              </div>
-            }
-            @else if (gridData().length === 0) {
-              <div class="empty-state-placeholder flex flex-col align-center justify-center h-full p-8 text-center opacity-40">
-                <i class="pi pi-inbox text-6xl mb-4"></i>
-                <p class="text-lg">No transactions found for this period.</p>
-              </div>
-            }
-            @else {
-              <app-ag-share-grid [columns]="gridColumns()" [data]="gridData()" style="height: 100%; width: 100%; display: block;"
-                (gridEvent)="eventFromGrid($event)">
-              </app-ag-share-grid>
-            }
+      <!-- @if (isEntityView && entityDetails()) {
+      <div
+        class="entity-summary-ribbon manish-border-1 border-secondary border-round p-3 mb-4 flex justify-between align-center bg-primary-light-subtle">
+        <div>
+          <h3 class="text-xl font-bold m-0 text-primary">{{ entityDetails().details.name ||
+            entityDetails().details.companyName }}</h3>
+          <p class="text-sm text-secondary m-0"><i class="pi pi-phone mr-1"></i> {{ entityDetails().details.phone ||
+            'N/A' }}</p>
+        </div>
+        <div class="flex gap-6 align-center">
+          <div class="text-right">
+            <label class="block text-xs uppercase font-bold text-secondary mb-1">Opening</label>
+            <span class="text-base font-semibold">{{ common.formatCurrency(entityDetails().openingBalance) }}</span>
           </div>
+          <div class="h-2rem border-left-1 border-secondary"></div>
+          <div class="text-right">
+            <label class="block text-xs uppercase font-bold text-secondary mb-1">Closing / Outstanding</label>
+            <span class="text-base font-bold text-primary">{{ common.formatCurrency(entityDetails().closingBalance)
+              }}</span>
+          </div>
+        </div>
+      </div>
+      } -->
 
-          @if (currentTab() === 'trialBalance' && reportData()) {
-            <div class="mt-4 p-3 manish-border-1 border-secondary border-round bg-secondary-light flex gap-8 justify-center align-center">
-              <div class="text-sm font-medium">Total Debit: <span class="font-bold text-red-600 ml-2 text-base">{{ common.formatCurrency(reportData().debit) }}</span></div>
-              <div class="text-sm font-medium">Total Credit: <span class="font-bold text-green-600 ml-2 text-base">{{ common.formatCurrency(reportData().credit) }}</span></div>
-              <div class="text-sm font-medium">Difference: <span [class.text-red-600]="reportData().diff !== 0" class="font-bold ml-2 text-base">{{ common.formatCurrency(reportData().diff) }}</span></div>
-            </div>
+      <!-- Entity ribbon — replace existing with: -->
+      @if (isEntityView && entityDetails()) {
+      <div class="entity-summary-ribbon">
+        <div>
+          <h3>{{ entityDetails().details.name || entityDetails().details.companyName }}</h3>
+          <p><i class="pi pi-phone mr-1"></i>{{ entityDetails().details.phone || 'N/A' }}</p>
+        </div>
+        <div class="ribbon-stats">
+          <div class="ribbon-stat">
+            <label>Opening Balance</label>
+            <span>{{ common.formatCurrency(entityDetails().openingBalance) }}</span>
+          </div>
+          <div class="ribbon-divider"></div>
+          <div class="ribbon-stat">
+            <label>Closing / Outstanding</label>
+            <span class="closing">{{ common.formatCurrency(entityDetails().closingBalance) }}</span>
+          </div>
+        </div>
+      </div>
+      }
+
+      <!-- Trial Balance footer — replace existing with: -->
+      @if (currentTab() === 'trialBalance' && reportData()) {
+      <div class="trial-totals-bar">
+        <div class="trial-total-item">
+          Total Debit&nbsp;
+          <strong class="dr">{{ common.formatCurrency(reportData().debit) }}</strong>
+        </div>
+        <div class="trial-separator"></div>
+        <div class="trial-total-item">
+          Total Credit&nbsp;
+          <strong class="cr">{{ common.formatCurrency(reportData().credit) }}</strong>
+        </div>
+        <div class="trial-separator"></div>
+        <div class="trial-total-item">
+          Difference&nbsp;
+          <strong [class.diff-warn]="reportData().diff !== 0" [class.diff-ok]="reportData().diff === 0">
+            {{ common.formatCurrency(reportData().diff) }}
+          </strong>
+        </div>
+      </div>
+      }
+      <div class="grid-container h-full flex flex-col">
+        <div class="flex-1 min-h-0 manish-border-1 border-secondary border-round overflow-hidden">
+          @if ( (currentTab() === 'customer' && !filterForm.value.customerId) || (currentTab() === 'supplier' &&
+          !filterForm.value.supplierId) ) {
+          <div
+            class="empty-state-placeholder flex flex-col align-center justify-center h-full p-8 text-center opacity-40">
+            <i class="pi pi-search text-6xl mb-4"></i>
+            <p class="text-lg">Please select a {{ currentTab() }} to view ledger history.</p>
+          </div>
+          }
+          @else if (gridData().length === 0) {
+          <div
+            class="empty-state-placeholder flex flex-col align-center justify-center h-full p-8 text-center opacity-40">
+            <i class="pi pi-inbox text-6xl mb-4"></i>
+            <p class="text-lg">No transactions found for this period.</p>
+          </div>
+          }
+          @else {
+
+          <!-- replace your ag-share-grid usage with: -->
+          <app-ag-share-grid [columns]="gridColumns()" [data]="gridData()" [pinnedBottomRowData]="pinnedBottomRowData()"
+            style="height: 100%; width: 100%; display: block;" (gridEvent)="eventFromGrid($event)">
+          </app-ag-share-grid>
+          <!-- <app-ag-share-grid [columns]="gridColumns()" [data]="gridData()"
+            style="height: 100%; width: 100%; display: block;" (gridEvent)="eventFromGrid($event)">
+          </app-ag-share-grid> -->
           }
         </div>
+
+        @if (currentTab() === 'trialBalance' && reportData()) {
+        <div
+          class="mt-4 p-3 manish-border-1 border-secondary border-round bg-secondary-light flex gap-8 justify-center align-center">
+          <div class="text-sm font-medium">Total Debit: <span class="font-bold text-red-600 ml-2 text-base">{{
+              common.formatCurrency(reportData().debit) }}</span></div>
+          <div class="text-sm font-medium">Total Credit: <span class="font-bold text-green-600 ml-2 text-base">{{
+              common.formatCurrency(reportData().credit) }}</span></div>
+          <div class="text-sm font-medium">Difference: <span [class.text-red-600]="reportData().diff !== 0"
+              class="font-bold ml-2 text-base">{{ common.formatCurrency(reportData().diff) }}</span></div>
+        </div>
+        }
+      </div>
       }
 
       @else {
-        <div class="report-views-container pb-6">
-          
-          @if (currentTab() === 'orgSummary' && reportData()) {
-            <div class="report-grid grid gap-4 mb-4">
-              <div class="col-12 md:col-6 lg:col-3">
-                <div class="kpi-card-v2 p-4 border-round manish-border-1 border-secondary bg-white border-left-3 border-blue-500">
-                  <div class="text-secondary text-xs font-bold uppercase mb-2"><i class="pi pi-wallet mr-2"></i>Total Income</div>
-                  <div class="text-2xl font-bold text-green-600">{{ common.formatCurrency(reportData().income) }}</div>
-                </div>
+      <div class="report-views-container pb-6">
+
+        @if (currentTab() === 'orgSummary' && reportData()) {
+        <div class="report-grid grid gap-4 mb-4">
+          <div class="col-12 md:col-6 lg:col-3">
+            <div
+              class="kpi-card-v2 p-4 border-round manish-border-1 border-secondary bg-white border-left-3 border-blue-500">
+              <div class="text-secondary text-xs font-bold uppercase mb-2"><i class="pi pi-wallet mr-2"></i>Total Income
               </div>
-              <div class="col-12 md:col-6 lg:col-3">
-                <div class="kpi-card-v2 p-4 border-round manish-border-1 border-secondary bg-white border-left-3 border-red-500">
-                  <div class="text-secondary text-xs font-bold uppercase mb-2"><i class="pi pi-shopping-cart mr-2"></i>Total Expenses</div>
-                  <div class="text-2xl font-bold text-red-600">{{ common.formatCurrency(reportData().expense) }}</div>
-                </div>
-              </div>
-              <div class="col-12 md:col-6 lg:col-3">
-                <div class="kpi-card-v2 p-4 border-round manish-border-1 border-secondary bg-white border-left-3 border-green-500">
-                  <div class="text-secondary text-xs font-bold uppercase mb-2"><i class="pi pi-dollar mr-2"></i>Net Profit</div>
-                  <div class="text-2xl font-bold text-primary">{{ common.formatCurrency(reportData().netProfit) }}</div>
-                </div>
-              </div>
-              <div class="col-12 md:col-6 lg:col-3">
-                <div class="kpi-card-v2 p-4 border-round manish-border-1 border-secondary bg-white border-left-3 border-orange-500">
-                  <div class="text-secondary text-xs font-bold uppercase mb-2"><i class="pi pi-building mr-2"></i>Equity</div>
-                  <div class="text-2xl font-bold text-primary">{{ common.formatCurrency(reportData().equity) }}</div>
-                </div>
-              </div>
+              <div class="text-2xl font-bold text-green-600">{{ common.formatCurrency(reportData().income) }}</div>
             </div>
-
-            <div class="manish-border-1 border-secondary border-round p-4 bg-white">
-              <h3 class="text-lg font-bold mb-4">Assets vs Liabilities</h3>
-              <div class="flex justify-between">
-                <div>
-                  <label class="block text-secondary text-xs font-bold uppercase mb-1">Total Assets</label>
-                  <span class="text-3xl font-bold text-primary">{{ common.formatCurrency(reportData().asset) }}</span>
-                </div>
-                <div class="text-right">
-                  <label class="block text-secondary text-xs font-bold uppercase mb-1">Total Liabilities</label>
-                  <span class="text-3xl font-bold text-red-600">{{ common.formatCurrency(reportData().liability) }}</span>
-                </div>
-              </div>
+          </div>
+          <div class="col-12 md:col-6 lg:col-3">
+            <div
+              class="kpi-card-v2 p-4 border-round manish-border-1 border-secondary bg-white border-left-3 border-red-500">
+              <div class="text-secondary text-xs font-bold uppercase mb-2"><i class="pi pi-shopping-cart mr-2"></i>Total
+                Expenses</div>
+              <div class="text-2xl font-bold text-red-600">{{ common.formatCurrency(reportData().expense) }}</div>
             </div>
-          }
-
-          @if (currentTab() === 'pnl' && reportData()) {
-            <div class="document-container max-w-3xl mx-auto manish-border-1 border-secondary border-round bg-white p-6 shadow-2 mt-4">
-              <div class="text-center border-bottom-2 border-secondary pb-4 mb-6">
-                <h2 class="text-2xl font-bold m-0 text-primary">Profit & Loss Statement</h2>
-                <p class="text-secondary m-0 mt-1 uppercase text-xs font-bold letter-spacing-1">{{ reportData().period?.startDate | date }} - {{ reportData().period?.endDate | date }}</p>
+          </div>
+          <div class="col-12 md:col-6 lg:col-3">
+            <div
+              class="kpi-card-v2 p-4 border-round manish-border-1 border-secondary bg-white border-left-3 border-green-500">
+              <div class="text-secondary text-xs font-bold uppercase mb-2"><i class="pi pi-dollar mr-2"></i>Net Profit
               </div>
-
-              <div class="pnl-content flex flex-col gap-4">
-                <div class="flex justify-between text-xs font-bold text-secondary uppercase border-bottom-1 border-secondary pb-2">
-                  <span>Category</span>
-                  <span>Amount</span>
-                </div>
-                <div class="flex justify-between align-center py-2 border-bottom-1 border-dashed border-secondary">
-                  <span class="text-base font-medium">Total Income</span>
-                  <span class="text-lg font-bold text-green-600">{{ common.formatCurrency(reportData().income) }}</span>
-                </div>
-                <div class="flex justify-between align-center py-2 border-bottom-1 border-dashed border-secondary">
-                  <span class="text-base font-medium">Total Expenses</span>
-                  <span class="text-lg font-bold text-red-600">{{ common.formatCurrency(reportData().expenses) }}</span>
-                </div>
-                <div class="flex justify-between align-center py-4 border-top-2 border-primary mt-2">
-                  <span class="text-xl font-bold">Net Profit / (Loss)</span>
-                  <span class="text-2xl font-bold" [class.text-green-600]="reportData().netProfit >= 0" [class.text-red-600]="reportData().netProfit < 0">
-                    {{ common.formatCurrency(reportData().netProfit) }}
-                  </span>
-                </div>
-              </div>
+              <div class="text-2xl font-bold text-primary">{{ common.formatCurrency(reportData().netProfit) }}</div>
             </div>
-          }
-
-          @if (currentTab() === 'balanceSheet' && reportData()) {
-            <div class="document-container max-w-5xl mx-auto manish-border-1 border-secondary border-round bg-white p-6 shadow-2 mt-4">
-              <div class="text-center border-bottom-2 border-secondary pb-4 mb-6">
-                <h2 class="text-2xl font-bold m-0 text-primary">Balance Sheet</h2>
-                <p class="text-secondary m-0 mt-1 uppercase text-xs font-bold letter-spacing-1">As of {{ reportData().asOnDate | date:'medium' }}</p>
+          </div>
+          <div class="col-12 md:col-6 lg:col-3">
+            <div
+              class="kpi-card-v2 p-4 border-round manish-border-1 border-secondary bg-white border-left-3 border-orange-500">
+              <div class="text-secondary text-xs font-bold uppercase mb-2"><i class="pi pi-building mr-2"></i>Equity
               </div>
-
-              <div class="grid grid-cols-2 gap-8">
-                <!-- Assets Column -->
-                <div class="col-6 pr-4">
-                  <h3 class="text-lg font-bold text-primary border-bottom-1 border-secondary pb-2 mb-4">Assets</h3>
-                  <div class="flex justify-between align-center py-2 border-bottom-1 border-dashed border-secondary">
-                    <span class="font-bold">Total Assets</span>
-                    <span class="font-bold">{{ common.formatCurrency(reportData().assets) }}</span>
-                  </div>
-                </div>
-
-                <!-- Liabilities & Equity Column -->
-                <div class="col-6 pl-4 border-left-1 border-secondary">
-                  <h3 class="text-lg font-bold text-primary border-bottom-1 border-secondary pb-2 mb-4">Liabilities & Equity</h3>
-                  <div class="flex flex-col gap-2">
-                    <div class="flex justify-between align-center py-2 border-bottom-1 border-dashed border-secondary">
-                      <span>Liabilities</span>
-                      <span>{{ common.formatCurrency(reportData().liabilities) }}</span>
-                    </div>
-                    <div class="flex justify-between align-center py-2 border-bottom-1 border-dashed border-secondary">
-                      <span>Equity</span>
-                      <span>{{ common.formatCurrency(reportData().equity) }}</span>
-                    </div>
-                    @if (reportData().details?.retainedEarnings) {
-                      <div class="flex justify-between align-center py-2 pl-4 text-sm text-secondary">
-                        <span>Retained Earnings</span>
-                        <span>{{ common.formatCurrency(reportData().details.retainedEarnings) }}</span>
-                      </div>
-                    }
-                    <div class="flex justify-between align-center py-4 border-top-2 border-primary mt-4">
-                      <span class="text-xl font-bold">Total L & E</span>
-                      <span class="text-xl font-bold">{{ common.formatCurrency(reportData().liabilities + reportData().equity) }}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <div class="text-2xl font-bold text-primary">{{ common.formatCurrency(reportData().equity) }}</div>
             </div>
-          }
+          </div>
         </div>
+
+        <div class="manish-border-1 border-secondary border-round p-4 bg-white">
+          <h3 class="text-lg font-bold mb-4">Assets vs Liabilities</h3>
+          <div class="flex justify-between">
+            <div>
+              <label class="block text-secondary text-xs font-bold uppercase mb-1">Total Assets</label>
+              <span class="text-3xl font-bold text-primary">{{ common.formatCurrency(reportData().asset) }}</span>
+            </div>
+            <div class="text-right">
+              <label class="block text-secondary text-xs font-bold uppercase mb-1">Total Liabilities</label>
+              <span class="text-3xl font-bold text-red-600">{{ common.formatCurrency(reportData().liability) }}</span>
+            </div>
+          </div>
+        </div>
+        }
+
+        @if (currentTab() === 'pnl' && reportData()) {
+        <div
+          class="document-container max-w-3xl mx-auto manish-border-1 border-secondary border-round bg-white p-6 shadow-2 mt-4">
+          <div class="text-center border-bottom-2 border-secondary pb-4 mb-6">
+            <h2 class="text-2xl font-bold m-0 text-primary">Profit & Loss Statement</h2>
+            <p class="text-secondary m-0 mt-1 uppercase text-xs font-bold letter-spacing-1">{{
+              reportData().period?.startDate | date }} - {{ reportData().period?.endDate | date }}</p>
+          </div>
+
+          <div class="pnl-content flex flex-col gap-4">
+            <div
+              class="flex justify-between text-xs font-bold text-secondary uppercase border-bottom-1 border-secondary pb-2">
+              <span>Category</span>
+              <span>Amount</span>
+            </div>
+            <div class="flex justify-between align-center py-2 border-bottom-1 border-dashed border-secondary">
+              <span class="text-base font-medium">Total Income</span>
+              <span class="text-lg font-bold text-green-600">{{ common.formatCurrency(reportData().income) }}</span>
+            </div>
+            <div class="flex justify-between align-center py-2 border-bottom-1 border-dashed border-secondary">
+              <span class="text-base font-medium">Total Expenses</span>
+              <span class="text-lg font-bold text-red-600">{{ common.formatCurrency(reportData().expenses) }}</span>
+            </div>
+            <div class="flex justify-between align-center py-4 border-top-2 border-primary mt-2">
+              <span class="text-xl font-bold">Net Profit / (Loss)</span>
+              <span class="text-2xl font-bold" [class.text-green-600]="reportData().netProfit >= 0"
+                [class.text-red-600]="reportData().netProfit < 0">
+                {{ common.formatCurrency(reportData().netProfit) }}
+              </span>
+            </div>
+          </div>
+        </div>
+        }
+
+        @if (currentTab() === 'balanceSheet' && reportData()) {
+        <div
+          class="document-container max-w-5xl mx-auto manish-border-1 border-secondary border-round bg-white p-6 shadow-2 mt-4">
+          <div class="text-center border-bottom-2 border-secondary pb-4 mb-6">
+            <h2 class="text-2xl font-bold m-0 text-primary">Balance Sheet</h2>
+            <p class="text-secondary m-0 mt-1 uppercase text-xs font-bold letter-spacing-1">As of {{
+              reportData().asOnDate | date:'medium' }}</p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-8">
+            <!-- Assets Column -->
+            <div class="col-6 pr-4">
+              <h3 class="text-lg font-bold text-primary border-bottom-1 border-secondary pb-2 mb-4">Assets</h3>
+              <div class="flex justify-between align-center py-2 border-bottom-1 border-dashed border-secondary">
+                <span class="font-bold">Total Assets</span>
+                <span class="font-bold">{{ common.formatCurrency(reportData().assets) }}</span>
+              </div>
+            </div>
+
+            <!-- Liabilities & Equity Column -->
+            <div class="col-6 pl-4 border-left-1 border-secondary">
+              <h3 class="text-lg font-bold text-primary border-bottom-1 border-secondary pb-2 mb-4">Liabilities & Equity
+              </h3>
+              <div class="flex flex-col gap-2">
+                <div class="flex justify-between align-center py-2 border-bottom-1 border-dashed border-secondary">
+                  <span>Liabilities</span>
+                  <span>{{ common.formatCurrency(reportData().liabilities) }}</span>
+                </div>
+                <div class="flex justify-between align-center py-2 border-bottom-1 border-dashed border-secondary">
+                  <span>Equity</span>
+                  <span>{{ common.formatCurrency(reportData().equity) }}</span>
+                </div>
+                @if (reportData().details?.retainedEarnings) {
+                <div class="flex justify-between align-center py-2 pl-4 text-sm text-secondary">
+                  <span>Retained Earnings</span>
+                  <span>{{ common.formatCurrency(reportData().details.retainedEarnings) }}</span>
+                </div>
+                }
+                <div class="flex justify-between align-center py-4 border-top-2 border-primary mt-4">
+                  <span class="text-xl font-bold">Total L & E</span>
+                  <span class="text-xl font-bold">{{ common.formatCurrency(reportData().liabilities +
+                    reportData().equity) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        }
+      </div>
       }
     </div>
 
@@ -295,21 +369,24 @@
 </div>
 
 <!-- Export Dialog -->
-<p-dialog appendTo="body" header="Export Financial Data" [(visible)]="showExportDialog" [modal]="true" [style]="{width: '500px'}"
-  styleClass="standard-dialog">
+<p-dialog appendTo="body" header="Export Financial Data" [(visible)]="showExportDialog" [modal]="true"
+  [style]="{width: '500px'}" styleClass="standard-dialog">
 
   <div [formGroup]="exportForm" class="flex flex-col gap-4 py-3">
     <div class="flex flex-col gap-3">
       <label class="text-sm font-bold text-secondary uppercase tracking-wider">Report Type</label>
       <div class="flex flex-col gap-2">
         <div class="flex align-center gap-2">
-          <p-radiobutton name="exportType" value="all" formControlName="exportType" label="All Ledger (Detailed Transactions)"></p-radiobutton>
+          <p-radiobutton name="exportType" value="all" formControlName="exportType"
+            label="All Ledger (Detailed Transactions)"></p-radiobutton>
         </div>
         <div class="flex align-center gap-2">
-          <p-radiobutton name="exportType" value="pnl" formControlName="exportType" label="Profit & Loss Statement"></p-radiobutton>
+          <p-radiobutton name="exportType" value="pnl" formControlName="exportType"
+            label="Profit & Loss Statement"></p-radiobutton>
         </div>
         <div class="flex align-center gap-2">
-          <p-radiobutton name="exportType" value="balanceSheet" formControlName="exportType" label="Balance Sheet"></p-radiobutton>
+          <p-radiobutton name="exportType" value="balanceSheet" formControlName="exportType"
+            label="Balance Sheet"></p-radiobutton>
         </div>
       </div>
     </div>
@@ -323,322 +400,10 @@
 
   <ng-template pTemplate="footer">
     <div class="flex justify-end gap-2 p-2">
-      <p-button label="Cancel" styleClass="p-button-text p-button-secondary" (onClick)="showExportDialog.set(false)"></p-button>
+      <p-button label="Cancel" styleClass="p-button-text p-button-secondary"
+        (onClick)="showExportDialog.set(false)"></p-button>
       <p-button label="Generate & Download" icon="pi pi-download" styleClass="p-button-primary"
         (onClick)="submitExportDialog()" [loading]="isExporting()"></p-button>
     </div>
   </ng-template>
 </p-dialog>
-
-<!-- <div class="ledger-container">
-
-  HEADER & CONTROLS
-  <header class="glass-header">
-    <div class="header-content">
-      <div class="title-section">
-        <div class="icon-wrapper">
-          <i class="pi pi-book text-xl text-primary"></i>
-        </div>
-        <div>
-          <h1 class="text-xl font-semibold text-primary">Financial Ledger</h1>
-          <p class="text-xs text-secondary">Track transactions, reports, and balances.</p>
-        </div>
-      </div>
-
-      GLOBAL FILTERS ROW (Aligned to Right)
-      <div class="filters-row" [formGroup]="filterForm">
-
-        Branch Selector
-        <p-select appendTo="body" [options]="branchOptions()" formControlName="branchId" placeholder="All Branches" [showClear]="true"
-          appendTo="body" styleClass="glass-input filter-branch" (onChange)="applyFilters()">
-        </p-select>
-
-        Date Range
-        <p-datepicker formControlName="dateRange" selectionMode="range" [readonlyInput]="true"
-          placeholder="Select Period" [showIcon]="true" appendTo="body" styleClass="glass-input filter-date"
-          (onClose)="applyFilters()">
-        </p-datepicker>
-
-        Filters Moved to Header (Conditional)
-        @if (!isReportView) {
-        All Trans Filters
-        @if (currentTab() === 'all') {
-        <span class="p-input-icon-left">
-          <i class="pi pi-search"></i>
-          <input pInputText formControlName="search" placeholder="Search..." (keyup.enter)="applyFilters()"
-            class="glass-input-sm filter-search" />
-        </span>
-        <p-select appendTo="body" [options]="accountOptions()" formControlName="accountId" placeholder="Account" [showClear]="true"
-          appendTo="body" styleClass="glass-input-sm filter-account" (onChange)="applyFilters()"></p-select>
-        <p-select appendTo="body" formControlName="txnType"
-          [options]="[{label:'Debit', value:'debit'}, {label:'Credit', value:'credit'}]" placeholder="Type"
-          [showClear]="true" appendTo="body" styleClass="glass-input-sm filter-type"
-          (onChange)="applyFilters()"></p-select>
-        }
-
-        Entity Selectors
-        @if (currentTab() === 'customer') {
-        <p-select appendTo="body" [options]="customerOptions()" formControlName="customerId" placeholder="Select Customer"
-          [filter]="true" [showClear]="true" appendTo="body" styleClass="glass-input filter-entity"
-          (onChange)="applyFilters()"></p-select>
-        }
-        @if (currentTab() === 'supplier') {
-        <p-select appendTo="body" [options]="supplierOptions()" formControlName="supplierId" placeholder="Select Supplier"
-          [filter]="true" [showClear]="true" appendTo="body" styleClass="glass-input filter-entity"
-          (onChange)="applyFilters()"></p-select>
-        }
-        }
-
-        Export
-        <p-button label="Export" icon="pi pi-download" styleClass="p-button-outlined p-button-secondary glass-btn"
-          [loading]="isExporting()" (onClick)="handleExportClick()">
-        </p-button>
-      </div>
-    </div>
-
-    TABS
-    <div class="tabs-wrapper">
-      <p-tabs [value]="tabIndex()" (valueChange)="onTabChange($event)" styleClass="glass-tabs">
-        <p-tablist>
-          <p-tab [value]="0">Transactions</p-tab>
-          <p-tab [value]="1">Customer</p-tab>
-          <p-tab [value]="2">Supplier</p-tab>
-          <p-tab [value]="3">Summary</p-tab>
-          <p-tab [value]="4">P & L</p-tab>
-          <p-tab [value]="5">Balance Sheet</p-tab>
-          <p-tab [value]="6">Trial Balance</p-tab>
-        </p-tablist>
-      </p-tabs>
-    </div>
-  </header>
-
-  CONTENT AREA
-  <main class="ledger-content">
-
-    LOADING STATE
-    @if (isLoading() && !gridData().length && !reportData()) {
-    <div class="loading-state">
-      <p-skeleton width="100%" height="60px" class="mb-3"></p-skeleton>
-      <p-skeleton width="100%" height="60px" class="mb-3"></p-skeleton>
-      <p-skeleton width="100%" height="60px" class="mb-3"></p-skeleton>
-    </div>
-    }
-
-    1. GRID VIEWS (All, Customer, Supplier, Trial)
-    @else if (!isReportView) {
-
-    Entity Summary Header (If Selected)
-    @if (isEntityView && entityDetails()) {
-    <div class="entity-summary-card">
-      <div class="details">
-        <h3>{{ entityDetails().details.name || entityDetails().details.companyName }}</h3>
-        <p><i class="pi pi-phone mr-1"></i> {{ entityDetails().details.phone || 'N/A' }}</p>
-      </div>
-      <div class="balances">
-        <div class="bal-item">
-          <label>Opening</label>
-          <span>{{ common.formatCurrency(entityDetails().openingBalance) }}</span>
-        </div>
-        <div class="divider"></div>
-        <div class="bal-item closing">
-          <label>Closing / Outstanding</label>
-          <span>{{ common.formatCurrency(entityDetails().closingBalance) }}</span>
-        </div>
-      </div>
-    </div>
-    }
-
-    The Grid
-    <div class="grid-wrapper glass-panel">
-      @if ( (currentTab() === 'customer' && !filterForm.value.customerId) || (currentTab() === 'supplier' &&
-      !filterForm.value.supplierId) ) {
-      <div class="empty-state">
-        <img src="src/app/assets/undraw_adventure_9my9.svg" alt="Select Entity" class="opacity-50 w-24">
-        <p>Please select a {{ currentTab() }} to view ledger history.</p>
-      </div>
-      }
-      @else if (gridData().length === 0) {
-      <div class="empty-state">
-        <img src="src/app/assets/undraw_adventure_9my9.svg" alt="No Data" class="w-32">
-        <p>No transactions found for this period.</p>
-      </div>
-      }
-      @else {
-      <app-ag-share-grid [columns]="gridColumns()" [data]="gridData()" style="height: 100%; width: 100%"
-        (gridEvent)="eventFromGrid($event)">
-      </app-ag-share-grid>
-      }
-    </div>
-
-    Trial Balance Footer
-    @if (currentTab() === 'trialBalance' && reportData()) {
-    <div class="trial-footer glass-panel">
-      <div class="tf-item">Total Debit: <span class="text-error">{{ common.formatCurrency(reportData().debit) }}</span>
-      </div>
-      <div class="tf-item">Total Credit: <span class="text-success">{{ common.formatCurrency(reportData().credit)
-          }}</span></div>
-      <div class="tf-item">Diff: <span [class.text-error]="reportData().diff !== 0">{{
-          common.formatCurrency(reportData().diff) }}</span></div>
-    </div>
-    }
-    }
-
-    2. REPORT VIEWS (Summaries)
-    @else {
-    <div class="report-container">
-
-      ORG SUMMARY
-      @if (currentTab() === 'orgSummary' && reportData()) {
-      <div class="report-grid">
-        <div class="kpi-card glass-card accent-blue">
-          <div class="kpi-header"><i class="pi pi-wallet"></i> Total Income</div>
-          <div class="kpi-value text-success">{{ common.formatCurrency(reportData().income) }}</div>
-        </div>
-        <div class="kpi-card glass-card accent-red">
-          <div class="kpi-header"><i class="pi pi-shopping-cart"></i> Total Expenses</div>
-          <div class="kpi-value text-error">{{ common.formatCurrency(reportData().expense) }}</div>
-        </div>
-        <div class="kpi-card glass-card accent-green">
-          <div class="kpi-header"><i class="pi pi-dollar"></i> Net Profit</div>
-          <div class="kpi-value">{{ common.formatCurrency(reportData().netProfit) }}</div>
-        </div>
-        <div class="kpi-card glass-card accent-orange">
-          <div class="kpi-header"><i class="pi pi-building"></i> Equity</div>
-          <div class="kpi-value">{{ common.formatCurrency(reportData().equity) }}</div>
-        </div>
-      </div>
-
-      <div class="report-row mt-4">
-        <div class="glass-card p-4 flex-1">
-          <h3>Assets vs Liabilities</h3>
-          <div class="flex justify-content-between mt-4">
-            <div>
-              <label class="block text-secondary mb-1">Total Assets</label>
-              <span class="text-2xl font-bold text-primary">{{ common.formatCurrency(reportData().asset) }}</span>
-            </div>
-            <div>
-              <label class="block text-secondary mb-1">Total Liabilities</label>
-              <span class="text-2xl font-bold text-error">{{ common.formatCurrency(reportData().liability) }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      }
-
-      P & L
-      @if (currentTab() === 'pnl' && reportData()) {
-      <div class="document-sheet glass-sheet">
-        <div class="sheet-header">
-          <h2>Profit & Loss Statement</h2>
-          <p>{{ reportData().period?.startDate | date }} - {{ reportData().period?.endDate | date }}</p>
-        </div>
-
-        <div class="sheet-section">
-          <div class="line-item header"><span>Category</span> <span>Amount</span></div>
-
-          <div class="line-item">
-            <span>Total Income</span>
-            <span class="text-success">{{ common.formatCurrency(reportData().income) }}</span>
-          </div>
-
-          <div class="line-item">
-            <span>Total Expenses</span>
-            <span class="text-error">{{ common.formatCurrency(reportData().expenses) }}</span>
-          </div>
-
-          <div class="divider"></div>
-
-          <div class="line-item total">
-            <span>Net Profit / (Loss)</span>
-            <span [class.text-success]="reportData().netProfit >= 0" [class.text-error]="reportData().netProfit < 0">
-              {{ common.formatCurrency(reportData().netProfit) }}
-            </span>
-          </div>
-        </div>
-      </div>
-      }
-
-      BALANCE SHEET
-      @if (currentTab() === 'balanceSheet' && reportData()) {
-      <div class="document-sheet glass-sheet">
-        <div class="sheet-header">
-          <h2>Balance Sheet</h2>
-          <p>As of {{ reportData().asOnDate | date:'medium' }}</p>
-        </div>
-
-        <div class="sheet-body grid grid-cols-2 gap-8">
-          Left Side
-          <div class="sheet-column">
-            <h3 class="border-b pb-2 mb-4">Assets</h3>
-            <div class="line-item">
-              <span>Total Assets</span>
-              <span class="font-bold">{{ common.formatCurrency(reportData().assets) }}</span>
-            </div>
-          </div>
-
-          Right Side
-          <div class="sheet-column">
-            <h3 class="border-b pb-2 mb-4">Liabilities & Equity</h3>
-            <div class="line-item">
-              <span>Liabilities</span>
-              <span>{{ common.formatCurrency(reportData().liabilities) }}</span>
-            </div>
-            <div class="line-item">
-              <span>Equity</span>
-              <span>{{ common.formatCurrency(reportData().equity) }}</span>
-            </div>
-            <div class="line-item" *ngIf="reportData().details?.retainedEarnings">
-              <span class="pl-4 text-sm text-secondary">Retained Earnings</span>
-              <span class="text-sm">{{ common.formatCurrency(reportData().details.retainedEarnings) }}</span>
-            </div>
-            <div class="divider"></div>
-            <div class="line-item total">
-              <span>Total L & E</span>
-              <span>{{ common.formatCurrency(reportData().liabilities + reportData().equity) }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      }
-    </div>
-    }
-
-  </main>
-</div>
-
-EXPORT DIALOG
-<p-dialog appendTo="body"   header="Export Data" [(visible)]="showExportDialog" [modal]="true" [style]="{width: '800px'}"
-  styleClass="glass-dialog">
-
-  <div [formGroup]="exportForm" class="flex flex-column gap-4 py-2">
-    <div class="field-radio">
-      <label class="text-sm text-secondary block mb-1">All Ledger</label>
-
-      <p-radiobutton name="exportType" value="all" formControlName="exportType" label="All Ledger"></p-radiobutton>
-    </div>
-    <div class="field-radio">
-      <label class="text-sm text-secondary block mb-1">Profit & Loss</label>
-
-      <p-radiobutton name="exportType" value="pnl" formControlName="exportType" label="Profit & Loss"></p-radiobutton>
-    </div>
-    <div class="field-radio">
-      <label class="text-sm text-secondary block mb-1">Balance Sheet </label>
-
-      <p-radiobutton name="exportType" value="balanceSheet" formControlName="exportType"
-        label="Balance Sheet"></p-radiobutton>
-    </div>
-
-    <div class="field mt-2">
-      <label class="text-sm text-secondary block mb-1">Date Range</label>
-      <p-datepicker formControlName="dateRange" selectionMode="range" [readonlyInput]="true" appendTo="body"
-        styleClass="w-full"></p-datepicker>
-    </div>
-  </div>
-
-  <ng-template pTemplate="footer">
-    <p-button label="Cancel" styleClass="p-button-text p-button-sm text-secondary"
-      (onClick)="showExportDialog.set(false)"></p-button>
-    <p-button label="Download CSV" icon="pi pi-download" styleClass="p-button-sm glass-btn-primary"
-      (onClick)="submitExportDialog()" [loading]="isExporting()"></p-button>
-  </ng-template>
-</p-dialog> -->

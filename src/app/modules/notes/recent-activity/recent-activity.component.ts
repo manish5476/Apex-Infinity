@@ -1,136 +1,101 @@
-import { Component,Input, inject, signal, computed, ViewEncapsulation, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { NoteService } from '../../../core/services/notes.service'; // Adjust path if needed
+import { NoteService } from '../../../core/services/notes.service';
 import { AppMessageService } from '../../../core/services/message.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
-import { 
-  Note, NoteActivity 
-} from '../../../core/models/note.types';
-import { Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
-
-// Interfaces based on your flattened UI needs
-interface FlattenedActivity {
+interface ActivityItem {
   id: string;
   action: string;
   timestamp: Date;
-  actor: string | { name: string };
-  note: {
-    id: string;
-    title: string;
-    type: string;
-    priority: string;
-  };
+  actor: { _id: string; name: string; email?: string } | null;
+  note: { id: string; title: string; type: string; priority: string };
 }
 
 @Component({
   selector: 'app-recent-activity',
   standalone: true,
   imports: [CommonModule, RouterModule, DatePipe],
-  encapsulation: ViewEncapsulation.None,
-  templateUrl:'./recent-activity.component.html',
-  styleUrl:'./recent-activity.component.scss'
+  templateUrl: './recent-activity.component.html',
+  styleUrl: './recent-activity.component.scss'
 })
 export class RecentActivityComponent implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
-  @Input() notesData:any
+  private readonly destroy$ = new Subject<void>();
   private noteService = inject(NoteService);
   private messageService = inject(AppMessageService);
 
-  rawNotes = signal<Note[]>([]);
+  // Raw flat activities list from API — shape: { _id, action, actor, noteId, createdAt }
+  private rawActivities = signal<any[]>([]);
   isLoading = signal(true);
-  timeline = computed(() => {
-    const allActivities: FlattenedActivity[] = [];
-    this.rawNotes().forEach(note => {
-      // Transitioning from 'activityLog' to 'history' as per new schema
-      const history = (note as any).history || (note as any).activityLog || [];
-      if (history.length > 0) {
-        history.forEach((log: any) => {
-          allActivities.push({
-            id: log._id,
-            action: log.action,
-            timestamp: new Date(log.createdAt || log.timestamp),
-            actor: log.actor || log.user,
-            note: {
-              id: note._id,
-              title: note.title,
-              type: note.itemType || (note as any).noteType,
-              priority: note.priority
-            }
-          });
-        });
+
+  /** Maps the flat API activities into display-ready items */
+  timeline = computed<ActivityItem[]>(() =>
+    this.rawActivities().map(a => ({
+      id: a._id,
+      action: a.action,
+      timestamp: new Date(a.createdAt),
+      actor: a.actor ?? null,
+      note: {
+        id: a.noteId?._id ?? a.noteId ?? '',
+        title: a.noteId?.title ?? 'Untitled',
+        type: a.noteId?.itemType ?? 'note',
+        priority: a.noteId?.priority ?? '',
       }
-    });
-    return allActivities.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-  });
+    }))
+  );
 
-  // ngOnInit() {
-  //   this.fetchActivity();
-  // }
+  ngOnInit(): void {
+    this.fetchActivity();
+  }
 
-  // fetchActivity() {
-  //   this.isLoading.set(true);
-  //    this.noteService.getRecentActivity(20).subscribe({
-  //     next: (res) => {
-  //       this.rawNotes.set(res.data.notes as unknown as NoteActivity[]);
-  //       this.isLoading.set(false);
-  //     },
-  //     error: (err) => {
-  //       console.error('Failed to fetch activity', err);
-  //       this.isLoading.set(false);
-  //     }
-  //   });
-  // }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
-  // --- Helpers ---
+  fetchActivity(): void {
+    this.isLoading.set(true);
+    this.noteService.getRecentActivity(20)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res: any) => {
+          // API returns { data: { activities: [...] } }
+          const activities = res?.data?.activities ?? [];
+          this.rawActivities.set(activities);
+          this.isLoading.set(false);
+        },
+        error: err => {
+          this.isLoading.set(false);
+          this.messageService.handleHttpError(err);
+        }
+      });
+  }
+
   getTypeIcon(type: string): string {
-    switch(type) {
+    switch (type) {
       case 'task': return 'pi pi-check-square';
       case 'meeting': return 'pi pi-video';
       case 'project': return 'pi pi-briefcase';
-      default: return 'pi pi-file'; // note
+      case 'idea': return 'pi pi-lightbulb';
+      default: return 'pi pi-file';
     }
   }
 
   formatAction(action: string): string {
-    switch(action) {
-      case 'viewed': return 'viewed';
-      case 'edited': return 'updated';
-      case 'created': return 'created';
-      default: return action;
-    }
+    const map: Record<string, string> = {
+      viewed: 'viewed',
+      created: 'created',
+      updated: 'updated',
+      edited: 'updated',
+      deleted: 'deleted',
+      archived: 'archived',
+      restored: 'restored',
+      converted_to_task: 'converted to task',
+      status_changed: 'changed status of',
+      priority_changed: 'changed priority of',
+    };
+    return map[action] ?? action.replace(/_/g, ' ');
   }
-
-  ngOnInit() {
-    this.fetchActivity();
-  }
-
-  fetchActivity() {
-    this.isLoading.set(true);
-    
-    // Using your common pattern of single-string messages and global error handling
-    this.noteService.getRecentActivity(20).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (res) => {
-        const notes = res?.data?.notes || [];
-        this.rawNotes.set(notes as Note[]);
-        this.isLoading.set(false);
-        
-        // Optional: show a small info toast if there is zero activity
-        if (notes.length === 0) {
-          this.messageService.showInfo('No recent activity found.');
-        }
-      },
-      error: (err) => {
-        this.isLoading.set(false);
-        // Replaced console.error with the global HTTP error handler
-        this.messageService.handleHttpError(err);
-      }
-    });
-  }
-
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
 }

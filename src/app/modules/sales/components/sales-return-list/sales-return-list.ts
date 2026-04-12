@@ -88,13 +88,13 @@ export class ActionButtonsRenderer {
     DatePickerModule,
     HasPermissionDirective,
     DynamicDialogModule
-],
+  ],
   templateUrl: './sales-return-list.html',
   styleUrl: './sales-return-list.scss',
   providers: [DialogService]
 })
 export class SalesReturnListComponent implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   readonly PERMISSIONS = PERMISSIONS;
 
   private cdr = inject(ChangeDetectorRef);
@@ -262,74 +262,279 @@ export class SalesReturnListComponent implements OnInit, OnDestroy {
   }
 
   getColumn(): void {
-    // Columns strictly mapped to JSON schema provided
     this.column = [
+      // ── Date ──────────────────────────────────────────────────────
       {
-        field: 'createdAt',
-        headerName: 'Date',
-        width: 140,
+        field: 'returnDate',
+        headerName: 'Return Date',
+        width: 150,
+        sortable: true,
         valueFormatter: (p: any) => this.common.formatDate(p.value, 'dd MMM yyyy'),
-        cellStyle: { 'color': 'var(--text-secondary)' }
+        cellStyle: {
+          'color': 'var(--text-secondary)',
+          'font-size': '13.5px',
+          'display': 'flex',
+          'align-items': 'center'
+        }
       },
+
+      // ── Return # ──────────────────────────────────────────────────
       {
         field: 'returnNumber',
         headerName: 'Return #',
-        width: 150,
-        cellStyle: { 'font-weight': '700', 'color': 'var(--accent-primary)' }
+        width: 140,
+        sortable: true,
+        cellStyle: {
+          'font-weight': '600',
+          'color': 'var(--accent-primary)',
+          'font-size': '13.5px',
+          'display': 'flex',
+          'align-items': 'center'
+        }
       },
+
+      // ── Invoice # ─────────────────────────────────────────────────
       {
         field: 'invoiceId.invoiceNumber',
         headerName: 'Invoice #',
-        width: 170,
-        cellStyle: { 'font-weight': '600', 'color': 'var(--text-secondary)', 'cursor': 'pointer' },
-        valueGetter: (p: any) => p.data.invoiceId?.invoiceNumber || '-'
+        width: 185,
+        valueGetter: (p: any) => p.data?.invoiceId?.invoiceNumber || '—',
+        cellStyle: {
+          'font-weight': '500',
+          'color': 'var(--color-info)',
+          'cursor': 'pointer',
+          'font-size': '13.5px',
+          'display': 'flex',
+          'align-items': 'center'
+        }
       },
+
+      // ── Customer ──────────────────────────────────────────────────
       {
         field: 'customerId.name',
         headerName: 'Customer',
         flex: 1,
-        minWidth: 200,
-        valueGetter: (p: any) => p.data.customerId?.name || '-'
+        minWidth: 180,
+        valueGetter: (p: any) => p.data?.customerId?.name || '—',
+        cellStyle: {
+          'font-weight': '500',
+          'font-size': '13.5px',
+          'display': 'flex',
+          'align-items': 'center'
+        }
       },
+
+      // ── Customer Phone ────────────────────────────────────────────
+      {
+        field: 'customerId.phone',
+        headerName: 'Phone',
+        width: 145,
+        valueGetter: (p: any) => p.data?.customerId?.phone || '—',
+        cellStyle: {
+          'color': 'var(--text-secondary)',
+          'font-size': '13px',
+          'font-family': 'var(--font-mono)',
+          'display': 'flex',
+          'align-items': 'center'
+        }
+      },
+
+      // ── Items (count + names) ─────────────────────────────────────
+      {
+        field: 'items',
+        headerName: 'Items',
+        width: 220,
+        sortable: false,
+        valueGetter: (p: any) => {
+          const items = p.data?.items || [];
+          if (!items.length) return '—';
+          return items.map((i: any) => `${i.name} ×${i.quantity}`).join(', ');
+        },
+        cellStyle: {
+          'color': 'var(--text-secondary)',
+          'font-size': '13px',
+          'overflow': 'hidden',
+          'text-overflow': 'ellipsis',
+          'white-space': 'nowrap',
+          'display': 'flex',
+          'align-items': 'center'
+        },
+        tooltipValueGetter: (p: any) => {
+          const items = p.data?.items || [];
+          return items.map((i: any) => `${i.name} ×${i.quantity} @ ₹${i.unitPrice}`).join('\n');
+        }
+      },
+
+      // ── Reason ────────────────────────────────────────────────────
       {
         field: 'reason',
         headerName: 'Reason',
-        width: 150,
-        valueFormatter: (p: any) => p.value ? p.value.charAt(0).toUpperCase() + p.value.slice(1) : '-',
-        cellStyle: { 'color': 'var(--text-secondary)' }
+        width: 140,
+        valueFormatter: (p: any) =>
+          p.value ? p.value.charAt(0).toUpperCase() + p.value.slice(1) : '—',
+        cellStyle: {
+          'color': 'var(--text-secondary)',
+          'font-size': '13.5px',
+          'display': 'flex',
+          'align-items': 'center'
+        }
       },
+
+      // ── Sub Total ─────────────────────────────────────────────────
+      {
+        field: 'subTotal',
+        headerName: 'Sub Total',
+        width: 130,
+        sortable: true,
+        type: 'rightAligned',
+        valueFormatter: (p: any) => this.common.formatCurrency(p.value ?? 0),
+        cellStyle: {
+          'font-family': 'var(--font-mono)',
+          'font-size': '13px',
+          'color': 'var(--text-secondary)',
+          'display': 'flex',
+          'align-items': 'center',
+          'justify-content': 'flex-end'
+        }
+      },
+
+      // ── Tax Total ─────────────────────────────────────────────────
+      {
+        field: 'taxTotal',
+        headerName: 'Tax',
+        width: 110,
+        sortable: true,
+        type: 'rightAligned',
+        valueFormatter: (p: any) => this.common.formatCurrency(p.value ?? 0),
+        cellStyle: {
+          'font-family': 'var(--font-mono)',
+          'font-size': '13px',
+          'color': 'var(--text-secondary)',
+          'display': 'flex',
+          'align-items': 'center',
+          'justify-content': 'flex-end'
+        }
+      },
+
+      // ── Total Refund ─────────────────────────────────────────────
       {
         field: 'totalRefundAmount',
         headerName: 'Refund Amt',
-        width: 140,
+        width: 145,
+        sortable: true,
         type: 'rightAligned',
-        valueFormatter: (p: any) => this.common.formatCurrency(p.value),
-        cellStyle: { 'font-weight': 'bold', 'color': 'var(--text-primary)' }
+        valueFormatter: (p: any) => this.common.formatCurrency(p.value ?? 0),
+        cellStyle: (p: any) => ({
+          'font-family': 'var(--font-mono)',
+          'font-size': '14px',
+          'font-weight': '700',
+          'color': p.value > 0 ? 'var(--color-error)' : 'var(--text-primary)',
+          'display': 'flex',
+          'align-items': 'center',
+          'justify-content': 'flex-end'
+        })
       },
+
+      // ── Approved / Rejected By ────────────────────────────────────
+      {
+        field: 'approvedBy',
+        headerName: 'Actioned By',
+        width: 150,
+        valueGetter: (p: any) => {
+          const row = p.data;
+          if (row?.approvedBy?.name) return `✓ ${row.approvedBy.name}`;
+          if (row?.rejectedBy?.name) return `✗ ${row.rejectedBy.name}`;
+          return '—';
+        },
+        cellStyle: (p: any) => {
+          const row = p.data;
+          const color = row?.approvedBy?.name
+            ? 'var(--color-success)'
+            : row?.rejectedBy?.name
+              ? 'var(--color-error)'
+              : 'var(--text-secondary)';
+          return {
+            'color': color,
+            'font-size': '13px',
+            'font-weight': '500',
+            'display': 'flex',
+            'align-items': 'center'
+          };
+        }
+      },
+
+      // ── Rejection Reason (only shown if rejected) ─────────────────
+      {
+        field: 'rejectionReason',
+        headerName: 'Rejection Note',
+        width: 160,
+        valueGetter: (p: any) => p.data?.rejectionReason || '—',
+        cellStyle: {
+          'color': 'var(--color-error)',
+          'font-size': '13px',
+          'font-style': 'italic',
+          'overflow': 'hidden',
+          'text-overflow': 'ellipsis',
+          'white-space': 'nowrap',
+          'display': 'flex',
+          'align-items': 'center'
+        },
+        tooltipValueGetter: (p: any) => p.data?.rejectionReason || ''
+      },
+
+      // ── Status Badge ─────────────────────────────────────────────
       {
         field: 'status',
         headerName: 'Status',
         width: 130,
+        sortable: true,
         cellRenderer: (p: any) => {
-          const status = p.value?.toLowerCase() || 'pending';
-          return `<span class="status-badge status-${status}">${status}</span>`;
+          if (p.node?.rowPinned) return '';
+          const status = (p.value || 'pending').toLowerCase();
+          const map: Record<string, { bg: string; color: string; label: string }> = {
+            approved: { bg: 'var(--color-success-bg)', color: 'var(--color-success-dark)', label: '✓ Approved' },
+            rejected: { bg: 'var(--color-error-bg)', color: 'var(--color-error-dark)', label: '✗ Rejected' },
+            pending: { bg: 'var(--color-warning-bg)', color: 'var(--color-warning-dark)', label: '⏳ Pending' }
+          };
+          const s = map[status] ?? map['pending'];
+          return `
+          <span style="
+            display:inline-flex; align-items:center;
+            padding:3px 10px; border-radius:20px;
+            font-size:12px; font-weight:600; white-space:nowrap;
+            background:${s.bg}; color:${s.color};
+          ">${s.label}</span>`;
+        },
+        cellStyle: {
+          'display': 'flex',
+          'align-items': 'center'
         }
       },
+
+      // ── Actions ───────────────────────────────────────────────────
       {
         headerName: 'Actions',
-        width: 100,
+        width: 110,
         suppressSizeToFit: true,
+        sortable: false,
+        filter: false,
+        pinned: 'right',
         cellRenderer: ActionButtonsRenderer,
         cellRendererParams: {
-          onAction: (row: any, actionType: 'approve' | 'reject') => this.openActionDialog(row, actionType)
+          onAction: (row: any, actionType: 'approve' | 'reject') =>
+            this.openActionDialog(row, actionType)
         },
-        cellStyle: { 'display': 'flex', 'align-items': 'center', 'justify-content': 'center' }
+        cellStyle: {
+          'display': 'flex',
+          'align-items': 'center',
+          'justify-content': 'center'
+        }
       }
     ];
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }
