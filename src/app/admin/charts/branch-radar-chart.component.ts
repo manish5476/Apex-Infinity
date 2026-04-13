@@ -1,6 +1,6 @@
 
 
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { signal, Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 
 import { Subject, takeUntil } from 'rxjs';
 import { Chart, registerables } from 'chart.js';
@@ -32,7 +32,7 @@ template: `<div class="chart-card branch-radar-card">
   </div>
 
   <!-- Loading -->
-  @if (isLoading) {
+  @if (isLoading()) {
     <div class="state-overlay">
       <div class="spinner"></div>
       <span>Loading...</span>
@@ -40,7 +40,7 @@ template: `<div class="chart-card branch-radar-card">
   }
 
   <!-- Error -->
-  @if (hasError && !isLoading) {
+  @if (hasError() && !isLoading()) {
     <div class="state-overlay error">
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
         <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
@@ -51,11 +51,11 @@ template: `<div class="chart-card branch-radar-card">
   }
 
   <!-- Content -->
-  @if (!isLoading && !hasError) {
+  @if (!isLoading() && !hasError()) {
     <!-- Branch Legends -->
-    @if (branchSummaries.length) {
+    @if (branchSummaries().length) {
       <div class="branch-legends">
-        @for (b of branchSummaries; track b) {
+        @for (b of branchSummaries(); track b) {
           <div class="legend-chip">
             <span class="legend-dot" [style.background]="b.color"></span>
             <span class="legend-name">{{ b.label }}</span>
@@ -69,9 +69,9 @@ template: `<div class="chart-card branch-radar-card">
       <canvas #radarCanvas></canvas>
     </div>
     <!-- Axis Descriptions -->
-    @if (chartData) {
+    @if (chartData()) {
       <div class="axis-pills">
-        @for (label of chartData.labels; track label) {
+        @for (label of chartData().labels; track label) {
           <span class="axis-pill">{{ label }}</span>
         }
       </div>
@@ -249,11 +249,11 @@ export class BranchRadarChartComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private radarChart?: Chart;
 
-  isLoading = true;
-  hasError = false;
+  isLoading = signal(true);
+  hasError = signal(false);
 
-  chartData: any = null;
-  branchSummaries: { label: string; avg: number; color: string }[] = [];
+  chartData = signal<any>(null);
+  branchSummaries = signal<{ label: string; avg: number; color: string }[]>([]);
 
   constructor(private chartService: ChartService) {}
 
@@ -262,39 +262,39 @@ export class BranchRadarChartComponent implements OnInit, OnDestroy {
   }
 
   loadData(): void {
-    this.isLoading = true;
-    this.hasError = false;
+    this.isLoading.set(true);
+    this.hasError.set(false);
 
     this.chartService.getBranchPerformanceRadar()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
-          this.chartData = res.data;
-          this.branchSummaries = res.data.datasets.map((ds: any) => ({
+          this.chartData.set(res.data);
+          this.branchSummaries.set(res.data.datasets.map((ds: any) => ({
             label: ds.label,
             avg: Math.round(ds.data.reduce((a: number, b: number) => a + b, 0) / ds.data.length),
             color: ds.borderColor
-          }));
-          this.isLoading = false;
+          })));
+          this.isLoading.set(false);
           setTimeout(() => this.renderChart(), 50);
         },
         error: () => {
-          this.isLoading = false;
-          this.hasError = true;
+          this.isLoading.set(false);
+          this.hasError.set(true);
         }
       });
   }
 
   renderChart(): void {
-    if (!this.radarCanvas || !this.chartData) return;
+    if (!this.radarCanvas || !this.chartData()) return;
     this.radarChart?.destroy();
     const ctx = this.radarCanvas.nativeElement.getContext('2d')!;
 
     this.radarChart = new Chart(ctx, {
       type: 'radar',
       data: {
-        labels: this.chartData.labels,
-        datasets: this.chartData.datasets.map((ds: any) => ({
+        labels: this.chartData().labels,
+        datasets: this.chartData().datasets.map((ds: any) => ({
           ...ds,
           borderWidth: 2,
           pointRadius: 4,

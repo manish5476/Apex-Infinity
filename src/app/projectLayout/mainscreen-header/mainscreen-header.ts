@@ -62,7 +62,7 @@ export interface ThemeGroup {
     DialogModule,
     AnnouncementList,
     TabStripComponent
-],
+  ],
   templateUrl: './mainscreen-header.html',
   styleUrl: './mainscreen-header.scss',
 })
@@ -88,7 +88,8 @@ export class MainscreenHeader implements OnInit, OnDestroy {
 
   // ── State ──────────────────────────────────────────────────────────────────
   activePopoverTab: 'settings' | 'notifications' = 'settings';
-  currentUser: any = null;
+  /** Auth user — Angular signal from AuthService (call as `currentUser()` in templates). */
+  readonly currentUser = this.authService.currentUser;
   recentNotifications: any[] = [];
 
   // Theme state
@@ -112,17 +113,10 @@ export class MainscreenHeader implements OnInit, OnDestroy {
     { id: 3, title: 'System Update', message: 'Scheduled maintenance in 30 minutes', time: '3 hours ago', read: true, type: 'warning' },
     { id: 4, title: 'New Message', message: 'You have a new message from Sarah', time: '5 hours ago', read: true, type: 'info' },
   ];
-
   // ── Lifecycle ───────────────────────────────────────────────────────────────
-
   ngOnInit() {
     this.organizeThemes();
     this.mobileMenuItems = SIDEBAR_MENU;
-
-    this.authService.currentUser$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(u => this.currentUser = u);
-
     this.notificationService.notifications$
       .pipe(takeUntil(this.destroy$))
       .subscribe((n: any) => {
@@ -132,7 +126,6 @@ export class MainscreenHeader implements OnInit, OnDestroy {
           this.recentNotifications = this.mockNotifications.filter(m => !m.read);
         }
       });
-
     this.themeService.settings$
       .pipe(takeUntil(this.destroy$))
       .subscribe((s: ThemeSettings) => {
@@ -234,8 +227,17 @@ export class MainscreenHeader implements OnInit, OnDestroy {
     this.closeAllPopovers();
   }
 
-  getInitials(name: string): string {
+  getInitials(name: string | undefined | null): string {
     return name ? name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() : 'U';
+  }
+
+  /** API may return `role` as a string or as `{ name: string }`; `User.role` is typed loosely. */
+  displayRoleName(): string {
+    const u = this.currentUser();
+    const r = u?.role as string | { name?: string } | undefined;
+    if (r == null) return 'Admin';
+    if (typeof r === 'string') return r || 'Admin';
+    return r.name || 'Admin';
   }
 
   clearAllNotifications() {

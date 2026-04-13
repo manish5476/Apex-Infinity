@@ -42,7 +42,7 @@ interface DistItem {
         <label class="ctrl-label">Group by</label>
         <div class="seg-ctrl">
           @for (g of groupByOptions; track g.value) {
-            <button class="seg-btn" [class.active]="selectedGroupBy === g.value"
+            <button class="seg-btn" [class.active]="selectedGroupBy() === g.value"
                     (click)="onGroupByChange(g.value)">{{ g.label }}</button>
           }
         </div>
@@ -53,7 +53,7 @@ interface DistItem {
         <label class="ctrl-label">Period</label>
         <div class="seg-ctrl">
           @for (p of periods; track p.label) {
-            <button class="seg-btn" [class.active]="selectedPeriod === p.label"
+            <button class="seg-btn" [class.active]="selectedPeriod() === p.label"
                     (click)="onPeriodChange(p)">{{ p.label }}</button>
           }
         </div>
@@ -63,12 +63,12 @@ interface DistItem {
       <div class="control-group">
         <label class="ctrl-label">View</label>
         <div class="seg-ctrl">
-          <button class="seg-btn" [class.active]="chartType === 'doughnut'"
-                  (click)="chartType = 'doughnut'; rebuildChart()" pTooltip="Doughnut">
+          <button class="seg-btn" [class.active]="chartType() === 'doughnut'"
+                  (click)="chartType.set('doughnut'); rebuildChart()" pTooltip="Doughnut">
             <i class="pi pi-circle"></i>
           </button>
-          <button class="seg-btn" [class.active]="chartType === 'pie'"
-                  (click)="chartType = 'pie'; rebuildChart()" pTooltip="Pie">
+          <button class="seg-btn" [class.active]="chartType() === 'pie'"
+                  (click)="chartType.set('pie'); rebuildChart()" pTooltip="Pie">
             <i class="pi pi-chart-pie"></i>
           </button>
         </div>
@@ -95,13 +95,13 @@ interface DistItem {
         }
         @if (!loading() && chartData()) {
           <!-- centre label for doughnut -->
-          @if (chartType === 'doughnut') {
+          @if (chartType() === 'doughnut') {
             <div class="donut-centre">
               <span class="centre-val">{{ formatINR(totalRevenue()) }}</span>
               <span class="centre-lbl">Total</span>
             </div>
           }
-          <p-chart [type]="chartType" [data]="chartData()!"
+          <p-chart [type]="chartType()" [data]="chartData()!"
                    [options]="chartOptions" height="100%" width="100%">
           </p-chart>
         }
@@ -169,9 +169,9 @@ interface DistItem {
   <div class="sd-footer">
     <div class="footer-note">
       <i class="pi pi-info-circle"></i>
-      Grouped by {{ groupByLabel() }} · {{ selectedPeriod }}
+      Grouped by {{ groupByLabel() }} · {{ selectedPeriod() }}
     </div>
-    <div class="footer-period">{{ selectedPeriod }}</div>
+    <div class="footer-period">{{ selectedPeriod() }}</div>
   </div>
 </div>
   `,
@@ -370,7 +370,7 @@ export class SalesDistributionChartComponent implements OnInit, OnDestroy {
   loading      = signal(false);
   items        = signal<DistItem[]>([]);
   hoveredIndex = signal(-1);
-  chartType: 'doughnut' | 'pie' = 'doughnut';
+  chartType = signal<'doughnut' | 'pie'>('doughnut');
   chartOptions: any;
 
   groupByOptions = [
@@ -379,11 +379,11 @@ export class SalesDistributionChartComponent implements OnInit, OnDestroy {
     { label: 'Branch',   value: 'branch'   },
     { label: 'Rep',      value: 'salesRep' },
   ];
-  selectedGroupBy = 'category';
+  selectedGroupBy = signal('category');
 
   // Quick period helpers
   periods = this.buildPeriods();
-  selectedPeriod = 'This Year';
+  selectedPeriod = signal('This Year');
 
   private currentQuery: SalesDistributionQuery = {};
   private destroy$ = new Subject<void>();
@@ -394,7 +394,7 @@ export class SalesDistributionChartComponent implements OnInit, OnDestroy {
   ngOnDestroy() { this.destroy$.next(); this.destroy$.complete(); }
 
   groupByLabel = computed(() =>
-    this.groupByOptions.find(g => g.value === this.selectedGroupBy)?.label ?? this.selectedGroupBy
+    this.groupByOptions.find(g => g.value === this.selectedGroupBy())?.label ?? this.selectedGroupBy()
   );
 
   totalRevenue = computed(() =>
@@ -414,13 +414,13 @@ export class SalesDistributionChartComponent implements OnInit, OnDestroy {
   });
 
   onGroupByChange(val: string) {
-    this.selectedGroupBy = val;
+    this.selectedGroupBy.set(val);
     this.currentQuery = { ...this.currentQuery, groupBy: val };
     this.loadData();
   }
 
   onPeriodChange(p: { label: string; startDate: string; endDate: string }) {
-    this.selectedPeriod  = p.label;
+    this.selectedPeriod.set(p.label);
     this.currentQuery    = { ...this.currentQuery, startDate: p.startDate, endDate: p.endDate };
     this.loadData();
   }
@@ -434,7 +434,7 @@ export class SalesDistributionChartComponent implements OnInit, OnDestroy {
 
   loadData() {
     this.loading.set(true);
-    this.chartService.getSalesDistribution({ groupBy: this.selectedGroupBy, ...this.currentQuery })
+    this.chartService.getSalesDistribution({ groupBy: this.selectedGroupBy(), ...this.currentQuery })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => { if (res?.status === 'success') this.process(res.data); this.loading.set(false); },

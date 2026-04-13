@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, Input } from '@angular/core';
+import { signal, Component, OnInit, OnDestroy, ViewChild, ElementRef, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { Chart, registerables } from 'chart.js';
@@ -37,7 +37,7 @@ Chart.register(...registerables);
   </div>
 
   <!-- Loading -->
-  @if (isLoading) {
+  @if (isLoading()) {
     <div class="state-overlay">
       <div class="spinner"></div>
       <span>Loading...</span>
@@ -45,7 +45,7 @@ Chart.register(...registerables);
   }
 
   <!-- Error -->
-  @if (hasError && !isLoading) {
+  @if (hasError() && !isLoading()) {
     <div class="state-overlay error">
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
         <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
@@ -56,13 +56,13 @@ Chart.register(...registerables);
   }
 
   <!-- Content -->
-  @if (!isLoading && !hasError) {
+  @if (!isLoading() && !hasError()) {
     <!-- Bar Chart -->
     <div class="chart-area">
       <canvas #barCanvas></canvas>
     </div>
     <!-- Meta Table -->
-    @if (metaList.length) {
+    @if (metaList().length) {
       <div class="meta-table">
         <div class="meta-header">
           <span class="col-rank">#</span>
@@ -70,7 +70,7 @@ Chart.register(...registerables);
           <span class="col-units">Units</span>
           <span class="col-revenue">Revenue</span>
         </div>
-        @for (item of metaList; track item; let i = $index) {
+        @for (item of metaList(); track item; let i = $index) {
           <div class="meta-row">
             <span class="col-rank">
               <span class="rank-num" [class.gold]="i === 0" [class.silver]="i === 1" [class.bronze]="i === 2">
@@ -291,12 +291,12 @@ export class TopPerformersChartComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private barChart?: Chart;
 
-  isLoading = true;
-  hasError = false;
+  isLoading = signal(true);
+  hasError = signal(false);
 
-  chartData: any = null;
-  metaList: any[] = [];
-  activeMetric: 'units' | 'revenue' = 'revenue';
+  chartData = signal<any>(null);
+  metaList = signal<any[]>([]);
+  activeMetric = signal<'units' | 'revenue'>('revenue');
 
   constructor(private chartService: ChartService) { }
 
@@ -305,32 +305,32 @@ export class TopPerformersChartComponent implements OnInit, OnDestroy {
   }
 
   loadData(): void {
-    this.isLoading = true;
-    this.hasError = false;
+    this.isLoading.set(true);
+    this.hasError.set(false);
 
     this.chartService.getTopPerformers({ type: this.type, limit: this.limit })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
-          this.chartData = res.data;
-          this.metaList = res.data._meta || [];
-          this.isLoading = false;
+          this.chartData.set(res.data);
+          this.metaList.set(res.data._meta || []);
+          this.isLoading.set(false);
           setTimeout(() => this.renderChart(), 50);
         },
         error: () => {
-          this.isLoading = false;
-          this.hasError = true;
+          this.isLoading.set(false);
+          this.hasError.set(true);
         }
       });
   }
 
   renderChart(): void {
-    if (!this.barCanvas || !this.chartData) return;
+    if (!this.barCanvas || !this.chartData()) return;
     this.barChart?.destroy();
     const ctx = this.barCanvas.nativeElement.getContext('2d')!;
 
     // Truncate long labels for display
-    const labels = this.chartData.labels.map((l: string) =>
+    const labels = this.chartData().labels.map((l: string) =>
       l.length > 18 ? l.substring(0, 16) + '…' : l
     );
 
@@ -338,7 +338,7 @@ export class TopPerformersChartComponent implements OnInit, OnDestroy {
       type: 'bar',
       data: {
         labels,
-        datasets: this.chartData.datasets.map((ds: any) => ({
+        datasets: this.chartData().datasets.map((ds: any) => ({
           ...ds,
           borderRadius: 5,
           borderSkipped: false,

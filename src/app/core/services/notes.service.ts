@@ -345,7 +345,12 @@ export class NoteService extends BaseApiService {
 
   // --- Standard CRUD ---
   getNoteById(id: string) {
-    return this.get<{ data: { note: Note } }>(`${this.endpoint}/${id}`, {}, 'getNoteById');
+    return this.get<{
+      data: {
+        note: Note;
+        activityLog: NoteActivity[];
+      }
+    }>(`${this.endpoint}/${id}`, {}, 'getNoteById');
   }
 
   updateNote(id: string, data: any) {

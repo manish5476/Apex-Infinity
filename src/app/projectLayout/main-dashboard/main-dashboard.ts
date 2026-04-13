@@ -9,7 +9,7 @@ import { Toast } from "primeng/toast";
 @Component({
   selector: 'app-main-dashboard',
   standalone: true,
-  imports: [RouterOutlet, MainscreenHeader, Mainscreensidebar, Toast, TabStripComponent],
+  imports: [RouterOutlet, MainscreenHeader, Mainscreensidebar, Toast],
   templateUrl: './main-dashboard.html',
   styleUrl: './main-dashboard.scss'
 })

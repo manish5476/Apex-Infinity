@@ -1,52 +1,52 @@
-    <div class="activity-widget glass-panel">
-      <div class="widget-header">
-        <h3>Recent Activity</h3>
-        <span class="badge">{{ timeline().length }} Events</span>
-      </div>
+<div class="activity-widget glass-panel">
+  <div class="widget-header">
+    <h3>Recent Activity</h3>
+    <span class="badge">{{ timeline().length }} Events</span>
+  </div>
 
-      <div class="timeline-container custom-scrollbar">
-        @if (isLoading()) {
-          <div class="loading-state">
-            <i class="pi pi-spin pi-spinner"></i>
-            <span>Loading...</span>
-          </div>
-        } @else {
-          @for (item of timeline(); track item.id) {
-            <div class="timeline-item">
-              
-              <!-- Icon Column -->
-              <div class="timeline-left">
-                <div class="icon-circle" [ngClass]="item.note.type">
-                  <i [class]="getTypeIcon(item.note.type)"></i>
-                </div>
-                <div class="line"></div>
-              </div>
-
-              <!-- Content Column -->
-              <div class="timeline-content" [routerLink]="['/notes', item.note.id]">
-                <div class="activity-header">
-                  <span class="user-name">{{ $any(item.actor).name || item.actor }}</span>
-                  <span class="action">{{ formatAction(item.action) }}</span>
-                  <span class="target-title">{{ item.note.title }}</span>
-                </div>
-                
-                <div class="activity-meta">
-                  <span class="priority-dot" [ngClass]="item.note.priority"></span>
-                  <span class="timestamp">{{ item.timestamp | date:'shortTime' }}</span>
-                  <span class="date-sep">&bull;</span>
-                  <span class="date">{{ item.timestamp | date:'MMM d' }}</span>
-                </div>
-              </div>
-
-            </div>
-          }
-
-          @if (timeline().length === 0) {
-            <div class="empty-state">
-              <i class="pi pi-clock"></i>
-              <p>No recent activity found</p>
-            </div>
-          }
-        }
-      </div>
+  <div class="timeline-container custom-scrollbar">
+    @if (isLoading()) {
+    <div class="loading-state">
+      <i class="pi pi-spin pi-spinner"></i>
+      <span>Loading...</span>
     </div>
+    } @else {
+    @for (item of timeline(); track item.id) {
+    <div class="timeline-item">
+
+      <!-- Icon Column -->
+      <div class="timeline-left">
+        <div class="icon-circle" [ngClass]="item.note.type">
+          <i [class]="getTypeIcon(item.note.type)"></i>
+        </div>
+        <div class="line"></div>
+      </div>
+
+      <!-- Content Column -->
+      <div class="timeline-content" [routerLink]="['/notes', item.note.id]">
+        <div class="activity-header">
+          <span class="user-name">{{ $any(item.actor).name || item.actor }}</span>
+          <span class="action">{{ formatAction(item.action) }}</span>
+          <span class="target-title">{{ item.note.title }}</span>
+        </div>
+
+        <div class="activity-meta">
+          <span class="priority-dot" [ngClass]="item.note.priority"></span>
+          <span class="timestamp">{{ item.timestamp | date:'shortTime' }}</span>
+          <span class="date-sep">&bull;</span>
+          <span class="date">{{ item.timestamp | date:'MMM d' }}</span>
+        </div>
+      </div>
+
+    </div>
+    }
+
+    @if (timeline().length === 0) {
+    <div class="empty-state">
+      <i class="pi pi-clock"></i>
+      <p>No recent activity found</p>
+    </div>
+    }
+    }
+  </div>
+</div>

@@ -1,5 +1,4 @@
 import { Injectable, inject, computed } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Permission, PermissionMode } from '../permissions.constants';
 import { AuthService } from '../../../modules/auth/services/auth-service';
@@ -27,7 +26,7 @@ import { SocketConnectionService } from '@core/services/socket/socket-connection
  * • authSvc.hasPermission(p)      → handles isOwner / isSuperAdmin / wildcard '*'
  * • authSvc.hasAnyPermission([])  → any match
  * • authSvc.hasAllPermissions([]) → all must match
- * • authSvc.currentUser$          → BehaviorSubject source of truth
+ * • authSvc.currentUser           → signal source of truth (currentUser$ mirrors it)
  */
 @Injectable({ providedIn: 'root' })
 export class PermissionService {
@@ -42,12 +41,8 @@ export class PermissionService {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.authSvc.refreshPermissions());
   }
-  // ── Convert BehaviorSubject → Signal ─────────────────────────────
-  // toSignal subscribes to currentUser$ once and keeps it in sync.
-  // When authSvc calls currentUserSubject.next(user) (login/logout/
-  // refreshPermissions), all computed signals and directives below
-  // automatically re-evaluate — zero manual wiring needed.
-  readonly user = toSignal(this.authSvc.currentUser$, { initialValue: null });
+  // ── User signal (same reference as AuthService.currentUser) ───────
+  readonly user = this.authSvc.currentUser;
 
   // ── Derived computed signals ──────────────────────────────────────
 

@@ -36,10 +36,41 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { TooltipModule } from 'primeng/tooltip';
 import { SliderModule } from 'primeng/slider';
 
-import { StorefrontPublicService } from '../../../../core/services/storefront-public.service';
+import {
+  StorefrontPublicService,
+  ProductListParams,
+} from '../../../../core/services/storefront-public.service';
 import { StorefrontStateService } from '../../../../core/services/storefront-state.service';
 import { ProductCardComponent } from '../../components/product-card/product-card';
 import { ProductListingConfig } from '@core/models/storefront.model';
+
+export interface ProductListingFilters {
+  category: string;
+  brand: string;
+  minPrice: number | null;
+  maxPrice: number | null;
+  search: string;
+  inStock: boolean;
+  tags: string;
+  sort: string;
+  page: number;
+  limit: number;
+}
+
+function defaultListingFilters(limit: number): ProductListingFilters {
+  return {
+    category: '',
+    brand: '',
+    minPrice: null,
+    maxPrice: null,
+    search: '',
+    inStock: false,
+    tags: '',
+    sort: '-createdAt',
+    page: 1,
+    limit,
+  };
+}
 
 @Component({
   selector: 'app-product-listing',
@@ -128,7 +159,7 @@ export class ProductListingComponent implements OnInit, OnDestroy {
   totalItems = signal(0);
   rows = signal(12);
   first = signal(0);
-  orgSlug = '';
+  orgSlug = signal('');
 
   // Sort Options (Matches Backend Logic)
   sortOptions = [
@@ -138,29 +169,18 @@ export class ProductListingComponent implements OnInit, OnDestroy {
     { label: 'Name (A-Z)', value: 'name', icon: 'pi pi-sort-alpha-down' }
   ];
 
-  filters: any = {
-    category: '',
-    brand: '',
-    minPrice: null,
-    maxPrice: null,
-    search: '',
-    inStock: false,
-    tags: '',
-    sort: '-createdAt',
-    page: 1,
-    limit: 12
-  };
+  filters = signal<ProductListingFilters>(defaultListingFilters(12));
 
-  // Slider UI Model
-  rangeValues: number[] = [0, 10000];
+  rangeValues = signal<[number, number]>([0, 10000]);
 
   activeFilterCount = computed(() => {
+    const f = this.filters();
     let count = 0;
-    if (this.filters.category) count++;
-    if (this.filters.brand) count++;
-    if (this.filters.minPrice || this.filters.maxPrice) count++;
-    if (this.filters.inStock) count++;
-    if (this.filters.tags) count++;
+    if (f.category) count++;
+    if (f.brand) count++;
+    if (f.minPrice != null || f.maxPrice != null) count++;
+    if (f.inStock) count++;
+    if (f.tags) count++;
     return count;
   });
 
@@ -180,18 +200,16 @@ export class ProductListingComponent implements OnInit, OnDestroy {
       this.route.queryParams
     ]).pipe(takeUntil(this.destroy$)).subscribe(([parentParams, queryParams]: any) => {
 
-      const newSlug = parentParams.get('orgSlug');
+      const newSlug = parentParams.get('orgSlug') ?? '';
 
-      console.log(this.orgSlug);
-      if (newSlug && newSlug !== this.orgSlug) {
-        this.orgSlug = newSlug;
-        console.log(this.orgSlug);
+      if (newSlug && newSlug !== this.orgSlug()) {
+        this.orgSlug.set(newSlug);
         this.loadStoreMetadata();
       }
 
       this.syncFiltersFromUrl(queryParams);
 
-      if (this.orgSlug) this.loadProducts();
+      if (this.orgSlug()) this.loadProducts();
     });
   }
 
@@ -203,7 +221,7 @@ export class ProductListingComponent implements OnInit, OnDestroy {
   // --- Data Loading ---
 
   loadStoreMetadata() {
-    this.publicService.getStoreMetadata(this.orgSlug).subscribe({
+    this.publicService.getStoreMetadata(this.orgSlug()).subscribe({
       next: (res: any) => {
         // ✅ Map response to signals
         this.categories.set(res.enums.categories || []);
@@ -215,8 +233,9 @@ export class ProductListingComponent implements OnInit, OnDestroy {
         this.priceLimits.set({ min: limits.min, max: limits.max });
 
         // Initialize slider only if user hasn't set a custom price
-        if (!this.filters.minPrice && !this.filters.maxPrice) {
-          this.rangeValues = [limits.min, limits.max];
+        const f = this.filters();
+        if (f.minPrice == null && f.maxPrice == null) {
+          this.rangeValues.set([limits.min, limits.max]);
         }
       },
       error: (err) => console.error('Meta load failed', err)
@@ -225,7 +244,13 @@ export class ProductListingComponent implements OnInit, OnDestroy {
 
   loadProducts() {
     this.loading.set(true);
-    this.publicService.getProducts(this.orgSlug, this.filters).subscribe({
+    const f = this.filters();
+    const params: ProductListParams = {
+      ...f,
+      minPrice: f.minPrice ?? undefined,
+      maxPrice: f.maxPrice ?? undefined,
+    };
+    this.publicService.getProducts(this.orgSlug(), params).subscribe({
       next: (res: any) => {
         this.products.set(res.products);
         this.totalItems.set(res.pagination.total);
@@ -283,38 +308,45 @@ export class ProductListingComponent implements OnInit, OnDestroy {
   }
 
   syncFiltersFromUrl(params: any) {
-    this.filters = {
-      category: '', brand: '', minPrice: null, maxPrice: null,
-      search: '', sort: '-createdAt', inStock: false, tags: '',
-      page: 1, limit: 12,
-      ...params
+    const base = defaultListingFilters(this.cfg().itemsPerPage);
+    const merged: ProductListingFilters = {
+      ...base,
+      category: params['category'] ?? '',
+      brand: params['brand'] ?? '',
+      minPrice: params['minPrice'] != null && params['minPrice'] !== '' ? +params['minPrice'] : null,
+      maxPrice: params['maxPrice'] != null && params['maxPrice'] !== '' ? +params['maxPrice'] : null,
+      search: params['search'] ?? '',
+      sort: params['sort'] ?? '-createdAt',
+      inStock: params['inStock'] === 'true',
+      tags: params['tags'] ?? '',
+      page: params['page'] ? +params['page'] : 1,
+      limit: params['limit'] ? +params['limit'] : this.cfg().itemsPerPage,
     };
 
-    // Coerce types
-    if (params['page']) this.filters.page = +params['page'];
-    if (params['limit']) this.filters.limit = +params['limit'];
-    else this.filters.limit = this.cfg().itemsPerPage;
-    this.filters.inStock = params['inStock'] === 'true';
+    this.filters.set(merged);
 
     // Sync Slider UI
     if (params['minPrice'] || params['maxPrice']) {
-      this.rangeValues = [
+      this.rangeValues.set([
         params['minPrice'] ? +params['minPrice'] : this.priceLimits().min,
         params['maxPrice'] ? +params['maxPrice'] : this.priceLimits().max
-      ];
+      ]);
     }
 
-    this.rows.set(this.filters.limit);
-    this.first.set((this.filters.page - 1) * this.filters.limit);
+    this.rows.set(merged.limit);
+    this.first.set((merged.page - 1) * merged.limit);
   }
 
   applyFilter(key: string, value: any, triggerNavigation = true) {
-    // 1. Update Local State
-    this.filters[key] = value;
-    
+    this.filters.update((f) => {
+      const next = { ...f, [key]: value };
+      if (triggerNavigation) next.page = 1;
+      return next;
+    });
+
     if (!triggerNavigation) return;
 
-    const queryParams: any = { ...this.filters, page: 1 };
+    const queryParams: any = { ...this.filters(), page: 1 };
 
     // 2. Clean URL Params (Remove null/empty)
     Object.keys(queryParams).forEach(k => {
@@ -329,16 +361,25 @@ export class ProductListingComponent implements OnInit, OnDestroy {
   }
 
   onPriceChange(event: any) {
-    const [min, max] = event.values;
-    // Debounce check: only update if changed
-    if (min !== this.filters.minPrice || max !== this.filters.maxPrice) {
-      const qp = { ...this.filters, minPrice: min, maxPrice: max, page: 1 };
+    const [min, max] = event.values as [number, number];
+    const f = this.filters();
+    if (min !== f.minPrice || max !== f.maxPrice) {
+      this.rangeValues.set([min, max]);
+      const qp = { ...f, minPrice: min, maxPrice: max, page: 1 };
       this.updateRouter(qp);
     }
   }
 
+  patchRangeEnd(index: 0 | 1, value: number) {
+    const r = this.rangeValues();
+    const next: [number, number] = index === 0 ? [+value, r[1]] : [r[0], +value];
+    this.rangeValues.set(next);
+    this.onPriceChange({ values: next });
+  }
+
   toggleTag(tag: string) {
-    let currentTags = this.filters.tags ? this.filters.tags.split(',') : [];
+    const f = this.filters();
+    let currentTags = f.tags ? f.tags.split(',') : [];
     if (currentTags.includes(tag)) currentTags = currentTags.filter((t: string) => t !== tag);
     else currentTags.push(tag);
     this.applyFilter('tags', currentTags.length ? currentTags.join(',') : null);
@@ -346,12 +387,12 @@ export class ProductListingComponent implements OnInit, OnDestroy {
 
   onPageChange(event: any) {
     const newPage = (event.first / event.rows) + 1;
-    this.updateRouter({ ...this.filters, page: newPage, limit: event.rows });
+    this.updateRouter({ ...this.filters(), page: newPage, limit: event.rows });
   }
 
   clearFilters() {
-    this.filters.search = '';
-    this.rangeValues = [this.priceLimits().min, this.priceLimits().max];
+    this.filters.update((f) => ({ ...f, search: '' }));
+    this.rangeValues.set([this.priceLimits().min, this.priceLimits().max]);
     this.router.navigate([], { relativeTo: this.route, queryParams: {} });
   }
 

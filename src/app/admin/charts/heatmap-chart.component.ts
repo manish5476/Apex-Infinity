@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { signal, Component, OnInit, OnDestroy } from '@angular/core';
 
 import { Subject, takeUntil } from 'rxjs';
 import { ChartService } from '../chart.service';
@@ -26,19 +26,19 @@ import { ChartService } from '../chart.service';
           <span class="legend-label">Low</span>
           <div class="legend-cells">
             @for (s of legendSteps; track s) {
-              <div class="legend-cell" [style.background]="getCellColor(s, maxVal)"></div>
+              <div class="legend-cell" [style.background]="getCellColor(s, maxVal())"></div>
             }
           </div>
           <span class="legend-label">High</span>
         </div>
       </div>
     
-      @if (isLoading) {
+      @if (isLoading()) {
         <div class="state-overlay">
           <div class="spinner"></div><span>Loading...</span>
         </div>
       }
-      @if (hasError && !isLoading) {
+      @if (hasError() && !isLoading()) {
         <div class="state-overlay error">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
@@ -48,11 +48,11 @@ import { ChartService } from '../chart.service';
         </div>
       }
     
-      @if (!isLoading && !hasError && chartData) {
+      @if (!isLoading() && !hasError() && chartData()) {
         <div class="heatmap-wrapper">
           <!-- Y labels -->
           <div class="y-labels">
-            @for (d of chartData.yLabels; track d) {
+            @for (d of chartData().yLabels; track d) {
               <div class="y-label">{{ d }}</div>
             }
           </div>
@@ -60,7 +60,7 @@ import { ChartService } from '../chart.service';
           <div class="heatmap-grid">
             <!-- X labels -->
             <div class="x-labels">
-              @for (h of chartData.xLabels; track h; let i = $index) {
+              @for (h of chartData().xLabels; track h; let i = $index) {
                 <span class="x-label"
                   [style.display]="i % 3 === 0 ? '' : 'invisible'">
                   {{ i % 3 === 0 ? h : '' }}
@@ -68,12 +68,12 @@ import { ChartService } from '../chart.service';
               }
             </div>
             <!-- Rows -->
-            @for (row of chartData.series; track row) {
+            @for (row of chartData().series; track row) {
               <div class="heatmap-row">
                 @for (val of row.data; track val; let hi = $index) {
                   <div class="heatmap-cell"
-                    [style.background]="getCellColor(val, maxVal)"
-                    [title]="row.name + ' ' + chartData.xLabels[hi] + ': ' + val">
+                    [style.background]="getCellColor(val, maxVal())"
+                    [title]="row.name + ' ' + chartData().xLabels[hi] + ': ' + val">
                   </div>
                 }
               </div>
@@ -84,15 +84,15 @@ import { ChartService } from '../chart.service';
         <div class="summary-row">
           <div class="summary-chip">
             <span class="chip-label">Total Activity</span>
-            <span class="chip-value">{{ totalActivity }}</span>
+            <span class="chip-value">{{ totalActivity() }}</span>
           </div>
           <div class="summary-chip">
             <span class="chip-label">Peak Hour</span>
-            <span class="chip-value">{{ peakHour }}</span>
+            <span class="chip-value">{{ peakHour() }}</span>
           </div>
           <div class="summary-chip">
             <span class="chip-label">Peak Day</span>
-            <span class="chip-value">{{ peakDay }}</span>
+            <span class="chip-value">{{ peakDay() }}</span>
           </div>
         </div>
       }
@@ -189,13 +189,13 @@ import { ChartService } from '../chart.service';
 export class HeatmapChartComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
-  isLoading = true;
-  hasError = false;
-  chartData: any = null;
-  maxVal = 1;
-  totalActivity = 0;
-  peakHour = '—';
-  peakDay = '—';
+  isLoading = signal(true);
+  hasError = signal(false);
+  chartData = signal<any>(null);
+  maxVal = signal(1);
+  totalActivity = signal(0);
+  peakHour = signal('—');
+  peakDay = signal('—');
   legendSteps = [0, 0.25, 0.5, 0.75, 1];
 
   constructor(private chartService: ChartService) { }
@@ -203,33 +203,33 @@ export class HeatmapChartComponent implements OnInit, OnDestroy {
   ngOnInit(): void { this.loadData(); }
 
   loadData(): void {
-    this.isLoading = true;
-    this.hasError = false;
+    this.isLoading.set(true);
+    this.hasError.set(false);
     this.chartService.getHeatmap()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
-          this.chartData = res.data;
+          this.chartData.set(res.data);
           this.computeStats();
-          this.isLoading = false;
+          this.isLoading.set(false);
         },
-        error: () => { this.isLoading = false; this.hasError = true; }
+        error: () => { this.isLoading.set(false); this.hasError.set(true); }
       });
   }
 
   computeStats(): void {
-    if (!this.chartData) return;
+    if (!this.chartData()) return;
     let max = 0, total = 0, peakDayIdx = 0, peakHourIdx = 0;
-    this.chartData.series.forEach((row: any, di: number) => {
+    this.chartData().series.forEach((row: any, di: number) => {
       row.data.forEach((val: number, hi: number) => {
         total += val;
         if (val > max) { max = val; peakDayIdx = di; peakHourIdx = hi; }
       });
     });
-    this.maxVal = max || 1;
-    this.totalActivity = total;
-    this.peakDay = total > 0 ? this.chartData.yLabels[peakDayIdx] : '—';
-    this.peakHour = total > 0 ? this.chartData.xLabels[peakHourIdx] : '—';
+    this.maxVal.set(max || 1);
+    this.totalActivity.set(total);
+    this.peakDay.set(total > 0 ? this.chartData().yLabels[peakDayIdx] : '—');
+    this.peakHour.set(total > 0 ? this.chartData().xLabels[peakHourIdx] : '—');
   }
 
   getCellColor(val: number, max: number): string {

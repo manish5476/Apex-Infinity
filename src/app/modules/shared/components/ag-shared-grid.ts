@@ -76,37 +76,39 @@ export interface ActionColumnConfig {
   changeDetection: ChangeDetectionStrategy.OnPush,
 
   template: `
-    <div class="shared-grid-root">
-      @if (enableExcelExport()) {
-        <div class="grid-top-bar">
-          @if (excelExportPermission()) {
-            <ng-container *hasPermission="excelExportPermission()!">
-              <app-excel-export-dialog [data]="$any(data() ?? [])"></app-excel-export-dialog>
-            </ng-container>
-          } @else {
+  <div class="shared-grid-root">
+    @if (enableExcelExport()) {
+      <div class="grid-top-bar">
+        @if (excelExportPermission()) {
+          <ng-container *hasPermission="excelExportPermission()!">
             <app-excel-export-dialog [data]="$any(data() ?? [])"></app-excel-export-dialog>
-          }
-        </div>
-      }
-      <ag-grid-angular
-        class="ag-theme-quartz"
-        style="width:100%; height:100%;"
-        [theme]="agTheme()"
-        [tooltipShowDelay]="500"
-        [tooltipShowMode]="'whenTruncated'"
-        [components]="components"
-        [rowData]="data() ?? []"
-        [columnDefs]="resolvedColumns()"
-        [gridOptions]="gridOptions"
-        [rowSelection]="selectionOptions"
-        (gridReady)="onGridReady($event)"
-        (columnResized)="onColumnResized($event)"     (cellClicked)="onCellClicked($event)"
-        (cellValueChanged)="onCellValueChanged($event)"
-        (selectionChanged)="onSelectionChanged()"
-        (bodyScrollEnd)="onBodyScrollEnd($event)">
-      </ag-grid-angular>
-    </div>
-    `,
+          </ng-container>
+        } @else {
+          <app-excel-export-dialog [data]="$any(data() ?? [])"></app-excel-export-dialog>
+        }
+      </div>
+    }
+    <ag-grid-angular
+      class="ag-theme-quartz"
+      style="width:100%; height:100%;"
+      [theme]="agTheme()"
+      [tooltipShowDelay]="500"
+      [tooltipShowMode]="'whenTruncated'"
+      [components]="components"
+      [rowData]="data() ?? []"
+      [pinnedBottomRowData]="pinnedBottomRowData() ?? []"
+      [columnDefs]="resolvedColumns()"
+      [gridOptions]="gridOptions"
+      [rowSelection]="selectionOptions"
+      (gridReady)="onGridReady($event)"
+      (columnResized)="onColumnResized($event)"
+      (cellClicked)="onCellClicked($event)"
+      (cellValueChanged)="onCellValueChanged($event)"
+      (selectionChanged)="onSelectionChanged()"
+      (bodyScrollEnd)="onBodyScrollEnd($event)">
+    </ag-grid-angular>
+  </div>
+`,
 
   styles: [`
     :host {
@@ -155,7 +157,8 @@ export interface ActionColumnConfig {
   `]
 })
 export class AgShareGrid<T = any> {
-
+  // Add this input alongside the other inputs:
+  readonly pinnedBottomRowData = input<any[] | null>(null);
   /* --------------------------------------------------
      INPUTS
   --------------------------------------------------- */

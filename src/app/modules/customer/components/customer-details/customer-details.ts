@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, ChangeDetectorRef, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { of, Subject } from 'rxjs';
@@ -64,6 +64,7 @@ interface TabState {
   providers: [CustomerService, InvoiceService, PaymentService, FinancialService, ConfirmationService],
   templateUrl: './customer-details.html',
   styleUrl: './customer-details.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CustomerDetails implements OnInit, OnDestroy {
     private readonly destroy$ = new Subject<void>();
@@ -104,12 +105,12 @@ export class CustomerDetails implements OnInit, OnDestroy {
   activeTab = signal<TabType>('ledger');
   private pageSize = 50;
 
-  tabStatus: Record<TabType, TabState> = {
+  tabStatus = signal<Record<TabType, TabState>>({
     ledger: { loaded: false, loading: false, page: 1, total: 0 },
     invoices: { loaded: false, loading: false, page: 1, total: 0 },
     payments: { loaded: false, loading: false, page: 1, total: 0 },
     feed: { loaded: false, loading: false, page: 1, total: 0 }
-  };
+  });
 
   // Data Signals
   invoices = signal<any[]>([]);
@@ -179,7 +180,8 @@ export class CustomerDetails implements OnInit, OnDestroy {
 
   onScrolledToBottom(tab: TabType) {
     const currentDataLength = this.getTabData(tab).length;
-    if (!this.tabStatus[tab].loading && currentDataLength < this.tabStatus[tab].total) {
+    const status = this.tabStatus()[tab];
+    if (!status.loading && currentDataLength < status.total) {
       this.fetchDataForTab(tab, false);
     }
   }
@@ -193,8 +195,9 @@ export class CustomerDetails implements OnInit, OnDestroy {
 
   switchTab(tab: TabType) {
     this.activeTab.set(tab);
+    const status = this.tabStatus()[tab];
     // Initial load for the tab if not already loaded
-    if (!this.tabStatus[tab].loaded && !this.tabStatus[tab].loading) {
+    if (!status.loaded && !status.loading) {
       this.fetchDataForTab(tab, true);
     }
   }
@@ -204,16 +207,16 @@ export class CustomerDetails implements OnInit, OnDestroy {
     if (!id) return;
 
     if (isReset) {
-      this.tabStatus[tab].page = 1;
-      this.tabStatus[tab].loaded = false;
+      this.tabStatus.update(s => ({ ...s, [tab]: { ...s[tab], page: 1, loaded: false } }));
     }
 
+    const currentStatus = this.tabStatus()[tab];
     const params = {
-      page: this.tabStatus[tab].page,
+      page: currentStatus.page,
       limit: this.pageSize
     };
 
-    this.tabStatus[tab].loading = true;
+    this.tabStatus.update(s => ({ ...s, [tab]: { ...s[tab], loading: true } }));
 
     if (tab === 'ledger') this.fetchLedger(id, params, isReset);
     else if (tab === 'invoices') this.fetchInvoices(id, params, isReset);
@@ -248,9 +251,10 @@ export class CustomerDetails implements OnInit, OnDestroy {
 
 
   private finishTabLoad(tab: TabType) {
-    this.tabStatus[tab].page++;
-    this.tabStatus[tab].loaded = true;
-    this.cdr.detectChanges();
+    this.tabStatus.update(s => ({ 
+      ...s, 
+      [tab]: { ...s[tab], page: s[tab].page + 1, loaded: true, loading: false } 
+    }));
   }
 
   // --- Initialization & Renderers ---
@@ -438,13 +442,13 @@ this.paymentColumns = [
         this.messageService.handleHttpError(err);
         return of({ history: [], closingBalance: 0, count: 0 });
       }),
-      finalize(() => this.tabStatus.ledger.loading = false), takeUntil(this.destroy$)
+      finalize(() => this.tabStatus.update(s => ({ ...s, ledger: { ...s.ledger, loading: false } }))), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       // Use the history array directly as per the JSON structure
       const history = res.history || [];
       this.ledgerHistory.update(old => isReset ? history : [...old, ...history]);
 
-      this.tabStatus.ledger.total = res.count || 0; // Use count for total
+      this.tabStatus.update(s => ({ ...s, ledger: { ...s.ledger, total: res.count || 0 } }));
       this.closingBalance.set(res.closingBalance || 0); // Use closingBalance directly
 
       this.finishTabLoad('ledger');
@@ -458,12 +462,12 @@ this.paymentColumns = [
         this.messageService.handleHttpError(err);
         return of({ data: { invoices: [] }, total: 0 });
       }),
-      finalize(() => this.tabStatus.invoices.loading = false), takeUntil(this.destroy$)
+      finalize(() => this.tabStatus.update(s => ({ ...s, invoices: { ...s.invoices, loading: false } }))), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       let data = res.invoices || res.data?.invoices || (Array.isArray(res) ? res : []);
       this.invoices.update(old => isReset ? data : [...old, ...data]);
 
-      this.tabStatus.invoices.total = res.total || res.results || 0;
+      this.tabStatus.update(s => ({ ...s, invoices: { ...s.invoices, total: res.total || res.results || 0 } }));
       this.finishTabLoad('invoices');
     });
   }
@@ -475,12 +479,12 @@ this.paymentColumns = [
         this.messageService.handleHttpError(err);
         return of({ data: { payments: [] }, total: 0 });
       }),
-      finalize(() => this.tabStatus.payments.loading = false), takeUntil(this.destroy$)
+      finalize(() => this.tabStatus.update(s => ({ ...s, payments: { ...s.payments, loading: false } }))), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       let data = res.payments || res.data?.payments || (Array.isArray(res) ? res : []);
       this.payments.update(old => isReset ? data : [...old, ...data]);
 
-      this.tabStatus.payments.total = res.total || res.results || 0;
+      this.tabStatus.update(s => ({ ...s, payments: { ...s.payments, total: res.total || res.results || 0 } }));
       this.finishTabLoad('payments');
     });
   }

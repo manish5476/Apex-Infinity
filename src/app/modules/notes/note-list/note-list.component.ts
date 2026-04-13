@@ -147,8 +147,9 @@ export class NoteListComponent implements OnDestroy {
       this.totalPages.set(1);
     }
 
-    if (filter === 'calendar') {
+    if (filter === 'calendar' || filter === 'recent') {
       this.isLoading.set(false);
+      this.notes.set([]);
       return;
     }
 
@@ -156,7 +157,6 @@ export class NoteListComponent implements OnDestroy {
     let request$;
 
     switch (filter) {
-      case 'recent': request$ = this.notesService.getRecentActivity(); break;
       case 'shared': request$ = this.notesService.getSharedNotesWithMe(); break;
       case 'shared-by-me': request$ = this.notesService.getNotesSharedByMe(); break;
       case 'trash': request$ = this.notesService.getTrashBin(); break;
@@ -174,7 +174,7 @@ export class NoteListComponent implements OnDestroy {
 
     request$.pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
-        this.notes.set(res.data.notes);
+        this.notes.set(res.data.notes ?? []);
         if (res.data.pagination) {
           this.totalPages.set(res.data.pagination.pages || 1);
           this.totalNotes.set(res.data.pagination.total || 0);

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { signal, Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { Chart, registerables } from 'chart.js';
@@ -30,14 +30,14 @@ Chart.register(...registerables);
       </div>
     
       <!-- Loading -->
-      @if (isLoading) {
+      @if (isLoading()) {
         <div class="state-overlay">
           <div class="spinner"></div><span>Loading...</span>
         </div>
       }
     
       <!-- Error -->
-      @if (hasError && !isLoading) {
+      @if (hasError() && !isLoading()) {
         <div class="state-overlay error">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
@@ -47,7 +47,7 @@ Chart.register(...registerables);
         </div>
       }
     
-      @if (!isLoading && !hasError && data) {
+      @if (!isLoading() && !hasError() && data()) {
         <!-- KPI Row -->
         <div class="kpi-row">
           <div class="kpi-card primary">
@@ -58,10 +58,10 @@ Chart.register(...registerables);
             </div>
             <div class="kpi-info">
               <span class="kpi-label">Portfolio Value</span>
-              <span class="kpi-value">₹{{ data.summary.totalPortfolioValue | number }}</span>
+              <span class="kpi-value">₹{{ data().summary.totalPortfolioValue | number }}</span>
             </div>
           </div>
-          <div class="kpi-card" [class.danger]="data.summary.overdueInstallments > 0">
+          <div class="kpi-card" [class.danger]="data().summary.overdueInstallments > 0">
             <div class="kpi-icon overdue">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
@@ -69,10 +69,10 @@ Chart.register(...registerables);
             </div>
             <div class="kpi-info">
               <span class="kpi-label">Overdue Instalments</span>
-              <span class="kpi-value overdue-val">{{ data.summary.overdueInstallments }}</span>
+              <span class="kpi-value overdue-val">{{ data().summary.overdueInstallments }}</span>
             </div>
           </div>
-          <div class="kpi-card" [class.danger]="data.summary.overdueAmount > 0">
+          <div class="kpi-card" [class.danger]="data().summary.overdueAmount > 0">
             <div class="kpi-icon overdue">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
@@ -81,7 +81,7 @@ Chart.register(...registerables);
             </div>
             <div class="kpi-info">
               <span class="kpi-label">Overdue Amount</span>
-              <span class="kpi-value overdue-val">₹{{ data.summary.overdueAmount | number }}</span>
+              <span class="kpi-value overdue-val">₹{{ data().summary.overdueAmount | number }}</span>
             </div>
           </div>
         </div>
@@ -92,13 +92,13 @@ Chart.register(...registerables);
             <canvas #emiCanvas></canvas>
             <!-- Centre label -->
             <div class="doughnut-centre">
-              <span class="centre-count">{{ totalCount }}</span>
+              <span class="centre-count">{{ totalCount() }}</span>
               <span class="centre-label">Contracts</span>
             </div>
           </div>
           <!-- Status breakdown list -->
           <div class="breakdown-list">
-            @for (item of metaList; track item) {
+            @for (item of metaList(); track item) {
               <div class="breakdown-item">
                 <div class="bi-dot" [style.background]="item.color"></div>
                 <div class="bi-info">
@@ -111,27 +111,27 @@ Chart.register(...registerables);
           </div>
         </div>
         <!-- Health Banner -->
-        <div class="health-banner" [class.good]="data.summary.overdueInstallments === 0" [class.warn]="data.summary.overdueInstallments > 0">
-          @if (data.summary.overdueInstallments === 0) {
+        <div class="health-banner" [class.good]="data().summary.overdueInstallments === 0" [class.warn]="data().summary.overdueInstallments > 0">
+          @if (data().summary.overdueInstallments === 0) {
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               >
               <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
               <polyline points="22 4 12 14.01 9 11.01"/>
             </svg>
           }
-          @if (data.summary.overdueInstallments > 0) {
+          @if (data().summary.overdueInstallments > 0) {
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               >
               <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
               <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
             </svg>
           }
-          @if (data.summary.overdueInstallments === 0) {
+          @if (data().summary.overdueInstallments === 0) {
             <span>Portfolio is healthy — no overdue instalments</span>
           }
-          @if (data.summary.overdueInstallments > 0) {
+          @if (data().summary.overdueInstallments > 0) {
             <span>
-              {{ data.summary.overdueInstallments }} overdue instalment(s) totalling ₹{{ data.summary.overdueAmount | number }}
+              {{ data().summary.overdueInstallments }} overdue instalment(s) totalling ₹{{ data().summary.overdueAmount | number }}
             </span>
           }
         </div>
@@ -240,37 +240,37 @@ export class EmiPortfolioChartComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private chart?: Chart;
 
-  isLoading = true;
-  hasError = false;
-  data: any = null;
-  metaList: { label: string; count: number; totalAmount: number; color: string }[] = [];
-  totalCount = 0;
+  isLoading = signal(true);
+  hasError = signal(false);
+  data = signal<any>(null);
+  metaList = signal<{ label: string; count: number; totalAmount: number; color: string }[]>([]);
+  totalCount = signal(0);
 
   constructor(private chartService: ChartService) { }
 
   ngOnInit(): void { this.loadData(); }
 
   loadData(): void {
-    this.isLoading = true;
-    this.hasError = false;
+    this.isLoading.set(true);
+    this.hasError.set(false);
     this.chartService.getEmiPortfolioStats()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
-          this.data = res.data;
+          this.data.set(res.data);
           const sb = res.data.statusBreakdown;
           const colors = sb.datasets[0]?.backgroundColor ?? [];
-          this.metaList = (sb._meta || []).map((m: any, i: number) => ({
+          this.metaList.set((sb._meta || []).map((m: any, i: number) => ({
             label: m._id,
             count: m.count,
             totalAmount: m.totalAmount,
             color: colors[i] ?? '#42A5F5'
-          }));
-          this.totalCount = this.metaList.reduce((s, m) => s + m.count, 0);
-          this.isLoading = false;
+          })));
+          this.totalCount.set(this.metaList().reduce((s, m) => s + m.count, 0));
+          this.isLoading.set(false);
           setTimeout(() => this.renderChart(sb), 50);
         },
-        error: () => { this.isLoading = false; this.hasError = true; }
+        error: () => { this.isLoading.set(false); this.hasError.set(true); }
       });
   }
 
@@ -297,7 +297,7 @@ export class EmiPortfolioChartComponent implements OnInit, OnDestroy {
           tooltip: {
             callbacks: {
               label: (ctx) => {
-                const meta = this.metaList[ctx.dataIndex];
+                const meta = this.metaList()[ctx.dataIndex];
                 return meta ? [`  ${meta.count} contracts`, `  ₹${meta.totalAmount.toLocaleString('en-IN')}`] : '';
               }
             }

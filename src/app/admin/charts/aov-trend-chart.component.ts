@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { signal, Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { Chart, registerables } from 'chart.js';
@@ -25,26 +25,26 @@ Chart.register(...registerables);
           </div>
         </div>
         <!-- KPI chips -->
-        @if (!isLoading && !hasError) {
+        @if (!isLoading() && !hasError()) {
           <div class="kpi-chips">
             <div class="kpi-chip">
               <span class="kpi-label">Peak AOV</span>
-              <span class="kpi-value">₹{{ peakAov | number }}</span>
+              <span class="kpi-value">₹{{ peakAov() | number }}</span>
             </div>
             <div class="kpi-chip">
               <span class="kpi-label">Total Orders</span>
-              <span class="kpi-value">{{ totalOrders }}</span>
+              <span class="kpi-value">{{ totalOrders() }}</span>
             </div>
           </div>
         }
       </div>
     
-      @if (isLoading) {
+      @if (isLoading()) {
         <div class="state-overlay">
           <div class="spinner"></div><span>Loading...</span>
         </div>
       }
-      @if (hasError && !isLoading) {
+      @if (hasError() && !isLoading()) {
         <div class="state-overlay error">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
@@ -54,7 +54,7 @@ Chart.register(...registerables);
         </div>
       }
     
-      @if (!isLoading && !hasError) {
+      @if (!isLoading() && !hasError()) {
         <div class="chart-area">
           <canvas #aovCanvas></canvas>
         </div>
@@ -120,19 +120,19 @@ export class AovTrendChartComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private chart?: Chart;
 
-  isLoading = true;
-  hasError = false;
-  peakAov = 0;
-  totalOrders = 0;
+  isLoading = signal(true);
+  hasError = signal(false);
+  peakAov = signal(0);
+  totalOrders = signal(0);
 
-  constructor(private chartService: ChartService, private cdr: ChangeDetectorRef) { }
+  constructor(private chartService: ChartService) { }
 
   ngOnInit(): void { this.loadData(); }
 
   loadData(): void {
-    this.isLoading = true;
-    this.hasError = false;
-    this.cdr.detectChanges();
+    this.isLoading.set(true);
+    this.hasError.set(false);
+    
     this.chartService.getAOVTrend()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -140,16 +140,16 @@ export class AovTrendChartComponent implements OnInit, OnDestroy {
           const data = res.data;
           const aovDs = data.datasets.find((d: any) => d.type === 'line');
           const cntDs = data.datasets.find((d: any) => d.type === 'bar');
-          this.peakAov = aovDs ? Math.max(...aovDs.data) : 0;
-          this.totalOrders = cntDs ? cntDs.data.reduce((a: number, b: number) => a + b, 0) : 0;
-          this.isLoading = false;
-          this.cdr.detectChanges();
+          this.peakAov.set(aovDs ? Math.max(...aovDs.data) : 0);
+          this.totalOrders.set(cntDs ? cntDs.data.reduce((a: number, b: number) => a + b, 0) : 0);
+          this.isLoading.set(false);
+          
           setTimeout(() => this.renderChart(data), 50);
         },
         error: () => { 
-          this.isLoading = false; 
-          this.hasError = true; 
-          this.cdr.detectChanges();
+          this.isLoading.set(false); 
+          this.hasError.set(true); 
+          
         }
       });
   }

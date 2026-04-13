@@ -71,22 +71,23 @@ const CATEGORY_META: Record<string, { color: string; icon: string }> = {
           </div>
 
           <div class="header-right">
-            <div class="search-wrap" [class.focused]="searchFocused">
+            <div class="search-wrap" [class.focused]="searchFocused()">
               <i class="pi pi-search search-icon"></i>
               <input
                 type="text"
-                [(ngModel)]="searchQuery"
+                [ngModel]="searchQuery()"
+                (ngModelChange)="searchQuery.set($event)"
                 placeholder="Search metrics..."
-                (focus)="searchFocused = true"
-                (blur)="searchFocused = false" />
-              @if (searchQuery) {
-                <button class="search-clear" (click)="searchQuery = ''">
+                (focus)="searchFocused.set(true)"
+                (blur)="searchFocused.set(false)" />
+              @if (searchQuery()) {
+                <button class="search-clear" (click)="searchQuery.set('')">
                   <i class="pi pi-times"></i>
                 </button>
               }
             </div>
 
-            <button class="action-btn" [class.spinning]="isRefreshing"
+            <button class="action-btn" [class.spinning]="isRefreshing()"
               (click)="refreshAllCharts()"
               pTooltip="Sync Data" tooltipPosition="bottom">
               <i class="pi pi-sync"></i>
@@ -173,7 +174,8 @@ const CATEGORY_META: Record<string, { color: string; icon: string }> = {
 
     <!-- ════════ IMMERSIVE 95x90 LIGHTBOX ════════ -->
     <p-dialog
-      [(visible)]="dialogVisible"
+      [visible]="dialogVisible()"
+      (visibleChange)="dialogVisible.set($event)"
       [modal]="true"
       [dismissableMask]="true"
       [closeOnEscape]="true"
@@ -230,7 +232,7 @@ const CATEGORY_META: Record<string, { color: string; icon: string }> = {
 
               <div class="dlg-sep"></div>
 
-              <button class="close-btn" (click)="dialogVisible = false"
+              <button class="close-btn" (click)="dialogVisible.set(false)"
                 pTooltip="Exit Fullscreen" tooltipPosition="bottom">
                 <i class="pi pi-times"></i>
               </button>
@@ -950,10 +952,10 @@ const CATEGORY_META: Record<string, { color: string; icon: string }> = {
 })
 export class AdminChartsAnalysisComponent {
 
-  searchQuery    = '';
-  searchFocused  = false;
-  isRefreshing   = false;
-  dialogVisible  = false;
+  searchQuery    = signal('');
+  searchFocused  = signal(false);
+  isRefreshing   = signal(false);
+  dialogVisible  = signal(false);
 
   activeCategory = signal('All');
   previewChart   = signal<ChartMeta | null>(null);
@@ -980,7 +982,7 @@ export class AdminChartsAnalysisComponent {
   ];
 
   filteredCharts = computed(() => {
-    const q   = this.searchQuery.toLowerCase();
+    const q   = this.searchQuery().toLowerCase();
     const cat = this.activeCategory();
     return this.charts.filter(c => {
       const matchSearch = !q
@@ -1013,7 +1015,7 @@ export class AdminChartsAnalysisComponent {
 
   openPreview(chart: ChartMeta): void {
     this.previewChart.set(chart);
-    this.dialogVisible = true;
+    this.dialogVisible.set(true);
   }
 
   onDialogHide(): void {
@@ -1030,18 +1032,18 @@ export class AdminChartsAnalysisComponent {
 
   @HostListener('document:keydown', ['$event'])
   onKeyDown(e: KeyboardEvent): void {
-    if (!this.dialogVisible) return;
+    if (!this.dialogVisible()) return;
     if (e.key === 'ArrowRight') { this.navigateChart(1);  return; }
     if (e.key === 'ArrowLeft')  { this.navigateChart(-1); return; }
   }
 
   refreshAllCharts(): void {
-    this.isRefreshing = true;
-    setTimeout(() => this.isRefreshing = false, 1500);
+    this.isRefreshing.set(true);
+    setTimeout(() => this.isRefreshing.set(false), 1500);
   }
 
   clearFilters(): void {
-    this.searchQuery = '';
+    this.searchQuery.set('');
     this.activeCategory.set('All');
   }
 }

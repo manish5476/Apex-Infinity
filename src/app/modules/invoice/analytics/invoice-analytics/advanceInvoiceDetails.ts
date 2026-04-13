@@ -350,7 +350,7 @@ export interface ProfitAnalysisReport {
         </div>
 
         <!-- ── TREND CHART ──────────────────────────────────────────────── -->
-        @if(r.trends.data?.length) {
+        @if(r.trends.data.length) {
           <div class="trend-section">
 
             <div class="trend-header">
@@ -523,7 +523,7 @@ export interface ProfitAnalysisReport {
 
               <!-- Customers Tab -->
               <p-tabpanel value="1">
-                @if (r.analysis.customerAnalysis.mostProfitable?.length) {
+                @if (r.analysis.customerAnalysis.mostProfitable.length) {
                   <p-table [value]="r.analysis.customerAnalysis.mostProfitable"
                            [rows]="10" [paginator]="true"
                            styleClass="p-datatable-sm theme-table"
@@ -578,7 +578,7 @@ export interface ProfitAnalysisReport {
 
               <!-- Category Tab -->
               <p-tabpanel value="2">
-                @if (r.analysis.productAnalysis.byCategory?.length) {
+                @if (r.analysis.productAnalysis.byCategory.length) {
                   <p-table [value]="r.analysis.productAnalysis.byCategory"
                            styleClass="p-datatable-sm theme-table"
                            responsiveLayout="scroll">

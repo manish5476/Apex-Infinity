@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { signal, Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 
 import { Subject, takeUntil } from 'rxjs';
 import { Chart, registerables } from 'chart.js';
@@ -28,26 +28,26 @@ Chart.register(...registerables);
           </div>
         </div>
         <!-- KPI row -->
-        @if (!isLoading && !hasError) {
+        @if (!isLoading() && !hasError()) {
           <div class="kpi-chips">
             <div class="kpi-chip accent">
               <span class="kpi-label">Total Customers</span>
-              <span class="kpi-value">{{ totalCustomers }}</span>
+              <span class="kpi-value">{{ totalCustomers() }}</span>
             </div>
             <div class="kpi-chip">
               <span class="kpi-label">Peak Month</span>
-              <span class="kpi-value">{{ peakMonth }}</span>
+              <span class="kpi-value">{{ peakMonth() }}</span>
             </div>
           </div>
         }
       </div>
     
-      @if (isLoading) {
+      @if (isLoading()) {
         <div class="state-overlay">
           <div class="spinner"></div><span>Loading...</span>
         </div>
       }
-      @if (hasError && !isLoading) {
+      @if (hasError() && !isLoading()) {
         <div class="state-overlay error">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
@@ -57,16 +57,16 @@ Chart.register(...registerables);
         </div>
       }
     
-      @if (!isLoading && !hasError) {
+      @if (!isLoading() && !hasError()) {
         <div class="chart-area">
           <canvas #acqCanvas></canvas>
         </div>
       }
     
       <!-- Monthly Breakdown mini -->
-      @if (!isLoading && !hasError && monthlyNew.length) {
+      @if (!isLoading() && !hasError() && monthlyNew().length) {
         <div class="monthly-strip">
-          @for (m of monthlyNew; track m; let i = $index) {
+          @for (m of monthlyNew(); track m; let i = $index) {
             <div class="month-cell"
               [class.has-data]="m.value > 0" [title]="m.label + ': ' + m.value">
               <div class="month-bar" [style.height.%]="m.pct" [style.background]="m.value > 0 ? '#FFA726' : 'var(--border-primary)'"></div>
@@ -155,19 +155,19 @@ export class CustomerAcquisitionChartComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private chart?: Chart;
 
-  isLoading = true;
-  hasError = false;
-  totalCustomers = 0;
-  peakMonth = '—';
-  monthlyNew: { label: string; value: number; pct: number }[] = [];
+  isLoading = signal(true);
+  hasError = signal(false);
+  totalCustomers = signal(0);
+  peakMonth = signal('—');
+  monthlyNew = signal<{ label: string; value: number; pct: number }[]>([]);
 
   constructor(private chartService: ChartService) { }
 
   ngOnInit(): void { this.loadData(); }
 
   loadData(): void {
-    this.isLoading = true;
-    this.hasError = false;
+    this.isLoading.set(true);
+    this.hasError.set(false);
     this.chartService.getCustomerAcquisition()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -175,20 +175,20 @@ export class CustomerAcquisitionChartComponent implements OnInit, OnDestroy {
           const data = res.data;
           const newDs = data.datasets.find((d: any) => d.label?.includes('New'));
           const cumDs = data.datasets.find((d: any) => d.label?.includes('Cumulative'));
-          this.totalCustomers = cumDs ? Math.max(...cumDs.data) : 0;
+          this.totalCustomers.set(cumDs ? Math.max(...cumDs.data) : 0);
           const newData: number[] = newDs?.data ?? [];
           const maxNew = Math.max(...newData) || 1;
           const peakIdx = newData.indexOf(Math.max(...newData));
-          this.peakMonth = newData.some(v => v > 0) ? data.labels[peakIdx] : '—';
-          this.monthlyNew = data.labels.map((label: string, i: number) => ({
+          this.peakMonth.set(newData.some(v => v > 0) ? data.labels[peakIdx] : '—');
+          this.monthlyNew.set(data.labels.map((label: string, i: number) => ({
             label,
             value: newData[i] ?? 0,
             pct: Math.round(((newData[i] ?? 0) / maxNew) * 100)
-          }));
-          this.isLoading = false;
+          })));
+          this.isLoading.set(false);
           setTimeout(() => this.renderChart(data), 50);
         },
-        error: () => { this.isLoading = false; this.hasError = true; }
+        error: () => { this.isLoading.set(false); this.hasError.set(true); }
       });
   }
 
