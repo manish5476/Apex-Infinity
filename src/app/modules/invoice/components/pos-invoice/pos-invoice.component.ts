@@ -215,36 +215,6 @@ export class PosInvoiceComponent implements OnInit, OnDestroy {
       this.manualSearchControl.reset();
     }
   }
-  // // 4. Manual Dropdown Handler
-  // onManualProductSelect(event: any): void {
-  //   const productId = event.value;
-  //   const product = this.productOptions().find(p => p._id === productId);
-  //   const branchId = this.invoiceForm.get('branchId')?.value;
-
-  //   if (product && branchId) {
-  //     this.invoiceService.checkStock({ branchId, items: [{ productId, quantity: 1 }] }).subscribe({
-  //       next: (res: any) => {
-  //         let availableQty = 0;
-  //         if (res.stock?.items && res.stock.items.length > 0) {
-  //           availableQty = res.stock.items[0].available;
-  //         } else if (res.stock?.summary?.totalStock !== undefined) {
-  //           availableQty = res.stock.summary.totalStock;
-  //         }
-
-  //         this.addProductToInvoice(product, availableQty);
-  //         this.manualSearchValue.set(null); // Clear the PrimeNG dropdown for next selection
-  //       },
-  //       error: (err) => {
-  //         this.messageService.showError('Stock Check: Failed to verify current availability.');
-  //         this.manualSearchValue.set(null);
-  //       }
-  //     });
-  //   } else if (!branchId) {
-  //      this.messageService.showWarn('Branch Required: Please select a branch to check stock.');
-  //      this.manualSearchValue.set(null);
-  //   }
-  // }
-
 
   // 5. Unified method to process any product (from scanner or manual)
   private addProductToInvoice(product: any, stock: number): void {

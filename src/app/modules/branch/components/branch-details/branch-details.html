@@ -1,373 +1,189 @@
 <div class="page-container animate-fadeIn">
   @if (loading()) {
-    <div class="loading-state">
-      <div class="skeleton-header">
-        <div class="left-group">
-          <p-skeleton shape="circle" size="4rem"></p-skeleton>
-          <div class="text-group">
-            <p-skeleton width="12rem" height="1.5rem"></p-skeleton>
-            <p-skeleton width="8rem" height="1rem"></p-skeleton>
-          </div>
+  <div class="loading-state">
+    <div class="skeleton-header">
+      <div class="left-group">
+        <p-skeleton shape="circle" size="4rem"></p-skeleton>
+        <div class="text-group">
+          <p-skeleton width="12rem" height="1.5rem"></p-skeleton>
+          <p-skeleton width="8rem" height="1rem"></p-skeleton>
         </div>
       </div>
-      <div class="layout-grid">
-        <aside class="skeleton-sidebar">
-          <p-skeleton height="400px" styleClass="w-full"></p-skeleton>
-        </aside>
-        <main class="skeleton-main">
-          <p-skeleton height="200px" styleClass="w-full"></p-skeleton>
-          <p-skeleton height="200px" styleClass="w-full"></p-skeleton>
-        </main>
-      </div>
     </div>
+    <div class="layout-grid">
+      <aside class="skeleton-sidebar">
+        <p-skeleton height="400px" styleClass="w-full"></p-skeleton>
+      </aside>
+      <main class="skeleton-main">
+        <p-skeleton height="200px" styleClass="w-full"></p-skeleton>
+        <p-skeleton height="200px" styleClass="w-full"></p-skeleton>
+      </main>
+    </div>
+  </div>
   }
 
   @else if (isError()) {
-    <div class="error-state">
-      <div class="error-icon"><i class="pi pi-building"></i></div>
-      <h2>Branch Not Found</h2>
-      <button pButton label="Back to Branches" icon="pi pi-arrow-left" class="p-button-outlined" routerLink="/branches"></button>
-    </div>
+  <div class="error-state">
+    <div class="error-icon"><i class="pi pi-building"></i></div>
+    <h2>Branch Not Found</h2>
+    <button pButton label="Back to Branches" icon="pi pi-arrow-left" class="p-button-outlined"
+      routerLink="/branches"></button>
+  </div>
   }
 
   @else if (branch(); as b) {
 
-    <header class="dashboard-header">
-      <div class="header-left">
-        <button pButton icon="pi pi-arrow-left" class="p-button-text p-button-rounded back-btn" routerLink="/branches"></button>
-        
-        <div class="identity-group">
-          <div class="name-row">
-            <h1>{{ b.name }}</h1>
-            <p-tag [value]="b.isActive ? 'Active' : 'Inactive'" [severity]="b.isActive ? 'success' : 'danger'" styleClass="status-tag"></p-tag>
-            @if (b.isMainBranch) {
-              <p-tag value="Main Branch" severity="info" icon="pi pi-star-fill"></p-tag>
-            }
+  <header class="dashboard-header">
+    <div class="header-left">
+      <button pButton icon="pi pi-arrow-left" class="p-button-text p-button-rounded back-btn"
+        routerLink="/branches"></button>
+
+      <div class="identity-group">
+        <div class="name-row">
+          <h1>{{ b.name }}</h1>
+          <p-tag [value]="b.isActive ? 'Active' : 'Inactive'" [severity]="b.isActive ? 'success' : 'danger'"
+            styleClass="status-tag"></p-tag>
+          @if (b.isMainBranch) {
+          <p-tag value="Main Branch" severity="info" icon="pi pi-star-fill"></p-tag>
+          }
+        </div>
+        <div class="meta-row">
+          <span class="id-badge">
+            <i class="pi pi-hashtag"></i> {{ b.branchCode || (b._id | slice:-6) | uppercase }}
+          </span>
+          <span class="category-badge">Org ID: {{ b.organizationId?._id || b.organizationId || 'N/A' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button pButton label="Edit" icon="pi pi-pencil" class="p-button-outlined p-button-secondary btn-sm"
+        [routerLink]="['/branches', b._id, 'edit']"></button>
+    </div>
+  </header>
+
+  <div class="layout-grid">
+
+    <aside class="sidebar-column">
+
+      <div class="profile-card">
+        <div class="card-banner"></div>
+
+        <div class="profile-content">
+          <div class="avatar-wrapper">
+            <p-avatar icon="pi pi-building" size="xlarge" shape="circle" styleClass="user-avatar"></p-avatar>
+            <div class="status-dot" [class.active]="b.isActive"></div>
+          </div>
+
+          <h3 class="contact-name">{{ b.name }}</h3>
+          <span class="contact-email">{{ b.isMainBranch ? 'Headquarters' : 'Branch Office' }}</span>
+
+          <div class="info-list">
+            <div class="info-item">
+              <div class="icon-box"><i class="pi pi-user"></i></div>
+              <div class="info-text">
+                <label>Manager</label>
+                <span>{{ managerName() }}</span>
+              </div>
+            </div>
+
+            <div class="info-item">
+              <div class="icon-box"><i class="pi pi-phone"></i></div>
+              <div class="info-text">
+                <label>Phone</label>
+                @if (b.phoneNumber) {
+                <a [href]="'tel:' + b.phoneNumber">{{ b.phoneNumber }}</a>
+                } @else {
+                <span>N/A</span>
+                }
+              </div>
+            </div>
+
+            <div class="info-item">
+              <div class="icon-box"><i class="pi pi-calendar"></i></div>
+              <div class="info-text">
+                <label>Established</label>
+                <span>{{ common.formatDate(b.createdAt) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-card meta-card">
+        <div class="card-header">
+          <i class="pi pi-info-circle"></i> <span>System Info</span>
+        </div>
+        <div class="card-body">
+          <div class="meta-row">
+            <label>Last Updated</label>
+            <span>{{ common.formatDate(b.updatedAt) }}</span>
           </div>
           <div class="meta-row">
-            <span class="id-badge">
-              <i class="pi pi-hashtag"></i> {{ b.branchCode || (b._id | slice:-6) | uppercase }}
-            </span>
-            <span class="category-badge">Org ID: {{ b.organizationId?._id || b.organizationId || 'N/A' }}</span>
+            <label>Database ID</label>
+            <span class="font-mono text-xs">{{ b._id }}</span>
           </div>
         </div>
       </div>
 
-      <div class="header-actions">
-        <button pButton label="Edit" icon="pi pi-pencil" class="p-button-outlined p-button-secondary btn-sm"
-          [routerLink]="['/branches', b._id, 'edit']"></button>
-      </div>
-    </header>
+    </aside>
 
-    <div class="layout-grid">
+    <main class="main-column">
 
-      <aside class="sidebar-column">
-        
-        <div class="profile-card">
-          <div class="card-banner"></div>
-          
-          <div class="profile-content">
-            <div class="avatar-wrapper">
-              <p-avatar icon="pi pi-building" size="xlarge" shape="circle" styleClass="user-avatar"></p-avatar>
-              <div class="status-dot" [class.active]="b.isActive"></div>
+      <section class="glass-card address-panel">
+        <div class="card-header">
+          <i class="pi pi-map-marker"></i> <span>Location Details</span>
+        </div>
+        <div class="card-body">
+
+          <div class="full-address-box">
+            <label>Formatted Address</label>
+            <p>{{ formatAddress(b.address) }}</p>
+          </div>
+
+          <div class="address-grid">
+            <div class="grid-item">
+              <label>Street</label>
+              <span>{{ b.address?.street || '—' }}</span>
             </div>
-
-            <h3 class="contact-name">{{ b.name }}</h3>
-            <span class="contact-email">{{ b.isMainBranch ? 'Headquarters' : 'Branch Office' }}</span>
-
-            <div class="info-list">
-              <div class="info-item">
-                <div class="icon-box"><i class="pi pi-user"></i></div>
-                <div class="info-text">
-                  <label>Manager</label>
-                  <span>{{ managerName() }}</span>
-                </div>
-              </div>
-
-              <div class="info-item">
-                <div class="icon-box"><i class="pi pi-phone"></i></div>
-                <div class="info-text">
-                  <label>Phone</label>
-                  @if (b.phoneNumber) {
-                    <a [href]="'tel:' + b.phoneNumber">{{ b.phoneNumber }}</a>
-                  } @else {
-                    <span>N/A</span>
-                  }
-                </div>
-              </div>
-
-              <div class="info-item">
-                <div class="icon-box"><i class="pi pi-calendar"></i></div>
-                <div class="info-text">
-                  <label>Established</label>
-                  <span>{{ common.formatDate(b.createdAt) }}</span>
-                </div>
-              </div>
+            <div class="grid-item">
+              <label>City</label>
+              <span>{{ b.address?.city || '—' }}</span>
             </div>
+            <div class="grid-item">
+              <label>State</label>
+              <span>{{ b.address?.state || '—' }}</span>
+            </div>
+            <div class="grid-item">
+              <label>Zip Code</label>
+              <span>{{ b.address?.zipCode || '—' }}</span>
+            </div>
+            <div class="grid-item">
+              <label>Country</label>
+              <span>{{ b.address?.country || '—' }}</span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <section class="glass-card org-panel">
+        <div class="card-header">
+          <i class="pi pi-sitemap"></i> <span>Organization Context</span>
+        </div>
+        <div class="card-body">
+          <div class="info-row">
+            <label>Parent Organization</label>
+            <span class="highlight">{{ b.organizationId?.name || b.organizationId || 'Unknown Org' }}</span>
+          </div>
+          <div class="info-row">
+            <label>Hierarchy Level</label>
+            <span>{{ b.isMainBranch ? 'Level 1 (Top)' : 'Level 2 (Sub)' }}</span>
           </div>
         </div>
+      </section>
 
-        <div class="glass-card meta-card">
-          <div class="card-header">
-            <i class="pi pi-info-circle"></i> <span>System Info</span>
-          </div>
-          <div class="card-body">
-            <div class="meta-row">
-              <label>Last Updated</label>
-              <span>{{ common.formatDate(b.updatedAt) }}</span>
-            </div>
-            <div class="meta-row">
-              <label>Database ID</label>
-              <span class="font-mono text-xs">{{ b._id }}</span>
-            </div>
-          </div>
-        </div>
-
-      </aside>
-
-      <main class="main-column">
-
-        <section class="glass-card address-panel">
-          <div class="card-header">
-            <i class="pi pi-map-marker"></i> <span>Location Details</span>
-          </div>
-          <div class="card-body">
-            
-            <div class="full-address-box">
-              <label>Formatted Address</label>
-              <p>{{ formatAddress(b.address) }}</p>
-            </div>
-
-            <div class="address-grid">
-              <div class="grid-item">
-                <label>Street</label>
-                <span>{{ b.address?.street || '—' }}</span>
-              </div>
-              <div class="grid-item">
-                <label>City</label>
-                <span>{{ b.address?.city || '—' }}</span>
-              </div>
-              <div class="grid-item">
-                <label>State</label>
-                <span>{{ b.address?.state || '—' }}</span>
-              </div>
-              <div class="grid-item">
-                <label>Zip Code</label>
-                <span>{{ b.address?.zipCode || '—' }}</span>
-              </div>
-              <div class="grid-item">
-                <label>Country</label>
-                <span>{{ b.address?.country || '—' }}</span>
-              </div>
-            </div>
-
-          </div>
-        </section>
-
-        <section class="glass-card org-panel">
-          <div class="card-header">
-            <i class="pi pi-sitemap"></i> <span>Organization Context</span>
-          </div>
-          <div class="card-body">
-            <div class="info-row">
-              <label>Parent Organization</label>
-              <span class="highlight">{{ b.organizationId?.name || b.organizationId || 'Unknown Org' }}</span>
-            </div>
-            <div class="info-row">
-              <label>Hierarchy Level</label>
-              <span>{{ b.isMainBranch ? 'Level 1 (Top)' : 'Level 2 (Sub)' }}</span>
-            </div>
-          </div>
-        </section>
-
-      </main>
-    </div>
+    </main>
+  </div>
   }
 </div>
-
-<!-- <div class="page-container animate-fadeIn">
-  @if (loading()) {
-    <div class="loading-state">
-      <div class="skeleton-header">
-        <div class="left-group">
-          <p-skeleton shape="circle" size="4rem"></p-skeleton>
-          <div class="text-group">
-            <p-skeleton width="12rem" height="1.5rem"></p-skeleton>
-            <p-skeleton width="8rem" height="1rem"></p-skeleton>
-          </div>
-        </div>
-      </div>
-      <div class="layout-grid">
-        <aside class="skeleton-sidebar">
-          <p-skeleton height="400px" styleClass="w-full"></p-skeleton>
-        </aside>
-        <main class="skeleton-main">
-          <p-skeleton height="200px" styleClass="w-full"></p-skeleton>
-          <p-skeleton height="200px" styleClass="w-full"></p-skeleton>
-        </main>
-      </div>
-    </div>
-  }
-
-  @else if (isError()) {
-    <div class="error-state">
-      <div class="error-icon"><i class="pi pi-building"></i></div>
-      <h2>Branch Not Found</h2>
-      <button pButton label="Back to Branches" icon="pi pi-arrow-left" class="p-button-outlined" routerLink="/branches"></button>
-    </div>
-  }
-
-  @else if (branch(); as b) {
-
-    <header class="dashboard-header">
-      <div class="header-left">
-        <button pButton icon="pi pi-arrow-left" class="p-button-text p-button-rounded back-btn" routerLink="/branches"></button>
-        
-        <div class="identity-group">
-          <div class="name-row">
-            <h1>{{ b.name }}</h1>
-            <p-tag [value]="b.isActive ? 'Active' : 'Inactive'" [severity]="b.isActive ? 'success' : 'danger'" styleClass="status-tag"></p-tag>
-            @if (b.isMainBranch) {
-              <p-tag value="Main Branch" severity="info" icon="pi pi-star-fill"></p-tag>
-            }
-          </div>
-          <div class="meta-row">
-            <span class="id-badge">
-              <i class="pi pi-hashtag"></i> {{ b.branchCode || b._id | uppercase }}
-            </span>
-            <span class="category-badge">Organization ID: {{ b.organizationId?._id || 'N/A' }}</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="header-actions">
-        <button pButton label="Edit" icon="pi pi-pencil" class="p-button-outlined p-button-secondary btn-sm"
-          [routerLink]="['/branches', b._id, 'edit']"></button>
-      </div>
-    </header>
-
-    <div class="layout-grid">
-
-      <aside class="sidebar-column">
-        
-        <div class="profile-card">
-          <div class="card-banner"></div>
-          
-          <div class="profile-content">
-            <div class="avatar-wrapper">
-              <p-avatar icon="pi pi-building" size="xlarge" shape="circle" styleClass="user-avatar"></p-avatar>
-              <div class="status-dot" [class.active]="b.isActive"></div>
-            </div>
-
-            <h3 class="contact-name">{{ b.name }}</h3>
-            <span class="contact-email">{{ b.isMainBranch ? 'Headquarters' : 'Branch Office' }}</span>
-
-            <div class="info-list">
-              <div class="info-item">
-                <div class="icon-box"><i class="pi pi-user"></i></div>
-                <div class="info-text">
-                  <label>Manager</label>
-                  <span>{{ managerName() }}</span>
-                </div>
-              </div>
-
-              <div class="info-item">
-                <div class="icon-box"><i class="pi pi-phone"></i></div>
-                <div class="info-text">
-                  <label>Phone</label>
-                  @if (b.phoneNumber) {
-                    <a [href]="'tel:' + b.phoneNumber">{{ b.phoneNumber }}</a>
-                  } @else {
-                    <span>N/A</span>
-                  }
-                </div>
-              </div>
-
-              <div class="info-item">
-                <div class="icon-box"><i class="pi pi-calendar"></i></div>
-                <div class="info-text">
-                  <label>Established</label>
-                  <span>{{ common.formatDate(b.createdAt) }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="glass-card meta-card">
-          <div class="card-header">
-            <i class="pi pi-info-circle"></i> <span>System Info</span>
-          </div>
-          <div class="card-body">
-            <div class="meta-row">
-              <label>Last Updated</label>
-              <span>{{ common.formatDate(b.updatedAt) }}</span>
-            </div>
-            <div class="meta-row">
-              <label>Database ID</label>
-              <span class="font-mono text-xs">{{ b._id }}</span>
-            </div>
-          </div>
-        </div>
-
-      </aside>
-
-      <main class="main-column">
-
-        <section class="glass-card address-panel">
-          <div class="card-header">
-            <i class="pi pi-map-marker"></i> <span>Location Details</span>
-          </div>
-          <div class="card-body">
-            
-            <div class="full-address-box">
-              <label>Formatted Address</label>
-              <p>{{ formatAddress(b.address) }}</p>
-            </div>
-
-            <div class="address-grid">
-              <div class="grid-item">
-                <label>Street</label>
-                <span>{{ b.address?.street || '—' }}</span>
-              </div>
-              <div class="grid-item">
-                <label>City</label>
-                <span>{{ b.address?.city || '—' }}</span>
-              </div>
-              <div class="grid-item">
-                <label>State</label>
-                <span>{{ b.address?.state || '—' }}</span>
-              </div>
-              <div class="grid-item">
-                <label>Zip Code</label>
-                <span>{{ b.address?.zipCode || '—' }}</span>
-              </div>
-              <div class="grid-item">
-                <label>Country</label>
-                <span>{{ b.address?.country || '—' }}</span>
-              </div>
-            </div>
-
-          </div>
-        </section>
-
-        <section class="glass-card org-panel">
-          <div class="card-header">
-            <i class="pi pi-sitemap"></i> <span>Organization Context</span>
-          </div>
-          <div class="card-body">
-            <div class="info-row">
-              <label>Parent Organization</label>
-              <span class="highlight">{{ b.organizationId?.name || 'Unknown Org' }}</span>
-            </div>
-            <div class="info-row">
-              <label>Hierarchy Level</label>
-              <span>{{ b.isMainBranch ? 'Level 1 (Top)' : 'Level 2 (Sub)' }}</span>
-            </div>
-          </div>
-        </section>
-
-      </main>
-    </div>
-  }
-</div> -->

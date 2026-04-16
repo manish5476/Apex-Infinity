@@ -9,8 +9,6 @@ import { InputTextModule } from 'primeng/inputtext';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { Router, RouterModule } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
-
-
 import { ImageCellRendererComponent } from '../../../shared/AgGrid/AgGridcomponents/image-cell-renderer/image-cell-renderer.component';
 import { CustomerService } from '../../services/customer-service';
 import { AppMessageService } from '../../../../core/services/message.service';
@@ -38,13 +36,13 @@ import { takeUntil } from "rxjs/operators";
     Toast,
     AgShareGrid,
     HasPermissionDirective
-],
+  ],
   providers: [CustomerService, ConfirmationService],
   templateUrl: './customer-list.html',
   styleUrl: './customer-list.scss',
 })
 export class CustomerList implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   private cdr = inject(ChangeDetectorRef);
   private customerService = inject(CustomerService);
   private messageService = inject(AppMessageService);
@@ -258,10 +256,10 @@ export class CustomerList implements OnInit, OnDestroy {
     const custId = this.selectedRows[0]._id;
 
     this.dialogServices.openImageUpload({
-            header: 'Update Customer Photo',
-            description: `Upload a new avatar for ${this.selectedRows[0].name}.`,
-            uploadFn: (file: File) => this.customerService.uploadCustomerPhoto(custId, file)
-          })?.onClose.pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
+      header: 'Update Customer Photo',
+      description: `Upload a new avatar for ${this.selectedRows[0].name}.`,
+      uploadFn: (file: File) => this.customerService.uploadCustomerPhoto(custId, file)
+    })?.onClose.pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
       if (res?.data?.customer?.photo) {
         this.messageService.showSuccess('Photo updated successfully.');
         this.getData(true); // Refresh grid to show new avatar
@@ -657,8 +655,8 @@ export class CustomerList implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }
