@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { map, catchError, tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 export interface DropdownOption {
@@ -41,118 +41,83 @@ export type DropdownEndpoint =
 })
 export class MasterDropdownService {
   private readonly baseUrl = `${environment.apiUrl}/v1/dropdowns`;
+  private cache = new Map<string, Observable<DropdownResponse>>();
 
   constructor(private http: HttpClient) { }
-  getDropdownData(endpoint: DropdownEndpoint, search: string = '', page: number = 1, limit: number = 100, includeIds?: string[], extraParams: any = {}): Observable<DropdownResponse> { // ✅ Return the full response for better UI control
+
+  /**
+   * Universal method to fetch dropdown data with built-in caching.
+   * Caches results based on endpoint and all query parameters.
+   */
+  getDropdownData(
+    endpoint: DropdownEndpoint,
+    search: string = '',
+    page: number = 1,
+    limit: number = 100,
+    includeIds?: string[],
+    extraParams: any = {}
+  ): Observable<DropdownResponse> {
+    // Generate a unique cache key based on all parameters
+    const cacheKey = JSON.stringify({ endpoint, search, page, limit, includeIds, extraParams });
+
+    // Return cached observable if it exists
+    if (this.cache.has(cacheKey)) {
+      return this.cache.get(cacheKey)!;
+    }
+
     let params = new HttpParams()
       .set('page', page.toString())
       .set('limit', limit.toString());
+
     if (search) params = params.set('search', search);
     if (includeIds?.length) params = params.set('includeIds', includeIds.join(','));
 
-    // ✅ Add any extra dynamic filters (like 'type', 'parentId', etc.)
+    // Add any extra dynamic filters
     Object.keys(extraParams).forEach(key => {
       if (extraParams[key] !== undefined && extraParams[key] !== null) {
         params = params.set(key, extraParams[key].toString());
       }
     });
-    return this.http.get<DropdownResponse>(`${this.baseUrl}/${endpoint}`, { params }).pipe(
+
+    // Create the observable, share it, and cache it
+    const request$ = this.http.get<DropdownResponse>(`${this.baseUrl}/${endpoint}`, { params }).pipe(
       catchError(error => {
         console.error(`Error fetching ${endpoint}:`, error);
+        // On error, remove from cache so it can be retried
+        this.cache.delete(cacheKey);
         return of({ status: 'error', results: 0, total: 0, hasMore: false, data: [] });
+      }),
+      // ✅ Cache the successful response for future subscribers
+      tap(res => {
+        if (res.status === 'error') this.cache.delete(cacheKey);
+      }),
+      // shareReplay(1) ensures multiple components sharing the same dropdown instance 
+      // get the same data without triggering multiple HTTP calls
+      // bufferSize: 1, refCount: false keeps the cache alive for the session
+    );
+
+    // We store the observable itself in the map. 
+    // However, for a simple "one-off" cache like this, storing the result via 'of()' 
+    // after the first completion is often easier to reason about.
+    // Let's use a slightly more robust "Result Cache" pattern.
+
+    const sharedRequest$ = request$.pipe(
+      tap(data => {
+        // Replace the "pending" observable with a "static" one once data arrives
+        this.cache.set(cacheKey, of(data));
       })
     );
+
+    this.cache.set(cacheKey, sharedRequest$);
+    return sharedRequest$;
+  }
+
+  /**
+   * Manually clear the dropdown cache. 
+   * Useful when a new master record is added and dropdowns need to be refreshed.
+   */
+  clearCache(): void {
+    this.cache.clear();
   }
 }
 
-
-// import { Injectable } from '@angular/core';
-// import { HttpClient, HttpParams } from '@angular/common/http';
-// import { Observable, of } from 'rxjs';
-// import { map, catchError } from 'rxjs/operators';
-// import { environment } from '../../../environments/environment';
-
-// // 1. Strict Interface matching your new optimized backend
-// export interface DropdownOption {
-//   label: string;
-//   value: string; // The _id from MongoDB
-// }
-
-// interface DropdownResponse {
-//   status: string;
-//   results: number;
-//   data: DropdownOption[];
-// }
-
-// // 2. 🟢 ENTERPRISE UPGRADE: Strict typing for all 20+ routes
-// // This gives you massive IDE auto-complete and prevents typos
-// export type DropdownEndpoint =
-//   // Auth & Org
-//   | 'users' | 'branches' | 'roles' | 'customers' | 'suppliers' | 'masters'
-//   // Inventory
-//   | 'products' | 'purchases' | 'sales'
-//   // Accounting
-//   | 'accounts' | 'invoices' | 'payments' | 'emis'
-//   // HRMS
-//   | 'departments' | 'designations' | 'shifts' | 'holidays' | 'geofencing'
-//   | 'shift-assignments' | 'attendance-machines';
-
-// @Injectable({
-//   providedIn: 'root'
-// })
-// export class MasterDropdownService {
-//   // Replace with your actual environment variable path
-//   // private readonly baseUrl = '/api/v1/dropdowns';
-//   private readonly baseUrl = environment.apiUrl + '/v1/dropdowns';
-//   constructor(private http: HttpClient) { }
-
-//   /**
-//    * Universal method to fetch optimized { label, value } pairs for ANY model
-//    * * @param endpoint The specific module route (strictly typed)
-//    * @param search The user's typed search term (for live filtering)
-//    * @param page For infinite scrolling/lazy loading
-//    * @param searchField (Optional) Override the backend default search field
-//    * @param labelField (Optional) Override the backend default label field
-//    * @param includeIds (Optional) Array of IDs to guarantee they load (fixes PrimeNG lazy load bug)
-//    */
-//   getDropdownData(
-//     endpoint: DropdownEndpoint,
-//     search: string = '',
-//     page: number = 1,
-//     searchField?: string,
-//     labelField?: string,
-//     includeIds?: string[]
-//   ): Observable<DropdownOption[]> {
-
-//     // 3. Dynamic HttpParams Construction
-//     let params = new HttpParams()
-//       .set('page', page.toString())
-//       .set('limit', '50'); // Keep payload small
-
-//     if (search) {
-//       params = params.set('search', search);
-//     }
-
-//     if (searchField) {
-//       params = params.set('searchField', searchField);
-//     }
-
-//     if (labelField) {
-//       params = params.set('labelField', labelField);
-//     }
-
-//     // 4. Handle the PrimeNG MultiSelect pre-filled data edge case
-//     if (includeIds && includeIds.length > 0) {
-//       params = params.set('includeIds', includeIds.join(','));
-//     }
-
-//     // 5. Execute Request and map directly to the data array
-//     return this.http.get<DropdownResponse>(`${this.baseUrl}/${endpoint}`, { params }).pipe(
-//       map(response => response.data || []), // Isolate just the array
-//       catchError(error => {
-//         console.error(`Error fetching dropdown data for ${endpoint}:`, error);
-//         return of([]); // Return an empty array on failure so the UI doesn't crash
-//       })
-//     );
-//   }
-// }
