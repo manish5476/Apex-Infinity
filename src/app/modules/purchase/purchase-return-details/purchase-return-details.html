@@ -1,23 +1,24 @@
 <div class="page-container animate-fadeIn custom-scrollbar">
 
   @if (loading()) {
-    <div class="loading-state">
-      <i class="pi pi-spin pi-spinner text-4xl mb-4 text-[var(--accent-primary)]"></i>
-      <p>Retrieving Debit Note...</p>
-    </div>
+  <div class="loading-state">
+    <i class="pi pi-spin pi-spinner text-4xl mb-4 text-[var(--accent-primary)]"></i>
+    <p>Retrieving Debit Note...</p>
+  </div>
   }
 
   @else if (ret(); as r) {
 
   <div class="action-bar no-print">
     <div class="left">
-      <p-button icon="pi pi-arrow-left" label="Back" styleClass="p-button-text p-button-secondary" (onClick)="goBack()"></p-button>
+      <p-button icon="pi pi-arrow-left" label="Back" styleClass="p-button-text p-button-secondary"
+        (onClick)="goBack()"></p-button>
       <span class="divider">/</span>
       <span class="crumb">Debit Note #{{ formatId(r._id) }}</span>
     </div>
     <div class="right flex gap-2">
       <p-button label="View Invoice" icon="pi pi-external-link" styleClass="p-button-outlined p-button-secondary"
-      (onClick)="goToInvoice(r.purchaseId?._id)"></p-button>
+        (onClick)="goToInvoice(r.purchaseId?._id)"></p-button>
       <p-button label="Print PDF" icon="pi pi-print" styleClass="p-button-primary" (onClick)="print()"></p-button>
     </div>
   </div>
@@ -29,7 +30,8 @@
     <header class="doc-header">
       <div class="brand-section">
         <div class="doc-type-label">DEBIT NOTE</div>
-        <h1 class="doc-number">#{{ formatId(r._id) }}</h1> <div class="doc-date">Date: <strong>{{ r.returnDate | date:'mediumDate' }}</strong></div>
+        <h1 class="doc-number">#{{ formatId(r._id) }}</h1>
+        <div class="doc-date">Date: <strong>{{ r.returnDate | date:'mediumDate' }}</strong></div>
       </div>
 
       <div class="total-section">
@@ -47,15 +49,15 @@
         <div class="primary-text">{{ r.supplierId?.companyName }}</div>
         <div class="secondary-text mt-1">
           @if (r.supplierId?.email) {
-            <div><i class="pi pi-envelope mr-1"></i> {{ r.supplierId.email }}</div>
+          <div><i class="pi pi-envelope mr-1"></i> {{ r.supplierId.email }}</div>
           }
           @if (r.supplierId?.phone) {
-            <div><i class="pi pi-phone mr-1"></i> {{ r.supplierId.phone }}</div>
+          <div><i class="pi pi-phone mr-1"></i> {{ r.supplierId.phone }}</div>
           }
           @if (r.supplierId?.address; as addr) {
-            <div class="mt-1 opacity-70">
-              {{ addr.street }}, {{ addr.city }}
-            </div>
+          <div class="mt-1 opacity-70">
+            {{ addr.street }}, {{ addr.city }}
+          </div>
           }
         </div>
       </div>
@@ -99,9 +101,9 @@
             <td style="padding-left: 1.5rem;">
               <div class="font-bold text-[var(--text-primary)]">{{ item.name }}</div>
               @if (item.productId?.sku) {
-                <div class="text-xs text-[var(--text-secondary)] mt-0.5">
-                  SKU: {{ item.productId.sku }}
-                </div>
+              <div class="text-xs text-[var(--text-secondary)] mt-0.5">
+                SKU: {{ item.productId.sku }}
+              </div>
               }
             </td>
             <td class="text-right">{{ item.returnPrice | currency:'INR' }}</td>
@@ -116,7 +118,8 @@
 
     <footer class="doc-footer">
       <div class="notes">
-        <strong>Note:</strong> This debit note confirms the return of goods. The value has been credited to your account.
+        <strong>Note:</strong> This debit note confirms the return of goods. The value has been credited to your
+        account.
       </div>
       <div class="signature">
         <div class="line"></div>
@@ -125,5 +128,5 @@
     </footer>
 
   </div>
-}
+  }
 </div>

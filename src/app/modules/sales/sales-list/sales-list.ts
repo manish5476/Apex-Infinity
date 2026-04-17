@@ -231,7 +231,7 @@ export class SalesListComponent implements OnInit, OnDestroy {
           return this.twoLine(
             `<span style="font-family:var(--font-mono);font-weight:700;color:var(--accent-primary);cursor:pointer;">${inv}</span>`,
             `<span style="font-size:10px;color:var(--text-tertiary);">🏢 ${branch}</span>
-           <span style="font-size:9px;font-weight:600;color:${invStatusColor};margin-left:6px;">${invStatus.toUpperCase()}</span>`,
+            <span style="font-size:9px;font-weight:600;color:${invStatusColor};margin-left:6px;">${invStatus.toUpperCase()}</span>`,
           );
         },
       },
@@ -251,21 +251,21 @@ export class SalesListComponent implements OnInit, OnDestroy {
           const avatar = this.common.getAvatarStyle(name);
           const initials = this.common.getInitials(name);
           return `
-          <div style="display:flex;align-items:center;gap:8px;width:100%;overflow:hidden;">
-            <span style="
-              width:26px;height:26px;border-radius:50%;flex-shrink:0;
-              background:${avatar.background};color:${avatar.color};
-              display:inline-flex;align-items:center;justify-content:center;
-              font-size:9px;font-weight:700;">
-              ${initials}
-            </span>
-            ${this.twoLine(
+            <div style="display:flex;align-items:center;gap:8px;width:100%;overflow:hidden;">
+              <span style="
+                width:26px;height:26px;border-radius:50%;flex-shrink:0;
+                background:${avatar.background};color:${avatar.color};
+                display:inline-flex;align-items:center;justify-content:center;
+                font-size:9px;font-weight:700;">
+                ${initials}
+              </span>
+              ${this.twoLine(
             name,
             phone + (email ? ' · ' + email : ''),
             'font-size:12px;font-weight:600;color:var(--text-primary);',
             'font-size:10px;color:var(--text-tertiary);'
           )}
-          </div>`;
+            </div>`;
         },
         tooltipValueGetter: (p: any) => {
           const c = p.data?.customerId;
@@ -333,10 +333,10 @@ export class SalesListComponent implements OnInit, OnDestroy {
         cellRenderer: (p: any) => {
           const val = p.value ?? 0;
           return `<span style="
-          font-family:var(--font-mono);font-size:13px;font-weight:700;
-          color:var(--text-primary);">
-          ${this.common.formatCurrency(val)}
-        </span>`;
+            font-family:var(--font-mono);font-size:13px;font-weight:700;
+            color:var(--text-primary);">
+            ${this.common.formatCurrency(val)}
+          </span>`;
         },
       },
 
@@ -352,10 +352,10 @@ export class SalesListComponent implements OnInit, OnDestroy {
           const val = p.value ?? 0;
           if (!val) return `<span style="color:var(--text-tertiary);font-size:11px;">—</span>`;
           return `<span style="
-          font-family:var(--font-mono);font-size:12px;font-weight:600;
-          color:var(--color-success);">
-          ${this.common.formatCurrency(val)}
-        </span>`;
+            font-family:var(--font-mono);font-size:12px;font-weight:600;
+            color:var(--color-success);">
+            ${this.common.formatCurrency(val)}
+          </span>`;
         },
       },
 
@@ -370,16 +370,16 @@ export class SalesListComponent implements OnInit, OnDestroy {
         cellRenderer: (p: any) => {
           if (p.node?.rowPinned) {
             return `<span style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--color-error);">
-            ${this.common.formatCurrency(p.value ?? 0)}
-          </span>`;
+              ${this.common.formatCurrency(p.value ?? 0)}
+            </span>`;
           }
           const val = p.value ?? 0;
           if (val === 0) return this.badge('✓ Cleared', 'var(--color-success-bg)', 'var(--color-success)', 'var(--color-success-border)');
           return `<span style="
-          font-family:var(--font-mono);font-size:12px;font-weight:700;
-          color:var(--color-error);">
-          ${this.common.formatCurrency(val)}
-        </span>`;
+            font-family:var(--font-mono);font-size:12px;font-weight:700;
+            color:var(--color-error);">
+            ${this.common.formatCurrency(val)}
+          </span>`;
         },
       },
 
@@ -405,15 +405,15 @@ export class SalesListComponent implements OnInit, OnDestroy {
           const [bg, color, bdr, label] = statusMap[status] ?? statusMap['unpaid'];
           const barColor = status === 'paid' ? 'var(--color-success)' : status === 'partial' ? 'var(--color-warning)' : 'var(--color-error)';
           return `
-          <div style="width:100%;">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-              ${this.badge(label, bg, color, bdr)}
-              <span style="font-size:10px;color:var(--text-tertiary);">${pct}%</span>
-            </div>
-            <div style="height:4px;border-radius:99px;background:var(--border-primary);overflow:hidden;">
-              <div style="height:100%;width:${pct}%;background:${barColor};border-radius:99px;"></div>
-            </div>
-          </div>`;
+            <div style="width:100%;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+                ${this.badge(label, bg, color, bdr)}
+                <span style="font-size:10px;color:var(--text-tertiary);">${pct}%</span>
+              </div>
+              <div style="height:4px;border-radius:99px;background:var(--border-primary);overflow:hidden;">
+                <div style="height:100%;width:${pct}%;background:${barColor};border-radius:99px;"></div>
+              </div>
+            </div>`;
         },
       },
 
@@ -456,8 +456,8 @@ export class SalesListComponent implements OnInit, OnDestroy {
         cellRenderer: (p: any) => {
           if (p.node?.rowPinned) {
             return `<span style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--color-success);">
-            ${this.common.formatCurrency(p.value?.margin ?? 0)}
-          </span>`;
+              ${this.common.formatCurrency(p.value?.margin ?? 0)}
+            </span>`;
           }
           const { margin, pct } = p.value;
           const color = margin > 0 ? 'var(--color-success)' : margin < 0 ? 'var(--color-error)' : 'var(--text-tertiary)';
@@ -497,20 +497,20 @@ export class SalesListComponent implements OnInit, OnDestroy {
   // ─── Private renderer helpers ────────────────────────────────────────────────
   private badge(label: string, bg: string, color: string, border: string): string {
     return `<span style="
-      background:${bg};
-      color:${color};
-      border:1px solid ${border};
-      padding:1px 6px;
-      border-radius:3px;
-      font-size:10px;
-      font-weight:700;
-      letter-spacing:0.3px;
-      text-transform:uppercase;
-      white-space:nowrap;
-      line-height:1.4;
-      display:inline-block;">
-      ${label}
-    </span>`;
+        background:${bg};
+        color:${color};
+        border:1px solid ${border};
+        padding:1px 6px;
+        border-radius:3px;
+        font-size:10px;
+        font-weight:700;
+        letter-spacing:0.3px;
+        text-transform:uppercase;
+        white-space:nowrap;
+        line-height:1.4;
+        display:inline-block;">
+        ${label}
+      </span>`;
   }
 
   private twoLine(
@@ -520,13 +520,13 @@ export class SalesListComponent implements OnInit, OnDestroy {
     bottomStyle = 'font-size:10px;color:var(--text-tertiary);'
   ): string {
     return `
-      <div style="
-        display:flex;flex-direction:column;
-        justify-content:center;gap:0px;
-        line-height:1.25;overflow:hidden;">
-        <span style="${topStyle}white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${top}</span>
-        <span style="${bottomStyle}white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${bottom}</span>
-      </div>`;
+        <div style="
+          display:flex;flex-direction:column;
+          justify-content:center;gap:0px;
+          line-height:1.25;overflow:hidden;">
+          <span style="${topStyle}white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${top}</span>
+          <span style="${bottomStyle}white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${bottom}</span>
+        </div>`;
   }
 
 }
