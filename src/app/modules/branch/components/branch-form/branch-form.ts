@@ -16,12 +16,12 @@ import { InputNumberModule } from 'primeng/inputnumber';
 
 // Services
 import { LoadingService } from '../../../../core/services/loading.service';
-import { MasterListService } from '../../../../core/services/master-list.service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { BranchService } from '../../services/branch-service';
 
 // ✅ Custom Components
 import { LocationPickerComponent } from '../../components/location-picker/location-picker.component'; 
+import { MasterDropdownComponent } from '../../../shared/components/masterFilterDropdown/master-dropdown.component';
 
 @Component({
   selector: 'app-branch-form',
@@ -35,7 +35,8 @@ import { LocationPickerComponent } from '../../components/location-picker/locati
     SelectModule,
     DividerModule,
     InputNumberModule,
-    LocationPickerComponent
+    LocationPickerComponent,
+    MasterDropdownComponent
 ],
   templateUrl: './branch-form.html',
   styleUrls: ['./branch-form.scss']
@@ -47,9 +48,8 @@ export class BranchFormComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private branchService = inject(BranchService);
-  private appMessage = inject(AppMessageService); // Renamed for consistency with MasterList pattern
+  private appMessage = inject(AppMessageService);
   private loadingService = inject(LoadingService);
-  private masterList = inject(MasterListService);
 
   // --- Form & State ---
   branchForm!: FormGroup;
@@ -58,22 +58,15 @@ export class BranchFormComponent implements OnInit, OnDestroy {
   branchId: string | null = null;
   formTitle = signal('Create New Branch');
 
-  // --- Signals ---
-  managerOptions = signal<any[]>([]);
-  
   // Holds the coordinates to pass TO the map (for editing)
   initialMapLocation = signal<{ lat: number, lng: number } | null>(null);
 
-  constructor() {
-    // Load managers from master list
-    this.managerOptions.set(this.masterList.users()); 
-  }
+  constructor() {}
 
   ngOnInit(): void {
     this.buildForm();
     this.checkRouteForEditMode();
 
-    // If creating new, try to get current location automatically
     if (!this.branchId) {
       this.setCurrentLocationIfEmpty();
     }
@@ -114,7 +107,7 @@ export class BranchFormComponent implements OnInit, OnDestroy {
       });
     }
   }
-  // --- Location Logic ---
+
   onMapLocationChange(coords: { lat: number; lng: number }) {
     this.branchForm.get('location')?.patchValue({
       lat: Number(coords.lat.toFixed(6)),
@@ -141,14 +134,12 @@ private checkRouteForEditMode(): void {
           this.patchForm(response.data.data);
         }
       },
-      // Removed the second 'Fetch Branch Details' parameter
       error: (err) => this.appMessage.handleHttpError(err)
     });
   }
 
   onLocationFieldFocus(): void {
     if (!navigator.geolocation) {
-      // Combined the old summary and detail into one clean string
       this.appMessage.showWarn('Not Supported: Geolocation is not available on this browser.');
       return;
     }
@@ -161,10 +152,8 @@ private checkRouteForEditMode(): void {
         this.branchForm.get('location')?.patchValue({ lat, lng });
         this.initialMapLocation.set({ lat, lng });
         
-        // Simplified to a single string
         this.appMessage.showInfo('Location synchronized from GPS.');
       },
-      // Simplified to a single string
       () => this.appMessage.showWarn('Permission Denied: Please enable location permissions in your browser.'),
       { enableHighAccuracy: true, timeout: 10000 }
     );
@@ -181,7 +170,6 @@ private checkRouteForEditMode(): void {
         this.branchForm.get('location')?.patchValue({ lat, lng });
         this.initialMapLocation.set({ lat, lng });
       },
-      // No message service here, but keeping your console.warn intact!
       (err) => console.warn('Auto-location failed', err)
     );
   }
@@ -189,7 +177,6 @@ private checkRouteForEditMode(): void {
   onSubmit(): void {
     if (this.branchForm.invalid) {
       this.branchForm.markAllAsTouched();
-      // Combined the summary and detail into a single warning string
       this.appMessage.showWarn('Invalid Form: Please check the required fields before saving.');
       return;
     }
@@ -205,99 +192,13 @@ private checkRouteForEditMode(): void {
       finalize(() => this.isSubmitting.set(false)), takeUntil(this.destroy$)
     ).subscribe({
       next: () => {
-        // This was already a perfect single string, no changes needed here!
         this.appMessage.showSuccess(`Branch ${this.editMode() ? 'updated' : 'created'} successfully.`);
-        this.masterList.refresh();
         this.router.navigate(['/branches']);
       },
-      // Removed the custom context strings since the service handles it now
       error: (err) => this.appMessage.handleHttpError(err)
     });
   }
   
-  // private checkRouteForEditMode(): void {
-  //   this.route.paramMap.pipe(
-  //     switchMap(params => {
-  //       this.branchId = params.get('id');
-  //       if (this.branchId) {
-  //         this.editMode.set(true);
-  //         this.formTitle.set('Edit Branch');
-  //         return this.branchService.getBranchById(this.branchId);
-  //       }
-  //       return of(null);
-  //     }),
-  //     finalize(() => this.loadingService.hide())
-  //   ).subscribe({
-  //     next: (response) => {
-  //       if (response?.data?.data) {
-  //         this.patchForm(response.data.data);
-  //       }
-  //     },
-  //     error: (err) => this.appMessage.handleHttpError(err, 'Fetch Branch Details')
-  //   });
-  // }
-
-
-  // onLocationFieldFocus(): void {
-  //   if (!navigator.geolocation) {
-  //     this.appMessage.showWarn('Geolocation is not available on this browser.', 'Not Supported');
-  //     return;
-  //   }
-
-  //   navigator.geolocation.getCurrentPosition(
-  //     (position) => {
-  //       const lat = Number(position.coords.latitude.toFixed(6));
-  //       const lng = Number(position.coords.longitude.toFixed(6));
-
-  //       this.branchForm.get('location')?.patchValue({ lat, lng });
-  //       this.initialMapLocation.set({ lat, lng });
-  //       this.appMessage.showInfo('Location updated from GPS', 'Location Synchronized');
-  //     },
-  //     () => this.appMessage.showWarn('Please enable location permissions in your browser.', 'Permission Denied'),
-  //     { enableHighAccuracy: true, timeout: 10000 }
-  //   );
-  // }
-
-  // private setCurrentLocationIfEmpty(): void {
-  //   const loc = this.branchForm.get('location')?.value;
-  //   if (loc?.lat || loc?.lng || !navigator.geolocation) return;
-
-  //   navigator.geolocation.getCurrentPosition(
-  //     (pos) => {
-  //       const lat = Number(pos.coords.latitude.toFixed(6));
-  //       const lng = Number(pos.coords.longitude.toFixed(6));
-  //       this.branchForm.get('location')?.patchValue({ lat, lng });
-  //       this.initialMapLocation.set({ lat, lng });
-  //     },
-  //     (err) => console.warn('Auto-location failed', err)
-  //   );
-  // }
-
-  // onSubmit(): void {
-  //   if (this.branchForm.invalid) {
-  //     this.branchForm.markAllAsTouched();
-  //     this.appMessage.showWarn('Please check the required fields before saving.', 'Invalid Form');
-  //     return;
-  //   }
-
-  //   this.isSubmitting.set(true);
-  //   const payload = this.branchForm.getRawValue();
-
-  //   const request$ = this.editMode()
-  //     ? this.branchService.updateBranch(this.branchId!, payload)
-  //     : this.branchService.createBranch(payload);
-
-  //   request$.pipe(
-  //     finalize(() => this.isSubmitting.set(false))
-  //   ).subscribe({
-  //     next: () => {
-  //       this.appMessage.showSuccess(`Branch ${this.editMode() ? 'updated' : 'created'} successfully.`);
-  //       this.masterList.refresh();
-  //       this.router.navigate(['/branches']);
-  //     },
-  //     error: (err) => this.appMessage.handleHttpError(err, this.editMode() ? 'Update Branch' : 'Create Branch')
-  //   });
-  // }
     ngOnDestroy(): void {
         this.destroy$.next();
         this.destroy$.complete();

@@ -30,7 +30,7 @@ import { TestimonialSliderComponent } from '../../../storefront-public/pages/tes
 import { TextContentComponent } from '../../../storefront-public/pages/text-content/text-content.component';
 import { VideoHeroComponent } from '../../../storefront-public/pages/video-hero/video-hero.component';
 import { ProductListingComponent } from '../../../storefront-public/pages/product-listing/product-listing.component';
-import { MasterListService } from '../../../../core/services/master-list.service';
+// import { MasterListService } from '../../../../core/services/master-list.service';
 import { AdminPage, PageSection, SectionDefinition } from '@core/models/storefront.model';
 import { StorefrontAdminService } from '@core/services/storefront-admin.service';
 import { StorefrontPublicService } from '@core/services/storefront-public.service';
@@ -88,7 +88,7 @@ export class PageBuilderComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private adminService = inject(StorefrontAdminService);
   private publicService = inject(StorefrontPublicService);
-  private masterListService = inject(MasterListService);
+  // private masterListService = inject(MasterListService);
 
   // ── Data ──────────────────────────────────────────────────────────────────
   page = signal<AdminPage | null>(null);
@@ -174,7 +174,7 @@ export class PageBuilderComponent implements OnInit, OnDestroy {
           categories: enums.categories ?? [],
           brands: enums.brands ?? [],
           tags: enums.tags ?? [],
-          products: this.masterListService.products?.() ?? []
+          products: [] // this.masterListService.products?.() ?? []
         });
       }
     });
@@ -361,4 +361,3 @@ export class PageBuilderComponent implements OnInit, OnDestroy {
         this.destroy$.complete();
     }
 }
-

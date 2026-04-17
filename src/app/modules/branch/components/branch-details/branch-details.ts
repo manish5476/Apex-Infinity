@@ -1,20 +1,20 @@
 import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { finalize, takeUntil } from 'rxjs/operators'; // Import finalize
+import { takeUntil } from 'rxjs/operators';
 
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
 import { DividerModule } from 'primeng/divider';
 import { TagModule } from 'primeng/tag';
 import { AvatarModule } from 'primeng/avatar';
-import { SkeletonModule } from 'primeng/skeleton'; // Import Skeleton
+import { SkeletonModule } from 'primeng/skeleton';
 
 // Services
 import { BranchService } from '../../services/branch-service';
-import { MasterListService } from '../../../../core/services/master-list.service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
+import { MasterDropdownService } from '../../../../core/services/master-dropdown.service';
 import { Subject } from "rxjs";
 
 @Component({
@@ -31,26 +31,25 @@ export class BranchDetailsComponent implements OnInit, OnDestroy {
     private readonly destroy$ = new Subject<void>();
   private route = inject(ActivatedRoute);
   private branchService = inject(BranchService);
-  private masterList = inject(MasterListService);
   private messageService = inject(AppMessageService);
   public common = inject(CommonMethodService);
+  private dropdownService = inject(MasterDropdownService);
 
   // Signals
   branch = signal<any | null>(null);
   managerName = signal('N/A');
-  loading = signal(true); // Added loading state
-  isError = signal(false); // Added error state
+  loading = signal(true);
+  isError = signal(false);
 
   ngOnInit(): void {
     this.loadBranchData();
   }
 
-private loadBranchData(): void {
+  private loadBranchData(): void {
     this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const branchId = params.get('id');
 
       if (!branchId) {
-        // Updated to pass a single formatted string instead of two parameters
         this.messageService.showError('Navigation Error: No branch ID provided.');
         this.isError.set(true);
         this.loading.set(false);
@@ -69,12 +68,21 @@ private loadBranchData(): void {
             
             // Resolve Manager Name
             if (branchData.managerId) {
-              const manager = this.masterList.users().find(u => u._id === branchData.managerId);
-              if (manager) this.managerName.set(manager.name);
+              if (typeof branchData.managerId === 'object' && branchData.managerId.name) {
+                this.managerName.set(branchData.managerId.name);
+              } else {
+                // Fetch from dropdown service if not populated
+                this.dropdownService.getDropdownData('users', '', 1, 1, [branchData.managerId])
+                  .pipe(takeUntil(this.destroy$))
+                  .subscribe(res => {
+                    if (res.data && res.data.length > 0) {
+                      this.managerName.set(res.data[0].label);
+                    }
+                  });
+              }
             }
           } else {
             this.isError.set(true);
-            // Added user feedback instead of just silently setting the error state
             this.messageService.showError('Failed to load branch details. Data is unavailable.');
           }
           this.loading.set(false);
@@ -83,6 +91,7 @@ private loadBranchData(): void {
       );
     });
   }
+
   formatAddress(address: any): string {
     if (!address) return 'No address on file.';
     return [address.street, address.city, address.state, address.zipCode, address.country]

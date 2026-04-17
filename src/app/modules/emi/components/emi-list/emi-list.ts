@@ -23,12 +23,13 @@ import { Subject } from 'rxjs';
 import { takeUntil, finalize } from 'rxjs/operators';
 
 import { AppMessageService } from '../../../../core/services/message.service';
-import { MasterListService } from '../../../../core/services/master-list.service';
+// import { MasterListService } from '../../../../core/services/master-list.service';
 import { EmiService } from '../../services/emi-service';
 import { AgShareGrid, ActionColumnConfig } from '../../../shared/components/ag-shared-grid';
 import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '@core/auth/permissions.constants';
 import { CommonMethodService } from '@core/utils/common-method.service';
+import { MasterDropdownComponent } from '../../../shared/components/masterFilterDropdown/master-dropdown.component';
 
 @Component({
   selector: 'app-emi-list',
@@ -44,7 +45,8 @@ import { CommonMethodService } from '@core/utils/common-method.service';
     ToastModule,
     AgShareGrid,
     HasPermissionDirective,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    MasterDropdownComponent
   ],
   providers: [EmiService, ConfirmationService],
   templateUrl: './emi-list.html',
@@ -74,7 +76,7 @@ export class EmiList implements OnInit, OnDestroy {
   private readonly messageService = inject(AppMessageService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly router = inject(Router);
-  public readonly masterList = inject(MasterListService);
+  // public readonly masterList = inject(MasterListService);
   public readonly common = inject(CommonMethodService);
 
   // ─── Lifecycle subjects ───────────────────────────────────────────────────────
@@ -95,7 +97,7 @@ export class EmiList implements OnInit, OnDestroy {
    * Derived from masterList signal via computed — no effect() needed.
    * This eliminates the signal-write-inside-effect memory/stack bug.
    */
-  readonly customerOptions = computed(() => this.masterList.customers());
+  // readonly customerOptions = computed(() => this.masterList.customers());
 
   readonly emiAnalytics = signal<any>(null);
 

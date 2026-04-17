@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed, OnDestroy } from '@angular/core';
+import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -17,26 +17,25 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ToggleButtonModule } from 'primeng/togglebutton';
 import { DatePicker } from 'primeng/datepicker';
 import { Divider } from "primeng/divider";
-import { MasterListService } from '../../../core/services/master-list.service';
+import { MasterDropdownComponent } from '../../shared/components/masterFilterDropdown/master-dropdown.component';
 import { AppMessageService } from '../../../core/services/message.service';
 import { PurchaseService } from '../purchase.service';
 
 @Component({
   selector: 'app-purchase-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ToastModule, ButtonModule, InputTextModule, InputNumberModule, SelectModule, DatePicker, TextareaModule, FileUploadModule, TooltipModule, ToggleButtonModule, RouterLink, Divider],
+  imports: [CommonModule, ReactiveFormsModule, ToastModule, ButtonModule, InputTextModule, InputNumberModule, SelectModule, DatePicker, TextareaModule, FileUploadModule, TooltipModule, ToggleButtonModule, RouterLink, Divider, MasterDropdownComponent],
   templateUrl: './purchase-form.html',
   styleUrl: './purchase-form.scss',
 })
 
 export class PurchaseFormComponent implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   // --- Injections ---
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private purchaseService = inject(PurchaseService);
-  private masterList = inject(MasterListService);
   private messageService = inject(AppMessageService);
 
   // --- State ---
@@ -45,11 +44,6 @@ export class PurchaseFormComponent implements OnInit, OnDestroy {
   editMode = signal(false);
   purchaseId: string | null = null;
   formTitle = signal('New Purchase Entry');
-
-  // --- Data Signals ---
-  supplierOptions = signal<any[]>([]);
-  branchOptions = signal<any[]>([]);
-  productOptions = signal<any[]>([]);
 
   // --- Enums ---
   statusOptions = [
@@ -69,13 +63,7 @@ export class PurchaseFormComponent implements OnInit, OnDestroy {
   // --- File Handling ---
   selectedFiles: File[] = [];
 
-  constructor() {
-    // Load Master Data
-    this.branchOptions.set(this.masterList.branches());
-    this.supplierOptions.set(this.masterList.suppliers());
-    this.productOptions.set(this.masterList.products());
-    console.log(this.masterList.products());
-  }
+  constructor() {}
 
   ngOnInit(): void {
     this.buildForm();
@@ -137,14 +125,14 @@ export class PurchaseFormComponent implements OnInit, OnDestroy {
     this.calculateTotals();
   }
 
-  onProductSelect(index: number, productId: string): void {
-    const product = this.productOptions().find(p => p._id === productId);
+  onProductSelect(index: number, product: any): void {
     if (product) {
       const row = this.items.at(index);
       row.patchValue({
-        name: product.name,
-        purchasePrice: product.purchasePrice || 0,
-        taxRate: product.taxRate || 0,
+        productId: product.value || product._id, // Support both formats
+        name: product.label || product.name,
+        purchasePrice: product.meta?.purchasePrice || product.purchasePrice || 0,
+        taxRate: product.meta?.taxRate || product.taxRate || 0,
         discount: 0
       }, { emitEvent: true });
     }
@@ -204,91 +192,18 @@ export class PurchaseFormComponent implements OnInit, OnDestroy {
     this.selectedFiles = this.selectedFiles.filter(f => f.name !== event.file.name);
   }
 
-  // onSubmit(): void {
-  //   if (this.purchaseForm.invalid) {
-  //     this.purchaseForm.markAllAsTouched();
-  //     this.messageService.showError('Invalid Form', 'Please check required fields.');
-  //     return;
-  //   }
-  //   const formValue = this.purchaseForm.getRawValue();
-  //   const fd = new FormData();
-  //   fd.append('supplierId', formValue.supplierId);
-  //   fd.append('branchId', formValue.branchId);
-  //   fd.append('invoiceNumber', formValue.invoiceNumber);
-  //   fd.append('purchaseDate', new Date(formValue.purchaseDate).toISOString());
-  //   if (formValue.dueDate) fd.append('dueDate', new Date(formValue.dueDate).toISOString());
-  //   fd.append('status', formValue.status);
-  //   fd.append('notes', formValue.notes || '');
-  //   fd.append('grandTotal', formValue.grandTotal);
-  //   fd.append('paidAmount', formValue.paidAmount);
-  //   fd.append('paymentMethod', formValue.paymentMethod);
-  //   fd.append('paymentStatus', formValue.paymentStatus);
-  //   const cleanItems = formValue.items.map((item: any) => ({
-  //     productId: item.productId,
-  //     name: item.name,
-  //     quantity: item.quantity,
-  //     purchasePrice: item.purchasePrice,
-  //     taxRate: item.taxRate,
-  //     discount: item.discount
-  //   }));
-  //   fd.append('items', JSON.stringify(cleanItems));
-  //   this.selectedFiles.forEach(file => {
-  //     fd.append('attachments', file);
-  //   });
-
-  //   const request$ = this.editMode()
-  //     ? this.purchaseService.updatePurchase(this.purchaseId!, fd)
-  //     : this.purchaseService.createPurchase(fd);
-  //   request$.pipe(
-  //     finalize(() => this.isSubmitting.set(false))
-  //   ).subscribe({
-  //     next: (res) => {
-  //       this.messageService.showSuccess('Success', 'Purchase saved successfully');
-  //       this.router.navigate(['/purchase']);
-  //     },
-  //     error: (err) => {
-  //       this.messageService.showError('Error', err.error?.message || 'Failed to save purchase');
-  //     }
-  //   });
-  // }
-  // private checkRouteForEditMode(): void {
-  //   this.route.paramMap.pipe(
-  //     switchMap(params => {
-  //       this.purchaseId = params.get('id');
-  //       if (this.purchaseId) {
-  //         this.formTitle.set('Edit Purchase');
-  //         return this.purchaseService.getPurchaseById(this.purchaseId);
-  //       }
-  //       return of(null);
-  //     })
-  //   ).subscribe({
-  //     next: (res: any) => {
-  //       if (res && res.data && res.data.purchase) {
-  //         this.patchData(res.data.purchase);
-  //       } else if (res && res.data) {
-  //         this.patchData(res.data);
-  //       }
-  //     },
-  //     error: (err) => {
-  //       this.messageService.showError('Error', 'Failed to load purchase details');
-  //     }
-  //   });
-  // }
-onSubmit(): void {
+  onSubmit(): void {
     if (this.purchaseForm.invalid) {
       this.purchaseForm.markAllAsTouched();
-      // Converted to a warning toast with a single string
       this.messageService.showWarn('Validation Error: Please check all required fields.');
       return;
     }
 
-    // Activated the submitting state so the UI locks during the request
     this.isSubmitting.set(true);
     
     const formValue = this.purchaseForm.getRawValue();
     const fd = new FormData();
     
-    // Append standard fields
     fd.append('supplierId', formValue.supplierId);
     fd.append('branchId', formValue.branchId);
     fd.append('invoiceNumber', formValue.invoiceNumber);
@@ -301,7 +216,6 @@ onSubmit(): void {
     fd.append('paymentMethod', formValue.paymentMethod);
     fd.append('paymentStatus', formValue.paymentStatus);
 
-    // Clean and stringify array data for multipart form submission
     const cleanItems = formValue.items.map((item: any) => ({
       productId: item.productId,
       name: item.name,
@@ -312,7 +226,6 @@ onSubmit(): void {
     }));
     fd.append('items', JSON.stringify(cleanItems));
 
-    // Append file attachments
     this.selectedFiles.forEach(file => {
       fd.append('attachments', file);
     });
@@ -391,8 +304,8 @@ onSubmit(): void {
     this.calculateTotals();
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

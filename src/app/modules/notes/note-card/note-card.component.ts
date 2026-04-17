@@ -13,7 +13,7 @@ import {
 import { CommonModule, TitleCasePipe, DatePipe, SlicePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NoteService } from '../../../core/services/notes.service';
-import { MasterListService } from '../../../core/services/master-list.service';
+// import { MasterListService } from '../../../core/services/master-list.service';
 import { Note, ItemType, Assignee } from '../../../core/models/note.types';
 import { AppMessageService } from "../../../core/services/message.service";
 import { Subject } from "rxjs";
@@ -39,7 +39,7 @@ export interface User {
 export class NoteCardComponent implements OnInit, OnDestroy {
     private readonly destroy$ = new Subject<void>();
   private noteService = inject(NoteService);
-  private masterList = inject(MasterListService);
+  // private masterList = inject(MasterListService);
   private messageService = inject(AppMessageService);
 
   // --- Inputs ---
@@ -58,7 +58,7 @@ export class NoteCardComponent implements OnInit, OnDestroy {
   @Output() linkClick = new EventEmitter<string>();
   @Output() convertToTask = new EventEmitter<string>();
 
-  users = computed(() => this.masterList.users());
+  // users = computed(() => this.masterList.users());
 
   showShareDialog = false;
   userSearch = '';
@@ -69,9 +69,9 @@ export class NoteCardComponent implements OnInit, OnDestroy {
   constructor(private cdr: ChangeDetectorRef) { }
   
   ngOnInit(): void {
-    if (!this.availableUsers || this.availableUsers.length === 0) {
-      this.availableUsers = this.users();
-    }
+    // if (!this.availableUsers || this.availableUsers.length === 0) {
+    //   this.availableUsers = this.users();
+    // }
   }
 
   // --- Computed Properties ---

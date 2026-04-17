@@ -6,7 +6,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 // Services
 import { NotificationService, NotificationData } from '../../../../core/services/notification.service';
 import { AppMessageService } from '../../../../core/services/message.service';
-import { MasterListService } from '../../../../core/services/master-list.service';
+// import { MasterListService } from '../../../../core/services/master-list.service';
 import { OrganizationService } from './../../organization.service';
 import { AnnouncementService } from '../../../../core/services/announcement.service';
 
@@ -19,6 +19,7 @@ import { SelectModule } from 'primeng/select';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
+import { MasterDropdownComponent } from '../../../shared/components/masterFilterDropdown/master-dropdown.component';
 
 @Component({
   selector: 'app-notification-bell',
@@ -26,7 +27,7 @@ import { TextareaModule } from 'primeng/textarea';
   imports: [
     CommonModule, FormsModule, DatePipe, SelectModule, MultiSelectModule,
     InputTextModule, TextareaModule, ButtonModule, BadgeModule,
-    TooltipModule, SkeletonModule
+    TooltipModule, SkeletonModule, MasterDropdownComponent
   ],
   templateUrl: './notification-bell-component.html',
   styleUrl: './notification-bell-component.scss',
@@ -36,7 +37,7 @@ export class NotificationBellComponent implements OnInit {
   private notificationService = inject(NotificationService);
   private messageService = inject(AppMessageService);
   private orgService = inject(OrganizationService);
-  private masterList = inject(MasterListService);
+  // private masterList = inject(MasterListService);
   private announcementService = inject(AnnouncementService);
   private cdr = inject(ChangeDetectorRef);
 
@@ -53,9 +54,9 @@ export class NotificationBellComponent implements OnInit {
   showAnnouncementSuccess = false;
 
   // Master Data
-  roles: any[] = [];
-  branches: any[] = [];
-  users: any[] = [];
+  // roles: any[] = [];
+  // branches: any[] = [];
+  // users: any[] = [];
   selectedRoles: { [userId: string]: string } = {};
   selectedBranches: { [userId: string]: string } = {};
 
@@ -77,12 +78,12 @@ export class NotificationBellComponent implements OnInit {
   @Output() close = new EventEmitter<void>();
 
   constructor() {
-    effect(() => {
-      this.roles = this.masterList.roles();
-      this.users = this.masterList.users();
-      this.branches = this.masterList.branches();
-      this.cdr.markForCheck();
-    });
+    // effect(() => {
+    //   this.roles = this.masterList.roles();
+    //   this.users = this.masterList.users();
+    //   this.branches = this.masterList.branches();
+    //   this.cdr.markForCheck();
+    // });
 
     this.notificationService.notifications$
       .pipe(takeUntilDestroyed())
@@ -100,17 +101,6 @@ export class NotificationBellComponent implements OnInit {
         this.checkForSignupRequests();
         this.cdr.markForCheck();
       });
-
-    // this.notificationService.notifications$
-    //   .pipe(takeUntilDestroyed())
-    //   .subscribe((allNotifications) => {
-    //     this.allNotifications = allNotifications;
-    //     this.historyList = allNotifications;
-    //     this.unreadList = allNotifications.filter(n => !n.isRead);
-
-    //     this.checkForSignupRequests();
-    //     this.cdr.markForCheck(); 
-    //   });
 
     this.notificationService.unreadCount$
       .pipe(takeUntilDestroyed())

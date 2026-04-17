@@ -1,12 +1,11 @@
 import { ChangeDetectorRef, Component, inject, OnInit, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog'; // 🟢 Added for Dialogs
+import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { MasterListService } from '../../../../core/services/master-list.service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
 import { TransactionService } from '../../../transactions/transaction.service';
@@ -23,7 +22,6 @@ import { takeUntil } from "rxjs/operators";
 })
 export class SupplierDashboardComponent implements OnInit, OnDestroy {
     private readonly destroy$ = new Subject<void>();
-  // 🟢 Replaced ActivatedRoute with DynamicDialog tools
   private config = inject(DynamicDialogConfig);
   private ref = inject(DynamicDialogRef);
 
@@ -31,7 +29,6 @@ export class SupplierDashboardComponent implements OnInit, OnDestroy {
   private supplierService = inject(SupplierService);
   private transactionService = inject(TransactionService);
   private messageService = inject(AppMessageService);
-  private masterList = inject(MasterListService);
   public common = inject(CommonMethodService);
 
   // State
@@ -59,8 +56,6 @@ export class SupplierDashboardComponent implements OnInit, OnDestroy {
           this.data.set(s);
         } else {
           this.isError.set(true);
-
-          // Added feedback for when the API returns a 200 OK, but the data payload is empty
           this.messageService.showError('Failed to load dashboard: Data is unavailable.');
         }
         this.loading.set(false);

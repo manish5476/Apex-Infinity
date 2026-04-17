@@ -13,8 +13,8 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { CheckboxModule } from 'primeng/checkbox';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { TooltipModule } from 'primeng/tooltip';
-
-import { MasterListService } from '../../../../core/services/master-list.service';
+import { FilterStorageService } from '../../../../core/services/filter-storage.service';
+import { MasterDropdownComponent } from '../masterFilterDropdown/master-dropdown.component';
 import { FilterField } from './filter-config.interface';
 
 @Component({
@@ -25,7 +25,8 @@ import { FilterField } from './filter-config.interface';
   imports: [
     CommonModule, FormsModule, SelectModule, MultiSelectModule,
     InputTextModule, IconFieldModule, InputIconModule, ButtonModule,
-    DatePickerModule, CheckboxModule, RadioButtonModule, TooltipModule
+    DatePickerModule, CheckboxModule, RadioButtonModule, TooltipModule,
+    MasterDropdownComponent
   ],
   template: `
     <div class="filter-deck">
@@ -48,34 +49,53 @@ import { FilterField } from './filter-config.interface';
           }
 
           @if (field.type === 'select') {
-            <p-select appendTo="body" 
-              [options]="getOptions(field)"
-              [optionLabel]="field.optionLabel || 'name'"
-              [optionValue]="field.optionValue || '_id'"
-              [placeholder]="field.placeholder || 'Select'"
-              [(ngModel)]="filters[field.key]"
-              (ngModelChange)="onFilterChange()"
-              [showClear]="true"
-              styleClass="deck-select"
-              [filter]="true"
-              [filterBy]="field.optionLabel || 'name'">
-            </p-select>
+            @if (field.dataSourceKey) {
+              <app-master-dropdown 
+                [endpoint]="field.dataSourceKey" 
+                [(ngModel)]="filters[field.key]" 
+                (onChangeEvent)="onFilterChange()"
+                [placeholder]="field.placeholder || 'Select'">
+              </app-master-dropdown>
+            } @else {
+              <p-select appendTo="body" 
+                [options]="getOptions(field)"
+                [optionLabel]="field.optionLabel || 'name'"
+                [optionValue]="field.optionValue || '_id'"
+                [placeholder]="field.placeholder || 'Select'"
+                [(ngModel)]="filters[field.key]"
+                (ngModelChange)="onFilterChange()"
+                [showClear]="true"
+                styleClass="deck-select"
+                [filter]="true"
+                [filterBy]="field.optionLabel || 'name'">
+              </p-select>
+            }
           }
 
           @if (field.type === 'multiselect') {
-            <p-multiSelect appendTo="body"
-              [options]="getOptions(field)"
-              [optionLabel]="field.optionLabel || 'name'"
-              [optionValue]="field.optionValue || '_id'"
-              [placeholder]="field.placeholder || 'Select Multiple'"
-              [(ngModel)]="filters[field.key]"
-              (ngModelChange)="onFilterChange()"
-              display="chip"
-              [showClear]="true"
-              styleClass="deck-multiselect"
-              [filter]="true"
-              [filterBy]="field.optionLabel || 'name'">
-            </p-multiSelect>
+            @if (field.dataSourceKey) {
+              <app-master-dropdown 
+                [endpoint]="field.dataSourceKey" 
+                [isMulti]="true"
+                [(ngModel)]="filters[field.key]" 
+                (onChangeEvent)="onFilterChange()"
+                [placeholder]="field.placeholder || 'Select Multiple'">
+              </app-master-dropdown>
+            } @else {
+              <p-multiSelect appendTo="body"
+                [options]="getOptions(field)"
+                [optionLabel]="field.optionLabel || 'name'"
+                [optionValue]="field.optionValue || '_id'"
+                [placeholder]="field.placeholder || 'Select Multiple'"
+                [(ngModel)]="filters[field.key]"
+                (ngModelChange)="onFilterChange()"
+                display="chip"
+                [showClear]="true"
+                styleClass="deck-multiselect"
+                [filter]="true"
+                [filterBy]="field.optionLabel || 'name'">
+              </p-multiSelect>
+            }
           }
 
           @if (field.type === 'date') {
@@ -307,7 +327,8 @@ export class UniversalFilterComponent implements OnInit {
   @Input() entityType: string = 'generic';
   @Output() filterChange = new EventEmitter<any>();
 
-  public masterList = inject(MasterListService);
+  // public masterList = inject(MasterListService);
+  private filterStorage = inject(FilterStorageService);
   filters: any = {};
 
   get hasActiveFilters(): boolean {
@@ -323,7 +344,7 @@ export class UniversalFilterComponent implements OnInit {
     });
 
     // 2. Load from Cache (Optional, based on entityType)
-    const savedFilters = this.masterList.getStoredFilters(this.entityType);
+    const savedFilters = this.filterStorage.getStoredFilters(this.entityType);
     if (savedFilters && Object.keys(savedFilters).length > 0) {
       this.config.forEach(field => {
         const savedVal = savedFilters[field.key];
@@ -343,12 +364,12 @@ export class UniversalFilterComponent implements OnInit {
 
   getOptions(field: FilterField): any[] {
     if (field.staticOptions) return field.staticOptions;
-    if (field.dataSourceKey) {
-      const service: any = this.masterList;
-      if (typeof service[field.dataSourceKey] === 'function') {
-        return service[field.dataSourceKey]() || [];
-      }
-    }
+    // if (field.dataSourceKey) {
+    //   const service: any = this.masterList;
+    //   if (typeof service[field.dataSourceKey] === 'function') {
+    //     return service[field.dataSourceKey]() || [];
+    //   }
+    // }
     return [];
   }
 
@@ -370,7 +391,7 @@ export class UniversalFilterComponent implements OnInit {
     this.config.forEach(field => {
       if (field.defaultValue !== undefined) this.filters[field.key] = field.defaultValue;
     });
-    this.masterList.clearFilters(this.entityType);
+    this.filterStorage.clearFilters(this.entityType);
     this.filterChange.emit(this.filters);
   }
 
@@ -384,7 +405,7 @@ export class UniversalFilterComponent implements OnInit {
       return acc;
     }, {} as any);
 
-    this.masterList.setFilters(this.entityType, cleanFilters);
+    this.filterStorage.setFilters(this.entityType, cleanFilters);
     this.filterChange.emit(cleanFilters);
   }
 }

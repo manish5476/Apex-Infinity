@@ -105,10 +105,12 @@
           <i class="pi pi-user"></i>
           Customer
         </label>
-        <p-select appendTo="body" (onChange)="applyFilters()" [options]="customerOptions()"
-          [(ngModel)]="emiFilter.customerId" [filter]="true" filterBy="name" optionLabel="name" optionValue="_id"
-          [showClear]="true" placeholder="All customers" styleClass="w-full filter-select">
-        </p-select>
+        <app-master-dropdown 
+          endpoint="customers" 
+          [(ngModel)]="emiFilter.customerId" 
+          (ngModelChange)="applyFilters()" 
+          placeholder="All customers">
+        </app-master-dropdown>
       </div>
 
       <div class="filter-field">

@@ -14,7 +14,7 @@ import { ToastModule } from 'primeng/toast'; import { DialogService } from 'prim
 
 // Services & Shared
 import { ProductService } from '../../services/product-service';
-import { MasterListService } from '../../../../core/services/master-list.service';
+// import { MasterListService } from '../../../../core/services/master-list.service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
 import { ImageViewerDirective } from '../../../shared/directives/image-viewer.directive';
@@ -28,6 +28,7 @@ import { HasPermissionDirective } from '../../../../core/auth/directives/has-per
 import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { MasterDropdownService } from '../../../../core/services/master-dropdown.service';
 
 // Import the dialog component (Ensure path is correct)
 
@@ -44,7 +45,8 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private productService = inject(ProductService);
-  private masterList = inject(MasterListService);
+  // private masterList = inject(MasterListService);
+  private masterDropdownService = inject(MasterDropdownService);
   private messageService = inject(AppMessageService);
   public common = inject(CommonMethodService);
   private cdr = inject(ChangeDetectorRef); 
@@ -63,20 +65,29 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
   branchNameMap = new Map<string, string>();
 
   constructor() {
-    effect(() => {
-      this.masterList.branches().forEach(b => this.branchNameMap.set(b._id, b.name));
-    });
+    // effect(() => {
+    //   this.masterList.branches().forEach(b => this.branchNameMap.set(b._id, b.name));
+    // });
   }
 
   ngOnInit(): void {
     this.setupInventoryColumns();
+    this.loadBranches();
 
     this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       this.productId = params.get('id'); this.loadProductData();
     });
   }
 
-
+  private loadBranches() {
+    this.masterDropdownService.getDropdownData('branches').pipe(takeUntil(this.destroy$)).subscribe({
+      next: (res: any) => {
+        const branches = res.data || [];
+        branches.forEach((b: any) => this.branchNameMap.set(b.value, b.label));
+        this.cdr.markForCheck();
+      }
+    });
+  }
 
  
   setupInventoryColumns() {
@@ -164,7 +175,7 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
     return this.product()?.tags?.filter((t: string) => t && t.trim()) || [];
   }
 
-loadProductData() {
+  loadProductData() {
     if (!this.productId) return;
 
     this.loading.set(true);

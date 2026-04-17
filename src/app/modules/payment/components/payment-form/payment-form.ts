@@ -15,7 +15,8 @@ import { DividerModule } from 'primeng/divider';
 import { ToastModule } from 'primeng/toast';
 import { DatePickerModule } from 'primeng/datepicker'; // Corrected import
 import { LoadingService } from '../../../../core/services/loading.service';
-import { MasterListService } from '../../../../core/services/master-list.service';
+// import { MasterListService } from '../../../../core/services/master-list.service';
+import { MasterDropdownComponent } from '../../../shared/components/masterFilterDropdown/master-dropdown.component';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { PaymentService } from '../../services/payment-service';
 import { text } from 'stream/consumers';
@@ -24,7 +25,7 @@ import { Textarea } from 'primeng/textarea';
 @Component({
   selector: 'app-payment-form',
   standalone: true,
-  imports: [ReactiveFormsModule, ToastModule, ButtonModule, InputTextModule, InputNumberModule, DatePickerModule, Textarea, SelectModule, DividerModule],
+  imports: [ReactiveFormsModule, ToastModule, ButtonModule, InputTextModule, InputNumberModule, DatePickerModule, Textarea, SelectModule, DividerModule, MasterDropdownComponent],
   templateUrl: './payment-form.html',
   styleUrls: ['./payment-form.scss']
 })
@@ -36,7 +37,7 @@ export class PaymentFormComponent implements OnInit, OnDestroy {
   private paymentService = inject(PaymentService);
   private messageService = inject(AppMessageService);
   private loadingService = inject(LoadingService);
-  private masterList = inject(MasterListService);
+  // private masterList = inject(MasterListService);
 
   // --- Form & State ---
   paymentForm!: FormGroup;
@@ -74,9 +75,9 @@ export class PaymentFormComponent implements OnInit, OnDestroy {
   ];
   
   constructor() {
-    this.customerOptions.set(this.masterList.customers());
-    this.supplierOptions.set(this.masterList.suppliers());
-    this.branchOptions.set(this.masterList.branches());
+    // this.customerOptions.set(this.masterList.customers());
+    // this.supplierOptions.set(this.masterList.suppliers());
+    // this.branchOptions.set(this.masterList.branches());
   }
 
   ngOnInit(): void {

@@ -5,9 +5,10 @@ import { map, catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 export interface DropdownOption {
+  data: any;           // ✅ Full original object for metadata access
   label: string;
   value: string;
-  meta?: any; // ✅ NEW: Support for rich data (stock, balance, etc.)
+  meta?: any; // ✅ Support for rich data (stock, balance, etc.)
 }
 
 interface DropdownResponse {
@@ -19,14 +20,22 @@ interface DropdownResponse {
 }
 
 // ✅ COMPLETE: Includes all 20+ routes currently in your backend
+// export type DropdownEndpoint =
+//   | 'users' | 'branches' | 'roles' | 'customers' | 'suppliers' | 'masters' | 'channels' | 'transfer-requests'
+//   | 'products' | 'purchases' | 'sales' | 'sales-returns' | 'purchase-returns'
+//   | 'accounts' | 'invoices' | 'payments' | 'emis'
+//   | 'departments' | 'designations' | 'shifts' | 'holidays' | 'geofencing'
+//   | 'attendance-machines' | 'attendance-requests' | 'leave-requests'
+//   | 'meetings' | 'brands' | 'categories' | 'subcategories' | 'units' | 'taxes';
+
 export type DropdownEndpoint =
   | 'users' | 'branches' | 'roles' | 'customers' | 'suppliers' | 'masters' | 'channels' | 'transfer-requests'
   | 'products' | 'purchases' | 'sales' | 'sales-returns' | 'purchase-returns'
+  | 'brands' | 'categories' | 'subcategories' | 'units' | 'taxes'
   | 'accounts' | 'invoices' | 'payments' | 'emis'
-  | 'departments' | 'designations' | 'shifts' | 'holidays' | 'geofencing'
-  | 'attendance-machines' | 'attendance-requests' | 'leave-requests'
+  | 'departments' | 'designations' | 'shifts' | 'shift-assignments'
+  | 'holidays' | 'geofencing' | 'attendance-machines' | 'attendance-requests' | 'leave-requests'
   | 'meetings';
-
 @Injectable({
   providedIn: 'root'
 })
@@ -34,12 +43,19 @@ export class MasterDropdownService {
   private readonly baseUrl = `${environment.apiUrl}/v1/dropdowns`;
 
   constructor(private http: HttpClient) { }
-  getDropdownData(endpoint: DropdownEndpoint, search: string = '', page: number = 1, limit: number = 100, includeIds?: string[]): Observable<DropdownResponse> { // ✅ Return the full response for better UI control
+  getDropdownData(endpoint: DropdownEndpoint, search: string = '', page: number = 1, limit: number = 100, includeIds?: string[], extraParams: any = {}): Observable<DropdownResponse> { // ✅ Return the full response for better UI control
     let params = new HttpParams()
       .set('page', page.toString())
       .set('limit', limit.toString());
     if (search) params = params.set('search', search);
     if (includeIds?.length) params = params.set('includeIds', includeIds.join(','));
+
+    // ✅ Add any extra dynamic filters (like 'type', 'parentId', etc.)
+    Object.keys(extraParams).forEach(key => {
+      if (extraParams[key] !== undefined && extraParams[key] !== null) {
+        params = params.set(key, extraParams[key].toString());
+      }
+    });
     return this.http.get<DropdownResponse>(`${this.baseUrl}/${endpoint}`, { params }).pipe(
       catchError(error => {
         console.error(`Error fetching ${endpoint}:`, error);

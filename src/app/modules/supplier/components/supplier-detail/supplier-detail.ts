@@ -1,10 +1,9 @@
-
 import { Component, OnInit, inject, signal, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { finalize, switchMap, takeUntil } from 'rxjs/operators';
 import { of, Subject } from 'rxjs';
-import { FormsModule } from '@angular/forms'; // Added
+import { FormsModule } from '@angular/forms';
 
 // AG Grid
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
@@ -20,17 +19,14 @@ import { SelectModule } from 'primeng/select';
 
 // Services
 import { SupplierService } from '../../services/supplier-service';
-// import { TransactionService } from '../../services/transaction.service'; // Check path
-import { MasterListService } from '../../../../core/services/master-list.service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
 import { TransactionService } from '../../../transactions/transaction.service';
 import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
-import { SupplierDashboardComponent } from '../supplier-dashboard/supplier-dashboard';
-// import { DialogService } from 'primeng/dynamicdialog';
-import { Dialog } from 'primeng/dialog';
+import { MasterDropdownService } from '../../../../core/services/master-dropdown.service';
 import { DialogService } from 'primeng/dynamicdialog';
 import { DynamicDialogServices } from '../../../../core/services/dynamic-dialog-services';
+
 @Component({
   selector: 'app-supplier-details',
   standalone: true,
@@ -45,18 +41,17 @@ import { DynamicDialogServices } from '../../../../core/services/dynamic-dialog-
   providers: [DialogService]
 })
 export class SupplierDetailsComponent implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   // Injections
   private dialogHelper = inject(DynamicDialogServices);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
   private supplierService = inject(SupplierService);
-  private transactionService = inject(TransactionService); // Added
+  private transactionService = inject(TransactionService);
   private messageService = inject(AppMessageService);
-  private masterList = inject(MasterListService);
   public common = inject(CommonMethodService);
-  private dialogService = inject(DialogService);
+  private dropdownService = inject(MasterDropdownService);
 
   // --- Supplier State ---
   supplier = signal<any | null>(null);
@@ -89,7 +84,7 @@ export class SupplierDetailsComponent implements OnInit, OnDestroy {
   ];
 
   ngOnInit(): void {
-    this.initGridColumns(); // Setup columns immediately
+    this.initGridColumns();
 
     this.route.paramMap.pipe(
       switchMap(params => {
@@ -110,8 +105,6 @@ export class SupplierDetailsComponent implements OnInit, OnDestroy {
           const s = res.data.data || res.data;
           this.supplier.set(s);
           this.resolveBranchNames(s.branchesSupplied);
-          
-          // 👇 TRIGGER TRANSACTION FETCH NOW
           this.getTransactions(true); 
         } else {
           this.isError.set(true);
@@ -120,10 +113,6 @@ export class SupplierDetailsComponent implements OnInit, OnDestroy {
       error: () => this.isError.set(true)
     });
   }
-
-  // --- Transaction Logic ---
-
-
 
   applyTxnFilters() { this.getTransactions(true); }
   
@@ -191,13 +180,25 @@ export class SupplierDetailsComponent implements OnInit, OnDestroy {
     return localDate.toISOString().split('T')[0];
   }
 
-  // --- Existing Helper Logic ---
-  private resolveBranchNames(branchIds: string[]) {
-    if (!branchIds?.length) return;
-    const allBranches = this.masterList.branches(); 
-    if(!allBranches) { this.branchNames.set('Loading branches...'); return; }
-    const names = branchIds.map(id => allBranches.find(b => b._id === id)?.name).filter(n => n).join(', ');
-    this.branchNames.set(names || 'N/A');
+  private resolveBranchNames(branchIds: any[]) {
+    if (!branchIds?.length) {
+      this.branchNames.set('N/A');
+      return;
+    }
+
+    if (typeof branchIds[0] === 'object' && branchIds[0].name) {
+      this.branchNames.set(branchIds.map(b => b.name).join(', '));
+    } else {
+      this.dropdownService.getDropdownData('branches', '', 1, 100, branchIds)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(res => {
+          if (res.data && res.data.length > 0) {
+            this.branchNames.set(res.data.map(d => d.label).join(', '));
+          } else {
+            this.branchNames.set('Multiple Branches');
+          }
+        });
+    }
   }
 
   formatCurrency(value: number): string {
@@ -219,8 +220,6 @@ export class SupplierDetailsComponent implements OnInit, OnDestroy {
     if (ref) {
       ref.onClose.pipe(takeUntil(this.destroy$)).subscribe((result) => {
         if (result === 'success') {
-          // Changed to showSuccess (since 'success' makes more sense here) 
-          // and simplified to a single clean string.
           this.messageService.showSuccess('Supplier KYC updated successfully.');
         }
       });
@@ -230,19 +229,16 @@ export class SupplierDetailsComponent implements OnInit, OnDestroy {
   openSupplierLedger(supplier: any) {
     const ref = this.dialogHelper.openSupplierLedger(supplier._id);
     if (ref) {
-      ref.onClose.pipe(takeUntil(this.destroy$)).subscribe(() => {
-        // Optional: refresh data if ledger interactions affected anything
-      });
+      ref.onClose.pipe(takeUntil(this.destroy$)).subscribe(() => {});
     }
   }
 
   openSupplierDashboard(supplier: any) {
-    // Pass the supplier object. Make sure your dynamic dialog service expects a supplier!
     const ref = this.dialogHelper.openSupplierDashboard(supplier);
     if (ref) {
       ref.onClose.pipe(takeUntil(this.destroy$)).subscribe((success: boolean) => {
         if (success) {
-          this.getTransactions(true); // Refresh if needed
+          this.getTransactions(true);
         }
       });
     }
@@ -284,94 +280,15 @@ export class SupplierDetailsComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.txnLoading = false;
-        
-        // I kept your console.error for debugging, but added the toast service!
         console.error(err);
         this.messageService.handleHttpError(err);
-        
-        // Added this so the loading spinner accurately vanishes on failure
         this.cdr.markForCheck(); 
       }
     });
   }
   
-  // ==========================================
-  // DIALOG TRIGGERS
-  // ==========================================
-
-  // openSupplierDashboard(supplier: any) {
-  //   // Pass the supplier object. Make sure your dynamic dialog service expects a supplier!
-  //   const ref = this.dialogHelper.openSupplierDashboard(supplier);
-  //   if (ref) {
-  //     ref.onClose.subscribe((success: boolean) => {
-  //       if (success) {
-  //         this.getTransactions(true); // Refresh if needed
-  //       }
-  //     });
-  //   }
-  // }
-
-  // openSupplierLedger(supplier: any) {
-  //   const ref = this.dialogHelper.openSupplierLedger(supplier._id);
-  //   if (ref) {
-  //     ref.onClose.subscribe(() => {
-  //       // Optional: refresh data if ledger interactions affected anything
-  //     });
-  //   }
-  // }
-
-  // openSupplierKyc(supplier: any) {
-  //   const ref = this.dialogHelper.openSupplierKyc(supplier._id);
-  //   if (ref) {
-  //     ref.onClose.subscribe((result) => {
-  //       if (result === 'success') {
-  //         this.messageService.showInfo('success',  'Updated', );
-  //       }
-  //     });
-  //   }
-  // }
-  //   getTransactions(isReset: boolean = false) {
-  //   const supplierId = this.supplier()?._id;
-  //   if (!supplierId || this.txnLoading) return;
-
-  //   this.txnLoading = true;
-
-  //   if (isReset) {
-  //     this.txnPage = 1;
-  //     this.txnData = [];
-  //     this.txnTotal = 0;
-  //   }
-
-  //   const queryParams: any = {
-  //     ...this.txnFilter,
-  //     page: this.txnPage,
-  //     limit: this.txnLimit
-  //   };
-
-  //   if (this.rangeDates && this.rangeDates.length > 0) {
-  //     if (this.rangeDates[0]) queryParams.startDate = this.formatDateForApi(this.rangeDates[0]);
-  //     if (this.rangeDates[1]) queryParams.endDate = this.formatDateForApi(this.rangeDates[1]);
-  //   }
-
-  //   this.transactionService.getSupplierTransactions(supplierId, queryParams).subscribe({
-  //     next: (res: any) => {
-  //       let newData = res.results || [];
-  //       this.txnTotal = res.total || this.txnTotal;
-  //       this.txnData = isReset ? newData : [...this.txnData, ...newData];
-        
-  //       if (newData.length > 0) this.txnPage++;
-        
-  //       this.txnLoading = false;
-  //       this.cdr.markForCheck();
-  //     },
-  //     error: (err) => {
-  //       this.txnLoading = false;
-  //       console.error(err);
-  //     }
-  //   });
-  // }
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

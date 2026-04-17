@@ -46,10 +46,12 @@
 
         <div class="filter-field flex-2 min-w-[250px]">
           <label class="block text-xs font-semibold mb-1 text-secondary">Customer</label>
-          <p-select appendTo="body" [(ngModel)]="filter.customerId" (onChange)="applyFilters()" 
-             [options]="customerOptions()" optionLabel="name" optionValue="_id" [filter]="true" 
-             filterBy="name" [showClear]="true" placeholder="Filter by Customer" styleClass="w-full">
-          </p-select>
+          <app-master-dropdown 
+            endpoint="customers" 
+            [(ngModel)]="filter.customerId" 
+            (ngModelChange)="applyFilters()" 
+            placeholder="Filter by Customer">
+          </app-master-dropdown>
         </div>
 
         <div class="filter-actions flex align-items-center mb-1">

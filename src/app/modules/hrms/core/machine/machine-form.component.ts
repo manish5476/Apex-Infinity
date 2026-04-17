@@ -3,7 +3,6 @@ import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy }
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of, catchError, map, Subject } from 'rxjs';
-import { MasterListService } from '../../../../core/services/master-list.service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { HRMSService } from '../../hrms.service';
 
@@ -13,11 +12,12 @@ import { SelectModule } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { takeUntil } from "rxjs/operators";
+import { MasterDropdownComponent } from '../../../shared/components/masterFilterDropdown/master-dropdown.component';
 
 @Component({
   selector: 'app-machine-form',
   standalone: true,
-  imports: [ReactiveFormsModule, ToggleSwitchModule, SelectModule, ButtonModule, InputTextModule],
+  imports: [ReactiveFormsModule, ToggleSwitchModule, SelectModule, ButtonModule, InputTextModule, MasterDropdownComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="app-fullscreen-wrapper fade-in">
@@ -74,7 +74,11 @@ import { takeUntil } from "rxjs/operators";
 
                 <div class="form-field">
                   <label for="branchId">Branch Location <span class="required">*</span></label>
-                  <p-select id="branchId" formControlName="branchId" [options]="$any(branchOptions())" optionLabel="name" optionValue="_id" placeholder="Select Branch" styleClass="full-width" [filter]="true" filterBy="name"></p-select>
+                  <app-master-dropdown 
+                    endpoint="branches" 
+                    formControlName="branchId" 
+                    placeholder="Select Branch">
+                  </app-master-dropdown>
                 </div>
 
                 <div class="form-field">
@@ -296,7 +300,6 @@ export class MachineFormComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
-  private masterList = inject(MasterListService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
@@ -306,8 +309,6 @@ export class MachineFormComponent implements OnInit, OnDestroy {
   isLoading = signal(false);
   isEditMode = signal(false);
   machineId: string | null = null;
-
-  branchOptions = this.masterList.branches;
 
   deviceProviderOptions: any[] = [];
   protocolOptions: any[] = [];
@@ -349,7 +350,6 @@ export class MachineFormComponent implements OnInit, OnDestroy {
       status: ['active']
     });
 
-    // Options for PrimeNG selects
     this.deviceProviderOptions = [
       { label: 'Generic / Custom', value: 'generic' },
       { label: 'ZKTeco', value: 'zkteco' },
@@ -373,7 +373,6 @@ export class MachineFormComponent implements OnInit, OnDestroy {
       { label: 'Maintenance', value: 'maintenance' }
     ];
 
-    // Auto-uppercase
     this.machineForm.get('serialNumber')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(val => {
       if (val && val !== val.toUpperCase()) {
         this.machineForm.get('serialNumber')?.setValue(val.toUpperCase(), { emitEvent: false });
@@ -469,7 +468,6 @@ export class MachineFormComponent implements OnInit, OnDestroy {
     } else {
       this.hrmsService.createMachine(payload).pipe(takeUntil(this.destroy$)).subscribe({
         next: (res: any) => {
-          // Note: response might contain the new apiKey, could show a modal here
           this.messageService.showSuccess( 'New machine registered successfully');
           this.isSubmitting.set(false);
           this.goBack();
@@ -491,422 +489,3 @@ export class MachineFormComponent implements OnInit, OnDestroy {
         this.destroy$.complete();
     }
 }
-
-
-
-// import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-// import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-// import { ActivatedRoute, Router } from '@angular/router';
-// import { catchError, finalize } from 'rxjs/operators';
-// import { of } from 'rxjs';
-
-// // Services
-// import { HRMSService } from '../../../hrms.service';
-// import { MessageService } from 'primeng/api';
-
-// // PrimeNG
-// import { CardModule } from 'primeng/card';
-// import { ButtonModule } from 'primeng/button';
-// import { InputTextModule } from 'primeng/inputtext';
-// import { DropdownModule } from 'primeng/dropdown';
-// import { InputNumberModule } from 'primeng/inputnumber';
-// import { ToggleSwitchModule } from 'primeng/toggleswitch';
-// import { ToastModule } from 'primeng/toast';
-// import { DialogModule } from 'primeng/dialog';
-// import { SkeletonModule } from 'primeng/skeleton';
-
-// @Component({
-//   selector: 'app-machine-form',
-//   standalone: true,
-//   imports: [
-//     CommonModule, ReactiveFormsModule, CardModule, ButtonModule,
-//     InputTextModule, DropdownModule, InputNumberModule, ToggleSwitchModule,
-//     ToastModule, DialogModule, SkeletonModule
-//   ],
-//   providers: [MessageService],
-//   changeDetection: ChangeDetectionStrategy.OnPush,
-//   template: `
-//     <p-toast position="top-right"></p-toast>
-
-//     <div class="page-wrapper fade-in">
-//       <header class="dashboard-header slide-down mb-5">
-//         <div class="header-left">
-//           <p-button icon="pi pi-arrow-left" [text]="true" [rounded]="true" size="large" styleClass="back-btn" (onClick)="onCancel()"></p-button>
-//           <div class="header-titles">
-//             <h1 class="page-title m-0">{{ isEditMode() ? 'Edit Device Configuration' : 'Register New Device' }}</h1>
-//             <p class="page-subtitle mt-1">Configure networking, protocols, and capabilities for this attendance machine.</p>
-//           </div>
-//         </div>
-//       </header>
-
-//       @if (isLoading()) {
-//         <p-card styleClass="premium-card glass-card"><p-skeleton width="100%" height="400px"></p-skeleton></p-card>
-//       } @else {
-        
-//         <form [formGroup]="machineForm" (ngSubmit)="onSubmit()" class="flex-col gap-5 pb-6">
-          
-//           <div class="grid-layout">
-//             <div class="flex-col gap-5">
-//               <p-card styleClass="premium-card glass-card slide-down" style="animation-delay: 0.1s">
-//                 <h3 class="font-heading text-lg m-0 mb-4 border-bottom pb-3 text-primary-color"><i class="pi pi-box mr-2"></i> Device Identity</h3>
-                
-//                 <div class="input-group mb-4">
-//                   <label class="info-label">Device Name <span class="text-error">*</span></label>
-//                   <input pInputText formControlName="name" placeholder="e.g. Main Entrance Gate 1" class="w-full premium-input" />
-//                 </div>
-                
-//                 <div class="grid-2 gap-4">
-//                   <div class="input-group">
-//                     <label class="info-label">Serial Number (SN) <span class="text-error">*</span></label>
-//                     <input pInputText formControlName="serialNumber" placeholder="Device SN" class="w-full premium-input uppercase" />
-//                   </div>
-//                   <div class="input-group">
-//                     <label class="info-label">Manufacturer / Provider</label>
-//                     <p-dropdown formControlName="providerType" [options]="providers" placeholder="Select Manufacturer" styleClass="w-full premium-dropdown"></p-dropdown>
-//                   </div>
-//                   <div class="input-group">
-//                     <label class="info-label">Model Number</label>
-//                     <input pInputText formControlName="model" placeholder="e.g. K40" class="w-full premium-input" />
-//                   </div>
-//                   <div class="input-group">
-//                     <label class="info-label">Firmware Version</label>
-//                     <input pInputText formControlName="firmwareVersion" placeholder="v1.0.0" class="w-full premium-input" />
-//                   </div>
-//                 </div>
-//               </p-card>
-
-//               <p-card styleClass="premium-card glass-card slide-down" style="animation-delay: 0.15s">
-//                 <h3 class="font-heading text-lg m-0 mb-4 border-bottom pb-3 text-primary-color"><i class="pi pi-wifi mr-2"></i> Network & Connectivity</h3>
-                
-//                 <div class="grid-2 gap-4">
-//                   <div class="input-group span-2">
-//                     <label class="info-label">Connection Protocol <span class="text-error">*</span></label>
-//                     <p-dropdown formControlName="connectionProtocol" [options]="protocols" placeholder="Select Protocol" styleClass="w-full premium-dropdown"></p-dropdown>
-//                   </div>
-//                   <div class="input-group">
-//                     <label class="info-label">Static IP Address</label>
-//                     <input pInputText formControlName="ipAddress" placeholder="192.168.1.x" class="w-full premium-input font-mono" />
-//                   </div>
-//                   <div class="input-group">
-//                     <label class="info-label">Port</label>
-//                     <p-inputNumber formControlName="port" placeholder="e.g. 4370" [useGrouping]="false" styleClass="w-full premium-input"></p-inputNumber>
-//                   </div>
-//                   <div class="input-group span-2">
-//                     <label class="info-label">MAC Address</label>
-//                     <input pInputText formControlName="macAddress" placeholder="00:00:00:00:00:00" class="w-full premium-input font-mono uppercase" />
-//                   </div>
-//                 </div>
-//               </p-card>
-//             </div>
-
-//             <div class="flex-col gap-5">
-              
-//               <p-card styleClass="premium-card glass-card slide-down" style="animation-delay: 0.2s">
-//                 <h3 class="font-heading text-lg m-0 mb-4 border-bottom pb-3 text-primary-color"><i class="pi pi-verified mr-2"></i> Hardware Capabilities</h3>
-                
-//                 <div formGroupName="capabilities" class="flex-col gap-3">
-//                   <div class="flex-between bg-surface p-3 border-radius-md">
-//                     <span class="font-medium text-sm"><i class="pi pi-camera text-tertiary mr-2"></i> Face Recognition</span>
-//                     <p-toggleswitch formControlName="faceRecognition"></p-toggleswitch>
-//                   </div>
-//                   <div class="flex-between bg-surface p-3 border-radius-md">
-//                     <span class="font-medium text-sm"><i class="pi pi-user text-tertiary mr-2"></i> Fingerprint Scanner</span>
-//                     <p-toggleswitch formControlName="fingerprint"></p-toggleswitch>
-//                   </div>
-//                   <div class="flex-between bg-surface p-3 border-radius-md">
-//                     <span class="font-medium text-sm"><i class="pi pi-id-card text-tertiary mr-2"></i> RFID Card Reader</span>
-//                     <p-toggleswitch formControlName="rfid"></p-toggleswitch>
-//                   </div>
-//                 </div>
-//               </p-card>
-
-//               <p-card styleClass="premium-card glass-card slide-down" style="animation-delay: 0.25s">
-//                 <h3 class="font-heading text-lg m-0 mb-4 border-bottom pb-3 text-primary-color"><i class="pi pi-cog mr-2"></i> Sync Configuration</h3>
-                
-//                 <div formGroupName="config" class="flex-col gap-4">
-//                   <div class="grid-2 gap-4">
-//                     <div class="input-group">
-//                       <label class="info-label">Sync Interval (Mins)</label>
-//                       <p-inputNumber formControlName="syncInterval" [min]="1" [max]="120" styleClass="w-full premium-input"></p-inputNumber>
-//                     </div>
-//                     <div class="input-group">
-//                       <label class="info-label">Retry Attempts</label>
-//                       <p-inputNumber formControlName="retryAttempts" [min]="1" [max]="10" styleClass="w-full premium-input"></p-inputNumber>
-//                     </div>
-//                   </div>
-//                   <div class="flex-between mt-2 pt-2 border-top">
-//                     <span class="font-bold text-sm text-secondary">Auto-Sync Enabled</span>
-//                     <p-toggleswitch formControlName="autoSync"></p-toggleswitch>
-//                   </div>
-//                 </div>
-//               </p-card>
-
-//             </div>
-//           </div>
-
-//           <div class="form-footer flex-align justify-end gap-3 mt-4 slide-down" style="animation-delay: 0.3s">
-//             <p-button label="Cancel" icon="pi pi-times" [text]="true" severity="secondary" (onClick)="onCancel()"></p-button>
-//             <p-button [label]="isEditMode() ? 'Save Configuration' : 'Register & Generate Key'" icon="pi pi-check" type="submit" [loading]="isSaving()" [disabled]="machineForm.invalid" styleClass="p-button-primary shadow-md"></p-button>
-//           </div>
-//         </form>
-//       }
-//     </div>
-
-//     <p-dialog header="Device Registered Successfully" [(visible)]="displayKeyModal" [modal]="true" [closable]="false" [style]="{width: '500px'}" styleClass="premium-dialog">
-//       <div class="text-center mb-4">
-//         <i class="pi pi-check-circle text-success text-5xl mb-3"></i>
-//         <h3 class="m-0 font-heading">Secure API Key Generated</h3>
-//       </div>
-      
-//       <p class="text-sm text-secondary mb-3 text-center">
-//         Please copy this API key and configure it within the physical device or sync utility. 
-//         <strong class="text-error">For security reasons, this key will never be shown again.</strong>
-//       </p>
-
-//       <div class="api-key-box bg-surface p-4 border-radius-md manish-border-1 surface-border flex-between mb-4">
-//         <code class="font-bold text-primary-color break-all">{{ generatedApiKey }}</code>
-//         <p-button icon="pi pi-copy" [text]="true" [rounded]="true" severity="secondary" pTooltip="Copy to clipboard" (onClick)="copyKey()"></p-button>
-//       </div>
-
-//       <div class="flex-align justify-center border-top pt-4">
-//         <p-button label="I have copied the key, proceed" styleClass="p-button-primary" (onClick)="closeKeyModal()"></p-button>
-//       </div>
-//     </p-dialog>
-//   `,
-//   styles: [`
-//     :host { display: block; width: 100%; min-height: 100vh; background-color: var(--bg-primary); color: var(--text-primary); font-family: var(--font-body); }
-//     .page-wrapper { padding: var(--spacing-2xl) var(--spacing-3xl); max-width: 1200px; margin: 0 auto; }
-    
-//     .grid-layout { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-2xl); align-items: start; }
-//     .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); }
-//     .span-2 { grid-column: span 2; }
-    
-//     .flex-col { display: flex; flex-direction: column; }
-//     .flex-between { display: flex; justify-content: space-between; align-items: center; }
-//     .flex-align { display: flex; align-items: center; }
-//     .justify-end { justify-content: flex-end; }
-//     .justify-center { justify-content: center; }
-    
-//     .gap-1 { gap: var(--spacing-xs); }
-//     .gap-2 { gap: var(--spacing-sm); }
-//     .gap-3 { gap: var(--spacing-md); }
-//     .gap-4 { gap: var(--spacing-lg); }
-//     .gap-5 { gap: var(--spacing-2xl); }
-    
-//     .m-0 { margin: 0; }
-//     .mb-3 { margin-bottom: var(--spacing-md); }
-//     .mb-4 { margin-bottom: var(--spacing-xl); }
-//     .mb-5 { margin-bottom: var(--spacing-2xl); }
-//     .mt-1 { margin-top: var(--spacing-xs); }
-//     .mt-2 { margin-top: var(--spacing-sm); }
-//     .mt-4 { margin-top: var(--spacing-xl); }
-//     .mr-2 { margin-right: var(--spacing-sm); }
-    
-//     .p-3 { padding: var(--spacing-lg); }
-//     .p-4 { padding: var(--spacing-xl); }
-//     .pb-3 { padding-bottom: var(--spacing-md); }
-//     .pb-6 { padding-bottom: var(--spacing-4xl); }
-//     .pt-2 { padding-top: var(--spacing-sm); }
-//     .pt-4 { padding-top: var(--spacing-xl); }
-    
-//     .w-full { width: 100%; }
-    
-//     .bg-surface { background: var(--bg-secondary); }
-//     .border-top { border-top: 1px solid var(--border-primary); }
-//     .border-bottom { border-bottom: 1px solid var(--border-primary); }
-//     .manish-border-1 { border: 1px solid; }
-//     .surface-border { border-color: var(--border-primary); }
-//     .border-radius-md { border-radius: var(--ui-border-radius-md); }
-    
-//     .text-center { text-align: center; }
-//     .text-sm { font-size: var(--font-size-sm); }
-//     .text-xs { font-size: var(--font-size-xs); }
-//     .text-lg { font-size: var(--font-size-lg); }
-//     .text-5xl { font-size: 3rem; }
-    
-//     .text-secondary { color: var(--text-secondary); }
-//     .text-tertiary { color: var(--text-tertiary); }
-//     .text-primary-color { color: var(--text-primary); }
-//     .text-success { color: var(--color-success); }
-//     .text-error { color: var(--color-error); }
-    
-//     .font-bold { font-weight: var(--font-weight-bold); }
-//     .font-medium { font-weight: var(--font-weight-medium); }
-//     .font-heading { font-family: var(--font-heading); }
-//     .font-mono { font-family: var(--font-mono); }
-//     .uppercase { text-transform: uppercase; }
-//     .break-all { word-break: break-all; }
-
-//     /* Header */
-//     .dashboard-header { display: flex; justify-content: space-between; align-items: center; }
-//     .header-left { display: flex; align-items: center; gap: var(--spacing-xl); }
-//     ::ng-deep .back-btn { color: var(--text-secondary) !important; background: var(--bg-secondary) !important; border: 1px solid var(--border-primary) !important; }
-//     .page-title { font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); font-family: var(--font-heading); letter-spacing: -0.02em; }
-//     .page-subtitle { font-size: var(--font-size-sm); color: var(--text-secondary); }
-
-//     /* Cards & Form */
-//     .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--radius-2xl); box-shadow: var(--shadow-sm); }
-//     ::ng-deep .premium-card .p-card-body { padding: var(--spacing-2xl); }
-//     ::ng-deep .premium-card .p-card-content { padding: 0; }
-    
-//     .input-group { display: flex; flex-direction: column; gap: var(--spacing-xs); }
-//     .info-label { font-size: 10px; font-weight: var(--font-weight-bold); color: var(--text-label); text-transform: uppercase; letter-spacing: 0.05em; }
-
-//     ::ng-deep .premium-input, ::ng-deep .premium-dropdown .p-dropdown, ::ng-deep .premium-input .p-inputnumber-input { background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: var(--ui-border-radius-md); transition: var(--transition-base); font-family: var(--font-body); color: var(--text-primary); }
-//     ::ng-deep .premium-input:focus, ::ng-deep .premium-dropdown .p-dropdown.p-focus { border-color: var(--color-primary); box-shadow: 0 0 0 2px var(--color-primary-bg) !important; }
-
-//     .form-footer { position: sticky; bottom: 0; background: var(--bg-primary); padding: var(--spacing-lg) 0; border-top: 1px solid var(--border-primary); z-index: 10; margin-top: var(--spacing-2xl); }
-
-//     ::ng-deep .premium-dialog .p-dialog-header { background: var(--bg-secondary); border-bottom: 1px solid var(--border-primary); padding: var(--spacing-xl); }
-//     ::ng-deep .premium-dialog .p-dialog-content { padding: var(--spacing-xl); }
-
-//     /* Animations */
-//     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-//     @keyframes slideDown { from { transform: translateY(-15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-//     .fade-in { animation: fadeIn 0.4s cubic-bezier(0.2, 0.9, 0.2, 1); }
-//     .slide-down { animation: slideDown 0.4s cubic-bezier(0.2, 0.9, 0.2, 1); animation-fill-mode: both; }
-
-//     @media (max-width: 900px) { .grid-layout { grid-template-columns: 1fr; } }
-//   `]
-// })
-// export class MachineFormComponent implements OnInit {
-//   private fb = inject(FormBuilder);
-//   private hrmsService = inject(HRMSService);
-//   private messageService = inject(AppMessageService);
-//   private router = inject(Router);
-//   private route = inject(ActivatedRoute);
-
-//   machineForm!: FormGroup;
-//   isLoading = signal(true);
-//   isSaving = signal(false);
-//   isEditMode = signal(false);
-//   machineId: string | null = null;
-
-//   // Dialog State
-//   displayKeyModal = false;
-//   generatedApiKey: string = '';
-
-//   providers = [
-//     { label: 'ZKTeco', value: 'zkteco' },
-//     { label: 'Hikvision', value: 'hikvision' },
-//     { label: 'eSSL', value: 'essl' },
-//     { label: 'Suprema', value: 'suprema' },
-//     { label: 'BioEnable', value: 'bioenable' },
-//     { label: 'Generic / Custom', value: 'generic' }
-//   ];
-
-//   protocols = [
-//     { label: 'HTTP (REST API)', value: 'http' },
-//     { label: 'TCP/IP', value: 'tcp' },
-//     { label: 'WebSocket (WSS)', value: 'websocket' },
-//     { label: 'MQTT', value: 'mqtt' }
-//   ];
-
-//   ngOnInit() {
-//     this.initForm();
-//     this.machineId = this.route.snapshot.paramMap.get('id');
-    
-//     if (this.machineId) {
-//       this.isEditMode.set(true);
-//       this.loadMachine(this.machineId);
-//     } else {
-//       this.isLoading.set(false);
-//     }
-//   }
-
-//   private initForm() {
-//     this.machineForm = this.fb.group({
-//       organizationId: ['698f1a7feff3e811b71a590f', Validators.required], // Injected normally
-//       branchId: ['698f1a82eff3e811b71a5916', Validators.required],
-      
-//       name: ['', Validators.required],
-//       serialNumber: ['', Validators.required],
-//       providerType: ['generic'],
-//       model: [''],
-//       firmwareVersion: [''],
-      
-//       connectionProtocol: ['http', Validators.required],
-//       ipAddress: [''],
-//       port: [null],
-//       macAddress: [''],
-      
-//       capabilities: this.fb.group({
-//         faceRecognition: [false],
-//         fingerprint: [true],
-//         rfid: [false]
-//       }),
-      
-//       config: this.fb.group({
-//         syncInterval: [5],
-//         retryAttempts: [3],
-//         autoSync: [true]
-//       })
-//     });
-//   }
-
-//   private loadMachine(id: string) {
-//     this.hrmsService.getMachine(id).pipe(
-//       catchError(() => {
-//         this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not load device configuration.' });
-//         this.onCancel();
-//         return of(null);
-//       }),
-//       finalize(() => this.isLoading.set(false))
-//     ).subscribe((res: any) => {
-//       const data = res?.data?.machine;
-//       if (data) {
-//         this.machineForm.patchValue(data);
-//       }
-//     });
-//   }
-
-//   onSubmit() {
-//     if (this.machineForm.invalid) {
-//       this.machineForm.markAllAsTouched();
-//       return;
-//     }
-
-//     this.isSaving.set(true);
-//     const payload = this.machineForm.value;
-
-//     const req$ = this.isEditMode() && this.machineId
-//       ? this.hrmsService.updateMachine(this.machineId, payload)
-//       : this.hrmsService.createMachine(payload);
-
-//     req$.pipe(
-//       catchError(err => {
-//         this.messageService.add({ severity: 'error', summary: 'Save Failed', detail: err.error?.message || 'Server error.' });
-//         return of(null);
-//       }),
-//       finalize(() => this.isSaving.set(false))
-//     ).subscribe((res: any) => {
-//       if (res) {
-//         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Device configuration saved.' });
-        
-//         // Show API key on Creation only
-//         if (!this.isEditMode() && res.data?.apiKey) {
-//           this.generatedApiKey = res.data.apiKey;
-//           this.displayKeyModal = true;
-//         } else {
-//           setTimeout(() => this.onCancel(), 1000);
-//         }
-//       }
-//     });
-//   }
-
-//   copyKey() {
-//     navigator.clipboard.writeText(this.generatedApiKey).then(() => {
-//       this.messageService.add({ severity: 'info', summary: 'Copied', detail: 'API Key copied to clipboard.' });
-//     });
-//   }
-
-//   closeKeyModal() {
-//     this.displayKeyModal = false;
-//     this.onCancel();
-//   }
-
-//   onCancel() {
-//     this.router.navigate(['/attendance/machines']); // Adjust as needed
-//   }
-// }

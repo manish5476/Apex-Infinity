@@ -46,54 +46,38 @@
               @if (paymentForm.get('type')?.value === 'inflow') {
                 <div class="form-group">
                   <label>Customer <span class="req">*</span></label>
-                  <p-select appendTo="body" appendTo="body" appendTo="body" 
+                  <app-master-dropdown 
+                    endpoint="customers" 
                     formControlName="customerId" 
-                    [options]="customerOptions()" 
-                    optionLabel="name" 
-                    optionValue="_id"
-                    [filter]="true" filterBy="name"
-                    [showClear]="true"
                     placeholder="Select Customer">
-                  </p-select>
+                  </app-master-dropdown>
                 </div>
                 <div class="form-group">
                   <label>Invoice (Optional)</label>
-                  <p-select appendTo="body" appendTo="body" appendTo="body" 
+                  <app-master-dropdown 
+                    endpoint="invoices" 
                     formControlName="invoiceId" 
-                    [options]="invoiceOptions()" 
-                    optionLabel="invoiceNumber" 
-                    optionValue="_id"
-                    [filter]="true" filterBy="invoiceNumber"
-                    [showClear]="true"
                     placeholder="Link to Invoice">
-                  </p-select>
+                  </app-master-dropdown>
                 </div>
               }
 
               @if (paymentForm.get('type')?.value === 'outflow') {
                 <div class="form-group">
                   <label>Supplier <span class="req">*</span></label>
-                  <p-select appendTo="body" appendTo="body" appendTo="body" 
+                  <app-master-dropdown 
+                    endpoint="suppliers" 
                     formControlName="supplierId" 
-                    [options]="supplierOptions()" 
-                    optionLabel="companyName" 
-                    optionValue="_id"
-                    [filter]="true" filterBy="companyName"
-                    [showClear]="true"
                     placeholder="Select Supplier">
-                  </p-select>
+                  </app-master-dropdown>
                 </div>
                 <div class="form-group">
                   <label>Purchase (Optional)</label>
-                   <p-select appendTo="body" appendTo="body" appendTo="body" 
+                  <app-master-dropdown 
+                    endpoint="purchases" 
                     formControlName="purchaseId" 
-                    [options]="purchaseOptions()" 
-                    optionLabel="purchaseNumber" 
-                    optionValue="_id"
-                    [filter]="true" filterBy="purchaseNumber"
-                    [showClear]="true"
                     placeholder="Link to Purchase">
-                  </p-select>
+                  </app-master-dropdown>
                 </div>
               }
 
@@ -126,15 +110,11 @@
               
               <div class="form-group col-span-2">
                 <label>Branch</label>
-                <p-select appendTo="body" appendTo="body" appendTo="body" 
+                <app-master-dropdown 
+                  endpoint="branches" 
                   formControlName="branchId" 
-                  [options]="branchOptions()" 
-                  optionLabel="name" 
-                  optionValue="_id"
-                  [filter]="true" filterBy="name"
-                  [showClear]="true"
                   placeholder="Select Branch">
-                </p-select>
+                </app-master-dropdown>
               </div>
             </div>
             

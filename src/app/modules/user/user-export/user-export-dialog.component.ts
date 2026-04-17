@@ -1,35 +1,30 @@
-import { Component, inject, signal, computed, ChangeDetectorRef, OnDestroy } from '@angular/core';
-
+import { Component, inject, signal, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
 import { SelectModule } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
 import { finalize, Subject } from 'rxjs';
+import { takeUntil } from "rxjs/operators";
 
 import { UserManagementService } from '../user-management.service';
-import { MasterListService } from '../../../core/services/master-list.service';
+import { MasterDropdownComponent } from '../../shared/components/masterFilterDropdown/master-dropdown.component';
 import { AppMessageService } from '../../../core/services/message.service';
-import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-user-export-dialog',
   standalone: true,
-  imports: [FormsModule, SelectModule, ButtonModule],
+  imports: [FormsModule, SelectModule, ButtonModule, MasterDropdownComponent],
   templateUrl: './user-export-dialog.component.html',
   styleUrl: './user-export-dialog.component.scss'
 })
 export class UserExportDialogComponent implements OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   private ref = inject(DynamicDialogRef);
   private config = inject(DynamicDialogConfig);
   private userService = inject(UserManagementService);
-  private masterList = inject(MasterListService);
   private messageService = inject(AppMessageService);
   private cdr = inject(ChangeDetectorRef);
 
-  // Options from MasterList
-  departmentOptions = this.masterList.department;
-  
   statusOptions = [
     { label: 'All Statuses', value: null },
     { label: 'Active Only', value: true },
@@ -101,8 +96,8 @@ export class UserExportDialogComponent implements OnDestroy {
     this.ref.close();
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

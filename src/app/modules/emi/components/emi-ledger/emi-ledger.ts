@@ -12,11 +12,12 @@ import { ToastModule } from 'primeng/toast';
 // Shared
 import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
 import { AppMessageService } from '../../../../core/services/message.service';
-import { MasterListService } from '../../../../core/services/master-list.service';
+// import { MasterListService } from '../../../../core/services/master-list.service';
 import { EmiService } from '../../services/emi-service';
 import { GridApi } from 'ag-grid-community';
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
+import { MasterDropdownComponent } from '../../../shared/components/masterFilterDropdown/master-dropdown.component';
 
 @Component({
   selector: 'app-emi-ledger',
@@ -28,7 +29,8 @@ import { takeUntil } from "rxjs/operators";
     DatePickerModule,
     SelectModule,
     ToastModule,
-    AgShareGrid
+    AgShareGrid,
+    MasterDropdownComponent
 ],
   providers: [EmiService],
   templateUrl: './emi-ledger.html',
@@ -39,7 +41,7 @@ export class EmiLedger implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
   private emiService = inject(EmiService);
   private messageService = inject(AppMessageService);
-  public masterList = inject(MasterListService);
+  // public masterList = inject(MasterListService);
   private gridApi!: GridApi;
 
   @ViewChild(AgShareGrid) grid!: AgShareGrid;
@@ -57,9 +59,9 @@ export class EmiLedger implements OnInit, OnDestroy {
   isLoading = false;
 
   constructor() {
-    effect(() => {
-      this.customerOptions.set(this.masterList.customers());
-    });
+    // effect(() => {
+    //   this.customerOptions.set(this.masterList.customers());
+    // });
   }
 
   ngOnInit(): void {

@@ -10,10 +10,11 @@ import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 
 import { NoteService } from '../../../core/services/notes.service';
-import { MasterListService } from '../../../core/services/master-list.service';
+// import { MasterListService } from '../../../core/services/master-list.service';
 import { AppMessageService } from '../../../core/services/message.service';
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
+import { MasterDropdownComponent } from '../../shared/components/masterFilterDropdown/master-dropdown.component';
 
 @Component({
   selector: 'app-create-meeting-dialog',
@@ -26,7 +27,8 @@ import { takeUntil } from "rxjs/operators";
     TextareaModule,
     InputTextModule,
     ButtonModule,
-    CheckboxModule
+    CheckboxModule,
+    MasterDropdownComponent
 ],
   encapsulation: ViewEncapsulation.None,
   templateUrl: './create-meeting-dialog.html',
@@ -37,12 +39,12 @@ export class CreateMeetingDialogComponent implements OnDestroy {
   private fb = inject(FormBuilder);
   private ref = inject(DynamicDialogRef);
   private noteService = inject(NoteService);
-  private masterList = inject(MasterListService);
+  // private masterList = inject(MasterListService);
   private messageService = inject(AppMessageService);
 
   // --- State ---
   isSubmitting = signal(false);
-  users = computed(() => this.masterList.users() || []);
+  // users = computed(() => this.masterList.users() || []);
   searchQuery = signal('');
   constructor(private cdr: ChangeDetectorRef) {}
 
@@ -65,15 +67,15 @@ export class CreateMeetingDialogComponent implements OnDestroy {
   }, { validators: this.dateRangeValidator });
 
   // --- Computed Helpers ---
-  filteredUsers = computed(() => {
-    const query = this.searchQuery().toLowerCase();
-    const all = this.users();
-    // Simple filter
-    return all.filter(u => 
-      u.name.toLowerCase().includes(query) || 
-      (u['email'] && u['email'].toLowerCase().includes(query))
-    );
-  });
+  // filteredUsers = computed(() => {
+  //   const query = this.searchQuery().toLowerCase();
+  //   const all = this.users();
+  //   // Simple filter
+  //   return all.filter(u => 
+  //     u.name.toLowerCase().includes(query) || 
+  //     (u['email'] && u['email'].toLowerCase().includes(query))
+  //   );
+  // });
 
   selectedCount = computed(() => {
     return (this.meetingForm.get('participants')?.value || []).length;
@@ -87,19 +89,19 @@ export class CreateMeetingDialogComponent implements OnDestroy {
   }
 
   // --- Actions ---
-  toggleUser(userId: string) {
-    const current = this.meetingForm.get('participants')?.value || [];
-    const idx = current.indexOf(userId);
-    
-    let updated;
-    if (idx > -1) {
-      updated = current.filter((id: string) => id !== userId);
-    } else {
-      updated = [...current, userId];
-    }
-    this.meetingForm.patchValue({ participants: updated });
-    this.meetingForm.markAsDirty();
-  }
+  // toggleUser(userId: string) {
+  //   const current = this.meetingForm.get('participants')?.value || [];
+  //   const idx = current.indexOf(userId);
+  //   
+  //   let updated;
+  //   if (idx > -1) {
+  //     updated = current.filter((id: string) => id !== userId);
+  //   } else {
+  //     updated = [...current, userId];
+  //   }
+  //   this.meetingForm.patchValue({ participants: updated });
+  //   this.meetingForm.markAsDirty();
+  // }
 
   isSelected(userId: string): boolean {
     const current = this.meetingForm.get('participants')?.value || [];

@@ -30,18 +30,16 @@
 
       <div class="filter-field">
         <label for="role">Role</label>
-        <p-select appendTo="body" (onChange)="applyFilters()" id="role" [options]="roleOptions()"
-          [(ngModel)]="userFilter.role" optionLabel="name" optionValue="_id" [showClear]="true" [filter]="true"
-          filterBy="name" placeholder="Filter by Role" styleClass="w-full">
-        </p-select>
+        <app-master-dropdown endpoint="roles" [(ngModel)]="userFilter.role" (onChange)="applyFilters()"
+          placeholder="Filter by Role">
+        </app-master-dropdown>
       </div>
 
       <div class="filter-field">
         <label for="branch">Branch</label>
-        <p-select appendTo="body" (onChange)="applyFilters()" id="branch" [options]="branchOptions()"
-          [(ngModel)]="userFilter.branchId" optionLabel="name" optionValue="_id" [showClear]="true" [filter]="true"
-          filterBy="name" placeholder="Filter by Branch" styleClass="w-full">
-        </p-select>
+        <app-master-dropdown endpoint="branches" [(ngModel)]="userFilter.branchId" (onChange)="applyFilters()"
+          placeholder="Filter by Branch">
+        </app-master-dropdown>
       </div>
 
       <div class="filter-field">

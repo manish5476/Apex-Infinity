@@ -55,18 +55,22 @@
 
       <div class="filter-field">
         <label for="customer">Customer</label>
-        <p-select appendTo="body" id="customer" [options]="customerOptions()" [ngModel]="filter().customerId"
-          (ngModelChange)="patchFilter({ customerId: $event }); applyFilters()" optionLabel="name" optionValue="_id"
-          [filter]="true" filterBy="name" [showClear]="true" placeholder="Select customer" styleClass="w-full">
-        </p-select>
+        <app-master-dropdown 
+          endpoint="customers" 
+          [ngModel]="filter().customerId"
+          (ngModelChange)="patchFilter({ customerId: $event }); applyFilters()"
+          placeholder="Select customer">
+        </app-master-dropdown>
       </div>
 
       <div class="filter-field">
         <label for="supplier">Supplier</label>
-        <p-select appendTo="body" id="supplier" [options]="supplierOptions()" [ngModel]="filter().supplierId"
-          (ngModelChange)="patchFilter({ supplierId: $event }); applyFilters()" optionLabel="name" optionValue="_id"
-          [filter]="true" filterBy="name" [showClear]="true" placeholder="Select supplier" styleClass="w-full">
-        </p-select>
+        <app-master-dropdown 
+          endpoint="suppliers" 
+          [ngModel]="filter().supplierId"
+          (ngModelChange)="patchFilter({ supplierId: $event }); applyFilters()"
+          placeholder="Select supplier">
+        </app-master-dropdown>
       </div>
 
       <div class="filter-field">
