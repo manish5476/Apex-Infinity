@@ -54,14 +54,14 @@ export interface Permission {
     DividerModule,
     CheckboxModule,
     AgShareGrid
-],
+  ],
   providers: [ConfirmationService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './role-management.html',
   styleUrl: './role-management.scss'
 })
 export class RoleManagementComponent implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   private apiService = inject(ApiService);
   private appMessage = inject(AppMessageService);
   private confirmationService = inject(ConfirmationService);
@@ -289,78 +289,8 @@ export class RoleManagementComponent implements OnInit, OnDestroy {
     });
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }
-
-
-
-  // openEditRoleDialog(role: Role) {
-  //   if (role.isSuperAdmin) {
-  //     this.appMessage.showInfo('Super Admin roles cannot be modified.', 'System Role');
-  //     return;
-  //   }
-  //   this.currentRole.set({ ...role });
-  //   this.selectedPermissions.set([...(role.permissions || [])]);
-  //   this.isEditMode.set(true);
-  //   this.showRoleDialog.set(true);
-  // }
-
-  // saveRole() {
-  //   const roleData = this.currentRole();
-  //   if (!roleData.name?.trim()) {
-  //     this.appMessage.showWarn('Required', 'Please enter a role name');
-  //     return;
-  //   }
-  //   this.isSaving.set(true);
-  //   const payload = { name: roleData.name, permissions: this.selectedPermissions() };
-  //   const req$ = this.isEditMode() ? this.apiService.updateRole(roleData._id!, payload) : this.apiService.createRole(payload);
-  //   req$.subscribe({
-  //     next: () => {
-  //       this.appMessage.showSuccess(`Role ${this.isEditMode() ? 'updated' : 'created'} successfully`);
-  //       this.loadRoles();
-  //       this.hideDialog();
-  //     },
-  //     error: (err) => {
-  //       this.appMessage.handleHttpError(err, 'Save Role');
-  //       this.isSaving.set(false);
-  //       this.cdr.markForCheck();
-  //     },
-  //     complete: () => { this.isSaving.set(false); this.cdr.markForCheck(); }
-  //   });
-  // }
-
-  // deleteRole(role: Role) {
-  //   this.confirmationService.confirm({
-  //     message: `Are you sure you want to delete <b>${role.name}</b>?`,
-  //     header: 'Confirm Delete',
-  //     icon: 'pi pi-exclamation-triangle',
-  //     accept: () => {
-  //       this.apiService.deleteRole(role._id).subscribe({
-  //         next: () => {
-  //           this.appMessage.showSuccess('Role removed successfully');
-  //           this.loadRoles();
-  //         },
-  //         error: (err) => this.appMessage.handleHttpError(err, 'Delete Role')
-  //       });
-  //     }
-  //   });
-  // }
-
-  // loadRoles(): void {
-  //   this.isLoading.set(true);
-  //   this.apiService.getRoles().subscribe({
-  //     next: (res: any) => {
-  //       this.roles.set(res.data?.roles || []);
-  //       this.isLoading.set(false);
-  //       this.cdr.markForCheck();
-  //     },
-  //     error: (err) => {
-  //       this.appMessage.handleHttpError(err, 'Fetch Roles');
-  //       this.isLoading.set(false);
-  //       this.cdr.markForCheck();
-  //     }
-  //   });
-  // }
