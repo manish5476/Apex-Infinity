@@ -39,18 +39,12 @@
 
           <div class="form-group span-4">
             <label>Customer <span class="required">*</span></label>
-            <p-select appendTo="body" appendTo="body" formControlName="customerId" [options]="customerOptions()"
-              optionLabel="name" optionValue="_id" [filter]="true" filterBy="name" placeholder="Select Customer..."
-              (onChange)="onCustomerSelect($event)" styleClass="w-full theme-control">
-              <ng-template pTemplate="selectedItem" let-selected>
-                @if (selected) {
-                  <div class="flex items-center gap-2">
-                    <i class="pi pi-user text-primary"></i>
-                    <span class="font-bold">{{ selected.name }}</span>
-                  </div>
-                }
-              </ng-template>
-            </p-select>
+            <app-master-dropdown 
+              endpoint="customers" 
+              formControlName="customerId" 
+              (onSelect)="onCustomerSelect($event)" 
+              placeholder="Select Customer...">
+            </app-master-dropdown>
           </div>
 
           <div class="form-group span-2">
@@ -61,10 +55,11 @@
 
             <div class="form-group span-2">
               <label>Branch</label>
-              <p-select appendTo="body" appendTo="body" formControlName="branchId" [options]="branchOptions()"
-                optionLabel="name" optionValue="_id" styleClass="w-full theme-control" placeholder="Select Branch"
-              [filter]="true" filterBy="name"></p-select>
-
+              <app-master-dropdown 
+                endpoint="branches" 
+                formControlName="branchId" 
+                placeholder="Select Branch">
+              </app-master-dropdown>
             </div>
 
             <div class="form-group span-2">
@@ -110,12 +105,14 @@
                     <td class="text-center index-col">{{ i + 1 }}</td>
 
                     <td>
-                      <p-select appendTo="body" appendTo="body" formControlName="productId" [options]="productOptions()"
-                        optionLabel="name" optionValue="_id" [filter]="true" filterBy="name" placeholder="Select Item"
-                        (onChange)="onProductSelect($event, i)" styleClass="w-full table-input">
-                      </p-select>
+                      <app-master-dropdown 
+                        endpoint="products" 
+                        formControlName="productId" 
+                        (onSelect)="onProductSelect($event, i)" 
+                        placeholder="Select Item">
+                      </app-master-dropdown>
                       @if (items.at(i).get('name')?.value) {
-                        <div class="item-meta">HSN: {{ items.at(i).get('hsnCode')?.value || '--' }}</div>
+                        <div class="item-meta">HSN: {{ items.at(i).get('sku')?.value || '--' }}</div>
                       }
                     </td>
 
@@ -124,14 +121,14 @@
                         <i class="pi pi-spin pi-spinner text-primary"></i>
                       } @else {
                         <span class="stock-pill" [ngClass]="items.at(i).get('isLowStock')?.value ? 'stock-low' : 'stock-ok'">
-                          {{ items.at(i).get('currentStock')?.value }}
+                          {{ items.at(i).get('currentStock')?.value ?? '--' }}
                         </span>
                       }
                     </td>
 
                     <td>
                       <p-inputNumber formControlName="quantity" [min]="1"
-                        [max]="items.at(i).get('currentStock')?.value || 99999" styleClass="w-full table-input"
+                        styleClass="w-full table-input"
                       inputStyleClass="text-center font-bold w-full"></p-inputNumber>
                     </td>
 

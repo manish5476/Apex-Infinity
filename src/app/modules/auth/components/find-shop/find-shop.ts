@@ -1,5 +1,4 @@
 import { Component, inject, signal, OnDestroy } from '@angular/core';
-
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ToastModule } from 'primeng/toast';
@@ -19,7 +18,7 @@ import { takeUntil } from "rxjs/operators";
   styleUrl: './find-shop.scss'
 })
 export class FindShopComponent implements OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   private fb = inject(FormBuilder);
   private orgService = inject(OrganizationService);
   private messageService = inject(AppMessageService);
@@ -52,8 +51,8 @@ export class FindShopComponent implements OnDestroy {
     });
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

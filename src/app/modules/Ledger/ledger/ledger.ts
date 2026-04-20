@@ -6,9 +6,10 @@ import { finalize, takeUntil } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 
 // Services
-import { MasterListService } from '../../../core/services/master-list.service';
+// import { MasterListService } from '../../../core/services/master-list.service';
 import { FinancialService } from '../financial.service';
 import { CommonMethodService } from '../../../core/utils/common-method.service';
+import { MasterDropdownComponent } from '../../shared/components/masterFilterDropdown/master-dropdown.component';
 
 // Shared Components
 import { AgShareGrid } from "../../shared/components/ag-shared-grid";
@@ -47,7 +48,8 @@ type LedgerTab =
     InputTextModule, TooltipModule, SkeletonModule,
     DatePickerModule, DialogModule, RadioButtonModule,
     TagModule, CardModule, ToastModule,
-    AgShareGrid
+    AgShareGrid,
+    MasterDropdownComponent
   ],
   templateUrl: './ledger.html',
   styleUrls: ['./ledger.scss']
@@ -55,11 +57,12 @@ type LedgerTab =
 export class LedgerComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
   private fb = inject(FormBuilder);
-  private master = inject(MasterListService);
+  // private master = inject(MasterListService);
   private messageService = inject(AppMessageService);
   private financial = inject(FinancialService);
   private router = inject(Router);
   public common = inject(CommonMethodService);
+  
   tabIndex = signal(0);
   currentTab = computed<LedgerTab>(() => this.resolveTab(this.tabIndex()));
   gridData = signal<any[]>([]);
@@ -73,16 +76,15 @@ export class LedgerComponent implements OnInit, OnDestroy {
   isExporting = signal(false);
   filterForm!: FormGroup;
   exportForm!: FormGroup;
-  customerOptions = computed(() => this.master.customers().map(c => ({ label: c.name, value: c._id })));
-  supplierOptions = computed(() => this.master.suppliers().map(s => ({ label: s['companyName'], value: s._id })));
-  branchOptions = computed(() => this.master.branches().map(b => ({ label: b.name, value: b._id })));
-  accountOptions = computed(() => this.master.accounts().map(a => ({ label: a.name, value: a._id })));
+  
   pinnedBottomRowData = signal<any>(null);
+
   constructor() {
     effect(() => {
       this.initColumns(this.currentTab());
     });
   }
+
   ngOnInit(): void {
     this.initializeForms();
     this.loadData(this.currentTab(), true);
@@ -119,9 +121,11 @@ export class LedgerComponent implements OnInit, OnDestroy {
     ];
     return map[i] || 'all';
   }
+
   applyFilters() {
     this.loadData(this.currentTab(), true);
   }
+
   resetFilters() {
     const now = new Date();
     const first = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -137,6 +141,7 @@ export class LedgerComponent implements OnInit, OnDestroy {
     });
     this.applyFilters();
   }
+
   private getParams(resetCursor: boolean = false) {
     const v = this.filterForm.value;
     const params: any = {};
@@ -196,10 +201,6 @@ export class LedgerComponent implements OnInit, OnDestroy {
       });
   }
 
-  // inside processResponse, after every this.gridData.set(...) call, add:
-  // this.pinnedBottomRowData.set(this.computePinnedTotals(tab, this.gridData()));
-
-  // Full updated processResponse:
   private processResponse(tab: LedgerTab, res: any) {
     if (res.status !== 'success') {
       this.messageService.showError(res.message || 'Failed to process ledger data.');
@@ -242,185 +243,14 @@ export class LedgerComponent implements OnInit, OnDestroy {
       return;
     }
   }
+
   private canQuery(tab: LedgerTab): boolean {
     const f = this.filterForm.value;
     if (tab === 'customer' && !f.customerId) return false;
     if (tab === 'supplier' && !f.supplierId) return false;
     return true;
   }
-  // private initColumns(tab: LedgerTab) {
-  //   let cols: any[] = [];
 
-  //   switch (tab) {
-  //     // ═══════════════════════════════════════════════════════
-  //     // TAB: ALL (GENERAL LEDGER)
-  //     // ═══════════════════════════════════════════════════════
-  //     case 'all':
-  //       cols = [
-  //         {
-  //           field: 'date',
-  //           headerName: 'Date',
-  //           sortable: true,
-  //           width: 140,
-  //           valueFormatter: (params: any) => this.common.formatDate(params.value, 'dd MMM yyyy'),
-  //           cellClass: 'text-secondary font-medium cell-flex-center'
-  //         },
-  //         {
-  //           field: 'referenceNumber',
-  //           headerName: 'Ref #',
-  //           sortable: true,
-  //           width: 160,
-  //           cellClass: 'text-accent font-bold cursor-pointer hover-underline cell-flex-center'
-  //         },
-  //         {
-  //           field: 'accountName',
-  //           headerName: 'Account',
-  //           sortable: true,
-  //           flex: 1,
-  //           minWidth: 150,
-  //           cellClass: 'text-primary font-semibold cell-flex-center'
-  //         },
-  //         {
-  //           field: 'description',
-  //           headerName: 'Description',
-  //           flex: 2,
-  //           minWidth: 250,
-  //           cellClass: 'text-secondary ellipsis cell-flex-center'
-  //         },
-  //         {
-  //           field: 'debit',
-  //           headerName: 'Debit',
-  //           sortable: true,
-  //           width: 130,
-  //           type: 'rightAligned',
-  //           valueFormatter: (params: any) => params.value ? this.common.formatCurrency(params.value) : '-',
-  //           cellClass: 'text-error font-mono font-semibold cell-flex-end'
-  //         },
-  //         {
-  //           field: 'credit',
-  //           headerName: 'Credit',
-  //           sortable: true,
-  //           width: 130,
-  //           type: 'rightAligned',
-  //           valueFormatter: (params: any) => params.value ? this.common.formatCurrency(params.value) : '-',
-  //           cellClass: 'text-success font-mono font-semibold cell-flex-end'
-  //         }
-  //       ];
-  //       break;
-
-  //     // ═══════════════════════════════════════════════════════
-  //     // TAB: CUSTOMER / SUPPLIER (SUB-LEDGER)
-  //     // ═══════════════════════════════════════════════════════
-  //     case 'customer':
-  //     case 'supplier':
-  //       cols = [
-  //         {
-  //           field: 'date',
-  //           headerName: 'Date',
-  //           sortable: true,
-  //           width: 140,
-  //           valueFormatter: (params: any) => this.common.formatDate(params.value, 'dd MMM yyyy'),
-  //           cellClass: 'text-secondary font-medium cell-flex-center'
-  //         },
-  //         {
-  //           field: 'referenceNumber',
-  //           headerName: 'Ref #',
-  //           width: 160,
-  //           cellClass: 'text-primary font-bold cell-flex-center'
-  //         },
-  //         {
-  //           field: 'description',
-  //           headerName: 'Description',
-  //           flex: 2,
-  //           minWidth: 250,
-  //           cellClass: 'text-secondary ellipsis cell-flex-center'
-  //         },
-  //         {
-  //           field: 'debit',
-  //           headerName: 'Debit',
-  //           width: 130,
-  //           type: 'rightAligned',
-  //           valueFormatter: (params: any) => params.value ? this.common.formatCurrency(params.value) : '-',
-  //           cellClass: 'text-error font-mono font-semibold cell-flex-end'
-  //         },
-  //         {
-  //           field: 'credit',
-  //           headerName: 'Credit',
-  //           width: 130,
-  //           type: 'rightAligned',
-  //           valueFormatter: (params: any) => params.value ? this.common.formatCurrency(params.value) : '-',
-  //           cellClass: 'text-success font-mono font-semibold cell-flex-end'
-  //         },
-  //         {
-  //           field: 'balance',
-  //           headerName: 'Balance',
-  //           width: 140,
-  //           type: 'rightAligned',
-  //           valueFormatter: (params: any) => this.common.formatCurrency(params.value),
-  //           cellClass: 'text-primary font-mono font-bold cell-flex-end'
-  //         }
-  //       ];
-  //       break;
-
-  //     // ═══════════════════════════════════════════════════════
-  //     // TAB: TRIAL BALANCE
-  //     // ═══════════════════════════════════════════════════════
-  //     case 'trialBalance':
-  //       cols = [
-  //         {
-  //           field: 'accountCode',
-  //           headerName: 'Code',
-  //           width: 100,
-  //           cellClass: 'text-tertiary font-mono font-medium cell-flex-center'
-  //         },
-  //         {
-  //           field: 'accountName',
-  //           headerName: 'Account Name',
-  //           flex: 2,
-  //           sortable: true,
-  //           cellClass: 'text-primary font-semibold cell-flex-center'
-  //         },
-  //         {
-  //           field: 'type',
-  //           headerName: 'Type',
-  //           width: 140,
-  //           cellClass: 'cell-flex-center',
-  //           cellRenderer: (params: any) => {
-  //             if (!params.value) return '-';
-  //             const type = params.value.toLowerCase();
-  //             // Assign logical colors to accounting types
-  //             let badgeClass = 'badge-neutral';
-  //             if (type.includes('asset')) badgeClass = 'badge-info-soft';
-  //             if (type.includes('liability')) badgeClass = 'badge-warning-soft';
-  //             if (type.includes('equity')) badgeClass = 'badge-success-soft';
-  //             if (type.includes('revenue') || type.includes('income')) badgeClass = 'badge-success-solid';
-  //             if (type.includes('expense')) badgeClass = 'badge-error-soft';
-
-  //             return `<span class="grid-badge ${badgeClass}">${params.value}</span>`;
-  //           }
-  //         },
-  //         {
-  //           field: 'debit',
-  //           headerName: 'Debit',
-  //           width: 150,
-  //           type: 'rightAligned',
-  //           valueFormatter: (params: any) => params.value ? this.common.formatCurrency(params.value) : '-',
-  //           cellClass: 'text-primary font-mono font-medium cell-flex-end'
-  //         },
-  //         {
-  //           field: 'credit',
-  //           headerName: 'Credit',
-  //           width: 150,
-  //           type: 'rightAligned',
-  //           valueFormatter: (params: any) => params.value ? this.common.formatCurrency(params.value) : '-',
-  //           cellClass: 'text-primary font-mono font-medium cell-flex-end'
-  //         }
-  //       ];
-  //       break;
-  //   }
-
-  //   this.gridColumns.set(cols);
-  // }
   private initColumns(tab: LedgerTab) {
     let cols: any[] = [];
 

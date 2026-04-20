@@ -16,14 +16,11 @@
     <!-- Option 2: Department Filter -->
     <div class="form-group">
       <label class="section-label">Filter by Department</label>
-      <p-select [options]="departmentOptions()" 
-                [(ngModel)]="departmentId" 
-                optionLabel="name" 
-                optionValue="_id" 
-                [showClear]="true" 
-                placeholder="All Departments"
-                styleClass="w-full glass-input">
-      </p-select>
+      <app-master-dropdown 
+        endpoint="departments" 
+        [(ngModel)]="departmentId" 
+        placeholder="All Departments">
+      </app-master-dropdown>
     </div>
   
     <!-- Option 3: Status Filter -->

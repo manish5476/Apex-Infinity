@@ -20,7 +20,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { Toast } from 'primeng/toast';
 
 import { AgShareGrid, ActionColumnConfig } from '../../../shared/components/ag-shared-grid';
-import { MasterListService } from '../../../../core/services/master-list.service';
+// import { MasterListService } from '../../../../core/services/master-list.service';
+import { MasterDropdownComponent } from '../../../shared/components/masterFilterDropdown/master-dropdown.component';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { PaymentService } from '../../services/payment-service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
@@ -66,6 +67,7 @@ interface PillConfig {
     AgShareGrid,
     HasPermissionDirective,
     CurrencyPipe,
+    MasterDropdownComponent,
   ],
   templateUrl: './payment-list.html',
   styleUrl: './payment-list.scss',
@@ -79,7 +81,7 @@ export class PaymentListComponent implements OnInit, OnDestroy {
   private readonly payment = inject(PaymentService);
   private readonly msg = inject(AppMessageService);
   private readonly common = inject(CommonMethodService);
-  readonly masterList = inject(MasterListService);
+  // readonly masterList = inject(MasterListService);
 
   // ── Lifecycle ─────────────────────────────────────────────────────────────
   private readonly destroy$ = new Subject<void>();
@@ -210,10 +212,10 @@ export class PaymentListComponent implements OnInit, OnDestroy {
   // Constructor
   // ─────────────────────────────────────────────────────────────────────────
   constructor() {
-    effect(() => {
-      this.customerOptions.set(this.masterList.customers());
-      this.supplierOptions.set(this.masterList.suppliers());
-    });
+    // effect(() => {
+    //   this.customerOptions.set(this.masterList.customers());
+    //   this.supplierOptions.set(this.masterList.suppliers());
+    // });
   }
 
   // ─────────────────────────────────────────────────────────────────────────

@@ -36,9 +36,11 @@
 
               <div class="form-group">
                 <label>Manager</label>
-                <p-select appendTo="body" appendTo="body" formControlName="managerId" [options]="managerOptions()" optionLabel="name"
-                  optionValue="_id" placeholder="Select Manager" [filter]="true">
-                </p-select>
+                <app-master-dropdown 
+                  endpoint="users" 
+                  formControlName="managerId" 
+                  placeholder="Select Manager">
+                </app-master-dropdown>
               </div>
             </div>
           </section>

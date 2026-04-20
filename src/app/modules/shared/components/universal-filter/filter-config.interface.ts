@@ -1,13 +1,15 @@
 // filter-config.interface.ts
 export type FilterType = 'text' | 'select' | 'multiselect' | 'date' | 'date-range' | 'checkbox' | 'radio';
 
+import { DropdownEndpoint } from '../../../../core/services/master-dropdown.service';
+
 export interface FilterField {
   key: string;              // The key sent to the API
   label: string;            // Display label
   type: FilterType;
   
   // Data Sources
-  dataSourceKey?: string;   // Dynamic: matches MasterListService signal (e.g. 'branches')
+  dataSourceKey?: DropdownEndpoint;   // Dynamic: matches MasterDropdown endpoints (e.g. 'branches')
   staticOptions?: any[];    // Static: for Radio/Select (e.g. [{label: 'Yes', value: true}])
   
   // Configuration

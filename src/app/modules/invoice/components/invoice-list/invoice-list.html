@@ -44,10 +44,12 @@
 
       <div class="filter-field">
         <label for="customer">Customer</label>
-        <p-select appendTo="body" id="customer" [options]="customerOptions()" [(ngModel)]="invoiceFilter.customerId"
-          [filter]="true" filterBy="name" optionLabel="name" optionValue="_id" [showClear]="true"
-          placeholder="All Customers" (onChange)="applyFilters()" styleClass="w-full">
-        </p-select>
+        <app-master-dropdown 
+          endpoint="customers" 
+          [(ngModel)]="invoiceFilter.customerId" 
+          (onSelect)="applyFilters()" 
+          placeholder="All Customers">
+        </app-master-dropdown>
       </div>
 
       <div class="filter-field">

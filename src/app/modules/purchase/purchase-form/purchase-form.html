@@ -30,18 +30,20 @@
 
               <div class="form-group">
                 <label>Supplier <span class="req">*</span></label>
-                <p-select appendTo="body" formControlName="supplierId" [options]="supplierOptions()"
-                  optionLabel="companyName" optionValue="_id" placeholder="Select Supplier" [filter]="true" filterBy="companyName">
-                </p-select>
-
+                <app-master-dropdown 
+                  endpoint="suppliers" 
+                  formControlName="supplierId" 
+                  placeholder="Select Supplier">
+                </app-master-dropdown>
               </div>
 
               <div class="form-group">
                 <label>Branch <span class="req">*</span></label>
-                <p-select appendTo="body" formControlName="branchId" [options]="branchOptions()" optionLabel="name"
-                  optionValue="_id" placeholder="Recieving Branch" [filter]="true" filterBy="name">
-                </p-select>
-
+                <app-master-dropdown 
+                  endpoint="branches" 
+                  formControlName="branchId" 
+                  placeholder="Recieving Branch">
+                </app-master-dropdown>
               </div>
 
               <div class="form-group">
@@ -78,11 +80,12 @@
               <div [formGroupName]="i" class="inventory-item-grid animate-slideInUp purchase-row">
                 <div class="form-group">
                   <label class="md:hidden">Product</label>
-                  <p-select appendTo="body" formControlName="productId" [options]="productOptions()" optionLabel="name"
-                    optionValue="_id" placeholder="Search Product" [filter]="true" filterBy="name"
-                    (onChange)="onProductSelect(i, $event.value)">
-                  </p-select>
-
+                  <app-master-dropdown 
+                    endpoint="products" 
+                    formControlName="productId" 
+                    placeholder="Search Product"
+                    (onSelect)="onProductSelect(i, $event)">
+                  </app-master-dropdown>
                 </div>
 
                 <div class="form-group">

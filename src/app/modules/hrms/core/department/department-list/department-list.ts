@@ -5,16 +5,17 @@ import { Router, RouterModule } from '@angular/router';
 import { finalize, takeUntil } from 'rxjs/operators';
 import { Subject } from "rxjs";
 
-import { MasterListService } from '../../../../../core/services/master-list.service';
+// import { MasterListService } from '../../../../../core/services/master-list.service';
 import { AppMessageService } from '../../../../../core/services/message.service';
 import { HRMSService } from '../../../hrms.service';
 import { AgShareGrid, ActionColumnConfig } from '../../../../shared/components/ag-shared-grid';
 import { PERMISSIONS } from '../../../../../core/auth/permissions.constants';
+import { MasterDropdownComponent } from '../../../../shared/components/masterFilterDropdown/master-dropdown.component';
 
 @Component({
   selector: 'app-department-list',
   standalone: true,
-  imports: [FormsModule, RouterModule, AgShareGrid],
+  imports: [FormsModule, RouterModule, AgShareGrid, MasterDropdownComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="list-page-container fade-in">
@@ -52,14 +53,12 @@ import { PERMISSIONS } from '../../../../../core/auth/permissions.constants';
 
           <!-- Branch Filter -->
           <div class="se-filter-field">
-            <div class="select-wrapper w-full">
-              <select id="branch" [(ngModel)]="deptFilter.branchId" (change)="applyFilters()" class="se-input w-full">
-                <option [ngValue]="null">All Branches</option>
-                @for (branch of branchOptions(); track branch._id) {
-                  <option [value]="branch._id">{{ branch.name }}</option>
-                }
-              </select>
-            </div>
+            <app-master-dropdown 
+              endpoint="branches" 
+              [(ngModel)]="deptFilter.branchId" 
+              (ngModelChange)="applyFilters()" 
+              placeholder="All Branches">
+            </app-master-dropdown>
           </div>
 
           <!-- Status Filter -->
@@ -377,7 +376,7 @@ export class DepartmentListComponent implements OnInit, OnDestroy {
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
   private router = inject(Router);
-  public masterList = inject(MasterListService);
+  // public masterList = inject(MasterListService);
 
   data: any[] = [];
   column: any[] = [];
@@ -385,7 +384,7 @@ export class DepartmentListComponent implements OnInit, OnDestroy {
   currentPage = 1;
   pageSize = 50;
   isLoading = false;
-  branchOptions = signal<any[]>([]);
+  // branchOptions = signal<any[]>([]);
 
   deptFilter = { search: '', branchId: null, isActive: null };
 
@@ -398,7 +397,7 @@ export class DepartmentListComponent implements OnInit, OnDestroy {
   };
 
   constructor() {
-    effect(() => this.branchOptions.set(this.masterList.branches()));
+    // effect(() => this.branchOptions.set(this.masterList.branches()));
   }
 
   ngOnInit(): void {

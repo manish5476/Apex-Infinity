@@ -34,7 +34,7 @@ import { PERMISSIONS } from '../../../core/auth/permissions.constants';
   styleUrl: './purchase-details.scss',
 })
 export class PurchaseDetailsComponent implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   readonly PERMISSIONS = PERMISSIONS;
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -381,133 +381,8 @@ export class PurchaseDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
-  // loadData() {
-  //   this.isLoading.set(true);
-
-  //   // 1. Get Purchase
-  //   this.purchaseService.getPurchaseById(this.purchaseId!).subscribe({
-  //     next: (res: any) => {
-  //       const data = res.data?.data || res.data;
-  //       this.purchase.set(data);
-  //       this.itemsData.set(data.items || []);
-
-  //       // 2. Get Payments (Chained or Parallel)
-  //       this.purchaseService.getPaymentHistory(this.purchaseId!).subscribe({
-  //          next: (payRes: any) => {
-  //             this.paymentHistoryData.set(payRes.data?.payments || []);
-  //          },
-  //          complete: () => this.isLoading.set(false)
-  //       });
-  //     },
-  //     error: () => {
-  //       this.isLoading.set(false);
-  //       this.messageService.showError('Error', 'Could not load details');
-  //       this.router.navigate(['/purchase']);
-  //     }
-  //   });
-  // }
-
-  // submitPayment() {
-  //   if (this.paymentForm.invalid) return;
-
-  //   const p = this.purchase();
-  //   const formVal = this.paymentForm.value;
-  //   const balance = p.balanceAmount;
-
-  //   // Use epsilon for float comparison safety
-  //   if (formVal.amount > (balance + 0.01)) {
-  //     this.messageService.showError('Invalid Amount', `Exceeds balance (${this.formatCurrency(balance)})`);
-  //     return;
-  //   }
-
-  //   this.isSubmittingPayment.set(true);
-  //   this.purchaseService.recordPayment(this.purchaseId!, formVal)
-  //     .pipe(finalize(() => this.isSubmittingPayment.set(false)))
-  //     .subscribe({
-  //       next: () => {
-  //         this.messageService.showSuccess('Success', 'Payment Recorded');
-  //         this.showPaymentDialog.set(false);
-  //         this.loadData(); // Reload both purchase (for status) and history
-  //       },
-  //       error: (err) => this.messageService.showError('Error', err.error?.message || 'Failed')
-  //     });
-  // }
-
-  // deletePayment(paymentId: string, amount: number) {
-  //   if(!confirm(`Delete payment of ${this.formatCurrency(amount)}? This will restore the balance.`)) return;
-
-  //   this.purchaseService.deletePayment(this.purchaseId!, paymentId).subscribe({
-  //     next: () => {
-  //       this.messageService.showSuccess('Deleted', 'Payment Removed');
-  //       this.loadData();
-  //     },
-  //     error: () => this.messageService.showError('Error', 'Delete Failed')
-  //   });
-  // }
-
-  // // --- NEW: Status Workflow ---
-  // updateStatus(newStatus: string) {
-  //   this.purchaseService.updateStatus(this.purchaseId!, newStatus, 'Status updated via UI')
-  //     .subscribe({
-  //       next: () => {
-  //         this.messageService.showSuccess('Updated', `Status changed to ${newStatus}`);
-  //         this.loadData();
-  //       },
-  //       error: () => this.messageService.showError('Error', 'Status update failed')
-  //     });
-  // }
-  // // --- NEW: Cancellation Logic ---
-  // showCancelDialog = signal(false);
-  // cancelReason = '';
-
-  // confirmCancel() {
-  //   if (!this.cancelReason.trim()) return;
-
-  //   this.purchaseService.cancelPurchase(this.purchaseId!, this.cancelReason)
-  //     .subscribe({
-  //       next: () => {
-  //         this.messageService.showSuccess('Cancelled', 'Purchase cancelled');
-  //         this.showCancelDialog.set(false);
-  //         this.loadData();
-  //       },
-  //       error: (err) => this.messageService.showError('Error', err.error?.message || 'Failed')
-  //     });
-  // }
-
-  // // --- NEW: Attachment Logic ---
-  // isUploading = signal(false);
-
-  // onFileSelect(event: any, fileUpload: any) {
-  //   this.isUploading.set(true);
-  //   const files = event.files;
-
-  //   this.purchaseService.addAttachments(this.purchaseId!, files).subscribe({
-  //     next: () => {
-  //       this.messageService.showSuccess('Uploaded', 'Files added successfully');
-  //       fileUpload.clear();
-  //       this.isUploading.set(false);
-  //       this.loadData(); // Refresh list
-  //     },
-  //     error: () => {
-  //       this.isUploading.set(false);
-  //       this.messageService.showError('Error', 'Upload failed');
-  //     }
-  //   });
-  // }
-
-  // deleteAttachment(index: number) {
-  //   if(!confirm('Delete this attachment?')) return;
-
-  //   this.purchaseService.deleteAttachment(this.purchaseId!, index).subscribe({
-  //     next: () => {
-  //       this.messageService.showSuccess('Deleted', 'File removed');
-  //       this.loadData();
-  //     },
-  //     error: () => this.messageService.showError('Error', 'Delete failed')
-  //   });
-  // }
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

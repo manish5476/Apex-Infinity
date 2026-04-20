@@ -20,7 +20,7 @@ import { TooltipModule } from 'primeng/tooltip'; // Added for hover info
     CommonModule,
     RouterModule,
     ButtonModule,
-    DividerModule,TooltipModule,
+    DividerModule, TooltipModule,
     TagModule,
     UpperCasePipe,
     DecimalPipe
@@ -29,7 +29,7 @@ import { TooltipModule } from 'primeng/tooltip'; // Added for hover info
   styleUrls: ['./payment-details.scss']
 })
 export class PaymentDetailsComponent implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   private route = inject(ActivatedRoute);
   private paymentService = inject(PaymentService);
   private loadingService = inject(LoadingService);
@@ -46,19 +46,19 @@ export class PaymentDetailsComponent implements OnInit, OnDestroy {
       switchMap(params => {
         const id = params.get('id');
         if (!id) return of(null);
-        
+
         // this.loadingService.show();
         return this.paymentService.getPaymentById(id).pipe(
-          finalize(() => this.loadingService.hide()) 
-        ); 
+          finalize(() => this.loadingService.hide())
+        );
       }), takeUntil(this.destroy$)
     ).subscribe({
       next: (res: any) => {
         if (res?.data) {
-           this.payment.set(res.data.data || res.data); 
+          this.payment.set(res.data.data || res.data);
         } else {
-           // Converted to single string
-           this.messageService.showError('Payment not found.');
+          // Converted to single string
+          this.messageService.showError('Payment not found.');
         }
       },
       error: (err) => {
@@ -72,7 +72,7 @@ export class PaymentDetailsComponent implements OnInit, OnDestroy {
     const p = this.payment();
     if (!p) return;
     const ref = p.referenceNumber || 'receipt';
-    
+
     this.common.apiCall(
       this.paymentService.downloadReceipt(p._id),
       (res: any) => {
@@ -89,7 +89,7 @@ export class PaymentDetailsComponent implements OnInit, OnDestroy {
   sendEmail(): void {
     const id = this.payment()?._id;
     if (!id) return;
-    
+
     this.common.apiCall(
       this.paymentService.emailReceipt(id),
       () => {
@@ -102,8 +102,8 @@ export class PaymentDetailsComponent implements OnInit, OnDestroy {
 
   formatDate(dateStr: string): string {
     if (!dateStr) return 'N/A';
-    return new Date(dateStr).toLocaleDateString('en-IN', { 
-        year: 'numeric', month: 'short', day: 'numeric' 
+    return new Date(dateStr).toLocaleDateString('en-IN', {
+      year: 'numeric', month: 'short', day: 'numeric'
     });
   }
 
@@ -117,84 +117,8 @@ export class PaymentDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }
-
-// export class PaymentDetailsComponent implements OnInit {
-//   private route = inject(ActivatedRoute);
-//   private paymentService = inject(PaymentService);
-//   private loadingService = inject(LoadingService);
-//   private messageService = inject(AppMessageService);
-//   public common = inject(CommonMethodService);
-//   payment = signal<any | null>(null);
-
-//   ngOnInit(): void {this.loadPaymentData()}
-//   private loadPaymentData(): void {
-//     this.route.paramMap.pipe(
-//       switchMap(params => {
-//         const id = params.get('id');
-//         if (!id) return of(null);
-//         // this.loadingService.show();
-//         return this.paymentService.getPaymentById(id).pipe(finalize(() => this.loadingService.hide()) ); })
-//     ).subscribe({
-//       next: (res: any) => {
-//         if (res?.data) {
-//            this.payment.set(res.data.data || res.data); 
-//         } else {
-//            this.messageService.showError('Error', 'Payment not found');
-//         }
-//       },
-//       error: (err) => this.messageService.showError('Error', err.error?.message || 'Load failed')
-//     });
-//   }
-
-// downloadReceipt(): void {
-//     const p = this.payment();
-//     if (!p) return;
-//     const ref = p.referenceNumber || 'receipt';
-//     this.common.apiCall(
-//       this.paymentService.downloadReceipt(p._id),
-//       (res: any) => {
-//         if (res.body) {
-//           this.common.downloadBlob(res.body, `payment-${ref}.pdf`);
-//           this.messageService.showSuccess('Downloaded', 'Receipt saved successfully.');
-//         }
-//       },
-//       'Download Receipt'
-//     );
-//   }
-
-//   sendEmail(): void {
-//     const id = this.payment()?._id;
-//     if (!id) return;
-//     this.common.apiCall(
-//       this.paymentService.emailReceipt(id),
-//       () => {
-//         this.messageService.showSuccess('Sent', 'Receipt emailed to customer.');
-//       },
-//       'Email Receipt'
-//     );
-//   }
-
-
-
-//   formatDate(dateStr: string): string {
-//     if (!dateStr) return 'N/A';
-//     return new Date(dateStr).toLocaleDateString('en-IN', { 
-//         year: 'numeric', month: 'short', day: 'numeric' 
-//     });
-//   }
-
-//   getStatusSeverity(status: string): Severity {
-//     switch (status?.toLowerCase()) {
-//       case 'completed': return 'success';
-//       case 'pending': return 'warn';
-//       case 'failed': return 'danger';
-//       case 'cancelled': return 'danger';
-//       default: return 'info';
-//     }
-//   }
-// }

@@ -13,7 +13,7 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 
-import { MasterListService } from '../../../core/services/master-list.service';
+// import { MasterListService } from '../../../core/services/master-list.service';
 import { AppMessageService } from '../../../core/services/message.service';
 import { ImageCellRendererComponent } from '../../shared/AgGrid/AgGridcomponents/image-cell-renderer/image-cell-renderer.component';
 import { AgShareGrid, ActionColumnConfig } from '../../shared/components/ag-shared-grid';
@@ -23,6 +23,7 @@ import { HasPermissionDirective } from '@core/auth/directives/has-permission.dir
 import { PERMISSIONS } from '@core/auth/permissions.constants';
 import { DynamicDialogServices } from '../../../core/services/dynamic-dialog-services';
 import { takeUntil } from "rxjs/operators";
+import { MasterDropdownComponent } from '../../shared/components/masterFilterDropdown/master-dropdown.component';
 
 @Component({
   selector: 'app-user-list',
@@ -36,14 +37,15 @@ import { takeUntil } from "rxjs/operators";
     ToastModule,
     ConfirmDialogModule,
     AgShareGrid,
-    HasPermissionDirective
-],
+    HasPermissionDirective,
+    MasterDropdownComponent
+  ],
   providers: [UserManagementService, ConfirmationService],
   templateUrl: './user-list.html',
   styleUrl: './user-list.scss'
 })
 export class UserListComponent implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   readonly PERMISSIONS = PERMISSIONS;
 
   readonly userActionColumn: ActionColumnConfig = {
@@ -59,7 +61,7 @@ export class UserListComponent implements OnInit, OnDestroy {
   private userService = inject(UserManagementService);
   private messageService = inject(AppMessageService);
   private confirmationService = inject(ConfirmationService);
-  public masterList = inject(MasterListService);
+  // public masterList = inject(MasterListService);
   private router = inject(Router);
   private dynamicDialog = inject(DynamicDialogServices);
 
@@ -77,10 +79,10 @@ export class UserListComponent implements OnInit, OnDestroy {
     search: ''
   };
   constructor() {
-    effect(() => {
-      this.roleOptions.set(this.masterList.roles());
-      this.branchOptions.set(this.masterList.branches());
-    });
+    // effect(() => {
+    // this.roleOptions.set(this.masterList.roles());
+    // this.branchOptions.set(this.masterList.branches());
+    // });
   }
 
   ngOnInit(): void {
@@ -409,8 +411,8 @@ export class UserListComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

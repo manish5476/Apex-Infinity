@@ -96,31 +96,14 @@
         <div class="form-section participants-section">
           <div class="section-header">
             <label>Invite Participants ({{ selectedCount() }})</label>
-            <span class="p-input-icon-left search-box">
-              <i class="pi pi-search"></i>
-              <input type="text" pInputText [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" [ngModelOptions]="{standalone: true}" placeholder="Search users..." class="p-inputtext-sm" />
-            </span>
           </div>
-
-          <div class="participants-list custom-scrollbar">
-            @for (user of filteredUsers(); track user._id) {
-              <div class="user-item" [class.selected]="isSelected(user._id)" (click)="toggleUser(user._id)">
-                <div class="avatar" [style.background-color]="getAvatarColor(user.name)">
-                  {{ getInitials(user.name) }}
-                </div>
-                <div class="user-info">
-                  <span class="name">{{ user.name }}</span>
-                  <span class="email">{{ user['email'] }}</span>
-                </div>
-                <div class="checkbox">
-                  <i class="pi" [class.pi-check-circle]="isSelected(user._id)" [class.pi-circle]="!isSelected(user._id)"></i>
-                </div>
-              </div>
-            }
-            @if (filteredUsers().length === 0) {
-              <div class="empty-search">No users found</div>
-            }
-          </div>
+          
+          <app-master-dropdown 
+            endpoint="users" 
+            [isMulti]="true" 
+            formControlName="participants" 
+            placeholder="Search and invite users...">
+          </app-master-dropdown>
         </div>
 
         <!-- Footer -->

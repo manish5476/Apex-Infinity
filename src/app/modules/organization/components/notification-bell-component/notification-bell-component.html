@@ -235,14 +235,14 @@
         <div class="title-group">
           <h3>Notifications</h3>
           @if (unreadCount > 0) {
-            <span class="count-pill">{{ unreadCount }} New</span>
+          <span class="count-pill">{{ unreadCount }} New</span>
           }
         </div>
         <div class="header-actions">
           @if (unreadCount > 0 && activeTab === 0) {
-            <button class="action-btn" pTooltip="Mark all read" tooltipPosition="bottom" (click)="markAllRead()">
-              <i class="pi pi-check-circle"></i>
-            </button>
+          <button class="action-btn" pTooltip="Mark all read" tooltipPosition="bottom" (click)="markAllRead()">
+            <i class="pi pi-check-circle"></i>
+          </button>
           }
           <button class="action-btn close-btn" (click)="closeDialog()">
             <i class="pi pi-times"></i>
@@ -276,181 +276,191 @@
     <div class="panel-body custom-scrollbar">
 
       @if (isLoading) {
-        <div class="skeleton-list">
-          @for (item of [1,2,3]; track $index) {
-            <div class="skeleton-item">
-              <p-skeleton width="42px" height="42px" shape="circle"></p-skeleton>
-              <div class="skeleton-lines">
-                <p-skeleton width="50%" height="1rem" styleClass="mb-2"></p-skeleton>
-                <p-skeleton width="90%" height="0.8rem"></p-skeleton>
-              </div>
-            </div>
-          }
+      <div class="skeleton-list">
+        @for (item of [1,2,3]; track $index) {
+        <div class="skeleton-item">
+          <p-skeleton width="42px" height="42px" shape="circle"></p-skeleton>
+          <div class="skeleton-lines">
+            <p-skeleton width="50%" height="1rem" styleClass="mb-2"></p-skeleton>
+            <p-skeleton width="90%" height="0.8rem"></p-skeleton>
+          </div>
         </div>
+        }
+      </div>
       } @else {
 
-        @if (activeTab === 0) {
-          <div class="list-container">
-            @if (unreadList.length === 0) {
-              <div class="empty-state">
-                <div class="empty-icon"><i class="pi pi-bell"></i></div>
-                <h4>All caught up!</h4>
-                <p>You have no new notifications.</p>
-              </div>
-            }
-
-            @for (n of unreadList; track n._id) {
-              <div class="notif-card unread" (click)="markAsRead(n)">
-                <div class="notif-avatar" [ngClass]="getIconColor(n.type)">
-                  <i class="pi" [ngClass]="getIcon(n.type)"></i>
-                </div>
-                <div class="notif-content">
-                  <div class="notif-header">
-                    <span class="title">{{ n.title }}</span>
-                    <span class="time">{{ n.createdAt | date:'shortTime' }}</span>
-                  </div>
-                  <p class="message">{{ n.message }}</p>
-                  @if (n.metadata?.entityType) { <span class="tag">{{ n.metadata.entityType }}</span> }
-                </div>
-                <div class="unread-dot"></div>
-              </div>
-            }
-          </div>
+      @if (activeTab === 0) {
+      <div class="list-container">
+        @if (unreadList.length === 0) {
+        <div class="empty-state">
+          <div class="empty-icon"><i class="pi pi-bell"></i></div>
+          <h4>All caught up!</h4>
+          <p>You have no new notifications.</p>
+        </div>
         }
 
-        @if (activeTab === 1) {
-          <div class="list-container">
-            @if (pendingMembers.length === 0) {
-              <div class="empty-state">
-                <div class="empty-icon success"><i class="pi pi-check-circle"></i></div>
-                <h4>Inbox Zero</h4>
-                <p>No pending member requests to review.</p>
-              </div>
-            }
-
-            @for (member of pendingMembers; track member._id) {
-              <div class="approval-card">
-                <div class="user-profile">
-                  <div class="avatar">{{ member.name?.charAt(0).toUpperCase() || 'U' }}</div>
-                  <div class="info">
-                    <span class="name">{{ member.name || 'Unknown User' }}</span>
-                    <span class="email">{{ member.email }}</span>
-                  </div>
-                  <span class="date">{{ member.createdAt | date:'MMM d' }}</span>
-                </div>
-
-                <div class="assignment-grid">
-                  <p-select appendTo="body" [options]="roles" [(ngModel)]="selectedRoles[member._id]"
-                    optionLabel="name" optionValue="_id" placeholder="Assign Role..." styleClass="w-full">
-                  </p-select>
-                  <p-select appendTo="body" [options]="branches" [(ngModel)]="selectedBranches[member._id]"
-                    optionLabel="name" optionValue="_id" placeholder="Assign Branch..." styleClass="w-full">
-                  </p-select>
-                </div>
-
-                <div class="action-footer">
-                  <button class="btn-ghost danger" (click)="rejectMember(member)">Reject</button>
-                  <button class="btn-primary" [disabled]="!selectedRoles[member._id] || !selectedBranches[member._id]" (click)="approveMember(member)">Approve Access</button>
-                </div>
-              </div>
-            }
+        @for (n of unreadList; track n._id) {
+        <div class="notif-card unread" (click)="markAsRead(n)">
+          <div class="notif-avatar" [ngClass]="getIconColor(n.type)">
+            <i class="pi" [ngClass]="getIcon(n.type)"></i>
           </div>
+          <div class="notif-content">
+            <div class="notif-header">
+              <span class="title">{{ n.title }}</span>
+              <span class="time">{{ n.createdAt | date:'shortTime' }}</span>
+            </div>
+            <p class="message">{{ n.message }}</p>
+            @if (n.metadata?.entityType) { <span class="tag">{{ n.metadata.entityType }}</span> }
+          </div>
+          <div class="unread-dot"></div>
+        </div>
+        }
+      </div>
+      }
+
+      @if (activeTab === 1) {
+      <div class="list-container">
+        @if (pendingMembers.length === 0) {
+        <div class="empty-state">
+          <div class="empty-icon success"><i class="pi pi-check-circle"></i></div>
+          <h4>Inbox Zero</h4>
+          <p>No pending member requests to review.</p>
+        </div>
         }
 
-        @if (activeTab === 2) {
-          <div class="list-container">
-            @if (historyList.length === 0) {
-              <div class="empty-state">
-                <div class="empty-icon"><i class="pi pi-history"></i></div>
-                <h4>No History</h4>
-                <p>Your previous notifications will appear here.</p>
-              </div>
-            }
-
-            @for (n of historyList; track n._id) {
-              <div class="notif-card" [class.unread]="!n.isRead">
-                <div class="notif-avatar" [ngClass]="getIconColor(n.type)">
-                  <i class="pi" [ngClass]="getIcon(n.type)"></i>
-                </div>
-                <div class="notif-content">
-                  <div class="notif-header">
-                    <span class="title">{{ n.title }}</span>
-                    <span class="time">{{ n.createdAt | date:'MMM d, h:mm a' }}</span>
-                  </div>
-                  <p class="message">{{ n.message }}</p>
-                </div>
-              </div>
-            }
+        @for (member of pendingMembers; track member._id) {
+        <div class="approval-card">
+          <div class="user-profile">
+            <div class="avatar">{{ member.name?.charAt(0).toUpperCase() || 'U' }}</div>
+            <div class="info">
+              <span class="name">{{ member.name || 'Unknown User' }}</span>
+              <span class="email">{{ member.email }}</span>
+            </div>
+            <span class="date">{{ member.createdAt | date:'MMM d' }}</span>
           </div>
+
+          <div class="assignment-grid">
+            <app-master-dropdown endpoint="roles" [(ngModel)]="selectedRoles[member._id]" placeholder="Assign Role...">
+            </app-master-dropdown>
+            <app-master-dropdown endpoint="branches" [(ngModel)]="selectedBranches[member._id]"
+              placeholder="Assign Branch...">
+            </app-master-dropdown>
+          </div>
+
+          <div class="action-footer">
+            <button class="btn-ghost danger" (click)="rejectMember(member)">Reject</button>
+            <button class="btn-primary" [disabled]="!selectedRoles[member._id] || !selectedBranches[member._id]"
+              (click)="approveMember(member)">Approve Access</button>
+          </div>
+        </div>
+        }
+      </div>
+      }
+
+      @if (activeTab === 2) {
+      <div class="list-container">
+        @if (historyList.length === 0) {
+        <div class="empty-state">
+          <div class="empty-icon"><i class="pi pi-history"></i></div>
+          <h4>No History</h4>
+          <p>Your previous notifications will appear here.</p>
+        </div>
         }
 
-        @if (activeTab === 3) {
-          <div class="broadcast-wrapper">
-            @if (showAnnouncementSuccess) {
-              <div class="success-banner">
-                <i class="pi pi-check-circle"></i>
-                <span>Broadcast dispatched successfully!</span>
-              </div>
-            }
+        @for (n of historyList; track n._id) {
+        <div class="notif-card" [class.unread]="!n.isRead">
+          <div class="notif-avatar" [ngClass]="getIconColor(n.type)">
+            <i class="pi" [ngClass]="getIcon(n.type)"></i>
+          </div>
+          <div class="notif-content">
+            <div class="notif-header">
+              <span class="title">{{ n.title }}</span>
+              <span class="time">{{ n.createdAt | date:'MMM d, h:mm a' }}</span>
+            </div>
+            <p class="message">{{ n.message }}</p>
+          </div>
+        </div>
+        }
+      </div>
+      }
 
-            <div class="form-layout">
-              <div class="form-group">
-                <label>Announcement Title</label>
-                <input type="text" pInputText [(ngModel)]="announcement.title" placeholder="E.g., System Update Tomorrow" class="w-full">
-              </div>
+      @if (activeTab === 3) {
+      <div class="broadcast-wrapper">
+        @if (showAnnouncementSuccess) {
+        <div class="success-banner">
+          <i class="pi pi-check-circle"></i>
+          <span>Broadcast dispatched successfully!</span>
+        </div>
+        }
 
-              <div class="form-grid-2">
-                <div class="form-group">
-                  <label>Audience</label>
-                  <p-select appendTo="body" [options]="audienceOptions" [(ngModel)]="announcement.targetAudience" (onChange)="onAudienceChange()" optionLabel="label" optionValue="value" styleClass="w-full"></p-select>
-                </div>
-                <div class="form-group">
-                  <label>Severity Level</label>
-                  <p-select appendTo="body" [options]="typeOptions" [(ngModel)]="announcement.type" optionLabel="label" optionValue="value" styleClass="w-full">
-                    <ng-template pTemplate="selectedItem" let-selectedOption>
-                      @if (selectedOption) {
-                        <div class="flex align-items-center gap-2">
-                          <i [class]="selectedOption.icon"></i><span>{{ selectedOption.label }}</span>
-                        </div>
-                      }
-                    </ng-template>
-                    <ng-template let-option pTemplate="item">
-                      <div class="flex align-items-center gap-2">
-                        <i [class]="option.icon"></i><span>{{ option.label }}</span>
-                      </div>
-                    </ng-template>
-                  </p-select>
-                </div>
-              </div>
+        <div class="form-layout">
+          <div class="form-group">
+            <label>Announcement Title</label>
+            <input type="text" pInputText [(ngModel)]="announcement.title" placeholder="E.g., System Update Tomorrow"
+              class="w-full">
+          </div>
 
-              @if (announcement.targetAudience === 'role') {
-                <div class="form-group slide-down">
-                  <label>Select Roles</label>
-                  <p-multiSelect appendTo="body" [options]="roles" [(ngModel)]="selectedTargetIds" optionLabel="name" optionValue="_id" placeholder="Choose roles..." styleClass="w-full"></p-multiSelect>
-                </div>
-              }
-
-              @if (announcement.targetAudience === 'specific') {
-                <div class="form-group slide-down">
-                  <label>Search Users</label>
-                  <p-multiSelect appendTo="body" [options]="users" [(ngModel)]="selectedTargetIds" optionLabel="name" optionValue="_id" placeholder="Search and select..." [filter]="true" styleClass="w-full"></p-multiSelect>
-                </div>
-              }
-
-              <div class="form-group">
-                <label>Message Content</label>
-                <textarea pInputTextarea [(ngModel)]="announcement.message" rows="4" placeholder="Write your full announcement here..." class="w-full"></textarea>
-              </div>
-
-              <div class="broadcast-actions">
-                <button class="btn-ghost" (click)="announcement = { title: '', message: '', type: 'info', targetAudience: 'all' }; selectedTargetIds = []">Clear</button>
-                <button class="btn-primary" (click)="sendAnnouncement()" [disabled]="!announcement.title || !announcement.message">
-                  <i class="pi pi-send"></i> Send Broadcast
-                </button>
-              </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label>Audience</label>
+              <p-select appendTo="body" [options]="audienceOptions" [(ngModel)]="announcement.targetAudience"
+                (onChange)="onAudienceChange()" optionLabel="label" optionValue="value" styleClass="w-full"></p-select>
+            </div>
+            <div class="form-group">
+              <label>Severity Level</label>
+              <p-select appendTo="body" [options]="typeOptions" [(ngModel)]="announcement.type" optionLabel="label"
+                optionValue="value" styleClass="w-full">
+                <ng-template pTemplate="selectedItem" let-selectedOption>
+                  @if (selectedOption) {
+                  <div class="flex align-items-center gap-2">
+                    <i [class]="selectedOption.icon"></i><span>{{ selectedOption.label }}</span>
+                  </div>
+                  }
+                </ng-template>
+                <ng-template let-option pTemplate="item">
+                  <div class="flex align-items-center gap-2">
+                    <i [class]="option.icon"></i><span>{{ option.label }}</span>
+                  </div>
+                </ng-template>
+              </p-select>
             </div>
           </div>
-        }
+
+          @if (announcement.targetAudience === 'role') {
+          <div class="form-group slide-down">
+            <label>Select Roles</label>
+            <app-master-dropdown endpoint="roles" [isMulti]="true" [(ngModel)]="selectedTargetIds"
+              placeholder="Choose roles...">
+            </app-master-dropdown>
+          </div>
+          }
+
+          @if (announcement.targetAudience === 'specific') {
+          <div class="form-group slide-down">
+            <label>Search Users</label>
+            <app-master-dropdown endpoint="users" [isMulti]="true" [(ngModel)]="selectedTargetIds"
+              placeholder="Search and select...">
+            </app-master-dropdown>
+          </div>
+          }
+
+          <div class="form-group">
+            <label>Message Content</label>
+            <textarea pInputTextarea [(ngModel)]="announcement.message" rows="4"
+              placeholder="Write your full announcement here..." class="w-full"></textarea>
+          </div>
+
+          <div class="broadcast-actions">
+            <button class="btn-ghost"
+              (click)="announcement = { title: '', message: '', type: 'info', targetAudience: 'all' }; selectedTargetIds = []">Clear</button>
+            <button class="btn-primary" (click)="sendAnnouncement()"
+              [disabled]="!announcement.title || !announcement.message">
+              <i class="pi pi-send"></i> Send Broadcast
+            </button>
+          </div>
+        </div>
+      </div>
+      }
       }
     </div>
   </div>

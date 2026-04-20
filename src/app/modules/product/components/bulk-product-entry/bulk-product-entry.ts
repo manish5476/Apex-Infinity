@@ -1,5 +1,4 @@
 import { Component, Input, OnInit, OnChanges, SimpleChanges, inject, signal, computed, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
-
 import { FormsModule } from '@angular/forms';
 import { finalize, forkJoin, Subject } from 'rxjs';
 
@@ -12,7 +11,7 @@ import { MessageService } from 'primeng/api';
 
 // Services
 import { ProductService } from '../../services/product-service';
-import { MasterListService } from '../../../../core/services/master-list.service';
+// import { MasterListService } from '../../../../core/services/master-list.service';
 import { LoadingService } from '../../../../core/services/loading.service';
 
 // Grid
@@ -31,26 +30,31 @@ import { takeUntil } from "rxjs/operators";
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BulkProductEntry implements OnInit, OnChanges, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   // Input from Parent
   @Input() selectedData: any[] = [];
   private productService = inject(ProductService);
-  private masterList = inject(MasterListService);
+  // private masterList = inject(MasterListService);
   private messageService = inject(AppMessageService);
   private loadingService = inject(LoadingService);
+  
   products = signal<any[]>([]);
   loading = signal(false);
   gridApi: any;
   selectedProductsToAdd: any[] = [];
   filteredProducts = signal<any[]>([]);
-  departments = computed(() => this.masterList.department().map(m => ({ label: m.name, value: m._id })));
-  categories = computed(() => this.masterList.categories().map(m => ({ label: m.name, value: m._id })));
-  subCategories = computed(() => this.masterList.categories().map(m => ({ label: m.name, value: m._id })));
-  brands = computed(() => this.masterList.brands().map(m => ({ label: m.name, value: m._id })));
-  units = computed(() => this.masterList.units().map(m => ({ label: m.name, value: m._id })));
-  suppliers = computed(() => this.masterList.suppliers().map(m => ({ label: m['companyName'] || m.name, value: m._id })));
+  
+  // departments = computed(() => this.masterList.department().map(m => ({ label: m.name, value: m._id })));
+  // categories = computed(() => this.masterList.categories().map(m => ({ label: m.name, value: m._id })));
+  // subCategories = computed(() => this.masterList.categories().map(m => ({ label: m.name, value: m._id })));
+  // brands = computed(() => this.masterList.brands().map(m => ({ label: m.name, value: m._id })));
+  // units = computed(() => this.masterList.units().map(m => ({ label: m.name, value: m._id })));
+  // suppliers = computed(() => this.masterList.suppliers().map(m => ({ label: m['companyName'] || m.name, value: m._id })));
+  
   columns: GridColDef<any>[] = [];
+  
   constructor() { }
+  
   ngOnInit() {
     this.initColumns();
     if (this.products().length === 0) {
@@ -82,11 +86,11 @@ export class BulkProductEntry implements OnInit, OnChanges, OnDestroy {
       { field: '_id', headerName: 'ID', hide: true },
       { field: 'name', headerName: 'Product Name', width: 220, pinned: 'left', editable: true, cellConfig: { type: 'text', placeholder: 'Required' } },
       { field: 'sku', headerName: 'SKU', width: 120, editable: true, cellConfig: { type: 'text', placeholder: 'Unique Code' } },
-      { field: 'departmentId', headerName: 'Department', width: 140, editable: true, cellConfig: { type: 'select', options: this.departments(), optionLabel: 'label' } },
-      { field: 'categoryId', headerName: 'Category', width: 140, editable: true, cellConfig: { type: 'select', options: this.categories(), optionLabel: 'label' } },
-      { field: 'subCategoryId', headerName: 'Sub Cat', width: 140, editable: true, cellConfig: { type: 'select', options: this.subCategories(), optionLabel: 'label' } },
-      { field: 'brandId', headerName: 'Brand', width: 140, editable: true, cellConfig: { type: 'select', options: this.brands(), optionLabel: 'label' } },
-      { field: 'unitId', headerName: 'Unit', width: 100, editable: true, cellConfig: { type: 'select', options: this.units(), optionLabel: 'label' } },
+      { field: 'departmentId', headerName: 'Department', width: 140, editable: true, cellConfig: { type: 'master-dropdown', endpoint: 'departments' } },
+      { field: 'categoryId', headerName: 'Category', width: 140, editable: true, cellConfig: { type: 'master-dropdown', endpoint: 'categories' } },
+      { field: 'subCategoryId', headerName: 'Sub Cat', width: 140, editable: true, cellConfig: { type: 'master-dropdown', endpoint: 'subcategories' } },
+      { field: 'brandId', headerName: 'Brand', width: 140, editable: true, cellConfig: { type: 'master-dropdown', endpoint: 'brands' } },
+      { field: 'unitId', headerName: 'Unit', width: 100, editable: true, cellConfig: { type: 'master-dropdown', endpoint: 'units' } },
       { field: 'purchasePrice', headerName: 'Cost Price', width: 110, editable: true, cellConfig: { type: 'number', min: 0 } },
       { field: 'sellingPrice', headerName: 'Sell Price', width: 110, editable: true, cellConfig: { type: 'number', min: 0 } },
       { field: 'discountedPrice', headerName: 'Disc. Price', width: 110, editable: true, cellConfig: { type: 'number' } },
@@ -104,7 +108,7 @@ export class BulkProductEntry implements OnInit, OnChanges, OnDestroy {
         }
       },
 
-      { field: 'defaultSupplierId', headerName: 'Supplier', width: 150, editable: true, cellConfig: { type: 'select', options: this.suppliers(), optionLabel: 'label' } },
+      { field: 'defaultSupplierId', headerName: 'Supplier', width: 150, editable: true, cellConfig: { type: 'master-dropdown', endpoint: 'suppliers' } },
       { field: 'description', headerName: 'Description', width: 200, editable: true, cellConfig: { type: 'text' } },
       { field: 'isActive', headerName: 'Active', width: 80, editable: true, cellConfig: { type: 'boolean' } }
     ];
@@ -163,12 +167,10 @@ export class BulkProductEntry implements OnInit, OnChanges, OnDestroy {
     const validRows = rowsToSave.filter(r => r.name && r.name.trim() !== '');
 
     if (validRows.length === 0) {
-      // Replaced silent return with a user warning
       this.messageService.showWarn('Validation Error: No valid products to save.');
       return;
     }
 
-    // Assign temporary IDs to distinguish new vs. existing rows
     validRows.forEach(r => { if (!r._id) r._id = `temp_${Date.now()}_fallback`; });
 
     const toCreate = validRows.filter(r => (r._id || '').startsWith('temp_'));
@@ -188,7 +190,7 @@ export class BulkProductEntry implements OnInit, OnChanges, OnDestroy {
 
     if (toCreate.length > 0) {
       const createPayload = toCreate.map(r => {
-        const { _id, ...rest } = cleanPayload(r); // Remove temp ID before creating
+        const { _id, ...rest } = cleanPayload(r);
         return rest;
       });
       tasks.push(this.productService.bulkImportProducts(createPayload));
@@ -198,7 +200,6 @@ export class BulkProductEntry implements OnInit, OnChanges, OnDestroy {
       const updatePayload = toUpdate.map(r => {
         const cleaned = cleanPayload(r);
         const id = cleaned._id;
-        // Strip out fields that shouldn't be mutated during a generic product update
         const { _id, quantity, purchasePrice, inventory, openingStock, costPrice, ...allowedFields } = cleaned;
         return { _id: id, update: allowedFields };
       });
@@ -213,19 +214,17 @@ export class BulkProductEntry implements OnInit, OnChanges, OnDestroy {
       finalize(() => this.loading.set(false)), takeUntil(this.destroy$)
     ).subscribe({
       next: () => {
-        // Updated to single-string success format
         this.messageService.showSuccess('Bulk save completed successfully.');
         this.onClearAll();
       },
       error: (err) => {
-        // Routed to global HTTP error handler
         this.messageService.handleHttpError(err);
       }
     });
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

@@ -3,8 +3,6 @@ import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePickerModule } from 'primeng/datepicker';
 
-import { MasterListService } from '../../../../core/services/master-list.service';
-
 @Component({
   selector: 'app-date-filter',
   standalone: true,
@@ -152,10 +150,7 @@ import { MasterListService } from '../../../../core/services/master-list.service
 export class DateFilterComponent {
   @Input() startDate?: string | Date;
   @Input() endDate?: string | Date;
-
   @Output() dateChange = new EventEmitter<any>();
-  public  masterList = inject(MasterListService);
-
   onDateChange(): void {
     const start = this.startDate instanceof Date ? this.startDate.toISOString().split('T')[0] : this.startDate;
     const end = this.endDate instanceof Date ? this.endDate.toISOString().split('T')[0] : this.endDate;

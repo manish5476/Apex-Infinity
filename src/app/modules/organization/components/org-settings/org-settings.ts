@@ -22,9 +22,10 @@ import { TooltipModule } from 'primeng/tooltip';
 /* Custom Services & Components */
 import { AuthService } from '../../../auth/services/auth-service';
 import { OrganizationService } from '../../organization.service';
-import { MasterListService } from '../../../../core/services/master-list.service';
+import { MasterDropdownComponent } from '../../../shared/components/masterFilterDropdown/master-dropdown.component';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { UserListComponent } from '../../../user/user-list/user-list';
+import { MasterDropdownService } from '../../../../core/services/master-dropdown.service';
 
 @Component({
   selector: 'app-org-settings',
@@ -45,7 +46,8 @@ import { UserListComponent } from '../../../user/user-list/user-list';
     BadgeModule,
     ToastModule,
     DividerModule,
-    TooltipModule
+    TooltipModule,
+    MasterDropdownComponent
   ],
   providers: [ConfirmationService],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -165,13 +167,19 @@ import { UserListComponent } from '../../../user/user-list/user-list';
                           <div class="req-body">
                             <div class="input-group">
                               <label>Assign Role</label>
-                              <p-select [options]="roles" [(ngModel)]="selectedRoles[p._id]" optionLabel="name"
-                                optionValue="_id" placeholder="Select Role" styleClass="w-full" appendTo="body" [filter]="true" filterBy="name"></p-select>
+                              <app-master-dropdown 
+                                endpoint="roles" 
+                                [(ngModel)]="selectedRoles[p._id]" 
+                                placeholder="Select Role">
+                              </app-master-dropdown>
                             </div>
                             <div class="input-group">
                               <label>Assign Branch</label>
-                              <p-select [options]="branches" [(ngModel)]="selectedBranches[p._id]" optionLabel="name"
-                                optionValue="_id" placeholder="Select Branch" styleClass="w-full" appendTo="body" [filter]="true" filterBy="name"></p-select>
+                              <app-master-dropdown 
+                                endpoint="branches" 
+                                [(ngModel)]="selectedBranches[p._id]" 
+                                placeholder="Select Branch">
+                              </app-master-dropdown>
                             </div>
                           </div>
 
@@ -347,11 +355,19 @@ import { UserListComponent } from '../../../user/user-list/user-list';
         <div class="grid grid-cols-2 gap-4 mt-3">
           <div class="field-group">
             <label>Role</label>
-            <p-select [options]="roles" formControlName="role" optionLabel="name" optionValue="_id" placeholder="Select Role" appendTo="body" styleClass="w-full" [filter]="true" filterBy="name"></p-select>
+            <app-master-dropdown 
+              endpoint="roles" 
+              formControlName="role" 
+              placeholder="Select Role">
+            </app-master-dropdown>
           </div>
           <div class="field-group">
             <label>Branch</label>
-            <p-select [options]="branches" formControlName="branchId" optionLabel="name" optionValue="_id" placeholder="Select Branch" appendTo="body" styleClass="w-full" [filter]="true" filterBy="name"></p-select>
+            <app-master-dropdown 
+              endpoint="branches" 
+              formControlName="branchId" 
+              placeholder="Select Branch">
+            </app-master-dropdown>
           </div>
         </div>
       </form>
@@ -781,7 +797,7 @@ export class OrgSettingsComponent implements OnInit, OnDestroy {
   private appMessage = inject(AppMessageService);
   private confirmationService = inject(ConfirmationService);
   private router = inject(Router);
-  private masterList = inject(MasterListService);
+  private dropdownService = inject(MasterDropdownService);
   private cdr = inject(ChangeDetectorRef);
 
   // --- UI State Signals ---
@@ -801,6 +817,8 @@ export class OrgSettingsComponent implements OnInit, OnDestroy {
   organization = signal<any>(null);
   activeMembers = signal<any[]>([]);
   pendingMembers = signal<any[]>([]);
+  roleList = signal<any[]>([]);
+  branchList = signal<any[]>([]);
 
   // --- Computed State ---
   isOwner = computed(() => {
@@ -853,7 +871,9 @@ export class OrgSettingsComponent implements OnInit, OnDestroy {
 
     forkJoin({
       org: this.orgService.getMyOrganization(),
-      pending: this.orgService.getPendingMembers()
+      pending: this.orgService.getPendingMembers(),
+      roles: this.dropdownService.getDropdownData('roles'),
+      branches: this.dropdownService.getDropdownData('branches')
     })
       .pipe(finalize(() => {
         this.isLoading.set(false);
@@ -871,14 +891,18 @@ export class OrgSettingsComponent implements OnInit, OnDestroy {
 
           // Load pending requests
           this.pendingMembers.set(res.pending.data?.pendingMembers || []);
+
+          // Load master data for metrics
+          this.roleList.set(res.roles.data || []);
+          this.branchList.set(res.branches.data || []);
         },
         error: (err) => this.appMessage.handleHttpError(err)
       });
   }
 
   // --- Helpers for Template ---
-  get roles() { return this.masterList.roles(); }
-  get branches() { return this.masterList.branches(); }
+  get roles() { return this.roleList(); }
+  get branches() { return this.branchList(); }
 
   getSelectedOwnerName(): string {
     const id = this.selectedNewOwnerId();

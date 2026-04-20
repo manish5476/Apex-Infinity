@@ -42,9 +42,9 @@ export type CellType =
   // ── COLLECTIONS ───────────────────────────────────────────
   | 'tags'        // Array / comma-string of tags — view only
 
-  // ── FILE & SYSTEM ─────────────────────────────────────────
   | 'filesize'    // Bytes → human readable (cm.formatFileSize)
-  | 'duration';   // Minutes → "2h 15m" (cm.formatDuration)
+  | 'duration'    // Minutes → "2h 15m" (cm.formatDuration)
+  | 'master-dropdown'; // New: Universal master dropdown integration
 
 
 /* ==========================================================================
@@ -204,6 +204,9 @@ export interface CellConfig {
 
   /** Key on each option to use as the bound value. Default: 'value' */
   optionValue?: string;
+
+  /** Endpoint for 'master-dropdown' type cells */
+  endpoint?: import('../../../../core/services/master-dropdown.service').DropdownEndpoint;
 
   /**
    * When true, the select value is rendered as a badge in view mode

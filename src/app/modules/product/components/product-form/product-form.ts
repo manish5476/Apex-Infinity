@@ -18,19 +18,25 @@ import { ToggleButtonModule } from 'primeng/togglebutton';
 // Custom
 import { ProductService } from '../../services/product-service';
 import { LoadingService } from '../../../../core/services/loading.service';
-import { MasterListService } from '../../../../core/services/master-list.service';
+// import { MasterListService } from '../../../../core/services/master-list.service';
+import { MasterDropdownComponent } from '../../../shared/components/masterFilterDropdown/master-dropdown.component';
+
 import { AppMessageService } from '../../../../core/services/message.service';
 import { ChipsComponent } from '../../../shared/components/chips.component';
 
 @Component({
   selector: 'app-product-form',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterModule, ButtonModule, ToggleButtonModule, InputTextModule, InputNumberModule, CheckboxModule, TextareaModule, SelectModule, DividerModule, ChipsComponent],
+  imports: [ReactiveFormsModule, RouterModule, ButtonModule,
+    ToggleButtonModule, InputTextModule, InputNumberModule,
+    CheckboxModule, TextareaModule, SelectModule, DividerModule,
+    ChipsComponent, MasterDropdownComponent],
+
   templateUrl: './product-form.html',
   styleUrls: ['./product-form.scss']
 })
 export class ProductFormComponent implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   // Services
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
@@ -38,13 +44,13 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   private productService = inject(ProductService);
   private messageService = inject(AppMessageService);
   private loadingService = inject(LoadingService);
-  public masterList = inject(MasterListService);
+  // public masterList = inject(MasterListService);
   productForm!: FormGroup;
   isSubmitting = signal(false);
   editMode = signal(false);
   productId = signal<string | null>(null);
   formTitle = computed(() => this.editMode() ? 'Edit Product' : 'New Product Entry');
-  branchOptions = computed(() => this.masterList.branches());
+  // branchOptions = computed(() => this.masterList.branches());
 
   ngOnInit(): void {
     this.buildForm();
@@ -106,20 +112,20 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   removeInventoryItem(index: number): void {
     this.inventory.removeAt(index);
   }
-private initDataFetch(): void {
+  private initDataFetch(): void {
     this.route.paramMap.pipe(
       switchMap(params => {
         const id = params.get('id');
         if (id) {
           this.productId.set(id);
           this.editMode.set(true);
-          
+
           // Attach finalize to the inner HTTP request which actually completes
           return this.productService.getProductById(id).pipe(
             finalize(() => this.loadingService.hide())
           );
         }
-        
+
         // Ensure spinner hides if navigating directly to "Create New"
         this.loadingService.hide();
         return of(null);
@@ -136,13 +142,13 @@ private initDataFetch(): void {
       error: (err) => {
         // Fallback safety to hide loading if the stream breaks entirely
         this.loadingService.hide();
-        
+
         // Routed to your global HTTP error handler
         this.messageService.handleHttpError(err);
       }
     });
   }
-   
+
   onSubmit(): void {
     if (this.productForm.invalid) {
       this.productForm.markAllAsTouched();
@@ -175,8 +181,8 @@ private initDataFetch(): void {
     });
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

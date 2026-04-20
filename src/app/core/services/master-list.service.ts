@@ -1,8 +1,8 @@
-import { Injectable, signal, computed, inject, PLATFORM_ID, OnDestroy } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { catchError, Observable, of, tap, Subject } from 'rxjs';
-import { ApiService } from './api';
+import { computed, inject, Injectable, OnDestroy, PLATFORM_ID, signal } from '@angular/core';
+import { catchError, Observable, of, Subject, tap } from 'rxjs';
 import { takeUntil } from "rxjs/operators";
+import { ApiService } from './api';
 
 // Enhanced interfaces
 export interface MasterItem {
@@ -29,7 +29,7 @@ export interface MasterList {
   recentPurchases?: MasterItem[];
   recentSales?: MasterItem[];
   recentPayments?: MasterItem[];
-  
+
   // Flattened from 'masters' object:
   category?: MasterItem[];
   brand?: MasterItem[];
@@ -56,7 +56,7 @@ export interface QuickStats {
 
 @Injectable({ providedIn: 'root' })
 export class MasterListService implements OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   private api = inject(ApiService);
   private platformId = inject(PLATFORM_ID);
 
@@ -73,7 +73,7 @@ export class MasterListService implements OnDestroy {
   readonly quickStats = computed(() => this._quickStats());
   readonly activeFilters = computed(() => this._activeFilters());
   readonly specificLists = computed(() => this._specificLists());
-  
+
   // Core Entities
   readonly masterData = computed(() => this._data()?.masterData ?? []);
   readonly branches = computed(() => this._data()?.branches ?? []);
@@ -120,10 +120,10 @@ export class MasterListService implements OnDestroy {
         const genericMasters = res.data.masters || {};
         const finalData: MasterList = {
           ...res.data,
-          ...genericMasters 
+          ...genericMasters
         };
         this.updateState(finalData);
-        
+
         // Store metadata if available
         if (res.metadata) {
           localStorage.setItem('masterListMetadata', JSON.stringify(res.metadata));
@@ -199,7 +199,7 @@ export class MasterListService implements OnDestroy {
             ...currentLists,
             [type]: res.data
           });
-          
+
           // Store summary if available
           if (res.summary) {
             localStorage.setItem(`${type}Summary`, JSON.stringify(res.summary));
@@ -226,18 +226,18 @@ export class MasterListService implements OnDestroy {
       // Apply search filter
       if (filters['search']) {
         const searchTerm = filters['search'].toLowerCase();
-        switch(type) {
+        switch (type) {
           case 'customer':
             return (item.name?.toLowerCase().includes(searchTerm) ||
-                   item.phone?.includes(searchTerm) ||
-                   item.email?.toLowerCase().includes(searchTerm));
+              item.phone?.includes(searchTerm) ||
+              item.email?.toLowerCase().includes(searchTerm));
           case 'product':
             return (item.name?.toLowerCase().includes(searchTerm) ||
-                   item.sku?.toLowerCase().includes(searchTerm) ||
-                   item.category?.toLowerCase().includes(searchTerm));
+              item.sku?.toLowerCase().includes(searchTerm) ||
+              item.category?.toLowerCase().includes(searchTerm));
           case 'invoice':
             return (item.invoiceNumber?.toLowerCase().includes(searchTerm) ||
-                   item.customerId?.name?.toLowerCase().includes(searchTerm));
+              item.customerId?.name?.toLowerCase().includes(searchTerm));
           default:
             return item.name?.toLowerCase().includes(searchTerm);
         }
@@ -282,12 +282,12 @@ export class MasterListService implements OnDestroy {
       ...currentFilters,
       [type]: filters
     });
-    
+
     // Persist filters to localStorage
     if (isPlatformBrowser(this.platformId)) {
       try {
         localStorage.setItem(`${type}Filters`, JSON.stringify(filters));
-      } catch {}
+      } catch { }
     }
   }
 
@@ -299,7 +299,7 @@ export class MasterListService implements OnDestroy {
       const currentFilters = this._activeFilters();
       const { [type]: _, ...remainingFilters } = currentFilters;
       this._activeFilters.set(remainingFilters);
-      
+
       // Remove from localStorage
       if (isPlatformBrowser(this.platformId)) {
         localStorage.removeItem(`${type}Filters`);
@@ -337,7 +337,7 @@ export class MasterListService implements OnDestroy {
     if (isPlatformBrowser(this.platformId)) {
       try {
         localStorage.setItem('masterList', JSON.stringify(data));
-      } catch {}
+      } catch { }
     }
   }
 
@@ -357,10 +357,10 @@ export class MasterListService implements OnDestroy {
 
     const key = typeKeyMap[type];
     if (key && currentData[key]) {
-      const updatedArray = (currentData[key] as any[]).map(item => 
+      const updatedArray = (currentData[key] as any[]).map(item =>
         item._id === id ? { ...item, ...entityData } : item
       );
-      
+
       this._data.set({
         ...currentData,
         [key]: updatedArray
@@ -386,7 +386,7 @@ export class MasterListService implements OnDestroy {
       if (statsCache) {
         try {
           this._quickStats.set(JSON.parse(statsCache));
-        } catch {}
+        } catch { }
       }
 
       // Load filter options
@@ -394,7 +394,7 @@ export class MasterListService implements OnDestroy {
       if (optionsCache) {
         try {
           this._filterOptions.set(JSON.parse(optionsCache));
-        } catch {}
+        } catch { }
       }
     }
   }
@@ -405,7 +405,7 @@ export class MasterListService implements OnDestroy {
     this._filterOptions.set({});
     this._activeFilters.set({});
     this._specificLists.set({});
-    
+
     if (isPlatformBrowser(this.platformId)) {
       localStorage.removeItem('masterList');
       localStorage.removeItem('quickStats');
@@ -418,8 +418,8 @@ export class MasterListService implements OnDestroy {
     }
   }
 
-  refresh(): void { 
-    this.load(); 
+  refresh(): void {
+    this.load();
   }
 
   refreshSpecific(type: string): void {
@@ -427,168 +427,8 @@ export class MasterListService implements OnDestroy {
     this.loadSpecificList(type, filters).pipe(takeUntil(this.destroy$)).subscribe();
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }
-
-// // ... existing imports ...
-// import { Injectable, signal, computed, inject, PLATFORM_ID } from '@angular/core';
-// import { isPlatformBrowser } from '@angular/common';
-// import { catchError, of } from 'rxjs';
-// import { ApiService } from './api';
-
-
-// export interface MasterItem {
-//   _id: string;
-//   name: string; // <--- Removed the '?' to make it required
-//   title?: string;
-//   customLabel?: string;
-//   [key: string]: any;
-// }
-
-// export interface MasterList {
-//   branches: MasterItem[];
-//   roles: MasterItem[];
-//   products: MasterItem[];
-//   customers: MasterItem[];
-//   suppliers: MasterItem[];
-//   users: MasterItem[];
-//   accounts: MasterItem[]; // Added
-//   emis: MasterItem[];     // Added
-//   // Flattened from 'masters' object:
-//   category?: MasterItem[];
-//   brand?: MasterItem[];
-//   units?: MasterItem[];
-//   taxes?: MasterItem[];
-// }
-
-// @Injectable({ providedIn: 'root' })
-// export class MasterListService {
-//   private api = inject(ApiService);
-//   private platformId = inject(PLATFORM_ID);
-
-//   // The main state signal
-//   private readonly _data = signal<MasterList | null>(null);
-
-//   // --- Computed Signals (Read-only accessors) ---
-//   readonly data = computed(() => this._data());
-  
-//   // Core Entities
-//   readonly branches = computed(() => this._data()?.branches ?? []);
-//   readonly roles = computed(() => this._data()?.roles ?? []);
-//   readonly users = computed(() => this._data()?.users ?? []);
-//   readonly customers = computed(() => this._data()?.customers ?? []);
-//   readonly suppliers = computed(() => this._data()?.suppliers ?? []);
-//   readonly products = computed(() => this._data()?.products ?? []);
-//   readonly accounts = computed(() => this._data()?.accounts ?? []);
-//   readonly emis = computed(() => this._data()?.emis ?? []);
-
-//   // Dynamic Masters (Flattened)
-//   readonly categories = computed(() => this._data()?.category ?? []);
-//   readonly brands = computed(() => this._data()?.brand ?? []);
-//   readonly units = computed(() => this._data()?.units ?? []);
-//   readonly taxes = computed(() => this._data()?.taxes ?? []);
-
-//   constructor() {
-//     this.initFromCache();
-//   }
-
-//   /**
-//    * 1. HEAVY LOAD
-//    * Fetches everything at once. Best for App Initialization.
-//    */
-//   load(): void {
-//     this.api.getMasterList().pipe(
-//       catchError(err => {
-//         console.error('Failed to load master list', err);
-//         return of({ data: null });
-//       })
-//     ).subscribe((res: any) => {
-//       if (res?.data) {
-//         // Flatten logic: Merge 'masters' (generic types) into the root object
-//         // Backend sends: { branches: [], masters: { category: [], brand: [] } }
-//         const genericMasters = res.data.masters || {}; 
-//         const finalData: MasterList = {
-//           ...res.data,
-//           ...genericMasters // Spreads category, brand, units, etc. to top level
-//         };
-//         this.updateState(finalData);
-//       }
-//     });
-//   }
-
-//   /**
-//    * 2. LIGHTWEIGHT REFRESH
-//    * Refreshes ONLY one list. Best used after creating/editing an item.
-//    * Usage: masterList.refreshSpecific('customer');
-//    */
-//   refreshSpecific(type: string): void {
-//     // Map 'singular' API type to 'plural' State key
-//     const keyMap: { [key: string]: keyof MasterList } = {
-//       'branch': 'branches',
-//       'role': 'roles',
-//       'customer': 'customers',
-//       'supplier': 'suppliers',
-//       'product': 'products',
-//       'user': 'users',
-//       'account': 'accounts',
-//       'emi': 'emis'
-//     };
-
-//     const stateKey = keyMap[type.toLowerCase()];
-//     if (!stateKey) {
-//       // If it's not a core entity, it might be a generic master (category, brand)
-//       // For now, we only support optimized refresh for core entities. 
-//       // Fallback to full load if needed or extend logic.
-//       return; 
-//     }
-
-//     this.api.getSpecificList(type).subscribe({
-//       next: (res:any) => {
-//         if (res?.data) {
-//           const currentData = this._data() || {} as MasterList;
-//           // Patch the specific array in the signal
-//           const updatedData = { ...currentData, [stateKey]: res.data };
-//           this.updateState(updatedData);
-//         }
-//       },
-//       error: (err:any) => console.error(`Failed to refresh ${type}`, err)
-//     });
-//   }
-
-//   private updateState(data: MasterList): void {
-//     this._data.set(data);
-//     if (isPlatformBrowser(this.platformId)) {
-//       try {
-//         localStorage.setItem('masterList', JSON.stringify(data));
-//       } catch {}
-//     }
-//   }
-
-//   initFromCache(): void {
-//     if (isPlatformBrowser(this.platformId)) {
-//       const cache = localStorage.getItem('masterList');
-//       if (cache) {
-//         try {
-//           this._data.set(JSON.parse(cache));
-//         } catch (e) {
-//           console.error('Failed to parse master list cache', e);
-//           localStorage.removeItem('masterList');
-//         }
-//       }
-//     }
-//   }
-
-//   clear(): void {
-//     this._data.set(null);
-//     if (isPlatformBrowser(this.platformId)) {
-//       localStorage.removeItem('masterList');
-//     }
-//   }
-
-//   refresh(): void { 
-//     this.load(); 
-//   }
-// }

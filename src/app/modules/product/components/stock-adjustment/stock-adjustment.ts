@@ -7,7 +7,8 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { SelectModule } from 'primeng/select'; // Or DropdownModule depending on version
 import { ProductService } from '../../services/product-service';
-import { MasterListService } from '../../../../core/services/master-list.service';
+// import { MasterListService } from '../../../../core/services/master-list.service';
+import { MasterDropdownComponent } from '../../../shared/components/masterFilterDropdown/master-dropdown.component';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { InputTextModule } from 'primeng/inputtext';
 import { finalize, Subject } from 'rxjs';
@@ -16,16 +17,16 @@ import { takeUntil } from "rxjs/operators";
 @Component({
   selector: 'app-stock-adjustment',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ButtonModule, SelectModule, InputNumberModule, InputTextModule, FloatLabelModule],
+  imports: [CommonModule, ReactiveFormsModule, ButtonModule, SelectModule, InputNumberModule, InputTextModule, FloatLabelModule, MasterDropdownComponent],
   templateUrl: './stock-adjustment.html',
   styleUrls: ['./stock-adjustment.scss'],
 })
 export class StockAdjustmentComponent implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   private fb = inject(FormBuilder);
   private productService = inject(ProductService);
   private messageService = inject(AppMessageService);
-  private masterList = inject(MasterListService);
+  // private masterList = inject(MasterListService);
   public ref = inject(DynamicDialogRef);
   public config = inject(DynamicDialogConfig);
   adjustmentForm!: FormGroup;
@@ -38,7 +39,7 @@ export class StockAdjustmentComponent implements OnInit, OnDestroy {
   ];
 
   ngOnInit(): void {
-    this.branches = this.masterList.branches() || [];
+    // this.branches = this.masterList.branches() || [];
 
     this.adjustmentForm = this.fb.group({
       branchId: [null, [Validators.required]],
@@ -47,9 +48,9 @@ export class StockAdjustmentComponent implements OnInit, OnDestroy {
       reason: ['', [Validators.required, Validators.minLength(3)]]
     });
 
-    if (this.branches.length > 0) {
-      this.adjustmentForm.patchValue({ branchId: this.branches[0]._id });
-    }
+    // if (this.branches.length > 0) {
+    //   this.adjustmentForm.patchValue({ branchId: this.branches[0]._id });
+    // }
   }
   get typeCtrl() { return this.adjustmentForm.get('type'); }
   get branchCtrl() { return this.adjustmentForm.get('branchId'); }
@@ -59,7 +60,6 @@ export class StockAdjustmentComponent implements OnInit, OnDestroy {
   onSubmit() {
     if (this.adjustmentForm.invalid) {
       this.adjustmentForm.markAllAsTouched();
-      // Added user feedback so silent failures don't happen
       this.messageService.showWarn('Validation Error: Please fill in all required adjustment fields.');
       return;
     }
@@ -68,7 +68,6 @@ export class StockAdjustmentComponent implements OnInit, OnDestroy {
     const productId = this.config.data?.id;
 
     if (!productId) {
-      // Replaced local error handler with a specific global toast
       this.messageService.showError('Configuration Error: Product ID is missing. Cannot adjust stock.');
       return;
     }
@@ -87,17 +86,12 @@ export class StockAdjustmentComponent implements OnInit, OnDestroy {
       });
   }
 
-  private handleError(msg: string) {
-    this.messageService.showError(msg);
-    this.isLoading = false;
-  }
-
   onCancel() {
     this.ref.close(false);
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

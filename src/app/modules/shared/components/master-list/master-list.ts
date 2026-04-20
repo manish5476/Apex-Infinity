@@ -95,9 +95,9 @@ export interface Master {
               <div class="flex gap-2 mr-2">
                 @if (!isBulkEditing()) {
                   <p-button
-                    label="Bulk Edit"
-                    icon="pi pi-pencil"
-                    [text]="true"
+label="Bulk Edit"
+icon="pi pi-pencil"
+[text]="true"
                     (click)="toggleBulkEdit()">
                   </p-button>
                 }
@@ -224,119 +224,6 @@ export class MasterList implements OnInit, OnDestroy {
     { label: 'tag', value: 'tag' }
   ];
 
-  // Define this within your MasterList class
-  // columns: GridColDef<Master>[] = [
-  //   {
-  //     headerName: 'Identity & Type',
-  //     marryChildren: true,
-  //     children: [
-  //       {
-  //         field: 'type',
-  //         headerName: 'Type',
-  //         width: 140,
-  //         pinned: 'left',
-  //         filter: 'agSetColumnFilter',
-  //         cellConfig: {
-  //           type: 'select',
-  //           options: this.masterTypes,
-  //         },
-  //         // Premium Badge Rendering using your theme tokens
-  //         cellRenderer: (params: any) => {
-  //           if (!params.value) return '';
-  //           const val = params.value.toLowerCase();
-  //           return `
-  //           <div class="type-badge-container">
-  //             <span class="type-badge badge-${val}">
-  //               ${params.value}
-  //             </span>
-  //           </div>
-  //         `;
-  //         }
-  //       },
-  //       {
-  //         field: 'name',
-  //         headerName: 'Display Name',
-  //         flex: 1,
-  //         minWidth: 200,
-  //         pinned: 'left',
-  //         cellClass: 'font-weight-bold text-primary-color',
-  //         cellConfig: {
-  //           type: 'text',
-  //           placeholder: 'e.g. Premium Electronics'
-  //         }
-  //       }
-  //     ]
-  //   },
-  //   {
-  //     headerName: 'Assets & Media',
-  //     children: [
-  //       {
-  //         field: 'imageUrl',
-  //         headerName: 'Visual',
-  //         width: 100,
-  //         sortable: false,
-  //         filter: false,
-  //         cellRenderer: (params: any) => {
-  //           const url = params.value;
-  //           if (url) {
-  //             return `<div class="grid-media-wrapper"><img src="${url}" class="grid-img-thumb" /></div>`;
-  //           }
-  //           return `<div class="grid-media-placeholder"><i class="pi pi-image"></i></div>`;
-  //         },
-  //         cellConfig: { type: 'text', placeholder: 'Image URL' }
-  //       },
-  //       {
-  //         field: 'code',
-  //         headerName: 'System Code',
-  //         width: 120,
-  //         valueFormatter: (params) => params.value ? params.value.toUpperCase() : '-',
-  //         cellClass: 'font-mono text-xs',
-  //         cellConfig: { type: 'text', placeholder: 'UNIT-001' }
-  //       }
-  //     ]
-  //   },
-  //   {
-  //     headerName: 'Operational Status',
-  //     children: [
-  //       {
-  //         field: 'isActive',
-  //         headerName: 'Availability',
-  //         width: 130,
-  //         cellConfig: { type: 'boolean' },
-  //         cellRenderer: (params: any) => {
-  //           const state = params.value ? 'active' : 'inactive';
-  //           const label = params.value ? 'Live' : 'Draft';
-  //           return `
-  //           <div class="status-pill status-${state}">
-  //             <span class="status-dot"></span>
-  //             <span class="status-label">${label}</span>
-  //           </div>
-  //         `;
-  //         }
-  //       },
-  //       {
-  //         field: 'metadata.isFeatured',
-  //         headerName: 'Featured',
-  //         width: 110,
-  //         valueGetter: (p) => p.data?.metadata?.isFeatured,
-  //         cellConfig: { type: 'boolean' },
-  //         // Simple star toggle renderer
-  //         cellRenderer: (params: any) => {
-  //           const color = params.value ? '#eab308' : 'var(--text-tertiary)';
-  //           const icon = params.value ? 'pi-star-fill' : 'pi-star';
-  //           return `<div style="text-align: center; color: ${color}"><i class="pi ${icon}"></i></div>`;
-  //         }
-  //       }
-  //     ]
-  //   },
-  //   {
-  //     field: 'description',
-  //     headerName: 'Notes & Context',
-  //     width: 250,
-  //     cellClass: 'text-muted-sm',
-  //     cellConfig: { type: 'text', placeholder: 'Add a description...' }
-  //   }
-  // ];
   columns: GridColDef<Master>[] = [
     {
       field: 'type',

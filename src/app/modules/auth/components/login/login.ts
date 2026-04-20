@@ -8,7 +8,6 @@ import { PasswordModule } from 'primeng/password';
 import { ToastModule } from 'primeng/toast';
 import { AuthService } from '../../services/auth-service';
 import { AppMessageService } from '../../../../core/services/message.service';
-import { MasterListService } from '../../../../core/services/master-list.service';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { Subject } from "rxjs";
@@ -32,7 +31,6 @@ import { takeUntil } from "rxjs/operators";
 })
 export class LoginComponent implements OnInit, OnDestroy {
     private readonly destroy$ = new Subject<void>();
-  private masterListService = inject(MasterListService);
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -110,7 +108,8 @@ export class LoginComponent implements OnInit, OnDestroy {
 
     this.authService.login(loginData, this.loginForm.value.remember, this.returnUrl).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
-        this.masterListService.load();
+        // MasterListService decommissioned - pre-caching no longer required as data is fetched lazily by universal dropdowns
+        // this.masterListService.load(); 
         this.isLoading.set(false);
       },
       error: (err) => {

@@ -29,6 +29,7 @@ import {
   SelectOption,
 } from '../grid.types';
 import { CommonMethodService } from '@core/utils/common-method.service';
+import { MasterDropdownComponent } from '../../../components/masterFilterDropdown/master-dropdown.component';
 
 @Component({
   selector: 'app-master-cell',
@@ -45,6 +46,7 @@ import { CommonMethodService } from '@core/utils/common-method.service';
     CheckboxModule,
     TagModule,
     TooltipModule,
+    MasterDropdownComponent,
   ],
   template: `
     <div
@@ -136,6 +138,14 @@ import { CommonMethodService } from '@core/utils/common-method.service';
               [showClear]="true"
               [placeholder]="config.placeholder || 'Select…'"
               [panelStyleClass]="'mc-dropdown-panel'"
+              (onFocus)="onEditorFocus($event)" (onBlur)="onBlur($event)" #focusTarget />
+          }
+
+          @case ('master-dropdown') {
+            <app-master-dropdown class="mc-select"
+              [ngModel]="draftValue" (ngModelChange)="onDraftChange($event)"
+              [endpoint]="config.endpoint!"
+              [placeholder]="config.placeholder || 'Select…'"
               (onFocus)="onEditorFocus($event)" (onBlur)="onBlur($event)" #focusTarget />
           }
 

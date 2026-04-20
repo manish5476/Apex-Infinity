@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, inject, signal, computed, OnDestroy } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 
 import { FormsModule, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
@@ -22,7 +22,7 @@ import { SalesReturnService, GetSalesReturnsQuery } from '../../../../core/servi
 import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
 import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
-import { MasterListService } from '../../../../core/services/master-list.service';
+import { MasterDropdownComponent } from '../../../shared/components/masterFilterDropdown/master-dropdown.component';
 import { Toast } from 'primeng/toast';
 import { Subject } from "rxjs";
 
@@ -87,7 +87,8 @@ export class ActionButtonsRenderer {
     Toast,
     DatePickerModule,
     HasPermissionDirective,
-    DynamicDialogModule
+    DynamicDialogModule,
+    MasterDropdownComponent
   ],
   templateUrl: './sales-return-list.html',
   styleUrl: './sales-return-list.scss',
@@ -102,7 +103,6 @@ export class SalesReturnListComponent implements OnInit, OnDestroy {
   private messageService = inject(AppMessageService);
   private router = inject(Router);
   public common = inject(CommonMethodService);
-  public masterList = inject(MasterListService);
   private dialogService = inject(DialogService);
 
   private gridApi!: GridApi;
@@ -141,7 +141,6 @@ export class SalesReturnListComponent implements OnInit, OnDestroy {
     this.getColumn();
     this.getData(true);
 
-    // Subscribe to search query changes after initial load
     this.searchControl.valueChanges.pipe(
       debounceTime(400),
       distinctUntilChanged(), takeUntil(this.destroy$)
@@ -194,7 +193,6 @@ export class SalesReturnListComponent implements OnInit, OnDestroy {
       }), takeUntil(this.destroy$))
       .subscribe({
         next: (res: any) => {
-          // Binding based on the provided API response structure (res.data.returns)
           const newData = res.data?.returns || res.data?.data || res.results || [];
           this.totalCount = res.total || res.pagination?.totalResults || res.results?.length || 0;
 
@@ -204,7 +202,6 @@ export class SalesReturnListComponent implements OnInit, OnDestroy {
             this.data.update(prev => [...prev, ...newData]);
           }
 
-          // Stop incrementing page if we fetched all data
           if (newData.length > 0 && this.data().length < this.totalCount) {
             this.currentPage++;
           }
@@ -227,7 +224,7 @@ export class SalesReturnListComponent implements OnInit, OnDestroy {
     }
 
     if (event.type === 'cellClicked') {
-      const rowData = event.row || event.data; // Ensure robust data access
+      const rowData = event.row || event.data;
 
       if (event.field === 'returnNumber') {
       } else if (event.field === 'invoiceId.invoiceNumber' || event.field === 'invoiceId') {
@@ -263,7 +260,6 @@ export class SalesReturnListComponent implements OnInit, OnDestroy {
 
   getColumn(): void {
     this.column = [
-      // ── Date ──────────────────────────────────────────────────────
       {
         field: 'returnDate',
         headerName: 'Return Date',
@@ -277,8 +273,6 @@ export class SalesReturnListComponent implements OnInit, OnDestroy {
           'align-items': 'center'
         }
       },
-
-      // ── Return # ──────────────────────────────────────────────────
       {
         field: 'returnNumber',
         headerName: 'Return #',
@@ -292,8 +286,6 @@ export class SalesReturnListComponent implements OnInit, OnDestroy {
           'align-items': 'center'
         }
       },
-
-      // ── Invoice # ─────────────────────────────────────────────────
       {
         field: 'invoiceId.invoiceNumber',
         headerName: 'Invoice #',
@@ -308,8 +300,6 @@ export class SalesReturnListComponent implements OnInit, OnDestroy {
           'align-items': 'center'
         }
       },
-
-      // ── Customer ──────────────────────────────────────────────────
       {
         field: 'customerId.name',
         headerName: 'Customer',
@@ -323,8 +313,6 @@ export class SalesReturnListComponent implements OnInit, OnDestroy {
           'align-items': 'center'
         }
       },
-
-      // ── Customer Phone ────────────────────────────────────────────
       {
         field: 'customerId.phone',
         headerName: 'Phone',
@@ -338,8 +326,6 @@ export class SalesReturnListComponent implements OnInit, OnDestroy {
           'align-items': 'center'
         }
       },
-
-      // ── Items (count + names) ─────────────────────────────────────
       {
         field: 'items',
         headerName: 'Items',
@@ -364,8 +350,6 @@ export class SalesReturnListComponent implements OnInit, OnDestroy {
           return items.map((i: any) => `${i.name} ×${i.quantity} @ ₹${i.unitPrice}`).join('\n');
         }
       },
-
-      // ── Reason ────────────────────────────────────────────────────
       {
         field: 'reason',
         headerName: 'Reason',
@@ -379,8 +363,6 @@ export class SalesReturnListComponent implements OnInit, OnDestroy {
           'align-items': 'center'
         }
       },
-
-      // ── Sub Total ─────────────────────────────────────────────────
       {
         field: 'subTotal',
         headerName: 'Sub Total',
@@ -397,8 +379,6 @@ export class SalesReturnListComponent implements OnInit, OnDestroy {
           'justify-content': 'flex-end'
         }
       },
-
-      // ── Tax Total ─────────────────────────────────────────────────
       {
         field: 'taxTotal',
         headerName: 'Tax',
@@ -415,8 +395,6 @@ export class SalesReturnListComponent implements OnInit, OnDestroy {
           'justify-content': 'flex-end'
         }
       },
-
-      // ── Total Refund ─────────────────────────────────────────────
       {
         field: 'totalRefundAmount',
         headerName: 'Refund Amt',
@@ -434,8 +412,6 @@ export class SalesReturnListComponent implements OnInit, OnDestroy {
           'justify-content': 'flex-end'
         })
       },
-
-      // ── Approved / Rejected By ────────────────────────────────────
       {
         field: 'approvedBy',
         headerName: 'Actioned By',
@@ -462,8 +438,6 @@ export class SalesReturnListComponent implements OnInit, OnDestroy {
           };
         }
       },
-
-      // ── Rejection Reason (only shown if rejected) ─────────────────
       {
         field: 'rejectionReason',
         headerName: 'Rejection Note',
@@ -481,8 +455,6 @@ export class SalesReturnListComponent implements OnInit, OnDestroy {
         },
         tooltipValueGetter: (p: any) => p.data?.rejectionReason || ''
       },
-
-      // ── Status Badge ─────────────────────────────────────────────
       {
         field: 'status',
         headerName: 'Status',
@@ -510,8 +482,6 @@ export class SalesReturnListComponent implements OnInit, OnDestroy {
           'align-items': 'center'
         }
       },
-
-      // ── Actions ───────────────────────────────────────────────────
       {
         headerName: 'Actions',
         width: 110,

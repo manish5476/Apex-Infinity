@@ -3,7 +3,7 @@ import { Component, OnInit, signal, inject, ChangeDetectorRef, OnDestroy } from 
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TooltipModule } from 'primeng/tooltip';
 import { AdminAnalyticsService } from '../admin-analytics.service';
-import { MasterListService } from '../../core/services/master-list.service';
+// import { MasterListService } from`` '../../core/services/master-list.service';
 import { CommonMethodService } from '../../core/utils/common-method.service';
 import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
 import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
@@ -458,7 +458,7 @@ import { takeUntil } from "rxjs/operators";
 })
 export class CustomerLtvAnalysisComponent implements OnInit, OnDestroy {
     private readonly destroy$ = new Subject<void>();
-  public  masterList       = inject(MasterListService);
+  // public  masterList       = inject(MasterListService);
   public  commonService    = inject(CommonMethodService);
   private analyticsService = inject(AdminAnalyticsService);
   private cdr              = inject(ChangeDetectorRef);

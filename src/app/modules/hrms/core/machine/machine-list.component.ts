@@ -17,7 +17,6 @@ import { takeUntil } from "rxjs/operators";
   template: `
     <div class="list-page-container">
       <div class="themed-card list-content-area">
-
         <div class="se-filter-bar">
           <div class="se-filter-field">
             <label>Search</label>
@@ -103,7 +102,7 @@ import { takeUntil } from "rxjs/operators";
   `]
 })
 export class MachineListComponent implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   private cdr = inject(ChangeDetectorRef);
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
@@ -111,7 +110,7 @@ export class MachineListComponent implements OnInit, OnDestroy {
 
   data: any[] = [];
   column: any[] = [];
-  
+
   filter = { search: '', connectionStatus: null, status: null };
   isLoading = false;
 
@@ -153,7 +152,7 @@ export class MachineListComponent implements OnInit, OnDestroy {
   }
 
   deleteMachine(id: string, name: string) {
-    if(confirm(`Delete machine ${name}?`)) {
+    if (confirm(`Delete machine ${name}?`)) {
       this.hrmsService.deleteMachine(id).pipe(takeUntil(this.destroy$)).subscribe({
         next: () => { this.messageService.showSuccess('Machine removed'); this.getData(); },
         error: (err) => this.messageService.handleHttpError(err)
@@ -190,15 +189,15 @@ export class MachineListComponent implements OnInit, OnDestroy {
           return `<span style="background:${bg}; color:${color}; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:600; text-transform:uppercase;">${s}</span>`;
         }
       },
-      { 
+      {
         headerName: 'Last Sync', field: 'lastSyncAt', width: 150,
         valueFormatter: (p: any) => p.value ? new Date(p.value).toLocaleString() : 'Never'
       }
     ];
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

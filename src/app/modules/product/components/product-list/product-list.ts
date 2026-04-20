@@ -20,7 +20,8 @@ import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
 import { ProductService } from '../../services/product-service';
 import { AppMessageService } from '../../../../core/services/message.service';
-import { MasterListService } from '../../../../core/services/master-list.service';
+// import { MasterListService } from '../../../../core/services/master-list.service';
+import { MasterDropdownComponent } from '../../../shared/components/masterFilterDropdown/master-dropdown.component';
 import { ImageCellRendererComponent } from '../../../shared/AgGrid/AgGridcomponents/image-cell-renderer/image-cell-renderer.component';
 import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
 import { Dialog } from "primeng/dialog";
@@ -47,7 +48,8 @@ import { CommonMethodService } from '../../../../core/utils/common-method.servic
     Dialog,
     BulkProductEntry,
     HasPermissionDirective,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    MasterDropdownComponent
   ],
   providers: [ConfirmationService, DecimalPipe],
   templateUrl: './product-list.html',
@@ -58,7 +60,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
   private productService = inject(ProductService);
   private messageService = inject(AppMessageService);
-  private masterList = inject(MasterListService);
+  // private masterList = inject(MasterListService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private confirmationService = inject(ConfirmationService);
@@ -94,10 +96,10 @@ export class ProductListComponent implements OnInit, OnDestroy {
   }
 
   constructor() {
-    effect(() => {
-      this.brandOptions.set(this.masterList.brands());
-      this.categoryOptions.set(this.masterList.categories());
-    });
+    // effect(() => {
+    //   this.brandOptions.set(this.masterList.brands());
+    //   this.categoryOptions.set(this.masterList.categories());
+    // });
   }
 
   ngOnInit(): void {

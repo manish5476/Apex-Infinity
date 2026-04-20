@@ -138,7 +138,7 @@ export class PurchaseReturnComponent implements OnInit, OnDestroy {
   }
   loadPurchase(id: string) {
     this.isLoading.set(true);
-    
+
     this.purchaseService.getPurchaseById(id)
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
@@ -172,8 +172,8 @@ export class PurchaseReturnComponent implements OnInit, OnDestroy {
     }
 
     // Safely extract all values, even if some form controls are disabled
-    const formValue = this.returnForm.getRawValue(); 
-    
+    const formValue = this.returnForm.getRawValue();
+
     const itemsToReturn = formValue.items
       .filter((item: any) => item.returnQty > 0)
       .map((item: any) => ({
@@ -187,7 +187,7 @@ export class PurchaseReturnComponent implements OnInit, OnDestroy {
     };
 
     this.isSubmitting.set(true);
-    
+
     this.purchaseService.partialReturn(this.purchaseId()!, payload)
       .pipe(finalize(() => this.isSubmitting.set(false)))
       .subscribe({
@@ -202,58 +202,4 @@ export class PurchaseReturnComponent implements OnInit, OnDestroy {
         }
       });
   }
-
-//    loadPurchase(id: string) {
-//     this.isLoading.set(true);
-//     this.purchaseService.getPurchaseById(id)
-//       .pipe(finalize(() => this.isLoading.set(false)))
-//       .subscribe({
-//         next: (res: any) => {
-//           const data = res.data?.data || res.data;
-//           if (data) {
-//             this.originalPurchase.set(data);
-//             this.initFormItems(data.items);
-//           }
-//         },
-//         error: () => {
-//           this.messageService.showError('Could not load purchase details');
-//           this.router.navigate(['/purchase']);
-//         }
-//       });
-//   }
-//  onSubmit() {
-//     if (this.returnForm.invalid) {
-//       this.returnForm.markAllAsTouched();
-//       return;
-//     }
-
-//     if (this.totalRefundAmount() <= 0) {
-//       this.messageService.showError('Please select items to return.');
-//       return;
-//     }
-
-//     const formValue = this.returnForm.value;
-//     const itemsToReturn = formValue.items
-//       .filter((item: any) => item.returnQty > 0)
-//       .map((item: any) => ({
-//         productId: item.productId,
-//         quantity: item.returnQty
-//       }));
-
-//     const payload = {
-//       items: itemsToReturn,
-//       reason: formValue.reason
-//     };
-
-//     this.isSubmitting.set(true);
-//     this.purchaseService.partialReturn(this.purchaseId()!, payload)
-//       .pipe(finalize(() => this.isSubmitting.set(false)))
-//       .subscribe({
-//         next: () => {
-//           this.messageService.showSuccess('Debit Note Created');
-//           this.router.navigate(['/purchase', this.purchaseId()]);
-//         },
-//         error: (err) => this.messageService.showError(err.error?.message || 'Error')
-//       });
-//   }
 }

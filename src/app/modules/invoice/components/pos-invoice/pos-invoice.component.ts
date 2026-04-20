@@ -9,7 +9,8 @@ import { Subject, EMPTY } from 'rxjs';
 
 // Services
 import { InvoiceService } from '../../services/invoice-service';
-import { MasterListService } from '../../../../core/services/master-list.service';
+// import { MasterListService } from '../../../../core/services/master-list.service';
+import { MasterDropdownComponent } from '../../../shared/components/masterFilterDropdown/master-dropdown.component';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
 
@@ -37,7 +38,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
     ToastModule, ButtonModule, InputTextModule, InputNumberModule,
     DatePickerModule, SelectModule, DividerModule, TooltipModule,
     TextareaModule, SkeletonModule, TagModule, ConfirmDialogModule,
-    ProgressSpinnerModule
+    ProgressSpinnerModule, MasterDropdownComponent
   ],
   providers: [ConfirmationService],
   templateUrl: './pos-invoice.component.html',
@@ -49,7 +50,7 @@ export class PosInvoiceComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private invoiceService = inject(InvoiceService);
-  private masterList = inject(MasterListService);
+  // private masterList = inject(MasterListService);
   private messageService = inject(AppMessageService);
   private productService = inject(ProductService);
   private confirmationService = inject(ConfirmationService);
@@ -74,9 +75,9 @@ export class PosInvoiceComponent implements OnInit, OnDestroy {
   formTitle = computed(() => this.editMode() ? `Edit Invoice #${this.invoiceForm.get('invoiceNumber')?.value || ''}` : 'New Smart Invoice');
 
   // --- Master Data ---
-  customerOptions = computed(() => this.masterList.customers());
-  productOptions = computed(() => this.masterList.products());
-  branchOptions = computed(() => this.masterList.branches());
+  // customerOptions = computed(() => this.masterList.customers());
+  // productOptions = computed(() => this.masterList.products());
+  // branchOptions = computed(() => this.masterList.branches());
 
   gstTypeOptions = [
     { label: 'Intra-State (CGST/SGST)', value: 'intra-state' },
@@ -108,10 +109,10 @@ export class PosInvoiceComponent implements OnInit, OnDestroy {
     this.setupTotalsCalculation();
     this.setupScannerQueue();
 
-    const defaultBranch = this.masterList.branches()[0]?._id;
-    if (defaultBranch && !this.editMode()) {
-      this.invoiceForm.patchValue({ branchId: defaultBranch });
-    }
+    // const defaultBranch = this.masterList.branches()[0]?._id;
+    // if (defaultBranch && !this.editMode()) {
+    //   this.invoiceForm.patchValue({ branchId: defaultBranch });
+    // }
 
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
@@ -185,24 +186,22 @@ export class PosInvoiceComponent implements OnInit, OnDestroy {
       this.focusScanner();
     }
   }
-  onManualProductSelect(event: any): void {
-    const productId = event.value;
-    const product = this.productOptions().find(p => p._id === productId);
+  onManualProductSelect(product: any): void {
+    if (!product) return;
+    const productId = product._id;
     const branchId = this.invoiceForm.get('branchId')?.value;
 
     if (product && branchId) {
       this.invoiceService.checkStock({ branchId, items: [{ productId, quantity: 1 }] }).subscribe({
         next: (res: any) => {
+          const stockData = res.data;
           let availableQty = 0;
-          if (res.stock?.items && res.stock.items.length > 0) {
-            availableQty = res.stock.items[0].available;
-          } else if (res.stock?.summary?.totalStock !== undefined) {
-            availableQty = res.stock.summary.totalStock;
+          if (stockData?.items && stockData.items.length > 0) {
+            availableQty = stockData.items[0].availableStock ?? 0;
+          } else if (stockData?.summary?.totalStock !== undefined) {
+            availableQty = stockData.summary.totalStock;
           }
-
           this.addProductToInvoice(product, availableQty);
-
-          // 3. Reset the form control instead of the signal
           this.manualSearchControl.reset();
         },
         error: (err) => {
@@ -215,43 +214,10 @@ export class PosInvoiceComponent implements OnInit, OnDestroy {
       this.manualSearchControl.reset();
     }
   }
-  // // 4. Manual Dropdown Handler
-  // onManualProductSelect(event: any): void {
-  //   const productId = event.value;
-  //   const product = this.productOptions().find(p => p._id === productId);
-  //   const branchId = this.invoiceForm.get('branchId')?.value;
 
-  //   if (product && branchId) {
-  //     this.invoiceService.checkStock({ branchId, items: [{ productId, quantity: 1 }] }).subscribe({
-  //       next: (res: any) => {
-  //         let availableQty = 0;
-  //         if (res.stock?.items && res.stock.items.length > 0) {
-  //           availableQty = res.stock.items[0].available;
-  //         } else if (res.stock?.summary?.totalStock !== undefined) {
-  //           availableQty = res.stock.summary.totalStock;
-  //         }
-
-  //         this.addProductToInvoice(product, availableQty);
-  //         this.manualSearchValue.set(null); // Clear the PrimeNG dropdown for next selection
-  //       },
-  //       error: (err) => {
-  //         this.messageService.showError('Stock Check: Failed to verify current availability.');
-  //         this.manualSearchValue.set(null);
-  //       }
-  //     });
-  //   } else if (!branchId) {
-  //      this.messageService.showWarn('Branch Required: Please select a branch to check stock.');
-  //      this.manualSearchValue.set(null);
-  //   }
-  // }
-
-
-  // 5. Unified method to process any product (from scanner or manual)
   private addProductToInvoice(product: any, stock: number): void {
     const itemsArray = this.items;
-    const existingIndex = itemsArray.controls.findIndex(
-      ctrl => ctrl.get('productId')?.value === (product._id || product.id)
-    );
+    const existingIndex = itemsArray.controls.findIndex(ctrl => ctrl.get('productId')?.value === (product._id || product.id));
 
     if (existingIndex > -1) {
       const existingGroup = itemsArray.at(existingIndex) as FormGroup;
@@ -360,25 +326,26 @@ export class PosInvoiceComponent implements OnInit, OnDestroy {
     this.focusScanner(); // Snap back to scanner after deleting an item
   }
 
-  onCustomerSelect(event: any): void {
-    const customer = this.customerOptions().find(c => c._id === event.value);
+  onCustomerSelect(customer: any): void {
     if (customer) {
-      const billAddr = this.formatAddress(customer['billingAddress']);
-      this.invoiceForm.patchValue({
-        billingAddress: billAddr,
-        shippingAddress: this.formatAddress(customer['shippingAddress']) || billAddr,
-        placeOfSupply: customer['billingAddress']?.state || ''
-      });
-      const terms = parseInt(customer['paymentTerms'] as string) || 0;
-      if (terms > 0) {
-        const due = new Date();
-        due.setDate(due.getDate() + terms);
-        this.invoiceForm.patchValue({ dueDate: due });
+      if (customer) {
+        const billAddr = this.formatAddress(customer['billingAddress']);
+        this.invoiceForm.patchValue({
+          billingAddress: billAddr,
+          shippingAddress: this.formatAddress(customer['shippingAddress']) || billAddr,
+          placeOfSupply: customer['billingAddress']?.state || ''
+        });
+        const terms = parseInt(customer['paymentTerms'] as string) || 0;
+        if (terms > 0) {
+          const due = new Date();
+          due.setDate(due.getDate() + terms);
+          this.invoiceForm.patchValue({ dueDate: due });
+        }
       }
     }
   }
 
-  private setupTotalsCalculation(): void {
+  setupTotalsCalculation(): void {
     this.invoiceForm.valueChanges.pipe(
       takeUntil(this.destroy$),
       debounceTime(100)
@@ -458,8 +425,10 @@ export class PosInvoiceComponent implements OnInit, OnDestroy {
         items: payload.items
       };
       this.invoiceService.checkStock(checkPayload).subscribe({
-        next: (validation: any) => {
+        next: (res: any) => {
+          const validation = res.data; // Corrected: use res.data
           const isValid = validation.isValid;
+
           if (isValid) {
             if (validation.warnings?.length > 0) {
               this.confirmSubmission(payload, 'Stock warnings detected. Continue?', 'pi pi-exclamation-triangle');
@@ -468,10 +437,11 @@ export class PosInvoiceComponent implements OnInit, OnDestroy {
             }
           } else {
             let msg = 'Insufficient stock for the following items: ';
-            if (validation.stock?.items && validation.stock.items.length > 0) {
-              const outOfStockItems = validation.stock.items.filter((i: any) => i.available < i.required);
+            if (validation.items && validation.items.length > 0) {
+              // Corrected: filter using availableStock and requestedQuantity
+              const outOfStockItems = validation.items.filter((i: any) => (i.availableStock ?? 0) < (i.requestedQuantity ?? 0));
               msg += outOfStockItems
-                .map((i: any) => `${i.productName}: Need ${i.required}, have ${i.available}`)
+                .map((i: any) => `${i.name}: Need ${i.requestedQuantity}, have ${i.availableStock}`)
                 .join(' | ');
             } else {
               msg = validation.message || 'Items out of stock';

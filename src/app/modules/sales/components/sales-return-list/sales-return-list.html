@@ -38,8 +38,9 @@
 
     <div class="filter-group">
       <label class="filter-label">Branch</label>
-      <p-select [options]="masterList.branches()" optionLabel="name" optionValue="_id" [(ngModel)]="filter.branchId"
-        (onChange)="applyFilters()" placeholder="Select Branch" class="w-full" [showClear]="true"></p-select>
+      <app-master-dropdown endpoint="branches" [(ngModel)]="filter.branchId" (onChange)="applyFilters()"
+        placeholder="Select Branch">
+      </app-master-dropdown>
     </div>
 
     <div class="filter-group">
