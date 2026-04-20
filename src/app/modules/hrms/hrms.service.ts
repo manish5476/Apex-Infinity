@@ -456,7 +456,7 @@ export class HRMSService extends BaseApiService {
   /**
    * Get all designations
    */
-  getDesignations(params?: any): Observable<{ status: string; data: { designations: Designation[] } }> {
+  getDesignations(params?: any): Observable<any> {
     return this.get<{ status: string; data: { designations: Designation[] } }>('/v1/hrms/designations', params);
   }
 
