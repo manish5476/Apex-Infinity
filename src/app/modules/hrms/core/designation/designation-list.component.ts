@@ -86,7 +86,7 @@ import { catchError, finalize } from 'rxjs/operators';
             [columns]="column()" 
             [data]="data()" 
             [actionColumn]="designationActionColumn"
-            [loading]="isLoading()"
+           
             selectionMode="single"
             (gridEvent)="eventFromGrid($event)">
           </app-ag-share-grid>
