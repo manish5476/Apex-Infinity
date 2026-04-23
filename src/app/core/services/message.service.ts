@@ -10,8 +10,13 @@ export class AppMessageService {
   private readonly DEFAULT_LIFE = 3000;
   private readonly ERROR_LIFE = 5000;
 
-  public showSuccess(message: string) {
-    this.messageService.add({ severity: 'success', summary: 'Success', detail: message, life: this.DEFAULT_LIFE });
+  public showSuccess(message?: string) {
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Success',
+      detail: message || 'Operation completed successfully.',
+      life: this.DEFAULT_LIFE
+    });
   }
 
   public showError(message: string) {

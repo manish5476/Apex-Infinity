@@ -242,43 +242,37 @@ export const SIDEBAR_MENU: MenuItem[] = [
     permissions: [PERMISSIONS.DEPARTMENT.READ, PERMISSIONS.USER.READ, PERMISSIONS.SHIFT.READ, PERMISSIONS.ATTENDANCE.READ, PERMISSIONS.LEAVE.READ],
     items: [
       {
-        label: 'Core HR',
-        icon: 'pi pi-building',
-        permissions: [PERMISSIONS.DEPARTMENT.READ, PERMISSIONS.DESIGNATION.READ],
+        label: 'Self Service',
+        icon: 'pi pi-user',
         items: [
-          { label: 'Department Hub', icon: 'pi pi-home', routerLink: ['/hrms/department/hub'], permissions: [PERMISSIONS.DEPARTMENT.READ] },
-          { label: 'Department List', icon: 'pi pi-list', routerLink: ['/hrms/department/list'], permissions: [PERMISSIONS.DEPARTMENT.READ] },
-          { label: 'Department Hierarchy', icon: 'pi pi-sitemap', routerLink: ['/hrms/department/heirachy'], permissions: [PERMISSIONS.DEPARTMENT.READ] },
-          { label: 'Add Department', icon: 'pi pi-plus', routerLink: ['/hrms/department/new'], permissions: [PERMISSIONS.DEPARTMENT.MANAGE] },
-          { label: 'Designation List', icon: 'pi pi-list', routerLink: ['/hrms/designation/list'], permissions: [PERMISSIONS.DESIGNATION.READ] },
-          { label: 'Designation Hierarchy', icon: 'pi pi-sitemap', routerLink: ['/hrms/designation/heirachy'], permissions: [PERMISSIONS.DESIGNATION.READ] },
-          { label: 'Add Designation', icon: 'pi pi-plus', routerLink: ['/hrms/designation/new'], permissions: [PERMISSIONS.DESIGNATION.MANAGE] },
-          { label: 'Salary Bands', icon: 'pi pi-money-bill', routerLink: ['/hrms/designation/salary'], permissions: [PERMISSIONS.DESIGNATION.MANAGE] },
-          { label: 'Promotions', icon: 'pi pi-angle-double-up', routerLink: ['/hrms/designation/promotion'], permissions: [PERMISSIONS.DESIGNATION.MANAGE] },
-          { label: 'Career Path', icon: 'pi pi-map', routerLink: ['/hrms/designation/career'], permissions: [PERMISSIONS.DESIGNATION.READ] }
-        ]
-      },
-      {
-        label: 'Staff Management',
-        icon: 'pi pi-users',
-        permissions: [PERMISSIONS.USER.READ],
-        items: [
-          { label: 'Employee List', icon: 'pi pi-users', routerLink: ['/user/list'], permissions: [PERMISSIONS.USER.READ] },
-          { label: 'Employee Hierarchy', icon: 'pi pi-sitemap', routerLink: ['/user/hierarchy'], permissions: [PERMISSIONS.USER.READ] },
-          { label: 'Onboard User', icon: 'pi pi-user-plus', routerLink: ['/user/create'], permissions: [PERMISSIONS.USER.MANAGE] },
-        ]
-      },
-      {
-        label: 'Time & Attendance',
-        icon: 'pi pi-clock',
-        permissions: [PERMISSIONS.ATTENDANCE.READ],
-        items: [
-          { label: 'My Clock', icon: 'pi pi-sign-in', routerLink: ['/hrms/attendance/my-clock'], permissions: [PERMISSIONS.ATTENDANCE.READ] },
+          { label: 'My Attendance', icon: 'pi pi-clock', routerLink: ['/hrms/attendance/my-clock'], permissions: [PERMISSIONS.ATTENDANCE.READ] },
           { label: 'My Timesheet', icon: 'pi pi-calendar', routerLink: ['/hrms/daily-attendance/my-timesheet'], permissions: [PERMISSIONS.ATTENDANCE.READ] },
-          { label: 'Live Feeds', icon: 'pi pi-bolt', routerLink: ['/hrms/attendance/live-feed'], permissions: [PERMISSIONS.ATTENDANCE.MANAGE] },
-          { label: 'Admin Logs', icon: 'pi pi-shield', routerLink: ['/hrms/attendance/admin'], permissions: [PERMISSIONS.ATTENDANCE.MANAGE] },
-          { label: 'Admin Timesheet', icon: 'pi pi-table', routerLink: ['/hrms/daily-attendance/admin'], permissions: [PERMISSIONS.ATTENDANCE.MANAGE] },
-          { label: 'HR Reports', icon: 'pi pi-chart-bar', routerLink: ['/hrms/daily-attendance/reports'], permissions: [PERMISSIONS.ATTENDANCE.MANAGE] }
+          { label: 'Leave Center', icon: 'pi pi-calendar-minus', routerLink: ['/hrms/leave/hub'], permissions: [PERMISSIONS.LEAVE.READ] },
+        ]
+      },
+      {
+        label: 'Workforce & Time',
+        icon: 'pi pi-users',
+        permissions: [PERMISSIONS.USER.READ, PERMISSIONS.ATTENDANCE.MANAGE],
+        items: [
+          { label: 'Employee Directory', icon: 'pi pi-users', routerLink: ['/user/list'], permissions: [PERMISSIONS.USER.READ] },
+          { label: 'Live Punches', icon: 'pi pi-bolt', routerLink: ['/hrms/attendance/live-feed'], permissions: [PERMISSIONS.ATTENDANCE.MANAGE] },
+          { label: 'Attendance Admin', icon: 'pi pi-shield', routerLink: ['/hrms/attendance/admin'], permissions: [PERMISSIONS.ATTENDANCE.MANAGE] },
+          { label: 'HR Reports', icon: 'pi pi-chart-bar', routerLink: ['/hrms/daily-attendance/reports'], permissions: [PERMISSIONS.ATTENDANCE.MANAGE] },
+          { label: 'Leave Admin', icon: 'pi pi-calendar-plus', routerLink: ['/hrms/leave/admin'], permissions: [PERMISSIONS.LEAVE.ADMIN] },
+        ]
+      },
+      {
+        label: 'HR Configuration',
+        icon: 'pi pi-cog',
+        permissions: [PERMISSIONS.DEPARTMENT.MANAGE, PERMISSIONS.SHIFT.MANAGE],
+        items: [
+          { label: 'Department Hub', icon: 'pi pi-building', routerLink: ['/hrms/department/hub'], permissions: [PERMISSIONS.DEPARTMENT.READ] },
+          { label: 'Designation Hub', icon: 'pi pi-id-card', routerLink: ['/hrms/designation/list'], permissions: [PERMISSIONS.DESIGNATION.READ] },
+          { label: 'Shift Roster', icon: 'pi pi-calendar', routerLink: ['/hrms/shifts/list'], permissions: [PERMISSIONS.SHIFT.READ] },
+          { label: 'Geofencing', icon: 'pi pi-map-marker', routerLink: ['/hrms/geofence/hub'], permissions: [PERMISSIONS.ATTENDANCE.MANAGE] },
+          { label: 'Biometrics', icon: 'pi pi-fingerprint', routerLink: ['/hrms/attendance/machines/hub'], permissions: [PERMISSIONS.ATTENDANCE.MANAGE] },
+          { label: 'Holiday Calendar', icon: 'pi pi-calendar-ext', routerLink: ['/hrms/holidays/hub'], permissions: [PERMISSIONS.DEPARTMENT.READ] },
         ]
       }
     ]

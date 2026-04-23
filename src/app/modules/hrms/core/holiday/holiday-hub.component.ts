@@ -369,11 +369,11 @@ export class HolidayHubComponent implements OnInit, OnDestroy {
   }
 
   onAdd() {
-    this.router.navigate(['hrms/holidays/new']);
+    this.router.navigate(['/hrms/holidays/new']);
   }
 
   onEdit(id: string) {
-    this.router.navigate(['/holidays/edit', id]);
+    this.router.navigate(['/hrms/holidays/edit', id]);
   }
 
   onDelete(holiday: any) {

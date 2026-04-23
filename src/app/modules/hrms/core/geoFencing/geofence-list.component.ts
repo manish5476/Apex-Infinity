@@ -137,12 +137,12 @@ export class GeofenceListComponent implements OnInit, OnDestroy {
 
   applyFilters() { this.getData(); }
   resetFilters() { this.filter = { search: '', type: null, isActive: null }; this.getData(); }
-  createNew() { this.router.navigate(['/hrms/attendance/geofences/new']); }
+  createNew() { this.router.navigate(['/hrms/geofence/new']); }
 
   eventFromGrid(event: any) {
     const id = event?.row?._id;
-    if (event.type === 'editStart') this.router.navigate(['/hrms/attendance/geofences/edit', id]);
-    else if (event.type === 'cellClicked') this.router.navigate(['/hrms/attendance/geofences/details', id]);
+    if (event.type === 'editStart') this.router.navigate(['/hrms/geofence/edit', id]);
+    else if (event.type === 'cellClicked') this.router.navigate(['/hrms/geofence/details', id]);
     else if (event.type === 'delete') this.deleteFence(id, event.row.name);
   }
 

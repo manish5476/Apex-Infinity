@@ -881,7 +881,7 @@ export class EmployeeAttendanceComponent implements OnInit, OnDestroy {
       finalize(() => this.isPunching.set(false)), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       if (res) {
-        this.messageService.showSuccess(res.message);
+        this.messageService.showSuccess(res.message || 'Punch recorded successfully.');
         this.loadMyLogs();
       }
     });

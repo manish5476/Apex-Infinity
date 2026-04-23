@@ -346,11 +346,11 @@ export class MachineHubComponent implements OnInit, OnDestroy {
   }
 
   onAddMachine() {
-    this.router.navigate(['hrms/attendance/machines/new']);
+    this.router.navigate(['/hrms/attendance/machines/new']);
   }
 
   onInspect(id: string) {
-    this.router.navigate(['hrms/attendance/machines/details', id]);
+    this.router.navigate(['/hrms/attendance/machines/details', id]);
   }
 
   submitBulkUpdate() {

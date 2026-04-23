@@ -482,8 +482,8 @@ export class MachineDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
-  onBack() { this.router.navigate(['hrms/attendance/machines']); }
-  onEdit() { this.router.navigate(['hrms/attendance/machines/edit', this.machineId]); }
+  onBack() { this.router.navigate(['/hrms/attendance/machines']); }
+  onEdit() { this.router.navigate(['/hrms/attendance/machines/edit', this.machineId]); }
 
   getConnectionSeverity(status: string): any {
     switch (status) {

@@ -362,7 +362,7 @@ export class MyDailyAttendanceComponent implements OnInit, OnDestroy {
       }), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       if (res) {
-        this.messageService.showSuccess(res.message)
+        this.messageService.showSuccess(res.message || 'Attendance regularization submitted.')
         this.loadMyAttendance(); // Reload to show pending status if applicable
       }
     });

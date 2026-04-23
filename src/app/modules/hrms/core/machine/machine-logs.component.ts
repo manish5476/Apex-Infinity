@@ -88,7 +88,7 @@ export class MachineLogsComponent implements OnInit, OnDestroy {
 
   getStatus() {
     this.hrmsService.getMachineStatus(this.machineId!).pipe(takeUntil(this.destroy$)).subscribe(res => {
-      this.machineStatus = res.data;
+      this.machineStatus = res.data?.machine || null;
       this.cdr.markForCheck();
     });
   }
@@ -114,18 +114,18 @@ export class MachineLogsComponent implements OnInit, OnDestroy {
       {
         headerName: 'User Details', field: 'user.name', width: 220,
         cellRenderer: (p: any) => {
-          const name = p.value || 'Unmapped User';
-          const hardwareId = p.data?.machineUserId || '-';
+          const name = p.data?.user?.name || 'Unmapped User';
+          const hardwareId = p.data?.user?.employeeProfile?.employeeId || '-';
           return `<div style="line-height:1.2; padding-top:6px;">
                     <div style="font-weight:600; color:var(--text-primary);">${name}</div>
-                    <div style="font-size:11px; color:var(--text-tertiary); font-family:monospace;">HW ID: ${hardwareId}</div>
+                    <div style="font-size:11px; color:var(--text-tertiary); font-family:monospace;">EMP ID: ${hardwareId}</div>
                   </div>`;
         }
       },
       {
-        headerName: 'Verification Mode', field: 'verifyMode', width: 160,
+        headerName: 'Verification Mode', field: 'biometricData.method', width: 160,
         cellRenderer: (p: any) => {
-          const mode = (p.value || 'unknown').toLowerCase();
+          const mode = (p.value || p.data?.source || 'unknown').toLowerCase();
           let icon = '<circle cx="12" cy="12" r="10"></circle>';
           if(mode.includes('face')) icon = '<circle cx="12" cy="12" r="10"></circle><line x1="8" y1="15" x2="16" y2="15"></line>';
           if(mode.includes('finger')) icon = '<path d="M2 12C2 6.48 6.48 2 12 2s10 4.48 10 10-4.48 10-10 10S2 17.52 2 12z"></path>';
@@ -136,20 +136,20 @@ export class MachineLogsComponent implements OnInit, OnDestroy {
         }
       },
       {
-        headerName: 'Punch Type', field: 'punchType', width: 140,
+        headerName: 'Punch Type', field: 'type', width: 140,
         cellRenderer: (p: any) => {
-          const t = p.value || 'Check In';
+          const t = p.value || 'in';
           const color = t.toLowerCase().includes('in') ? '#15803d' : '#b91c1c';
           return `<span style="font-weight:600; font-size:12px; color:${color};">${t}</span>`;
         }
       },
       {
-        headerName: 'Status', field: 'status', width: 120,
+        headerName: 'Status', field: 'processingStatus', width: 120,
         cellRenderer: (p: any) => {
-          const isSuccess = p.value !== 'failed';
+          const isSuccess = p.value !== 'rejected' && p.value !== 'flagged';
           const bg = isSuccess ? '#ecfdf5' : '#fef2f2';
           const color = isSuccess ? '#15803d' : '#b91c1c';
-          return `<span style="background:${bg}; color:${color}; padding:2px 8px; border-radius:4px; font-size:10px; font-weight:bold; text-transform:uppercase;">${isSuccess ? 'Success' : 'Failed'}</span>`;
+          return `<span style="background:${bg}; color:${color}; padding:2px 8px; border-radius:4px; font-size:10px; font-weight:bold; text-transform:uppercase;">${p.value || 'unknown'}</span>`;
         }
       }
     ];

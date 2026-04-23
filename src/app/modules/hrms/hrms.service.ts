@@ -1,6 +1,6 @@
 // services/hrms.service.ts
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { BaseApiService } from '../../core/services/base-api.service';
 
 export interface Department {
@@ -206,7 +206,11 @@ export interface AttendanceLog {
   ipAddress?: string;
   userAgent?: string;
   location?: {
-    coordinates: [number, number];
+    geoJson?: {
+      type: 'Point';
+      coordinates: [number, number];
+    };
+    coordinates?: [number, number];
     accuracy?: number;
     geofenceStatus?: 'inside' | 'outside' | 'disabled';
     geofenceId?: string;
@@ -374,6 +378,39 @@ export interface HolidayCalendar {
   providedIn: 'root'
 })
 export class HRMSService extends BaseApiService {
+  private normalizeMachineAnalytics(data: any): any {
+    const summary = data?.summary?.[0] || {};
+    const machines = Array.isArray(data?.machines) ? data.machines : [];
+    const byStatus = Array.isArray(data?.byStatus) ? data.byStatus : [];
+
+    const offlineByStatus = byStatus
+      .filter((item: any) => ['offline', 'error', 'inactive'].includes(item?._id))
+      .reduce((acc: number, item: any) => acc + (item?.count || 0), 0);
+
+    const offlineByConnection = machines.filter(
+      (m: any) => m?.connectionStatus !== 'online' || ['offline', 'error', 'inactive'].includes(m?.status),
+    );
+
+    const successfulReads = machines.reduce((acc: number, m: any) => acc + (m?.stats?.successfulReads || 0), 0);
+    const failedReads = machines.reduce((acc: number, m: any) => acc + (m?.stats?.failedReads || 0), 0);
+
+    return {
+      ...data,
+      totalMachines: summary.totalMachines || 0,
+      onlineMachines: summary.onlineMachines || 0,
+      offlineMachines: Math.max(
+        offlineByStatus,
+        offlineByConnection.length,
+        (summary.totalMachines || 0) - (summary.onlineMachines || 0),
+      ),
+      transactions24h: summary.totalLogs || 0,
+      totalActiveMachines: summary.activeMachines || 0,
+      totalTransactions: summary.totalLogs || 0,
+      successfulReads,
+      failedReads,
+      offlineDeviceList: offlineByConnection,
+    };
+  }
 
   // ======================================================
   // DEPARTMENT ENDPOINTS
@@ -1039,7 +1076,12 @@ export class HRMSService extends BaseApiService {
    */
   getMachineAnalytics(days?: number): Observable<{ status: string; data: any }> {
     const params = days ? { days } : {};
-    return this.get<{ status: string; data: any }>('/v1/hrms/attendance/machines/analytics', params);
+    return this.get<{ status: string; data: any }>('/v1/hrms/attendance/machines/analytics', params).pipe(
+      map((res: any) => ({
+        ...res,
+        data: this.normalizeMachineAnalytics(res?.data),
+      })),
+    );
   }
 
   /**

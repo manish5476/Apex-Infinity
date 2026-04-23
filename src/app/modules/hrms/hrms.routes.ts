@@ -187,7 +187,7 @@ export const HRMS_ROUTES: Routes = [
       { path: 'new', component: MachineFormComponent, data: { tabLabel: 'Add Device', tabIcon: 'pi pi-plus' } },
       { path: 'edit/:id', component: MachineFormComponent, data: { tabLabel: 'Edit Device', tabIcon: 'pi pi-pencil' } },
       { path: 'details/:id', component: MachineDetailsComponent, data: { tabLabel: 'Device Details', tabIcon: 'pi pi-info-circle' } },
-      { path: 'logs', component: MachineLogsComponent, data: { tabLabel: 'Raw Logs', tabIcon: 'pi pi-list' } },
+      { path: ':id/logs', component: MachineLogsComponent, data: { tabLabel: 'Raw Logs', tabIcon: 'pi pi-list' } },
       { path: 'analytics', component: MachineAnalyticsComponent, data: { tabLabel: 'Device Stats', tabIcon: 'pi pi-chart-line' } },
     ]
   },
