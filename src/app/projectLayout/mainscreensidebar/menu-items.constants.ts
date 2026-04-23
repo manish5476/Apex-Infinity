@@ -267,6 +267,19 @@ export const SIDEBAR_MENU: MenuItem[] = [
           { label: 'Employee Hierarchy', icon: 'pi pi-sitemap', routerLink: ['/user/hierarchy'], permissions: [PERMISSIONS.USER.READ] },
           { label: 'Onboard User', icon: 'pi pi-user-plus', routerLink: ['/user/create'], permissions: [PERMISSIONS.USER.MANAGE] },
         ]
+      },
+      {
+        label: 'Time & Attendance',
+        icon: 'pi pi-clock',
+        permissions: [PERMISSIONS.ATTENDANCE.READ],
+        items: [
+          { label: 'My Clock', icon: 'pi pi-sign-in', routerLink: ['/hrms/attendance/my-clock'], permissions: [PERMISSIONS.ATTENDANCE.READ] },
+          { label: 'My Timesheet', icon: 'pi pi-calendar', routerLink: ['/hrms/daily-attendance/my-timesheet'], permissions: [PERMISSIONS.ATTENDANCE.READ] },
+          { label: 'Live Feeds', icon: 'pi pi-bolt', routerLink: ['/hrms/attendance/live-feed'], permissions: [PERMISSIONS.ATTENDANCE.MANAGE] },
+          { label: 'Admin Logs', icon: 'pi pi-shield', routerLink: ['/hrms/attendance/admin'], permissions: [PERMISSIONS.ATTENDANCE.MANAGE] },
+          { label: 'Admin Timesheet', icon: 'pi pi-table', routerLink: ['/hrms/daily-attendance/admin'], permissions: [PERMISSIONS.ATTENDANCE.MANAGE] },
+          { label: 'HR Reports', icon: 'pi pi-chart-bar', routerLink: ['/hrms/daily-attendance/reports'], permissions: [PERMISSIONS.ATTENDANCE.MANAGE] }
+        ]
       }
     ]
   },
