@@ -60,7 +60,7 @@
 
     @else {
     <div class="doc-grid">
-      @for (doc of documents(); track doc._id; let i = $index) {
+      @for (doc of documents(); track doc._id) {
       <div class="doc-card">
         <div class="doc-icon">
           <i class="pi" [ngClass]="doc.url.includes('.pdf') ? 'pi-file-pdf text-error' : 'pi-image text-primary'"></i>
@@ -77,7 +77,7 @@
           <p-button icon="pi pi-eye" styleClass="p-button-rounded p-button-text p-button-secondary" pTooltip="View"
             (onClick)="viewDocument(doc.url)"></p-button>
           <p-button icon="pi pi-trash" styleClass="p-button-rounded p-button-text p-button-danger" pTooltip="Delete"
-            (onClick)="deleteDocument(i)"></p-button>
+            (onClick)="deleteDocument(doc)"></p-button>
         </div>
       </div>
       }

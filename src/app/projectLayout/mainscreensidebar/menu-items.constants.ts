@@ -270,6 +270,7 @@ export const SIDEBAR_MENU: MenuItem[] = [
           { label: 'Department Hub', icon: 'pi pi-building', routerLink: ['/hrms/department/hub'], permissions: [PERMISSIONS.DEPARTMENT.READ] },
           { label: 'Designation Hub', icon: 'pi pi-id-card', routerLink: ['/hrms/designation/list'], permissions: [PERMISSIONS.DESIGNATION.READ] },
           { label: 'Shift Roster', icon: 'pi pi-calendar', routerLink: ['/hrms/shifts/list'], permissions: [PERMISSIONS.SHIFT.READ] },
+          { label: 'Shift Assignment', icon: 'pi pi-user-plus', routerLink: ['/hrms/shift-groups/list'], permissions: [PERMISSIONS.SHIFT.GROUP_READ] },
           { label: 'Geofencing', icon: 'pi pi-map-marker', routerLink: ['/hrms/geofence/hub'], permissions: [PERMISSIONS.ATTENDANCE.MANAGE] },
           { label: 'Biometrics', icon: 'pi pi-fingerprint', routerLink: ['/hrms/attendance/machines/hub'], permissions: [PERMISSIONS.ATTENDANCE.MANAGE] },
           { label: 'Holiday Calendar', icon: 'pi pi-calendar-ext', routerLink: ['/hrms/holidays/hub'], permissions: [PERMISSIONS.DEPARTMENT.READ] },

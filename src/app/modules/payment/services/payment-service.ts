@@ -46,6 +46,7 @@ export class PaymentService extends BaseApiService {
    */
   downloadReceipt(paymentId: string): Observable<any> {
     return this.http.get(`${this.baseUrl}${this.endpoint}/${paymentId}/receipt/download`, {
+      withCredentials: true,
       responseType: 'blob', // <--- CRITICAL for files
       observe: 'response'
     }).pipe(

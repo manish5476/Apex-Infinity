@@ -56,6 +56,7 @@ export class SupplierListComponent implements OnInit, OnDestroy {
   supplierFilter = {
     companyName: null,
     phone: null,
+    search: null,
   };
 
   constructor() { }
@@ -73,6 +74,7 @@ export class SupplierListComponent implements OnInit, OnDestroy {
     this.supplierFilter = {
       companyName: null,
       phone: null,
+      search: null,
     };
     this.getData(true);
   }

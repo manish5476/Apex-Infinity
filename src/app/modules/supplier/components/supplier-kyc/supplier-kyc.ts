@@ -47,11 +47,12 @@ export class SupplierKyc implements OnInit, OnDestroy {
 
   // Upload Form State
   docTypes = [
-    { label: 'GST Certificate', value: 'GST_CERTIFICATE' },
-    { label: 'PAN Card', value: 'PAN_CARD' },
-    { label: 'Cancelled Cheque', value: 'CANCELLED_CHEQUE' },
-    { label: 'MSME Certificate', value: 'MSME_CERTIFICATE' },
-    { label: 'Other Document', value: 'OTHER' }
+    { label: 'GST Certificate', value: 'GST' },
+    { label: 'PAN Card', value: 'PAN' },
+    { label: 'Trade License', value: 'TradeLicense' },
+    { label: 'MSME Certificate', value: 'MSME' },
+    { label: 'Aadhaar', value: 'Aadhaar' },
+    { label: 'Other Document', value: 'Other' }
   ];
   selectedDocType: string | null = null;
   selectedFile: File | null = null;
@@ -111,7 +112,12 @@ export class SupplierKyc implements OnInit, OnDestroy {
         // Simplified success message
         this.messageService.showSuccess('Document uploaded successfully.');
         this.clearSelection();
-        this.documents.set(res.data?.supplier?.documents || []);
+        const createdDoc = res?.data?.document;
+        if (createdDoc) {
+          this.documents.set([createdDoc, ...this.documents()]);
+        } else {
+          this.loadDocuments();
+        }
         this.uploading.set(false);
       },
       error: (err) => {
@@ -122,17 +128,17 @@ export class SupplierKyc implements OnInit, OnDestroy {
     });
   }
 
-  deleteDocument(docIndex: number) {
+  deleteDocument(doc: any) {
+    const docId = doc?._id;
+    if (!docId) return;
+
     if (confirm('Are you sure you want to delete this document?')) {
-      this.supplierService.deleteKycDocument(this.supplierId, docIndex).pipe(takeUntil(this.destroy$)).subscribe({
+      this.supplierService.deleteKycDocument(this.supplierId, docId).pipe(takeUntil(this.destroy$)).subscribe({
         next: () => {
           // Simplified success message
           this.messageService.showSuccess('Document removed successfully.');
 
-          // Remove from local array to update UI instantly without another API call
-          const currentDocs = this.documents();
-          currentDocs.splice(docIndex, 1);
-          this.documents.set([...currentDocs]);
+          this.documents.set(this.documents().filter((d: any) => d?._id !== docId));
         },
         error: (err) => {
           // Captured the 'err' argument and passed it to the handler

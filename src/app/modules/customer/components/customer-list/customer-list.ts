@@ -77,6 +77,7 @@ export class CustomerList implements OnInit, OnDestroy {
     _id: null,
     email: null,
     phone: null,
+    search: null,
   };
 
   emailSuggestions: string[] = [];
@@ -94,7 +95,7 @@ export class CustomerList implements OnInit, OnDestroy {
   }
 
   resetFilters() {
-    this.customerFilter = { _id: null, email: null, phone: null };
+    this.customerFilter = { _id: null, email: null, phone: null, search: null };
     this.getData(true);
   }
 

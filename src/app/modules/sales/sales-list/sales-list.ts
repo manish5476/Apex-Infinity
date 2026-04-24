@@ -94,9 +94,19 @@ export class SalesListComponent implements OnInit, OnDestroy {
       this.totalCount = 0;
     }
 
+    const { dateRange, ...baseFilters } = this.salesFilter || {};
+    let startDate: string | undefined;
+    let endDate: string | undefined;
+    if (Array.isArray(dateRange)) {
+      if (dateRange[0]) startDate = (dateRange[0] as Date).toISOString();
+      if (dateRange[1]) endDate = (dateRange[1] as Date).toISOString();
+    }
+
     const filterParams = {
-      ...this.salesFilter,
+      ...baseFilters,
       search: this.searchControl.value,
+      startDate,
+      endDate,
       page: this.currentPage,
       limit: this.pageSize,
     };

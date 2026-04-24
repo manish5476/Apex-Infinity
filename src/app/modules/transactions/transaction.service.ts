@@ -30,6 +30,7 @@ export class TransactionService extends BaseApiService {
     const params = this.createHttpParams(filterParams);
     return this.http.get(`${this.baseUrl}/v1/transactions/export`, { 
       params,
+      withCredentials: true,
       responseType: 'blob' 
     }).pipe(
       catchError(err => this.errorhandler.handleError(err, 'exportTransactionsCsv'))

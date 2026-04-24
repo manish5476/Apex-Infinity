@@ -39,6 +39,12 @@
           class="w-full" />
       </div>
 
+      <div class="filter-field">
+        <label for="search">Smart Search</label>
+        <input id="search" type="text" pInputText [(ngModel)]="supplierFilter.search"
+          placeholder="Company, contact, GST, PAN..." class="w-full" />
+      </div>
+
       <!-- Actions -->
       <div class="filter-actions">
         <p-button label="Apply" icon="pi pi-check" (onClick)="applyFilters()"></p-button>
