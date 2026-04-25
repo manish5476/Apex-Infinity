@@ -32,8 +32,9 @@ export type DropdownEndpoint =
   | 'users' | 'branches' | 'roles' | 'customers' | 'suppliers' | 'masters' | 'channels' | 'transfer-requests'
   | 'products' | 'purchases' | 'sales' | 'sales-returns' | 'purchase-returns'
   | 'brands' | 'categories' | 'subcategories' | 'units' | 'taxes'
-  | 'accounts' | 'invoices' | 'payments' | 'emis'
-  | 'departments' | 'designations' | 'shifts' | 'shift-assignments'
+  | 'accounts' | 'invoices' | 'payments' | 'emis' |
+  'brands' | 'categories' | 'subcategories' | 'units' |
+  'tags' | 'departments' | 'designations' | 'shifts' | 'shift-assignments'
   | 'holidays' | 'geofencing' | 'attendance-machines' | 'attendance-requests' | 'leave-requests'
   | 'meetings';
 @Injectable({

@@ -278,7 +278,7 @@ export class EmiDetailsComponent implements OnInit, OnDestroy {
   initPaymentForm() {
     this.paymentForm = this.fb.group({
       amount: [0, [Validators.required, Validators.min(1)]],
-      paymentId: ['', Validators.required],
+      paymentId: [''],
       paymentMode: ['cash', Validators.required],
       notes: ['']
     });
@@ -301,7 +301,7 @@ export class EmiDetailsComponent implements OnInit, OnDestroy {
   submitPayment() {
     if (this.paymentForm.invalid) {
       this.paymentForm.markAllAsTouched();
-      this.messageService.showWarn('Validation Error: Reference ID is required.');
+      this.messageService.showWarn('Please fill all required fields correctly.');
       return;
     }
 

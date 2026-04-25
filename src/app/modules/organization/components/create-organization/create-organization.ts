@@ -7,6 +7,7 @@ import { ToastModule } from 'primeng/toast';
 import { PasswordModule } from 'primeng/password';
 import { StepperModule } from 'primeng/stepper';
 import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
 import { AuthService } from '../../../auth/services/auth-service';
 import { OrganizationService } from '../../organization.service';
 // import { MasterListService } from '../../../../core/services/master-list.service';
@@ -22,14 +23,15 @@ import { Subject } from "rxjs";
     ToastModule,
     PasswordModule,
     StepperModule,
-    ButtonModule
-],
+    ButtonModule,
+    InputTextModule
+  ],
   providers: [AppMessageService],
   templateUrl: './create-organization.html',
   styleUrl: './create-organization.scss'
 })
 export class CreateOrganizationComponent implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private messageService = inject(AppMessageService);
@@ -147,8 +149,8 @@ export class CreateOrganizationComponent implements OnInit, OnDestroy {
       });
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

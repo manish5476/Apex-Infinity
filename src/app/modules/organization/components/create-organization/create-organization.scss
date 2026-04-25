@@ -1,330 +1,335 @@
-// create-organization.component.scss
-@use '../../../auth/auth.shared' as *;
+/* create-organization.component.scss */
 
-// ─── Org: Stepper Container ────────────────────────────────────────────────
-.custom-stepper {
-  background: transparent !important;
-  border: none !important;
-  margin: 20px 0;
+// Import shared auth styles if needed, or define here
+.auth-root {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  background: var(--bg-primary);
+  font-family: var(--font-body);
+}
 
-  // Header styling
-  ::ng-deep .p-stepper-nav {
+/* ══════════════════════════════════════════════════════
+   LEFT: BRAND PANEL
+   ═══════════════════════════════════════════════════════ */
+.brand-panel {
+  display: none;
+  position: relative;
+  width: 40%;
+  max-width: 500px;
+  background: var(--component-surface-raised);
+  border-right: var(--ui-border-width) solid var(--border-secondary);
+  padding: var(--spacing-5xl);
+  overflow: hidden;
+
+  @media (min-width: 1024px) {
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
-    margin-bottom: 32px;
-    padding: 0;
-    gap: 12px;
-    background: transparent;
-    border-bottom: 1px solid var(--border-primary);
-    padding-bottom: 24px;
-  }
-
-  ::ng-deep .p-stepper-header {
-    background: transparent;
-    padding: 0;
-    cursor: pointer;
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    transition: $t-base;
-    opacity: 0.6;
-
-    &.p-stepper-header-active {
-      opacity: 1;
-
-      .p-stepper-number {
-        background: var(--accent-primary);
-        border-color: var(--accent-primary);
-        color: #fff;
-        box-shadow: 0 0 15px var(--accent-focus);
-      }
-
-      .p-stepper-title {
-        color: var(--text-primary);
-        font-weight: 700;
-      }
-    }
-
-    &.p-stepper-header-completed {
-      opacity: 0.8;
-
-      .p-stepper-number {
-        background: color-mix(in srgb, var(--color-success) 20%, transparent);
-        border-color: var(--color-success);
-        color: var(--color-success);
-      }
-    }
-  }
-
-  ::ng-deep .p-stepper-number {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    border: 1.5px solid var(--border-primary);
-    display: grid;
-    place-items: center;
-    font-size: $fs-sm;
-    font-weight: 700;
-    color: var(--text-label);
-    transition: all 0.3s ease;
-  }
-
-  ::ng-deep .p-stepper-title {
-    font-size: $fs-sm;
-    font-weight: 600;
-    color: var(--text-label);
-    white-space: nowrap;
-  }
-
-  ::ng-deep .p-stepper-separator {
-    display: none; // We handle gaps manually or use border-bottom on nav
   }
 }
 
-// ─── Org: Step Tracker (Left Sidebar) ───────────────────────────────────────
-// Keep this in sync with the stepper
+.brand-inner {
+  display: flex;
+  flex-direction: column;
+}
+
+.wordmark {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  text-decoration: none;
+  color: var(--text-primary);
+}
+
+.logo-glyph {
+  width: 40px;
+  height: 40px;
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
+  border: var(--ui-border-width) solid var(--color-primary-border);
+  border-radius: var(--ui-border-radius-sm);
+  display: grid;
+  place-items: center;
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.wordmark-text {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.02em;
+}
+
+.hero-copy {
+  .overline-text {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .hero-headline {
+    font-family: var(--font-heading);
+    font-size: var(--font-size-5xl);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-tight);
+    color: var(--text-primary);
+    margin: 0 0 var(--spacing-lg) 0;
+
+    em {
+      color: var(--color-primary);
+      font-style: normal;
+    }
+  }
+
+  .hero-body {
+    font-size: var(--font-size-md);
+    color: var(--text-secondary);
+    line-height: var(--line-height-relaxed);
+    margin: 0;
+  }
+}
+
+/* ── STEP TRACKER ── */
 .step-tracker {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  margin-top: 48px;
-  animation: fadeSlideUp 0.8s $ease-out-spring 0.18s both;
+  gap: var(--spacing-xl);
+  margin-top: var(--spacing-5xl);
 }
 
 .step-item {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--spacing-md);
+  opacity: 0.6;
+  transition: var(--transition-base);
 
   .step-dot {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    border: 1.5px solid color-mix(in srgb, var(--text-primary) 15%, transparent);
+    width: 32px;
+    height: 32px;
+    border-radius: var(--ui-border-radius-sm);
+    background: var(--bg-primary);
+    border: var(--ui-border-width) solid var(--border-secondary);
     display: grid;
     place-items: center;
-    font-size: $fs-sm;
-    font-weight: 700;
-    color: var(--text-label);
-    transition: $t-base;
-    flex-shrink: 0;
-    background: color-mix(in srgb, var(--text-primary) 5%, transparent);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-secondary);
+    transition: var(--transition-base);
   }
 
   .step-label {
-    font-size: $fs-md;
-    font-weight: 600;
-    color: var(--text-label);
-    transition: color 0.3s;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-secondary);
   }
 
   &.active {
+    opacity: 1;
+
     .step-dot {
-      background: var(--accent-gradient);
-      border-color: transparent;
-      color: #fff;
-      box-shadow: 0 8px 16px var(--accent-focus);
-      transform: scale(1.1);
+      background: var(--color-primary-bg);
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary) 10%, transparent);
     }
 
     .step-label {
       color: var(--text-primary);
-      font-weight: 700;
     }
   }
 
   &.done {
+    opacity: 1;
+
     .step-dot {
-      background: color-mix(in srgb, var(--color-success) 15%, transparent);
+      background: var(--color-success-bg);
       border-color: var(--color-success);
       color: var(--color-success);
-    }
-
-    .step-label {
-      color: var(--text-secondary);
     }
   }
 }
 
-// ─── Org: Panel Styling ───────────────────────────────────────────────────
-.p-stepper-panel {
-  padding: 0;
-  animation: fadeIn 0.4s ease-out;
-}
-
-.form-section {
+/* ══════════════════════════════════════════════════════
+   RIGHT: FORM PANEL
+   ═══════════════════════════════════════════════════════ */
+.form-panel {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-3xl) var(--spacing-xl);
+  overflow-y: auto;
 }
 
+.form-inner {
+  width: 100%;
+  max-width: 640px;
+}
+
+/* ── FORM STRUCTURE ── */
+.fields-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-lg);
+
+  @media (min-width: 640px) {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-xl) var(--spacing-lg);
+  }
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.field-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-secondary);
+}
+
+/* ── PREMIUM INPUT OVERRIDE ── */
+::ng-deep .premium-input.p-inputtext {
+  background: var(--bg-primary);
+  border: var(--ui-border-width) solid var(--border-secondary);
+  border-radius: var(--ui-border-radius);
+  transition: var(--transition-base);
+  height: 44px;
+  color: var(--text-primary);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
+
+  &:hover {
+    border-color: var(--color-primary-border);
+  }
+
+  &:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 var(--focus-ring-width) var(--color-primary-bg);
+    outline: none;
+  }
+}
+
+/* ── SECTION HEADER ── */
 .section-heading {
   display: flex;
   align-items: center;
-  gap: 16px;
-  background: var(--bg-secondary);
-  padding: 16px 20px;
-  border-radius: 12px;
-  border: 1px solid var(--border-primary);
+  gap: var(--spacing-md);
 }
 
 .section-badge {
-  width: 44px;
-  height: 44px;
-  background: var(--accent-primary);
-  color: #fff;
-  border-radius: 10px;
+  width: 48px;
+  height: 48px;
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
+  border-radius: var(--ui-border-radius);
+  border: var(--ui-border-width) solid var(--color-primary-border);
   display: grid;
   place-items: center;
   font-size: 1.25rem;
-  box-shadow: 0 4px 12px var(--accent-focus);
 
   &--admin {
-    background: var(--accent-secondary);
-    box-shadow: 0 4px 12px color-mix(in srgb, var(--accent-secondary) 30%, transparent);
+    background: var(--color-warning-bg);
+    color: var(--theme-warning);
+    border-color: var(--color-warning-border);
   }
 }
 
 .section-title {
   margin: 0;
-  font-size: $fs-lg;
-  font-weight: 700;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
   color: var(--text-primary);
-  letter-spacing: -0.02em;
 }
 
 .section-desc {
-  margin: 2px 0 0;
-  font-size: $fs-sm;
+  margin: 0;
+  font-size: var(--font-size-sm);
   color: var(--text-secondary);
 }
 
-// ─── Org: Grids and Fields ───────────────────────────────────────────────
-.fields-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+/* ── PRIMENG STEPPER OVERRIDES ── */
+::ng-deep .custom-stepper {
+  background: transparent;
+  border: none;
 
-  @media (max-width: 640px) {
-    grid-template-columns: 1fr;
+  .p-stepper-nav {
+    display: none !important; /* Hide default nav as we use custom step-tracker */
+  }
+
+  .p-stepper-panel {
+    padding: 0;
   }
 }
 
+/* ── BUTTON OVERRIDES ── */
+::ng-deep .btn-primary {
+  box-shadow: var(--elevation-1);
+  transition: var(--transition-base);
+}
+
+::ng-deep .btn-primary:hover {
+  box-shadow: var(--elevation-2);
+  transform: translateY(-1px);
+}
+
+::ng-deep .btn-back.p-button {
+  background: var(--bg-primary);
+  border: var(--ui-border-width) solid var(--border-secondary);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-xs);
+}
+
+::ng-deep .btn-back.p-button:hover {
+  background: var(--bg-secondary);
+}
+
+/* ── UTILS & ANIMATIONS ── */
 .col-span-2 {
   grid-column: 1 / -1;
 }
 
-.password-wrap {
-  position: relative;
-
-  .pwd-eye-btn {
-    position: absolute;
-    right: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--text-label);
-    padding: 8px;
-    transition: color 0.2s;
-
-    &:hover {
-      color: var(--text-primary);
-    }
-  }
-
-  .apex-input {
-    padding-right: 48px !important;
-  }
-}
-
-// ─── Org: Admin Section Highlights ──────────────────────────────────────
-.admin-section {
-  .fields-grid {
-    background: color-mix(in srgb, var(--accent-secondary) 5%, transparent);
-    padding: 24px;
-    border-radius: 16px;
-    border: 1px dashed color-mix(in srgb, var(--accent-secondary) 25%, transparent);
-  }
-}
-
-// ─── Navigation Overrides ───────────────────────────────────────────────
-::ng-deep .p-button {
-  padding: 12px 24px;
-  border-radius: 10px;
-  font-weight: 600;
-  font-family: inherit;
-  transition: $t-base;
-
-  &.p-button-secondary {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-primary);
-    color: var(--text-primary);
-
-    &:hover {
-      background: var(--border-primary);
-    }
-  }
-
-  &:not(.p-button-secondary) {
-    background: var(--accent-gradient);
-    border: none;
-    box-shadow: 0 4px 12px var(--accent-focus);
-
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px var(--accent-focus);
-    }
-  }
-}
-
-.submit-btn {
-  height: 48px;
-  padding: 0 32px;
-  background: var(--accent-gradient);
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  font-size: $fs-md;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  box-shadow: 0 4px 12px var(--accent-focus);
-  transition: $t-base;
-
-  &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px var(--accent-focus);
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-}
-
-// Layout adjustments
-.form-panel {
-  align-items: center; // Center the stepper vertically if form is short
-  padding-top: 40px;
-}
-
-.form-inner {
-  max-width: 600px;
+.uppercase {
+  text-transform: uppercase;
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0);
   }
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98) translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+.card-anim-1 {
+  animation: popIn 0.4s cubic-bezier(0.2, 0.9, 0.2, 1) both;
 }
