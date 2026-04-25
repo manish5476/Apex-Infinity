@@ -10,6 +10,7 @@ import { BaseApiService } from '../../../core/services/base-api.service';
 export interface SearchCustomerQuery {
   q?: string;
   search?: string;
+  query?: string;
   [key: string]: any;
 }
 

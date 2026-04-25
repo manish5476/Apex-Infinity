@@ -16,8 +16,8 @@ export interface AnalyticsFilter {
 
 @Injectable({ providedIn: 'root' })
 export class CustomerAnalyticsService extends BaseApiService {
-  // Ensure this prefix matches your main app route registration (e.g., /v1/customer-analytics)
-  private endpoint = '/v1/customeranalytics';
+  // Canonical path (backend also supports legacy /v1/customeranalytics alias).
+  private endpoint = '/v1/customer-analytics';
 
   // =============================================================================
   // 1. CACHED ANALYTICS ROUTES
@@ -75,11 +75,11 @@ export class CustomerAnalyticsService extends BaseApiService {
    * Usually handled via direct window.open or a blob response 
    */
   exportFinancials(filters?: AnalyticsFilter): Observable<Blob> {
-    const url = `${this.endpoint}/export/financials`;
-    // We use 'blob' as the response type for file downloads
-    return this.http.get(url, {
-      params: filters,
-      responseType: 'blob'
+    const params = this.createHttpParams(filters);
+    return this.http.get(`${this.baseUrl}${this.endpoint}/export/financials`, {
+      params,
+      responseType: 'blob',
+      withCredentials: true,
     });
   }
 }

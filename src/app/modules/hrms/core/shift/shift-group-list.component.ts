@@ -17,7 +17,7 @@ import { takeUntil } from "rxjs/operators";
     FormsModule,
     RouterModule,
     AgShareGrid
-],
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="list-page-container fade-in">
@@ -98,8 +98,8 @@ import { takeUntil } from "rxjs/operators";
 
     .list-page-container {
       padding: var(--spacing-2xl) var(--spacing-3xl);
-      max-width: 1400px;
-      margin: 0 auto;
+      // max-width: 1400px;
+      // margin: 0 auto;
       height: calc(100vh - 80px);
       display: flex;
       flex-direction: column;
@@ -203,7 +203,7 @@ import { takeUntil } from "rxjs/operators";
   `]
 })
 export class ShiftGroupListComponent implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   private cdr = inject(ChangeDetectorRef);
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
@@ -213,10 +213,10 @@ export class ShiftGroupListComponent implements OnInit, OnDestroy {
   private isLoading = false;
   private totalCount = 0;
   private pageSize = 50;
-  
+
   data: any[] = [];
   column: any[] = [];
-  
+
   filter = {
     search: '',
     rotationType: null,
@@ -271,7 +271,7 @@ export class ShiftGroupListComponent implements OnInit, OnDestroy {
     this.hrmsService.getShiftGroups().pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         const newData = res.data?.shiftGroups || res.data?.data || [];
-        const pagination = res.pagination; 
+        const pagination = res.pagination;
 
         if (pagination) {
           this.totalCount = pagination.totalResults;
@@ -377,9 +377,9 @@ export class ShiftGroupListComponent implements OnInit, OnDestroy {
         sortable: true,
         cellRenderer: (params: any) => {
           const type = (params.value || 'weekly').toLowerCase();
-          
+
           let bg = '#f3f4f6', color = '#6b7280', iconPath = '<circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>'; // custom default
-          
+
           if (type === 'daily') { bg = '#fef2f2'; color = '#ef4444'; iconPath = '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><line x1="9" y1="16" x2="15" y2="16"></line>'; }
           else if (type === 'weekly') { bg = '#eff6ff'; color = '#3b82f6'; iconPath = '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>'; }
           else if (type === 'monthly') { bg = '#fdf4ff'; color = '#d946ef'; iconPath = '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><line x1="12" y1="14" x2="12" y2="18"></line><line x1="10" y1="16" x2="14" y2="16"></line>'; }
@@ -431,7 +431,7 @@ export class ShiftGroupListComponent implements OnInit, OnDestroy {
         cellRenderer: (params: any) => {
           const depts = params.data?.applicableDepartments?.length || 0;
           const desigs = params.data?.applicableDesignations?.length || 0;
-          
+
           return `
             <div style="display:flex; flex-direction:column; justify-content:center; height:100%; gap:2px; padding: 4px 0;">
               <div style="display:flex; align-items:center; gap:6px; color:var(--text-secondary); font-size:12px;">
@@ -457,7 +457,7 @@ export class ShiftGroupListComponent implements OnInit, OnDestroy {
           const bg = isActive ? '#ecfdf5' : '#fef2f2';
           const color = isActive ? '#15803d' : '#b91c1c';
           const border = isActive ? '#bbf7d0' : '#fecaca';
-          
+
           return `
             <div style="display:flex; align-items:center; height:100%;">
               <span style="
@@ -482,8 +482,8 @@ export class ShiftGroupListComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

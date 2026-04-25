@@ -49,7 +49,7 @@ export class InvoiceService extends BaseApiService implements OnDestroy {
   //   return this.post(`${this.endpoint}/check-stock`, { items }, 'checkStock');
   // }
 
-  checkStock(payload: { branchId: string, items: any[] }): Observable<any> {
+  checkStock(payload: { branchId?: string, items: any[] }): Observable<any> {
     return this.post(`${this.endpoint}/check-stock`, payload, 'checkStock');
   }
   /** Get invoice with current stock information */
@@ -59,7 +59,7 @@ export class InvoiceService extends BaseApiService implements OnDestroy {
 
   /** Get low stock warnings for invoice items */
   getLowStockWarnings(id: string): Observable<any> {
-    return this.get(`${this.endpoint}/${id}/low-stock-warnings`, {}, 'getLowStockWarnings');
+    return this.get(`${this.endpoint}/${id}/low-stock`, {}, 'getLowStockWarnings');
   }
 
   /** Suggest alternative products if stock is low */
@@ -121,6 +121,7 @@ export class InvoiceService extends BaseApiService implements OnDestroy {
   /** Download invoice as PDF */
   downloadInvoicePDF(id: string): Observable<Blob> {
     return this.http.get(`${this.baseUrl}${this.endpoint}/${id}/download`, {
+      withCredentials: true,
       responseType: 'blob'
     });
   }
@@ -177,6 +178,7 @@ export class InvoiceService extends BaseApiService implements OnDestroy {
   exportInvoices(filterParams?: any): Observable<Blob> {
     return this.http.get(`${this.baseUrl}${this.endpoint}/export/all`, {
       params: this.createHttpParams(filterParams),
+      withCredentials: true,
       responseType: 'blob'
     });
   }
@@ -303,7 +305,10 @@ export class InvoiceService extends BaseApiService implements OnDestroy {
   createInvoiceWithValidation(invoiceData: any): Observable<any> {
     // First check stock
     return new Observable(observer => {
-      this.checkStock(invoiceData.items).pipe(takeUntil(this.destroy$)).subscribe({
+      this.checkStock({
+        branchId: invoiceData?.branchId,
+        items: invoiceData?.items || []
+      }).pipe(takeUntil(this.destroy$)).subscribe({
         next: (stockCheck) => {
           if (stockCheck.isValid) {
             // Stock is available, create invoice

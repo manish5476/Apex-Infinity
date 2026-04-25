@@ -388,7 +388,7 @@ export class ShiftValidatorComponent implements OnInit, OnDestroy {
     ).subscribe((response: any) => {
       if (response?.status === 'success' || response?.isValid === true) {
         this.validationResult.set({ isValid: true, conflicts: [] });
-        this.messageService.showSuccess(response.Message)
+        this.messageService.showSuccess(response.message || 'Shift assignment is valid.')
       } else {
         this.validationResult.set(response?.data || response);
       }

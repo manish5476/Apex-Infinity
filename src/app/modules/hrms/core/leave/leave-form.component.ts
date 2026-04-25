@@ -222,6 +222,7 @@ export class LeaveFormComponent implements OnInit, OnDestroy {
   private messageService = inject(AppMessageService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private readonly objectIdPattern = /^[a-f\d]{24}$/i;
 
   leaveForm!: FormGroup;
   isLoading = signal(true);
@@ -243,9 +244,7 @@ export class LeaveFormComponent implements OnInit, OnDestroy {
   ];
 
   colleagues = [
-    { id: 'usr_1', name: 'John Doe' },
-    { id: 'usr_2', name: 'Jane Smith' }
-  ]; // Replace with API call
+  ]; // TODO: Replace with API call
 
   ngOnInit() {
     this.initForm();
@@ -261,7 +260,6 @@ export class LeaveFormComponent implements OnInit, OnDestroy {
 
   private initForm() {
     this.leaveForm = this.fb.group({
-      organizationId: ['698f1a7feff3e811b71a590f', Validators.required], // Hidden/Injected typically
       leaveType: [null, Validators.required],
       startDate: [null, Validators.required],
       endDate: [null, Validators.required],
@@ -328,7 +326,26 @@ export class LeaveFormComponent implements OnInit, OnDestroy {
     }
 
     this.isSaving.set(true);
-    const payload = this.leaveForm.value;
+    const raw = this.leaveForm.getRawValue();
+    const handoverTo = typeof raw.handoverTo === 'string' && this.objectIdPattern.test(raw.handoverTo)
+      ? raw.handoverTo
+      : undefined;
+    const emergencyContact = raw.emergencyContact && Object.values(raw.emergencyContact).some(v => !!v)
+      ? raw.emergencyContact
+      : undefined;
+
+    const payload: any = {
+      leaveType: raw.leaveType,
+      startDate: raw.startDate,
+      endDate: raw.endDate,
+      startSession: raw.startSession,
+      endSession: raw.endSession,
+      daysCount: raw.daysCount,
+      reason: raw.reason,
+      handoverNotes: raw.handoverNotes || undefined,
+      handoverTo,
+      emergencyContact
+    };
 
     const req$ = this.isEditMode() && this.leaveId
       ? this.hrmsService.updateLeaveRequest(this.leaveId, payload)
@@ -349,7 +366,7 @@ export class LeaveFormComponent implements OnInit, OnDestroy {
   }
 
   onCancel() {
-    this.router.navigate(['/leave']);
+    this.router.navigate(['/hrms/leave/hub']);
   }
 
     ngOnDestroy(): void {

@@ -368,7 +368,6 @@ export class GeofenceFormComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private initForm() {
     this.fenceForm = this.fb.group({
-      organizationId: ['org_01', Validators.required], // Inject auth context here
       name: ['', Validators.required],
       code: ['', Validators.required],
       type: ['circle'],
@@ -409,7 +408,7 @@ export class GeofenceFormComponent implements OnInit, AfterViewInit, OnDestroy {
     this.map = L.map(this.mapContainer.nativeElement).setView([this.defaultLat, this.defaultLng], 5);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: 'Â© OpenStreetMap contributors'
+      attribution: '© OpenStreetMap contributors'
     }).addTo(this.map);
 
     this.map.on('click', (e: L.LeafletMouseEvent) => {
@@ -476,7 +475,16 @@ export class GeofenceFormComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.fenceForm.invalid || !this.hasCoordinates()) return;
 
     this.isSaving.set(true);
-    const payload = this.fenceForm.value;
+    const raw = this.fenceForm.getRawValue();
+    const payload: any = {
+      name: raw.name?.trim(),
+      code: raw.code?.trim()?.toUpperCase(),
+      type: raw.type,
+      radius: raw.radius,
+      center: raw.center,
+      address: raw.address,
+      isActive: !!raw.isActive
+    };
 
     const req$ = this.isEditMode() && this.fenceId
       ? this.hrmsService.updateGeoFence(this.fenceId, payload)
@@ -805,7 +813,7 @@ export class GeofenceFormComponent implements OnInit, AfterViewInit, OnDestroy {
 //     this.map = L.map(this.mapContainer.nativeElement).setView([this.defaultLat, this.defaultLng], 5);
 
 //     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-//       attribution: 'Â© OpenStreetMap contributors'
+//       attribution: '© OpenStreetMap contributors'
 //     }).addTo(this.map);
 
 //     // Handle Clicks
@@ -875,7 +883,16 @@ export class GeofenceFormComponent implements OnInit, AfterViewInit, OnDestroy {
 //     if (this.fenceForm.invalid || !this.hasCoordinates()) return;
 
 //     this.isSaving.set(true);
-//     const payload = this.fenceForm.value;
+//     const raw = this.fenceForm.getRawValue();
+//     const payload: any = {
+//       name: raw.name?.trim(),
+//       code: raw.code?.trim()?.toUpperCase(),
+//       type: raw.type,
+//       radius: raw.radius,
+//       center: raw.center,
+//       address: raw.address,
+//       isActive: !!raw.isActive
+//     };
 
 //     const req$ = this.isEditMode() && this.fenceId
 //       ? this.hrmsService.updateGeoFence(this.fenceId, payload)
@@ -1102,7 +1119,7 @@ export class GeofenceFormComponent implements OnInit, AfterViewInit, OnDestroy {
 
 //     this.map = L.map('geofenceMap').setView([defaultLat, defaultLng], 12);
 //     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-//       attribution: 'Â© OpenStreetMap contributors'
+//       attribution: '© OpenStreetMap contributors'
 //     }).addTo(this.map);
 
 //     this.map.on('click', (e: L.LeafletMouseEvent) => {
@@ -1205,3 +1222,7 @@ export class GeofenceFormComponent implements OnInit, AfterViewInit, OnDestroy {
 
 //   goBack() { this.router.navigate(['/hrms/attendance/geofences']); }
 // }
+
+
+
+

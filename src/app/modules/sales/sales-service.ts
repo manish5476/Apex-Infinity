@@ -27,7 +27,7 @@ export class SalesService extends BaseApiService {
 
   // ================= UPDATE =================
   updateSales(id: string, data: any): Observable<any> {
-    return this.patch(`${this.endpoint}/${id}`, data, 'updateSales');
+    return this.put(`${this.endpoint}/${id}`, data, 'updateSales');
   }
 
   // ================= DELETE =================

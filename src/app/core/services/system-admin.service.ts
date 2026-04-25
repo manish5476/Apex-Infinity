@@ -20,10 +20,22 @@ export class SystemAdminService extends BaseApiService {
   }
 
   // --- Exports ---
-  downloadSalesReport(format: 'pdf' | 'csv' = 'pdf'): void {
-    // Downloads usually require specific handling for Blob responses
-    const url = `/v1/analytics/export/sales?format=${format}`;
-    window.open(this.baseUrl + url, '_blank'); 
+  downloadSalesReport(
+    format: 'pdf' | 'csv' = 'csv',
+    startDate?: string,
+    endDate?: string
+  ): Observable<Blob> {
+    const params = this.createHttpParams({
+      type: 'sales',
+      format,
+      startDate,
+      endDate,
+    });
+    return this.http.get(`${this.baseUrl}/v1/analytics/export`, {
+      params,
+      responseType: 'blob',
+      withCredentials: true,
+    });
   }
 
   // --- Organization Extras ---

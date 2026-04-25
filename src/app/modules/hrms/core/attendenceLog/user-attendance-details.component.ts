@@ -486,7 +486,7 @@ export class UserAttendanceDetailsComponent implements OnInit, OnDestroy {
   // HELPERS
   // ==========================================================================
   onBack() {
-    this.router.navigate(['hrms/attendance/admin']); 
+    this.router.navigate(['/hrms/attendance/admin']);
   }
 
   formatType(type: string): string {

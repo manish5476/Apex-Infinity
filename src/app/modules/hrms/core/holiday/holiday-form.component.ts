@@ -235,6 +235,7 @@ export class HolidayFormComponent implements OnInit, OnDestroy {
   private messageService = inject(AppMessageService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private readonly objectIdPattern = /^[a-f\d]{24}$/i;
 
   holidayForm!: FormGroup;
   isLoading = signal(true);
@@ -257,8 +258,8 @@ export class HolidayFormComponent implements OnInit, OnDestroy {
   ];
 
   // Mocks: Should fetch from APIs
-  branches = [{ label: 'Global HQ (Delhi)', value: 'br_del' }, { label: 'Mumbai Site', value: 'br_mum' }];
-  departments = [{ label: 'Engineering', value: 'dept_eng' }, { label: 'Sales', value: 'dept_sal' }];
+  branches = [];
+  departments = [];
 
   ngOnInit() {
     this.initForm();
@@ -274,7 +275,6 @@ export class HolidayFormComponent implements OnInit, OnDestroy {
 
   private initForm() {
     this.holidayForm = this.fb.group({
-      organizationId: ['698f1a7feff3e811b71a590f', Validators.required],
       name: ['', Validators.required],
       date: [null, Validators.required],
       holidayType: ['company', Validators.required],
@@ -317,7 +317,28 @@ export class HolidayFormComponent implements OnInit, OnDestroy {
     }
 
     this.isSaving.set(true);
-    const payload = this.holidayForm.value;
+    const raw = this.holidayForm.getRawValue();
+    const applicableTo = raw.applicableTo || {};
+    const branchId = typeof raw.branchId === 'string' && this.objectIdPattern.test(raw.branchId)
+      ? raw.branchId
+      : undefined;
+
+    const payload: any = {
+      name: raw.name,
+      date: raw.date,
+      holidayType: raw.holidayType,
+      description: raw.description || undefined,
+      branchId,
+      isOptional: !!raw.isOptional,
+      isActive: !!raw.isActive,
+      applicableTo: {
+        allEmployees: !!applicableTo.allEmployees,
+        departments: Array.isArray(applicableTo.departments)
+          ? applicableTo.departments.filter((id: unknown) => typeof id === 'string' && this.objectIdPattern.test(id))
+          : [],
+        employmentTypes: Array.isArray(applicableTo.employmentTypes) ? applicableTo.employmentTypes : []
+      }
+    };
 
     const req$ = this.isEditMode() && this.holidayId
       ? this.hrmsService.updateHoliday(this.holidayId, payload)
@@ -338,7 +359,7 @@ export class HolidayFormComponent implements OnInit, OnDestroy {
   }
 
   onCancel() {
-    this.router.navigate(['/holidays']); // Adjust to match your routes
+    this.router.navigate(['/hrms/holidays/hub']);
   }
 
     ngOnDestroy(): void {

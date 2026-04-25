@@ -55,9 +55,10 @@ export class SupplierService extends BaseApiService {
     let params = new HttpParams();
     if (startDate) params = params.set('startDate', startDate);
     if (endDate) params = params.set('endDate', endDate);
-    return this.http.get(`${this.endpoint}/${id}/ledger-export`, {
+    return this.http.get(`${this.baseUrl}${this.endpoint}/${id}/ledger-export`, {
       params,
-      responseType: 'blob' 
+      responseType: 'blob',
+      withCredentials: true,
     });
   }
 
@@ -74,7 +75,7 @@ export class SupplierService extends BaseApiService {
     return this.post(`${this.endpoint}/${id}/kyc`, formData, 'uploadKycDocument');
   }
 
-  deleteKycDocument(id: string, docIndex: number): Observable<any> {
-    return this.delete(`${this.endpoint}/${id}/kyc/${docIndex}`, null, 'deleteKycDocument');
+  deleteKycDocument(id: string, docId: string): Observable<any> {
+    return this.delete(`${this.endpoint}/${id}/kyc/${docId}`, null, 'deleteKycDocument');
   }
 }

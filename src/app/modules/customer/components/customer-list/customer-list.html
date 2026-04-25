@@ -61,6 +61,12 @@
           [(ngModel)]="customerFilter.phone" placeholder="Phone" class="w-full" />
       </div>
 
+      <div class="filter-field">
+        <label for="search">Smart Search</label>
+        <input (keydown.enter)="applyFilters()" (blur)="applyFilters()" id="search" type="text" pInputText
+          [(ngModel)]="customerFilter.search" placeholder="Name, contact, GST, PAN..." class="w-full" />
+      </div>
+
       <div class="filter-actions">
         <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined p-button-secondary"
           (onClick)="resetFilters()"></p-button>
@@ -75,4 +81,4 @@
     </div>
 
   </div>
-</div>
+</div>

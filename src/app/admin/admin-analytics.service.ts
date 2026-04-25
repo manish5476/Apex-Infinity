@@ -109,11 +109,11 @@ export class AdminAnalyticsService extends BaseApiService {
     return this.get<any>('/v1/analytics/staff-performance', params, 'getStaffPerformance');
   }
 
-  // /** Staff attendance & productivity correlation */
-  // getStaffAttendancePerformance(startDate?: string, endDate?: string, branchId?: string): Observable<any> {
-  //   const params = this.buildParams(startDate, endDate, branchId);
-  //   return this.get<any>('/v1/analytics/staff-attendance-performance', params, 'getStaffAttendancePerformance');
-  // }
+  /** Staff attendance & productivity correlation */
+  getStaffAttendancePerformance(startDate?: string, endDate?: string, branchId?: string): Observable<any> {
+    const params = this.buildParams(startDate, endDate, branchId);
+    return this.get<any>('/v1/analytics/staff-attendance-performance', params, 'getStaffAttendancePerformance');
+  }
 
   /** Peak business hours analysis */
   getPeakBusinessHours(branchId?: string): Observable<any> {
@@ -122,16 +122,28 @@ export class AdminAnalyticsService extends BaseApiService {
   }
 
   /** Time-based analytics (hourly, daily, weekly, monthly) */
-  getTimeBasedAnalytics(branchId?: string): Observable<any> {
-    const params = this.buildParams(undefined, undefined, branchId);
+  getTimeBasedAnalytics(startDateOrBranchId?: string, endDate?: string, branchId?: string): Observable<any> {
+    const isDateLike = (value?: string) =>
+      !!value && !Number.isNaN(new Date(value).getTime()) && (value.includes('-') || value.includes('/'));
+
+    let startDate: string | undefined = startDateOrBranchId;
+    let resolvedBranchId = branchId;
+
+    // Backward compatibility: existing callers pass only branchId as first arg.
+    if (startDateOrBranchId && !endDate && !branchId && !isDateLike(startDateOrBranchId)) {
+      startDate = undefined;
+      resolvedBranchId = startDateOrBranchId;
+    }
+
+    const params = this.buildParams(startDate, endDate, resolvedBranchId);
     return this.get<any>('/v1/analytics/time-analytics', params, 'getTimeBasedAnalytics');
   }
 
-  // /** Procurement analysis */
-  // getProcurementAnalysis(startDate?: string, endDate?: string, branchId?: string): Observable<any> {
-  //   const params = this.buildParams(startDate, endDate, branchId);
-  //   return this.get<any>('/v1/analytics/procurement', params, 'getProcurementAnalysis');
-  // }
+  /** Procurement analysis */
+  getProcurementAnalysis(startDate?: string, endDate?: string, branchId?: string): Observable<any> {
+    const params = this.buildParams(startDate, endDate, branchId);
+    return this.get<any>('/v1/analytics/procurement', params, 'getProcurementAnalysis');
+  }
 
   // ==========================================================================
   // 6. PREDICTIVE ANALYTICS & FORECASTING
@@ -194,14 +206,15 @@ export class AdminAnalyticsService extends BaseApiService {
 
     return this.http.get(`${this.baseUrl}/v1/analytics/export`, {
       params: httpParams,
-      responseType: 'blob'
+      responseType: 'blob',
+      withCredentials: true,
     });
   }
 
-  // /** Custom analytics query */
-  // customAnalyticsQuery(queryData: { queryType: string; parameters?: any; format?: string; limit?: number }): Observable<any> {
-  //   return this.post<any>('/v1/analytics/query', queryData, 'customAnalyticsQuery');
-  // }
+  /** Custom analytics query */
+  customAnalyticsQuery(queryData: { queryType: string; parameters?: any; format?: string; limit?: number }): Observable<any> {
+    return this.post<any>('/v1/analytics/query', queryData, 'customAnalyticsQuery');
+  }
 
   // ==========================================================================
   // 9. SYSTEM PERFORMANCE & HEALTH

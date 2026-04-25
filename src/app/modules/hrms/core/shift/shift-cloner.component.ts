@@ -356,7 +356,7 @@ export class ShiftClonerComponent implements OnInit, OnDestroy {
     ).subscribe((res: any) => {
       if (res && res.status === 'success' && res.data?.shift) {
         this.clonedResult.set(res.data.shift);
-        this.messageService.showSuccess(res.Message);
+        this.messageService.showSuccess(res.message || 'Shift cloned successfully.');
       }
     });
   }

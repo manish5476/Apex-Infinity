@@ -670,7 +670,7 @@ gridColumns: any = [
     if (this.deptId) {
       this.loadDepartmentData();
     } else {
-      this.router.navigate(['/hrms/departments/list']);
+      this.router.navigate(['/hrms/department/list']);
     }
   }
 
@@ -708,7 +708,7 @@ gridColumns: any = [
   }
 
   onBack() {
-    this.router.navigate(['/hrms/departments/list']);
+    this.router.navigate(['/hrms/department/list']);
   }
 
   // --- Actions ---

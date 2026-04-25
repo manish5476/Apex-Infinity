@@ -15,14 +15,23 @@ export class BaseApiService {
   protected baseUrl = environment.apiUrl;
   protected errorhandler = inject(ErrorhandlingService);
 
+  private normalizeParamValue(value: any): string | null {
+    if (value === undefined || value === null || value === '') return null;
+    if (value instanceof Date) return value.toISOString();
+    if (Array.isArray(value)) return value.length ? value.join(',') : null;
+    if (typeof value === 'object') return JSON.stringify(value);
+    return String(value);
+  }
+
   protected createHttpParams(filterParams?: any): HttpParams {
     let params = new HttpParams();
     if (!filterParams) return params;
     // If it's already HttpParams, return it directly
     if (filterParams instanceof HttpParams) return filterParams;
     Object.entries(filterParams).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        params = params.set(key, String(value));
+      const normalized = this.normalizeParamValue(value);
+      if (normalized !== null) {
+        params = params.set(key, normalized);
       }
     });
     return params;
@@ -32,19 +41,12 @@ export class BaseApiService {
   // GET
   // -------------------------------
   protected get<T>(url: string, params?: any, _context?: string): Observable<T> {
-     const fullUrl = `${this.baseUrl}${url}`;
-  // console.log(`[BaseApiService] GET Request to: ${fullUrl}`);
-  // console.log(`[BaseApiService] Base URL: ${this.baseUrl}`);
-  // console.log(`[BaseApiService] Relative URL: ${url}`);
-  
-    let httpParams = new HttpParams();
-    if (params) {
-      Object.keys(params).forEach(key => {
-        if (params[key] !== undefined && params[key] !== null) {
-          httpParams = httpParams.set(key, params[key]);
-        }
-      });
-    }
+    const fullUrl = `${this.baseUrl}${url}`;
+    // console.log(`[BaseApiService] GET Request to: ${fullUrl}`);
+    // console.log(`[BaseApiService] Base URL: ${this.baseUrl}`);
+    // console.log(`[BaseApiService] Relative URL: ${url}`);
+
+    const httpParams = this.createHttpParams(params);
 
     return this.http.get<T>(`${this.baseUrl}${url}`, {
       params: httpParams,
@@ -56,14 +58,7 @@ export class BaseApiService {
   // GET BLOB (For file downloads)
   // -------------------------------
   protected getBlob(url: string, params?: any, _context?: string): Observable<Blob> {
-    let httpParams = new HttpParams();
-    if (params) {
-      Object.keys(params).forEach(key => {
-        if (params[key] !== undefined && params[key] !== null) {
-          httpParams = httpParams.set(key, params[key]);
-        }
-      });
-    }
+    const httpParams = this.createHttpParams(params);
 
     return this.http.get(`${this.baseUrl}${url}`, {
       params: httpParams,

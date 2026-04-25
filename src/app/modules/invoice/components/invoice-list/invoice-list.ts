@@ -159,8 +159,17 @@ export class InvoiceListComponent implements OnInit, OnDestroy {
     if (this.isLoading || (!isReset && !this.hasNextPage)) return;
     this.isLoading = true;
 
+    let startDate: string | undefined;
+    let endDate: string | undefined;
+    if (Array.isArray(this.dateRange)) {
+      if (this.dateRange[0]) startDate = this.dateRange[0].toISOString();
+      if (this.dateRange[1]) endDate = this.dateRange[1].toISOString();
+    }
+
     const filterParams = {
       ...this.invoiceFilter,
+      startDate,
+      endDate,
       page: this.currentPage,
       limit: this.pageSize,
     };
