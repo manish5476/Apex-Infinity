@@ -573,7 +573,13 @@ export class CustomerIntelligenceComponent implements OnInit, OnDestroy {
 
   loadData(): void {
     this.loading.set(true);
-    this.analyticsService.getCustomerIntelligence(this.currentFilters['branchId']).pipe(takeUntil(this.destroy$)).subscribe({
+    const [startDate, endDate] = this.resolveDateRange();
+
+    this.analyticsService.getCustomerIntelligence(
+            startDate,
+            endDate,
+            this.currentFilters['branchId']
+          ).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         if (res.status === 'success') this.intelligenceData.set(res.data);
         this.loading.set(false);
@@ -581,6 +587,18 @@ export class CustomerIntelligenceComponent implements OnInit, OnDestroy {
       },
       error: () => this.loading.set(false)
     });
+  }
+
+  private resolveDateRange(): [string | undefined, string | undefined] {
+    const start = this.currentFilters['startDate'] ?? this.currentFilters['date']?.[0];
+    const end = this.currentFilters['endDate'] ?? this.currentFilters['date']?.[1];
+    return [this.toIsoDate(start), this.toIsoDate(end)];
+  }
+
+  private toIsoDate(value: any): string | undefined {
+    if (!value) return undefined;
+    const date = value instanceof Date ? value : new Date(value);
+    return Number.isNaN(date.getTime()) ? undefined : date.toISOString();
   }
 
   setupColumns(): void {

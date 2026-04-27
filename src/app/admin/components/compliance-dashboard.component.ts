@@ -251,18 +251,10 @@ export class ComplianceDashboardComponent implements OnInit, OnDestroy {
     }
   ];
 
-  constructor(
-    private analyticsService: AdminAnalyticsService,
-    public commonService: CommonMethodService,
-    private cdr: ChangeDetectorRef
-  ) {}
+  constructor(private analyticsService: AdminAnalyticsService,public commonService: CommonMethodService,private cdr: ChangeDetectorRef  ) {}
 
-  ngOnInit() {
-    this.setupColumns();
-    // loadData is called via filter init
-  }
+  ngOnInit() {this.setupColumns(); this.loadData(); }
 
-  // 2. FILTER HANDLER
   onFilterUpdate(filters: any) {
     this.currentFilters = filters;
     this.loadData();
@@ -270,19 +262,13 @@ export class ComplianceDashboardComponent implements OnInit, OnDestroy {
 
   loadData() {
     this.loading.set(true);
-
+    const [startDate, endDate] = this.resolveDateRange();
     const params = {
-      startDate: this.currentFilters.startDate,
-      endDate: this.currentFilters.endDate,
+      startDate,
+      endDate,
       branchId: this.currentFilters.branchId
     };
-
-    this.analyticsService.getComplianceDashboard(
-            params.startDate, 
-            params.endDate, 
-            params.branchId
-          ).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (res) => {
+    this.analyticsService.getComplianceDashboard(params.startDate,params.endDate,params.branchId).pipe(takeUntil(this.destroy$)).subscribe({next: (res) => {
         if (res.status === 'success') {
           this.complianceData.set(res.data);
         }
@@ -290,6 +276,18 @@ export class ComplianceDashboardComponent implements OnInit, OnDestroy {
       },
       error: () => this.loading.set(false)
     });
+  }
+
+  private resolveDateRange(): [string | undefined, string | undefined] {
+    const start = this.currentFilters.startDate ?? this.currentFilters.date?.[0];
+    const end = this.currentFilters.endDate ?? this.currentFilters.date?.[1];
+    return [this.toIsoDate(start), this.toIsoDate(end)];
+  }
+
+  private toIsoDate(value: any): string | undefined {
+    if (!value) return undefined;
+    const date = value instanceof Date ? value : new Date(value);
+    return Number.isNaN(date.getTime()) ? undefined : date.toISOString();
   }
 
   setupColumns(): void {
