@@ -81,18 +81,29 @@ export class ProductListComponent implements OnInit, OnDestroy {
   rowSelectionMode: any = 'single';
   isLoading = signal(false);
 
-  brandOptions = signal<any[]>([]);
-  categoryOptions = signal<any[]>([]);
-
   productFilter = signal({
     name: null as string | null,
     sku: null as string | null,
-    brand: null as string | null,
-    category: null as string | null,
+    // Backend expects ObjectId fields (Product schema): brandId, categoryId
+    brandId: null as string | null,
+    categoryId: null as string | null,
+    subCategoryId: null as string | null,
+    unitId: null as string | null,
+    // Backend expects boolean, ApiFeatures will coerce "true"/"false"
+    isActive: null as boolean | null,
   });
 
-  patchProductFilter(key: 'name' | 'sku' | 'brand' | 'category', value: any) {
-    this.productFilter.update((f) => ({ ...f, [key]: value }));
+  patchProductFilter(
+    key: 'name' | 'sku' | 'brandId' | 'categoryId' | 'subCategoryId' | 'unitId' | 'isActive',
+    value: any
+  ) {
+    this.productFilter.update((f) => {
+      // If category changes, subCategory should reset (dependent dropdown)
+      if (key === 'categoryId') {
+        return { ...f, categoryId: value, subCategoryId: null };
+      }
+      return { ...f, [key]: value };
+    });
   }
 
   constructor() {
@@ -112,7 +123,15 @@ export class ProductListComponent implements OnInit, OnDestroy {
   }
 
   resetFilters() {
-    this.productFilter.set({ name: null, sku: null, brand: null, category: null });
+    this.productFilter.set({
+      name: null,
+      sku: null,
+      brandId: null,
+      categoryId: null,
+      subCategoryId: null,
+      unitId: null,
+      isActive: null,
+    });
     this.getData(true);
   }
 

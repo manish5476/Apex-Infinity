@@ -70,6 +70,7 @@ export class PurchaseListComponent implements OnInit, OnDestroy {
   purchaseFilter = {
     invoiceNumber: null,
     supplierId: null,
+    branchId: null,
     status: null,
     paymentStatus: null,
     dateRange: null
@@ -90,6 +91,7 @@ export class PurchaseListComponent implements OnInit, OnDestroy {
     this.purchaseFilter = {
       invoiceNumber: null,
       supplierId: null,
+      branchId: null,
       status: null,
       paymentStatus: null,
       dateRange: null

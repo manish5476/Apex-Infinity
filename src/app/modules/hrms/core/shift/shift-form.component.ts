@@ -1,8 +1,8 @@
 import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { of, catchError, map, Subject } from 'rxjs';
+import { of, catchError, finalize, map, Subject } from 'rxjs';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { HRMSService } from '../../hrms.service';
 
@@ -371,7 +371,7 @@ import { takeUntil } from "rxjs/operators";
             </div>
           </p-card>
 
-          <p-card styleClass="grid-card span-3 card-anim-6" styleClass="padding: var(--spacing-md) var(--spacing-lg);">
+          <p-card styleClass="grid-card span-3 card-anim-6 compact-card">
             <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--spacing-md);">
               
               <div style="display: flex; gap: var(--spacing-xl);">
@@ -450,7 +450,7 @@ import { takeUntil } from "rxjs/operators";
     .btn:disabled { opacity: 0.6; cursor: not-allowed; }
     .btn-outline { background: var(--bg-primary); border: 1px solid var(--border-secondary); color: var(--text-primary); }
     .btn-outline:not(:disabled):hover { background: var(--bg-secondary); border-color: var(--text-tertiary); }
-    .btn-primary { background: var(--color-primary); color: #ffffff; }
+    .btn-primary { background: var(--color-primary); color: var(--color-on-primary); }
     .btn-primary:not(:disabled):hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
 
     /* Layout */
@@ -473,7 +473,7 @@ import { takeUntil } from "rxjs/operators";
       padding: 0 16px; font-size: 14px; font-family: var(--font-body);
       color: var(--text-primary); font-weight: 500; transition: all 0.2s ease; outline: none; box-sizing: border-box;
     }
-    .prime-override-input:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+    .prime-override-input:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px var(--accent-focus); }
 
     // /* PrimeNG Overrides (Select, MultiSelect, DatePicker, InputNumber, Textarea) */
     // ::ng-deep .p-inputtext, 
@@ -504,10 +504,11 @@ import { takeUntil } from "rxjs/operators";
     .toggle-container { display: flex; align-items: center; cursor: pointer; gap: 14px; }
     .toggle-input { display: none; }
     .toggle-slider { position: relative; width: 44px; height: 24px; background-color: var(--border-secondary); border-radius: 24px; transition: all 0.3s ease; flex-shrink: 0; }
-    .toggle-slider::before { content: ""; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: #ffffff; border-radius: 50%; transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1); box-shadow: var(--shadow-sm); }
+    .toggle-slider::before { content: ""; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: var(--bg-primary); border-radius: 50%; transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1); box-shadow: var(--shadow-sm); }
     .toggle-input:checked + .toggle-slider { background-color: var(--color-success); }
     .toggle-input:checked + .toggle-slider::before { transform: translateX(20px); }
     .toggle-label { font-size: 14px; color: var(--text-primary); font-weight: 500; }
+    ::ng-deep .compact-card .p-card-body { padding: var(--spacing-md) var(--spacing-lg); }
 
     /* Card Overrides */
     ::ng-deep .grid-card .p-card { height: 100%; border-radius: var(--ui-border-radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-secondary); background: var(--bg-primary); display: flex; flex-direction: column; transition: all 0.2s ease; overflow: hidden; background-clip: padding-box; }
@@ -575,13 +576,20 @@ export class ShiftFormComponent implements OnInit, OnDestroy {
   }
 
   private initForm() {
+    const timeToDate = (value: string) => {
+      const [hours, minutes] = value.split(':').map(Number);
+      const date = new Date();
+      date.setHours(hours || 0, minutes || 0, 0, 0);
+      return date;
+    };
+
     this.shiftForm = this.fb.group({
       name: ['', [Validators.required, Validators.maxLength(100)]],
       code: ['', [Validators.required, Validators.maxLength(20)]],
       description: [''],
       
-      startTime: ['09:00', [Validators.required]],
-      endTime: ['18:00', [Validators.required]],
+      startTime: [timeToDate('09:00'), [Validators.required]],
+      endTime: [timeToDate('18:00'), [Validators.required]],
       breakDurationMins: [60, [Validators.min(0)]],
       
       gracePeriodMins: [15, [Validators.min(0)]],
@@ -615,13 +623,25 @@ export class ShiftFormComponent implements OnInit, OnDestroy {
       isActive: [true],
       effectiveFrom: [null],
       effectiveTo: [null]
-    });
+    }, { validators: this.dayThresholdValidator });
 
     this.shiftForm.get('code')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(val => {
-      if (val && val !== val.toUpperCase()) {
-        this.shiftForm.get('code')?.setValue(val.toUpperCase(), { emitEvent: false });
+      const normalized = typeof val === 'string'
+        ? val.trim().toUpperCase().replace(/\s+/g, '_')
+        : val;
+      if (val && normalized !== val) {
+        this.shiftForm.get('code')?.setValue(normalized, { emitEvent: false });
       }
     });
+  }
+
+  private dayThresholdValidator(control: AbstractControl): ValidationErrors | null {
+    const halfDay = Number(control.get('halfDayThresholdHrs')?.value);
+    const fullDay = Number(control.get('minFullDayHrs')?.value);
+    if (!Number.isFinite(halfDay) || !Number.isFinite(fullDay)) {
+      return null;
+    }
+    return fullDay <= halfDay ? { fullDayThreshold: true } : null;
   }
 
   private checkEditMode() {
@@ -642,30 +662,38 @@ export class ShiftFormComponent implements OnInit, OnDestroy {
     this.hrmsService.getShift(this.shiftId).pipe(
       map((res: any) => res?.data?.shift || res?.data?.data || res?.data || res),
       catchError(err => {
-        this.isLoading.set(false);
-        this.shiftForm.enable();
         this.messageService.handleHttpError(err);
         return of(null);
-      }), takeUntil(this.destroy$)
+      }),
+      finalize(() => {
+        this.isLoading.set(false);
+        this.shiftForm.enable();
+      }),
+      takeUntil(this.destroy$)
     ).subscribe((data) => {
       if (data) {
         this.patchFormValues(data);
       }
-      this.isLoading.set(false);
-      this.shiftForm.enable();
     });
   }
 
   private patchFormValues(data: any) {
     const toDateObj = (dateVal: string) => dateVal ? new Date(dateVal) : null;
+    const toTimeDate = (value: string) => {
+      if (!value) return null;
+      const [hours, minutes] = value.split(':').map(Number);
+      const date = new Date();
+      date.setHours(hours || 0, minutes || 0, 0, 0);
+      return date;
+    };
 
     this.shiftForm.patchValue({
       name: data.name,
       code: data.code,
       description: data.description,
       
-      startTime: data.startTime,
-      endTime: data.endTime,
+      startTime: toTimeDate(data.startTime),
+      endTime: toTimeDate(data.endTime),
       breakDurationMins: data.breakDurationMins,
       
       gracePeriodMins: data.gracePeriodMins,
@@ -689,10 +717,10 @@ export class ShiftFormComponent implements OnInit, OnDestroy {
       },
 
       flexiConfig: {
-        coreStartTime: data.flexiConfig?.coreStartTime || '',
-        coreEndTime: data.flexiConfig?.coreEndTime || '',
-        flexibleBandStart: data.flexiConfig?.flexibleBandStart || '',
-        flexibleBandEnd: data.flexiConfig?.flexibleBandEnd || '',
+        coreStartTime: toTimeDate(data.flexiConfig?.coreStartTime),
+        coreEndTime: toTimeDate(data.flexiConfig?.coreEndTime),
+        flexibleBandStart: toTimeDate(data.flexiConfig?.flexibleBandStart),
+        flexibleBandEnd: toTimeDate(data.flexiConfig?.flexibleBandEnd),
         minHoursPerDay: data.flexiConfig?.minHoursPerDay || 4
       },
 
@@ -710,6 +738,24 @@ export class ShiftFormComponent implements OnInit, OnDestroy {
 
     this.isSubmitting.set(true);
     const payload = { ...this.shiftForm.value };
+    const formatTime = (value: unknown) => {
+      if (value instanceof Date) {
+        return `${String(value.getHours()).padStart(2, '0')}:${String(value.getMinutes()).padStart(2, '0')}`;
+      }
+      return value;
+    };
+
+    payload.startTime = formatTime(payload.startTime);
+    payload.endTime = formatTime(payload.endTime);
+    if (payload.flexiConfig) {
+      payload.flexiConfig = {
+        ...payload.flexiConfig,
+        coreStartTime: formatTime(payload.flexiConfig.coreStartTime),
+        coreEndTime: formatTime(payload.flexiConfig.coreEndTime),
+        flexibleBandStart: formatTime(payload.flexiConfig.flexibleBandStart),
+        flexibleBandEnd: formatTime(payload.flexiConfig.flexibleBandEnd),
+      };
+    }
 
     if (payload.effectiveFrom instanceof Date) {
       payload.effectiveFrom = payload.effectiveFrom.toISOString().split('T')[0];
@@ -725,31 +771,20 @@ export class ShiftFormComponent implements OnInit, OnDestroy {
       delete payload.flexiConfig;
     }
 
-    if (this.isEditMode()) {
-      this.hrmsService.updateShift(this.shiftId!, payload).pipe(takeUntil(this.destroy$)).subscribe({
-        next: () => {
-          this.messageService.showSuccess('Shift updated successfully');
-          this.isSubmitting.set(false);
-          this.goBack();
-        },
-        error: (err: any) => {
-          this.messageService.handleHttpError(err);
-          this.isSubmitting.set(false);
-        }
-      });
-    } else {
-      this.hrmsService.createShift(payload).pipe(takeUntil(this.destroy$)).subscribe({
-        next: () => {
-          this.messageService.showSuccess('Shift created successfully');
-          this.isSubmitting.set(false);
-          this.goBack();
-        },
-        error: (err: any) => {
-          this.messageService.handleHttpError(err);
-          this.isSubmitting.set(false);
-        }
-      });
-    }
+    const request$ = this.isEditMode()
+      ? this.hrmsService.updateShift(this.shiftId!, payload)
+      : this.hrmsService.createShift(payload);
+
+    request$.pipe(
+      finalize(() => this.isSubmitting.set(false)),
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: () => {
+        this.messageService.showSuccess(`Shift ${this.isEditMode() ? 'updated' : 'created'} successfully`);
+        this.goBack();
+      },
+      error: (err: any) => this.messageService.handleHttpError(err)
+    });
   }
 
   goBack() {

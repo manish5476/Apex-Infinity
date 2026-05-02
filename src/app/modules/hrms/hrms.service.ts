@@ -198,11 +198,11 @@ export interface LeaveBalanceSummary {
 // Attendance Interfaces
 export interface AttendanceLog {
   _id?: string;
-  source: 'machine' | 'web' | 'mobile' | 'admin_manual' | 'api';
+  source: 'machine' | 'web' | 'mobile' | 'admin_manual' | 'api' | 'biometric' | 'rfid';
   machineId?: string;
   user: string;
   timestamp: Date;
-  type: 'in' | 'out' | 'break_start' | 'break_end' | 'remote_in' | 'remote_out';
+  type: 'in' | 'out' | 'break_start' | 'break_end' | 'remote_in' | 'remote_out' | 'overtime_in' | 'overtime_out';
   ipAddress?: string;
   userAgent?: string;
   location?: {
@@ -216,7 +216,7 @@ export interface AttendanceLog {
     geofenceId?: string;
   };
   isVerified?: boolean;
-  processingStatus?: 'pending' | 'processed' | 'flagged' | 'rejected' | 'corrected';
+  processingStatus?: 'pending' | 'processed' | 'flagged' | 'rejected' | 'corrected' | 'duplicate';
 }
 
 export interface AttendanceDaily {
@@ -228,8 +228,10 @@ export interface AttendanceDaily {
   totalWorkHours: number;
   breakHours: number;
   overtimeHours: number;
-  status: 'present' | 'absent' | 'half_day' | 'late' | 'on_leave' | 'week_off' | 'holiday' | 'work_from_home';
+  status: 'present' | 'absent' | 'half_day' | 'late' | 'on_leave' | 'week_off' | 'holiday' | 'work_from_home' | 'on_duty';
   isLate: boolean;
+  isEarlyDeparture?: boolean;
+  isOvertime?: boolean;
   isHalfDay: boolean;
   isRegularized?: boolean;
   shiftId?: string;
@@ -274,18 +276,29 @@ export interface AttendanceMachine {
   manufacturer?: string;
   firmwareVersion?: string;
   branchId: string;
-  providerType: 'generic' | 'zkteco' | 'hikvision' | 'essl' | 'bioenable';
+  providerType: 'generic' | 'zkteco' | 'hikvision' | 'essl' | 'bioenable' | 'suprema';
   ipAddress?: string;
-  connectionProtocol?: 'tcp' | 'http' | 'websocket' | 'mqtt';
-  status: 'active' | 'inactive' | 'maintenance' | 'offline';
-  connectionStatus?: 'online' | 'offline';
+  macAddress?: string;
+  connectionProtocol?: 'tcp' | 'http' | 'websocket' | 'mqtt' | 'usb';
+  port?: number;
+  timeout?: number;
+  status: 'active' | 'inactive' | 'maintenance' | 'offline' | 'error';
+  connectionStatus?: 'online' | 'offline' | 'connecting' | 'disconnected';
   lastSyncAt?: Date;
   lastPingAt?: Date;
+  lastError?: string;
   capabilities?: {
     faceRecognition: boolean;
     fingerprint: boolean;
     rfid: boolean;
     temperature: boolean;
+    maskDetection?: boolean;
+  };
+  config?: {
+    timezone?: string;
+    syncInterval?: number;
+    retryAttempts?: number;
+    autoSync?: boolean;
   };
   apiKey?: string; // Only returned on creation
 }
@@ -314,8 +327,9 @@ export interface GeoFence {
   _id?: string;
   name: string;
   code: string;
-  type: 'circle' | 'polygon' | 'building';
+  type: 'circle' | 'polygon' | 'building' | 'custom';
   center?: {
+    type?: 'Point';
     coordinates: [number, number];
   };
   radius?: number;
@@ -328,19 +342,24 @@ export interface GeoFence {
     country: string;
     pincode: string;
   };
+  allowedEntryTypes?: 'in' | 'out' | 'both';
+  timeRestrictions?: Array<{
+    dayOfWeek: number[];
+    startTime?: string;
+    endTime?: string;
+    allowed: boolean;
+  }>;
   applicableToAll?: boolean;
   applicableUsers?: string[];
   applicableDepartments?: string[];
+  applicableDesignations?: string[];
   isActive?: boolean;
 }
 
 export interface GeoFenceCheck {
   isInside: boolean;
   distance: string | null;
-  geofence: {
-    _id: string;
-    name: string;
-  };
+  geofence: string;
 }
 
 // Holiday Interfaces
@@ -593,8 +612,8 @@ export class HRMSService extends BaseApiService {
    * Get shift timeline
    */
   getShiftTimeline(date?: any): Observable<{ status: string; data: { timeline: any[] } }> {
-    // const params = date ;
-    return this.get<{ status: string; data: { timeline: any[] } }>('/v1/hrms/shifts/timeline', date);
+    const params = date ? { date: date instanceof Date ? date.toISOString().split('T')[0] : date } : {};
+    return this.get<{ status: string; data: { timeline: any[] } }>('/v1/hrms/shifts/timeline', params);
   }
 
   /**
@@ -710,8 +729,8 @@ export class HRMSService extends BaseApiService {
   /**
    * Get group assignments
    */
-  getGroupAssignments(id: string): Observable<{ status: string; data: { assignments: ShiftAssignment[] } }> {
-    return this.get<{ status: string; data: { assignments: ShiftAssignment[] } }>(`/v1/hrms/shift-groups/${id}/assignments`);
+  getGroupAssignments(id: string, params?: any): Observable<{ status: string; data: { assignments: ShiftAssignment[] } }> {
+    return this.get<{ status: string; data: { assignments: ShiftAssignment[] } }>(`/v1/hrms/shift-groups/${id}/assignments`, params);
   }
 
   // ======================================================
@@ -886,6 +905,13 @@ export class HRMSService extends BaseApiService {
    */
   bulkInitializeLeaveBalances(financialYear: string, carryForward?: boolean): Observable<{ status: string; data: any }> {
     return this.post<{ status: string; data: any }>('/v1/hrms/leave-balances/bulk-initialize', { financialYear, carryForward });
+  }
+
+  /**
+   * Trigger monthly leave accrual
+   */
+  accrueMonthlyLeave(data: { financialYear?: string; month?: number; userIds?: string[]; departmentId?: string } = {}): Observable<{ status: string; data: any }> {
+    return this.post<{ status: string; data: any }>('/v1/hrms/leave-balances/accrue-monthly', data);
   }
 
   // ======================================================

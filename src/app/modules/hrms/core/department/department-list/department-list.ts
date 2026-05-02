@@ -468,9 +468,9 @@ export class DepartmentListComponent implements OnInit, OnDestroy {
         pinned: 'right',
         cellRenderer: (p: any) => {
           const isActive = p.value;
-          const color = isActive ? 'var(--color-success-dark, #059669)' : 'var(--color-error-dark, #dc2626)';
-          const bg = isActive ? 'var(--color-success-bg, rgba(16, 185, 129, 0.1))' : 'var(--color-error-bg, rgba(239, 68, 68, 0.1))';
-          const border = isActive ? 'var(--color-success-border, rgba(16, 185, 129, 0.2))' : 'var(--color-error-border, rgba(239, 68, 68, 0.2))';
+          const color = isActive ? 'var(--color-success-dark)' : 'var(--color-error-dark)';
+          const bg = isActive ? 'var(--color-success-bg)' : 'var(--color-error-bg)';
+          const border = isActive ? 'var(--color-success-border)' : 'var(--color-error-border)';
 
           return `
             <div style="height: 100%; display: flex; align-items: center; justify-content: flex-end;">

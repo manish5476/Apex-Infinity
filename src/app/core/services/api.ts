@@ -292,7 +292,7 @@ export class ApiService extends BaseApiService {
    * Get permissions list
    */
   permissions(): Observable<ApiResponse<any>> {
-    return this.get<ApiResponse<any>>('/v1/master-list/permissions', {}, 'getMasterList');
+    return this.get<ApiResponse<any>>('/v1/roles/permissions', {}, 'getAvailableRolePermissions');
   }
 
   /**
