@@ -42,8 +42,11 @@
                 <div>
                   <h4 class="font-semibold text-sm">{{ item.name }}</h4>
                   <p class="text-xs text-secondary opacity-70">
-                    Invoiced: {{ item.quantity }} {{ item.unit }} |
+                    Invoiced: {{ item.quantity }} {{ item.unit || '' }} |
                     Price: {{ item.price | currency:'INR' }}
+                    @if (item.alreadyReturned > 0) {
+                      <span class="text-yellow-500 font-semibold ml-2">| Returned: {{ item.alreadyReturned }}</span>
+                    }
                   </p>
                 </div>
               </div>
@@ -53,7 +56,7 @@
               <div class="flex flex-col items-end">
                 <span class="text-xxs uppercase opacity-50 mb-1">Return Qty</span>
                 <p-inputNumber [ngModel]="item.returnQuantity" (ngModelChange)="onQuantityChange(item, $event)"
-                  [min]="0" [max]="item.quantity" [showButtons]="true" buttonLayout="horizontal"
+                  [min]="0" [max]="item.maxReturnable" [showButtons]="true" buttonLayout="horizontal"
                   spinnerMode="horizontal" decrementButtonClass="p-button-text p-button-secondary qty-btn"
                   incrementButtonClass="p-button-text p-button-secondary qty-btn" incrementButtonIcon="pi pi-plus"
                   decrementButtonIcon="pi pi-minus" inputStyleClass="qty-input"></p-inputNumber>

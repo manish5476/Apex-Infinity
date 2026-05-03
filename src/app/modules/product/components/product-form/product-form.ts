@@ -160,7 +160,11 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     const rawData = this.productForm.getRawValue();
     const payload = { ...rawData };
     if (this.editMode()) {
+      // Strip fields that are blocked on the backend in edit mode:
+      // - inventory: must go through Purchase or Stock Adjustment
+      // - purchasePrice: must go through Purchase entries (not direct edit)
       delete payload.inventory;
+      delete payload.purchasePrice;
     }
 
     const request = this.editMode()

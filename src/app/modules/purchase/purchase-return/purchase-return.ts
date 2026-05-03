@@ -3,7 +3,7 @@ import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { finalize, distinctUntilChanged } from 'rxjs/operators';
-import { Subscription } from 'rxjs';
+import { forkJoin, Subscription } from 'rxjs';
 
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
@@ -112,23 +112,37 @@ export class PurchaseReturnComponent implements OnInit, OnDestroy {
 
 
 
-  initFormItems(items: any[]) {
+  initFormItems(items: any[], priorReturns: any[] = []) {
     this.returnItems.clear();
 
+    const returnedQtyMap: { [key: string]: number } = {};
+    for (const r of priorReturns) {
+      if (r.status !== 'rejected') {
+        for (const i of r.items) {
+          const key = i.productId?._id || i.productId;
+          returnedQtyMap[key] = (returnedQtyMap[key] || 0) + i.quantity;
+        }
+      }
+    }
+
     items.forEach(item => {
-      if (item.quantity > 0) {
-        // Handle populated object or string ID
-        const prodId = item.productId && item.productId._id ? item.productId._id : item.productId;
+      const prodId = item.productId && item.productId._id ? item.productId._id : item.productId;
+      const alreadyReturned = returnedQtyMap[prodId] || 0;
+      const maxReturnable = Math.max(0, item.quantity - alreadyReturned);
+
+      if (maxReturnable > 0) {
         const prodName = item.productId && item.productId.name ? item.productId.name : item.name;
 
         this.returnItems.push(this.fb.group({
           productId: [prodId],
           name: [prodName],
           purchasedQty: [item.quantity],
+          alreadyReturned: [alreadyReturned],
+          maxReturnable: [maxReturnable],
           price: [item.purchasePrice],
           taxRate: [item.taxRate || 0],
           // Min 0 required for typing, Max prevents over-return
-          returnQty: [0, [Validators.required, Validators.min(0), Validators.max(item.quantity)]]
+          returnQty: [0, [Validators.required, Validators.min(0), Validators.max(maxReturnable)]]
         }));
       }
     });
@@ -139,14 +153,18 @@ export class PurchaseReturnComponent implements OnInit, OnDestroy {
   loadPurchase(id: string) {
     this.isLoading.set(true);
 
-    this.purchaseService.getPurchaseById(id)
+    forkJoin({
+      purchase: this.purchaseService.getPurchaseById(id),
+      returns: this.purchaseService.getAllReturns({ purchaseId: id })
+    })
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: (res: any) => {
-          const data = res.data?.data || res.data;
+          const data = res.purchase.data?.data || res.purchase.data;
+          const returnsData = res.returns.data?.returns || res.returns.data || [];
           if (data) {
             this.originalPurchase.set(data);
-            this.initFormItems(data.items);
+            this.initFormItems(data.items, returnsData);
           }
         },
         error: (err) => {

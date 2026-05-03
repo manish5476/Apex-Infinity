@@ -72,6 +72,9 @@
 
                   <td class="text-center">
                     <span class="qty-badge">{{ control.get('purchasedQty').value }}</span>
+                    @if (control.get('alreadyReturned').value > 0) {
+                      <div class="text-[10px] text-[var(--text-tertiary)] mt-1 font-medium">Returned: {{ control.get('alreadyReturned').value }}</div>
+                    }
                   </td>
 
                   <td class="text-center p-2">
@@ -80,7 +83,7 @@
                       <p-inputNumber
                         formControlName="returnQty"
                         [min]="0"
-                        [max]="control.get('purchasedQty').value"
+                        [max]="control.get('maxReturnable').value"
                         [showButtons]="true"
                         buttonLayout="horizontal"
                         spinnerMode="horizontal"
@@ -90,7 +93,7 @@
                       </p-inputNumber>
 
                       @if (control.get('returnQty').hasError('max')) {
-                        <div class="error-msg">Max: {{ control.get('purchasedQty').value }}</div>
+                        <div class="error-msg">Max: {{ control.get('maxReturnable').value }}</div>
                       }
                     </div>
                   </td>
