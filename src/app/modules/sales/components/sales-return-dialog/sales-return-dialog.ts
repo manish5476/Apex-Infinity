@@ -17,7 +17,6 @@ import { SalesReturnService, CreateSalesReturnPayload } from '@core/services/sal
 import { InvoiceService } from '../../../../modules/invoice/services/invoice-service';
 import { AppMessageService } from '@core/services/message.service';
 import { CommonMethodService } from '@core/utils/common-method.service';
-import { CommonMethodService } from '@core/utils/common-method.service';
 
 @Component({
   selector: 'app-sales-return-dialog',
@@ -36,7 +35,7 @@ import { CommonMethodService } from '@core/utils/common-method.service';
   styleUrl: './sales-return-dialog.scss'
 })
 export class SalesReturnDialogComponent implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   private config = inject(DynamicDialogConfig);
   private ref = inject(DynamicDialogRef);
   private fb = inject(FormBuilder);
@@ -114,7 +113,7 @@ export class SalesReturnDialogComponent implements OnInit, OnDestroy {
 
   private loadInvoice(id: string): void {
     this.isLoading.set(true);
-    
+
     forkJoin({
       invoiceRes: this.invoiceService.getInvoiceById(id),
       returnsRes: this.salesReturnService.getSalesReturns({ invoiceId: id, limit: 100 })
@@ -191,7 +190,7 @@ export class SalesReturnDialogComponent implements OnInit, OnDestroy {
     const qty = value || 0;
     // Cap to max returnable
     const validQty = Math.min(qty, item.maxReturnable);
-    
+
     this.returnItems.update(items =>
       items.map(i => {
         if (i._id === item._id) {
@@ -237,8 +236,8 @@ export class SalesReturnDialogComponent implements OnInit, OnDestroy {
     this.ref.close();
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }
