@@ -29,7 +29,7 @@ import { CommonMethodService } from '../../../../core/utils/common-method.servic
 import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '@core/auth/permissions.constants';
 import { Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
+import { finalize, takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-emi-details',
@@ -51,13 +51,13 @@ import { takeUntil } from "rxjs/operators";
     SkeletonModule,
     AgShareGrid,
     HasPermissionDirective
-],
+  ],
   providers: [ConfirmationService, DatePipe],
   templateUrl: './emi-details.html',
   styleUrl: './emi-details.scss'
 })
 export class EmiDetailsComponent implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   // --- Injections ---
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -301,33 +301,39 @@ export class EmiDetailsComponent implements OnInit, OnDestroy {
   submitPayment() {
     if (this.paymentForm.invalid) {
       this.paymentForm.markAllAsTouched();
-      this.messageService.showWarn('Please fill all required fields correctly.');
+      // This message confirms the frontend validation works, 
+      // but the backend might still fail if the payload key is wrong.
+      this.messageService.showWarn('Validation Error: Reference ID is required.');
       return;
     }
 
     const emiId = this.emiData()._id;
-    const { amount, paymentId, paymentMode } = this.paymentForm.value;
+    const { amount, paymentId, paymentMode, notes } = this.paymentForm.value;
     this.isSubmittingPayment.set(true);
-
     const payload = {
       emiId: emiId,
       installmentNumber: this.selectedInstallment.installmentNumber,
       amount: amount,
       paymentMethod: paymentMode,
-      referenceNumber: `${paymentMode.toUpperCase()}-${paymentId}`
+      referenceNumber: paymentId,
+      notes: notes
     };
 
     this.common.apiCall(
-      this.emiService.payEmiInstallment(emiId, payload),
+      this.emiService.payEmiInstallment(emiId, payload).pipe(
+        finalize(() => this.isSubmittingPayment.set(false))
+      ),
       (res: any) => {
         this.messageService.showSuccess('Payment recorded successfully.');
         this.showPaymentDialog = false;
-        this.isSubmittingPayment.set(false);
         this.fetchEmiDetails(emiId);
         this.fetchEmiHistory(emiId);
-      }
+      },
+      'Submit Payment'
     );
+
   }
+
 
   private fetchEmiDetails(id: string) {
     this.isLoading.set(true);
@@ -359,8 +365,8 @@ export class EmiDetailsComponent implements OnInit, OnDestroy {
     return dueDate < today;
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

@@ -71,15 +71,15 @@ export class SupplierDetailsComponent implements OnInit, OnDestroy {
   // Filters
   rangeDates: Date[] | undefined;
   txnFilter = { type: null, effect: null, search: '' };
-  
+
   txnTypes = [
-    { label: 'Purchase', value: 'purchase' }, 
+    { label: 'Purchase', value: 'purchase' },
     { label: 'Payment', value: 'payment' },
     { label: 'Ledger', value: 'ledger' }
   ];
-  
+
   txnEffects = [
-    { label: 'Credit (+)', value: 'credit' }, 
+    { label: 'Credit (+)', value: 'credit' },
     { label: 'Debit (-)', value: 'debit' }
   ];
 
@@ -90,8 +90,8 @@ export class SupplierDetailsComponent implements OnInit, OnDestroy {
       switchMap(params => {
         const id = params.get('id');
         if (!id) {
-            this.router.navigate(['/suppliers']);
-            return of(null);
+          this.router.navigate(['/suppliers']);
+          return of(null);
         }
         this.loading.set(true);
         this.isError.set(false);
@@ -105,7 +105,7 @@ export class SupplierDetailsComponent implements OnInit, OnDestroy {
           const s = res.data.data || res.data;
           this.supplier.set(s);
           this.resolveBranchNames(s.branchesSupplied);
-          this.getTransactions(true); 
+          this.getTransactions(true);
         } else {
           this.isError.set(true);
         }
@@ -115,7 +115,7 @@ export class SupplierDetailsComponent implements OnInit, OnDestroy {
   }
 
   applyTxnFilters() { this.getTransactions(true); }
-  
+
   resetTxnFilters() {
     this.txnFilter = { type: null, effect: null, search: '' };
     this.rangeDates = undefined;
@@ -135,26 +135,26 @@ export class SupplierDetailsComponent implements OnInit, OnDestroy {
 
   initGridColumns(): void {
     this.txnColumns = [
-      { 
+      {
         field: 'date', headerName: 'Date', width: 140, pinned: 'left',
-        valueFormatter: (p:any) => this.common.formatDate(p.value, 'dd MMM yyyy'),
+        valueFormatter: (p: any) => this.common.formatDate(p.value, 'dd MMM yyyy'),
         cellStyle: { 'display': 'flex', 'align-items': 'center', 'font-weight': '600' }
       },
-      { 
+      {
         field: 'type', headerName: 'Type', width: 120,
-        cellRenderer: (p:any) => {
-           const type = p.value?.toLowerCase() || '-';
-           let color = type === 'purchase' ? '#0ea5e9' : (type === 'payment' ? '#22c55e' : '#eab308');
-           return `<span style="color:${color}; font-weight:700; text-transform:uppercase; font-size:11px;">${type}</span>`;
+        cellRenderer: (p: any) => {
+          const type = p.value?.toLowerCase() || '-';
+          let color = type === 'purchase' ? '#0ea5e9' : (type === 'payment' ? '#22c55e' : '#eab308');
+          return `<span style="color:${color}; font-weight:700; text-transform:uppercase; font-size:11px;">${type}</span>`;
         }
       },
-      { 
+      {
         field: 'description', headerName: 'Description', minWidth: 200, flex: 1,
         cellStyle: { 'display': 'flex', 'align-items': 'center' }
       },
-      { 
-        field: 'effect', headerName: 'Effect', width: 110, 
-        cellRenderer: (p:any) => {
+      {
+        field: 'effect', headerName: 'Effect', width: 110,
+        cellRenderer: (p: any) => {
           const isCredit = p.value?.toLowerCase() === 'credit';
           const color = isCredit ? '#16a34a' : '#dc2626';
           const icon = isCredit ? 'pi-arrow-down' : 'pi-arrow-up';
@@ -163,12 +163,12 @@ export class SupplierDetailsComponent implements OnInit, OnDestroy {
                   </span>`;
         }
       },
-      { 
+      {
         field: 'amount', headerName: 'Amount', width: 140, type: 'rightAligned',
-        valueFormatter: (p:any) => this.common.formatCurrency(p.value),
-        cellStyle: (p:any) => ({ 
-            'color': p.data.effect === 'credit' ? '#16a34a' : '#dc2626', 
-            'font-weight': '700', 'text-align': 'right', 'display': 'flex', 'justify-content': 'flex-end', 'align-items': 'center' 
+        valueFormatter: (p: any) => this.common.formatCurrency(p.value),
+        cellStyle: (p: any) => ({
+          'color': p.data.effect === 'credit' ? '#16a34a' : '#dc2626',
+          'font-weight': '700', 'text-align': 'right', 'display': 'flex', 'justify-content': 'flex-end', 'align-items': 'center'
         })
       }
     ];
@@ -229,7 +229,7 @@ export class SupplierDetailsComponent implements OnInit, OnDestroy {
   openSupplierLedger(supplier: any) {
     const ref = this.dialogHelper.openSupplierLedger(supplier._id);
     if (ref) {
-      ref.onClose.pipe(takeUntil(this.destroy$)).subscribe(() => {});
+      ref.onClose.pipe(takeUntil(this.destroy$)).subscribe(() => { });
     }
   }
 
@@ -269,12 +269,12 @@ export class SupplierDetailsComponent implements OnInit, OnDestroy {
 
     this.transactionService.getSupplierTransactions(supplierId, queryParams).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
-        let newData = res.results || [];
+        let newData = res.data.data || [];
         this.txnTotal = res.total || this.txnTotal;
         this.txnData = isReset ? newData : [...this.txnData, ...newData];
-        
+
         if (newData.length > 0) this.txnPage++;
-        
+
         this.txnLoading = false;
         this.cdr.markForCheck();
       },
@@ -282,11 +282,11 @@ export class SupplierDetailsComponent implements OnInit, OnDestroy {
         this.txnLoading = false;
         console.error(err);
         this.messageService.handleHttpError(err);
-        this.cdr.markForCheck(); 
+        this.cdr.markForCheck();
       }
     });
   }
-  
+
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
