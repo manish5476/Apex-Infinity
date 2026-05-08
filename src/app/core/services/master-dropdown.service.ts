@@ -19,14 +19,6 @@ interface DropdownResponse {
   data: DropdownOption[];
 }
 
-// ✅ COMPLETE: Includes all 20+ routes currently in your backend
-// export type DropdownEndpoint =
-//   | 'users' | 'branches' | 'roles' | 'customers' | 'suppliers' | 'masters' | 'channels' | 'transfer-requests'
-//   | 'products' | 'purchases' | 'sales' | 'sales-returns' | 'purchase-returns'
-//   | 'accounts' | 'invoices' | 'payments' | 'emis'
-//   | 'departments' | 'designations' | 'shifts' | 'holidays' | 'geofencing'
-//   | 'attendance-machines' | 'attendance-requests' | 'leave-requests'
-//   | 'meetings' | 'brands' | 'categories' | 'subcategories' | 'units' | 'taxes';
 
 /**
  * Must match backend dropdown routes under `/api/v1/dropdowns/:endpoint`.
@@ -70,7 +62,9 @@ export type DropdownEndpoint =
   | 'attendance-requests'
   | 'leave-requests'
   // Notes & CRM
-  | 'meetings';
+  | 'meetings'
+  | 'supplier-categories';
+
 @Injectable({
   providedIn: 'root'
 })

@@ -24,7 +24,9 @@
 
               <div class="form-group">
                 <label>Category</label>
-                <input pInputText formControlName="category" placeholder="e.g., Hardware" />
+                <app-master-dropdown [endpoint]="'supplier-categories'" formControlName="categoryId"
+                  placeholder="Select supplier category">
+                </app-master-dropdown>
               </div>
 
               <div class="form-group">
@@ -78,10 +80,7 @@
                   </div>
                   <div class="form-group">
                     <label>Department</label>
-                    <app-master-dropdown 
-                      endpoint="departments" 
-                      formControlName="department" 
-                      placeholder="Select Dept">
+                    <app-master-dropdown endpoint="departments" formControlName="department" placeholder="Select Dept">
                     </app-master-dropdown>
                   </div>
                   <div class="form-group">
