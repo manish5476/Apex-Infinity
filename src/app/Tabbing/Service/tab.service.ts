@@ -65,12 +65,13 @@ export class TabService implements OnDestroy {
       qp[key] = String(rawQueryParams[key]);
     }
 
-    const isIgnoredRoute = 
-      routeConfig?.path === '**' || 
-      fullUrl.includes('/unauthorized') || 
-      data['disableTab'] === true;
+    const lowUrl = fullUrl.toLowerCase();
+    const componentName = (routeConfig?.component as any)?.name || '';
+    
+    const isAuth = lowUrl.includes('login') || lowUrl.includes('signup') || lowUrl.includes('auth') || lowUrl.includes('password') || lowUrl.includes('verification') || componentName.includes('Login');
+    const isError = lowUrl.includes('error') || lowUrl.includes('unauthorized') || lowUrl.includes('notfound') || routeConfig?.path === '**' || componentName.includes('NotFound') || componentName.includes('Unauthorized');
 
-    if (!hasTarget || isIgnoredRoute || fullUrl === '/' || fullUrl.includes('/login') || fullUrl.includes('/signup') || fullUrl.includes('/auth/')) {
+    if (!hasTarget || isAuth || isError || fullUrl === '/' || data['disableTab'] === true) {
       this.syncFromRouter(fullUrl, qp);
       return;
     }
@@ -78,7 +79,10 @@ export class TabService implements OnDestroy {
     let label = (data['tabLabel'] as string | undefined);
     if (!label) {
       const segments = fullUrl.split('/').filter(Boolean);
-      const lastSegment = segments.pop() || 'Home';
+      let lastSegment = segments.pop() || 'Home';
+      // Strip matrix parameters (;) or encoded matrix parameters (%3b)
+      lastSegment = lastSegment.split(';')[0].split('%3b')[0];
+      
       label = lastSegment
         .split('-')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
