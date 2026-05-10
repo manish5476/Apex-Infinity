@@ -385,7 +385,7 @@ export class PaymentListComponent implements OnInit, OnDestroy {
         },
       },
 
-      // ── Entity ────────────────────────────────────────────────────────────
+      // ── Entity (Customer / Supplier) ──────────────────────────────────────
       {
         headerName: 'Entity',
         flex: 1,
@@ -393,12 +393,17 @@ export class PaymentListComponent implements OnInit, OnDestroy {
         cellStyle: { display: 'flex', alignItems: 'center', padding: '0 8px' },
         cellRenderer: (p: any) => {
           const isIn = p.data?.type === 'inflow';
+          const customer = p.data?.customerId;
+          const supplier = p.data?.supplierId;
+
           const name = isIn
-            ? (p.data?.customerId?.name || 'Walk-in Customer')
-            : (p.data?.supplierId?.companyName || 'Unknown Supplier');
+            ? (customer?.name || 'Walk-in Customer')
+            : (supplier?.companyName || 'Unknown Supplier');
+
           const sub = isIn
-            ? (p.data?.customerId?.phone || p.data?.customerId?.email || '—')
-            : (p.data?.supplierId?.gstin || 'Supplier');
+            ? (customer?.phone || customer?.email || '—')
+            : [supplier?.contactPerson, supplier?.phone || supplier?.email].filter(Boolean).join(' • ') || 'Supplier';
+
           const branch = p.data?.branchId?.name || '';
           const avatar = this.common.getAvatarStyle(name);
           const initials = this.common.getInitials(name);
@@ -423,17 +428,18 @@ export class PaymentListComponent implements OnInit, OnDestroy {
           p.data?.customerId?.name ?? p.data?.supplierId?.companyName ?? 'Walk-in',
       },
 
-      // ── Invoice ───────────────────────────────────────────────────────────
+      // ── Reference (Invoice / Purchase) ───────────────────────────────────
       {
-        headerName: 'Invoice',
+        headerName: 'Reference',
         width: 148,
         cellStyle: { display: 'flex', alignItems: 'center', padding: '0 8px' },
         cellRenderer: (p: any) => {
-          const inv = p.data?.invoiceId;
-          if (!inv) return `<span style="color:var(--text-tertiary);font-size:12px;">—</span>`;
+          const ref = p.data?.invoiceId || p.data?.purchaseId;
+          if (!ref) return `<span style="color:var(--text-tertiary);font-size:12px;">—</span>`;
+          
           return this.twoLine(
-            `<span style="font-family:var(--font-mono);font-size:11.5px;font-weight:600;color:#185FA5;">${inv.invoiceNumber}</span>`,
-            `Total: ${this.common.formatCurrency(inv.grandTotal)}`,
+            `<span style="font-family:var(--font-mono);font-size:11.5px;font-weight:600;color:#185FA5;">${ref.invoiceNumber}</span>`,
+            `Total: ${this.common.formatCurrency(ref.grandTotal)}`,
             '',
             'font-size:10.5px;color:var(--text-secondary);',
           );
@@ -470,7 +476,7 @@ export class PaymentListComponent implements OnInit, OnDestroy {
       {
         field: 'paymentMethod',
         headerName: 'Method',
-        width: 90,
+        width: 100,
         cellStyle: { display: 'flex', alignItems: 'center', padding: '0 10px' },
         cellRenderer: (p: any) => {
           const m = (p.value || 'other').toLowerCase();
@@ -480,6 +486,7 @@ export class PaymentListComponent implements OnInit, OnDestroy {
             card: { label: 'Card', bg: '#EEEDFE', color: '#3C3489' },
             neft: { label: 'NEFT', bg: '#FAEEDA', color: '#633806' },
             rtgs: { label: 'RTGS', bg: '#FAEEDA', color: '#633806' },
+            bank: { label: 'Bank', bg: '#FAEEDA', color: '#633806' },
             bank_transfer: { label: 'Bank', bg: '#FAEEDA', color: '#633806' },
             cheque: { label: 'Cheque', bg: '#FBEAF0', color: '#72243E' },
           };
