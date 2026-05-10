@@ -65,7 +65,12 @@ export class TabService implements OnDestroy {
       qp[key] = String(rawQueryParams[key]);
     }
 
-    if (!hasTarget || fullUrl === '/' || fullUrl === '/login' || fullUrl === '/signup') {
+    const isIgnoredRoute = 
+      routeConfig?.path === '**' || 
+      fullUrl.includes('/unauthorized') || 
+      data['disableTab'] === true;
+
+    if (!hasTarget || isIgnoredRoute || fullUrl === '/' || fullUrl.includes('/login') || fullUrl.includes('/signup') || fullUrl.includes('/auth/')) {
       this.syncFromRouter(fullUrl, qp);
       return;
     }
@@ -272,8 +277,21 @@ export class TabService implements OnDestroy {
     this.router.navigate(tab ? [tab.path] : ['/']);
   }
 
-  updateTab(id: TabId, patch: Partial<Pick<TabMeta, 'label' | 'icon' | 'data' | 'loading'>>): void {
-    this._patchTab(id, patch);
+  /**
+   * Update the currently active tab's metadata
+   */
+  updateActiveTab(options: Partial<Omit<TabMeta, 'id' | 'path'>>): void {
+    const activeId = this._state().activeTabId;
+    if (activeId) {
+      this.updateTab(activeId, options);
+    }
+  }
+
+  /**
+   * Update a specific tab's metadata
+   */
+  updateTab(id: TabId, options: Partial<Omit<TabMeta, 'id' | 'path'>>): void {
+    this._patchTab(id, options);
   }
 
   togglePin(id: TabId): void {
@@ -295,6 +313,14 @@ export class TabService implements OnDestroy {
     const id = this.buildTabId(path, queryParams);
     if (!this._findById(id)) return;
     this._activate(id);
+  }
+
+  /**
+   * Reset all tabs (useful for logout)
+   */
+  reset(): void {
+    this._state.set({ tabs: [], activeTabId: null });
+    try { sessionStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
   }
 
   /**

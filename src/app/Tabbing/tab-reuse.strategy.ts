@@ -48,7 +48,20 @@ export class TabReuseStrategy implements RouteReuseStrategy {
   }
 
   retrieve(route: ActivatedRouteSnapshot): DetachedRouteHandle | null {
-    return this.cache.get(this._key(route)) ?? null;
+    const handle = this.cache.get(this._key(route));
+    if (handle) {
+      const compRef = (handle as any).componentRef;
+      if (compRef?.instance) {
+        if (typeof compRef.instance.onTabReattached === 'function') {
+          setTimeout(() => compRef.instance.onTabReattached(), 10);
+        } else if (typeof compRef.instance.getData === 'function') {
+          setTimeout(() => compRef.instance.getData(true), 10);
+        } else if (typeof compRef.instance.loadData === 'function') {
+          setTimeout(() => compRef.instance.loadData(true), 10);
+        }
+      }
+    }
+    return handle ?? null;
   }
 
   // ── Decide whether to reuse the same component instance ────────────────────

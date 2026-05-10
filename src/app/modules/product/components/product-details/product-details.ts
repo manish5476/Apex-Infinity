@@ -29,6 +29,8 @@ import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MasterDropdownService } from '../../../../core/services/master-dropdown.service';
+import { TabService } from '../../../../Tabbing';
+
 
 // Import the dialog component (Ensure path is correct)
 
@@ -52,6 +54,8 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef); 
   private dialogService = inject(DialogService);
   private confirmationService = inject(ConfirmationService);
+  private tabService = inject(TabService);
+
 
   PERMISSIONS = PERMISSIONS;
 
@@ -194,6 +198,10 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
           
           this.product.set(p);
           this.inventoryData = [...(p.inventory || [])];
+
+          // Update tab label with product name
+          this.tabService.updateActiveTab({ label: p.name });
+
         } else {
           this.isError.set(true);
           this.messageService.showError('Product data not found.');
@@ -286,6 +294,11 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
        }
      });
   }
+
+  onTabReattached() {
+    this.loadProductData();
+  }
+
 
     ngOnDestroy(): void {
         this.destroy$.next();

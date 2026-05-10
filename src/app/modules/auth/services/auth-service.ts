@@ -8,6 +8,8 @@ import { AppMessageService } from '../../../core/services/message.service';
 import { ApiService } from '../../../core/services/api';
 import { OrganizationService } from './../../organization/organization.service';
 import { User, Session, LoginResponse, SignupResponse, VerifyTokenResponse } from './auth.types';
+import { TabService } from '../../../Tabbing/Service/tab.service';
+import { RouteReuseStrategy } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService implements OnDestroy {
@@ -28,6 +30,8 @@ export class AuthService implements OnDestroy {
   private OrganizationService = inject(OrganizationService);
   private messageService = inject(AppMessageService);
   private router = inject(Router);
+  private tabService = inject(TabService);
+  private routeReuseStrategy = inject(RouteReuseStrategy);
   private _token: string | null = null;
   private isLoggingOut = signal(false)
 
@@ -142,6 +146,11 @@ export class AuthService implements OnDestroy {
       localStorage.removeItem(this.USER_KEY);
       localStorage.removeItem(this.REMEMBER_ME_KEY);
       localStorage.removeItem('orgSlug');
+    }
+
+    this.tabService.reset();
+    if (typeof (this.routeReuseStrategy as any).evictAll === 'function') {
+      (this.routeReuseStrategy as any).evictAll();
     }
 
     this._token = null; // ✅ Kill the token state
