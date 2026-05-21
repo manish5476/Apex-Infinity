@@ -1,5 +1,6 @@
 // src/app/core/services/socket-connection.service.ts
-import { Injectable, NgZone, OnDestroy, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Injectable, NgZone, OnDestroy, PLATFORM_ID, inject } from '@angular/core';
 import { io, Socket, ManagerOptions, SocketOptions } from 'socket.io-client';
 import { BehaviorSubject, Subject, timer, Subscription } from 'rxjs';
 import { environment } from '../../../../environments/environment';
@@ -11,6 +12,7 @@ export class SocketConnectionService implements OnDestroy {
   private zone = inject(NgZone);
   private authService = inject(AuthService);
   private messageService = inject(AppMessageService);
+  private platformId = inject(PLATFORM_ID);
 
   private socket: Socket | null = null;
   private readonly url = environment.socketUrl;
@@ -37,6 +39,8 @@ export class SocketConnectionService implements OnDestroy {
   private lastPongTime = 0;
 
   constructor() {
+    if (!isPlatformBrowser(this.platformId)) return;
+
     // Re-connect when tab becomes visible again
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible' && this.socket?.disconnected) {

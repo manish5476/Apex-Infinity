@@ -37,6 +37,14 @@ export const PERMISSIONS = {
   AI: {
     CHAT: 'ai:chat',
   },
+  STOREFRONT: {
+    READ: 'storefront:read',
+    PAGE_MANAGE: 'storefront:page_manage',
+    PUBLISH: 'storefront:publish',
+    LAYOUT_MANAGE: 'storefront:layout_manage',
+    THEME_MANAGE: 'storefront:theme_manage',
+    RULE_MANAGE: 'storefront:rule_manage',
+  },
 
   // ── Security & Settings ───────────────────────────────────────────
   AUTH: {

@@ -1,23 +1,9 @@
 <!-- storefront-layout.component.html -->
-<div class="min-h-screen w-full flex flex-col font-sans relative transition-colors duration-700"
+<div class="storefront-shell min-h-screen w-full flex flex-col font-sans relative transition-colors duration-700"
   [class.dark-mode]="isDarkMode()" [style]="activeThemeStyle()">
 
   <!-- ── Ambient background layer ── -->
-  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-[var(--bg-page)] transition-colors duration-700">
-
-    <!-- Grain texture -->
-    <div class="absolute inset-0 opacity-[0.04] mix-blend-overlay"
-      style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noise)%22 opacity=%221%22/%3E%3C/svg%3E')">
-    </div>
-
-    <!-- Ambient orbs -->
-    <div
-      class="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] rounded-full bg-[var(--primary)] opacity-10 blur-[120px] animate-pulse-slow">
-    </div>
-    <div
-      class="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] rounded-full bg-[var(--secondary,#64748b)] opacity-10 blur-[100px] animate-float">
-    </div>
-  </div>
+  <div class="storefront-shell__backdrop fixed inset-0 pointer-events-none z-0 overflow-hidden bg-[var(--bg-page)] transition-colors duration-700"></div>
 
   <!-- ── Header (from layout sections) ── -->
   @if (state.layout(); as layout) {
@@ -39,7 +25,7 @@
          }">
 
       <div
-        class="w-full relative overflow-hidden bg-[var(--bg-page)]/50 backdrop-blur-sm shadow-sm transition-all duration-1000 border border-[var(--glass-border,rgba(255,255,255,0.15))]"
+        class="storefront-shell__frame w-full relative overflow-hidden bg-[var(--bg-page)]/50 backdrop-blur-sm shadow-sm transition-all duration-1000 border border-[var(--glass-border,rgba(255,255,255,0.15))]"
         [ngClass]="{
              'min-h-[90vh] rounded-[2.5rem] md:rounded-[3.5rem]': isHomePage(),
              'min-h-screen rounded-none':                          !isHomePage()

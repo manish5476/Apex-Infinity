@@ -1,5 +1,6 @@
 // src/app/modules/storefront-public/dynamic-page/dynamic-page.component.ts
 import { Component, OnInit, inject, signal, isDevMode, OnDestroy } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { Title, Meta } from '@angular/platform-browser';
@@ -7,52 +8,17 @@ import { combineLatest, Subject } from 'rxjs';
 import { animate, style, transition, trigger, query, stagger } from '@angular/animations';
 
 
-// Section components
-import { BlogFeedComponent }          from '../pages/blog-feed/blog-feed.component';
-import { CategoryGridComponent }      from '../pages/category-grid/category-grid.component';
-import { ContactFormComponent }       from '../pages/contact-form/contact-form.component';
-import { CountdownTimerComponent }    from '../pages/countdown-timer/countdown-timer.component';
-import { FaqAccordionComponent }      from '../pages/faq-accordion/faq-accordion.component';
-import { FeatureGridComponent }       from '../pages/feature-grid/feature-grid.component';
-import { LogoCloudComponent }         from '../pages/logo-cloud/logo-cloud.component';
-import { MapLocationsComponent }      from '../pages/map-locations/map-locations.component';
-import { NewsletterSignupComponent }  from '../pages/newsletter-signup/newsletter-signup.component';
-import { PricingTableComponent }      from '../pages/pricing-table/pricing-table.component';
-import { ProductGridComponent }       from '../pages/product-grid/product-grid.component';
-import { SplitContentComponent }      from '../pages/split-content/split-content.component';
-import { StatsCounterComponent }      from '../pages/stats-counter/stats-counter.component';
-import { TestimonialSliderComponent } from '../pages/testimonial-slider/testimonial-slider.component';
-import { TextContentComponent }       from '../pages/text-content/text-content.component';
-import { VideoHeroComponent }         from '../pages/video-hero/video-hero.component';
-import { HeroBannerComponent }        from '../components/hero-banner/hero-banner.component';
 import { StorefrontPublicService } from '@core/services/storefront-public.service';
 import { StorefrontStateService } from '@core/services/storefront-state.service';
-import { ProductSliderComponent } from '../components/product-slider/product-slider.component';
 import { takeUntil } from "rxjs/operators";
+import { StorefrontSectionRendererComponent } from './storefront-section-renderer.component';
 
 @Component({
   selector: 'app-dynamic-page',
   standalone: true,
   imports: [
     RouterModule,
-    HeroBannerComponent,
-    ProductSliderComponent,
-    CategoryGridComponent,
-    ProductGridComponent,
-    FeatureGridComponent,
-    TextContentComponent,
-    ContactFormComponent,
-    VideoHeroComponent,
-    SplitContentComponent,
-    TestimonialSliderComponent,
-    LogoCloudComponent,
-    NewsletterSignupComponent,
-    StatsCounterComponent,
-    PricingTableComponent,
-    CountdownTimerComponent,
-    FaqAccordionComponent,
-    BlogFeedComponent,
-    MapLocationsComponent
+    StorefrontSectionRendererComponent
 ],
   templateUrl: './dynamic-page.component.html',
   styles: [`
@@ -73,12 +39,21 @@ import { takeUntil } from "rxjs/operators";
       gap: var(--spacing-2xl);
     }
 
-    .loader-pulse {
-      width: 48px; height: 48px;
-      border-radius: 50%;
-      background: var(--accent-primary);
-      box-shadow: var(--shadow-lg);
-      animation: pulse 1.5s infinite ease-in-out;
+    .storefront-skeleton {
+      width: min(720px, calc(100vw - 48px));
+      display: grid;
+      gap: var(--apx-space-4, 1rem);
+    }
+
+    .storefront-skeleton span {
+      min-height: 5rem;
+      border-radius: var(--apx-radius-lg, 12px);
+      border: 1px solid var(--apx-color-border, rgba(17, 24, 39, 0.1));
+      background:
+        linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent),
+        var(--apx-color-surface-raised, rgba(255,255,255,0.86));
+      background-size: 220% 100%;
+      animation: apxSkeleton 1.25s var(--apx-ease-standard, ease) infinite;
     }
 
     .loading-text {
@@ -90,9 +65,9 @@ import { takeUntil } from "rxjs/operators";
       color: var(--text-tertiary);
     }
 
-    @keyframes pulse {
-      0%   { transform: scale(0.8); opacity: 0.5; }
-      100% { transform: scale(1.5); opacity: 0; }
+    @keyframes apxSkeleton {
+      from { background-position: 220% 0; }
+      to { background-position: -220% 0; }
     }
 
     .error-screen {
@@ -199,6 +174,7 @@ export class DynamicPageComponent implements OnInit, OnDestroy {
   private stateService    = inject(StorefrontStateService);
   private titleService    = inject(Title);
   private metaService     = inject(Meta);
+  private document        = inject(DOCUMENT);
 
   pageData   = signal<any>(null);
   isLoading  = signal(true);
@@ -267,9 +243,38 @@ isDevMode: any;
     if (seo.image) {
       this.metaService.updateTag({ property: 'og:image', content: seo.image });
     }
+    this.metaService.updateTag({ property: 'og:type', content: 'website' });
+    this.metaService.updateTag({ property: 'og:title', content: seo.title ?? data.page.name ?? 'Store' });
+    this.metaService.updateTag({ name: 'twitter:card', content: seo.image ? 'summary_large_image' : 'summary' });
+    this._updateJsonLd(data);
     if (seo.noIndex) {
       this.metaService.updateTag({ name: 'robots', content: 'noindex, nofollow' });
+    } else {
+      this.metaService.updateTag({ name: 'robots', content: 'index, follow' });
     }
+  }
+
+  private _updateJsonLd(data: any): void {
+    const id = 'storefront-page-jsonld';
+    this.document.getElementById(id)?.remove();
+
+    const org = data?.organization;
+    const page = data?.page;
+    const script = this.document.createElement('script');
+    script.id = id;
+    script.type = 'application/ld+json';
+    script.text = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: page?.seo?.title ?? page?.name,
+      description: page?.seo?.description,
+      publisher: org ? {
+        '@type': 'Organization',
+        name: org.name,
+        logo: org.logo || undefined
+      } : undefined
+    });
+    this.document.head.appendChild(script);
   }
 
     ngOnDestroy(): void {

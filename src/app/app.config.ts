@@ -5,6 +5,7 @@ import { provideHttpClient, withInterceptors, withFetch } from '@angular/common/
 import { provideRouter, RouteReuseStrategy } from '@angular/router';
 import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { provideClientHydration, withEventReplay, withHttpTransferCacheOptions, withIncrementalHydration } from '@angular/platform-browser';
 import { DatePipe, DecimalPipe, PercentPipe } from '@angular/common';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { successInterceptor } from './core/interceptors/success.interceptor';
@@ -30,6 +31,14 @@ export const appConfig: ApplicationConfig = {
       withFetch()
     ),
     provideRouter(routes),
+    provideClientHydration(
+      withEventReplay(),
+      withIncrementalHydration(),
+      withHttpTransferCacheOptions({
+        includePostRequests: false,
+        includeRequestsWithAuthHeaders: false
+      })
+    ),
     provideZonelessChangeDetection(),
     provideAnimationsAsync(),
     // providePrimeNG({

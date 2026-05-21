@@ -38,7 +38,6 @@ function getOrgSlug(): string {
   imports: [CommonModule, RouterModule, ReactiveFormsModule, DatePipe],
   template: `
     <div class="page-container">
-      <div class="bg-overlay"></div>
 
       <div class="content-relative">
 
@@ -841,8 +840,8 @@ export class PageListComponent implements OnInit, OnDestroy {
       this.error.set(`Unpublish "${page.name}" before deleting it.`);
       return;
     }
-    if (page.isHomepage) {
-      this.error.set('Cannot delete the active homepage.');
+    if (page.isHomepage || page.pageType === 'home' || page.pageType === 'products') {
+      this.error.set('Cannot delete core system pages (Home or Products).');
       return;
     }
     if (!confirm(`Permanently delete "${page.name}"? This cannot be undone.`)) return;

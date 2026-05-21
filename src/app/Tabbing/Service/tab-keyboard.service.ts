@@ -5,17 +5,20 @@
 //         is cosmetic, but kept for correctness if the service is ever scoped.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { Injectable, OnDestroy, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Injectable, OnDestroy, PLATFORM_ID, inject } from '@angular/core';
 import { TabService } from './tab.service';
 
 @Injectable({ providedIn: 'root' })
 export class TabKeyboardService implements OnDestroy {
 
   private readonly tabService = inject(TabService);
+  private readonly platformId = inject(PLATFORM_ID);
   private _handler!: (e: KeyboardEvent) => void;
   private _initialised = false;
 
   init(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
     if (this._initialised) return;
     this._initialised = true;
 
@@ -63,7 +66,7 @@ export class TabKeyboardService implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this._handler) {
+    if (isPlatformBrowser(this.platformId) && this._handler) {
       window.removeEventListener('keydown', this._handler, { capture: true });
     }
   }
@@ -72,6 +75,7 @@ export class TabKeyboardService implements OnDestroy {
 
   /** Returns true when focus is inside a text-entry element. */
   private _isFocusedOnInput(): boolean {
+    if (!isPlatformBrowser(this.platformId)) return false;
     const el = document.activeElement;
     if (!el) return false;
     const tag = el.tagName.toLowerCase();

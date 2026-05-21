@@ -22,6 +22,7 @@ import { ThemeService, ThemeSettings } from '../../../core/services/theme.servic
 import { NavbarSimpleComponent } from '../components/navbar-simple/navbar-simple.component';
 import { FooterSimpleComponent } from '../components/footer-simple/footer-simple.component';
 import { StorefrontStateService } from '@core/services/storefront-state.service';
+import { ThemeEngineService } from '@apx/theme-engine';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -61,6 +62,7 @@ export class StorefrontLayoutComponent implements OnInit, OnDestroy {
 
   public state = inject(StorefrontStateService);
   private themeService = inject(ThemeService);
+  private themeEngine = inject(ThemeEngineService);
   private router = inject(Router);
   private destroy$ = new Subject<void>();
 
@@ -94,6 +96,7 @@ export class StorefrontLayoutComponent implements OnInit, OnDestroy {
     // User selected a named theme — use its colour
     if (selectedTheme && selectedId !== 'auto-theme') {
       return {
+        ...this.themeEngine.styleMap(),
         '--primary': selectedTheme.color,
         '--secondary': selectedTheme.color,
         '--bg-page': dark ? '#0f172a' : '#FDFCF8',
@@ -101,16 +104,7 @@ export class StorefrontLayoutComponent implements OnInit, OnDestroy {
       };
     }
 
-    // Fall back to the merchant's storefront settings
-    // ✅ FIX: correct path is themeOverride.customSettings, not page.theme
-    const custom = this.state.page()?.themeOverride?.customSettings;
-    const colors = this.state.globalSettings()?.colors;
-    return {
-      '--primary': custom?.primaryColor ?? colors?.primary ?? '#2563eb',
-      '--secondary': custom?.secondaryColor ?? colors?.secondary ?? '#475569',
-      '--bg-page': custom?.backgroundColor ?? (dark ? '#0f172a' : '#FDFCF8'),
-      '--glass-border': 'rgba(255,255,255,0.2)'
-    };
+    return this.themeEngine.styleMap();
   });
 
   // ── Constructor: effects must be created here, NOT in ngOnInit ────────────
@@ -118,6 +112,14 @@ export class StorefrontLayoutComponent implements OnInit, OnDestroy {
     // Apply text scale to root font size
     effect(() => {
       document.documentElement.style.fontSize = `${this.textScale()}%`;
+    });
+
+    effect(() => {
+      this.themeEngine.apply({
+        settings: this.state.globalSettings(),
+        override: this.state.page()?.themeOverride,
+        dark: this.isDarkMode()
+      });
     });
 
     // Scroll to top on navigation

@@ -2,6 +2,33 @@
   display: block;
 }
 
+.storefront-shell {
+  font-family: var(--apx-font-sans);
+  color: var(--apx-color-ink);
+  background: var(--apx-color-canvas);
+}
+
+.storefront-shell__backdrop {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--apx-color-primary) 7%, transparent), transparent 36%),
+    radial-gradient(circle at 18% 12%, color-mix(in srgb, var(--apx-color-accent) 14%, transparent), transparent 34rem),
+    radial-gradient(circle at 88% 18%, color-mix(in srgb, var(--apx-color-primary) 13%, transparent), transparent 30rem),
+    var(--bg-page);
+}
+
+.storefront-shell__backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.035;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.68' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.storefront-shell__frame {
+  box-shadow: var(--apx-shadow-lg);
+}
+
 .animate-pulse-slow {
   animation: pulse-slow 8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
@@ -23,40 +50,56 @@
 
 /* Glass Dock (Mobile) */
 .glass-dock {
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: var(--apx-glass-bg);
+  border-color: var(--apx-glass-border);
+  backdrop-filter: var(--apx-glass-blur);
+  -webkit-backdrop-filter: var(--apx-glass-blur);
 }
 
 .dock-item {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
-  color: #64748b;
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+  border-radius: var(--apx-radius-pill);
+  transition:
+    color var(--apx-duration-base) var(--apx-ease-standard),
+    transform var(--apx-duration-base) var(--apx-ease-standard);
+  color: var(--apx-color-muted);
   
   &.active-link {
     color: var(--primary);
     transform: scale(1.1);
   }
+
+  &:hover {
+    transform: translateY(-1px);
+  }
 }
 
 /* Settings Popover Glass */
 ::ng-deep .glass-popover .p-popover {
-  background: rgba(255, 255, 255, 0.65) !important;
-  backdrop-filter: blur(30px) !important;
-  -webkit-backdrop-filter: blur(30px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.5) !important;
-  border-radius: 1.5rem !important;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15) !important;
+  background: var(--apx-glass-bg) !important;
+  backdrop-filter: var(--apx-glass-blur) !important;
+  -webkit-backdrop-filter: var(--apx-glass-blur) !important;
+  border: 1px solid var(--apx-glass-border) !important;
+  border-radius: var(--apx-radius-2xl) !important;
+  box-shadow: var(--apx-shadow-lg) !important;
   overflow: hidden;
 }
 
 ::ng-deep .glass-trigger {
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(12px);
+  background: var(--apx-glass-bg);
+  backdrop-filter: var(--apx-glass-blur);
   &:hover {
-    background: rgba(255, 255, 255, 0.8);
+    background: var(--apx-color-surface-raised);
+  }
+}
+
+@media (max-width: 767px) {
+  .storefront-shell__frame {
+    border-radius: 0 !important;
   }
 }
 
