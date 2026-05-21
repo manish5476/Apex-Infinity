@@ -21,7 +21,7 @@ export interface Product {
   id: string;
   name: string;
   slug: string;
-  description: string;
+  description?: string | null;
 
   // 2. FIX: Make 'image' and 'brand' optional (?) so 'PublicProduct' is accepted
   image?: string | null;

@@ -1,10 +1,12 @@
 import { Type } from '@angular/core';
+import { SectionDataResolverService } from '../services/section-data-resolver.service';
 
 export interface SectionRenderEntry {
   load: () => Promise<Type<unknown>>;
   inputs: (section: any, orgSlug: string) => Record<string, unknown>;
 }
 
+const resolver = new SectionDataResolverService();
 const configOnly = (section: any) => ({ config: section.config });
 
 export const SECTION_COMPONENT_REGISTRY: Record<string, SectionRenderEntry> = {
@@ -14,15 +16,15 @@ export const SECTION_COMPONENT_REGISTRY: Record<string, SectionRenderEntry> = {
   },
   product_slider: {
     load: () => import('../components/product-slider/product-slider.component').then(m => m.ProductSliderComponent),
-    inputs: section => ({ config: section.config, products: section.data ?? [] })
+    inputs: section => ({ config: section.config, products: resolver.resolveProducts(section) })
   },
   product_grid: {
     load: () => import('../pages/product-grid/product-grid.component').then(m => m.ProductGridComponent),
-    inputs: (section, orgSlug) => ({ config: section.config, products: section.data ?? [], orgSlug })
+    inputs: (section, orgSlug) => ({ config: section.config, products: resolver.resolveProducts(section), orgSlug })
   },
   category_grid: {
     load: () => import('../pages/category-grid/category-grid.component').then(m => m.CategoryGridComponent),
-    inputs: (section, orgSlug) => ({ config: section.config, categories: section.data ?? [], orgSlug })
+    inputs: (section, orgSlug) => ({ config: section.config, categories: resolver.resolveCategories(section), orgSlug })
   },
   feature_grid: {
     load: () => import('../pages/feature-grid/feature-grid.component').then(m => m.FeatureGridComponent),
@@ -46,7 +48,7 @@ export const SECTION_COMPONENT_REGISTRY: Record<string, SectionRenderEntry> = {
   },
   map_locations: {
     load: () => import('../pages/map-locations/map-locations.component').then(m => m.MapLocationsComponent),
-    inputs: section => ({ config: section.config, locations: section.data ?? [] })
+    inputs: section => ({ config: section.config, locations: resolver.resolveLocations(section) })
   },
   testimonial_slider: {
     load: () => import('../pages/testimonial-slider/testimonial-slider.component').then(m => m.TestimonialSliderComponent),
@@ -78,6 +80,26 @@ export const SECTION_COMPONENT_REGISTRY: Record<string, SectionRenderEntry> = {
   },
   blog_feed: {
     load: () => import('../pages/blog-feed/blog-feed.component').then(m => m.BlogFeedComponent),
-    inputs: section => ({ config: section.config, posts: section.data ?? [] })
+    inputs: section => ({ config: section.config, posts: resolver.resolvePosts(section) })
+  },
+  featured_product: {
+    load: () => import('../pages/featured-product/featured-product').then(m => m.FeaturedProductComponent),
+    inputs: section => ({ config: section.config, product: resolver.resolveArrayData(section)[0] ?? null })
+  },
+  product_listing: {
+    load: () => import('../pages/product-listing/product-listing.component').then(m => m.ProductListingComponent),
+    inputs: section => ({ config: section.config, products: resolver.resolveProducts(section) })
+  },
+  instagram_feed: {
+    load: () => import('../pages/instagram-feed/instagram-feed').then(m => m.InstagramFeedComponent),
+    inputs: configOnly
+  },
+  divider: {
+    load: () => import('../components/divider/divider').then(m => m.DividerComponent),
+    inputs: configOnly
+  },
+  spacer: {
+    load: () => import('../components/spacer/spacer').then(m => m.SpacerComponent),
+    inputs: configOnly
   }
 };

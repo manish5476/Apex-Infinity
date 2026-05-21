@@ -2,11 +2,21 @@
 
   <div #mapStage id="map-stage" class="absolute inset-0 z-0 fade-in-map"></div>
 
-  @if(!map && locations.length > 0){
+  @if (!map && filteredLocations.length > 0) {
     <div class="absolute inset-0 z-10 flex items-center justify-center bg-[#0a0a0f] z-[50]">
       <div class="flex flex-col items-center gap-4">
         <div class="w-10 h-10 border-2 border-rose-500 border-t-transparent rounded-full animate-spin"></div>
         <p class="text-xs text-gray-500 uppercase tracking-widest">Initializing Map...</p>
+      </div>
+    </div>
+  }
+
+  @if (filteredLocations.length === 0) {
+    <div class="absolute inset-0 z-[55] flex items-center justify-center backdrop-blur-sm bg-black/40">
+      <div class="text-center p-8 border border-white/10 rounded-2xl bg-black/50 backdrop-blur-md shadow-2xl">
+        <i class="pi pi-map-marker text-4xl text-rose-500 mb-4 block opacity-50"></i>
+        <h3 class="text-xl font-bold text-white mb-2">No Locations Found</h3>
+        <p class="text-sm text-gray-400">There are no valid locations configured for this map section.</p>
       </div>
     </div>
   }

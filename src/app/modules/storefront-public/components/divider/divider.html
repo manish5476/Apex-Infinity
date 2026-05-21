@@ -1,0 +1,17 @@
+<div class="flex justify-center items-center w-full my-8">
+  <div 
+    [ngClass]="{
+      'w-full': config.width === 'full',
+      'w-full max-w-7xl mx-auto px-4 md:px-8': config.width === 'container' || !config.width,
+      'w-1/3 mx-auto': config.width === 'small'
+    }"
+  >
+    <div 
+      class="border-t w-full opacity-30"
+      [ngStyle]="{
+        'border-style': config.style || 'solid',
+        'border-color': config.color || 'var(--primary)'
+      }"
+    ></div>
+  </div>
+</div>
