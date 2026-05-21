@@ -1,0 +1,153 @@
+<main class="commerce-flow" [attr.data-mode]="mode()">
+  <section class="commerce-hero apx-page-wide">
+    <div>
+      <span class="apx-kicker">
+        <i class="pi" [ngClass]="{
+          'pi-shopping-bag': mode() === 'cart',
+          'pi-credit-card': mode() === 'checkout',
+          'pi-user': mode() === 'account',
+          'pi-map-marker': mode() === 'addresses',
+          'pi-bell': mode() === 'notifications',
+          'pi-history': mode() === 'orders'
+        }"></i>
+        {{ mode() === 'checkout' ? 'Secure checkout' : mode() === 'cart' ? 'Shopping cart' : 'Customer hub' }}
+      </span>
+      <h1>
+        @switch (mode()) {
+          @case ('checkout') { Checkout }
+          @case ('account') { Your Account }
+          @case ('addresses') { Saved Addresses }
+          @case ('notifications') { Notifications }
+          @case ('orders') { Orders }
+          @default { Your Cart }
+        }
+      </h1>
+      <p>
+        @switch (mode()) {
+          @case ('checkout') { Review delivery, payment, and order details in a focused checkout flow. }
+          @case ('account') { Manage orders, addresses, rewards, notifications, and profile settings from one clean dashboard. }
+          @case ('addresses') { Keep checkout fast with validated delivery and billing addresses. }
+          @case ('notifications') { Track account, delivery, rewards, and security messages. }
+          @case ('orders') { Review purchases, fulfillment status, invoices, and return windows. }
+          @default { Review items, update quantities, save decisions, and continue to checkout with confidence. }
+        }
+      </p>
+    </div>
+    <div class="hero-search">
+      <i class="pi pi-search"></i>
+      <input type="search" placeholder="Search products to add next" [ngModel]="searchTerm()" (ngModelChange)="onSearch($event)" />
+      @if (suggestions().length) {
+        <div class="suggestions">
+          @for (product of suggestions().slice(0, 4); track product._id || product.id || product.slug) {
+            <a [routerLink]="['/store', orgSlug(), 'products', product.slug || product._id || product.id]">
+              <span>{{ product.name }}</span>
+              <i class="pi pi-arrow-right"></i>
+            </a>
+          }
+        </div>
+      }
+    </div>
+  </section>
+
+  @if (mode() === 'cart') {
+    <section class="commerce-grid apx-page-wide">
+      <div class="line-panel">
+        @if (loading()) {
+          @for (i of [1,2,3]; track i) { <div class="line-skeleton apx-skeleton"></div> }
+        } @else if (!items().length) {
+          <div class="empty-state">
+            <div class="empty-icon"><i class="pi pi-shopping-bag"></i></div>
+            <h2>Your cart is ready when you are</h2>
+            <p>Browse products, compare favorites, and come back here when something feels right.</p>
+            <a class="apx-button-primitive primary" [routerLink]="['/store', orgSlug(), 'products']">Shop products</a>
+          </div>
+        } @else {
+          @for (item of items(); track item._id || item.id || item.product?._id) {
+            <article class="cart-line">
+              <img [src]="productImage(item)" [alt]="productName(item)" />
+              <div class="line-copy">
+                <span>{{ item?.product?.brand || item?.brand || 'Store pick' }}</span>
+                <h3>{{ productName(item) }}</h3>
+                <p>{{ itemPrice(item) | currency: currency() }}</p>
+              </div>
+              <div class="quantity-stepper">
+                <button type="button" (click)="updateQuantity(item, itemQuantity(item) - 1)" [disabled]="itemQuantity(item) <= 1">-</button>
+                <span>{{ itemQuantity(item) }}</span>
+                <button type="button" (click)="updateQuantity(item, itemQuantity(item) + 1)">+</button>
+              </div>
+              <strong>{{ itemLineTotal(item) | currency: currency() }}</strong>
+              <button class="icon-action danger" type="button" (click)="removeItem(item)" aria-label="Remove item">
+                <i class="pi pi-trash"></i>
+              </button>
+            </article>
+          }
+        }
+      </div>
+      <aside class="summary-card">
+        <h2>Order Summary</h2>
+        <div class="summary-row"><span>Subtotal</span><strong>{{ subtotal() | currency: currency() }}</strong></div>
+        <div class="summary-row"><span>Discount</span><strong>-{{ discount() | currency: currency() }}</strong></div>
+        <div class="summary-row"><span>Shipping</span><strong>{{ shipping() ? (shipping() | currency: currency()) : 'Calculated next' }}</strong></div>
+        <div class="summary-total"><span>Total</span><strong>{{ total() | currency: currency() }}</strong></div>
+        @if (error()) { <p class="error-note">{{ error() }}</p> }
+        <button class="checkout-button" type="button" (click)="validateAndCheckout()" [disabled]="!items().length || validating()">
+          @if (validating()) { <i class="pi pi-spin pi-spinner"></i> } @else { <i class="pi pi-lock"></i> }
+          Continue checkout
+        </button>
+        <div class="trust-row">
+          <span><i class="pi pi-shield"></i> Secure checkout</span>
+          <span><i class="pi pi-refresh"></i> Easy returns</span>
+        </div>
+      </aside>
+    </section>
+  }
+
+  @if (mode() === 'checkout') {
+    <section class="checkout-grid apx-page-wide">
+      <div class="checkout-steps">
+        @for (step of ['contact','delivery','payment','review']; track step) {
+          <button type="button" [class.active]="checkoutStep() === step" (click)="checkoutStep.set($any(step))">
+            <span></span>{{ step }}
+          </button>
+        }
+      </div>
+      <form class="checkout-form">
+        <label>Email<input type="email" placeholder="you@example.com" /></label>
+        <label>Full name<input type="text" placeholder="Customer name" /></label>
+        <label>Delivery address<textarea rows="4" placeholder="Street, city, state, postal code"></textarea></label>
+        <div class="form-grid">
+          <label>Payment method<select><option>Card / UPI / Wallet</option><option>Cash on delivery</option></select></label>
+          <label>Delivery speed<select><option>Standard delivery</option><option>Express delivery</option></select></label>
+        </div>
+      </form>
+      <aside class="summary-card">
+        <h2>Review</h2>
+        <div class="summary-row"><span>Items</span><strong>{{ itemCount() }}</strong></div>
+        <div class="summary-total"><span>Total</span><strong>{{ total() | currency: currency() }}</strong></div>
+        <button class="checkout-button" type="button"><i class="pi pi-credit-card"></i> Place order</button>
+        <p class="muted">Payment creation will connect to the backend order/payment endpoint when exposed.</p>
+      </aside>
+    </section>
+  }
+
+  @if (mode() === 'account' || mode() === 'orders' || mode() === 'addresses' || mode() === 'notifications') {
+    <section class="account-grid apx-page-wide">
+      @if (mode() === 'addresses') {
+        @for (address of addressCards; track address.name) {
+          <article class="account-card"><i class="pi pi-map-marker"></i><span>{{ address.badge }}</span><h3>{{ address.name }}</h3><p>{{ address.line }}</p><button type="button">Edit address</button></article>
+        }
+      } @else if (mode() === 'notifications') {
+        @for (note of notifications; track note.title) {
+          <article class="account-card"><i [class]="note.icon"></i><span>Notification</span><h3>{{ note.title }}</h3><p>{{ note.body }}</p><button type="button">Manage</button></article>
+        }
+      } @else {
+        @for (card of accountCards; track card.title) {
+          <article class="account-card">
+            <i [class]="card.icon"></i><span>{{ card.value }}</span><h3>{{ card.title }}</h3><p>{{ card.body }}</p>
+            <a [routerLink]="['/store', orgSlug(), card.route]">Open</a>
+          </article>
+        }
+      }
+    </section>
+  }
+</main>

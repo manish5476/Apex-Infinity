@@ -192,7 +192,8 @@ isDevMode: any;
           ]).pipe(takeUntil(this.destroy$)).subscribe(([parentParams, childParams]) => {
       const params  = { ...parentParams, ...childParams };
       const orgSlug = params['orgSlug'];
-      const pageSlug = params['pageSlug'] || 'home';
+      const wildcardSlug = this.route.snapshot.url.map(s => s.path).join('/');
+      const pageSlug = params['pageSlug'] || wildcardSlug || 'home';
 
       this.orgSlug = orgSlug ?? '';
 
@@ -202,7 +203,7 @@ isDevMode: any;
     });
   }
 
-  loadPage(orgSlug: string, pageSlug: string): void {
+  loadPage(orgSlug: string, pageSlug: string, attemptedNotFound = false): void {
     this.isLoading.set(true);
     this.error.set(null);
 
@@ -223,9 +224,26 @@ isDevMode: any;
         this.isLoading.set(false);
       },
       error: (err: any) => {
+        if (err?.status === 404 && pageSlug !== '404' && !attemptedNotFound) {
+          this.loadPage(orgSlug, '404', true);
+          return;
+        }
+
         const msg = err?.status === 404
           ? 'The page you are looking for does not exist.'
           : 'We encountered an error loading this page.';
+        this._updateSeo({
+          organization: this.stateService.organization(),
+          page: {
+            name: 'Page not found',
+            slug: pageSlug,
+            seo: {
+              title: 'Page not found',
+              description: msg,
+              noIndex: true
+            }
+          }
+        });
         this.error.set(msg);
         this.isLoading.set(false);
       }
@@ -246,6 +264,9 @@ isDevMode: any;
     this.metaService.updateTag({ property: 'og:type', content: 'website' });
     this.metaService.updateTag({ property: 'og:title', content: seo.title ?? data.page.name ?? 'Store' });
     this.metaService.updateTag({ name: 'twitter:card', content: seo.image ? 'summary_large_image' : 'summary' });
+    const canonical = this._canonicalUrl(data);
+    this.metaService.updateTag({ property: 'og:url', content: canonical });
+    this._updateCanonicalLink(canonical);
     this._updateJsonLd(data);
     if (seo.noIndex) {
       this.metaService.updateTag({ name: 'robots', content: 'noindex, nofollow' });
@@ -272,9 +293,33 @@ isDevMode: any;
         '@type': 'Organization',
         name: org.name,
         logo: org.logo || undefined
-      } : undefined
+      } : undefined,
+      url: this._canonicalUrl(data)
     });
     this.document.head.appendChild(script);
+  }
+
+  private _canonicalUrl(data: any): string {
+    const explicit = data?.page?.seo?.canonicalUrl ?? data?.page?.canonicalUrl;
+    if (explicit) return explicit;
+
+    const origin = this.document.location?.origin ?? '';
+    const org = data?.organization?.slug ?? this.orgSlug;
+    const slug = data?.page?.slug ?? 'home';
+    const path = slug === 'home' ? `/store/${org}/home` : `/store/${org}/${slug}`;
+    return `${origin}${path}`.replace(/\/+$/, '');
+  }
+
+  private _updateCanonicalLink(url: string): void {
+    const id = 'storefront-canonical';
+    let link = this.document.getElementById(id) as HTMLLinkElement | null;
+    if (!link) {
+      link = this.document.createElement('link');
+      link.id = id;
+      link.rel = 'canonical';
+      this.document.head.appendChild(link);
+    }
+    link.href = url;
   }
 
     ngOnDestroy(): void {

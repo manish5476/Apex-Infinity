@@ -10,6 +10,15 @@ const storefrontExperienceRoute = (path: string, pageKey: string, title: string)
   title
 });
 
+const commerceFlowRoute = (path: string, mode: string, title: string): Routes[number] => ({
+  path,
+  loadComponent: () =>
+    import('./pages/commerce-flow/commerce-flow.component')
+      .then(m => m.CommerceFlowComponent),
+  data: { mode },
+  title
+});
+
 export const STOREFRONT_PUBLIC_ROUTES: Routes = [
   {
     path: '',
@@ -23,15 +32,16 @@ export const STOREFRONT_PUBLIC_ROUTES: Routes = [
         .then(m => m.ProductListingComponent),
     title: 'Shop'
   },
+  commerceFlowRoute('cart', 'cart', 'Cart'),
+  commerceFlowRoute('checkout', 'checkout', 'Checkout'),
+  commerceFlowRoute('account', 'account', 'Account'),
+  commerceFlowRoute('account/orders', 'orders', 'Orders'),
+  commerceFlowRoute('account/addresses', 'addresses', 'Saved Addresses'),
+  commerceFlowRoute('account/notifications', 'notifications', 'Notifications'),
   ...[
-    ['cart', 'cart', 'Cart'],
-    ['checkout', 'checkout', 'Checkout'],
     ['search', 'search', 'Search'],
     ['login', 'login', 'Store Login'],
     ['register', 'register', 'Create Account'],
-    ['account', 'account', 'Account'],
-    ['account/addresses', 'addresses', 'Saved Addresses'],
-    ['account/notifications', 'notifications', 'Notifications'],
     ['wishlist', 'wishlist', 'Wishlist'],
     ['compare', 'compare', 'Compare Products'],
     ['recently-viewed', 'recently-viewed', 'Recently Viewed'],
@@ -41,20 +51,7 @@ export const STOREFRONT_PUBLIC_ROUTES: Routes = [
     ['orders/success', 'order-success', 'Order Success'],
     ['orders/failure', 'order-failure', 'Order Failure'],
     ['track-order', 'track-order', 'Track Order'],
-    ['gift-card', 'gift-card', 'Gift Card'],
-    ['about', 'about', 'About Us'],
-    ['contact', 'contact', 'Contact Us'],
-    ['faq', 'faq', 'FAQ'],
-    ['privacy-policy', 'privacy', 'Privacy Policy'],
-    ['terms-and-conditions', 'terms', 'Terms and Conditions'],
-    ['shipping-policy', 'shipping', 'Shipping Policy'],
-    ['refund-policy', 'refund', 'Refund Policy'],
-    ['blog', 'blog', 'Blog'],
-    ['blog/:slug', 'blog-detail', 'Blog Detail'],
-    ['404', 'not-found', 'Page Not Found'],
-    ['maintenance', 'maintenance', 'Maintenance'],
-    ['coming-soon', 'coming-soon', 'Coming Soon'],
-    ['store-locator', 'store-locator', 'Store Locator']
+    ['gift-card', 'gift-card', 'Gift Card']
   ].map(([path, pageKey, title]) => storefrontExperienceRoute(path, pageKey, title)),
   {
     path: 'products/:productSlug',
@@ -68,6 +65,14 @@ export const STOREFRONT_PUBLIC_ROUTES: Routes = [
     loadComponent: () =>
       import('./dynamic-page/dynamic-page.component')
         .then(m => m.DynamicPageComponent),
+    title: 'Store'
+  },
+  {
+    path: '**',
+    loadComponent: () =>
+      import('./dynamic-page/dynamic-page.component')
+        .then(m => m.DynamicPageComponent),
+    data: { notFoundFallback: true },
     title: 'Store'
   }
 ];

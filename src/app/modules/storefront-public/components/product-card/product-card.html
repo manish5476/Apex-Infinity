@@ -25,8 +25,8 @@
     @if (!stockInfo().isAvailable) {
     <span class="badge badge-out">Sold Out</span>
     }
-    @if (product().stock?.qty !== undefined && product().stock!.qty < 5 && stockInfo().isAvailable) { <span
-      class="badge badge-low">{{ product().stock!.qty }} left</span>
+    @if (stockInfo().qty > 0 && stockInfo().qty < 5 && stockInfo().isAvailable) { <span
+      class="badge badge-low">{{ stockInfo().qty }} left</span>
       }
   </div>
 
