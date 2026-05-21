@@ -4,15 +4,15 @@
 
 .storefront-shell {
   font-family: var(--apx-font-sans);
-  color: var(--apx-color-ink);
+  color: var(--text-primary);
   background: var(--apx-color-canvas);
 }
 
 .storefront-shell__backdrop {
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--apx-color-primary) 7%, transparent), transparent 36%),
-    radial-gradient(circle at 18% 12%, color-mix(in srgb, var(--apx-color-accent) 14%, transparent), transparent 34rem),
-    radial-gradient(circle at 88% 18%, color-mix(in srgb, var(--apx-color-primary) 13%, transparent), transparent 30rem),
+    linear-gradient(180deg, color-mix(in srgb, var(--color-primary) 7%, transparent), transparent 36%),
+    radial-gradient(circle at 18% 12%, color-mix(in srgb, var(--accent-primary) 14%, transparent), transparent 34rem),
+    radial-gradient(circle at 88% 18%, color-mix(in srgb, var(--color-primary) 13%, transparent), transparent 30rem),
     var(--bg-page);
 }
 
@@ -26,7 +26,7 @@
 }
 
 .storefront-shell__frame {
-  box-shadow: var(--apx-shadow-lg);
+  box-shadow: var(--shadow-lg);
 }
 
 .animate-pulse-slow {
@@ -66,7 +66,7 @@
   transition:
     color var(--apx-duration-base) var(--apx-ease-standard),
     transform var(--apx-duration-base) var(--apx-ease-standard);
-  color: var(--apx-color-muted);
+  color: var(--text-secondary);
   
   &.active-link {
     color: var(--primary);
@@ -85,7 +85,7 @@
   -webkit-backdrop-filter: var(--apx-glass-blur) !important;
   border: 1px solid var(--apx-glass-border) !important;
   border-radius: var(--apx-radius-2xl) !important;
-  box-shadow: var(--apx-shadow-lg) !important;
+  box-shadow: var(--shadow-lg) !important;
   overflow: hidden;
 }
 
@@ -93,7 +93,7 @@
   background: var(--apx-glass-bg);
   backdrop-filter: var(--apx-glass-blur);
   &:hover {
-    background: var(--apx-color-surface-raised);
+    background: var(--bg-secondary-raised);
   }
 }
 
@@ -116,7 +116,7 @@
     color: #cbd5e1;
     &:hover {
       background: rgba(30, 41, 59, 0.9);
-      color: #fff;
+      color: var(--text-primary);
     }
   }
 

@@ -5,9 +5,9 @@
 .sf-experience {
   min-height: 100vh;
   padding: clamp(5rem, 8vw, 8rem) 0 clamp(4rem, 7vw, 7rem);
-  color: var(--apx-color-ink);
+  color: var(--text-primary);
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--apx-color-primary) 7%, transparent), transparent 28rem),
+    linear-gradient(180deg, color-mix(in srgb, var(--color-primary) 7%, transparent), transparent 28rem),
     var(--apx-color-canvas);
 }
 
@@ -35,7 +35,7 @@
 .sf-hero p {
   max-width: 62ch;
   margin: 0;
-  color: var(--apx-color-muted);
+  color: var(--text-secondary);
   font-size: clamp(1rem, 2vw, 1.2rem);
   line-height: 1.75;
 }
@@ -81,7 +81,7 @@
   width: 0.7rem;
   height: 0.7rem;
   border-radius: 50%;
-  background: color-mix(in srgb, var(--apx-color-ink) 18%, transparent);
+  background: color-mix(in srgb, var(--text-primary) 18%, transparent);
 }
 
 .preview-body {
@@ -94,7 +94,7 @@
   align-content: end;
   gap: 1rem;
   padding: 1.4rem;
-  box-shadow: var(--apx-shadow-md);
+  box-shadow: var(--shadow-md);
 }
 
 .preview-icon {
@@ -104,7 +104,7 @@
   place-items: center;
   border-radius: 1.25rem;
   background: rgba(255, 255, 255, 0.22);
-  color: #fff;
+  color: var(--text-primary);
   font-size: 1.6rem;
   backdrop-filter: blur(14px);
 }
@@ -137,8 +137,8 @@
   gap: 0.25rem;
   padding: 1rem;
   border-radius: 1rem;
-  background: var(--apx-color-surface);
-  border: 1px solid var(--apx-color-border);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
 }
 
 .metric-card strong {
@@ -147,7 +147,7 @@
 }
 
 .metric-card span {
-  color: var(--apx-color-muted);
+  color: var(--text-secondary);
   font-size: 0.78rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -187,14 +187,14 @@
   min-height: 14rem;
   padding: 1.25rem;
   border-radius: var(--apx-radius-lg);
-  background: color-mix(in srgb, var(--apx-color-surface) 82%, transparent);
-  border: 1px solid var(--apx-color-border);
+  background: color-mix(in srgb, var(--bg-secondary) 82%, transparent);
+  border: 1px solid var(--border-secondary);
   transition: transform var(--apx-duration-base) var(--apx-ease-standard), box-shadow var(--apx-duration-base) var(--apx-ease-standard);
 }
 
 .section-card:hover {
   transform: translateY(-3px);
-  box-shadow: var(--apx-shadow-md);
+  box-shadow: var(--shadow-md);
 }
 
 .section-icon {
@@ -203,8 +203,8 @@
   display: grid;
   place-items: center;
   border-radius: 0.75rem;
-  color: var(--apx-color-primary);
-  background: var(--apx-color-primary-soft);
+  color: var(--color-primary);
+  background: var(--component-bg-hover);
   margin-bottom: 1rem;
 }
 
@@ -216,7 +216,7 @@
 
 .section-card p {
   margin: 0;
-  color: var(--apx-color-muted);
+  color: var(--text-secondary);
   line-height: 1.65;
 }
 

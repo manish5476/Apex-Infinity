@@ -6,7 +6,7 @@
   width: 100%;
   display: flex;
   align-items: center;
-  background: #0c0e12;
+  background: var(--bg-primary);
   background-size: cover;
   background-position: center;
   overflow: hidden;
@@ -26,7 +26,7 @@
 .hero-overlay {
   position: absolute;
   inset: 0;
-  background: #000;
+  background: color-mix(in srgb, var(--bg-primary) 50%, transparent 50%);
   z-index: 1;
 }
 
@@ -69,7 +69,7 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 3px;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-secondary);
   margin-bottom: 20px;
 
   &::before {
@@ -87,10 +87,9 @@
   font-family: var(--font-heading);
   font-size: clamp(36px, 7vw, 88px);
   font-weight: 800;
-  color: #fff;
+  color: var(--text-primary);
   line-height: 1.0;
   letter-spacing: -0.03em;
-  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
 }
 
 .hero-actions {
@@ -120,28 +119,28 @@
   cursor: pointer;
 
   &-primary {
-    background: #fff;
-    color: #0c0e12;
-    &:hover { background: var(--accent-primary); color: #fff; border-color: var(--accent-primary); transform: translateY(-2px); }
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    &:hover { background: var(--accent-primary); color: var(--bg-primary); border-color: var(--accent-primary); transform: translateY(-2px); }
   }
 
   &-secondary {
     background: var(--accent-primary);
-    color: #fff;
-    &:hover { background: transparent; border-color: #fff; transform: translateY(-2px); }
+    color: var(--bg-primary);
+    &:hover { background: transparent; color: var(--accent-primary); border-color: var(--accent-primary); transform: translateY(-2px); }
   }
 
   &-outline {
     background: transparent;
-    color: #fff;
-    border-color: rgba(255, 255, 255, 0.45);
-    &:hover { border-color: #fff; background: rgba(255, 255, 255, 0.1); }
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+    &:hover { border-color: var(--text-primary); background: var(--text-primary); color: var(--bg-primary); }
   }
 
   &-ghost {
     background: transparent;
-    color: rgba(255, 255, 255, 0.75);
-    &:hover { color: #fff; }
+    color: var(--text-secondary);
+    &:hover { color: var(--text-primary); }
   }
 }
 
@@ -160,7 +159,7 @@
 .hero-scroll-line {
   width: 1px;
   height: 48px;
-  background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.45));
+  background: linear-gradient(to bottom, transparent, var(--border-secondary));
   animation: scroll-drop 1.8s ease-in-out infinite;
 }
 
@@ -177,7 +176,7 @@
 //   width: 100%;
 //   overflow: hidden;
 //   background-color: var(--bg-primary);
-//   color: #ffffff; // Force white for hero contrast
+//   color: var(--text-primary); // Force white for hero contrast
 // }
 
 // /* --- MEDIA HANDLING --- */
@@ -200,7 +199,7 @@
 //   .overlay {
 //     position: absolute;
 //     inset: 0;
-//     background: #000000;
+//     background: var(--text-primary);
 //     z-index: 1;
 //   }
 
@@ -261,7 +260,7 @@
 
 //   &.variant-primary {
 //     background-color: var(--accent-primary);
-//     color: #ffffff;
+//     color: var(--text-primary);
 //     border: 1px solid var(--accent-primary);
 
 //     &:hover {
@@ -324,7 +323,7 @@
 // // .overlay {
 // //   position: absolute;
 // //   inset: 0;
-// //   background-color: black;
+// //   background-color: var(--text-primary);
 // //   transition: opacity 0.7s ease;
 // //   z-index: 1;
 // // }
@@ -373,7 +372,7 @@
 // //   font-size: clamp(3rem, 6vw, 6rem);
 // //   font-weight: 900;
 // //   line-height: 1.1;
-// //   color: white;
+// //   color: var(--text-primary);
 // //   letter-spacing: -0.02em;
 // //   margin-bottom: var(--spacing-md);
 // //   text-shadow: 0 4px 20px rgba(0,0,0,0.3);
@@ -424,7 +423,7 @@
   
 // //   /* VARIANTS */
 // //   &.variant-primary {
-// //     background: white;
+// //     background: var(--bg-primary);
 // //     color: #0f172a;
 // //     border: 1px solid white;
     
@@ -437,21 +436,21 @@
   
 // //   &.variant-outline {
 // //     background: transparent;
-// //     color: white;
+// //     color: var(--text-primary);
 // //     border: 1px solid rgba(255,255,255,0.6);
 // //     backdrop-filter: blur(4px);
     
 // //     &:hover {
-// //       background: white;
+// //       background: var(--bg-primary);
 // //       color: #0f172a;
-// //       border-color: white;
+// //       border-color: var(--text-primary);
 // //       transform: translateY(-4px);
 // //     }
 // //   }
   
 // //   &.variant-secondary {
 // //     background: var(--color-primary);
-// //     color: white;
+// //     color: var(--text-primary);
 // //     border: 1px solid var(--color-primary);
     
 // //     &:hover {
@@ -571,7 +570,7 @@
 // // // // // //     overflow: hidden;
 // // // // // //     display: flex;
 // // // // // //     align-items: center;
-// // // // // //     background-color: #000;
+// // // // // //     background-color: var(--text-primary);
 // // // // // //     font-family: 'Roboto', sans-serif;
 // // // // // // }
 
@@ -709,8 +708,8 @@
 // // // // // // }
 
 // // // // // // .hero-btn.primary {
-// // // // // //     background: #fff;
-// // // // // //     color: #000;
+// // // // // //     background: var(--bg-primary);
+// // // // // //     color: var(--text-primary);
 // // // // // // }
 // // // // // // .hero-btn.primary:hover {
 // // // // // //     background: #e2e2e2;
@@ -798,7 +797,7 @@
 // // // // // // //     /* Massive Font Size */
 // // // // // // //     font-size: 5rem; 
 // // // // // // //     font-weight: 800;
-// // // // // // //     color: #ffffff;
+// // // // // // //     color: var(--text-primary);
 // // // // // // //     line-height: 1.1;
 // // // // // // //     margin: 0 0 var(--spacing-lg) 0;
 // // // // // // //     text-shadow: 0 4px 16px rgba(0,0,0,0.4);
@@ -902,7 +901,7 @@
 
 // // // // // // // .hero-btn.secondary {
 // // // // // // //     background-color: var(--color-text-main, #000000);
-// // // // // // //     color: #ffffff;
+// // // // // // //     color: var(--text-primary);
 // // // // // // // }
 // // // // // // // .hero-btn.secondary:hover {
 // // // // // // //     transform: translateY(-3px);
@@ -913,7 +912,7 @@
 // // // // // // //     background: rgba(255, 255, 255, 0.1);
 // // // // // // //     backdrop-filter: blur(12px);
 // // // // // // //     border: 1px solid rgba(255, 255, 255, 0.4);
-// // // // // // //     color: #ffffff;
+// // // // // // //     color: var(--text-primary);
 // // // // // // // }
 // // // // // // // .hero-btn.glass:hover {
 // // // // // // //     background: rgba(255, 255, 255, 0.25);
@@ -1007,7 +1006,7 @@
 // // // // // // // //     font-family: var(--font-heading);
 // // // // // // // //     font-size: 3.5rem; /* Large impact */
 // // // // // // // //     font-weight: 800;
-// // // // // // // //     color: #ffffff;
+// // // // // // // //     color: var(--text-primary);
 // // // // // // // //     line-height: 1.1;
 // // // // // // // //     margin: 0 0 var(--spacing-lg) 0;
 // // // // // // // //     text-shadow: 0 4px 12px rgba(0,0,0,0.3);
@@ -1069,7 +1068,7 @@
 // // // // // // // // /* Variant: Secondary (Solid Black/Dark) */
 // // // // // // // // .hero-btn.secondary {
 // // // // // // // //     background-color: var(--color-text-main, #000000);
-// // // // // // // //     color: #ffffff;
+// // // // // // // //     color: var(--text-primary);
 // // // // // // // //     border: 2px solid transparent;
 // // // // // // // // }
 // // // // // // // // .hero-btn.secondary:hover {
@@ -1080,12 +1079,12 @@
 // // // // // // // // /* Variant: Outline (Bordered) */
 // // // // // // // // .hero-btn.outline {
 // // // // // // // //     background-color: transparent;
-// // // // // // // //     color: #ffffff;
+// // // // // // // //     color: var(--text-primary);
 // // // // // // // //     border: 2px solid #ffffff;
 // // // // // // // // }
 // // // // // // // // .hero-btn.outline:hover {
-// // // // // // // //     background-color: #ffffff;
-// // // // // // // //     color: #000000;
+// // // // // // // //     background-color: var(--bg-primary);
+// // // // // // // //     color: var(--text-primary);
 // // // // // // // // }
 
 // // // // // // // // /* Variant: Glass (Frosted) */
@@ -1094,7 +1093,7 @@
 // // // // // // // //     backdrop-filter: blur(10px);
 // // // // // // // //     -webkit-backdrop-filter: blur(10px);
 // // // // // // // //     border: 1px solid rgba(255, 255, 255, 0.3);
-// // // // // // // //     color: #ffffff;
+// // // // // // // //     color: var(--text-primary);
 // // // // // // // // }
 // // // // // // // // .hero-btn.glass:hover {
 // // // // // // // //     background: rgba(255, 255, 255, 0.3);

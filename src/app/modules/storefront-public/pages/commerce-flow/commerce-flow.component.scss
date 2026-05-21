@@ -4,9 +4,9 @@
   min-height: 100vh;
   padding: clamp(5rem, 8vw, 7.5rem) 0 clamp(4rem, 7vw, 6rem);
   background:
-    radial-gradient(circle at 12% 0%, color-mix(in srgb, var(--apx-color-primary) 14%, transparent), transparent 30rem),
+    radial-gradient(circle at 12% 0%, color-mix(in srgb, var(--color-primary) 14%, transparent), transparent 30rem),
     var(--apx-color-canvas);
-  color: var(--apx-color-ink);
+  color: var(--text-primary);
 }
 
 .commerce-hero {
@@ -28,7 +28,7 @@
 .commerce-hero p {
   max-width: 64ch;
   margin: 0;
-  color: var(--apx-color-muted);
+  color: var(--text-secondary);
   line-height: 1.7;
 }
 
@@ -39,9 +39,9 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0 1rem;
-  border: 1px solid var(--apx-color-border);
+  border: 1px solid var(--border-secondary);
   border-radius: 1rem;
-  background: var(--apx-color-surface);
+  background: var(--bg-secondary);
   box-shadow: var(--apx-shadow-sm);
 }
 
@@ -63,10 +63,10 @@
   display: grid;
   gap: 0.25rem;
   padding: 0.5rem;
-  border: 1px solid var(--apx-color-border);
+  border: 1px solid var(--border-secondary);
   border-radius: 1rem;
-  background: var(--apx-color-surface);
-  box-shadow: var(--apx-shadow-lg);
+  background: var(--bg-secondary);
+  box-shadow: var(--shadow-lg);
 }
 
 .suggestions a {
@@ -79,7 +79,7 @@
   text-decoration: none;
 }
 
-.suggestions a:hover { background: var(--apx-color-primary-soft); }
+.suggestions a:hover { background: var(--component-bg-hover); }
 
 .commerce-grid,
 .checkout-grid {
@@ -94,9 +94,9 @@
 .checkout-form,
 .checkout-steps,
 .account-card {
-  border: 1px solid var(--apx-color-border);
+  border: 1px solid var(--border-secondary);
   border-radius: 1.25rem;
-  background: var(--apx-color-surface);
+  background: var(--bg-secondary);
   box-shadow: var(--apx-shadow-xs);
 }
 
@@ -117,7 +117,7 @@
   gap: 1rem;
   align-items: center;
   padding: 0.75rem;
-  border: 1px solid var(--apx-color-border);
+  border: 1px solid var(--border-secondary);
   border-radius: 1rem;
 }
 
@@ -132,7 +132,7 @@
 .line-copy span,
 .account-card span,
 .muted {
-  color: var(--apx-color-muted);
+  color: var(--text-secondary);
   font-size: 0.76rem;
   font-weight: 850;
   text-transform: uppercase;
@@ -144,14 +144,14 @@
   font-family: var(--apx-font-display);
 }
 
-.line-copy p { margin: 0; color: var(--apx-color-muted); }
+.line-copy p { margin: 0; color: var(--text-secondary); }
 
 .quantity-stepper {
   display: grid;
   grid-template-columns: 2.2rem 2.2rem 2.2rem;
   align-items: center;
   overflow: hidden;
-  border: 1px solid var(--apx-color-border);
+  border: 1px solid var(--border-secondary);
   border-radius: 0.75rem;
 }
 
@@ -186,10 +186,10 @@
   gap: 1rem;
 }
 
-.summary-row { color: var(--apx-color-muted); }
+.summary-row { color: var(--text-secondary); }
 .summary-total {
   padding-top: 1rem;
-  border-top: 1px solid var(--apx-color-border);
+  border-top: 1px solid var(--border-secondary);
   font-size: 1.2rem;
 }
 
@@ -198,7 +198,7 @@
   border: 0;
   border-radius: 0.9rem;
   background: var(--apx-gradient-commerce);
-  color: #fff;
+  color: var(--text-primary);
   font-weight: 900;
   cursor: pointer;
 }
@@ -211,7 +211,7 @@
 .trust-row {
   display: grid;
   gap: 0.45rem;
-  color: var(--apx-color-muted);
+  color: var(--text-secondary);
   font-weight: 750;
 }
 
@@ -233,8 +233,8 @@
   display: grid;
   place-items: center;
   border-radius: 1rem;
-  background: var(--apx-color-primary-soft);
-  color: var(--apx-color-primary);
+  background: var(--component-bg-hover);
+  color: var(--color-primary);
 }
 
 .checkout-steps {
@@ -250,14 +250,14 @@
   border: 0;
   border-radius: 0.75rem;
   background: transparent;
-  color: var(--apx-color-muted);
+  color: var(--text-secondary);
   font-weight: 850;
   text-transform: capitalize;
   cursor: pointer;
 }
 
 .checkout-steps button.active {
-  color: #fff;
+  color: var(--text-primary);
   background: #111827;
 }
 
@@ -270,7 +270,7 @@
 .checkout-form label {
   display: grid;
   gap: 0.45rem;
-  color: var(--apx-color-muted);
+  color: var(--text-secondary);
   font-weight: 850;
 }
 
@@ -278,10 +278,10 @@
 .checkout-form textarea,
 .checkout-form select {
   width: 100%;
-  border: 1px solid var(--apx-color-border);
+  border: 1px solid var(--border-secondary);
   border-radius: 0.8rem;
   padding: 0.85rem;
-  color: var(--apx-color-ink);
+  color: var(--text-primary);
   background: var(--apx-color-canvas);
 }
 
@@ -312,7 +312,7 @@
 
 .account-card p {
   margin: 0;
-  color: var(--apx-color-muted);
+  color: var(--text-secondary);
   line-height: 1.65;
 }
 
@@ -323,7 +323,7 @@
   border: 0;
   border-radius: 0.75rem;
   background: #111827;
-  color: #fff;
+  color: var(--text-primary);
   padding: 0.7rem 1rem;
   text-decoration: none;
   font-weight: 850;

@@ -14,6 +14,7 @@ import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { StorefrontCartService } from '@core/services/storefront.cart.service';
 import { StorefrontPublicService } from '@core/services/storefront-public.service';
 import { StorefrontStateService } from '@core/services/storefront-state.service';
+import { ThemeService } from '@core/services/theme.service';
 import { Subject, catchError, debounceTime, distinctUntilChanged, filter, of, switchMap, takeUntil } from 'rxjs';
 
 @Component({
@@ -58,6 +59,9 @@ import { Subject, catchError, debounceTime, distinctUntilChanged, filter, of, sw
         </div>
 
         <div class="sf-nav__actions">
+          <button type="button" (click)="toggleTheme()" aria-label="Toggle Theme">
+            <i class="pi" [ngClass]="isDarkMode() ? 'pi-sun' : 'pi-moon'"></i>
+          </button>
           <button type="button" (click)="searchOpen.set(true)" aria-label="Search">
             <i class="pi pi-search"></i>
           </button>
@@ -166,6 +170,7 @@ export class NavbarSimpleComponent implements OnInit, OnDestroy {
   private readonly stateService = inject(StorefrontStateService);
   private readonly cartService = inject(StorefrontCartService);
   private readonly publicService = inject(StorefrontPublicService);
+  private readonly themeService = inject(ThemeService);
   private readonly router = inject(Router);
   private readonly destroy$ = new Subject<void>();
   private readonly search$ = new Subject<string>();
@@ -189,6 +194,7 @@ export class NavbarSimpleComponent implements OnInit, OnDestroy {
   readonly grandTotal = this.cartService.grandTotal;
   readonly cartItems = computed<any[]>(() => this.cartService.cart()?.items ?? []);
   readonly currency = computed(() => this.cartService.cart()?.currency ?? 'INR');
+  readonly isDarkMode = signal(false);
 
   readonly defaultMegaLinks = [
     { label: 'New arrivals', url: 'new-arrivals' },
@@ -226,6 +232,10 @@ export class NavbarSimpleComponent implements OnInit, OnDestroy {
       this.accountOpen.set(false);
     });
 
+    this.themeService.settings$.pipe(takeUntil(this.destroy$)).subscribe(s => {
+      this.isDarkMode.set(s.isDarkMode);
+    });
+
     this.search$.pipe(
       debounceTime(220),
       distinctUntilChanged(),
@@ -247,6 +257,10 @@ export class NavbarSimpleComponent implements OnInit, OnDestroy {
   @HostListener('window:scroll')
   onScroll(): void {
     this.isScrolled.set(window.scrollY > 24);
+  }
+
+  toggleTheme(): void {
+    this.themeService.setDarkMode(!this.isDarkMode());
   }
 
   navLink(url: string): string[] {

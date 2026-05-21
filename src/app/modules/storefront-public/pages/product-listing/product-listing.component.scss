@@ -153,7 +153,7 @@
     }
     &.active {
       background: var(--accent-primary);
-      color: #ffffff;
+      color: var(--text-primary);
     }
   }
   @media (max-width: 768px) {
@@ -170,7 +170,7 @@
   gap: var(--spacing-md);
   padding: var(--spacing-lg) var(--spacing-2xl);
   background: var(--accent-primary);
-  color: #ffffff;
+  color: var(--text-primary);
   border: none;
   border-radius: 9999px;
   font-weight: var(--font-weight-semibold);
@@ -191,7 +191,7 @@
   }
 
   .badge {
-    background: #ffffff;
+    background: var(--bg-primary);
     color: var(--accent-primary);
     width: var(--spacing-xl);
     height: var(--spacing-xl);
@@ -387,7 +387,7 @@
     }
     &.active {
       background: var(--accent-primary);
-      color: #ffffff;
+      color: var(--text-primary);
       border-color: var(--accent-primary);
     }
   }
@@ -498,7 +498,7 @@
 
   .btn-primary {
     background: var(--accent-primary);
-    color: #ffffff;
+    color: var(--text-primary);
     border: none;
     padding: var(--spacing-lg) var(--spacing-2xl);
     border-radius: 9999px;
@@ -666,7 +666,7 @@
 
     &.active {
       background: var(--accent-primary);
-      color: #ffffff;
+      color: var(--text-primary);
       box-shadow: var(--shadow-md);
     }
   }
@@ -694,7 +694,7 @@
 
     &.active {
       background: var(--accent-primary);
-      color: #ffffff;
+      color: var(--text-primary);
       border-color: var(--accent-primary);
     }
   }
@@ -725,7 +725,7 @@
   .apply-btn {
     flex: 2;
     background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-hover) 100%);
-    color: #ffffff;
+    color: var(--text-primary);
     border: none;
     border-radius: var(--radius-2xl);
     font-weight: var(--font-weight-semibold);
@@ -903,7 +903,7 @@
   
 //   .badge {
 //     background: var(--color-error);
-//     color: white;
+//     color: var(--text-primary);
 //     width: 20px; height: 20px;
 //     border-radius: 50%;
 //     font-size: 0.7rem;
@@ -1200,7 +1200,7 @@
     
 //     &.active {
 //       background: var(--primary);
-//       color: white;
+//       color: var(--text-primary);
 //       border-color: var(--primary);
 //     }
 //   }

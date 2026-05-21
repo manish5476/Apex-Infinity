@@ -71,7 +71,7 @@
   font-family: var(--font-mono);
   font-size: clamp(36px, 5vw, 60px);
   font-weight: 800;
-  color: #fff;
+  color: var(--text-primary);
   line-height: 1;
   letter-spacing: -0.03em;
   font-variant-numeric: tabular-nums;
@@ -248,7 +248,7 @@
 // // :host { display: block; font-family: 'Manrope', sans-serif; }
 
 // // .section-root {
-// //   // background-color: white;
+// //   // background-color: var(--bg-primary);
 // //   background-color: transparent;
 // // }
 

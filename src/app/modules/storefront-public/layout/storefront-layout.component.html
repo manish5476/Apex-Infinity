@@ -117,7 +117,7 @@
       <button class="relative inline-block w-10 h-6 rounded-full cursor-pointer transition-colors duration-200"
         [class.bg-slate-900]="isDarkMode()" [class.bg-slate-200]="!isDarkMode()" (click)="toggleDarkMode()"
         [attr.aria-label]="isDarkMode() ? 'Disable dark mode' : 'Enable dark mode'">
-        <span class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200"
+        <span class="absolute left-1 top-1 w-4 h-4 bg-primary rounded-full shadow transition-transform duration-200"
           [class.translate-x-4]="isDarkMode()">
         </span>
       </button>
@@ -156,7 +156,7 @@
               <div class="absolute inset-0 opacity-90" [style.background]="theme.gradient"></div>
               @if (activeThemeId() === theme.id) {
               <i
-                class="pi pi-check text-white text-xs font-bold relative z-10 drop-shadow-md flex items-center justify-center h-full w-full"></i>
+                class="pi pi-check text-primary text-xs font-bold relative z-10 drop-shadow-md flex items-center justify-center h-full w-full"></i>
               }
             </button>
             }

@@ -1,13 +1,13 @@
 .footer-commerce {
   padding: clamp(3rem, 7vw, 6rem) 1rem 1rem;
   background:
-    radial-gradient(circle at 12% 0%, color-mix(in srgb, var(--apx-color-primary) 20%, transparent), transparent 24rem),
-    #080b12;
-  color: #fff;
+    radial-gradient(circle at 12% 0%, color-mix(in srgb, var(--accent-primary) 20%, transparent), transparent 24rem),
+    var(--bg-primary);
+  color: var(--text-primary);
 }
 
 .footer-commerce__inner {
-  width: min(100%, var(--apx-container-wide, 1440px));
+  width: min(100%, var(--container-wide, 1440px));
   margin-inline: auto;
   display: grid;
   grid-template-columns: minmax(280px, 1.1fr) minmax(320px, 1.4fr);
@@ -24,8 +24,8 @@
   width: fit-content;
   padding: 0.35rem 0.65rem;
   border-radius: 999px;
-  background: rgba(255,255,255,0.1);
-  color: rgba(255,255,255,0.72);
+  background: var(--component-bg-hover);
+  color: var(--text-secondary);
   font-size: 0.72rem;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -34,7 +34,7 @@
 
 .footer-commerce h2 {
   margin: 0;
-  font-family: var(--apx-font-display);
+  font-family: var(--font-heading);
   font-size: clamp(2.2rem, 5vw, 4.8rem);
   line-height: 0.95;
 }
@@ -42,7 +42,7 @@
 .footer-commerce p {
   max-width: 48ch;
   margin: 0;
-  color: rgba(255,255,255,0.64);
+  color: var(--text-secondary);
   line-height: 1.7;
 }
 
@@ -52,8 +52,8 @@
   gap: 0.55rem;
   padding: 0.35rem;
   border-radius: 0.9rem;
-  background: rgba(255,255,255,0.09);
-  border: 1px solid rgba(255,255,255,0.12);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
 }
 
 .footer-commerce__newsletter input {
@@ -61,7 +61,7 @@
   min-width: 0;
   border: 0;
   outline: 0;
-  color: #fff;
+  color: var(--text-primary);
   background: transparent;
   padding: 0 0.8rem;
 }
@@ -83,7 +83,7 @@
 
 .footer-commerce__columns h3 {
   margin: 0 0 0.8rem;
-  color: rgba(255,255,255,0.86);
+  color: var(--text-primary);
   font-size: 0.82rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -98,13 +98,13 @@
 }
 
 .footer-commerce__columns a {
-  color: rgba(255,255,255,0.62);
+  color: var(--text-secondary);
   text-decoration: none;
   font-weight: 650;
 }
 
 .footer-commerce__columns a:hover {
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .footer-commerce__trust,
@@ -125,9 +125,9 @@
   gap: 0.75rem;
   padding: 1rem;
   border-radius: 1rem;
-  background: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.1);
-  color: rgba(255,255,255,0.78);
+  background: var(--bg-secondary);
+  border: 1px solid var(--component-bg-hover);
+  color: var(--text-primary);
   font-weight: 800;
 }
 
@@ -137,8 +137,8 @@
   justify-content: space-between;
   gap: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid rgba(255,255,255,0.1);
-  color: rgba(255,255,255,0.52);
+  border-top: 1px solid var(--component-bg-hover);
+  color: var(--text-tertiary);
 }
 
 .payment-icons {
@@ -150,8 +150,8 @@
 .payment-icons span {
   padding: 0.25rem 0.5rem;
   border-radius: 0.4rem;
-  background: rgba(255,255,255,0.08);
-  color: rgba(255,255,255,0.74);
+  background: var(--component-bg-hover);
+  color: var(--text-secondary);
   font-size: 0.7rem;
   font-weight: 900;
 }
