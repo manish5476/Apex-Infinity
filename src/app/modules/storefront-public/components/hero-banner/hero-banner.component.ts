@@ -76,7 +76,13 @@ export class HeroBannerComponent {
     'opacity': (this.cfg().overlayOpacity / 100).toString()
   }));
 
-  isExternal(url: string): boolean {
+  isExternal(url: string | null | undefined): boolean {
+    if (!url) return false;
     return url.startsWith('http') || url.startsWith('www');
+  }
+
+  getLink(url: string | null | undefined): string {
+    if (!url) return '/';
+    return url;
   }
 }

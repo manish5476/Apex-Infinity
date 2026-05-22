@@ -81,10 +81,9 @@ export class PageBuilderComponent implements OnInit, OnDestroy {
   sections = signal<PageSection[]>([]);
   selectedSection = signal<PageSection | null>(null);
   
-  private _storeEnums = signal<any>({ categories: [], brands: [], tags: [] });
+  private _storeEnums = signal<any>({ categories: [], brands: [], tags: [], products: [] });
   mastersData = computed(() => ({
-    ...this._storeEnums(),
-    products: this.masterListService.products() ?? []
+    ...this._storeEnums()
   }));
   // ── View state ────────────────────────────────────────────────────────────
   viewMode = signal<'sidebar' | 'dialog'>('sidebar');
@@ -163,7 +162,8 @@ export class PageBuilderComponent implements OnInit, OnDestroy {
         this._storeEnums.set({
           categories: enums.categories ?? [],
           brands: enums.brands ?? [],
-          tags: enums.tags ?? []
+          tags: enums.tags ?? [],
+          products: enums.products ?? []
         });
       }
     });
