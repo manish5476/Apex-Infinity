@@ -104,10 +104,33 @@ export class PurchaseDetailsComponent implements OnInit, OnDestroy {
       cellStyle: { fontWeight: '700' }
     },
     {
+      headerName: 'Catalog Price',
+      field: 'productId.purchasePrice',
+      width: 140,
+      type: 'rightAligned',
+      headerTooltip: 'Master purchase price from product catalog',
+      cellRenderer: (params: any) => {
+        const catalogPrice = params.data.productId?.purchasePrice;
+        const invoicePrice = params.data.purchasePrice;
+        if (catalogPrice == null) return `<span style="color:var(--text-tertiary); font-size:11px;">N/A</span>`;
+        const formatted = this.formatCurrency(catalogPrice);
+        let badge = '';
+        if (invoicePrice != null && catalogPrice !== invoicePrice) {
+          const diff = invoicePrice - catalogPrice;
+          const color = diff > 0 ? 'var(--color-error, #ef4444)' : 'var(--color-success, #22c55e)';
+          const arrow = diff > 0 ? '▲' : '▼';
+          badge = `<span style="font-size:9px; color:${color}; margin-left:4px; font-weight:700;">${arrow} ${this.formatCurrency(Math.abs(diff))}</span>`;
+        }
+        return `<span style="color:var(--text-secondary);">${formatted}</span>${badge}`;
+      }
+    },
+    {
       headerName: 'Unit Price',
       field: 'purchasePrice',
       width: 120,
       type: 'rightAligned',
+      headerTooltip: 'Price at which this item was purchased in this invoice',
+      cellStyle: { fontWeight: '600', color: 'var(--text-primary)' },
       valueFormatter: (p: any) => this.formatCurrency(p.value)
     },
     {

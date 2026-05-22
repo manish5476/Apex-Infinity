@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, inject, signal, DestroyRef } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { of, catchError, map, finalize } from 'rxjs';
@@ -536,8 +536,8 @@ export class DesignationFormComponent implements OnInit {
   private initForm() {
     this.desigForm = this.fb.group({
       title: ['', [Validators.required, Validators.maxLength(100)]],
-      code: ['', [Validators.required, Validators.maxLength(20)]],
-      description: [''],
+      code: ['', [Validators.required, Validators.maxLength(20), Validators.pattern(/^[A-Z0-9_-]+$/)]],
+      description: ['', [Validators.maxLength(500)]],
       
       level: [1, [Validators.required, Validators.min(1)]],
       grade: ['C', [Validators.required]],
@@ -545,17 +545,17 @@ export class DesignationFormComponent implements OnInit {
       nextDesignation: [null],
       promotionAfterYears: [null, [Validators.min(0)]],
       
-      jobFamily: [''],
+      jobFamily: ['', [Validators.maxLength(100)]],
       experienceRequired: [null, [Validators.min(0)]],
       
       responsibilitiesText: [''], 
       qualificationsText: [''],
 
       salaryBand: this.fb.group({
-        min: [null],
-        max: [null],
+        min: [null, [Validators.min(0)]],
+        max: [null, [Validators.min(0)]],
         currency: ['INR']
-      }),
+      }, { validators: this.salaryBandRangeValidator }),
 
       reportsTo: [[]], 
       isActive: [true],
@@ -567,14 +567,25 @@ export class DesignationFormComponent implements OnInit {
       })
     });
 
-    // Auto-uppercase Job Code using takeUntilDestroyed
     this.desigForm.get('code')?.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(val => {
-        if (val && val !== val.toUpperCase()) {
-          this.desigForm.get('code')?.setValue(val.toUpperCase(), { emitEvent: false });
+        const normalized = typeof val === 'string'
+          ? val.trim().toUpperCase().replace(/\s+/g, '_')
+          : val;
+        if (val && normalized !== val) {
+          this.desigForm.get('code')?.setValue(normalized, { emitEvent: false });
         }
       });
+  }
+
+  private salaryBandRangeValidator(control: AbstractControl): ValidationErrors | null {
+    const min = control.get('min')?.value;
+    const max = control.get('max')?.value;
+    if (min === null || min === undefined || max === null || max === undefined) {
+      return null;
+    }
+    return Number(min) > Number(max) ? { salaryBandRange: true } : null;
   }
 
   private loadDependencies() {
@@ -645,8 +656,8 @@ export class DesignationFormComponent implements OnInit {
       qualificationsText: qualificationsTxt,
 
       salaryBand: {
-        min: data.salaryBand?.min || null,
-        max: data.salaryBand?.max || null,
+        min: data.salaryBand?.min ?? null,
+        max: data.salaryBand?.max ?? null,
         currency: data.salaryBand?.currency || 'INR'
       },
 

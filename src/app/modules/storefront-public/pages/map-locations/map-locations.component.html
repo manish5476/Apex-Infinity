@@ -2,7 +2,7 @@
 
   <div #mapStage id="map-stage" class="absolute inset-0 z-0 fade-in-map"></div>
 
-  @if(!map && locations.length > 0){
+  @if (!map && filteredLocations.length > 0) {
     <div class="absolute inset-0 z-10 flex items-center justify-center bg-[#0a0a0f] z-[50]">
       <div class="flex flex-col items-center gap-4">
         <div class="w-10 h-10 border-2 border-rose-500 border-t-transparent rounded-full animate-spin"></div>
@@ -11,20 +11,30 @@
     </div>
   }
 
+  @if (filteredLocations.length === 0) {
+    <div class="absolute inset-0 z-[55] flex items-center justify-center backdrop-blur-sm bg-black/40">
+      <div class="text-center p-8 border border-white/10 rounded-2xl bg-black/50 backdrop-blur-md shadow-2xl">
+        <i class="pi pi-map-marker text-4xl text-rose-500 mb-4 block opacity-50"></i>
+        <h3 class="text-xl font-bold text-white mb-2">No Locations Found</h3>
+        <p class="text-sm text-gray-400">There are no valid locations configured for this map section.</p>
+      </div>
+    </div>
+  }
+
   <div class="absolute top-6 right-6 z-[60] flex gap-2">
     <button (click)="setMapStyle('dark')"
       class="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider border transition-all"
-      [ngClass]="currentStyle === 'dark' ? 'bg-rose-600 border-rose-600 text-white shadow-lg' : 'bg-black/60 border-white/10 text-gray-400 backdrop-blur hover:bg-black/80'">
+      [ngClass]="currentStyle === 'dark' ? 'bg-rose-600 border-rose-600 text-primary shadow-lg' : 'bg-secondary/60 border-white/10 text-gray-400 backdrop-blur hover:bg-secondary/80'">
       Dark
     </button>
     <button (click)="setMapStyle('light')"
       class="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider border transition-all"
-      [ngClass]="currentStyle === 'light' ? 'bg-white border-white text-black shadow-lg' : 'bg-black/60 border-white/10 text-gray-400 backdrop-blur hover:bg-black/80'">
+      [ngClass]="currentStyle === 'light' ? 'bg-primary border-white text-primary shadow-lg' : 'bg-secondary/60 border-white/10 text-gray-400 backdrop-blur hover:bg-secondary/80'">
       Light
     </button>
     <button (click)="setMapStyle('satellite')"
       class="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider border transition-all"
-      [ngClass]="currentStyle === 'satellite' ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg' : 'bg-black/60 border-white/10 text-gray-400 backdrop-blur hover:bg-black/80'">
+      [ngClass]="currentStyle === 'satellite' ? 'bg-emerald-600 border-emerald-600 text-primary shadow-lg' : 'bg-secondary/60 border-white/10 text-gray-400 backdrop-blur hover:bg-secondary/80'">
       Sat
     </button>
   </div>
@@ -34,7 +44,7 @@
 
       <div>
         <h2 class="font-serif text-3xl md:text-4xl font-bold tracking-tight transition-colors duration-300"
-          [ngClass]="currentStyle === 'light' ? 'text-slate-900' : 'text-white'">
+          [ngClass]="currentStyle === 'light' ? 'text-slate-900' : 'text-primary'">
           {{ config.title || 'Global Presence' }}
         </h2>
         <div class="flex items-center gap-3 mt-2">
@@ -50,10 +60,10 @@
         <input [(ngModel)]="searchQuery" (input)="searchLocations()" type="text" placeholder="Search..."
           class="w-full backdrop-blur-xl border rounded-full py-2.5 px-5 pl-10 focus:outline-none transition-all shadow-lg"
           [ngClass]="currentStyle === 'light' 
-            ? 'bg-white/80 border-gray-300 text-slate-800 placeholder-gray-500 focus:border-rose-500' 
-            : 'bg-white/10 border-white/10 text-white placeholder-white/50 focus:bg-white/20 focus:border-rose-500/50'" />
+            ? 'bg-primary/80 border-gray-300 text-slate-800 placeholder-gray-500 focus:border-rose-500' 
+            : 'bg-primary/10 border-white/10 text-primary placeholder-white/50 focus:bg-primary/20 focus:border-rose-500/50'" />
           <i class="pi pi-search absolute left-4 top-1/2 -translate-y-1/2 transition-colors"
-          [ngClass]="currentStyle === 'light' ? 'text-gray-500' : 'text-white/50'"></i>
+          [ngClass]="currentStyle === 'light' ? 'text-gray-500' : 'text-primary/50'"></i>
         </div>
 
       </div>
@@ -68,7 +78,7 @@
         @if (filteredLocations.length > 1) {
           <button (click)="scrollCards(-1)"
             class="absolute left-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full backdrop-blur-md border flex items-center justify-center hover:scale-110 transition-all hidden md:flex shadow-lg"
-            [ngClass]="currentStyle === 'light' ? 'bg-white text-slate-700 border-gray-200' : 'bg-white/10 text-white border-white/10'">
+            [ngClass]="currentStyle === 'light' ? 'bg-primary text-slate-700 border-gray-200' : 'bg-primary/10 text-primary border-white/10'">
             <i class="pi pi-chevron-left"></i>
           </button>
         }
@@ -76,7 +86,7 @@
         @if (filteredLocations.length > 1) {
           <button (click)="scrollCards(1)"
             class="absolute right-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full backdrop-blur-md border flex items-center justify-center hover:scale-110 transition-all hidden md:flex shadow-lg"
-            [ngClass]="currentStyle === 'light' ? 'bg-white text-slate-700 border-gray-200' : 'bg-white/10 text-white border-white/10'">
+            [ngClass]="currentStyle === 'light' ? 'bg-primary text-slate-700 border-gray-200' : 'bg-primary/10 text-primary border-white/10'">
             <i class="pi pi-chevron-right"></i>
           </button>
         }
@@ -95,8 +105,8 @@
               <div
                 class="relative backdrop-blur-xl border rounded-2xl p-5 overflow-hidden transition-all duration-300 hover:shadow-2xl"
             [ngClass]="currentStyle === 'light' 
-                   ? 'bg-white/95 border-gray-200 shadow-md text-slate-800' 
-                   : 'bg-[#1a1a20]/90 border-white/10 text-white'">
+                   ? 'bg-primary/95 border-gray-200 shadow-md text-slate-800' 
+                   : 'bg-[#1a1a20]/90 border-white/10 text-primary'">
 
                 @if (selectedBranch?._id === loc._id) {
                   <div
@@ -125,7 +135,7 @@
 
                     <button (click)="$event.stopPropagation(); getDirections(loc)"
                       class="w-8 h-8 rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-md"
-                      [ngClass]="currentStyle === 'light' ? 'bg-slate-900 text-white' : 'bg-white text-black'">
+                      [ngClass]="currentStyle === 'light' ? 'bg-slate-900 text-primary' : 'bg-primary text-primary'">
                       <i class="pi pi-directions text-xs font-bold"></i>
                     </button>
                   </div>
@@ -151,26 +161,26 @@
   </div>
 
   <div *ngIf="!map && locations.length === 0" class="absolute inset-0 z-10 flex items-center justify-center bg-[#0a0a0f] z-[100]">
-    <p class="text-white text-sm">No location data available.</p>
+    <p class="text-primary text-sm">No location data available.</p>
   </div>
 
   <div class="absolute top-6 right-6 z-30 flex gap-2">
     <button
       (click)="setMapStyle('dark')"
       class="h-8 px-3 rounded-lg text-xs font-bold uppercase tracking-wider border transition-all"
-      [ngClass]="currentStyle === 'dark' ? 'bg-rose-600 border-rose-600 text-white shadow-lg shadow-rose-900/50' : 'bg-black/40 border-white/10 text-gray-400 backdrop-blur-md hover:bg-black/60'">
+      [ngClass]="currentStyle === 'dark' ? 'bg-rose-600 border-rose-600 text-primary shadow-lg shadow-rose-900/50' : 'bg-secondary/40 border-white/10 text-gray-400 backdrop-blur-md hover:bg-secondary/60'">
       Dark
     </button>
     <button
       (click)="setMapStyle('light')"
       class="h-8 px-3 rounded-lg text-xs font-bold uppercase tracking-wider border transition-all"
-      [ngClass]="currentStyle === 'light' ? 'bg-white border-white text-black shadow-lg' : 'bg-black/40 border-white/10 text-gray-400 backdrop-blur-md hover:bg-black/60'">
+      [ngClass]="currentStyle === 'light' ? 'bg-primary border-white text-primary shadow-lg' : 'bg-secondary/40 border-white/10 text-gray-400 backdrop-blur-md hover:bg-secondary/60'">
       Light
     </button>
     <button
       (click)="setMapStyle('satellite')"
       class="h-8 px-3 rounded-lg text-xs font-bold uppercase tracking-wider border transition-all"
-      [ngClass]="currentStyle === 'satellite' ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-900/50' : 'bg-black/40 border-white/10 text-gray-400 backdrop-blur-md hover:bg-black/60'">
+      [ngClass]="currentStyle === 'satellite' ? 'bg-emerald-600 border-emerald-600 text-primary shadow-lg shadow-emerald-900/50' : 'bg-secondary/40 border-white/10 text-gray-400 backdrop-blur-md hover:bg-secondary/60'">
       Sat
     </button>
   </div>
@@ -179,7 +189,7 @@
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pointer-events-auto">
       <div>
         <h2 class="font-serif text-3xl md:text-4xl font-bold tracking-tight transition-colors duration-500"
-          [ngClass]="currentStyle === 'light' ? 'text-slate-900' : 'text-white'">
+          [ngClass]="currentStyle === 'light' ? 'text-slate-900' : 'text-primary'">
           {{ config.title || 'Global Presence' }}
         </h2>
         <div class="flex items-center gap-3 mt-2">
@@ -199,13 +209,13 @@
           placeholder="Search locations..."
           class="w-full backdrop-blur-xl border rounded-full py-3 px-6 pl-12 focus:outline-none transition-all shadow-lg"
           [ngClass]="currentStyle === 'light' 
-            ? 'bg-white/80 border-gray-200 text-slate-800 placeholder-gray-400 focus:border-rose-500' 
-            : 'bg-white/10 border-white/10 text-white placeholder-white/50 focus:bg-white/20 focus:border-rose-500/50'"
+            ? 'bg-primary/80 border-gray-200 text-slate-800 placeholder-gray-400 focus:border-rose-500' 
+            : 'bg-primary/10 border-white/10 text-primary placeholder-white/50 focus:bg-primary/20 focus:border-rose-500/50'"
           />
           <i class="pi pi-search absolute left-4 top-1/2 -translate-y-1/2 transition-colors"
-          [ngClass]="currentStyle === 'light' ? 'text-gray-400' : 'text-white/50'"></i>
+          [ngClass]="currentStyle === 'light' ? 'text-gray-400' : 'text-primary/50'"></i>
           <button *ngIf="searchQuery" (click)="clearSearch()" class="absolute right-4 top-1/2 -translate-y-1/2 hover:text-rose-500 transition-colors"
-            [ngClass]="currentStyle === 'light' ? 'text-gray-400' : 'text-white/50'">
+            [ngClass]="currentStyle === 'light' ? 'text-gray-400' : 'text-primary/50'">
             <i class="pi pi-times"></i>
           </button>
         </div>
@@ -219,14 +229,14 @@
       <div class="relative pointer-events-auto">
 
         <button *ngIf="filteredLocations.length > 1" (click)="scrollCards(-1)"
-          class="absolute left-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full backdrop-blur-md border flex items-center justify-center hover:bg-rose-500 hover:border-rose-500 hover:text-white transition-all hidden md:flex"
-          [ngClass]="currentStyle === 'light' ? 'bg-white/80 border-gray-200 text-slate-600' : 'bg-white/10 border-white/10 text-white'">
+          class="absolute left-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full backdrop-blur-md border flex items-center justify-center hover:bg-rose-500 hover:border-rose-500 hover:text-primary transition-all hidden md:flex"
+          [ngClass]="currentStyle === 'light' ? 'bg-primary/80 border-gray-200 text-slate-600' : 'bg-primary/10 border-white/10 text-primary'">
           <i class="pi pi-chevron-left"></i>
         </button>
 
         <button *ngIf="filteredLocations.length > 1" (click)="scrollCards(1)"
-          class="absolute right-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full backdrop-blur-md border flex items-center justify-center hover:bg-rose-500 hover:border-rose-500 hover:text-white transition-all hidden md:flex"
-          [ngClass]="currentStyle === 'light' ? 'bg-white/80 border-gray-200 text-slate-600' : 'bg-white/10 border-white/10 text-white'">
+          class="absolute right-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full backdrop-blur-md border flex items-center justify-center hover:bg-rose-500 hover:border-rose-500 hover:text-primary transition-all hidden md:flex"
+          [ngClass]="currentStyle === 'light' ? 'bg-primary/80 border-gray-200 text-slate-600' : 'bg-primary/10 border-white/10 text-primary'">
           <i class="pi pi-chevron-right"></i>
         </button>
 
@@ -244,8 +254,8 @@
 
               <div class="relative backdrop-blur-xl border rounded-2xl p-6 overflow-hidden transition-all duration-300 hover:shadow-xl"
                  [ngClass]="currentStyle === 'light' 
-                   ? 'bg-white/90 border-gray-200 shadow-sm hover:border-rose-500/30 text-slate-800' 
-                   : 'bg-[#1a1a20]/80 border-white/10 hover:border-rose-500/30 text-white'">
+                   ? 'bg-primary/90 border-gray-200 shadow-sm hover:border-rose-500/30 text-slate-800' 
+                   : 'bg-[#1a1a20]/80 border-white/10 hover:border-rose-500/30 text-primary'">
 
                 <div *ngIf="selectedBranch?._id === loc._id" class="absolute -inset-1 bg-gradient-to-r from-rose-500/20 to-purple-500/20 blur-xl opacity-50"></div>
 
@@ -277,13 +287,13 @@
                     <div class="flex gap-2">
                       @for(tag of loc.features?.slice(0,2); track tag) {
                         <span class="text-[10px] px-2 py-1 rounded border"
-                        [ngClass]="currentStyle === 'light' ? 'bg-gray-100 border-gray-200 text-gray-500' : 'bg-white/5 border-white/5 text-gray-400'">{{ tag }}</span>
+                        [ngClass]="currentStyle === 'light' ? 'bg-gray-100 border-gray-200 text-gray-500' : 'bg-primary/5 border-white/5 text-gray-400'">{{ tag }}</span>
                       }
                     </div>
                     <button
                       (click)="$event.stopPropagation(); getDirections(loc)"
                       class="w-10 h-10 rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-lg"
-                      [ngClass]="currentStyle === 'light' ? 'bg-slate-900 text-white' : 'bg-white text-black'">
+                      [ngClass]="currentStyle === 'light' ? 'bg-slate-900 text-primary' : 'bg-primary text-primary'">
                       <i class="pi pi-directions font-bold"></i>
                     </button>
                   </div>
@@ -312,7 +322,7 @@
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pointer-events-auto">
 
       <div>
-        <h2 class="font-serif text-3xl md:text-4xl text-white font-bold tracking-tight">
+        <h2 class="font-serif text-3xl md:text-4xl text-primary font-bold tracking-tight">
           {{ config.title || 'Global Presence' }}
         </h2>
         <div class="flex items-center gap-3 mt-2">
@@ -329,10 +339,10 @@
           (input)="searchLocations()"
           type="text"
           placeholder="Search city, state, or branch..."
-          class="w-full bg-white/10 backdrop-blur-xl border border-white/10 rounded-full py-3 px-6 pl-12 text-white placeholder-white/50 focus:outline-none focus:bg-white/20 focus:border-rose-500/50 transition-all shadow-lg"
+          class="w-full bg-primary/10 backdrop-blur-xl border border-white/10 rounded-full py-3 px-6 pl-12 text-primary placeholder-white/50 focus:outline-none focus:bg-primary/20 focus:border-rose-500/50 transition-all shadow-lg"
           />
-          <i class="pi pi-search absolute left-4 top-1/2 -translate-y-1/2 text-white/50"></i>
-          <button *ngIf="searchQuery" (click)="clearSearch()" class="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white">
+          <i class="pi pi-search absolute left-4 top-1/2 -translate-y-1/2 text-primary/50"></i>
+          <button *ngIf="searchQuery" (click)="clearSearch()" class="absolute right-4 top-1/2 -translate-y-1/2 text-primary/50 hover:text-primary">
             <i class="pi pi-times"></i>
           </button>
         </div>
@@ -344,11 +354,11 @@
 
       <div class="relative pointer-events-auto">
 
-        <button *ngIf="filteredLocations.length > 1" (click)="scrollCards(-1)" class="absolute left-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white flex items-center justify-center hover:bg-rose-500 hover:border-rose-500 transition-all hidden md:flex">
+        <button *ngIf="filteredLocations.length > 1" (click)="scrollCards(-1)" class="absolute left-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full bg-primary/10 backdrop-blur-md border border-white/10 text-primary flex items-center justify-center hover:bg-rose-500 hover:border-rose-500 transition-all hidden md:flex">
           <i class="pi pi-chevron-left"></i>
         </button>
 
-        <button *ngIf="filteredLocations.length > 1" (click)="scrollCards(1)" class="absolute right-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white flex items-center justify-center hover:bg-rose-500 hover:border-rose-500 transition-all hidden md:flex">
+        <button *ngIf="filteredLocations.length > 1" (click)="scrollCards(1)" class="absolute right-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full bg-primary/10 backdrop-blur-md border border-white/10 text-primary flex items-center justify-center hover:bg-rose-500 hover:border-rose-500 transition-all hidden md:flex">
           <i class="pi pi-chevron-right"></i>
         </button>
 
@@ -371,7 +381,7 @@
                 <div class="relative z-10">
                   <div class="flex justify-between items-start mb-4">
                     <div>
-                      <h3 class="text-xl font-bold text-white mb-1">{{ loc.name }}</h3>
+                      <h3 class="text-xl font-bold text-primary mb-1">{{ loc.name }}</h3>
                       <p class="text-sm text-gray-400 flex items-center gap-1">
                         <i class="pi pi-map-marker text-rose-500"></i> {{ loc.address.city }}, {{ loc.address.state }}
                       </p>
@@ -396,13 +406,13 @@
                   <div class="flex items-center justify-between">
                     <div class="flex gap-2">
                       @for(tag of loc.features?.slice(0,2); track tag) {
-                        <span class="text-[10px] bg-white/5 text-gray-400 px-2 py-1 rounded border border-white/5">{{ tag }}</span>
+                        <span class="text-[10px] bg-primary/5 text-gray-400 px-2 py-1 rounded border border-white/5">{{ tag }}</span>
                       }
                     </div>
 
                     <button
                       (click)="$event.stopPropagation(); getDirections(loc)"
-                      class="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center hover:scale-110 transition-transform shadow-lg shadow-white/10">
+                      class="w-10 h-10 rounded-full bg-primary text-primary flex items-center justify-center hover:scale-110 transition-transform shadow-lg shadow-white/10">
                       <i class="pi pi-directions font-bold"></i>
                     </button>
                   </div>
@@ -416,14 +426,14 @@
     </div>
 
     <div class="absolute top-6 right-6 z-20 hidden lg:block">
-      <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4 flex gap-6">
+      <div class="bg-primary/5 backdrop-blur-xl border border-white/10 rounded-xl p-4 flex gap-6">
         <div class="text-center px-2">
-          <p class="text-2xl font-bold text-white">{{ locations.length }}</p>
+          <p class="text-2xl font-bold text-primary">{{ locations.length }}</p>
           <p class="text-[10px] text-gray-400 uppercase tracking-wider">Locations</p>
         </div>
-        <div class="w-px bg-white/10 h-10 my-auto"></div>
+        <div class="w-px bg-primary/10 h-10 my-auto"></div>
         <div class="text-center px-2">
-          <p class="text-2xl font-bold text-white">Global</p>
+          <p class="text-2xl font-bold text-primary">Global</p>
           <p class="text-[10px] text-gray-400 uppercase tracking-wider">Reach</p>
         </div>
       </div>
@@ -445,7 +455,7 @@
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pointer-events-auto">
 
       <div>
-        <h2 class="font-serif text-3xl md:text-4xl text-white font-bold tracking-tight">
+        <h2 class="font-serif text-3xl md:text-4xl text-primary font-bold tracking-tight">
           {{ config.title || 'Global Presence' }}
         </h2>
         <div class="flex items-center gap-3 mt-2">
@@ -462,10 +472,10 @@
           (input)="searchLocations()"
           type="text"
           placeholder="Search city, state, or branch..."
-          class="w-full bg-white/10 backdrop-blur-xl border border-white/10 rounded-full py-3 px-6 pl-12 text-white placeholder-white/50 focus:outline-none focus:bg-white/20 focus:border-rose-500/50 transition-all shadow-lg"
+          class="w-full bg-primary/10 backdrop-blur-xl border border-white/10 rounded-full py-3 px-6 pl-12 text-primary placeholder-white/50 focus:outline-none focus:bg-primary/20 focus:border-rose-500/50 transition-all shadow-lg"
           />
-          <i class="pi pi-search absolute left-4 top-1/2 -translate-y-1/2 text-white/50"></i>
-          <button *ngIf="searchQuery" (click)="clearSearch()" class="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white">
+          <i class="pi pi-search absolute left-4 top-1/2 -translate-y-1/2 text-primary/50"></i>
+          <button *ngIf="searchQuery" (click)="clearSearch()" class="absolute right-4 top-1/2 -translate-y-1/2 text-primary/50 hover:text-primary">
             <i class="pi pi-times"></i>
           </button>
         </div>
@@ -477,11 +487,11 @@
 
       <div class="relative pointer-events-auto">
 
-        <button *ngIf="filteredLocations.length > 1" (click)="scrollCards(-1)" class="absolute left-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white flex items-center justify-center hover:bg-rose-500 hover:border-rose-500 transition-all hidden md:flex">
+        <button *ngIf="filteredLocations.length > 1" (click)="scrollCards(-1)" class="absolute left-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full bg-primary/10 backdrop-blur-md border border-white/10 text-primary flex items-center justify-center hover:bg-rose-500 hover:border-rose-500 transition-all hidden md:flex">
           <i class="pi pi-chevron-left"></i>
         </button>
 
-        <button *ngIf="filteredLocations.length > 1" (click)="scrollCards(1)" class="absolute right-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white flex items-center justify-center hover:bg-rose-500 hover:border-rose-500 transition-all hidden md:flex">
+        <button *ngIf="filteredLocations.length > 1" (click)="scrollCards(1)" class="absolute right-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full bg-primary/10 backdrop-blur-md border border-white/10 text-primary flex items-center justify-center hover:bg-rose-500 hover:border-rose-500 transition-all hidden md:flex">
           <i class="pi pi-chevron-right"></i>
         </button>
 
@@ -504,7 +514,7 @@
                 <div class="relative z-10">
                   <div class="flex justify-between items-start mb-4">
                     <div>
-                      <h3 class="text-xl font-bold text-white mb-1">{{ loc.name }}</h3>
+                      <h3 class="text-xl font-bold text-primary mb-1">{{ loc.name }}</h3>
                       <p class="text-sm text-gray-400 flex items-center gap-1">
                         <i class="pi pi-map-marker text-rose-500"></i> {{ loc.address.city }}, {{ loc.address.state }}
                       </p>
@@ -529,13 +539,13 @@
                   <div class="flex items-center justify-between">
                     <div class="flex gap-2">
                       @for(tag of loc.features?.slice(0,2); track tag) {
-                        <span class="text-[10px] bg-white/5 text-gray-400 px-2 py-1 rounded border border-white/5">{{ tag }}</span>
+                        <span class="text-[10px] bg-primary/5 text-gray-400 px-2 py-1 rounded border border-white/5">{{ tag }}</span>
                       }
                     </div>
 
                     <button
                       (click)="$event.stopPropagation(); getDirections(loc)"
-                      class="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center hover:scale-110 transition-transform shadow-lg shadow-white/10">
+                      class="w-10 h-10 rounded-full bg-primary text-primary flex items-center justify-center hover:scale-110 transition-transform shadow-lg shadow-white/10">
                       <i class="pi pi-directions font-bold"></i>
                     </button>
                   </div>
@@ -549,14 +559,14 @@
     </div>
 
     <div class="absolute top-6 right-6 z-20 hidden lg:block">
-      <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4 flex gap-6">
+      <div class="bg-primary/5 backdrop-blur-xl border border-white/10 rounded-xl p-4 flex gap-6">
         <div class="text-center px-2">
-          <p class="text-2xl font-bold text-white">{{ locations.length }}</p>
+          <p class="text-2xl font-bold text-primary">{{ locations.length }}</p>
           <p class="text-[10px] text-gray-400 uppercase tracking-wider">Locations</p>
         </div>
-        <div class="w-px bg-white/10 h-10 my-auto"></div>
+        <div class="w-px bg-primary/10 h-10 my-auto"></div>
         <div class="text-center px-2">
-          <p class="text-2xl font-bold text-white">Global</p>
+          <p class="text-2xl font-bold text-primary">Global</p>
           <p class="text-[10px] text-gray-400 uppercase tracking-wider">Reach</p>
         </div>
       </div>
@@ -572,7 +582,7 @@
   <div class="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-[#0f1216]/90 to-transparent pointer-events-none z-10"></div>
 
   <div class="absolute top-8 left-6 md:left-12 z-20 pointer-events-none">
-    <h2 class="font-serif text-3xl md:text-4xl text-white font-bold tracking-tight drop-shadow-lg">
+    <h2 class="font-serif text-3xl md:text-4xl text-primary font-bold tracking-tight drop-shadow-lg">
       {{ config.title || 'Our Presence' }}
     </h2>
     <div class="flex items-center gap-2 mt-2">
@@ -594,19 +604,19 @@
           class="relative flex-shrink-0 w-[85vw] md:w-[380px] snap-center cursor-pointer group/card transition-all duration-500"
           [ngClass]="selectedBranch === loc ? 'scale-100 opacity-100' : 'scale-95 opacity-70 hover:opacity-100'">
 
-          <div class="relative bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl p-6 overflow-hidden hover:bg-white/15 transition-colors">
+          <div class="relative bg-primary/10 backdrop-blur-xl border border-white/10 rounded-2xl p-6 overflow-hidden hover:bg-primary/15 transition-colors">
 
             <div *ngIf="selectedBranch === loc" class="absolute inset-0 border-2 border-rose-500/50 rounded-2xl pointer-events-none"></div>
 
             <div class="flex justify-between items-start mb-4">
               <div>
-                <h3 class="text-xl font-serif text-white font-bold mb-1">{{ loc.name }}</h3>
+                <h3 class="text-xl font-serif text-primary font-bold mb-1">{{ loc.name }}</h3>
                 <span *ngIf="loc.isMainBranch" class="text-[10px] bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded border border-rose-500/30 uppercase tracking-wider font-bold">
                   Headquarters
                 </span>
               </div>
               <button (click)="$event.stopPropagation(); getDirections(loc)"
-                class="w-10 h-10 rounded-full bg-white text-slate-900 flex items-center justify-center hover:scale-110 transition-transform shadow-lg">
+                class="w-10 h-10 rounded-full bg-primary text-slate-900 flex items-center justify-center hover:scale-110 transition-transform shadow-lg">
                 <i class="pi pi-arrow-up-right text-lg font-bold"></i>
               </button>
             </div>

@@ -21,7 +21,7 @@ export interface Product {
   id: string;
   name: string;
   slug: string;
-  description: string;
+  description?: string | null;
 
   // 2. FIX: Make 'image' and 'brand' optional (?) so 'PublicProduct' is accepted
   image?: string | null;
@@ -40,7 +40,8 @@ export interface Product {
 
   stock?: {
     available: boolean;
-    qty: number;
+    qty?: number;
+    quantity?: number;
   };
 
   sku?: string;
@@ -98,18 +99,22 @@ export class ProductCardComponent {
     const s = this.product().stock;
     if (!s) return { isAvailable: false, qty: 0, label: 'Out of Stock', severity: 'danger' as TagSeverity };
 
-    const available = s.available && (s.qty > 0);
+    const qty = s.qty ?? s.quantity ?? 0;
+
+    // We trust the 'available' flag from backend if present, otherwise fallback to qty check.
+    // If backend returns available=true but qty=0 (e.g. for non-inventory items), we still consider it available.
+    const available = s.available || (qty > 0);
 
     // Correct PrimeNG severity mapping: 'warning' -> 'warn'
     let severity: TagSeverity = 'danger';
 
     if (available) {
-      severity = s.qty < 10 ? 'warn' : 'success';
+      severity = qty < 10 ? 'warn' : 'success';
     }
 
     return {
       isAvailable: available,
-      qty: s.qty,
+      qty: qty,
       label: available ? 'In Stock' : 'Out of Stock',
       severity: severity
     };

@@ -72,7 +72,7 @@ export class SupplierFormComponent implements OnInit, OnDestroy {
       altPhone: [''],
       gstNumber: [''],
       panNumber: [''],
-      category: [''],
+      categoryId: [null],
       tags: [[]],
       contacts: this.fb.array([]),
       address: this.fb.group({
@@ -164,7 +164,7 @@ export class SupplierFormComponent implements OnInit, OnDestroy {
       altPhone: supplier.altPhone,
       gstNumber: supplier.gstNumber,
       panNumber: supplier.panNumber,
-      category: supplier.category,
+      categoryId: supplier.categoryId || null,
       tags: supplier.tags || [],
       contacts: supplier.contacts || [],
       openingBalance: supplier.openingBalance,

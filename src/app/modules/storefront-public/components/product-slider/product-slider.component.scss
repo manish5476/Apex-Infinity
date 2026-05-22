@@ -81,7 +81,7 @@
     &:hover:not(:disabled) {
       border-color: var(--color-primary);
       background: var(--color-primary);
-      color: white;
+      color: var(--text-primary);
       transform: scale(1.05);
     }
     
@@ -243,7 +243,7 @@
 //     &:hover:not(:disabled) {
 //       border-color: var(--primary-color, #0f172a);
 //       background: var(--primary-color, #0f172a);
-//       color: white;
+//       color: var(--text-primary);
 //       transform: scale(1.05);
 //     }
 //     &:disabled { opacity: 0.3; cursor: not-allowed; }

@@ -12,6 +12,7 @@ import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
 import { TooltipModule } from 'primeng/tooltip';
 import { ToastModule } from 'primeng/toast';
+import { DatePickerModule } from 'primeng/datepicker';
 
 // Services
 import { AppMessageService } from '../../../core/services/message.service';
@@ -21,11 +22,12 @@ import { AgShareGrid } from "../../shared/components/ag-shared-grid";
 import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '@core/auth/permissions.constants';
 import { Subject } from "rxjs";
+import { MasterDropdownComponent } from '../../shared/components/masterFilterDropdown/master-dropdown.component';
 
 @Component({
   selector: 'app-sales-list',
   standalone: true,
-  imports: [SelectModule, FormsModule, ReactiveFormsModule, ButtonModule, InputTextModule, RouterModule, TooltipModule, AgShareGrid, ToastModule, HasPermissionDirective],
+  imports: [SelectModule, FormsModule, ReactiveFormsModule, ButtonModule, InputTextModule, RouterModule, TooltipModule, AgShareGrid, ToastModule, DatePickerModule, HasPermissionDirective, MasterDropdownComponent],
   templateUrl: './sales-list.html',
   styleUrl: './sales-list.scss',
 })
@@ -50,6 +52,7 @@ export class SalesListComponent implements OnInit, OnDestroy {
   searchControl = new FormControl('');
   searchQuery = toSignal(this.searchControl.valueChanges.pipe(debounceTime(400), distinctUntilChanged()), { initialValue: '' });
   salesFilter: any = {
+    branchId: null,
     status: null,
     paymentStatus: null,
     dateRange: null
@@ -80,7 +83,7 @@ export class SalesListComponent implements OnInit, OnDestroy {
 
   resetFilters() {
     this.searchControl.setValue('');
-    this.salesFilter = { status: null, paymentStatus: null, dateRange: null };
+    this.salesFilter = { branchId: null, status: null, paymentStatus: null, dateRange: null };
     this.getData(true);
   }
 

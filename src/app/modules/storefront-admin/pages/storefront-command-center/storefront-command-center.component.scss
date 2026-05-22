@@ -1,0 +1,305 @@
+:host {
+  display: block;
+}
+
+.admin-console {
+  min-height: 100vh;
+  padding: clamp(1rem, 3vw, 2rem);
+  color: var(--apx-color-ink);
+  background:
+    radial-gradient(circle at 16% 0%, color-mix(in srgb, var(--apx-color-primary) 14%, transparent), transparent 28rem),
+    linear-gradient(180deg, #f8fafc, var(--apx-color-canvas));
+}
+
+.admin-hero,
+.admin-grid,
+.workflow-panel {
+  width: min(100%, 1380px);
+  margin-inline: auto;
+}
+
+.hero-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 360px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.72fr);
+  gap: 2rem;
+  align-items: end;
+  padding: clamp(1.25rem, 4vw, 3rem);
+  border-radius: 2rem;
+  color: #fff;
+  box-shadow: var(--apx-shadow-xl);
+}
+
+.hero-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.18), transparent 42%),
+    radial-gradient(circle at 80% 10%, rgba(255,255,255,0.22), transparent 18rem);
+  pointer-events: none;
+}
+
+.hero-copy,
+.hero-preview {
+  position: relative;
+  z-index: 1;
+}
+
+.console-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: fit-content;
+  padding: 0.4rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.14);
+  border: 1px solid rgba(255,255,255,0.22);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.console-kicker.muted {
+  color: var(--apx-color-primary);
+  background: var(--apx-color-primary-soft);
+  border-color: color-mix(in srgb, var(--apx-color-primary) 18%, transparent);
+}
+
+.hero-copy h1 {
+  max-width: 12ch;
+  margin: 1rem 0;
+  font-family: var(--apx-font-display);
+  font-size: clamp(2.6rem, 6vw, 5.4rem);
+  line-height: 0.92;
+  letter-spacing: 0;
+}
+
+.hero-copy p {
+  max-width: 66ch;
+  margin: 0;
+  color: rgba(255,255,255,0.78);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-top: 1.35rem;
+}
+
+.console-btn {
+  min-height: 2.55rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.7rem;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.12);
+  color: inherit;
+  padding: 0 1rem;
+  font-weight: 850;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform var(--apx-duration-base) var(--apx-ease-standard), background var(--apx-duration-base) var(--apx-ease-standard);
+}
+
+.console-btn:hover {
+  transform: translateY(-1px);
+  background: rgba(255,255,255,0.2);
+}
+
+.console-btn.primary,
+.console-btn.dark {
+  background: #fff;
+  color: #0f172a;
+}
+
+.console-btn.dark {
+  border-color: var(--apx-color-border);
+  box-shadow: var(--apx-shadow-xs);
+}
+
+.hero-preview {
+  align-self: stretch;
+  display: grid;
+  align-content: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 1.5rem;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  backdrop-filter: blur(18px);
+}
+
+.command-pill {
+  min-height: 3rem;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0 1rem;
+  border-radius: 0.9rem;
+  background: rgba(255,255,255,0.92);
+  color: #64748b;
+  font-weight: 750;
+  box-shadow: var(--apx-shadow-md);
+}
+
+.preview-bars {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.preview-bars span {
+  display: block;
+  height: 4.5rem;
+  border-radius: 1rem;
+  background: rgba(255,255,255,0.16);
+  border: 1px solid rgba(255,255,255,0.18);
+}
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.metric-tile,
+.workflow-panel {
+  border: 1px solid var(--apx-color-border);
+  background: var(--apx-color-surface);
+  box-shadow: var(--apx-shadow-xs);
+}
+
+.metric-tile {
+  min-height: 13rem;
+  padding: 1.2rem;
+  border-radius: 1.25rem;
+  display: grid;
+  align-content: start;
+  gap: 0.55rem;
+}
+
+.tile-icon {
+  width: 2.6rem;
+  height: 2.6rem;
+  display: grid;
+  place-items: center;
+  border-radius: 0.8rem;
+  color: var(--apx-color-primary);
+  background: var(--apx-color-primary-soft);
+}
+
+.metric-tile span {
+  color: var(--apx-color-muted);
+  font-size: 0.78rem;
+  font-weight: 850;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.metric-tile strong {
+  font-family: var(--apx-font-display);
+  font-size: 2rem;
+}
+
+.metric-tile p {
+  margin: 0;
+  color: var(--apx-color-muted);
+  line-height: 1.55;
+}
+
+.workflow-panel {
+  margin-top: 1rem;
+  border-radius: 1.5rem;
+  padding: clamp(1rem, 3vw, 1.5rem);
+}
+
+.panel-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.panel-heading h2 {
+  max-width: 18ch;
+  margin: 0.85rem 0 0;
+  font-family: var(--apx-font-display);
+  font-size: clamp(1.9rem, 4vw, 3.1rem);
+  line-height: 1;
+}
+
+.workflow-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.workflow-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--apx-color-border);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--apx-color-canvas) 48%, var(--apx-color-surface));
+}
+
+.workflow-row h3 {
+  margin: 0 0 0.35rem;
+  font-family: var(--apx-font-display);
+}
+
+.workflow-row p {
+  margin: 0;
+  color: var(--apx-color-muted);
+  line-height: 1.55;
+}
+
+.workflow-row > span {
+  align-self: start;
+  white-space: nowrap;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  color: var(--apx-color-success);
+  background: color-mix(in srgb, var(--apx-color-success) 12%, transparent);
+  font-size: 0.72rem;
+  font-weight: 850;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+@media (max-width: 960px) {
+  .hero-card,
+  .admin-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .admin-console {
+    padding: 0.75rem;
+  }
+
+  .hero-card {
+    min-height: auto;
+    border-radius: 1.25rem;
+  }
+
+  .panel-heading,
+  .workflow-row {
+    flex-direction: column;
+  }
+
+  .console-btn.dark {
+    width: 100%;
+  }
+}

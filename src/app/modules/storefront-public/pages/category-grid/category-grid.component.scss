@@ -71,7 +71,7 @@
   line-height: 1.15;
   letter-spacing: -0.02em;
 
-  &.light { color: #fff; text-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+  &.light { color: var(--text-primary); text-shadow: 0 2px 12px rgba(0,0,0,0.3); }
 }
 
 // ── Grid layouts ─────────────────────────────────────────────────────────────
@@ -222,7 +222,7 @@
   font-family: var(--font-heading);
   font-size: clamp(16px, 1.8vw, 20px);
   font-weight: 700;
-  color: #fff;
+  color: var(--text-primary);
   line-height: 1.2;
   letter-spacing: -0.01em;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
@@ -257,7 +257,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: var(--text-primary);
   transition: transform 0.25s ease;
   flex-shrink: 0;
 

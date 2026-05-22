@@ -161,7 +161,9 @@ export const routes: Routes = [
       {
         path: 'storefront',
         loadChildren: () =>
-          import('./modules/storefront-admin/storefront-admin.routes').then(m => m.STOREFRONT_ADMIN_ROUTES)
+          import('./modules/storefront-admin/storefront-admin.routes').then(m => m.STOREFRONT_ADMIN_ROUTES),
+        canActivate: [permissionGuard],
+        data: { permissions: [PERMISSIONS.STOREFRONT.READ] }
       },
 
       // Utilities

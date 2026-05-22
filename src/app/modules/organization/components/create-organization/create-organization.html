@@ -1,5 +1,5 @@
 <!-- create-organization.component.html -->
-<div class="auth-root">
+<div class="auth-root fade-in">
 
   <!-- ══════════════════════════════════════════════════════
        LEFT — Brand Panel
@@ -9,9 +9,9 @@
     <div class="orb orb-1" aria-hidden="true"></div>
     <div class="orb orb-2" aria-hidden="true"></div>
 
-    <div class="brand-inner">
-      <a routerLink="/" class="wordmark">
-        <div class="logo-glyph">
+    <div class="brand-inner z-10">
+      <a routerLink="/" class="wordmark group">
+        <div class="logo-glyph group-hover:shadow-lg transition-all">
           <svg viewBox="0 0 32 32" fill="none">
             <path d="M4 28L16 4L28 28" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
               stroke-linejoin="round" />
@@ -21,7 +21,7 @@
         <span class="wordmark-text">Apex</span>
       </a>
 
-      <div class="hero-copy">
+      <div class="hero-copy mt-5xl">
         <p class="overline-text">Enterprise Setup</p>
         <h1 class="hero-headline">
           Build your<br>
@@ -34,227 +34,209 @@
       </div>
 
       <!-- Step Tracker (Synced with Stepper via activeSection) -->
-      <div class="step-tracker">
+      <div class="step-tracker hidden md:flex">
         @for (step of sections; track step; let i = $index) {
         <div class="step-item" [class.active]="activeSection() === i" [class.done]="activeSection() > i">
           <div class="step-dot">
             @if (activeSection() > i) {
-            <svg viewBox="0 0 12 12" fill="none">
-              <path d="M2 6l2.5 2.5L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-                stroke-linejoin="round" />
-            </svg>
+            <i class="pi pi-check text-xs"></i>
             } @else {
             <span>{{ i + 1 }}</span>
             }
           </div>
           <span class="step-label">{{ step }}</span>
         </div>
-        @if (i < sections.length - 1) { <div class="step-connector" [class.done]="activeSection() > i">
+        }
       </div>
-      }
-      }
     </div>
 
-    <footer class="brand-footer">
+    <footer class="brand-footer z-10">
       <span>© 2026 Apex Intelligence</span>
     </footer>
-</div>
-</aside>
+  </aside>
 
-<!-- ══════════════════════════════════════════════════════
+  <!-- ══════════════════════════════════════════════════════
        RIGHT — Form Panel with PrimeNG Stepper
   ═══════════════════════════════════════════════════════ -->
-<main class="form-panel">
-  <div class="form-inner">
+  <main class="form-panel">
+    <div class="form-inner">
 
-    <div class="mobile-logo">
-      <div class="logo-glyph">
-        <svg viewBox="0 0 32 32" fill="none">
-          <path d="M4 28L16 4L28 28" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-            stroke-linejoin="round" />
-          <path d="M8.5 20L23.5 20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
-        </svg>
+      <div class="form-header mb-xl">
+        <h2 class="form-title m-0 text-3xl font-heading font-bold text-primary">Onboarding Wizard</h2>
+        <p class="form-subtitle mt-sm text-secondary">Follow the steps to register your organization.</p>
       </div>
-      <span>Apex</span>
-    </div>
 
-    <div class="form-header">
-      <h2 class="form-title">Onboarding Wizard</h2>
-      <p class="form-subtitle">Follow the steps to register your organization.</p>
-    </div>
+      <!-- UI Feedback -->
+      @if (successMessage()) {
+      <div class="bg-success-bg border-success-border text-success-dark p-md rounded-md mb-lg border" role="status">
+        <i class="pi pi-check-circle mr-sm"></i> {{ successMessage() }}
+      </div>
+      }
+      @if (errorMessage()) {
+      <div class="bg-error-bg border-error-border text-error-dark p-md rounded-md mb-lg border" role="alert">
+        <i class="pi pi-exclamation-triangle mr-sm"></i> {{ errorMessage() }}
+      </div>
+      }
 
-    <!-- UI Feedback -->
-    @if (successMessage()) {
-    <div class="success-banner" role="status">
-      <span>{{ successMessage() }}</span>
-    </div>
-    }
-    @if (errorMessage()) {
-    <div class="error-banner" role="alert">
-      <span>{{ errorMessage() }}</span>
-    </div>
-    }
+      <form [formGroup]="organizationForm" (ngSubmit)="onSubmit()" novalidate class="card-anim-1">
 
-    <form [formGroup]="organizationForm" (ngSubmit)="onSubmit()" novalidate>
+        <p-stepper [value]="activeSection() + 1" (valueChange)="activeSection.set(($event || 1) - 1)"
+          class="custom-stepper">
 
-      <p-stepper [value]="activeSection() + 1" (valueChange)="activeSection.set(($event || 1) - 1)" class="custom-stepper">
+          <!-- Hidden List to satisfy PrimeNG Structure -->
+          <p-step-list class="hidden">
+            <p-step [value]="1">Profile</p-step>
+            <p-step [value]="2">Location</p-step>
+            <p-step [value]="3">Security</p-step>
+          </p-step-list>
 
-        <!-- STEP 1: ORGANIZATION PROFILE -->
-        <p-step-item [value]="1">
-          <p-step>Profile</p-step>
-          <p-step-panel>
-            <ng-template #content1 let-activateCallback="activateCallback">
-              <div class="form-section">
-                <div class="section-heading">
-                  <div class="section-badge"><i class="pi pi-building"></i></div>
-                  <div class="section-info">
-                    <h3 class="section-title">Organization Profile</h3>
-                    <p class="section-desc">Basic identification details for your company.</p>
-                  </div>
-                </div>
-
-                <div class="fields-grid mt-4">
-                  <div class="field-group col-span-2">
-                    <label class="field-label">Legal Entity Name</label>
-                    <input type="text" class="apex-input" formControlName="organizationName"
-                      placeholder="e.g. Apex Global" (blur)="generateShopId()" />
-                  </div>
-                  <div class="field-group">
-                    <label class="field-label">Workspace ID</label>
-                    <input type="text" class="apex-input uppercase-field" formControlName="uniqueShopId"
-                      placeholder="APEX-HQ" />
-                  </div>
-                  <div class="field-group">
-                    <label class="field-label">Tax ID / GST <span class="optional-badge">Optional</span></label>
-                    <input type="text" class="apex-input uppercase-field" formControlName="gstNumber" />
-                  </div>
-                  <div class="field-group">
-                    <label class="field-label">Contact Email</label>
-                    <input type="email" class="apex-input" formControlName="primaryEmail" />
-                  </div>
-                  <div class="field-group">
-                    <label class="field-label">Contact Phone</label>
-                    <input type="tel" class="apex-input" formControlName="primaryPhone" />
-                  </div>
-                </div>
-
-                <div class="py-10 flex justify-end">
-                  <p-button label="Next" icon="pi pi-arrow-right" iconPos="right" (onClick)="activateCallback(2)"
-                    [disabled]="f['organizationName']?.invalid || f['uniqueShopId']?.invalid" />
-                </div>
-              </div>
-            </ng-template>
-          </p-step-panel>
-        </p-step-item>
-
-        <!-- STEP 2: HEADQUARTERS -->
-        <p-step-item [value]="2">
-          <p-step>Location</p-step>
-          <p-step-panel>
-            <ng-template #content2 let-activateCallback="activateCallback">
-              <div class="form-section">
-                <div class="section-heading">
-                  <div class="section-badge"><i class="pi pi-map-marker"></i></div>
-                  <div class="section-info">
-                    <h3 class="section-title">Headquarters Location</h3>
-                    <p class="section-desc">The physical base of your operation.</p>
-                  </div>
-                </div>
-
-                <div class="fields-grid mt-4" formGroupName="mainBranchAddress">
-                  <div class="field-group col-span-2">
-                    <label class="field-label">Branch Designation</label>
-                    <input type="text" class="apex-input" [formControl]="$any(organizationForm.get('mainBranchName'))!"
-                      placeholder="Head Office" />
-                  </div>
-                  <div class="field-group col-span-2">
-                    <label class="field-label">Street Address</label>
-                    <input type="text" class="apex-input" formControlName="street" />
-                  </div>
-                  <div class="field-group">
-                    <label class="field-label">City</label>
-                    <input type="text" class="apex-input" formControlName="city" />
-                  </div>
-                  <div class="field-group">
-                    <label class="field-label">State</label>
-                    <input type="text" class="apex-input" formControlName="state" />
-                  </div>
-                  <div class="field-group">
-                    <label class="field-label">Zip Code</label>
-                    <input type="text" class="apex-input" formControlName="zipCode" />
-                  </div>
-                </div>
-
-                <div class="py-10 flex justify-between">
-                  <p-button label="Back" severity="secondary" icon="pi pi-arrow-left" (onClick)="activateCallback(1)" />
-                  <p-button label="Next" icon="pi pi-arrow-right" iconPos="right" (onClick)="activateCallback(3)"
-                    [disabled]="organizationForm.get('mainBranchAddress')?.invalid" />
-                </div>
-              </div>
-            </ng-template>
-          </p-step-panel>
-        </p-step-item>
-
-        <!-- STEP 3: SUPER ADMIN -->
-        <p-step-item [value]="3">
-          <p-step>Security</p-step>
-          <p-step-panel>
-            <ng-template #content3 let-activateCallback="activateCallback">
-              <div class="form-section admin-section">
-                <div class="section-heading">
-                  <div class="section-badge section-badge--admin"><i class="pi pi-shield"></i></div>
-                  <div class="section-info">
-                    <h3 class="section-title">Super Admin Credentials</h3>
-                    <p class="section-desc">The master account for your organization.</p>
-                  </div>
-                </div>
-
-                <div class="fields-grid mt-4">
-                  <div class="field-group">
-                    <label class="field-label">Admin Full Name</label>
-                    <input type="text" class="apex-input" formControlName="ownerName" />
-                  </div>
-                  <div class="field-group">
-                    <label class="field-label">Login Email</label>
-                    <input type="email" class="apex-input" formControlName="ownerEmail" />
-                  </div>
-                  <div class="field-group col-span-2">
-                    <label class="field-label">Access Password</label>
-                    <div class="password-wrap">
-                      <input id="ownerPwd" [type]="passwordVisible() ? 'text' : 'password'" class="apex-input"
-                        formControlName="ownerPassword" />
-                      <button type="button" class="pwd-eye-btn" (click)="togglePassword()" tabindex="-1">
-                        <i [class]="passwordVisible() ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
-                      </button>
+          <p-step-panels>
+            <!-- STEP 1: ORGANIZATION PROFILE -->
+            <p-step-panel [value]="1">
+              <ng-template pTemplate="content" let-activateCallback="activateCallback">
+                <div class="form-section">
+                  <div class="section-heading mb-xl">
+                    <div class="section-badge"><i class="pi pi-building"></i></div>
+                    <div class="section-info">
+                      <h3 class="section-title">Organization Profile</h3>
+                      <p class="section-desc">Basic identification details for your company.</p>
                     </div>
                   </div>
+
+                  <div class="fields-grid">
+                    <div class="field-group col-span-2">
+                      <label class="field-label">Legal Entity Name</label>
+                      <input type="text" pInputText class="premium-input w-full" formControlName="organizationName"
+                        placeholder="e.g. Apex Global" (blur)="generateShopId()" />
+                    </div>
+                    <div class="field-group">
+                      <label class="field-label">Workspace ID</label>
+                      <input type="text" pInputText class="premium-input w-full uppercase" formControlName="uniqueShopId"
+                        placeholder="APEX-HQ" />
+                    </div>
+                    <div class="field-group">
+                      <label class="field-label">Tax ID / GST <span
+                          class="text-xs text-tertiary ml-xs font-normal">(Optional)</span></label>
+                      <input type="text" pInputText class="premium-input w-full uppercase" formControlName="gstNumber" />
+                    </div>
+                    <div class="field-group">
+                      <label class="field-label">Contact Email</label>
+                      <input type="email" pInputText class="premium-input w-full" formControlName="primaryEmail" />
+                    </div>
+                    <div class="field-group">
+                      <label class="field-label">Contact Phone</label>
+                      <input type="tel" pInputText class="premium-input w-full" formControlName="primaryPhone" />
+                    </div>
+                  </div>
+
+                  <div class="flex justify-end mt-3xl">
+                    <p-button label="Next Step" icon="pi pi-arrow-right" iconPos="right" (onClick)="activateCallback(2)"
+                      [disabled]="f['organizationName']?.invalid || f['uniqueShopId']?.invalid"
+                      styleClass="btn-primary" />
+                  </div>
                 </div>
+              </ng-template>
+            </p-step-panel>
 
-                <div class="py-10 flex justify-between">
-                  <p-button label="Back" severity="secondary" icon="pi pi-arrow-left" (onClick)="activateCallback(2)" />
-                  <button type="submit" class="submit-btn" [disabled]="isLoading() || organizationForm.invalid">
-                    @if (isLoading()) {
-                    <span class="spinner"></span>
-                    <span>Deploying…</span>
-                    } @else {
-                    <span>Complete Setup</span>
-                    <i class="pi pi-check-circle ml-2"></i>
-                    }
-                  </button>
+            <!-- STEP 2: HEADQUARTERS -->
+            <p-step-panel [value]="2">
+              <ng-template pTemplate="content" let-activateCallback="activateCallback">
+                <div class="form-section">
+                  <div class="section-heading mb-xl">
+                    <div class="section-badge"><i class="pi pi-map-marker"></i></div>
+                    <div class="section-info">
+                      <h3 class="section-title">Headquarters Location</h3>
+                      <p class="section-desc">The physical base of your operation.</p>
+                    </div>
+                  </div>
+
+                  <div class="fields-grid" formGroupName="mainBranchAddress">
+                    <div class="field-group col-span-2">
+                      <label class="field-label">Branch Designation</label>
+                      <input type="text" pInputText class="premium-input w-full"
+                        [formControl]="$any(organizationForm.get('mainBranchName'))!" placeholder="Head Office" />
+                    </div>
+                    <div class="field-group col-span-2">
+                      <label class="field-label">Street Address</label>
+                      <input type="text" pInputText class="premium-input w-full" formControlName="street" />
+                    </div>
+                    <div class="field-group">
+                      <label class="field-label">City</label>
+                      <input type="text" pInputText class="premium-input w-full" formControlName="city" />
+                    </div>
+                    <div class="field-group">
+                      <label class="field-label">State</label>
+                      <input type="text" pInputText class="premium-input w-full" formControlName="state" />
+                    </div>
+                    <div class="field-group col-span-2 sm:col-span-1">
+                      <label class="field-label">Zip Code</label>
+                      <input type="text" pInputText class="premium-input w-full" formControlName="zipCode" />
+                    </div>
+                  </div>
+
+                  <div class="flex justify-between mt-3xl">
+                    <p-button label="Back" severity="secondary" icon="pi pi-arrow-left" (onClick)="activateCallback(1)"
+                      styleClass="btn-back" />
+                    <p-button label="Next Step" icon="pi pi-arrow-right" iconPos="right" (onClick)="activateCallback(3)"
+                      [disabled]="organizationForm.get('mainBranchAddress')?.invalid" styleClass="btn-primary" />
+                  </div>
                 </div>
-              </div>
-            </ng-template>
-          </p-step-panel>
-        </p-step-item>
+              </ng-template>
+            </p-step-panel>
 
-      </p-stepper>
+            <!-- STEP 3: SUPER ADMIN -->
+            <p-step-panel [value]="3">
+              <ng-template pTemplate="content" let-activateCallback="activateCallback">
+                <div class="form-section admin-section">
+                  <div class="section-heading mb-xl">
+                    <div class="section-badge section-badge--admin"><i class="pi pi-shield"></i></div>
+                    <div class="section-info">
+                      <h3 class="section-title">Super Admin Credentials</h3>
+                      <p class="section-desc">The master account for your organization.</p>
+                    </div>
+                  </div>
 
-    </form>
+                  <div class="fields-grid bg-surface border-tertiary p-xl rounded-lg border-dashed border">
+                    <div class="field-group col-span-2">
+                      <label class="field-label">Admin Full Name</label>
+                      <input type="text" pInputText class="premium-input w-full" formControlName="ownerName" />
+                    </div>
+                    <div class="field-group col-span-2">
+                      <label class="field-label">Login Email</label>
+                      <input type="email" pInputText class="premium-input w-full" formControlName="ownerEmail" />
+                    </div>
+                    <div class="field-group col-span-2">
+                      <label class="field-label">Access Password</label>
+                      <div class="password-wrap relative">
+                        <input [type]="passwordVisible() ? 'text' : 'password'" pInputText
+                          class="premium-input w-full pr-5xl" formControlName="ownerPassword" />
+                        <button type="button"
+                          class="absolute right-0 top-0 h-full px-md text-tertiary hover:text-primary transition-base cursor-pointer bg-transparent border-none"
+                          (click)="togglePassword()" tabindex="-1">
+                          <i [class]="passwordVisible() ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
 
-    <p class="footer-note">
-      Need help? <a href="#" class="footer-link">Contact Support</a>
-    </p>
+                  <div class="flex justify-between mt-3xl">
+                    <p-button label="Back" severity="secondary" icon="pi pi-arrow-left" (onClick)="activateCallback(2)"
+                      styleClass="btn-back" />
+                    <p-button [label]="isLoading() ? 'Deploying...' : 'Complete Setup'"
+                      [icon]="isLoading() ? 'pi pi-spin pi-spinner' : 'pi pi-check-circle'" iconPos="right" type="submit"
+                      [disabled]="isLoading() || organizationForm.invalid" styleClass="btn-primary px-xl" />
+                  </div>
+                </div>
+              </ng-template>
+            </p-step-panel>
+          </p-step-panels>
+        </p-stepper>
+      </form>
 
-  </div>
-</main>
+      <p class="text-center text-secondary text-sm mt-5xl">
+        Need help? <a href="#" class="text-primary font-medium hover:underline text-accent">Contact Support</a>
+      </p>
+
+    </div>
+  </main>
 </div>

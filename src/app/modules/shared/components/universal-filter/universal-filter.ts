@@ -360,6 +360,8 @@ export class UniversalFilterComponent implements OnInit {
         }
       });
     }
+
+    this.emitAndStore();
   }
 
   getOptions(field: FilterField): any[] {
@@ -398,6 +400,24 @@ export class UniversalFilterComponent implements OnInit {
   private emitAndStore() {
     // Clean null/empty values before emitting
     const cleanFilters = Object.entries(this.filters).reduce((acc, [k, v]) => {
+      const field = this.config.find(item => item.key === k);
+
+      if (field?.type === 'date-range') {
+        const [start, end] = Array.isArray(v) ? v : [];
+        const startKey = field.startKey || 'startDate';
+        const endKey = field.endKey || 'endDate';
+
+        // Backend list/report handlers normalize startDate/endDate across date fields.
+        if (start) acc[startKey] = this.toIsoDate(start);
+        if (end) acc[endKey] = this.toIsoDate(end);
+        return acc;
+      }
+
+      if (field?.type === 'date') {
+        if (v) acc[k] = this.toIsoDate(v);
+        return acc;
+      }
+
       if (v !== null && v !== '' && v !== undefined) {
         if (Array.isArray(v) && v.length === 0) return acc;
         acc[k] = v;
@@ -407,5 +427,10 @@ export class UniversalFilterComponent implements OnInit {
 
     this.filterStorage.setFilters(this.entityType, cleanFilters);
     this.filterChange.emit(cleanFilters);
+  }
+
+  private toIsoDate(value: any): string {
+    const date = value instanceof Date ? value : new Date(value);
+    return Number.isNaN(date.getTime()) ? value : date.toISOString();
   }
 }

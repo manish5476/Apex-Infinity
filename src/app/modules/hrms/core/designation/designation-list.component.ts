@@ -1,12 +1,11 @@
-import { ChangeDetectorRef, Component, OnInit, inject, ChangeDetectionStrategy, signal, computed, effect } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { AgShareGrid, ActionColumnConfig } from '../../../shared/components/ag-shared-grid';
 import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
 import { HRMSService } from '../../hrms.service';
-import { rxResource } from '@angular/core/rxjs-interop'; // If using Angular 19+ utilities
-import { of } from 'rxjs';
+import { of, take } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
 
 @Component({
@@ -49,10 +48,13 @@ import { catchError, finalize } from 'rxjs/operators';
             <label for="grade">Grade</label>
             <div class="select-wrapper w-full">
               <select id="grade" [ngModel]="filters().grade" (change)="updateGrade($event)" class="se-input w-full">
-                <option [ngValue]="null">All Grades</option>
+                <option value="">All Grades</option>
                 <option value="A">Grade A</option>
                 <option value="B">Grade B</option>
                 <option value="C">Grade C</option>
+                <option value="D">Grade D</option>
+                <option value="E">Grade E</option>
+                <option value="F">Grade F</option>
               </select>
             </div>
           </div>
@@ -61,9 +63,9 @@ import { catchError, finalize } from 'rxjs/operators';
             <label for="status">Status</label>
             <div class="select-wrapper w-full">
               <select id="status" [ngModel]="filters().isActive" (change)="updateStatus($event)" class="se-input w-full">
-                <option [ngValue]="null">All Statuses</option>
-                <option [ngValue]="true">Active</option>
-                <option [ngValue]="false">Inactive</option>
+                <option value="">All Statuses</option>
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
               </select>
             </div>
           </div>
@@ -157,7 +159,7 @@ import { catchError, finalize } from 'rxjs/operators';
     .btn-primary {
       background: var(--accent-gradient);
       border: none;
-      color: white;
+      color: var(--color-on-primary);
       box-shadow: var(--shadow-md);
     }
 
@@ -196,26 +198,23 @@ export class DesignationListComponent implements OnInit {
     deletePermission: PERMISSIONS.DESIGNATION.MANAGE,
   };
 
-  constructor() {
-    // Effect to auto-load data when filters or page changes
-    effect(() => {
-      this.loadData();
-    }, { allowSignalWrites: true });
-  }
-
   ngOnInit(): void {
     this.setupColumns();
+    this.loadData(true);
   }
 
   // --- Logic ---
   private loadData(isReset: boolean = true) {
     this.isLoading.set(true);
     
-    const params = {
+    const rawParams = {
       ...this.filters(),
       page: this.currentPage(),
       limit: this.pageSize()
     };
+    const params = Object.fromEntries(
+      Object.entries(rawParams).filter(([, value]) => value !== null && value !== '')
+    );
 
     this.hrmsService.getDesignations(params).pipe(
       finalize(() => this.isLoading.set(false)),
@@ -226,7 +225,7 @@ export class DesignationListComponent implements OnInit {
     ).subscribe(res => {
       if (res) {
         const newData = res.data?.designations || res.data?.data || [];
-        this.totalCount.set(res.pagination?.totalResults || 0);
+        this.totalCount.set(res.pagination?.totalResults ?? res.total ?? res.results ?? newData.length);
         this.data.set(isReset ? newData : [...this.data(), ...newData]);
       }
     });
@@ -236,22 +235,26 @@ export class DesignationListComponent implements OnInit {
   updateSearch(val: string) {
     this.filters.update(f => ({ ...f, search: val }));
     this.currentPage.set(1);
+    this.loadData(true);
   }
 
   updateGrade(event: any) {
-    this.filters.update(f => ({ ...f, grade: event.target.value }));
+    this.filters.update(f => ({ ...f, grade: event.target.value || null }));
     this.currentPage.set(1);
+    this.loadData(true);
   }
 
   updateStatus(event: any) {
     const val = event.target.value === 'true' ? true : event.target.value === 'false' ? false : null;
     this.filters.update(f => ({ ...f, isActive: val }));
     this.currentPage.set(1);
+    this.loadData(true);
   }
 
   resetFilters() {
     this.filters.set({ search: '', grade: null, isActive: null });
     this.currentPage.set(1);
+    this.loadData(true);
   }
 
   createNew() {
@@ -281,10 +284,15 @@ export class DesignationListComponent implements OnInit {
   }
 
   private deleteDesignation(id: string) {
-    this.hrmsService.deleteDesignation(id).subscribe(() => {
-      this.messageService.showSuccess('Deleted');
-      this.loadData(true);
-    });
+    this.hrmsService.deleteDesignation(id)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this.messageService.showSuccess('Deleted');
+          this.loadData(true);
+        },
+        error: (err: any) => this.messageService.handleHttpError(err)
+      });
   }
 
   setupColumns(): void {

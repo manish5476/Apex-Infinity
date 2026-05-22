@@ -582,9 +582,11 @@ export class BranchComparisonComponent implements OnInit, OnDestroy {
 
   loadData(): void {
     this.loading.set(true);
+    const [startDate, endDate] = this.resolveDateRange();
+
     this.analyticsService.getBranchComparison(
-            this.currentFilters['startDate'],
-            this.currentFilters['endDate'],
+            startDate,
+            endDate,
             this.currentFilters['groupBy'] ?? 'revenue',
             50
           ).pipe(takeUntil(this.destroy$)).subscribe({
@@ -594,6 +596,18 @@ export class BranchComparisonComponent implements OnInit, OnDestroy {
       },
       error: () => this.loading.set(false)
     });
+  }
+
+  private resolveDateRange(): [string | undefined, string | undefined] {
+    const start = this.currentFilters['startDate'] ?? this.currentFilters['date']?.[0];
+    const end = this.currentFilters['endDate'] ?? this.currentFilters['date']?.[1];
+    return [this.toIsoDate(start), this.toIsoDate(end)];
+  }
+
+  private toIsoDate(value: any): string | undefined {
+    if (!value) return undefined;
+    const date = value instanceof Date ? value : new Date(value);
+    return Number.isNaN(date.getTime()) ? undefined : date.toISOString();
   }
 
   getPercentage(value: number): number {

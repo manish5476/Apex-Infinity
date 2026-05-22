@@ -1,29 +1,30 @@
 // src/app/modules/storefront-public/storefront-public.routes.ts
-//
-// Mount in app.routes.ts:
-//   {
-//     path: 'store/:orgSlug',
-//     loadComponent: () => import('./modules/storefront-public/layout/storefront-layout.component')
-//       .then(m => m.StorefrontLayoutComponent),
-//     children: STOREFRONT_PUBLIC_ROUTES
-//   }
-//
-// Route order matters:
-//   1. Specific named routes first  (products, cart, etc.)
-//   2. Dynamic product detail       (:productSlug under products/)
-//   3. Catch-all page slug last     (:pageSlug)
-
 import { Routes } from '@angular/router';
 
+const storefrontExperienceRoute = (path: string, pageKey: string, title: string): Routes[number] => ({
+  path,
+  loadComponent: () =>
+    import('./pages/storefront-experience/storefront-experience.component')
+      .then(m => m.StorefrontExperienceComponent),
+  data: { pageKey },
+  title
+});
+
+const commerceFlowRoute = (path: string, mode: string, title: string): Routes[number] => ({
+  path,
+  loadComponent: () =>
+    import('./pages/commerce-flow/commerce-flow.component')
+      .then(m => m.CommerceFlowComponent),
+  data: { mode },
+  title
+});
+
 export const STOREFRONT_PUBLIC_ROUTES: Routes = [
-  // Default — redirect to home page
   {
     path: '',
     redirectTo: 'home',
     pathMatch: 'full'
   },
-
-  // Product listing
   {
     path: 'products',
     loadComponent: () =>
@@ -31,8 +32,27 @@ export const STOREFRONT_PUBLIC_ROUTES: Routes = [
         .then(m => m.ProductListingComponent),
     title: 'Shop'
   },
-
-  // Product detail — must be under products/ so it doesn't clash with page slugs
+  commerceFlowRoute('cart', 'cart', 'Cart'),
+  commerceFlowRoute('checkout', 'checkout', 'Checkout'),
+  commerceFlowRoute('account', 'account', 'Account'),
+  commerceFlowRoute('account/orders', 'orders', 'Orders'),
+  commerceFlowRoute('account/addresses', 'addresses', 'Saved Addresses'),
+  commerceFlowRoute('account/notifications', 'notifications', 'Notifications'),
+  ...[
+    ['search', 'search', 'Search'],
+    ['login', 'login', 'Store Login'],
+    ['register', 'register', 'Create Account'],
+    ['wishlist', 'wishlist', 'Wishlist'],
+    ['compare', 'compare', 'Compare Products'],
+    ['recently-viewed', 'recently-viewed', 'Recently Viewed'],
+    ['recommendations', 'recommendations', 'Recommendations'],
+    ['reviews', 'reviews', 'Customer Reviews'],
+    ['rewards', 'rewards', 'Rewards'],
+    ['orders/success', 'order-success', 'Order Success'],
+    ['orders/failure', 'order-failure', 'Order Failure'],
+    ['track-order', 'track-order', 'Track Order'],
+    ['gift-card', 'gift-card', 'Gift Card']
+  ].map(([path, pageKey, title]) => storefrontExperienceRoute(path, pageKey, title)),
   {
     path: 'products/:productSlug',
     loadComponent: () =>
@@ -40,22 +60,19 @@ export const STOREFRONT_PUBLIC_ROUTES: Routes = [
         .then(m => m.ProductDetailComponent),
     title: 'Product'
   },
-
-  // Cart
-  // {
-  //   path: 'cart',
-  //   loadComponent: () =>
-  //     import('./pages/cart/cart.component')
-  //       .then(m => m.CartComponent),
-  //   title: 'Cart'
-  // },
-
-  // Dynamic CMS pages — catch-all, MUST stay last
   {
     path: ':pageSlug',
     loadComponent: () =>
       import('./dynamic-page/dynamic-page.component')
         .then(m => m.DynamicPageComponent),
+    title: 'Store'
+  },
+  {
+    path: '**',
+    loadComponent: () =>
+      import('./dynamic-page/dynamic-page.component')
+        .then(m => m.DynamicPageComponent),
+    data: { notFoundFallback: true },
     title: 'Store'
   }
 ];

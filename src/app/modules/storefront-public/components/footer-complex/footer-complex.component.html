@@ -1,0 +1,53 @@
+<footer class="footer-complex">
+  <div class="footer-complex__inner">
+    <section class="footer-complex__brand">
+      <h3 class="footer-complex__title">{{ organization?.name || 'Store' }}</h3>
+      <p class="footer-complex__copyright">
+        {{ config?.description || config?.copyright || 'A premium storefront with secure checkout, fast discovery, and thoughtful customer support.' }}
+      </p>
+
+      <form class="footer-complex__newsletter">
+        <label for="footer-complex-email">Get offers and launch notes</label>
+        <div>
+          <input id="footer-complex-email" type="email" placeholder="Email address" />
+          <button type="button">Subscribe</button>
+        </div>
+      </form>
+    </section>
+
+    <nav class="footer-complex__columns" aria-label="Footer navigation">
+      @for (col of columns(); track col.title) {
+        <div class="footer-complex__column">
+          <h4 class="footer-complex__column-title">{{ col.title }}</h4>
+          <ul class="footer-complex__link-list">
+            @for (link of col.links; track link.url) {
+              <li>
+                @if (link.url?.startsWith('http')) {
+                  <a [href]="link.url" class="footer-complex__link" target="_blank" rel="noopener">
+                    {{ link.label }}
+                  </a>
+                } @else {
+                  <a [routerLink]="linkFor(link.url)" class="footer-complex__link">
+                    {{ link.label }}
+                  </a>
+                }
+              </li>
+            }
+          </ul>
+        </div>
+      }
+    </nav>
+
+    <div class="footer-complex__bottom">
+      <div class="footer-complex__policy-links">
+        @for (policy of policies(); track policy.url) {
+          <a [routerLink]="linkFor(policy.url)">{{ policy.label }}</a>
+        }
+      </div>
+      <div class="footer-complex__payments" aria-label="Payment methods">
+        <span>Visa</span><span>Mastercard</span><span>UPI</span><span>Wallets</span>
+      </div>
+      <p>© {{ currentYear }} {{ organization?.name || 'Store' }}</p>
+    </div>
+  </div>
+</footer>

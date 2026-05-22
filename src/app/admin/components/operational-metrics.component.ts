@@ -288,7 +288,8 @@ export class OperationalMetricsComponent implements OnInit, OnDestroy {
 
   loadData() {
     this.loading.set(true);
-    const { startDate, endDate, branchId } = this.currentFilters;
+    const [startDate, endDate] = this.resolveDateRange();
+    const branchId = this.currentFilters.branchId;
 
     this.analyticsService.getOperationalMetrics(startDate, endDate, branchId).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
@@ -299,6 +300,18 @@ export class OperationalMetricsComponent implements OnInit, OnDestroy {
       },
       error: () => this.loading.set(false)
     });
+  }
+
+  private resolveDateRange(): [string | undefined, string | undefined] {
+    const start = this.currentFilters.startDate ?? this.currentFilters.date?.[0];
+    const end = this.currentFilters.endDate ?? this.currentFilters.date?.[1];
+    return [this.toIsoDate(start), this.toIsoDate(end)];
+  }
+
+  private toIsoDate(value: any): string | undefined {
+    if (!value) return undefined;
+    const date = value instanceof Date ? value : new Date(value);
+    return Number.isNaN(date.getTime()) ? undefined : date.toISOString();
   }
 
   getFormattedPeakHour(): string {

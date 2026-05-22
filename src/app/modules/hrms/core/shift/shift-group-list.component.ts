@@ -58,14 +58,14 @@ import { takeUntil } from "rxjs/operators";
 
           <div class="se-filter-actions">
             <button class="btn btn-outline" (click)="resetFilters()">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+              <i class="pi pi-refresh"></i>
               Reset
             </button>
           </div>
 
           <div class="se-filter-right">
             <button class="btn btn-primary" (click)="createNew()">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              <i class="pi pi-plus"></i>
               Create Shift Group
             </button>
           </div>
@@ -109,7 +109,7 @@ import { takeUntil } from "rxjs/operators";
       background: var(--bg-primary);
       border: 1px solid var(--border-primary);
       border-radius: var(--ui-border-radius-lg);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      box-shadow: var(--shadow-sm);
       display: flex;
       flex-direction: column;
       height: 100%;
@@ -167,15 +167,14 @@ import { takeUntil } from "rxjs/operators";
       height: 38px;
     }
 
-    .se-input:focus { border-color: var(--color-primary); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1); }
+    .se-input:focus { border-color: var(--color-primary); box-shadow: 0 0 0 2px var(--accent-focus); }
 
     .select-wrapper { position: relative; }
     select.se-input { appearance: none; padding-right: 2.5rem; cursor: pointer; }
     .select-wrapper::after {
-      content: ""; position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);
-      width: 10px; height: 6px;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%2364748b' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-      background-repeat: no-repeat; pointer-events: none;
+      content: "\\e933"; font-family: 'primeicons'; position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);
+      color: var(--text-tertiary);
+      pointer-events: none; font-size: var(--font-size-xs);
     }
 
     /* Buttons */
@@ -187,7 +186,7 @@ import { takeUntil } from "rxjs/operators";
 
     .btn-outline { background: var(--bg-primary); border-color: var(--border-secondary); color: var(--text-primary); }
     .btn-outline:hover { background: var(--bg-secondary); border-color: var(--border-primary); }
-    .btn-primary { background: var(--color-primary); color: #ffffff; }
+    .btn-primary { background: var(--color-primary); color: var(--color-on-primary); }
     .btn-primary:hover { background: var(--color-primary-dark); }
 
     .list-grid-wrapper { flex: 1; height: 100%; min-height: 0; }
@@ -266,9 +265,11 @@ export class ShiftGroupListComponent implements OnInit, OnDestroy {
       limit: this.pageSize
     };
 
-    // Assumes getShiftGroups is updated to accept params if paginated
-    // Otherwise fallback to generic standard get: this.hrmsService.get('/v1/hrms/shift-groups', params)
-    this.hrmsService.getShiftGroups().pipe(takeUntil(this.destroy$)).subscribe({
+    const cleanParams = Object.fromEntries(
+      Object.entries(params).filter(([, value]) => value !== null && value !== '')
+    );
+
+    this.hrmsService.getShiftGroups(cleanParams).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         const newData = res.data?.shiftGroups || res.data?.data || [];
         const pagination = res.pagination;
@@ -377,17 +378,12 @@ export class ShiftGroupListComponent implements OnInit, OnDestroy {
         sortable: true,
         cellRenderer: (params: any) => {
           const type = (params.value || 'weekly').toLowerCase();
-
-          let bg = '#f3f4f6', color = '#6b7280', iconPath = '<circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>'; // custom default
-
-          if (type === 'daily') { bg = '#fef2f2'; color = '#ef4444'; iconPath = '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><line x1="9" y1="16" x2="15" y2="16"></line>'; }
-          else if (type === 'weekly') { bg = '#eff6ff'; color = '#3b82f6'; iconPath = '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>'; }
-          else if (type === 'monthly') { bg = '#fdf4ff'; color = '#d946ef'; iconPath = '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><line x1="12" y1="14" x2="12" y2="18"></line><line x1="10" y1="16" x2="14" y2="16"></line>'; }
+          const icon = type === 'custom' ? 'pi-sliders-h' : 'pi-calendar';
 
           return `
             <div style="display:flex; align-items:center; gap:8px; height:100%;">
-              <div style="width:28px; height:28px; border-radius:6px; background-color:${bg}; color:${color}; display:flex; align-items:center; justify-content:center;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${iconPath}</svg>
+              <div style="width:28px; height:28px; border-radius:var(--ui-border-radius-sm); background-color:var(--bg-secondary); color:var(--text-tertiary); display:flex; align-items:center; justify-content:center;">
+                <i class="pi ${icon}" style="font-size:12px;"></i>
               </div>
               <span style="font-weight:500; color:var(--text-secondary); text-transform:capitalize; font-size:12px;">${type}</span>
             </div>`;
@@ -410,7 +406,7 @@ export class ShiftGroupListComponent implements OnInit, OnDestroy {
 
           let dotsHtml = visibleShifts.map((s: any) => {
             const color = s.color || 'var(--color-primary)';
-            return `<div style="width:12px; height:12px; border-radius:50%; background-color:${color}; box-shadow:0 0 0 1px var(--bg-primary); margin-left:-4px; border:1px solid rgba(0,0,0,0.1);" title="Shift Sequence"></div>`;
+            return `<div style="width:12px; height:12px; border-radius:50%; background-color:${color}; box-shadow:0 0 0 1px var(--bg-primary); margin-left:-4px; border:1px solid var(--border-secondary);" title="Shift Sequence"></div>`;
           }).join('');
 
           let extraHtml = extra > 0 ? `<span style="font-size:11px; color:var(--text-tertiary); margin-left:6px;">+${extra} more</span>` : '';
@@ -435,11 +431,11 @@ export class ShiftGroupListComponent implements OnInit, OnDestroy {
           return `
             <div style="display:flex; flex-direction:column; justify-content:center; height:100%; gap:2px; padding: 4px 0;">
               <div style="display:flex; align-items:center; gap:6px; color:var(--text-secondary); font-size:12px;">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><path d="M9 22v-4h6v4"></path><path d="M8 6h.01"></path><path d="M16 6h.01"></path><path d="M12 6h.01"></path><path d="M12 10h.01"></path><path d="M12 14h.01"></path><path d="M16 10h.01"></path><path d="M16 14h.01"></path><path d="M8 10h.01"></path><path d="M8 14h.01"></path></svg>
+                <i class="pi pi-building" style="color:var(--text-tertiary); font-size:12px;"></i>
                 <span>${depts} Depts</span>
               </div>
               <div style="display:flex; align-items:center; gap:6px; color:var(--text-secondary); font-size:12px;">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                <i class="pi pi-id-card" style="color:var(--text-tertiary); font-size:12px;"></i>
                 <span>${desigs} Desigs</span>
               </div>
             </div>`;
@@ -454,9 +450,9 @@ export class ShiftGroupListComponent implements OnInit, OnDestroy {
         sortable: true,
         cellRenderer: (params: any) => {
           const isActive = params.value;
-          const bg = isActive ? '#ecfdf5' : '#fef2f2';
-          const color = isActive ? '#15803d' : '#b91c1c';
-          const border = isActive ? '#bbf7d0' : '#fecaca';
+          const bg = isActive ? 'var(--color-success-bg)' : 'var(--color-error-bg)';
+          const color = isActive ? 'var(--color-success-text)' : 'var(--color-error-text)';
+          const border = isActive ? 'var(--color-success-border)' : 'var(--color-error-border)';
 
           return `
             <div style="display:flex; align-items:center; height:100%;">

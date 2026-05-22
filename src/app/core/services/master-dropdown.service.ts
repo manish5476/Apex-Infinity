@@ -19,23 +19,52 @@ interface DropdownResponse {
   data: DropdownOption[];
 }
 
-// ✅ COMPLETE: Includes all 20+ routes currently in your backend
-// export type DropdownEndpoint =
-//   | 'users' | 'branches' | 'roles' | 'customers' | 'suppliers' | 'masters' | 'channels' | 'transfer-requests'
-//   | 'products' | 'purchases' | 'sales' | 'sales-returns' | 'purchase-returns'
-//   | 'accounts' | 'invoices' | 'payments' | 'emis'
-//   | 'departments' | 'designations' | 'shifts' | 'holidays' | 'geofencing'
-//   | 'attendance-machines' | 'attendance-requests' | 'leave-requests'
-//   | 'meetings' | 'brands' | 'categories' | 'subcategories' | 'units' | 'taxes';
 
+/**
+ * Must match backend dropdown routes under `/api/v1/dropdowns/:endpoint`.
+ * Source: `apex-crm-backend/src/modules/master/core/routes/dropdownlist.routes.js`
+ */
 export type DropdownEndpoint =
-  | 'users' | 'branches' | 'roles' | 'customers' | 'suppliers' | 'masters' | 'channels' | 'transfer-requests'
-  | 'products' | 'purchases' | 'sales' | 'sales-returns' | 'purchase-returns'
-  | 'brands' | 'categories' | 'subcategories' | 'units' | 'taxes'
-  | 'accounts' | 'invoices' | 'payments' | 'emis'
-  | 'departments' | 'designations' | 'shifts' | 'shift-assignments'
-  | 'holidays' | 'geofencing' | 'attendance-machines' | 'attendance-requests' | 'leave-requests'
-  | 'meetings';
+  // Organization & auth
+  | 'users'
+  | 'branches'
+  | 'roles'
+  | 'customers'
+  | 'suppliers'
+  | 'masters'
+  | 'channels'
+  | 'transfer-requests'
+  // Inventory
+  | 'products'
+  | 'purchases'
+  | 'sales'
+  | 'sales-returns'
+  | 'purchase-returns'
+  | 'brands'
+  | 'categories'
+  | 'subcategories'
+  | 'units'
+  | 'tags'
+  | 'taxes'
+  // Accounting
+  | 'accounts'
+  | 'invoices'
+  | 'payments'
+  | 'emis'
+  // HRMS
+  | 'departments'
+  | 'designations'
+  | 'shifts'
+  | 'shift-assignments'
+  | 'holidays'
+  | 'geofencing'
+  | 'attendance-machines'
+  | 'attendance-requests'
+  | 'leave-requests'
+  // Notes & CRM
+  | 'meetings'
+  | 'supplier-categories';
+
 @Injectable({
   providedIn: 'root'
 })

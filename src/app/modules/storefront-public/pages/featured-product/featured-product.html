@@ -1,0 +1,83 @@
+<section class="py-16 md:py-24 bg-[var(--bg-page)] text-[var(--primary)] transition-colors duration-500 overflow-hidden">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8">
+    @if (!product) {
+      <div class="flex flex-col items-center justify-center p-12 border border-dashed border-[var(--glass-border)] rounded-2xl bg-white/5 backdrop-blur-sm">
+        <i class="pi pi-box text-4xl mb-4 opacity-50"></i>
+        <h3 class="text-xl font-bold mb-2">No Product Selected</h3>
+        <p class="text-sm opacity-70">Configure this section to feature a product from your catalog.</p>
+      </div>
+    } @else {
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center"
+           [ngClass]="{'lg:flex-row-reverse': config.layout === 'image_right'}">
+        
+        <!-- Image Area -->
+        <div class="relative group">
+          <div class="absolute -inset-4 bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] opacity-20 blur-3xl rounded-full group-hover:opacity-30 transition-opacity duration-700"></div>
+          <div class="relative aspect-square md:aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border border-[var(--glass-border)]">
+            <img [src]="product.image || 'assets/images/placeholder.jpg'" 
+                 [alt]="product.name"
+                 class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            
+            @if (product.price.hasDiscount) {
+              <div class="absolute top-6 left-6 bg-rose-500 text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider shadow-lg">
+                Save {{ product.price.discountPercentage }}%
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="flex flex-col">
+          <div class="mb-4">
+            @if (product.brand) {
+              <p class="text-sm uppercase tracking-widest font-semibold opacity-70 mb-2">{{ product.brand }}</p>
+            }
+            <h2 class="text-4xl md:text-5xl font-serif font-bold tracking-tight mb-4">
+              {{ product.name }}
+            </h2>
+          </div>
+
+          <div class="flex items-center gap-4 mb-8">
+            @if (product.price.hasDiscount) {
+              <span class="text-3xl font-bold">{{ product.price.current | currency:product.price.currency }}</span>
+              <span class="text-xl opacity-50 line-through">{{ product.price.original | currency:product.price.currency }}</span>
+            } @else {
+              <span class="text-3xl font-bold">{{ product.price.current | currency:product.price.currency }}</span>
+            }
+          </div>
+
+          @if (config.showDescription !== false) {
+            <p class="text-lg opacity-80 leading-relaxed mb-8 max-w-xl">
+              Discover the exceptional quality and design of {{ product.name }}. Expertly crafted to elevate your experience.
+            </p>
+          }
+
+          <div class="flex flex-col sm:flex-row gap-4 mt-auto">
+            <button class="flex-1 bg-[var(--primary)] text-[var(--bg-page)] font-bold py-4 px-8 rounded-full shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300">
+              Add to Cart
+            </button>
+            <a [routerLink]="['/store', orgSlug(), 'products', product.slug]" 
+               class="flex-1 flex justify-center items-center py-4 px-8 rounded-full border-2 border-[var(--primary)] font-bold hover:bg-[var(--primary)] hover:text-[var(--bg-page)] transition-all duration-300">
+              View Details
+            </a>
+          </div>
+          
+          <div class="mt-8 pt-8 border-t border-[var(--glass-border)] grid grid-cols-3 gap-4">
+             <div class="text-center">
+               <i class="pi pi-shield text-xl mb-2"></i>
+               <p class="text-xs uppercase tracking-wider opacity-70">Warranty</p>
+             </div>
+             <div class="text-center">
+               <i class="pi pi-send text-xl mb-2"></i>
+               <p class="text-xs uppercase tracking-wider opacity-70">Shipping</p>
+             </div>
+             <div class="text-center">
+               <i class="pi pi-refresh text-xl mb-2"></i>
+               <p class="text-xs uppercase tracking-wider opacity-70">Returns</p>
+             </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</section>

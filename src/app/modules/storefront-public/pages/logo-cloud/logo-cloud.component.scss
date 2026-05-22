@@ -127,7 +127,7 @@
 /* --- DARK MODE ADAPTATIONS --- */
 .text-white {
   .section-label { color: rgba(255,255,255,0.6); }
-  .divider-line { background: #fff; opacity: 0.2; }
+  .divider-line { background: var(--bg-primary); opacity: 0.2; }
   
   .logo-item:hover {
     &::after {

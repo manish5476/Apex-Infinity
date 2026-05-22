@@ -1,0 +1,32 @@
+<section class="py-16 md:py-24 bg-[var(--bg-page)] text-[var(--primary)] overflow-hidden">
+  <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center max-w-2xl mx-auto mb-12">
+      <i class="pi pi-instagram text-4xl mb-4 text-rose-500"></i>
+      <h2 class="text-3xl md:text-5xl font-serif font-bold tracking-tight mb-4">
+        {{ config.title || 'Follow Us on Instagram' }}
+      </h2>
+      <a [href]="'https://instagram.com/' + (config.username || 'apx')" 
+         target="_blank"
+         class="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest hover:text-rose-500 transition-colors">
+        @{{ config.username || 'apx_commerce' }}
+      </a>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-4">
+      @for (post of mockPosts.slice(0, config.limit || 6); track $index) {
+        <a [href]="'https://instagram.com/' + (config.username || 'apx')" 
+           target="_blank"
+           class="group relative aspect-square overflow-hidden rounded-xl bg-gray-100 block">
+          
+          <img [src]="post" 
+               alt="Instagram Post"
+               class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+               
+          <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-sm">
+            <i class="pi pi-instagram text-white text-3xl transform scale-50 group-hover:scale-100 transition-transform duration-500 delay-100"></i>
+          </div>
+        </a>
+      }
+    </div>
+  </div>
+</section>

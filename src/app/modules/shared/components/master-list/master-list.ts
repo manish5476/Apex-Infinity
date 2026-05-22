@@ -216,12 +216,14 @@ export class MasterList implements OnInit, OnDestroy {
 
   // --- Master Types Definition ---
   readonly masterTypes = [
+    { label: 'Department', value: 'department' },
     { label: 'Category', value: 'category' },
+    { label: 'Sub Category', value: 'sub_category' },
     { label: 'Brand', value: 'brand' },
     { label: 'Unit', value: 'unit' },
-    // { label: 'Department', value: 'department' },
-    { label: 'subcategory', value: 'subcategory' },
-    { label: 'tag', value: 'tag' }
+    { label: 'Tax Rate', value: 'tax_rate' },
+    { label: 'Warranty Plan', value: 'warranty_plan' },
+    { label: 'Product Condition', value: 'product_condition' }
   ];
 
   columns: GridColDef<Master>[] = [

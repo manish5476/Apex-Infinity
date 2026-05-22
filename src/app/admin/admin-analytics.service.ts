@@ -55,8 +55,20 @@ export class AdminAnalyticsService extends BaseApiService {
   // ==========================================================================
 
   /** Comprehensive customer analytics */
-  getCustomerIntelligence(branchId?: string): Observable<any> {
-    const params = this.buildParams(undefined, undefined, branchId);
+  getCustomerIntelligence(startDateOrBranchId?: string, endDate?: string, branchId?: string): Observable<any> {
+    const isDateLike = (value?: string) =>
+      !!value && !Number.isNaN(new Date(value).getTime()) && (value.includes('-') || value.includes('/'));
+
+    let startDate: string | undefined = startDateOrBranchId;
+    let resolvedBranchId = branchId;
+
+    // Backward compatibility: existing callers pass only branchId as first arg.
+    if (startDateOrBranchId && !endDate && !branchId && !isDateLike(startDateOrBranchId)) {
+      startDate = undefined;
+      resolvedBranchId = startDateOrBranchId;
+    }
+
+    const params = this.buildParams(startDate, endDate, resolvedBranchId);
     return this.get<any>('/v1/analytics/customer-intelligence', params, 'getCustomerIntelligence');
   }
 

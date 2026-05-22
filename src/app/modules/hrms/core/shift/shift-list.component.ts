@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
+import { Subject, debounceTime, distinctUntilChanged, finalize } from 'rxjs';
 
 // PrimeNG Imports
 import { ButtonModule } from 'primeng/button';
@@ -273,19 +273,27 @@ export class ShiftListComponent implements OnInit {
       this.totalCount.set(0);
     }
 
-    const params = {
+    const rawParams = {
       ...this.shiftFilter(),
       page: this.currentPage(),
       limit: this.pageSize
     };
+    const params = Object.fromEntries(
+      Object.entries(rawParams).filter(([, value]) => value !== null && value !== '')
+    );
 
-    this.hrmsService.getShifts(params).subscribe({
+    this.hrmsService.getShifts(params).pipe(
+      finalize(() => this.isLoading.set(false)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
       next: (res: any) => {
         const newData = res.data?.shifts || res.data?.data || res.data || [];
         const pagination = res.pagination; 
 
         if (pagination) {
           this.totalCount.set(pagination.totalResults);
+        } else {
+          this.totalCount.set(res.total ?? res.results ?? newData.length);
         }
 
         this.data.update(prev => isReset ? newData : [...prev, ...newData]);
@@ -294,10 +302,8 @@ export class ShiftListComponent implements OnInit {
           this.currentPage.update(p => p + 1);
         }
 
-        this.isLoading.set(false);
       },
       error: (err: any) => {
-        this.isLoading.set(false);
         this.messageService.handleHttpError(err);
       }
     });
@@ -330,7 +336,7 @@ export class ShiftListComponent implements OnInit {
   }
 
   private deleteShift(id: string): void {
-    this.hrmsService.deleteShift(id).subscribe({
+    this.hrmsService.deleteShift(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.messageService.showSuccess('Shift removed successfully');
         this.getData(true);
@@ -383,7 +389,7 @@ export class ShiftListComponent implements OnInit {
           
           // Use standard PrimeIcons for consistency rather than complex raw SVG
           const icon = data.isNightShift ? 'pi-moon' : 'pi-sun';
-          const iconColor = data.isNightShift ? 'color-mix(in srgb, var(--color-primary) 80%, black)' : 'var(--color-warning, #f59e0b)';
+          const iconColor = data.isNightShift ? 'var(--color-primary)' : 'var(--color-warning)';
 
           return `
             <div style="display:flex; align-items:center; height:100%; font-family: var(--font-mono, monospace); font-size:12px;">
@@ -430,9 +436,9 @@ export class ShiftListComponent implements OnInit {
         sortable: true,
         cellRenderer: (params: any) => {
           const isActive = params.value;
-          const bg = isActive ? 'var(--color-success-bg, #ecfdf5)' : 'var(--color-error-bg, #fef2f2)';
-          const color = isActive ? 'var(--color-success-text, #15803d)' : 'var(--color-error-text, #b91c1c)';
-          const border = isActive ? 'var(--color-success-border, #bbf7d0)' : 'var(--color-error-border, #fecaca)';
+          const bg = isActive ? 'var(--color-success-bg)' : 'var(--color-error-bg)';
+          const color = isActive ? 'var(--color-success-text)' : 'var(--color-error-text)';
+          const border = isActive ? 'var(--color-success-border)' : 'var(--color-error-border)';
           
           return `
             <div style="display:flex; align-items:center; height:100%;">

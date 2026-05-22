@@ -1,11 +1,11 @@
 <!-- page-builder.component.html -->
-<div class="builder-layout h-full flex flex-col bg-surface-50">
+<div class="builder-layout builder-workbench h-full flex flex-col bg-surface-50">
 
   <!-- ══════════════════════════════════════════════════════════════════════
        HEADER
   ═══════════════════════════════════════════════════════════════════════ -->
   <header
-    class="builder-header shrink-0 h-16 bg-white border-b border-surface-200 px-6 flex items-center justify-between shadow-sm z-20">
+    class="builder-header builder-workbench__header shrink-0 h-16 bg-white border-b border-surface-200 px-6 flex items-center justify-between shadow-sm z-20">
 
     <div class="flex items-center gap-4">
       <a routerLink="../../"
@@ -14,7 +14,8 @@
       </a>
 
       <div class="flex flex-col">
-        <h1 class="text-sm font-heading font-bold text-surface-800 leading-none tracking-tight">
+        <h1
+          class="builder-workbench__title text-sm font-heading font-bold text-surface-800 leading-none tracking-tight">
           {{ page()?.name || 'Untitled Page' }}
         </h1>
         <div class="flex items-center gap-2 mt-1.5">
@@ -81,13 +82,14 @@
   <div class="flex-1 overflow-hidden relative min-h-0">
 
     <!-- FIX: Added min-h-0 to styleClass so the splitter doesn't overflow its flex parent -->
-    <p-splitter [panelSizes]="[25, 75]" [minSizes]="[15, 50]" [gutterSize]="5" stateKey="builder-main-splitter"
+    <p-splitter [panelSizes]="[25, 75]" [minSizes]="[18, 50]" [gutterSize]="5" stateKey="builder-main-splitter"
       stateStorage="local" styleClass="h-full border-none bg-surface-100 custom-splitter">
 
       <!-- ── LEFT PANEL: Layers + Config ── -->
       <ng-template pTemplate>
         @if (viewMode() === 'sidebar') {
-        <div class="h-full w-full flex flex-col bg-white border-r border-surface-200 z-10 overflow-hidden">
+        <div
+          class="builder-workbench__sidebar h-full w-full flex flex-col bg-white border-r border-surface-200 z-10 overflow-hidden">
 
           <p-splitter layout="vertical" styleClass="h-full border-none"
             [panelSizes]="sidebarState() === 'full' ? [0, 100] : [40, 60]" [minSizes]="[10, 10]"
@@ -95,7 +97,7 @@
 
             <!-- Layer list -->
             <ng-template pTemplate>
-              <div class="h-full flex flex-col w-full overflow-hidden"
+              <div class="builder-workbench__layers h-full flex flex-col w-full overflow-hidden"
                 [class.hidden]="sidebarState() === 'full' && selectedSection()">
 
                 <div
@@ -188,24 +190,24 @@
 
               </div>
               } @else {
-                <div class="h-full flex flex-col items-center justify-center text-surface-300 bg-surface-50/40 gap-3">
-                  <div
-                    class="w-14 h-14 rounded-2xl bg-surface-100 border border-surface-200 flex items-center justify-center">
-                    <i class="pi pi-sliders-h text-xl opacity-30"></i>
-                  </div>
-                  <span class="text-[11px] font-medium tracking-wide text-surface-400">
-                    Select a layer to configure
-                  </span>
+              <div class="h-full flex flex-col items-center justify-center text-surface-300 bg-surface-50/40 gap-3">
+                <div
+                  class="w-14 h-14 rounded-2xl bg-surface-100 border border-surface-200 flex items-center justify-center">
+                  <i class="pi pi-sliders-h text-xl opacity-30"></i>
                 </div>
+                <span class="text-[11px] font-medium tracking-wide text-surface-400">
+                  Select a layer to configure
+                </span>
+              </div>
               }
             </ng-template>
 
           </p-splitter>
         </div>
         } @else {
-          <div class="h-full w-full bg-surface-50 flex items-center justify-center">
-            <span class="text-surface-300 text-xs italic">Sidebar docked</span>
-          </div>
+        <div class="h-full w-full bg-surface-50 flex items-center justify-center">
+          <span class="text-surface-300 text-xs italic">Sidebar docked</span>
+        </div>
         }
       </ng-template>
 
@@ -236,11 +238,11 @@
                  (splitter panel) provides a real, constrained height.
             -->
             <main id="preview-container"
-              class="h-full w-full min-h-0 bg-surface-100 overflow-y-auto relative custom-scrollbar scroll-smooth">
+              class="builder-workbench__canvas h-full w-full min-h-0 bg-surface-100 overflow-y-auto relative custom-scrollbar scroll-smooth">
 
               <!-- ── Component Library Overlay ── -->
               @if (showAddMenu()) {
-              <div
+              <div appendTo="body"
                 class="absolute inset-0 z-50 backdrop-blur-sm bg-white/70 flex items-start justify-center pt-16 animate-fade-in"
                 (click)="showAddMenu.set(false)">
 
@@ -349,7 +351,8 @@
                       <!-- Hover overlay -->
                       @if (selectedSection()?.id !== section.id) {
                       <div
-                        class="absolute inset-0 bg-primary-500/[0.03] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-10"></div>
+                        class="absolute inset-0 bg-primary-500/[0.03] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                      </div>
                       }
 
                       <!-- Section type label -->

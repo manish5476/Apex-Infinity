@@ -104,14 +104,20 @@ export class MapLocationsComponent implements OnInit, AfterViewInit, OnChanges, 
     // 1. Safety Checks
     if (this.map || !this.mapStage) return;
 
-    // 2. Find the first VALID location (ignore ones without lat/lng)
-    const validLocation = this.filteredLocations.find(l => l.location && l.location.lat && l.location.lng);
+    // 2. Filter out invalid locations first
+    const validLocations = this.filteredLocations.filter(l => 
+      l.location && 
+      Number.isFinite(Number(l.location.lat)) && 
+      Number.isFinite(Number(l.location.lng))
+    );
 
-    // 3. If NO valid locations exist, stop here (prevents crash)
-    if (!validLocation) {
+    // 3. If NO valid locations exist, gracefully stop (prevents crash)
+    if (validLocations.length === 0) {
       console.warn('Map initialization skipped: No locations with valid coordinates found.');
       return; 
     }
+
+    const validLocation = validLocations[0];
 
     // 4. Determine Start Point
     const startLoc = (this.selectedBranch && this.selectedBranch.location?.lat) 
@@ -169,8 +175,10 @@ export class MapLocationsComponent implements OnInit, AfterViewInit, OnChanges, 
     this.markers = [];
 
     this.filteredLocations.forEach(location => {
-      // CRITICAL FIX: Skip locations with missing coordinates
-      if (!location.location || !location.location.lat || !location.location.lng) {
+      // CRITICAL FIX: Skip locations with missing or invalid coordinates
+      if (!location.location || 
+          !Number.isFinite(Number(location.location.lat)) || 
+          !Number.isFinite(Number(location.location.lng))) {
         return;
       }
 

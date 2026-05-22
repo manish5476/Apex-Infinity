@@ -32,6 +32,32 @@
       </div>
 
       <div class="filter-field">
+        <label for="branch">Branch</label>
+        <app-master-dropdown
+          endpoint="branches"
+          [(ngModel)]="salesFilter.branchId"
+          (onChange)="applyFilters()"
+          placeholder="All Branches">
+        </app-master-dropdown>
+      </div>
+
+      <div class="filter-field" style="min-width: 220px;">
+        <label for="dateRange">Date Range</label>
+        <p-datepicker
+          appendTo="body"
+          id="dateRange"
+          [(ngModel)]="salesFilter.dateRange"
+          (onSelect)="applyFilters()"
+          selectionMode="range"
+          [readonlyInput]="true"
+          placeholder="Select Range"
+          [showIcon]="true"
+          styleClass="w-full"
+          inputStyleClass="w-full">
+        </p-datepicker>
+      </div>
+
+      <div class="filter-field">
         <label for="payStatus">Payment Status</label>
         <p-select appendTo="body" id="payStatus" [options]="paymentStatusOptions"
           [(ngModel)]="salesFilter.paymentStatus" [showClear]="true" placeholder="All Status" styleClass="w-full"

@@ -1,8 +1,8 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal, computed, OnDestroy, Injectable } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of, catchError, map, Subject } from 'rxjs';
-import { takeUntil } from "rxjs/operators";
+import { finalize, takeUntil } from "rxjs/operators";
 
 // PrimeNG
 import { SelectModule } from 'primeng/select';
@@ -534,8 +534,8 @@ export class DepartmentFormComponent implements OnInit, OnDestroy {
   private initForm() {
     this.deptForm = this.fb.group({
       name: ['', [Validators.required, Validators.maxLength(100)]],
-      code: ['', [Validators.required, Validators.maxLength(20)]],
-      description: [''],
+      code: ['', [Validators.required, Validators.maxLength(20), Validators.pattern(/^[A-Z0-9_-]+$/)]],
+      description: ['', [Validators.maxLength(500)]],
 
       parentDepartment: [null],
       branchId: [null],
@@ -547,7 +547,7 @@ export class DepartmentFormComponent implements OnInit, OnDestroy {
       maxStrength: [null, Validators.min(0)],
 
       contactEmail: ['', [Validators.email]],
-      contactPhone: [''],
+      contactPhone: ['', [Validators.maxLength(20)]],
       location: [''],
 
       isActive: [true],
@@ -560,8 +560,11 @@ export class DepartmentFormComponent implements OnInit, OnDestroy {
     });
 
     this.deptForm.get('code')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(val => {
-      if (val && val !== val.toUpperCase()) {
-        this.deptForm.get('code')?.setValue(val.toUpperCase(), { emitEvent: false });
+      const normalized = typeof val === 'string'
+        ? val.trim().toUpperCase().replace(/\s+/g, '_')
+        : val;
+      if (normalized && normalized !== val) {
+        this.deptForm.get('code')?.setValue(normalized, { emitEvent: false });
       }
     });
   }
@@ -653,27 +656,29 @@ export class DepartmentFormComponent implements OnInit, OnDestroy {
     if (!payload.assistantHOD) delete payload.assistantHOD;
 
     if (this.isEditMode()) {
-      this.hrmsService.updateDepartment(this.deptId!, payload).pipe(takeUntil(this.destroy$)).subscribe({
+      this.hrmsService.updateDepartment(this.deptId!, payload).pipe(
+        finalize(() => this.isSubmitting.set(false)),
+        takeUntil(this.destroy$)
+      ).subscribe({
         next: (res: any) => {
           this.messageService.showSuccess( 'Department updated successfully');
-          this.isSubmitting.set(false);
           this.goBack();
         },
         error: (err: any) => {
           this.messageService.handleHttpError(err)
-          this.isSubmitting.set(false);
         }
       });
     } else {
-      this.hrmsService.createDepartment(payload).pipe(takeUntil(this.destroy$)).subscribe({
+      this.hrmsService.createDepartment(payload).pipe(
+        finalize(() => this.isSubmitting.set(false)),
+        takeUntil(this.destroy$)
+      ).subscribe({
         next: (res: any) => {
           this.messageService.showSuccess('Department created successfully');
-          this.isSubmitting.set(false);
           this.goBack();
         },
         error: (err: any) => {
           this.messageService.handleHttpError(err)
-          this.isSubmitting.set(false);
         }
       });
     }

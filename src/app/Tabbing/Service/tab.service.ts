@@ -65,7 +65,13 @@ export class TabService implements OnDestroy {
       qp[key] = String(rawQueryParams[key]);
     }
 
-    if (!hasTarget || fullUrl === '/' || fullUrl === '/login' || fullUrl === '/signup') {
+    const lowUrl = fullUrl.toLowerCase();
+    const componentName = (routeConfig?.component as any)?.name || '';
+    
+    const isAuth = lowUrl.includes('login') || lowUrl.includes('signup') || lowUrl.includes('auth') || lowUrl.includes('password') || lowUrl.includes('verification') || componentName.includes('Login');
+    const isError = lowUrl.includes('error') || lowUrl.includes('unauthorized') || lowUrl.includes('notfound') || routeConfig?.path === '**' || componentName.includes('NotFound') || componentName.includes('Unauthorized');
+
+    if (!hasTarget || isAuth || isError || fullUrl === '/' || data['disableTab'] === true) {
       this.syncFromRouter(fullUrl, qp);
       return;
     }
@@ -73,7 +79,10 @@ export class TabService implements OnDestroy {
     let label = (data['tabLabel'] as string | undefined);
     if (!label) {
       const segments = fullUrl.split('/').filter(Boolean);
-      const lastSegment = segments.pop() || 'Home';
+      let lastSegment = segments.pop() || 'Home';
+      // Strip matrix parameters (;) or encoded matrix parameters (%3b)
+      lastSegment = lastSegment.split(';')[0].split('%3b')[0];
+      
       label = lastSegment
         .split('-')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
@@ -272,8 +281,21 @@ export class TabService implements OnDestroy {
     this.router.navigate(tab ? [tab.path] : ['/']);
   }
 
-  updateTab(id: TabId, patch: Partial<Pick<TabMeta, 'label' | 'icon' | 'data' | 'loading'>>): void {
-    this._patchTab(id, patch);
+  /**
+   * Update the currently active tab's metadata
+   */
+  updateActiveTab(options: Partial<Omit<TabMeta, 'id' | 'path'>>): void {
+    const activeId = this._state().activeTabId;
+    if (activeId) {
+      this.updateTab(activeId, options);
+    }
+  }
+
+  /**
+   * Update a specific tab's metadata
+   */
+  updateTab(id: TabId, options: Partial<Omit<TabMeta, 'id' | 'path'>>): void {
+    this._patchTab(id, options);
   }
 
   togglePin(id: TabId): void {
@@ -295,6 +317,14 @@ export class TabService implements OnDestroy {
     const id = this.buildTabId(path, queryParams);
     if (!this._findById(id)) return;
     this._activate(id);
+  }
+
+  /**
+   * Reset all tabs (useful for logout)
+   */
+  reset(): void {
+    this._state.set({ tabs: [], activeTabId: null });
+    try { sessionStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
   }
 
   /**

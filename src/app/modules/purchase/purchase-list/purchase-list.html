@@ -41,6 +41,16 @@
         </app-master-dropdown>
       </div>
 
+      <div class="filter-field">
+        <label for="branch">Branch</label>
+        <app-master-dropdown
+          endpoint="branches"
+          [(ngModel)]="purchaseFilter.branchId"
+          (onChange)="applyFilters()"
+          placeholder="All Branches">
+        </app-master-dropdown>
+      </div>
+
       <div class="filter-field" style="min-width: 220px;">
         <label for="dateRange">Date Range</label>
         <p-datepicker id="dateRange" [(ngModel)]="purchaseFilter.dateRange" (onSelect)="applyFilters()"
@@ -54,6 +64,14 @@
         <p-select appendTo="body" id="status" [options]="statusOptions" [(ngModel)]="purchaseFilter.status"
           (onChange)="applyFilters()" [showClear]="true" placeholder="Any Status" [filter]="true" filterBy="label"
           styleClass="w-full">
+        </p-select>
+      </div>
+
+      <div class="filter-field">
+        <label for="paymentStatus">Payment Status</label>
+        <p-select appendTo="body" id="paymentStatus" [options]="paymentStatusOptions"
+          [(ngModel)]="purchaseFilter.paymentStatus" (onChange)="applyFilters()" [showClear]="true"
+          placeholder="Any Payment" [filter]="true" filterBy="label" styleClass="w-full">
         </p-select>
       </div>
 
@@ -71,4 +89,4 @@
     </div>
 
   </div>
-</div>
+</div>

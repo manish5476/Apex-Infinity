@@ -1,4 +1,5 @@
-import { Injectable, inject, OnDestroy, effect } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Injectable, PLATFORM_ID, inject, OnDestroy, effect } from '@angular/core';
 import { BehaviorSubject, Subscription, Subject } from 'rxjs';
 import { SocketConnectionService } from './socket/socket-connection.service';
 import { AuthService } from '../../modules/auth/services/auth-service';
@@ -83,6 +84,8 @@ export class ThemeService implements OnDestroy {
     private readonly destroy$ = new Subject<void>();
   private socketService = inject(SocketConnectionService);
   private authService = inject(AuthService);
+  private platformId = inject(PLATFORM_ID);
+  private isBrowser = isPlatformBrowser(this.platformId);
   private readonly STORAGE_KEY = 'themeSettings-v4'; // bumped version — merges pattern
 
   private readonly defaultSettings: ThemeSettings = {
@@ -113,9 +116,11 @@ export class ThemeService implements OnDestroy {
 
   constructor() {
     const initialSettings = this.settingsSubject.value;
-    ThemeFontLoader.preloadThemes(['theme-light', 'theme-dark', initialSettings.lightThemeClass]);
-    this.applyTheme(initialSettings);
-    this.setupSocketListener();
+    if (this.isBrowser) {
+      ThemeFontLoader.preloadThemes(['theme-light', 'theme-dark', initialSettings.lightThemeClass]);
+      this.applyTheme(initialSettings);
+      this.setupSocketListener();
+    }
     effect(() => {
       const user = this.authService.currentUser();
       if (user?.preferences?.theme) {
@@ -157,6 +162,7 @@ export class ThemeService implements OnDestroy {
   // ─────────────────────────────────────────────────────────────────────────
 
   private loadSettings(): ThemeSettings {
+    if (!this.isBrowser) return this.defaultSettings;
     try {
       const stored = localStorage.getItem(this.STORAGE_KEY);
       if (stored) {
@@ -170,6 +176,7 @@ export class ThemeService implements OnDestroy {
   }
 
   private saveSettings(settings: ThemeSettings): void {
+    if (!this.isBrowser) return;
     try {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(settings));
     } catch {
@@ -182,6 +189,7 @@ export class ThemeService implements OnDestroy {
   // ─────────────────────────────────────────────────────────────────────────
 
   private async applyTheme(settings: ThemeSettings): Promise<void> {
+    if (!this.isBrowser) return;
     const html = document.documentElement;
     const targetThemeId = settings.isDarkMode ? 'theme-dark' : settings.lightThemeClass;
 
@@ -207,6 +215,7 @@ export class ThemeService implements OnDestroy {
   // ─────────────────────────────────────────────────────────────────────────
 
   private applyPattern(settings: ThemeSettings): void {
+    if (!this.isBrowser) return;
     const html = document.documentElement;
     const layout = document.querySelector<HTMLElement>(this.LAYOUT_SELECTOR);
 
@@ -232,6 +241,7 @@ export class ThemeService implements OnDestroy {
   }
 
   private applySvgPattern(patternId: string, opacity: number): void {
+    if (!this.isBrowser) return;
     const template = SVG_TEMPLATES[patternId];
     if (!template) return;
 
@@ -253,6 +263,7 @@ export class ThemeService implements OnDestroy {
 
   /** Reads --accent-primary computed value from <html> and normalises to hex */
   private resolveAccentColor(): string {
+    if (!this.isBrowser) return '#6366f1';
     const raw = getComputedStyle(document.documentElement)
       .getPropertyValue('--accent-primary')
       .trim();

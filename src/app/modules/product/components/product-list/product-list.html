@@ -54,16 +54,51 @@
 
       <div class="filter-field">
         <label for="brand">Brand</label>
-        <app-master-dropdown endpoint="brands" [ngModel]="productFilter().brand"
-          (ngModelChange)="patchProductFilter('brand', $event)" placeholder="Select Brand">
+        <app-master-dropdown endpoint="brands" [ngModel]="productFilter().brandId"
+          (ngModelChange)="patchProductFilter('brandId', $event)" placeholder="Select Brand">
         </app-master-dropdown>
       </div>
 
       <div class="filter-field">
         <label for="category">Category</label>
-        <app-master-dropdown endpoint="categories" [ngModel]="productFilter().category"
-          (ngModelChange)="patchProductFilter('category', $event)" placeholder="Select Category">
+        <app-master-dropdown endpoint="categories" [ngModel]="productFilter().categoryId"
+          (ngModelChange)="patchProductFilter('categoryId', $event)" placeholder="Select Category">
         </app-master-dropdown>
+      </div>
+
+      <div class="filter-field">
+        <label for="subcategory">Sub-Category</label>
+        <app-master-dropdown endpoint="subcategories"
+          [extraParams]="{ parentId: productFilter().categoryId }"
+          [ngModel]="productFilter().subCategoryId"
+          (ngModelChange)="patchProductFilter('subCategoryId', $event)"
+          placeholder="Select Sub-Category">
+        </app-master-dropdown>
+      </div>
+
+      <div class="filter-field">
+        <label for="unit">Unit</label>
+        <app-master-dropdown endpoint="units" [ngModel]="productFilter().unitId"
+          (ngModelChange)="patchProductFilter('unitId', $event)" placeholder="Select Unit">
+        </app-master-dropdown>
+      </div>
+
+      <div class="filter-field">
+        <label for="status">Status</label>
+        <p-select
+          appendTo="body"
+          id="status"
+          [options]="[
+            { label: 'All', value: null },
+            { label: 'Active', value: true },
+            { label: 'Inactive', value: false }
+          ]"
+          [ngModel]="productFilter().isActive"
+          (ngModelChange)="patchProductFilter('isActive', $event)"
+          [showClear]="false"
+          placeholder="All"
+          styleClass="w-full">
+        </p-select>
       </div>
 
       <div class="filter-actions">

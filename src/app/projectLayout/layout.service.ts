@@ -1,8 +1,11 @@
-import { Injectable, signal, computed, effect } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Injectable, PLATFORM_ID, computed, effect, inject, signal } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class LayoutService {
-  isPinned = signal(localStorage.getItem('sidebarPinned') === 'true');
+  private platformId = inject(PLATFORM_ID);
+  private isBrowser = isPlatformBrowser(this.platformId);
+  isPinned = signal(this.isBrowser && localStorage.getItem('sidebarPinned') === 'true');
   isHovered = signal(false);
   isMobileMenuOpen = signal(false);
   screenWidth = signal(0);
@@ -25,9 +28,10 @@ export class LayoutService {
   isCollapsed = computed(() => !this.isExpanded());
 
   constructor() {
-    effect(() =>
+    effect(() => {
+      if (!this.isBrowser) return;
       localStorage.setItem('sidebarPinned', String(this.isPinned()))
-    );
+    });
   }
 
   togglePin() {

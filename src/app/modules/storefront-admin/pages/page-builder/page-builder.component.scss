@@ -715,3 +715,77 @@ app-map-locations {
 //   .p-resizable-handle { opacity: 0.5; }
 // }
 
+.builder-workbench {
+  --builder-bg: #f4f6fb;
+  --builder-surface: rgba(255, 255, 255, 0.92);
+  --builder-border: var(--apx-color-border);
+  --builder-ink: var(--apx-color-ink);
+  --builder-muted: var(--apx-color-muted);
+  min-height: calc(100vh - 64px);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0)),
+    var(--builder-bg);
+  color: var(--builder-ink);
+  font-family: var(--apx-font-sans);
+}
+
+.builder-workbench__header {
+  background: var(--builder-surface) !important;
+  backdrop-filter: var(--apx-glass-blur);
+  border-color: var(--builder-border) !important;
+  box-shadow: var(--apx-shadow-xs) !important;
+}
+
+.builder-workbench__title {
+  letter-spacing: 0;
+}
+
+.builder-workbench__sidebar {
+  background: color-mix(in srgb, var(--apx-color-surface) 92%, transparent) !important;
+  backdrop-filter: blur(18px);
+}
+
+.builder-workbench__layers .layer-card {
+  min-height: 3rem;
+  border-radius: var(--apx-radius-md);
+  border: 1px solid transparent;
+  transition:
+    transform var(--apx-duration-fast) var(--apx-ease-standard),
+    border-color var(--apx-duration-base) var(--apx-ease-standard),
+    background var(--apx-duration-base) var(--apx-ease-standard),
+    box-shadow var(--apx-duration-base) var(--apx-ease-standard);
+}
+
+.builder-workbench__layers .layer-card:hover,
+.builder-workbench__layers .layer-card.active {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--apx-color-primary) 30%, var(--builder-border));
+  background: color-mix(in srgb, var(--apx-color-primary) 6%, #fff);
+  box-shadow: var(--apx-shadow-xs);
+}
+
+.builder-workbench__canvas {
+  background:
+    linear-gradient(90deg, rgba(17,24,39,0.045) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(17,24,39,0.045) 1px, transparent 1px),
+    #eef1f6 !important;
+  background-size: 24px 24px;
+}
+
+.builder-workbench .action-btn-primary,
+.builder-workbench .action-btn-secondary,
+.builder-workbench .icon-btn,
+.builder-workbench .btn-dashed {
+  border-radius: var(--apx-radius-md);
+  transition:
+    transform var(--apx-duration-fast) var(--apx-ease-standard),
+    box-shadow var(--apx-duration-base) var(--apx-ease-standard),
+    background var(--apx-duration-base) var(--apx-ease-standard);
+}
+
+.builder-workbench .action-btn-primary:hover,
+.builder-workbench .action-btn-secondary:hover,
+.builder-workbench .icon-btn:hover,
+.builder-workbench .btn-dashed:hover {
+  transform: translateY(-1px);
+}

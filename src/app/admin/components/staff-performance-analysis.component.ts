@@ -402,12 +402,13 @@ export class StaffPerformanceAnalysisComponent implements OnInit, OnDestroy {
 
   loadData() {
     this.loading.set(true);
+    const [startDate, endDate] = this.resolveDateRange();
     
     // API Call with Filters
     const params = {
       branchId: this.currentFilters.branchId,
-      startDate: this.currentFilters.startDate,
-      endDate: this.currentFilters.endDate,
+      startDate,
+      endDate,
       minSales: this.currentFilters.minSales || 0,
       sortBy: 'revenue' // Default sort
     };
@@ -428,6 +429,18 @@ export class StaffPerformanceAnalysisComponent implements OnInit, OnDestroy {
       },
       error: () => this.loading.set(false)
     });
+  }
+
+  private resolveDateRange(): [string | undefined, string | undefined] {
+    const start = this.currentFilters.startDate ?? this.currentFilters.date?.[0];
+    const end = this.currentFilters.endDate ?? this.currentFilters.date?.[1];
+    return [this.toIsoDate(start), this.toIsoDate(end)];
+  }
+
+  private toIsoDate(value: any): string | undefined {
+    if (!value) return undefined;
+    const date = value instanceof Date ? value : new Date(value);
+    return Number.isNaN(date.getTime()) ? undefined : date.toISOString();
   }
 
   setupColumns(): void {

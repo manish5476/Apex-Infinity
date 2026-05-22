@@ -142,6 +142,7 @@ export class MasterDropdownComponent
 
   @Output() onSelect = new EventEmitter<any>();
   @Output() onChangeEvent = new EventEmitter<any>();
+  @Output('onChange') onChangeCompat = new EventEmitter<any>();
   @Output() onClearEvent = new EventEmitter<void>();
   @Output() onShow = new EventEmitter<any>();
   @Output() onHide = new EventEmitter<any>();
@@ -165,7 +166,7 @@ export class MasterDropdownComponent
   private readonly searchSubject = new Subject<string>();
   private searchSubscription?: Subscription;
 
-  onChange = (_value: any) => { };
+  private propagateChange = (_value: any) => { };
   onTouched = () => { };
 
   ngOnInit(): void {
@@ -203,7 +204,7 @@ export class MasterDropdownComponent
   handleClear(): void {
     this.value = this.isMulti ? [] : null;
     this.pendingSelectedIds.clear();
-    this.onChange(this.value);
+    this.propagateChange(this.value);
     this.onTouched();
     this.onChangeEvent.emit(this.value);
     this.onClearEvent.emit();
@@ -229,9 +230,10 @@ export class MasterDropdownComponent
   onSelectionChange(newValue: any): void {
     this.value = newValue;
     this.syncPendingSelectedIds(newValue);
-    this.onChange(this.value);
+    this.propagateChange(this.value);
     this.onTouched();
     this.onChangeEvent.emit(this.value);
+    this.onChangeCompat.emit(this.value);
     this.emitSelectData(newValue);
   }
 
@@ -257,7 +259,7 @@ export class MasterDropdownComponent
   }
 
   registerOnChange(fn: any): void {
-    this.onChange = fn;
+    this.propagateChange = fn;
   }
 
   registerOnTouched(fn: any): void {
