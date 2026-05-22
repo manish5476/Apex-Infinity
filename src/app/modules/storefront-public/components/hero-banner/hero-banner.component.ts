@@ -11,12 +11,12 @@ export interface HeroBannerConfig {
   backgroundImage?: string;
   height?: 'auto' | 'small' | 'medium' | 'large' | 'screen';
   overlayOpacity?: number;
-  ctaButtons?: Array<{ text: string; link: string; variant: 'primary' | 'secondary' | 'outline' | 'ghost' }>;
+  ctaButtons?: Array<{ text: string; link: string; variant: 'primary' | 'secondary' | 'outline' | 'ghost'; icon?: string }>;
   contentPosition?: 'left' | 'center' | 'right';
   paddingTop?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
   paddingBottom?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
   backgroundColor?: string;
-  themeMode?: 'auto' | 'light' | 'dark';
+  themeMode?: 'auto' | 'light' | 'dark' | 'glass';
 }
 
 const HEIGHT_MAP: Record<string, string> = {
@@ -64,10 +64,10 @@ export class HeroBannerComponent {
 
   readonly sectionStyle = computed(() => ({
     'min-height': HEIGHT_MAP[this.cfg().height] ?? '70vh',
-    'background-color': this.cfg().backgroundColor || '',
-    'background-image': this.cfg().backgroundImage
-      ? `url(${this.cfg().backgroundImage})`
-      : '',
+    'background-color': this.cfg().backgroundColor || ''
+  }));
+
+  readonly contentStyle = computed(() => ({
     'padding-top': this.paddingMap[this.cfg().paddingTop] ?? this.paddingMap['md'],
     'padding-bottom': this.paddingMap[this.cfg().paddingBottom] ?? this.paddingMap['md']
   }));

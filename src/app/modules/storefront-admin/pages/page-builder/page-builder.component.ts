@@ -1,6 +1,7 @@
 // src/app/features/storefront-admin/pages/page-builder/page-builder.component.ts
 import {
-  Component, OnInit, inject, signal, ViewEncapsulation, OnDestroy } from '@angular/core';
+  Component, OnInit, inject, signal, computed, ViewEncapsulation, OnDestroy
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
@@ -12,7 +13,7 @@ import { SplitterModule } from 'primeng/splitter';
 // Config form
 import { ConfigFormComponent } from '../config-form/config-form.component';
 
-// import { MasterListService } from '../../../../core/services/master-list.service';
+import { MasterListService } from '../../../../core/services/master-list.service';
 import { AdminPage, PageSection, SectionDefinition } from '@core/models/storefront.model';
 import { StorefrontAdminService } from '@core/services/storefront-admin.service';
 import { StorefrontPublicService } from '@core/services/storefront-public.service';
@@ -69,18 +70,22 @@ function buildDefaultConfig(schema: Record<string, any>): Record<string, any> {
   encapsulation: ViewEncapsulation.None
 })
 export class PageBuilderComponent implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   private route = inject(ActivatedRoute);
   private adminService = inject(StorefrontAdminService);
   private publicService = inject(StorefrontPublicService);
-  // private masterListService = inject(MasterListService);
+  private masterListService = inject(MasterListService);
 
   // ── Data ──────────────────────────────────────────────────────────────────
   page = signal<AdminPage | null>(null);
   sections = signal<PageSection[]>([]);
   selectedSection = signal<PageSection | null>(null);
-  mastersData = signal<any>({ categories: [], brands: [], tags: [], products: [] });
-
+  
+  private _storeEnums = signal<any>({ categories: [], brands: [], tags: [] });
+  mastersData = computed(() => ({
+    ...this._storeEnums(),
+    products: this.masterListService.products() ?? []
+  }));
   // ── View state ────────────────────────────────────────────────────────────
   viewMode = signal<'sidebar' | 'dialog'>('sidebar');
   sidebarState = signal<'split' | 'full'>('split');
@@ -155,11 +160,10 @@ export class PageBuilderComponent implements OnInit, OnDestroy {
     this.publicService.getStoreMetadata(orgSlug).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         const enums = res.data?.enums ?? res.enums ?? {};
-        this.mastersData.set({
+        this._storeEnums.set({
           categories: enums.categories ?? [],
           brands: enums.brands ?? [],
-          tags: enums.tags ?? [],
-          products: [] // this.masterListService.products?.() ?? []
+          tags: enums.tags ?? []
         });
       }
     });
@@ -348,8 +352,8 @@ export class PageBuilderComponent implements OnInit, OnDestroy {
     });
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

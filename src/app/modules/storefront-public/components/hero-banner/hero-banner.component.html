@@ -13,7 +13,7 @@
   <div class="hero-grain" aria-hidden="true"></div>
 
   <!-- Content -->
-  <div class="hero-content" [class.align-left]="cfg().contentPosition === 'left'"
+  <div class="hero-content" [ngStyle]="contentStyle()" [class.align-left]="cfg().contentPosition === 'left'"
     [class.align-center]="cfg().contentPosition === 'center'" [class.align-right]="cfg().contentPosition === 'right'">
 
     <div class="hero-inner" [class.text-left]="cfg().alignment === 'left'"
@@ -38,10 +38,12 @@
         @for (btn of cfg().ctaButtons; track btn.text) {
         @if (isExternal(btn.link)) {
         <a [href]="btn.link" target="_blank" rel="noopener" class="hero-btn" [class]="'hero-btn-' + btn.variant">
+          @if (btn.icon) { <i [class]="btn.icon"></i> }
           {{ btn.text }}
         </a>
         } @else {
         <a [routerLink]="[btn.link]" class="hero-btn" [class]="'hero-btn-' + btn.variant">
+          @if (btn.icon) { <i [class]="btn.icon"></i> }
           {{ btn.text }}
         </a>
         }

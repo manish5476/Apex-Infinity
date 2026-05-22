@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, inject, forwardRef } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, forwardRef, OnChanges, SimpleChanges } from '@angular/core';
 import { AbstractControl, FormArray, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { BadgeModule } from 'primeng/badge';
@@ -125,11 +125,11 @@ import { DynamicFieldDefinition } from './section-schema.types';
 
           <div class="p-fluid">
             @if (field.type === 'reference-multi') {
-              <p-multiselect [options]="getEnumOptions(field)" [formControlName]="field.key" optionLabel="label"
+              <p-multiselect [options]="options" [formControlName]="field.key" optionLabel="label"
                 optionValue="value" display="chip" placeholder="Select..." appendTo="body" [filter]="true" [showClear]="true">
               </p-multiselect>
             } @else if (field.enum || field.type === 'reference') {
-              <p-select [options]="getEnumOptions(field)" [formControlName]="field.key" optionLabel="label" optionValue="value"
+              <p-select [options]="options" [formControlName]="field.key" optionLabel="label" optionValue="value"
                 placeholder="Select..." appendTo="body" [filter]="true" filterBy="label" [showClear]="!field.required">
               </p-select>
             } @else if (field.type === 'color') {
@@ -195,7 +195,7 @@ import { DynamicFieldDefinition } from './section-schema.types';
     }
   `
 })
-export class DynamicFieldRendererComponent {
+export class DynamicFieldRendererComponent implements OnChanges {
   @Input({ required: true }) field!: DynamicFieldDefinition;
   @Input({ required: true }) parentGroup!: FormGroup;
   @Input() masters: any = { categories: [], brands: [], tags: [], products: [] };
@@ -203,6 +203,16 @@ export class DynamicFieldRendererComponent {
   @Output() arrayMutation = new EventEmitter<void>();
 
   private readonly engine = inject(DynamicFormEngineService);
+
+  options: Array<{ label: string; value: unknown }> = [];
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['field'] || changes['masters']) {
+      if (this.field && (this.field.enum || this.field.type?.includes('reference'))) {
+        this.options = this.generateOptions();
+      }
+    }
+  }
 
   getFormArray(key: string): FormArray {
     return this.parentGroup.get(key) as FormArray;
@@ -241,17 +251,17 @@ export class DynamicFieldRendererComponent {
     return value?.text ?? value?.title ?? value?.name ?? value?.label ?? value?.question ?? 'Item';
   }
 
-  getEnumOptions(field: DynamicFieldDefinition): Array<{ label: string; value: unknown }> {
-    if (field.enum) {
-      return field.enum.map(value => ({
+  generateOptions(): Array<{ label: string; value: unknown }> {
+    if (this.field.enum) {
+      return this.field.enum.map(value => ({
         label: typeof value === 'string' ? this.formatLabel(value) : String(value),
         value
       }));
     }
 
-    if (field.type?.includes('reference')) {
-      const ref = (field.ref ?? '').toLowerCase();
-      const key = (field.key ?? '').toLowerCase();
+    if (this.field.type?.includes('reference')) {
+      const ref = (this.field.ref ?? '').toLowerCase();
+      const key = (this.field.key ?? '').toLowerCase();
       let source: unknown[] = [];
 
       if (ref === 'product' || key.includes('product')) source = this.masters?.products ?? [];
@@ -279,3 +289,4 @@ export class DynamicFieldRendererComponent {
       .trim();
   }
 }
+
