@@ -45,6 +45,13 @@ export const serverRoutes: ServerRoute[] = [
     }
   },
   {
+    path: 'store/:orgSlug/**',
+    renderMode: RenderMode.Server,
+    headers: {
+      'Cache-Control': 'public, max-age=120, stale-while-revalidate=1800'
+    }
+  },
+  {
     path: '**',
     renderMode: RenderMode.Client
   }

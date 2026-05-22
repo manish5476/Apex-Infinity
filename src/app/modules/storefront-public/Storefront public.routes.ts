@@ -22,8 +22,11 @@ const commerceFlowRoute = (path: string, mode: string, title: string): Routes[nu
 export const STOREFRONT_PUBLIC_ROUTES: Routes = [
   {
     path: '',
-    redirectTo: 'home',
-    pathMatch: 'full'
+    loadComponent: () =>
+      import('./dynamic-page/dynamic-page.component')
+        .then(m => m.DynamicPageComponent),
+    pathMatch: 'full',
+    title: 'Store'
   },
   {
     path: 'products',

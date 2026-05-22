@@ -1,6 +1,11 @@
 {
   "version": 2,
+  "buildCommand": "npm run build:prod",
+  "outputDirectory": "dist/apex/browser",
   "rewrites": [
-    { "source": "/(.*)", "destination": "/" }
+    {
+      "source": "/(.*)",
+      "destination": "/index.csr.html"
+    }
   ]
 }
