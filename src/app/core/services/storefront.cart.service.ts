@@ -11,6 +11,7 @@ export interface AddItemDto {
   productId: string;
   quantity?: number;
   branchId?: string;
+  variantId?: string;
 }
 
 export interface CartValidationResult {
@@ -55,7 +56,7 @@ export class StorefrontCartService extends BaseApiService {
 
   /** Derived: grand total after discount. */
   readonly grandTotal = computed(() =>
-    (this.cart()?.grandTotal) ?? 0
+    this.cart()?.totals?.total ?? this.cart()?.grandTotal ?? 0
   );
 
   // ── Private helpers ───────────────────────────────────────────────────────
@@ -123,17 +124,25 @@ export class StorefrontCartService extends BaseApiService {
     );
   }
 
-  /**
-   * Merge a guest cart into the logged-in customer's cart.
-   * Call this immediately after a successful login.
-   *
-   * @param orgSlug       The organisation slug
-   * @param sessionToken  The guest cartSession token (read from document.cookie if needed)
-   */
-  mergeCart(orgSlug: string, sessionToken: string): Observable<any> {
+  applyCoupon(orgSlug: string, couponCode: string): Observable<any> {
+    return this.post<any>(
+      `${this.cartBase(orgSlug)}/coupons`,
+      { couponCode }
+    ).pipe(this.updateCart());
+  }
+
+  estimateShipping(orgSlug: string, payload: Record<string, any>): Observable<any> {
+    return this.post<any>(
+      `${this.cartBase(orgSlug)}/shipping-estimate`,
+      payload
+    ).pipe(this.updateCart());
+  }
+
+  /** Merge the current guest sf_session cart into the authenticated storefront customer cart. */
+  mergeCart(orgSlug: string): Observable<any> {
     return this.post<any>(
       `${this.cartBase(orgSlug)}/merge`,
-      { sessionToken }
+      {}
     ).pipe(this.updateCart());
   }
 
@@ -142,7 +151,7 @@ export class StorefrontCartService extends BaseApiService {
   /** Read the guest cartSession token from the browser cookie jar. */
   getGuestSessionToken(): string | null {
     if (typeof document === 'undefined') return null; // SSR guard
-    const match = document.cookie.match(/(?:^|;\s*)cartSession=([^;]+)/);
+    const match = document.cookie.match(/(?:^|;\s*)sf_session=([^;]+)/);
     return match ? decodeURIComponent(match[1]) : null;
   }
 

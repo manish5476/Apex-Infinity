@@ -365,37 +365,8 @@
                         </span>
                       </div>
 
-                      <!-- Section renderer -->
-                      @switch (section.type) {
-                      @case ('hero_banner') { <app-hero-banner [config]="section.config" /> }
-                      @case ('product_slider') { <app-product-slider [config]="section.config" /> }
-                      @case ('product_grid') { <app-product-grid [config]="section.config" /> }
-                      @case ('category_grid') { <app-category-grid [config]="section.config" /> }
-                      @case ('feature_grid') { <app-feature-grid [config]="section.config" /> }
-                      @case ('text_content') { <app-text-content [config]="section.config" /> }
-                      @case ('video_hero') { <app-video-hero [config]="section.config" /> }
-                      @case ('split_image_text') { <app-split-content [config]="section.config" /> }
-                      @case ('testimonial_slider') { <app-testimonial-slider [config]="section.config" /> }
-                      @case ('logo_cloud') { <app-logo-cloud [config]="section.config" /> }
-                      @case ('stats_counter') { <app-stats-counter [config]="section.config" /> }
-                      @case ('newsletter_signup') { <app-newsletter-signup [config]="section.config" /> }
-                      @case ('contact_form') { <app-contact-form [config]="section.config" /> }
-                      @case ('pricing_table') { <app-pricing-table [config]="section.config" /> }
-                      @case ('faq_accordion') { <app-faq-accordion [config]="section.config" /> }
-                      @case ('countdown_timer') { <app-countdown-timer [config]="section.config" /> }
-                      @case ('blog_feed') { <app-blog-feed [config]="section.config" /> }
-                      @case ('product_listing') { <app-product-listing [config]="section.config" /> }
-                      @default {
-                      <div
-                        class="p-10 text-center bg-surface-50 border-2 border-dashed border-surface-200 rounded-lg m-4">
-                        <p class="text-surface-400 font-bold text-xs uppercase tracking-widest mb-2">Unknown Component
-                        </p>
-                        <code class="text-surface-700 font-mono text-sm bg-surface-100 px-2 py-1 rounded">
-                          {{ section.type }}
-                        </code>
-                      </div>
-                      }
-                      }
+                      <!-- Section renderer: same registry-driven lazy runtime used by public storefront pages. -->
+                      <app-storefront-section-renderer [section]="section" [orgSlug]="''" [isDev]="true" />
 
                     </div>
                     }

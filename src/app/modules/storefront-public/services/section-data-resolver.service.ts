@@ -27,23 +27,32 @@ export class SectionDataResolverService {
     return [];
   }
 
+  resolveData<T = any>(section: any, fallback: T | null = null): T | null {
+    if (!section) return fallback;
+    return section.data
+      ?? section.manualData
+      ?? section.hydratedData
+      ?? section.config?.data
+      ?? fallback;
+  }
+
   /**
    * Specialized resolver for map locations.
    */
   resolveLocations(section: any): any[] {
     if (!section) return [];
     
-    let locations: any[] = [];
-    
-    if (Array.isArray(section.data) && section.data.length > 0) {
-      locations = section.data;
-    } else if (Array.isArray(section.manualData) && section.manualData.length > 0) {
-      locations = section.manualData;
-    } else if (section.config?.locations && Array.isArray(section.config.locations)) {
-      locations = section.config.locations;
-    }
+    const locations =
+      this.firstArray(section.data)
+      ?? this.firstArray(section.manualData)
+      ?? this.firstArray(section.hydratedData)
+      ?? this.firstArray(section.config?.data)
+      ?? this.firstArray(section.config?.locations)
+      ?? [];
 
-    return locations;
+    return locations
+      .map(location => this.normalizeLocation(location))
+      .filter(location => location && Number.isFinite(Number(location.location?.lat)) && Number.isFinite(Number(location.location?.lng)));
   }
 
   /**
@@ -65,5 +74,28 @@ export class SectionDataResolverService {
    */
   resolvePosts(section: any): any[] {
     return this.resolveArrayData(section);
+  }
+
+  private firstArray(value: any): any[] | null {
+    return Array.isArray(value) ? value : null;
+  }
+
+  private normalizeLocation(location: any): any | null {
+    if (!location) return null;
+
+    const coordinates = location.location?.coordinates;
+    const lat = location.location?.lat ?? location.lat ?? (Array.isArray(coordinates) ? coordinates[1] : undefined);
+    const lng = location.location?.lng ?? location.lng ?? (Array.isArray(coordinates) ? coordinates[0] : undefined);
+
+    return {
+      ...location,
+      _id: location._id ?? location.id ?? `${lat}-${lng}-${location.name ?? 'location'}`,
+      address: location.address ?? {},
+      location: {
+        ...location.location,
+        lat: Number(lat),
+        lng: Number(lng)
+      }
+    };
   }
 }

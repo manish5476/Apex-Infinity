@@ -12,31 +12,17 @@ import { SplitterModule } from 'primeng/splitter';
 // Config form
 import { ConfigFormComponent } from '../config-form/config-form.component';
 
-// Section preview components
-import { HeroBannerComponent } from '../../../storefront-public/components/hero-banner/hero-banner.component';
-import { BlogFeedComponent } from '../../../storefront-public/pages/blog-feed/blog-feed.component';
-import { CategoryGridComponent } from '../../../storefront-public/pages/category-grid/category-grid.component';
-import { ContactFormComponent } from '../../../storefront-public/pages/contact-form/contact-form.component';
-import { CountdownTimerComponent } from '../../../storefront-public/pages/countdown-timer/countdown-timer.component';
-import { FaqAccordionComponent } from '../../../storefront-public/pages/faq-accordion/faq-accordion.component';
-import { FeatureGridComponent } from '../../../storefront-public/pages/feature-grid/feature-grid.component';
-import { LogoCloudComponent } from '../../../storefront-public/pages/logo-cloud/logo-cloud.component';
-import { NewsletterSignupComponent } from '../../../storefront-public/pages/newsletter-signup/newsletter-signup.component';
-import { PricingTableComponent } from '../../../storefront-public/pages/pricing-table/pricing-table.component';
-import { ProductGridComponent } from '../../../storefront-public/pages/product-grid/product-grid.component';
-import { SplitContentComponent } from '../../../storefront-public/pages/split-content/split-content.component';
-import { StatsCounterComponent } from '../../../storefront-public/pages/stats-counter/stats-counter.component';
-import { TestimonialSliderComponent } from '../../../storefront-public/pages/testimonial-slider/testimonial-slider.component';
-import { TextContentComponent } from '../../../storefront-public/pages/text-content/text-content.component';
-import { VideoHeroComponent } from '../../../storefront-public/pages/video-hero/video-hero.component';
-import { ProductListingComponent } from '../../../storefront-public/pages/product-listing/product-listing.component';
 // import { MasterListService } from '../../../../core/services/master-list.service';
 import { AdminPage, PageSection, SectionDefinition } from '@core/models/storefront.model';
 import { StorefrontAdminService } from '@core/services/storefront-admin.service';
 import { StorefrontPublicService } from '@core/services/storefront-public.service';
-import { ProductSliderComponent } from '../../../storefront-public/components/product-slider/product-slider.component';
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
+import {
+  SECTION_COMPONENT_REGISTRY,
+  SECTION_RUNTIME_TYPES
+} from '../../../storefront-public/dynamic-page/section-component.registry';
+import { StorefrontSectionRendererComponent } from '../../../storefront-public/dynamic-page/storefront-section-renderer.component';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -56,6 +42,10 @@ function buildDefaultConfig(schema: Record<string, any>): Record<string, any> {
   for (const [key, def] of Object.entries(schema ?? {})) {
     if (def?.default !== undefined) {
       config[key] = def.default;
+    } else if (def?.type === 'array') {
+      config[key] = [];
+    } else if (def?.type === 'object') {
+      config[key] = buildDefaultConfig(def.schema ?? def.itemSchema ?? {});
     }
   }
   return config;
@@ -72,12 +62,7 @@ function buildDefaultConfig(schema: Record<string, any>): Record<string, any> {
     CommonModule, RouterModule, DragDropModule,
     DialogModule, TooltipModule, SplitterModule,
     ConfigFormComponent,
-    HeroBannerComponent, ProductSliderComponent, ProductGridComponent,
-    CategoryGridComponent, FeatureGridComponent, TextContentComponent,
-    ContactFormComponent, VideoHeroComponent, SplitContentComponent,
-    TestimonialSliderComponent, LogoCloudComponent, NewsletterSignupComponent,
-    StatsCounterComponent, PricingTableComponent, FaqAccordionComponent,
-    CountdownTimerComponent, BlogFeedComponent, ProductListingComponent
+    StorefrontSectionRendererComponent
   ],
   templateUrl: './page-builder.component.html',
   styleUrls: ['./page-builder.component.scss'],
@@ -121,7 +106,7 @@ export class PageBuilderComponent implements OnInit, OnDestroy {
       next: (res: any) => {
         const types: SectionDefinition[] = res.data ?? (Array.isArray(res) ? res : []);
 
-        this.availableTypes = types.filter(t => !t.isSystem);
+        this.availableTypes = types.filter(t => !t.isSystem && this.hasRuntimeSupport(t.type));
         this.sectionRegistry = types.reduce<Record<string, SectionDefinition>>((acc, t) => {
           acc[t.type] = t;
           return acc;
@@ -154,7 +139,7 @@ export class PageBuilderComponent implements OnInit, OnDestroy {
 
         // Only keep sections whose type exists in the registry
         const valid = (data.sections ?? [])
-          .filter((s: PageSection) => !!this.sectionRegistry[s.type])
+          .filter((s: PageSection) => !!this.sectionRegistry[s.type] && this.hasRuntimeSupport(s.type))
           .map((s: PageSection) => ({ ...s, id: s.id || crypto.randomUUID() }));
 
         this.sections.set(valid);
@@ -197,7 +182,10 @@ export class PageBuilderComponent implements OnInit, OnDestroy {
 
   addSection(type: string): void {
     const def = this.sectionRegistry[type];
-    if (!def) return;
+    if (!def || !this.hasRuntimeSupport(type)) {
+      this.saveError.set(`Section "${type}" is not available in the Angular runtime yet.`);
+      return;
+    }
 
     const newSection: PageSection = {
       id: crypto.randomUUID(),
@@ -340,6 +328,10 @@ export class PageBuilderComponent implements OnInit, OnDestroy {
   }
   scrollToTop(): void {
     document.getElementById('preview-container')?.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  hasRuntimeSupport(type: string): boolean {
+    return SECTION_RUNTIME_TYPES.includes(type) || !!SECTION_COMPONENT_REGISTRY[type];
   }
   deletePage(): void {
     const page = this.page();

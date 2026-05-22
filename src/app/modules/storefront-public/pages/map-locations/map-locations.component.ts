@@ -34,12 +34,20 @@ export class MapLocationsComponent implements OnInit, AfterViewInit, OnChanges, 
     animationDuration: 1.5
   };
   
-  @Input() locations: MapLocation[] = [];
+  @Input() set locations(value: MapLocation[]) {
+    this._locations = this.normalizeLocations(value ?? []);
+    this.filteredLocations = [...this._locations];
+  }
+  get locations(): MapLocation[] {
+    return this._locations;
+  }
   
   @ViewChild('cardsContainer') cardsContainer!: ElementRef;
   @ViewChild('mapStage') mapStage!: ElementRef;
 
   public map: L.Map | undefined;
+  public isLoadingMap = false;
+  public mapError: string | null = null;
   private markers: L.Marker[] = [];
   private markerLayer: L.LayerGroup | undefined;
   private tileLayer: L.TileLayer | undefined; // To manage switching styles
@@ -48,6 +56,7 @@ export class MapLocationsComponent implements OnInit, AfterViewInit, OnChanges, 
   selectedBranch: MapLocation | null = null;
   filteredLocations: MapLocation[] = [];
   searchQuery: string = '';
+  private _locations: MapLocation[] = [];
   
   // Track current style for UI classes
   currentStyle: 'dark' | 'light' | 'satellite' = 'dark';
@@ -102,7 +111,9 @@ export class MapLocationsComponent implements OnInit, AfterViewInit, OnChanges, 
   // --- Map Initialization (FIXED) ---
   private initMap(): void {
     // 1. Safety Checks
-    if (this.map || !this.mapStage) return;
+    if (this.map || !this.mapStage || !isPlatformBrowser(this.platformId)) return;
+    this.isLoadingMap = true;
+    this.mapError = null;
 
     // 2. Filter out invalid locations first
     const validLocations = this.filteredLocations.filter(l => 
@@ -114,6 +125,7 @@ export class MapLocationsComponent implements OnInit, AfterViewInit, OnChanges, 
     // 3. If NO valid locations exist, gracefully stop (prevents crash)
     if (validLocations.length === 0) {
       console.warn('Map initialization skipped: No locations with valid coordinates found.');
+      this.isLoadingMap = false;
       return; 
     }
 
@@ -125,13 +137,19 @@ export class MapLocationsComponent implements OnInit, AfterViewInit, OnChanges, 
       : validLocation.location;
     
     // 5. Create Map
-    this.map = L.map(this.mapStage.nativeElement, {
-      zoomControl: false, 
-      scrollWheelZoom: true, // Enabled zooming
-      attributionControl: false,
-      fadeAnimation: true,
-      zoomAnimation: true
-    }).setView([startLoc.lat, startLoc.lng], this.config.zoom || 13);
+    try {
+      this.map = L.map(this.mapStage.nativeElement, {
+        zoomControl: false,
+        scrollWheelZoom: true,
+        attributionControl: false,
+        fadeAnimation: true,
+        zoomAnimation: true
+      }).setView([startLoc.lat, startLoc.lng], this.config.zoom || 13);
+    } catch {
+      this.mapError = 'Map is temporarily unavailable.';
+      this.isLoadingMap = false;
+      return;
+    }
 
     // 6. Set Initial Tile Layer
     this.setMapLayer(this.currentStyle);
@@ -147,6 +165,7 @@ export class MapLocationsComponent implements OnInit, AfterViewInit, OnChanges, 
     if (this.filteredLocations.length > 1) {
       this.fitMapToMarkers();
     }
+    this.isLoadingMap = false;
   }
 
   // --- Theme Switcher Logic ---
@@ -164,7 +183,11 @@ export class MapLocationsComponent implements OnInit, AfterViewInit, OnChanges, 
     }
 
     const style = this.mapStyles[styleKey as keyof typeof this.mapStyles];
-    this.tileLayer = L.tileLayer(style.url, style.options).addTo(this.map);
+    this.tileLayer = L.tileLayer(style.url, style.options)
+      .on('tileerror', () => {
+        this.mapError = 'Map tiles could not be loaded. Location cards are still available.';
+      })
+      .addTo(this.map);
   }
 
   // --- Marker Logic (FIXED) ---
@@ -211,7 +234,7 @@ export class MapLocationsComponent implements OnInit, AfterViewInit, OnChanges, 
 
   // --- User Interaction ---
   selectLocation(location: MapLocation): void {
-    if (this.isAnimating || !this.map || !location.location) return;
+    if (this.isAnimating || !location.location) return;
     
     this.isAnimating = true;
     this.selectedBranch = location;
@@ -219,10 +242,12 @@ export class MapLocationsComponent implements OnInit, AfterViewInit, OnChanges, 
     // Refresh markers to update "selected" CSS class
     this.addMarkers();
 
-    this.map.flyTo([location.location.lat, location.location.lng], 16, {
-      duration: this.config.animationDuration || 1.5,
-      easeLinearity: 0.25
-    });
+    if (this.map) {
+      this.map.flyTo([location.location.lat, location.location.lng], 16, {
+        duration: this.config.animationDuration || 1.5,
+        easeLinearity: 0.25
+      });
+    }
 
     this.scrollToCard(location._id);
 
@@ -245,9 +270,9 @@ export class MapLocationsComponent implements OnInit, AfterViewInit, OnChanges, 
     } else {
       const query = this.searchQuery.toLowerCase();
       this.filteredLocations = this.locations.filter(l =>
-        l.name.toLowerCase().includes(query) ||
-        l.address.city.toLowerCase().includes(query) ||
-        l.address.state.toLowerCase().includes(query)
+        (l.name ?? '').toLowerCase().includes(query) ||
+        (l.address?.city ?? '').toLowerCase().includes(query) ||
+        (l.address?.state ?? '').toLowerCase().includes(query)
       );
     }
     this.addMarkers();
@@ -286,5 +311,29 @@ export class MapLocationsComponent implements OnInit, AfterViewInit, OnChanges, 
       this.map.remove();
       this.map = undefined;
     }
+  }
+
+  private normalizeLocations(locations: MapLocation[]): MapLocation[] {
+    return locations
+      .map((location: any) => {
+        const coordinates = location?.location?.coordinates;
+        const lat = location?.location?.lat ?? location?.lat ?? (Array.isArray(coordinates) ? coordinates[1] : undefined);
+        const lng = location?.location?.lng ?? location?.lng ?? (Array.isArray(coordinates) ? coordinates[0] : undefined);
+
+        return {
+          ...location,
+          _id: location?._id ?? location?.id ?? `${lat}-${lng}-${location?.name ?? 'location'}`,
+          address: location?.address ?? {},
+          location: {
+            ...location?.location,
+            lat: Number(lat),
+            lng: Number(lng)
+          }
+        } as MapLocation;
+      })
+      .filter(location =>
+        Number.isFinite(Number(location.location?.lat)) &&
+        Number.isFinite(Number(location.location?.lng))
+      );
   }
 }

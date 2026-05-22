@@ -36,6 +36,15 @@ export const STOREFRONT_ADMIN_ROUTES: Routes = [
     canActivate: [permissionGuard],
     data: { permissions: [PERMISSIONS.STOREFRONT.PAGE_MANAGE] }
   },
+  {
+    path: 'customers',
+    loadComponent: () =>
+      import('./pages/storefront-customers/storefront-customers.component')
+        .then(m => m.StorefrontCustomersComponent),
+    title: 'Storefront Customers',
+    canActivate: [permissionGuard],
+    data: { permissions: [PERMISSIONS.STOREFRONT.READ] }
+  },
   ...[
     ['activity', 'activity-logs', 'Activity Logs'],
     ['notifications', 'notifications-center', 'Notifications Center'],

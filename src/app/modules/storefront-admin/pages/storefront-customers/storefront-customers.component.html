@@ -1,0 +1,90 @@
+<main class="sf-admin-customers">
+  <header class="sf-admin-header">
+    <div>
+      <span>Commerce identity</span>
+      <h1>Storefront Customers</h1>
+      <p>Shoppers, guests, carts, orders, addresses, and manual CRM conversion stay separate from ERP customers.</p>
+    </div>
+    <button type="button" (click)="load()"><i class="pi pi-refresh"></i> Refresh</button>
+  </header>
+
+  @if (error()) { <div class="admin-alert">{{ error() }}</div> }
+
+  <section class="toolbar">
+    <label>
+      <i class="pi pi-search"></i>
+      <input placeholder="Search email, phone, name" [ngModel]="search()" (ngModelChange)="search.set($event)" (keyup.enter)="load()" />
+    </label>
+    <button type="button" [class.active]="guestOnly()" (click)="guestOnly.set(!guestOnly()); load()">Guest shoppers</button>
+    <button type="button" [class.active]="unconvertedOnly()" (click)="unconvertedOnly.set(!unconvertedOnly()); load()">Not converted</button>
+  </section>
+
+  <section class="customer-layout">
+    <div class="customer-list">
+      @if (loading()) {
+        @for (i of [1,2,3,4]; track i) { <div class="customer-row skeleton"></div> }
+      } @else {
+        @for (customer of customers(); track customer._id || customer.id) {
+          <article class="customer-row" [class.active]="(selected()?._id || selected()?.id) === (customer._id || customer.id)" (click)="open(customer)">
+            <div class="avatar">{{ displayName(customer).charAt(0) }}</div>
+            <div>
+              <h3>{{ displayName(customer) }}</h3>
+              <p>{{ customer.email || customer.phone || 'Guest identity' }}</p>
+            </div>
+            <span [class.converted]="customer.convertedToMainCustomer">
+              {{ customer.convertedToMainCustomer ? 'CRM linked' : customer.guestAccount ? 'Guest' : 'Account' }}
+            </span>
+          </article>
+        } @empty {
+          <div class="empty-panel">No storefront customers found.</div>
+        }
+      }
+    </div>
+
+    <aside class="customer-detail">
+      @if (!selected()) {
+        <div class="empty-panel">Select a storefront customer to inspect orders, addresses, carts, and conversion status.</div>
+      } @else {
+        <div class="detail-head">
+          <div>
+            <span>{{ selected().guestAccount ? 'Guest shopper' : 'Storefront account' }}</span>
+            <h2>{{ displayName(selected()) }}</h2>
+            <p>{{ selected().email || 'No email' }} · {{ selected().phone || 'No phone' }}</p>
+          </div>
+          <button type="button" (click)="convert(selected())" [disabled]="selected().convertedToMainCustomer || converting() === (selected()._id || selected().id)">
+            @if (converting() === (selected()._id || selected().id)) { <i class="pi pi-spin pi-spinner"></i> }
+            @else { <i class="pi pi-user-plus"></i> }
+            {{ selected().convertedToMainCustomer ? 'Converted' : 'Convert to CRM Customer' }}
+          </button>
+        </div>
+
+        <div class="metric-grid">
+          <div><span>Orders</span><strong>{{ selected().orderCount || 0 }}</strong></div>
+          <div><span>Total spent</span><strong>{{ selected().totalSpent || 0 | currency:'INR' }}</strong></div>
+          <div><span>Last seen</span><strong>{{ selected().lastSeenAt | date:'mediumDate' }}</strong></div>
+        </div>
+
+        @if (detail(); as data) {
+          <section class="detail-section">
+            <h3>Addresses</h3>
+            @for (address of data.addresses || []; track address._id || address.id) {
+              <p>{{ address.fullName }} · {{ address.addressLine1 }}, {{ address.city }}, {{ address.state }}</p>
+            } @empty { <p>No addresses saved.</p> }
+          </section>
+
+          <section class="detail-section">
+            <h3>Orders</h3>
+            @for (order of data.orders || []; track order._id || order.id) {
+              <p><strong>{{ order.orderNumber }}</strong> · {{ order.orderStatus }} · {{ order.totals?.grandTotal | currency: order.totals?.currency || 'INR' }}</p>
+            } @empty { <p>No orders yet.</p> }
+          </section>
+
+          <section class="detail-section">
+            <h3>Wishlist</h3>
+            <p>{{ (data.wishlist || []).length }} saved item(s)</p>
+          </section>
+        }
+      }
+    </aside>
+  </section>
+</main>

@@ -41,11 +41,12 @@ export const STOREFRONT_PUBLIC_ROUTES: Routes = [
   commerceFlowRoute('account/orders', 'orders', 'Orders'),
   commerceFlowRoute('account/addresses', 'addresses', 'Saved Addresses'),
   commerceFlowRoute('account/notifications', 'notifications', 'Notifications'),
+  commerceFlowRoute('login', 'login', 'Store Login'),
+  commerceFlowRoute('register', 'register', 'Create Account'),
+  commerceFlowRoute('wishlist', 'wishlist', 'Wishlist'),
+  commerceFlowRoute('track-order', 'track-order', 'Track Order'),
   ...[
     ['search', 'search', 'Search'],
-    ['login', 'login', 'Store Login'],
-    ['register', 'register', 'Create Account'],
-    ['wishlist', 'wishlist', 'Wishlist'],
     ['compare', 'compare', 'Compare Products'],
     ['recently-viewed', 'recently-viewed', 'Recently Viewed'],
     ['recommendations', 'recommendations', 'Recommendations'],
@@ -53,7 +54,6 @@ export const STOREFRONT_PUBLIC_ROUTES: Routes = [
     ['rewards', 'rewards', 'Rewards'],
     ['orders/success', 'order-success', 'Order Success'],
     ['orders/failure', 'order-failure', 'Order Failure'],
-    ['track-order', 'track-order', 'Track Order'],
     ['gift-card', 'gift-card', 'Gift Card']
   ].map(([path, pageKey, title]) => storefrontExperienceRoute(path, pageKey, title)),
   {

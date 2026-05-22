@@ -128,6 +128,29 @@ export class StorefrontAdminService extends BaseApiService {
   ): Observable<any> {
     return this.get(`${this.base}/pages/${pageId}/analytics`, { period });
   }
+
+  getStorefrontCustomers(params?: {
+    status?: string;
+    converted?: boolean;
+    guest?: boolean;
+    search?: string;
+    page?: number;
+    limit?: number;
+  }): Observable<any> {
+    return this.get(`${this.base}/customers`, {
+      ...params,
+      converted: params?.converted === undefined ? undefined : String(params.converted),
+      guest: params?.guest === undefined ? undefined : String(params.guest)
+    });
+  }
+
+  getStorefrontCustomer(customerId: string): Observable<any> {
+    return this.get(`${this.base}/customers/${customerId}`);
+  }
+
+  convertStorefrontCustomerToCrm(customerId: string): Observable<any> {
+    return this.post(`${this.base}/customers/${customerId}/convert-to-crm`, {});
+  }
 }
 
 // import { Injectable, inject } from '@angular/core';

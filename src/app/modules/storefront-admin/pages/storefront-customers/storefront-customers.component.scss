@@ -1,0 +1,248 @@
+:host {
+  display: block;
+}
+
+.sf-admin-customers {
+  min-height: 100vh;
+  padding: 1.25rem;
+  background: #f5f7fb;
+  color: #111827;
+}
+
+.sf-admin-header,
+.toolbar,
+.customer-row,
+.customer-detail {
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 12px 30px rgba(17, 24, 39, 0.06);
+}
+
+.sf-admin-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: end;
+  padding: 1.25rem;
+  border-radius: 1rem;
+}
+
+.sf-admin-header span,
+.detail-head span,
+.metric-grid span {
+  color: #667085;
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.sf-admin-header h1,
+.detail-head h2 {
+  margin: 0.35rem 0;
+  letter-spacing: 0;
+}
+
+.sf-admin-header p,
+.detail-head p {
+  margin: 0;
+  color: #667085;
+}
+
+button {
+  border: 0;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: #111827;
+  color: white;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.admin-alert {
+  margin: 1rem 0;
+  padding: 0.85rem 1rem;
+  border-radius: 0.85rem;
+  border: 1px solid #fed7aa;
+  background: #fff7ed;
+  color: #9a3412;
+  font-weight: 800;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 1rem 0;
+  padding: 0.75rem;
+  border-radius: 1rem;
+}
+
+.toolbar label {
+  flex: 1;
+  min-width: 18rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0 0.85rem;
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  border-radius: 0.75rem;
+  background: #f8fafc;
+}
+
+.toolbar input {
+  width: 100%;
+  min-height: 2.5rem;
+  border: 0;
+  outline: 0;
+  background: transparent;
+}
+
+.toolbar button {
+  color: #475467;
+  background: #f2f4f7;
+}
+
+.toolbar button.active {
+  color: white;
+  background: #111827;
+}
+
+.customer-layout {
+  display: grid;
+  grid-template-columns: minmax(20rem, 0.85fr) minmax(0, 1.5fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.customer-list {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.customer-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.85rem;
+  align-items: center;
+  padding: 0.85rem;
+  border-radius: 0.9rem;
+  cursor: pointer;
+}
+
+.customer-row.active {
+  border-color: #111827;
+}
+
+.avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: grid;
+  place-items: center;
+  border-radius: 0.75rem;
+  background: #111827;
+  color: white;
+  font-weight: 900;
+}
+
+.customer-row h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.customer-row p {
+  margin: 0.2rem 0 0;
+  color: #667085;
+  font-size: 0.82rem;
+}
+
+.customer-row > span {
+  border-radius: 999px;
+  padding: 0.35rem 0.6rem;
+  background: #fff7ed;
+  color: #9a3412;
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.customer-row > span.converted {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.customer-detail {
+  position: sticky;
+  top: 1rem;
+  min-height: 30rem;
+  padding: 1rem;
+  border-radius: 1rem;
+}
+
+.detail-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: start;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.metric-grid div,
+.detail-section,
+.empty-panel {
+  padding: 1rem;
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  border-radius: 0.9rem;
+  background: #f8fafc;
+}
+
+.metric-grid strong {
+  display: block;
+  margin-top: 0.35rem;
+}
+
+.detail-section {
+  margin-top: 0.75rem;
+}
+
+.detail-section h3 {
+  margin: 0 0 0.6rem;
+}
+
+.detail-section p,
+.empty-panel {
+  color: #667085;
+}
+
+.skeleton {
+  min-height: 4.25rem;
+  background: linear-gradient(90deg, #f2f4f7, #fff, #f2f4f7);
+  background-size: 220% 100%;
+  animation: pulse 1.2s ease infinite;
+}
+
+@keyframes pulse {
+  from { background-position: 220% 0; }
+  to { background-position: -220% 0; }
+}
+
+@media (max-width: 980px) {
+  .customer-layout,
+  .metric-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .customer-detail {
+    position: static;
+  }
+}

@@ -31,6 +31,7 @@
             "styles": [
               "node_modules/quill/dist/quill.snow.css",
               "libs/design-tokens/src/styles/tokens.scss",
+              "libs/storefront-tokens/src/styles/storefront-tokens.scss",
               "src/styles/styles.scss",
               "src/styles/animation.scss",
               "src/styles/common.scss",

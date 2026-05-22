@@ -133,7 +133,34 @@ import { StorefrontSectionRendererComponent } from './storefront-section-rendere
     }
 
     .page-wrapper { width: 100%; min-height: 100vh; }
-    .section-block { position: relative; width: 100%; }
+    .section-block {
+      position: relative;
+      width: 100%;
+      background: var(--sf-section-bg, transparent);
+    }
+
+    .section-block[data-padding-top="none"] { padding-top: 0; }
+    .section-block[data-padding-top="sm"] { padding-top: var(--sf-space-6); }
+    .section-block[data-padding-top="md"] { padding-top: var(--sf-space-10); }
+    .section-block[data-padding-top="lg"] { padding-top: var(--sf-space-16); }
+    .section-block[data-padding-top="xl"] { padding-top: var(--sf-space-20); }
+    .section-block[data-padding-bottom="none"] { padding-bottom: 0; }
+    .section-block[data-padding-bottom="sm"] { padding-bottom: var(--sf-space-6); }
+    .section-block[data-padding-bottom="md"] { padding-bottom: var(--sf-space-10); }
+    .section-block[data-padding-bottom="lg"] { padding-bottom: var(--sf-space-16); }
+    .section-block[data-padding-bottom="xl"] { padding-bottom: var(--sf-space-20); }
+
+    .section-block[data-theme-mode="dark"] {
+      background: var(--sf-color-canvas);
+      color: var(--sf-color-ink);
+    }
+
+    @media (max-width: 767px) {
+      .section-block[data-padding-top="lg"],
+      .section-block[data-padding-top="xl"] { padding-top: var(--sf-space-12); }
+      .section-block[data-padding-bottom="lg"],
+      .section-block[data-padding-bottom="xl"] { padding-bottom: var(--sf-space-12); }
+    }
 
     .debug-placeholder {
       margin: var(--spacing-3xl) auto;

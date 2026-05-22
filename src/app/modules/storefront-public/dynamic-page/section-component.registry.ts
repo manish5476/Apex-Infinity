@@ -103,3 +103,5 @@ export const SECTION_COMPONENT_REGISTRY: Record<string, SectionRenderEntry> = {
     inputs: configOnly
   }
 };
+
+export const SECTION_RUNTIME_TYPES = Object.keys(SECTION_COMPONENT_REGISTRY);
