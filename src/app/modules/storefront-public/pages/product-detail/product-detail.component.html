@@ -1,326 +1,197 @@
 <p-toast position="bottom-center" key="pd" [showTransformOptions]="'translateY(100%)'"></p-toast>
 
 @if (loading()) {
-  <div class="loader-container">
-    <div class="loader-pulse"></div>
-  </div>
-} 
-
+<div class="h-screen w-full flex items-center justify-center bg-[color:var(--bg-primary)]">
+  <div class="loader-pulse"></div>
+</div>
+}
 @else if (product(); as p) {
+<div class="relative min-h-screen overflow-x-hidden font-[family:var(--font-body,Manrope)] text-[color:var(--text-primary)] bg-[color:var(--bg-primary)] selection:bg-[color:var(--accent-primary)] selection:text-[color:var(--bg-primary)]">
   
-  <div class="page-container">
+  <!-- Ambient glow -->
+  <div class="fixed inset-0 z-0 opacity-50 pointer-events-none transition-colors duration-1000" [style.background]="'radial-gradient(circle at 30% 40%, ' + ambientColor() + ' 0%, transparent 60%)'"></div>
+  <div class="noise-texture"></div>
+
+  <!-- Main Grid -->
+  <div class="relative z-10 max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-12 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start py-8 lg:py-24">
     
-    <div class="ambient-backdrop" [style.background]="'radial-gradient(circle at 20% 40%, ' + ambientColor() + ' 0%, transparent 50%)'"></div>
-
-    <div class="grid-layout">
+    <!-- Image Gallery -->
+    <div class="lg:col-span-7 lg:sticky lg:top-24 flex flex-col gap-8 group/gallery">
       
-      <div class="visual-col">
-        <div class="sticky-stage">
-          
-          <nav class="breadcrumb md:hidden">
-            <a [routerLink]="['/store', orgSlug()]">Home</a>
-            <span>/</span>
-            <span class="text-primary">{{ p.name }}</span>
-          </nav>
+      <!-- Mobile Breadcrumb -->
+      <nav class="flex lg:hidden items-center gap-2 text-xs font-bold uppercase tracking-widest text-[color:var(--text-secondary)]">
+        <a [routerLink]="['/store', orgSlug()]" class="hover:text-[color:var(--accent-primary)] transition-colors">Home</a>
+        <span>/</span>
+        <span class="text-[color:var(--text-primary)]">{{ p.name }}</span>
+      </nav>
 
-          <div class="main-image-card" @fadeIn>
-            <img [src]="selectedImage()" [alt]="p.name" class="hero-img" />
-            
-            <div class="badges">
-              @if (discountPercentage() > 0) {
-                <span class="badge sale">-{{ discountPercentage() }}%</span>
-              }
-              @if (!p.stock?.available) {
-                <span class="badge sold">Sold Out</span>
-              }
-            </div>
-          </div>
-
-          @if (p.images?.length > 1) {
-            <div class="thumbnails-dock">
-              @for (img of p.images; track img) {
-                <button 
-                  class="thumb-btn" 
-                  [class.active]="selectedImage() === img"
-                  (click)="changeImage(img)">
-                  <img [src]="img" [alt]="p.name" />
-                </button>
-              }
-            </div>
+      <!-- Main Image -->
+      <div class="relative w-full rounded-[2rem] overflow-hidden bg-[color:var(--glass-bg-c)] backdrop-blur-md shadow-2xl shadow-[color:var(--shadow-color,rgba(0,0,0,0.05))] aspect-square lg:aspect-[4/3] ring-1 ring-[color:var(--glass-border-c)]" @fadeIn>
+        
+        <!-- Subtle glare effect -->
+        <div class="absolute inset-0 z-20 pointer-events-none opacity-0 group-hover/gallery:opacity-100 transition-opacity duration-1000 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 transform translate-x-[-100%] group-hover/gallery:translate-x-[100%]"></div>
+        
+        <img [src]="selectedImage()" [alt]="p.name" class="relative z-10 w-full h-full object-contain p-8 sm:p-16 animate-float transition-transform duration-700 hover:scale-105 drop-shadow-xl" />
+        
+        <div class="absolute top-6 left-6 z-30 flex flex-col gap-2">
+          @if (discountPercentage() > 0) {
+            <span class="px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-red-500/10 text-red-500 border border-red-500/20 backdrop-blur-md shadow-lg shadow-red-500/10">-{{ discountPercentage() }}%</span>
+          }
+          @if (!p.stock?.available) {
+            <span class="px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-black/10 text-black border border-black/10 backdrop-blur-md shadow-lg shadow-black/5 dark:bg-white/10 dark:text-white dark:border-white/10">Sold Out</span>
           }
         </div>
       </div>
 
-      <div class="details-col" @fadeUp>
-        
-        <nav class="breadcrumb hidden md:flex">
-          <a [routerLink]="['/store', orgSlug()]">Home</a>
-          <span>/</span>
-          <span>{{ p.category || 'Shop' }}</span>
-          <span>/</span>
-          <span style="color: var(--text-primary);">{{ p.brand || 'Product' }}</span>
-        </nav>
+      <!-- Thumbnails -->
+      @if (p.images?.length > 1) {
+      <div class="flex items-center gap-4 overflow-x-auto pb-4 snap-x hide-scrollbar mask-edges">
+        @for (img of p.images; track img) {
+        <button 
+          class="shrink-0 w-24 h-24 rounded-2xl bg-[color:var(--glass-bg-c)] backdrop-blur-md border border-[color:var(--glass-border-c)] p-3 snap-center transition-all duration-300 relative overflow-hidden"
+          [ngClass]="selectedImage() === img ? 'ring-2 ring-[color:var(--accent-primary)] ring-offset-2 ring-offset-[color:var(--bg-primary)] scale-105 opacity-100' : 'opacity-60 hover:opacity-100 hover:-translate-y-1 hover:shadow-lg'"
+          (click)="changeImage(img)">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent pointer-events-none"></div>
+          <img [src]="img" [alt]="p.name" class="w-full h-full object-contain drop-shadow-md" />
+        </button>
+        }
+      </div>
+      }
+    </div>
 
-        <div class="header-section">
-          <h1 class="product-title">{{ p.name }}</h1>
-          
-          <div class="meta-row">
-            <div class="price-wrapper">
-              <span class="current-price">{{ (p.price.discounted || p.price.original) | currency:p.price.currency }}</span>
-              @if (p.price.hasDiscount) {
-                <span class="original-price">{{ p.price.original | currency:p.price.currency }}</span>
-              }
-            </div>
-            
-            @if(p.rating) {
-              <div class="rating-pill">
-                <i class="pi pi-star-fill text-yellow-500"></i>
-                <span>{{ p.rating }}</span>
-              </div>
+    <!-- Product Details -->
+    <div class="lg:col-span-5 flex flex-col pt-4 lg:pt-0 pb-24" @fadeUp>
+      
+      <!-- Desktop Breadcrumb -->
+      <nav class="hidden lg:flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[color:var(--text-secondary)] mb-10">
+        <a [routerLink]="['/store', orgSlug()]" class="hover:text-[color:var(--accent-primary)] transition-colors">Home</a>
+        <span>/</span>
+        <a [routerLink]="['/store', orgSlug(), 'products']" [queryParams]="{category: p.category}" class="hover:text-[color:var(--accent-primary)] transition-colors">{{ p.category || 'Shop' }}</a>
+        <span>/</span>
+        <span class="text-[color:var(--text-primary)]">{{ p.brand || 'Product' }}</span>
+      </nav>
+
+      <!-- Header -->
+      <div class="mb-8 relative">
+        <h1 class="font-[family:var(--font-heading,Playfair_Display)] text-4xl sm:text-5xl lg:text-6xl text-[color:var(--text-primary)] leading-[1.1] font-medium tracking-tight mb-6">{{ p.name }}</h1>
+        <div class="flex items-center justify-between pb-8 border-b border-[color:var(--border-secondary)]">
+          <div class="flex items-baseline gap-4">
+            <span class="text-2xl sm:text-3xl font-medium text-[color:var(--text-primary)]">{{ (p.price.discounted || p.price.original) | currency:p.price.currency }}</span>
+            @if (p.price.hasDiscount) {
+              <span class="text-lg text-[color:var(--text-secondary)] opacity-60 line-through">{{ p.price.original | currency:p.price.currency }}</span>
+            }
+          </div>
+          @if(p.rating) {
+          <div class="flex items-center gap-1.5 text-[color:var(--text-primary)] font-semibold bg-[color:var(--glass-bg-c)] backdrop-blur-sm px-4 py-2 rounded-full border border-[color:var(--glass-border-c)] shadow-sm">
+            <i class="pi pi-star-fill text-amber-500 text-sm"></i>
+            <span>{{ p.rating }}</span>
+          </div>
+          }
+        </div>
+      </div>
+
+      <p class="text-lg text-[color:var(--text-secondary)] leading-relaxed font-light mb-12">{{ p.description }}</p>
+
+      <!-- Configurator / Form -->
+      <div class="bg-[color:var(--glass-bg-c)] backdrop-blur-xl border border-[color:var(--glass-border-c)] rounded-3xl p-6 sm:p-8 shadow-xl shadow-[color:var(--shadow-color,rgba(0,0,0,0.05))] mb-12">
+        
+        <div class="mb-8">
+          <span class="block text-xs font-bold uppercase tracking-wider text-[color:var(--text-secondary)] mb-4">
+            Selected Finish: <span class="text-[color:var(--text-primary)]">{{ selectedVariant().name }}</span>
+          </span>
+          <div class="flex items-center gap-3 flex-wrap">
+            @for (v of variants(); track v.code) {
+            <button 
+              class="w-12 h-12 rounded-full border-[3px] border-[color:var(--bg-primary)] shadow-md transition-all duration-300 outline-none"
+              [ngClass]="selectedVariant() === v ? 'scale-110 ring-2 ring-[color:var(--accent-primary)] ring-offset-2 ring-offset-[color:var(--bg-primary)]' : 'hover:scale-110'"
+              [style.background-color]="v.colorCode"
+              (click)="selectVariant(v)"
+              [pTooltip]="v.name" tooltipPosition="top">
+            </button>
             }
           </div>
         </div>
 
-        <p class="description">{{ p.description }}</p>
-
-        <div class="configurator">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mb-8">
           
-          <div class="config-group">
-            <span class="label">Color: <strong style="color: var(--text-primary)">{{ selectedVariant().name }}</strong></span>
-            <div class="color-row">
-              @for (v of variants(); track v.code) {
-                <button 
-                  class="color-circle" 
-                  [class.active]="selectedVariant() === v"
-                  [style.background-color]="v.colorCode"
-                  (click)="selectVariant(v)"
-                  pTooltip="{{v.name}}" tooltipPosition="top">
-                </button>
-              }
-            </div>
+          <div class="flex items-center justify-between bg-[color:var(--bg-primary)] rounded-2xl p-1 h-14 ring-1 ring-[color:var(--border-secondary)] sm:w-32 shadow-inner">
+            <button class="w-12 h-full text-xl text-[color:var(--text-secondary)] hover:bg-[color:var(--glass-bg-c)] hover:text-[color:var(--text-primary)] rounded-xl disabled:opacity-30 transition-colors" (click)="updateQuantity(-1)" [disabled]="quantity() <= 1">−</button>
+            <span class="font-mono font-semibold text-lg w-8 text-center text-[color:var(--text-primary)]">{{ quantity() }}</span>
+            <button class="w-12 h-full text-xl text-[color:var(--text-secondary)] hover:bg-[color:var(--glass-bg-c)] hover:text-[color:var(--text-primary)] rounded-xl transition-colors" (click)="updateQuantity(1)">+</button>
           </div>
 
-          <div class="actions-row">
-            <div class="qty-stepper">
-              <button (click)="updateQuantity(-1)" [disabled]="quantity() <= 1">−</button>
-              <span class="val">{{ quantity() }}</span>
-              <button (click)="updateQuantity(1)">+</button>
-            </div>
+          <!-- Add to Bag Shimmer Button -->
+          <button 
+            class="group relative overflow-hidden flex-1 h-14 bg-[color:var(--accent-primary)] text-[color:var(--bg-primary)] rounded-2xl flex items-center justify-center gap-4 font-semibold text-base transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl disabled:opacity-50 disabled:hover:translate-y-0 disabled:shadow-none" 
+            [disabled]="!p.stock?.available" 
+            (click)="addToCart()">
+            <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer pointer-events-none"></div>
+            <span class="relative z-10">{{ p.stock?.available ? 'Add to Bag' : 'Out of Stock' }}</span>
+            <span class="relative z-10 w-px h-5 bg-current opacity-20"></span>
+            <span class="relative z-10 font-normal opacity-90">{{ ((p.price.discounted || p.price.original) * quantity()) | currency:p.price.currency }}</span>
+          </button>
 
-            <button class="add-btn" 
-                    [disabled]="!p.stock?.available"
-                    (click)="addToCart()">
-              <span>{{ p.stock?.available ? 'Add to Bag' : 'Out of Stock' }}</span>
-              <span class="separator">|</span>
-              <span class="price-calc">{{ ((p.price.discounted || p.price.original) * quantity()) | currency:p.price.currency }}</span>
-            </button>
-
-            <button class="wishlist-btn" pTooltip="Save for Later">
-              <i class="pi pi-heart"></i>
-            </button>
-          </div>
-
-          <div class="trust-badges">
-            <div class="item"><i class="pi pi-truck"></i> Free Shipping</div>
-            <div class="item"><i class="pi pi-shield"></i> Secure Payment</div>
-            <div class="item"><i class="pi pi-replay"></i> Easy Returns</div>
-          </div>
+          <button class="w-14 h-14 shrink-0 rounded-2xl border border-[color:var(--border-secondary)] text-[color:var(--text-secondary)] flex items-center justify-center text-xl transition-all hover:border-[color:var(--color-error)] hover:text-[color:var(--color-error)] bg-[color:var(--bg-primary)] shadow-sm hover:shadow-md" pTooltip="Save for Later">
+            <i class="pi pi-heart"></i>
+          </button>
         </div>
 
-        <div class="accordion-group">
-          <div class="accordion-item" [class.open]="openAccordion() === 'desc'">
-            <button class="accordion-header" (click)="toggleAccordion('desc')">
-              <span>Features & Specs</span>
-              <i class="pi pi-chevron-down indicator"></i>
-            </button>
-            <div class="accordion-content">
-              <div class="inner">
-                <p>Designed for excellence, this product combines durability with aesthetic appeal. Perfect for daily use.</p>
-                <ul class="feature-list">
-                  <li>High-quality materials</li>
-                  <li>Modern ergonomic design</li>
-                  <li>Industry-leading warranty</li>
-                </ul>
-              </div>
-            </div>
+        <div class="flex flex-wrap gap-4 sm:gap-6 pt-6 border-t border-[color:var(--border-secondary)]">
+          <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[color:var(--text-secondary)]">
+            <i class="pi pi-truck text-[color:var(--text-primary)] text-base"></i> Free Shipping
           </div>
-
-          <div class="accordion-item" [class.open]="openAccordion() === 'ship'">
-            <button class="accordion-header" (click)="toggleAccordion('ship')">
-              <span>Shipping Information</span>
-              <i class="pi pi-chevron-down indicator"></i>
-            </button>
-            <div class="accordion-content">
-              <div class="inner">
-                <p>Orders placed before 2PM ship same-day. Free standard shipping on all orders over $50.</p>
-              </div>
-            </div>
+          <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[color:var(--text-secondary)]">
+            <i class="pi pi-shield text-[color:var(--text-primary)] text-base"></i> Secure
           </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-}
-
-<!-- <p-toast position="bottom-center" [showTransformOptions]="'translateY(100%)'" [showTransitionOptions]="'300ms ease-out'" [hideTransitionOptions]="'200ms ease-in'"></p-toast>
-
-@if (loading()) {
-  <div class="h-screen w-full flex items-center justify-center">
-    <div class="loader-pulse"></div>
-  </div>
-} 
-@else if (product(); as p) {
-  
-  <div class="page-container font-sans text-slate-900 selection:bg-rose-200 selection:text-rose-900">
-    
-    <div class="ambient-backdrop" [style.background]="'radial-gradient(circle at 30% 40%, ' + ambientColor() + ' 0%, transparent 60%)'"></div>
-    <div class="noise-overlay"></div>
-
-    <div class="grid-layout">
-      
-      <div class="visual-col">
-        <div class="sticky-stage">
-          
-          <nav class="md:hidden flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400 mb-6">
-            <a [routerLink]="['/store', orgSlug()]" class="hover:text-slate-900 transition-colors">Home</a>
-            <span>/</span>
-            <span class="text-slate-900">{{ p.name }}</span>
-          </nav>
-
-          <div class="main-image-card" @fadeIn>
-            <img [src]="selectedImage()" [alt]="p.name" class="hero-img" />
-            
-            <div class="badges">
-              @if (p.price.hasDiscount) {
-                <span class="badge sale">-{{ discountPercentage() }}%</span>
-              }
-              @if (!p.stock?.available) {
-                <span class="badge sold">Sold Out</span>
-              }
-            </div>
+          <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[color:var(--text-secondary)]">
+            <i class="pi pi-replay text-[color:var(--text-primary)] text-base"></i> 30-Day Returns
           </div>
-
-          @if (p.images?.length > 1) {
-            <div class="thumbnails-dock">
-              @for (img of p.images; track img) {
-                <button 
-                  class="thumb-btn" 
-                  [class.active]="selectedImage() === img"
-                  (click)="changeImage(img)">
-                  <img [src]="img" [alt]="p.name" />
-                </button>
-              }
-            </div>
-          }
         </div>
       </div>
 
-      <div class="details-col" @fadeUp>
+      <!-- Accordions -->
+      <div class="border-t border-[color:var(--border-secondary)]">
         
-        <nav class="hidden md:flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400 mb-8">
-          <a [routerLink]="['/store', orgSlug()]" class="hover:text-slate-900 transition-colors">Home</a>
-          <span>/</span>
-          <span class="text-slate-900">{{ p.brand || 'Shop' }}</span>
-        </nav>
-
-        <div class="header-section">
-          <h1 class="product-title">{{ p.name }}</h1>
-          
-          <div class="meta-row">
-            <div class="price-wrapper">
-              <span class="current-price">{{ p.price.discounted || p.price.original | currency:p.price.currency }}</span>
-              @if (p.price.hasDiscount) {
-                <span class="original-price">{{ p.price.original | currency:p.price.currency }}</span>
-              }
-            </div>
-            <div class="rating-pill">
-              <i class="pi pi-star-fill text-yellow-500 text-xs"></i>
-              <span>4.9</span>
-              <span class="text-slate-400">/ 5</span>
-            </div>
-          </div>
-        </div>
-
-        <p class="description">{{ p.description }}</p>
-
-        <div class="configurator">
-          
-          <div class="config-group">
-            <span class="label">Finish: <strong class="text-slate-900">{{ selectedVariant().name }}</strong></span>
-            <div class="color-row">
-              @for (v of variants(); track v.code) {
-                <button 
-                  class="color-circle" 
-                  [class.active]="selectedVariant() === v"
-                  [style.background-color]="v.colorCode"
-                  (click)="selectVariant(v)"
-                  pTooltip="{{v.name}}" tooltipPosition="top">
-                </button>
-              }
-            </div>
-          </div>
-
-          <div class="actions-row">
-            <div class="qty-stepper">
-              <button (click)="updateQuantity(-1)" [disabled]="quantity() <= 1">−</button>
-              <span class="val">{{ quantity() }}</span>
-              <button (click)="updateQuantity(1)">+</button>
-            </div>
-
-            <button class="add-btn" 
-                    [disabled]="!p.stock?.available"
-                    (click)="addToCart()">
-              <span>{{ p.stock?.available ? 'Add to Bag' : 'Out of Stock' }}</span>
-              <span class="separator">|</span>
-              <span class="price-calc">{{ (p.price.discounted || p.price.original) * quantity() | currency:p.price.currency }}</span>
-            </button>
-
-            <button class="wishlist-btn">
-              <i class="pi pi-heart"></i>
-            </button>
-          </div>
-
-          <div class="trust-badges">
-            <div class="item"><i class="pi pi-truck"></i> Free Shipping</div>
-            <div class="item"><i class="pi pi-check-circle"></i> 30-Day Returns</div>
-            <div class="item"><i class="pi pi-shield"></i> 2-Year Warranty</div>
-          </div>
-
-        </div>
-
-        <div class="accordion-group">
-          <div class="accordion-item" [class.open]="openAccordion() === 'desc'">
-            <button class="accordion-header" (click)="toggleAccordion('desc')">
-              <span>Product Details</span>
-              <i class="pi pi-chevron-down indicator"></i>
-            </button>
-            <div class="accordion-content">
-              <div class="inner">
-                <p>Crafted with precision and designed for the modern lifestyle. This product features premium materials sourced sustainably.</p>
-                <ul class="feature-list">
-                  <li>Premium aerospace-grade finish</li>
-                  <li>Hand-assembled components</li>
-                  <li>Eco-friendly packaging</li>
+        <div class="border-b border-[color:var(--border-secondary)]">
+          <button class="w-full flex items-center justify-between py-6 group" (click)="toggleAccordion('desc')">
+            <span class="font-[family:var(--font-heading,Playfair_Display)] text-xl text-[color:var(--text-primary)] group-hover:text-[color:var(--accent-primary)] transition-colors">Product Details</span>
+            <i class="pi pi-chevron-down text-sm text-[color:var(--text-secondary)] transition-transform duration-300" [ngClass]="openAccordion() === 'desc' ? 'rotate-180' : ''"></i>
+          </button>
+          <div class="overflow-hidden transition-all duration-500" [ngClass]="openAccordion() === 'desc' ? 'max-h-[500px] opacity-100 pb-6' : 'max-h-0 opacity-0'">
+            <div class="text-[color:var(--text-secondary)] font-light leading-relaxed">
+              @if (p.features && p.features.length) {
+                <ul class="space-y-3">
+                  @for (feature of p.features; track feature) {
+                    <li class="flex gap-3"><span class="w-1.5 h-1.5 rounded-full bg-[color:var(--accent-primary)] shrink-0 mt-2 shadow-[0_0_8px_var(--accent-primary)]"></span> {{ feature }}</li>
+                  }
                 </ul>
-              </div>
+              } @else {
+                <p class="mb-4">Crafted with precision and designed for the modern lifestyle. This product features premium materials sourced sustainably.</p>
+                <ul class="space-y-3">
+                  <li class="flex gap-3"><span class="w-1.5 h-1.5 rounded-full bg-[color:var(--accent-primary)] shrink-0 mt-2 shadow-[0_0_8px_var(--accent-primary)]"></span> Premium aerospace-grade finish</li>
+                  <li class="flex gap-3"><span class="w-1.5 h-1.5 rounded-full bg-[color:var(--accent-primary)] shrink-0 mt-2 shadow-[0_0_8px_var(--accent-primary)]"></span> Hand-assembled components</li>
+                  <li class="flex gap-3"><span class="w-1.5 h-1.5 rounded-full bg-[color:var(--accent-primary)] shrink-0 mt-2 shadow-[0_0_8px_var(--accent-primary)]"></span> Eco-friendly packaging</li>
+                </ul>
+              }
             </div>
           </div>
+        </div>
 
-          <div class="accordion-item" [class.open]="openAccordion() === 'ship'">
-            <button class="accordion-header" (click)="toggleAccordion('ship')">
-              <span>Shipping & Returns</span>
-              <i class="pi pi-chevron-down indicator"></i>
-            </button>
-            <div class="accordion-content">
-              <div class="inner">
-                <p>Free standard shipping on all orders over $100. Returns accepted within 30 days of delivery in original condition.</p>
-              </div>
+        <div class="border-b border-[color:var(--border-secondary)]">
+          <button class="w-full flex items-center justify-between py-6 group" (click)="toggleAccordion('ship')">
+            <span class="font-[family:var(--font-heading,Playfair_Display)] text-xl text-[color:var(--text-primary)] group-hover:text-[color:var(--accent-primary)] transition-colors">Shipping & Returns</span>
+            <i class="pi pi-chevron-down text-sm text-[color:var(--text-secondary)] transition-transform duration-300" [ngClass]="openAccordion() === 'ship' ? 'rotate-180' : ''"></i>
+          </button>
+          <div class="overflow-hidden transition-all duration-500" [ngClass]="openAccordion() === 'ship' ? 'max-h-[500px] opacity-100 pb-6' : 'max-h-0 opacity-0'">
+            <div class="text-[color:var(--text-secondary)] font-light leading-relaxed">
+              <p>Complimentary standard shipping on all orders over $100. Returns accepted within 30 days of delivery in original condition.</p>
             </div>
           </div>
         </div>
 
       </div>
+
     </div>
   </div>
-} -->
+</div>
+}

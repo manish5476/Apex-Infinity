@@ -1,6 +1,6 @@
 // src/app/modules/storefront-public/dynamic-page/dynamic-page.component.ts
 import { Component, OnInit, inject, signal, isDevMode, OnDestroy } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { DOCUMENT, CommonModule } from '@angular/common';
 
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { Title, Meta } from '@angular/platform-browser';
@@ -17,6 +17,7 @@ import { StorefrontSectionRendererComponent } from './storefront-section-rendere
   selector: 'app-dynamic-page',
   standalone: true,
   imports: [
+    CommonModule,
     RouterModule,
     StorefrontSectionRendererComponent
 ],

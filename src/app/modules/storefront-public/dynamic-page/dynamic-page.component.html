@@ -31,15 +31,15 @@
 
     @for (section of data.page.sections; track section.id) {
 
-    @if (section.isActive !== false) {
+    @if ((section.config?.isActive ?? section.isActive) !== false) {
     <!-- ✅ FIX: use section.id — 'position' does not exist on PageSection -->
-    <section [id]="'section-' + section.id" class="section-block section-enter">
+    <section [id]="'section-' + section.id" class="section-block section-enter" [ngClass]="{
+               'hidden md:block': section.config?.hideOnMobile && !section.config?.hideOnDesktop,
+               'block md:hidden': section.config?.hideOnDesktop && !section.config?.hideOnMobile,
+               '!hidden': section.config?.hideOnMobile && section.config?.hideOnDesktop
+             }">
 
-      <app-storefront-section-renderer
-        [section]="section"
-        [orgSlug]="orgSlug"
-        [isDev]="isDev"
-      />
+      <app-storefront-section-renderer [section]="section" [orgSlug]="orgSlug" [isDev]="isDev" />
     </section>
     }
 

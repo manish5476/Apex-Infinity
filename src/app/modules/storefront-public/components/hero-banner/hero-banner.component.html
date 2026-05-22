@@ -1,5 +1,5 @@
 <!-- hero-banner.component.html -->
-<section class="hero-root" [ngStyle]="sectionStyle()">
+<section class="hero-root" [ngStyle]="sectionStyle()" [ngClass]="cfg().themeMode !== 'auto' ? 'theme-' + cfg().themeMode : ''">
 
   <!-- Background image -->
   @if (cfg().backgroundImage) {
