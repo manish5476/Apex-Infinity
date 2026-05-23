@@ -1,7 +1,7 @@
 // src/app/modules/storefront-public/pages/product-grid/product-grid.component.ts
 import { Component, Input, Output, EventEmitter, computed, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ProductCardComponent } from '../../components/product-card/product-card';
+import { ProductCardComponent } from '../product-card/product-card';
 import { ProductGridConfig } from '@core/models/storefront.model';
 
 @Component({
@@ -13,7 +13,7 @@ import { ProductGridConfig } from '@core/models/storefront.model';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProductGridComponent {
-  
+
   @Input() set config(v: ProductGridConfig) { this._config.set(v ?? {}); }
   private _config = signal<ProductGridConfig>({});
 
@@ -23,11 +23,11 @@ export class ProductGridComponent {
   @Output() addToCart = new EventEmitter<any>();
 
   readonly cfg = computed(() => ({
-    title:         this._config().title         ?? 'Shop All',
-    columns:       this._config().columns       ?? 4,
-    gap:           this._config().gap           ?? 'md',
-    pagination:    this._config().pagination    ?? false,
-    paddingTop:    this._config().paddingTop    ?? 'md',
+    title: this._config().title ?? 'Shop All',
+    columns: this._config().columns ?? 4,
+    gap: this._config().gap ?? 'md',
+    pagination: this._config().pagination ?? false,
+    paddingTop: this._config().paddingTop ?? 'md',
     paddingBottom: this._config().paddingBottom ?? 'md',
     backgroundColor: this._config().backgroundColor ?? ''
   }));
@@ -41,7 +41,7 @@ export class ProductGridComponent {
   };
 
   readonly sectionStyle = computed(() => ({
-    'padding-top':    this.paddingMap[this.cfg().paddingTop]    ?? this.paddingMap['md'],
+    'padding-top': this.paddingMap[this.cfg().paddingTop] ?? this.paddingMap['md'],
     'padding-bottom': this.paddingMap[this.cfg().paddingBottom] ?? this.paddingMap['md'],
     'background-color': this.cfg().backgroundColor || ''
   }));

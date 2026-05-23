@@ -1,0 +1,214 @@
+/* ==========================================================================
+   COMPONENT: PREMIUM PRODUCT SLIDER
+   Strict Token Usage
+   ========================================================================== */
+
+:host {
+  display: block;
+}
+
+.section-root {
+  position: relative;
+  padding: var(--spacing-5xl) 0;
+  overflow: hidden;
+  background-color: var(--bg-primary);
+  /* Default fallback */
+}
+
+/* --- CONTAINER --- */
+.container-wrapper {
+  position: relative;
+  z-index: 10;
+  margin: 0 auto;
+  padding: 0 var(--spacing-2xl);
+
+  &.standard {
+    max-width: 1440px;
+  }
+
+  &.full {
+    max-width: 100%;
+    padding: 0 var(--spacing-xl);
+  }
+}
+
+/* --- HEADER --- */
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: var(--spacing-4xl);
+}
+
+.title-group {
+  .subtitle {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .section-title {
+    font-family: var(--font-heading);
+    font-size: var(--font-size-3xl);
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.1;
+    margin: 0;
+
+    @media (min-width: 768px) {
+      font-size: var(--font-size-4xl);
+    }
+  }
+}
+
+/* --- CONTROLS --- */
+.nav-controls {
+  display: none;
+  gap: var(--spacing-sm);
+
+  @media (min-width: 768px) {
+    display: flex;
+  }
+
+  .nav-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid var(--border-secondary);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+      border-color: var(--color-primary);
+      background: var(--color-primary);
+      color: var(--text-primary);
+      transform: scale(1.05);
+    }
+
+    &:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      border-color: var(--border-secondary);
+    }
+
+    i {
+      font-size: 0.9rem;
+    }
+  }
+}
+
+/* --- SLIDER VIEWPORT --- */
+.slider-viewport {
+  display: flex;
+  gap: var(--spacing-lg);
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: var(--spacing-sm) 0 var(--spacing-3xl) 0;
+  /* Space for shadows */
+
+  /* Scroll Snap Logic */
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+
+  /* Hide Scrollbar */
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.slider-item {
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  height: 100%;
+
+  /* Mobile Default: Fixed width for consistency */
+  width: 280px;
+
+  /* Desktop: Use calculation passed via style binding */
+  @media (min-width: 768px) {
+    width: auto;
+  }
+}
+
+/* --- SKELETON LOADER --- */
+.skeleton-card {
+  width: 280px;
+  height: 400px;
+  background: var(--bg-secondary);
+  border-radius: var(--ui-border-radius-lg);
+  position: relative;
+  overflow: hidden;
+
+  /* Shimmer Effect */
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-100%);
+    background-image: linear-gradient(90deg,
+        rgba(255, 255, 255, 0) 0,
+        rgba(255, 255, 255, 0.2) 20%,
+        rgba(255, 255, 255, 0.5) 60%,
+        rgba(255, 255, 255, 0));
+    animation: shimmer 2s infinite;
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* --- MOBILE PROGRESS BAR --- */
+.mobile-progress {
+  display: block;
+  width: 100%;
+  max-width: 200px;
+  height: 2px;
+  background: var(--border-secondary);
+  margin: 0 auto;
+  border-radius: 10px;
+  overflow: hidden;
+
+  @media (min-width: 768px) {
+    display: none;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: var(--color-primary);
+    width: 25%;
+    /* Dynamic in TS later if needed, mostly visual hint */
+    border-radius: 10px;
+    animation: slideIndicate 2s infinite ease-in-out;
+  }
+}
+
+@keyframes slideIndicate {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(300%);
+  }
+}

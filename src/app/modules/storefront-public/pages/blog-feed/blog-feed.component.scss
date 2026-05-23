@@ -6,7 +6,9 @@
    restrained accent colour. Typography-led — titles do the heavy lifting.
    ========================================================================== */
 
-:host { display: block; }
+:host {
+  display: block;
+}
 
 // ── Section shell ───────────────────────────────────────────────────────────
 
@@ -14,7 +16,7 @@
   position: relative;
   // background: #0c0e12;      // Intentionally deep — not a theme token, this is
   background: transparent;
-  padding: 96px 0 80px;     // a design-forward dark editorial section
+  padding: 96px 0 80px; // a design-forward dark editorial section
   overflow: hidden;
 
   // Subtle radial atmosphere
@@ -86,11 +88,16 @@
   flex-shrink: 0;
   transition: color 0.2s ease;
 
-  @media (min-width: 768px) { display: flex; }
+  @media (min-width: 768px) {
+    display: flex;
+  }
 
   &:hover {
     color: var(--text-primary);
-    .feed-view-all-arrow { transform: translateX(4px); }
+
+    .feed-view-all-arrow {
+      transform: translateX(4px);
+    }
   }
 }
 
@@ -104,7 +111,9 @@
   justify-content: center;
   transition: transform 0.25s ease;
 
-  i { font-size: 10px; }
+  i {
+    font-size: 10px;
+  }
 }
 
 // ── Layout variants ──────────────────────────────────────────────────────────
@@ -135,7 +144,9 @@
   }
 }
 
-.featured-col { height: 100%; }
+.featured-col {
+  height: 100%;
+}
 
 .side-col {
   display: flex;
@@ -165,12 +176,22 @@
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
     border-color: rgba(255, 255, 255, 0.15);
 
-    .img-cover { transform: scale(1.04); }
-    .card-featured-gradient { opacity: 1; }
-    .card-cta-text { gap: 8px; }
+    .img-cover {
+      transform: scale(1.04);
+    }
+
+    .card-featured-gradient {
+      opacity: 1;
+    }
+
+    .card-cta-text {
+      gap: 8px;
+    }
   }
 
-  @media (max-width: 899px) { height: 440px; }
+  @media (max-width: 899px) {
+    height: 440px;
+  }
 }
 
 .card-featured-image {
@@ -181,13 +202,11 @@
 .card-featured-gradient {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 0.92) 0%,
-    rgba(0, 0, 0, 0.55) 40%,
-    rgba(0, 0, 0, 0.1)  70%,
-    transparent         100%
-  );
+  background: linear-gradient(to top,
+      rgba(0, 0, 0, 0.92) 0%,
+      rgba(0, 0, 0, 0.55) 40%,
+      rgba(0, 0, 0, 0.1) 70%,
+      transparent 100%);
   opacity: 0.88;
   transition: opacity 0.3s ease;
 }
@@ -225,7 +244,10 @@
   background: rgba(0, 0, 0, 0.35);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.65);
-  i { font-size: 8px; }
+
+  i {
+    font-size: 8px;
+  }
 }
 
 .card-date-pill {
@@ -288,7 +310,9 @@
   font-family: var(--font-mono, monospace);
   transition: gap 0.2s ease, color 0.2s ease;
 
-  .pi { font-size: 9px; }
+  .pi {
+    font-size: 9px;
+  }
 }
 
 // ── Standard card (used in 2-up layout) ─────────────────────────────────────
@@ -308,8 +332,15 @@
   &:focus-visible {
     transform: translateY(-4px);
     border-color: rgba(255, 255, 255, 0.14);
-    .img-cover      { transform: scale(1.05); }
-    .card-read-more { letter-spacing: 2.5px; color: var(--accent-primary, #2563eb); }
+
+    .img-cover {
+      transform: scale(1.05);
+    }
+
+    .card-read-more {
+      letter-spacing: 2.5px;
+      color: var(--accent-primary, #2563eb);
+    }
   }
 }
 
@@ -404,21 +435,29 @@
   outline: none;
   transition: opacity 0.2s ease;
 
-  &.card-side-last { border-bottom: none; }
+  &.card-side-last {
+    border-bottom: none;
+  }
 
   &:hover,
   &:focus-visible {
     opacity: 0.82;
+
     .card-side-arrow {
       transform: translateX(3px);
       color: var(--accent-primary, #2563eb);
     }
-    .img-cover { transform: scale(1.06); }
+
+    .img-cover {
+      transform: scale(1.06);
+    }
   }
 
   // First side card gets extra top spacing on desktop
   &:first-child {
-    @media (min-width: 900px) { padding-top: 0; }
+    @media (min-width: 900px) {
+      padding-top: 0;
+    }
   }
 }
 
@@ -472,7 +511,10 @@
   color: rgba(255, 255, 255, 0.2);
   flex-shrink: 0;
   transition: transform 0.25s ease, color 0.2s ease;
-  i { font-size: 11px; }
+
+  i {
+    font-size: 11px;
+  }
 }
 
 // ── Shared ───────────────────────────────────────────────────────────────────
@@ -500,8 +542,14 @@
   border: 1px dashed rgba(255, 255, 255, 0.08);
   border-radius: 16px;
 
-  i { font-size: 2rem; }
-  p { font-size: 13px; margin: 0; }
+  i {
+    font-size: 2rem;
+  }
+
+  p {
+    font-size: 13px;
+    margin: 0;
+  }
 }
 
 // ── Mobile CTA ────────────────────────────────────────────────────────────────
@@ -511,7 +559,9 @@
   justify-content: center;
   margin-top: 40px;
 
-  @media (min-width: 768px) { display: none; }
+  @media (min-width: 768px) {
+    display: none;
+  }
 }
 
 .mobile-view-all-btn {
@@ -535,225 +585,6 @@
   }
 }
 
-.feed-header-left { flex: 1; }
-
-// /* ==========================================================================
-//    COMPONENT: PREMIUM BLOG FEED
-//    Strict Token Usage
-//    ========================================================================== */
-
-// :host {
-//   display: block;
-//   // background-color: var(--bg-primary);
-//   background-color: transparent;
-// }
-
-// .section-root {
-//   position: relative;
-//   padding: var(--spacing-5xl) 0;
-//   overflow: hidden;
-  
-//   /* Subtle Background Texture */
-//   &::before {
-//     content: '';
-//     position: absolute;
-//     top: 0; left: 0; right: 0; bottom: 0;
-//     background: radial-gradient(circle at top left, var(--bg-secondary) 0%, transparent 40%);
-//     opacity: 0.6;
-//     z-index: 0;
-//   }
-// }
-
-// .container-wrapper {
-//   position: relative;
-//   z-index: 10;
-//   margin: 0 auto;
-//   padding: 0 var(--spacing-2xl);
-  
-//   &.standard { max-width: 1280px; }
-//   &.wide { max-width: 1600px; }
-// }
-
-// /* --- HEADER --- */
-// .header-row {
-//   display: flex;
-//   flex-direction: column;
-//   gap: var(--spacing-lg);
-//   margin-bottom: var(--spacing-4xl);
-//   padding-bottom: var(--spacing-xl);
-//   border-bottom: 1px solid var(--border-secondary);
-
-//   @media (min-width: 768px) {
-//     flex-direction: row;
-//     align-items: flex-end;
-//     justify-content: space-between;
-//   }
-// }
-
-// .section-title {
-//   font-family: var(--font-heading);
-//   font-size: var(--font-size-4xl);
-//   font-weight: 700;
-//   color: var(--text-primary);
-//   margin-bottom: var(--spacing-sm);
-//   line-height: 1.1;
-// }
-
-// .section-desc {
-//   font-family: var(--font-body);
-//   color: var(--text-secondary);
-//   font-size: var(--font-size-md);
-//   max-width: 500px;
-// }
-
-// .view-all-link {
-//   display: inline-flex;
-//   align-items: center;
-//   gap: var(--spacing-sm);
-  
-//   font-family: var(--font-mono);
-//   font-size: var(--font-size-xs);
-//   font-weight: 700;
-//   text-transform: uppercase;
-//   letter-spacing: 1px;
-//   color: var(--text-primary);
-  
-//   text-decoration: none;
-//   transition: color 0.2s, transform 0.2s;
-  
-//   &:hover {
-//     color: var(--color-primary);
-//     transform: translateX(4px);
-//   }
-// }
-
-// /* --- BLOG GRID --- */
-// .blog-grid {
-//   display: grid;
-//   grid-template-columns: 1fr;
-//   gap: var(--spacing-3xl);
-  
-//   @media (min-width: 768px) {
-//     grid-template-columns: repeat(2, 1fr);
-//   }
-  
-//   @media (min-width: 1024px) {
-//     grid-template-columns: repeat(3, 1fr);
-//   }
-// }
-
-// /* --- CARD DESIGN --- */
-// .article-card {
-//   display: flex;
-//   flex-direction: column;
-//   height: 100%;
-//   cursor: pointer;
-//   group: true; /* For Tailwind-like group hover logic in pure CSS */
-  
-//   &:hover {
-//     .card-image { transform: scale(1.05); }
-//     .card-title { color: var(--color-primary); }
-//     .read-more { color: var(--color-primary); }
-//     .read-more::after { width: 100%; background: var(--color-primary); }
-//   }
-// }
-
-// .image-container {
-//   position: relative;
-//   aspect-ratio: 4/3;
-//   border-radius: var(--ui-border-radius-lg);
-//   overflow: hidden;
-//   margin-bottom: var(--spacing-lg);
-//   background-color: var(--bg-ternary);
-// }
-
-// .card-image {
-//   width: 100%;
-//   height: 100%;
-//   object-fit: cover;
-//   transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-// }
-
-// .date-badge {
-//   position: absolute;
-//   top: var(--spacing-md);
-//   left: var(--spacing-md);
-  
-//   background: var(--bg-primary); /* Solid bg for readability */
-//   color: var(--text-primary);
-  
-//   padding: 6px 12px;
-//   border-radius: 50px;
-//   font-family: var(--font-mono);
-//   font-size: 10px;
-//   font-weight: 700;
-//   text-transform: uppercase;
-//   box-shadow: var(--shadow-sm);
-// }
-
-// .content-body {
-//   flex: 1;
-//   display: flex;
-//   flex-direction: column;
-// }
-
-// .category-tag {
-//   display: inline-block;
-//   font-family: var(--font-mono);
-//   font-size: 10px;
-//   font-weight: 700;
-//   text-transform: uppercase;
-//   letter-spacing: 1px;
-//   color: var(--color-primary);
-//   margin-bottom: var(--spacing-sm);
-// }
-
-// .card-title {
-//   font-family: var(--font-heading);
-//   font-size: var(--font-size-xl);
-//   font-weight: 700;
-//   color: var(--text-primary);
-//   line-height: 1.3;
-//   margin-bottom: var(--spacing-md);
-//   transition: color 0.2s ease;
-// }
-
-// .excerpt {
-//   font-family: var(--font-body);
-//   font-size: var(--font-size-sm);
-//   color: var(--text-secondary);
-//   line-height: 1.6;
-//   margin-bottom: var(--spacing-lg);
-  
-//   /* Line Clamp */
-//   display: -webkit-box;
-//   -webkit-line-clamp: 3;
-//   -webkit-box-orient: vertical;
-//   overflow: hidden;
-// }
-
-// .read-more {
-//   position: relative;
-//   display: inline-block;
-//   font-family: var(--font-body);
-//   font-size: var(--font-size-xs);
-//   font-weight: 700;
-//   text-transform: uppercase;
-//   letter-spacing: 1.5px;
-//   color: var(--text-primary);
-//   padding-bottom: 2px;
-//   margin-top: auto; /* Push to bottom */
-//   transition: color 0.2s;
-
-//   /* Animated Underline */
-//   &::after {
-//     content: '';
-//     position: absolute;
-//     bottom: 0;
-//     left: 0;
-//     width: 0%;
-//     height: 1px;
-//     background: var(--text-primary);
-//     transition: width 0.3s ease;
-//   }
-// }
+.feed-header-left {
+  flex: 1;
+}

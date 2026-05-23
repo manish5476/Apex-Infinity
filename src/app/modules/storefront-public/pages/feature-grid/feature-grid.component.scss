@@ -5,7 +5,9 @@
    Token-native throughout; dark section variants via .fg-card-dark modifier.
    ========================================================================== */
 
-:host { display: block; }
+:host {
+  display: block;
+}
 
 // ── Section shell ────────────────────────────────────────────────────────────
 
@@ -20,11 +22,9 @@
     content: '';
     position: absolute;
     inset: 0;
-    background-image: radial-gradient(
-      circle,
-      var(--border-secondary) 1px,
-      transparent 1px
-    );
+    background-image: radial-gradient(circle,
+        var(--border-secondary) 1px,
+        transparent 1px);
     background-size: 28px 28px;
     opacity: 0.25;
     pointer-events: none;
@@ -87,7 +87,9 @@
   background: var(--accent-primary);
   opacity: 0.9;
 
-  &.fg-title-line-light { opacity: 0.7; }
+  &.fg-title-line-light {
+    opacity: 0.7;
+  }
 }
 
 // ── Grid ─────────────────────────────────────────────────────────────────────
@@ -133,9 +135,19 @@
     border-color: var(--accent-primary);
     outline: none;
 
-    .fg-icon-wrap   { background: var(--accent-primary); color: var(--text-primary); transform: scale(1.08) rotate(-4deg); }
-    .fg-card-accent { transform: scaleX(1); }
-    .fg-link        { gap: 10px; }
+    .fg-icon-wrap {
+      background: var(--accent-primary);
+      color: var(--text-primary);
+      transform: scale(1.08) rotate(-4deg);
+    }
+
+    .fg-card-accent {
+      transform: scaleX(1);
+    }
+
+    .fg-link {
+      gap: 10px;
+    }
   }
 
   // Dark context variant — glassmorphic card
@@ -207,7 +219,9 @@
   display: block;
   transition: transform 0.6s ease;
 
-  .fg-card:hover & { transform: scale(1.05); }
+  .fg-card:hover & {
+    transform: scale(1.05);
+  }
 }
 
 // ── Text ─────────────────────────────────────────────────────────────────────
@@ -229,7 +243,9 @@
   letter-spacing: -0.01em;
   transition: color 0.2s ease;
 
-  &.fg-item-title-light { color: var(--text-primary); }
+  &.fg-item-title-light {
+    color: var(--text-primary);
+  }
 }
 
 .fg-item-desc {
@@ -238,7 +254,9 @@
   color: var(--text-secondary);
   line-height: 1.7;
 
-  &.fg-item-desc-light { color: rgba(255, 255, 255, 0.65); }
+  &.fg-item-desc-light {
+    color: rgba(255, 255, 255, 0.65);
+  }
 }
 
 // ── Link ─────────────────────────────────────────────────────────────────────
@@ -258,227 +276,15 @@
   margin-top: auto;
   padding-top: var(--spacing-sm);
 
-  i { font-size: 9px; }
+  i {
+    font-size: 9px;
+  }
 
-  &.fg-link-light { color: rgba(255, 255, 255, 0.8); }
-  &:hover { color: var(--accent-hover, var(--accent-primary)); }
+  &.fg-link-light {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  &:hover {
+    color: var(--accent-hover, var(--accent-primary));
+  }
 }
-
-// /* ==========================================================================
-//    COMPONENT: PREMIUM FEATURE GRID
-//    Strict Token Usage
-//    ========================================================================== */
-
-// :host {
-//   display: block;
-// }
-
-// .section-root {
-//   position: relative;
-//   background-size: cover;
-//   background-position: center;
-//   // background-color: var(--bg-primary); /* Default fallback */
-//   background-color: transparent;
-//   overflow: hidden;
-// }
-
-// /* Dark Overlay for Background Images */
-// .bg-overlay {
-//   position: absolute;
-//   inset: 0;
-//   background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7));
-//   z-index: 0;
-// }
-
-// .container-wrapper {
-//   position: relative;
-//   z-index: 10;
-//   margin: 0 auto;
-//   padding: 0 var(--spacing-2xl);
-  
-//   &.standard { max-width: 1280px; }
-//   &.full { max-width: 100%; padding: 0 var(--spacing-xl); }
-// }
-
-// /* --- HEADER --- */
-// .header-group {
-//   margin-bottom: var(--spacing-5xl);
-//   max-width: 800px;
-  
-//   /* Text Align Utility */
-//   &.text-center { text-align: center; margin-left: auto; margin-right: auto; }
-//   &.text-left { text-align: left; }
-// }
-
-// .subtitle {
-//   display: inline-block;
-//   padding: 6px 12px;
-//   border-radius: 100px;
-  
-//   background: rgba(255, 255, 255, 0.1);
-//   backdrop-filter: blur(8px);
-//   border: 1px solid rgba(255, 255, 255, 0.2);
-  
-//   font-family: var(--font-mono);
-//   font-size: var(--font-size-xs);
-//   font-weight: 700;
-//   text-transform: uppercase;
-//   letter-spacing: 2px;
-//   color: var(--text-primary);
-//   margin-bottom: var(--spacing-md);
-// }
-
-// .section-title {
-//   font-family: var(--font-heading);
-//   font-size: var(--font-size-4xl);
-//   font-weight: 700;
-//   color: var(--text-primary); /* Assumes dark bg if image exists, otherwise override in template */
-//   line-height: 1.1;
-//   text-shadow: 0 4px 12px rgba(0,0,0,0.3);
-
-//   @media (min-width: 768px) { font-size: var(--font-size-5xl); }
-// }
-
-// /* --- GRID LAYOUT --- */
-// .feature-grid {
-//   display: grid;
-//   gap: var(--gap, var(--spacing-xl));
-//   grid-template-columns: repeat(1, 1fr);
-
-//   @media (min-width: 768px) {
-//     grid-template-columns: repeat(2, 1fr);
-//   }
-
-//   @media (min-width: 1024px) {
-//     grid-template-columns: repeat(var(--cols, 3), 1fr);
-//   }
-// }
-
-// /* ============================================================
-//    CARD STYLES
-//    ============================================================ */
-
-// /* 1. GLASS STYLE (Premium, Dark) */
-// .feature-card.style-glass {
-//   background: rgba(255, 255, 255, 0.05);
-//   backdrop-filter: blur(16px);
-//   border: 1px solid rgba(255, 255, 255, 0.1);
-//   border-radius: var(--radius-2xl);
-//   padding: var(--spacing-2xl);
-//   transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.3s;
-  
-//   h3, p { color: var(--text-primary); }
-//   p { opacity: 0.8; }
-
-//   &:hover {
-//     transform: translateY(-8px);
-//     background: rgba(255, 255, 255, 0.1);
-//     box-shadow: var(--shadow-2xl);
-//   }
-
-//   .media-wrapper {
-//     height: 220px;
-//     border-radius: var(--ui-border-radius-lg);
-//     overflow: hidden;
-//     margin-bottom: var(--spacing-lg);
-    
-//     img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
-//   }
-  
-//   &:hover .media-wrapper img { transform: scale(1.08); }
-// }
-
-// /* 2. MINIMAL STYLE (Clean, Icon-based) */
-// .feature-card.style-minimal {
-//   padding: var(--spacing-xl);
-//   border-radius: var(--ui-border-radius-lg);
-//   transition: background 0.3s ease;
-  
-//   h3 { color: var(--text-primary); margin-bottom: var(--spacing-sm); }
-//   p { color: var(--text-secondary); }
-
-//   &:hover {
-//     background: var(--bg-secondary);
-//   }
-
-//   .icon-frame {
-//     width: 56px;
-//     height: 56px;
-//     border-radius: 12px;
-//     background: var(--bg-secondary);
-//     display: inline-flex;
-//     align-items: center;
-//     justify-content: center;
-//     font-size: 1.5rem;
-//     margin-bottom: var(--spacing-md);
-//     color: var(--color-primary);
-//     transition: all 0.3s ease;
-//   }
-  
-//   &:hover .icon-frame {
-//     background: var(--color-primary);
-//     color: var(--text-primary);
-//     transform: scale(1.1) rotate(-5deg);
-//   }
-// }
-
-// /* 3. BOXED STYLE (Classic Card) */
-// .feature-card.style-boxed {
-//   background: var(--bg-secondary);
-//   border: 1px solid var(--border-secondary);
-//   border-radius: var(--radius-2xl);
-//   padding: 0; /* Image goes to edge */
-//   overflow: hidden;
-//   box-shadow: var(--shadow-md);
-//   transition: transform 0.3s ease;
-
-//   &:hover { transform: translateY(-5px); box-shadow: var(--shadow-xl); }
-
-//   .media-wrapper {
-//     height: 240px;
-//     width: 100%;
-    
-//     img { width: 100%; height: 100%; object-fit: cover; }
-//   }
-
-//   .content-box {
-//     padding: var(--spacing-xl);
-//     h3 { color: var(--text-primary); font-size: var(--font-size-xl); margin-bottom: var(--spacing-sm); }
-//     p { color: var(--text-secondary); font-size: var(--font-size-sm); }
-//   }
-// }
-
-// /* SHARED LINK STYLES */
-// .action-link {
-//   display: inline-flex;
-//   align-items: center;
-//   gap: 8px;
-//   margin-top: var(--spacing-lg);
-  
-//   font-family: var(--font-mono);
-//   font-size: var(--font-size-xs);
-//   font-weight: 700;
-//   text-transform: uppercase;
-//   letter-spacing: 1px;
-//   color: var(--color-primary); /* Default for light bg */
-  
-//   text-decoration: none;
-//   transition: gap 0.2s ease;
-  
-//   i { font-size: 0.7rem; }
-  
-//   &:hover { gap: 12px; }
-// }
-
-// /* Animation Utilities */
-// @keyframes fadeUp {
-//   from { opacity: 0; transform: translateY(30px); }
-//   to { opacity: 1; transform: translateY(0); }
-// }
-
-// .animate-fade-up {
-//   opacity: 0;
-//   animation: fadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-// }
-
-// .delay-100 { animation-delay: 100ms; }

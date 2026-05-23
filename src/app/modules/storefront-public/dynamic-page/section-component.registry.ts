@@ -11,11 +11,11 @@ const configOnly = (section: any) => ({ config: section.config });
 
 export const SECTION_COMPONENT_REGISTRY: Record<string, SectionRenderEntry> = {
   hero_banner: {
-    load: () => import('../components/hero-banner/hero-banner.component').then(m => m.HeroBannerComponent),
+    load: () => import('../pages/hero-banner/hero-banner.component').then(m => m.HeroBannerComponent),
     inputs: configOnly
   },
   product_slider: {
-    load: () => import('../components/product-slider/product-slider.component').then(m => m.ProductSliderComponent),
+    load: () => import('../pages/product-slider/product-slider.component').then(m => m.ProductSliderComponent),
     inputs: section => ({ config: section.config, products: resolver.resolveProducts(section) })
   },
   product_grid: {
@@ -95,11 +95,11 @@ export const SECTION_COMPONENT_REGISTRY: Record<string, SectionRenderEntry> = {
     inputs: configOnly
   },
   divider: {
-    load: () => import('../components/divider/divider').then(m => m.DividerComponent),
+    load: () => import('../pages/divider/divider').then(m => m.DividerComponent),
     inputs: configOnly
   },
   spacer: {
-    load: () => import('../components/spacer/spacer').then(m => m.SpacerComponent),
+    load: () => import('../pages/spacer/spacer').then(m => m.SpacerComponent),
     inputs: configOnly
   }
 };

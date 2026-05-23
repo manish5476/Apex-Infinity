@@ -11,12 +11,23 @@
   position: relative;
   width: 100%;
   overflow: hidden;
-  background-color: var(--text-primary); /* Deepest black for cinema feel */
-  
+  background-color: var(--text-primary);
+  /* Deepest black for cinema feel */
+
   /* Height Variants */
-  &.h-medium { height: 60vh; min-height: 500px; }
-  &.h-large { height: 80vh; min-height: 600px; }
-  &.h-fullscreen { height: 100vh; }
+  &.h-medium {
+    height: 60vh;
+    min-height: 500px;
+  }
+
+  &.h-large {
+    height: 80vh;
+    min-height: 600px;
+  }
+
+  &.h-fullscreen {
+    height: 100vh;
+  }
 }
 
 /* --- VIDEO LAYER --- */
@@ -24,17 +35,20 @@
   position: absolute;
   inset: 0;
   z-index: 0;
-  
+
   video {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    opacity: 0; /* Hidden until loaded */
+    opacity: 0;
+    /* Hidden until loaded */
     transition: opacity 1s ease-in;
-    
-    &.is-playing { opacity: 1; }
+
+    &.is-playing {
+      opacity: 1;
+    }
   }
-  
+
   /* Fallback Image (Visible while video loads) */
   .poster-img {
     position: absolute;
@@ -58,8 +72,8 @@
 .overlay-gradient {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 40%),
-              linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 30%);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, transparent 40%),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 0%, transparent 30%);
   z-index: 2;
   pointer-events: none;
 }
@@ -75,7 +89,7 @@
   align-items: center;
   text-align: center;
   padding: 0 var(--spacing-2xl);
-  
+
   /* Max width constraint for readability */
   max-width: 1000px;
   margin: 0 auto;
@@ -83,11 +97,12 @@
 
 .hero-title {
   font-family: var(--font-heading);
-  font-size: clamp(3rem, 8vw, 6rem); /* Responsive scaling */
+  font-size: clamp(3rem, 8vw, 6rem);
+  /* Responsive scaling */
   font-weight: 700;
   line-height: 1;
   color: var(--text-primary);
-  text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
   margin-bottom: var(--spacing-lg);
   letter-spacing: -0.02em;
 }
@@ -99,7 +114,7 @@
   color: rgba(255, 255, 255, 0.9);
   max-width: 600px;
   line-height: 1.6;
-  text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
   margin-bottom: var(--spacing-4xl);
 }
 
@@ -131,21 +146,22 @@
   &.variant-primary {
     background: var(--bg-primary);
     color: #0f172a;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+
     &:hover {
       transform: translateY(-4px);
-      box-shadow: 0 20px 40px rgba(255,255,255,0.2);
+      box-shadow: 0 20px 40px rgba(255, 255, 255, 0.2);
     }
   }
 
   /* Variant: Glass / Outline */
-  &.variant-outline, &.variant-white {
+  &.variant-outline,
+  &.variant-white {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.3);
     color: var(--text-primary);
-    
+
     &:hover {
       background: rgba(255, 255, 255, 0.2);
       border-color: var(--text-primary);
@@ -163,20 +179,42 @@
   z-index: 10;
   color: rgba(255, 255, 255, 0.5);
   animation: bounce 2s infinite;
-  
-  i { font-size: 1.5rem; }
+
+  i {
+    font-size: 1.5rem;
+  }
 }
 
 /* --- ANIMATIONS --- */
 @keyframes bounce {
-  0%, 20%, 50%, 80%, 100% { transform: translate(-50%, 0); }
-  40% { transform: translate(-50%, -10px); }
-  60% { transform: translate(-50%, -5px); }
+
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translate(-50%, 0);
+  }
+
+  40% {
+    transform: translate(-50%, -10px);
+  }
+
+  60% {
+    transform: translate(-50%, -5px);
+  }
 }
 
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(40px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fade-up {
@@ -185,38 +223,10 @@
   animation-delay: 0.2s;
 }
 
-.delay-1 { animation-delay: 0.4s; }
-.delay-2 { animation-delay: 0.6s; }
+.delay-1 {
+  animation-delay: 0.4s;
+}
 
-// @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Manrope:wght@400;600&display=swap');
-
-// :host {
-//   display: block;
-//   font-family: 'Manrope', sans-serif;
-// }
-
-// .font-serif {
-//   font-family: 'Playfair Display', serif;
-// }
-
-// /* Ensure video covers exactly like object-cover */
-// video {
-//   width: 100%;
-//   height: 100%;
-//   object-fit: cover;
-//   pointer-events: none; /* User can't pause/click it */
-// }
-
-// /* Animations */
-// .animate-fade-up {
-//   animation: fadeUp 1s ease-out forwards;
-//   opacity: 0;
-//   transform: translateY(30px);
-// }
-
-// @keyframes fadeUp {
-//   to {
-//     opacity: 1;
-//     transform: translateY(0);
-//   }
-// }
+.delay-2 {
+  animation-delay: 0.6s;
+}
