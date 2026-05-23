@@ -1,188 +1,250 @@
+// ============================================================================
 // video-hero.component.ts
-import { Component, Input, signal, computed, ChangeDetectionStrategy } from '@angular/core';
+// ============================================================================
+import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { SectionBaseConfig, SectionButton, PADDING_MAP } from '../../../storefront-admin/schema/section.types';
 
-import { RouterModule } from '@angular/router';
-
-export interface VideoHeroConfig {
-  videoUrl?:       string;   // YouTube embed, direct .mp4, or Vimeo
-  posterImage?:    string;   // Fallback / first-frame
-  title?:          string;
-  subtitle?:       string;
-  ctaText?:        string;
-  ctaLink?:        string;
+interface VideoHeroConfig extends SectionBaseConfig {
+  title?: string;
+  titleTag?: 'h1' | 'h2' | 'h3';
+  subtitle?: string;
+  alignment?: 'left' | 'center' | 'right';
+  videoUrl?: string;
+  posterImage?: string;
   overlayOpacity?: number;
-  height?:         'medium' | 'large' | 'screen';
+  ctaButtons?: SectionButton[];
 }
-
-const HEIGHT_MAP: Record<string, string> = { medium: '65vh', large: '85vh', screen: '100vh' };
 
 @Component({
   selector: 'app-video-hero',
   standalone: true,
-  imports: [RouterModule],
+  imports: [CommonModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <section class="vh-root" [style.min-height]="height()">
+<section class="video-hero" [style.paddingTop]="pt" [style.paddingBottom]="pb">
+  <video class="video-hero__video"
+    [src]="config.videoUrl"
+    [poster]="config.posterImage || ''"
+    autoplay muted loop playsinline
+    aria-hidden="true">
+  </video>
 
-      <!-- Video / poster background -->
-      @if (cfg().videoUrl && isDirectVideo()) {
-        <video
-          class="vh-video"
-          [src]="cfg().videoUrl"
-          [poster]="cfg().posterImage || ''"
-          autoplay muted loop playsinline
-          aria-hidden="true">
-        </video>
-      } @else if (cfg().posterImage) {
-        <div class="vh-poster" [style.background-image]="'url(' + cfg().posterImage + ')'"></div>
-      }
+  <div class="video-hero__overlay"
+    [style.opacity]="(config.overlayOpacity ?? 40) / 100">
+  </div>
 
-      <!-- Overlay -->
-      <div class="vh-overlay" [style.opacity]="(cfg().overlayOpacity / 100)"></div>
-
-      <!-- Content -->
-      <div class="vh-content">
-        @if (cfg().subtitle) {
-          <span class="vh-eyebrow">{{ cfg().subtitle }}</span>
-        }
-        <h2 class="vh-title">{{ cfg().title }}</h2>
-        @if (cfg().ctaText && cfg().ctaLink) {
-          <a [routerLink]="[cfg().ctaLink]" class="vh-cta">
-            {{ cfg().ctaText }} <i class="pi pi-arrow-right"></i>
-          </a>
+  <div class="video-hero__content" [ngClass]="'align-' + (config.alignment ?? 'center')">
+    @if (config.title) {
+      <h2 class="video-hero__title">{{ config.title }}</h2>
+    }
+    @if (config.subtitle) {
+      <p class="video-hero__subtitle">{{ config.subtitle }}</p>
+    }
+    @if (config.ctaButtons?.length) {
+      <div class="video-hero__actions">
+        @for (btn of config.ctaButtons; track $index) {
+          @if (btn.text) {
+            <a [href]="btn.link || '#'" class="vhero-btn vhero-btn--{{ btn.variant ?? 'primary' }}">
+              {{ btn.text }}
+            </a>
+          }
         }
       </div>
-
-    </section>
+    }
+  </div>
+</section>
   `,
   styles: [`
-    :host { display: block; }
-    .vh-root { position: relative; overflow: hidden; background: #0c0e12; display: flex; align-items: center; justify-content: center; }
-    .vh-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
-    .vh-poster { position: absolute; inset: 0; background-size: cover; background-position: center; z-index: 0; }
-    .vh-overlay { position: absolute; inset: 0; background: #000; z-index: 1; }
-    .vh-content {
-      position: relative; z-index: 10; text-align: center; padding: 80px 24px;
-      max-width: 760px; display: flex; flex-direction: column; align-items: center; gap: 20px;
+    :host { display: block; width: 100%; }
+    .video-hero {
+      position: relative;
+      min-height: 560px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      font-family: var(--font-heading, sans-serif);
     }
-    .vh-eyebrow {
-      font-family: var(--font-mono); font-size: 11px; font-weight: 800;
-      text-transform: uppercase; letter-spacing: 3px; color: rgba(255,255,255,0.55);
+    .video-hero__video {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
     }
-    .vh-title {
-      margin: 0; font-family: var(--font-heading);
-      font-size: clamp(28px, 6vw, 68px); font-weight: 800; color: #fff;
-      line-height: 1.05; letter-spacing: -0.03em;
-      text-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    .video-hero__overlay {
+      position: absolute;
+      inset: 0;
+      background: #000;
+      pointer-events: none;
     }
-    .vh-cta {
-      display: inline-flex; align-items: center; gap: 10px;
-      padding: 14px 32px; background: #fff; color: #0c0e12;
-      border-radius: 100px; font-size: 13px; font-weight: 800;
-      text-transform: uppercase; letter-spacing: 1px; text-decoration: none;
-      transition: all 0.25s ease;
-      i { font-size: 11px; transition: transform 0.2s ease; }
-      &:hover { background: var(--accent-primary); color: #fff; transform: translateY(-2px); }
-      &:hover i { transform: translateX(4px); }
+    .video-hero__content {
+      position: relative;
+      z-index: 2;
+      max-width: 720px;
+      padding: 0 5%;
+      text-align: center;
     }
-  `],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    .align-left  { text-align: left;  align-self: flex-start; }
+    .align-right { text-align: right; align-self: flex-end; }
+    .video-hero__title {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      color: #fff;
+      margin: 0 0 16px;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+    .video-hero__subtitle {
+      color: rgba(255,255,255,0.8);
+      font-size: 1.125rem;
+      margin: 0 0 28px;
+      font-family: var(--font-body, sans-serif);
+    }
+    .video-hero__actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .align-left  .video-hero__actions { justify-content: flex-start; }
+    .align-right .video-hero__actions { justify-content: flex-end; }
+    .vhero-btn {
+      padding: 13px 26px; border-radius: 7px; font-weight: 700;
+      font-size: 0.875rem; text-decoration: none; transition: all 0.2s;
+      display: inline-block;
+    }
+    .vhero-btn--primary {
+      background: var(--theme-accent-primary, #2563eb);
+      color: #fff;
+      &:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    }
+    .vhero-btn--outline {
+      border: 2px solid #fff; color: #fff;
+      &:hover { background: #fff; color: #000; }
+    }
+    .vhero-btn--secondary {
+      background: rgba(255,255,255,0.2);
+      color: #fff; backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+  `]
 })
-export class VideoHeroComponent {
-  @Input() set config(v: VideoHeroConfig) { this._config.set(v ?? {}); }
-  private _config = signal<VideoHeroConfig>({});
-
-  readonly cfg = computed(() => ({
-    videoUrl:       this._config().videoUrl       ?? '',
-    posterImage:    this._config().posterImage    ?? 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=1400&q=80',
-    title:          this._config().title          ?? 'Experience the Difference',
-    subtitle:       this._config().subtitle       ?? 'Play',
-    ctaText:        this._config().ctaText        ?? 'Explore Products',
-    ctaLink:        this._config().ctaLink        ?? '/products',
-    overlayOpacity: this._config().overlayOpacity ?? 50,
-    height:         this._config().height         ?? 'large'
-  }));
-
-  readonly height = computed(() => HEIGHT_MAP[this.cfg().height] ?? '85vh');
-
-  isDirectVideo(): boolean {
-    const url = this.cfg().videoUrl;
-    return !!url && (url.endsWith('.mp4') || url.endsWith('.webm') || url.includes('blob:'));
+export class VideoHeroComponent implements OnInit {
+  @Input() config: VideoHeroConfig = {};
+  @Input() data: any = null;
+  pt = '0'; pb = '0';
+  ngOnInit(): void {
+    this.pt = PADDING_MAP[this.config.paddingTop ?? 'md'];
+    this.pb = PADDING_MAP[this.config.paddingBottom ?? 'md'];
   }
 }
 
-// // src/app/modules/storefront-public/pages/video-hero/video-hero.component.ts
-// import { Component, Input, computed, ElementRef, ViewChild, AfterViewInit, signal, ChangeDetectionStrategy } from '@angular/core';
-// import { CommonModule } from '@angular/common';
+
+
+// // video-hero.component.ts
+// import { Component, Input, signal, computed, ChangeDetectionStrategy } from '@angular/core';
+
 // import { RouterModule } from '@angular/router';
-// import { VideoHeroConfig } from '@core/models/storefront.model';
+
+// export interface VideoHeroConfig {
+//   videoUrl?:       string;   // YouTube embed, direct .mp4, or Vimeo
+//   posterImage?:    string;   // Fallback / first-frame
+//   title?:          string;
+//   subtitle?:       string;
+//   ctaText?:        string;
+//   ctaLink?:        string;
+//   overlayOpacity?: number;
+//   height?:         'medium' | 'large' | 'screen';
+// }
+
+// const HEIGHT_MAP: Record<string, string> = { medium: '65vh', large: '85vh', screen: '100vh' };
 
 // @Component({
 //   selector: 'app-video-hero',
 //   standalone: true,
-//   imports: [CommonModule, RouterModule],
-//   templateUrl: './video-hero.component.html',
-//   styleUrls: ['./video-hero.component.scss'],
+//   imports: [RouterModule],
+//   template: `
+//     <section class="vh-root" [style.min-height]="height()">
+
+//       <!-- Video / poster background -->
+//       @if (cfg().videoUrl && isDirectVideo()) {
+//         <video
+//           class="vh-video"
+//           [src]="cfg().videoUrl"
+//           [poster]="cfg().posterImage || ''"
+//           autoplay muted loop playsinline
+//           aria-hidden="true">
+//         </video>
+//       } @else if (cfg().posterImage) {
+//         <div class="vh-poster" [style.background-image]="'url(' + cfg().posterImage + ')'"></div>
+//       }
+
+//       <!-- Overlay -->
+//       <div class="vh-overlay" [style.opacity]="(cfg().overlayOpacity / 100)"></div>
+
+//       <!-- Content -->
+//       <div class="vh-content">
+//         @if (cfg().subtitle) {
+//           <span class="vh-eyebrow">{{ cfg().subtitle }}</span>
+//         }
+//         <h2 class="vh-title">{{ cfg().title }}</h2>
+//         @if (cfg().ctaText && cfg().ctaLink) {
+//           <a [routerLink]="[cfg().ctaLink]" class="vh-cta">
+//             {{ cfg().ctaText }} <i class="pi pi-arrow-right"></i>
+//           </a>
+//         }
+//       </div>
+
+//     </section>
+//   `,
+//   styles: [`
+//     :host { display: block; }
+//     .vh-root { position: relative; overflow: hidden; background: #0c0e12; display: flex; align-items: center; justify-content: center; }
+//     .vh-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+//     .vh-poster { position: absolute; inset: 0; background-size: cover; background-position: center; z-index: 0; }
+//     .vh-overlay { position: absolute; inset: 0; background: #000; z-index: 1; }
+//     .vh-content {
+//       position: relative; z-index: 10; text-align: center; padding: 80px 24px;
+//       max-width: 760px; display: flex; flex-direction: column; align-items: center; gap: 20px;
+//     }
+//     .vh-eyebrow {
+//       font-family: var(--font-mono); font-size: 11px; font-weight: 800;
+//       text-transform: uppercase; letter-spacing: 3px; color: rgba(255,255,255,0.55);
+//     }
+//     .vh-title {
+//       margin: 0; font-family: var(--font-heading);
+//       font-size: clamp(28px, 6vw, 68px); font-weight: 800; color: #fff;
+//       line-height: 1.05; letter-spacing: -0.03em;
+//       text-shadow: 0 4px 20px rgba(0,0,0,0.4);
+//     }
+//     .vh-cta {
+//       display: inline-flex; align-items: center; gap: 10px;
+//       padding: 14px 32px; background: #fff; color: #0c0e12;
+//       border-radius: 100px; font-size: 13px; font-weight: 800;
+//       text-transform: uppercase; letter-spacing: 1px; text-decoration: none;
+//       transition: all 0.25s ease;
+//       i { font-size: 11px; transition: transform 0.2s ease; }
+//       &:hover { background: var(--accent-primary); color: #fff; transform: translateY(-2px); }
+//       &:hover i { transform: translateX(4px); }
+//     }
+//   `],
 //   changeDetection: ChangeDetectionStrategy.OnPush
 // })
-// export class VideoHeroComponent implements AfterViewInit {
-
+// export class VideoHeroComponent {
 //   @Input() set config(v: VideoHeroConfig) { this._config.set(v ?? {}); }
 //   private _config = signal<VideoHeroConfig>({});
 
 //   readonly cfg = computed(() => ({
-//     title:          this._config().title,
-//     subtitle:       this._config().subtitle,
-//     videoUrl:       this._config().videoUrl,
-//     posterImage:    this._config().posterImage,
-//     overlayOpacity: this._config().overlayOpacity ?? 40,
-//     ctaButtons:     this._config().ctaButtons ?? []
+//     videoUrl:       this._config().videoUrl       ?? '',
+//     posterImage:    this._config().posterImage    ?? 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=1400&q=80',
+//     title:          this._config().title          ?? 'Experience the Difference',
+//     subtitle:       this._config().subtitle       ?? 'Play',
+//     ctaText:        this._config().ctaText        ?? 'Explore Products',
+//     ctaLink:        this._config().ctaLink        ?? '/products',
+//     overlayOpacity: this._config().overlayOpacity ?? 50,
+//     height:         this._config().height         ?? 'large'
 //   }));
 
-//   @ViewChild('videoPlayer') videoPlayer!: ElementRef<HTMLVideoElement>;
-  
-//   // Track if video has actually started playing to fade it in
-//   isPlaying = signal(false);
+//   readonly height = computed(() => HEIGHT_MAP[this.cfg().height] ?? '85vh');
 
-//   // Layout Computation
-//   heightClass = computed(() => {
-//     // Currently no height defined in video-hero backend schema, defaulting to fullscreen-like or large
-//     return 'h-large';
-//   });
-
-//   // Valid Button Filter
-//   readonly validButtons = computed(() => {
-//     return this.cfg().ctaButtons.filter(b => b.text && b.link);
-//   });
-
-//   ngAfterViewInit() {
-//     if (this.videoPlayer?.nativeElement) {
-//       const video = this.videoPlayer.nativeElement;
-      
-//       video.muted = true; // Required for auto-play      
-//       const playPromise = video.play();
-      
-//       if (playPromise !== undefined) {
-//         playPromise
-//           .then(() => {
-//             // Video started playing successfully
-//             this.isPlaying.set(true);
-//           })
-//           .catch(error => {
-//             console.warn('Auto-play prevented:', error);
-//             // Fallback: isPlaying stays false, Poster image remains visible
-//           });
-//       }
-//     }
-//   }
-
-//   getLink(url: string | undefined): any[] {
-//     if (!url) return [];
-//     if (url.startsWith('http') || url.startsWith('www')) return [];
-//     const clean = url.startsWith('/') ? url.slice(1) : url;
-//     return clean ? ['/', clean] : [];
-//   }
-
-//   isExternal(url: string | undefined): boolean {
-//     return !!url && (url.startsWith('http') || url.startsWith('www'));
+//   isDirectVideo(): boolean {
+//     const url = this.cfg().videoUrl;
+//     return !!url && (url.endsWith('.mp4') || url.endsWith('.webm') || url.includes('blob:'));
 //   }
 // }
