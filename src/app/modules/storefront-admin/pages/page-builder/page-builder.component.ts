@@ -209,17 +209,17 @@ export class PageBuilderComponent implements OnInit, OnDestroy {
     }, 80);
   }
 
-  selectSection(section: PageSection): void {
-    if (this.viewMode() === 'sidebar' && this.sidebarState() === 'full') {
-      this.sidebarState.set('split');
-    }
-    // Deep-clone to prevent direct mutation before explicit save
-    try {
-      this.selectedSection.set(JSON.parse(JSON.stringify(section)));
-    } catch {
-      this.selectedSection.set(section);
-    }
-  }
+  // selectSection(section: PageSection): void {
+  //   if (this.viewMode() === 'sidebar' && this.sidebarState() === 'full') {
+  //     this.sidebarState.set('split');
+  //   }
+  //   // Deep-clone to prevent direct mutation before explicit save
+  //   try {
+  //     this.selectedSection.set(JSON.parse(JSON.stringify(section)));
+  //   } catch {
+  //     this.selectedSection.set(section);
+  //   }
+  // }
 
   deselectSection(): void {
     this.selectedSection.set(null);
@@ -240,26 +240,26 @@ export class PageBuilderComponent implements OnInit, OnDestroy {
     this.sections.set(list);
   }
 
-  onConfigChange(newConfig: Record<string, any>): void {
-    const current = this.selectedSection();
-    if (!current) return;
+  // onConfigChange(newConfig: Record<string, any>): void {
+  //   const current = this.selectedSection();
+  //   if (!current) return;
 
-    // ✅ FIX: Only overwrite keys where newConfig has a real value.
-    // If the form emits null/undefined for a key (e.g. an optional field
-    // left blank), we keep the section's existing saved value instead of
-    // wiping it out. This is critical for preserving items[] arrays after
-    // selecting a section that has pre-saved content.
-    const merged: Record<string, any> = { ...current.config };
-    for (const [k, v] of Object.entries(newConfig)) {
-      if (v !== null && v !== undefined) {
-        merged[k] = v;
-      }
-    }
+  //   // ✅ FIX: Only overwrite keys where newConfig has a real value.
+  //   // If the form emits null/undefined for a key (e.g. an optional field
+  //   // left blank), we keep the section's existing saved value instead of
+  //   // wiping it out. This is critical for preserving items[] arrays after
+  //   // selecting a section that has pre-saved content.
+  //   const merged: Record<string, any> = { ...current.config };
+  //   for (const [k, v] of Object.entries(newConfig)) {
+  //     if (v !== null && v !== undefined) {
+  //       merged[k] = v;
+  //     }
+  //   }
 
-    const updated: PageSection = { ...current, config: merged };
-    this.selectedSection.set(updated);
-    this.sections.update(list => list.map(s => s.id === updated.id ? updated : s));
-  }
+  //   const updated: PageSection = { ...current, config: merged };
+  //   this.selectedSection.set(updated);
+  //   this.sections.update(list => list.map(s => s.id === updated.id ? updated : s));
+  // }
 
   // ── API actions ───────────────────────────────────────────────────────────
 
@@ -355,5 +355,86 @@ export class PageBuilderComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+
+  // ============================================================================
+// Drop these two methods into PageBuilderComponent, replacing the originals.
+// ============================================================================
+
+  // ── selectSection ─────────────────────────────────────────────────────────
+  //
+  // Key changes vs original:
+  //   1. Guard: skip if the same section is already selected (no-op).
+  //      Prevents unnecessary form rebuilds when clicking the active layer.
+  //   2. Scroll reset targets the PrimeNG .p-tabpanels element (the actual
+  //      scroll container) instead of the outer wrapper.
+  //   3. Reset happens AFTER Angular renders the new form (setTimeout 0).
+
+  selectSection(section: PageSection): void {
+    if (this.viewMode() === 'sidebar' && this.sidebarState() === 'full') {
+      this.sidebarState.set('split');
+    }
+
+    // No-op: clicking the already-selected layer should not rebuild the form.
+    if (this.selectedSection()?.id === section.id) return;
+
+    try {
+      this.selectedSection.set(JSON.parse(JSON.stringify(section)));
+    } catch {
+      this.selectedSection.set(section);
+    }
+
+    // Scroll the config panel back to top only when switching sections.
+    // Wait one tick so Angular has rendered the new section's form.
+    setTimeout(() => {
+      // PrimeNG Tabs: the .p-tabpanels div is the real scroll surface.
+      const sidebarPanel = document.querySelector<HTMLElement>(
+        '.builder-workbench__sidebar .p-tabpanels'
+      );
+      if (sidebarPanel) sidebarPanel.scrollTop = 0;
+
+      // Floating dialog mode: PrimeNG wraps content in .p-dialog-content.
+      const dialogPanel = document.querySelector<HTMLElement>(
+        '.builder-floating-panel .p-dialog-content'
+      );
+      if (dialogPanel) dialogPanel.scrollTop = 0;
+    }, 0);
+  }
+
+
+  // ── onConfigChange ────────────────────────────────────────────────────────
+  //
+  // KEY FIX — this is the root cause of the scroll-to-top bug.
+  //
+  // Original called selectedSection.set(updated) with a new object reference
+  // on every keystroke. Angular's @if block detected the new reference,
+  // destroyed and recreated the config panel DOM, resetting scrollTop to 0.
+  //
+  // Fix: mutate current.config in place instead of replacing the signal.
+  // The @if block sees the same object → no DOM teardown → scroll preserved.
+  // The canvas sections() list is still updated immutably for live preview.
+
+  onConfigChange(newConfig: Record<string, any>): void {
+    const current = this.selectedSection();
+    if (!current) return;
+
+    // Merge incoming values into the existing config object IN PLACE.
+    // Skips null/undefined so optional fields don't wipe previously saved data.
+    for (const [k, v] of Object.entries(newConfig)) {
+      if (v !== null && v !== undefined) {
+        current.config[k] = v;
+      }
+    }
+
+    // Update the canvas sections list (immutable spread drives live preview).
+    // selectedSection signal reference is intentionally NOT updated here.
+    this.sections.update(list =>
+      list.map(s =>
+        s.id === current.id
+          ? { ...s, config: { ...current.config } }
+          : s
+      )
+    );
   }
 }
