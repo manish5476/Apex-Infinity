@@ -1,9 +1,9 @@
 // hero-banner.component.ts
 import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PADDING_MAP, SectionBaseConfig, SectionButton } from '../../../storefront-admin/schema/section.types';
+import { SectionBaseConfig, SectionButton, PADDING_MAP } from '../../dynamic-page/section.types';
 
-interface HeroBannerConfig extends SectionBaseConfig {
+export interface HeroBannerConfig extends SectionBaseConfig {
   title?: string;
   titleTag?: 'h1' | 'h2' | 'h3';
   subtitle?: string;
@@ -22,29 +22,27 @@ interface HeroBannerConfig extends SectionBaseConfig {
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
 <section class="hero-banner" [style]="hostStyles">
-  <!-- Background image layer -->
   @if (config.backgroundImage) {
     <div class="hero-bg"
       [style.backgroundImage]="'url(' + config.backgroundImage + ')'">
     </div>
   } @else {
-    <div class="hero-bg hero-bg--gradient"></div>
+    <div class="hero-bg hero-bg--fallback"></div>
   }
 
-  <!-- Overlay -->
   <div class="hero-overlay"
-    [style.opacity]="(config.overlayOpacity ?? 20) / 100">
+    [style.opacity]="(config.overlayOpacity ?? 30) / 100">
   </div>
 
-  <!-- Content -->
   <div class="hero-inner" [ngClass]="'hero-inner--' + (config.contentPosition ?? 'center')">
-    <div class="hero-content" [ngClass]="'hero-content--' + (config.alignment ?? 'left')">
+    <div class="hero-content" [ngClass]="'hero-content--' + (config.alignment ?? 'center')">
 
       @if (config.title) {
-        <ng-container [ngSwitch]="config.titleTag ?? 'h2'">
+        <ng-container [ngSwitch]="config.titleTag ?? 'h1'">
           <h1 *ngSwitchCase="'h1'" class="hero-title">{{ config.title }}</h1>
           <h2 *ngSwitchCase="'h2'" class="hero-title">{{ config.title }}</h2>
           <h3 *ngSwitchCase="'h3'" class="hero-title">{{ config.title }}</h3>
+          <h1 *ngSwitchDefault class="hero-title">{{ config.title }}</h1>
         </ng-container>
       }
 
@@ -54,7 +52,7 @@ interface HeroBannerConfig extends SectionBaseConfig {
 
       @if (config.ctaButtons?.length) {
         <div class="hero-actions">
-          @for (btn of config.ctaButtons; track $index) {
+          @for (btn of config.ctaButtons; track btn.text) {
             @if (btn.text) {
               <a [href]="btn.link || '#'"
                 class="hero-btn"
@@ -62,7 +60,7 @@ interface HeroBannerConfig extends SectionBaseConfig {
                 @if (btn.icon) {
                   <i [class]="btn.icon" aria-hidden="true"></i>
                 }
-                {{ btn.text }}
+                <span>{{ btn.text }}</span>
               </a>
             }
           }
@@ -74,52 +72,85 @@ interface HeroBannerConfig extends SectionBaseConfig {
 </section>
   `,
   styles: [`
-    :host { display: block; width: 100%; }
+    :host { 
+      display: block; 
+      width: 100%; 
+    }
+
+    /* --- Material Design Standard Easing --- */
+    :host {
+      --md-sys-motion-easing-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
+      --md-sys-motion-easing-decelerate: cubic-bezier(0.0, 0.0, 0.2, 1);
+      --md-sys-color-primary: var(--theme-accent-primary, #1a73e8); /* Google Blue */
+    }
 
     .hero-banner {
       position: relative;
       width: 100%;
       overflow: hidden;
-      font-family: var(--font-heading, 'Plus Jakarta Sans', sans-serif);
+      /* Google's signature font stack */
+      font-family: 'Google Sans', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: var(--bg-primary, #f8f9fa);
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
-    /* Height variants */
-    :host-context(.hero-height--small)  .hero-banner { min-height: 320px; }
-    :host-context(.hero-height--medium) .hero-banner { min-height: 520px; }
-    :host-context(.hero-height--large)  .hero-banner { min-height: 700px; }
-    :host-context(.hero-height--screen) .hero-banner { min-height: 100vh; }
-
+    /* --- Background --- */
     .hero-bg {
       position: absolute;
-      inset: 0;
+      inset: -2%; 
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      transform: scale(1.03);
-      transition: transform 8s ease-out;
+      z-index: 0;
+      /* Subtle, professional scale-in rather than dramatic pan */
+      animation: md-scale-in 10s var(--md-sys-motion-easing-decelerate) forwards;
+      will-change: transform;
     }
 
-    .hero-bg--gradient {
-      background: linear-gradient(135deg,
-        var(--theme-accent-primary, #2563eb) 0%,
-        color-mix(in srgb, var(--theme-accent-primary, #2563eb) 60%, #000) 100%);
+    /* Google Store style clean mesh fallback */
+    .hero-bg--fallback {
+      background: radial-gradient(
+        circle at 15% 50%, 
+        color-mix(in srgb, var(--md-sys-color-primary) 8%, transparent), 
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 85% 30%, 
+        color-mix(in srgb, var(--md-sys-color-primary) 5%, transparent), 
+        transparent 50%
+      );
+      background-color: var(--bg-primary, #f8f9fa);
     }
 
+    /* --- Overlay --- */
     .hero-overlay {
       position: absolute;
       inset: 0;
-      background: #000;
+      z-index: 1;
+      /* Dark scrim only applied if there's an image, handled by opacity */
+      background-color: #202124; /* Google Dark Gray */
       pointer-events: none;
     }
 
+    /* If no image, hide the dark overlay to keep the clean M3 look */
+    .hero-bg--fallback + .hero-overlay {
+      display: none;
+    }
+
+    /* --- Layout --- */
     .hero-inner {
       position: relative;
       z-index: 2;
       width: 100%;
-      min-height: inherit;
+      flex: 1;
       display: flex;
       align-items: center;
-      padding: 64px 5%;
+      padding: 0 5%;
+      max-width: 1440px;
+      margin: 0 auto;
     }
 
     .hero-inner--left   { justify-content: flex-start; }
@@ -127,79 +158,133 @@ interface HeroBannerConfig extends SectionBaseConfig {
     .hero-inner--right  { justify-content: flex-end; }
 
     .hero-content {
-      max-width: 680px;
+      max-width: 840px; /* Slightly wider for Google's readable line lengths */
+      width: 100%;
+      display: flex;
+      flex-direction: column;
     }
 
-    .hero-content--center { text-align: center; }
-    .hero-content--right  { text-align: right; }
+    .hero-content--left   { text-align: left; align-items: flex-start; }
+    .hero-content--center { text-align: center; align-items: center; }
+    .hero-content--right  { text-align: right; align-items: flex-end; }
 
+    /* --- Typography (Google Display Styles) --- */
     .hero-title {
-      font-size: clamp(2rem, 5vw, 4rem);
-      font-weight: 800;
-      color: #fff;
+      /* Fluid scaling matching Google Store headers */
+      font-size: clamp(2.75rem, 5vw + 1rem, 4.5rem);
+      font-weight: 700; /* Google Sans looks best at 700 */
+      color: #ffffff;
       line-height: 1.1;
-      letter-spacing: -0.02em;
-      margin: 0 0 16px;
-      text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+      letter-spacing: -0.04em;
+      margin: 0 0 1rem;
+      opacity: 0;
+      animation: md-fade-up 0.8s var(--md-sys-motion-easing-decelerate) forwards;
     }
 
     .hero-subtitle {
-      font-size: clamp(1rem, 2vw, 1.25rem);
-      color: rgba(255,255,255,0.85);
-      font-family: var(--font-body, 'Inter', sans-serif);
+      font-size: clamp(1.125rem, 2vw, 1.375rem);
+      color: #e8eaed; /* Google's specific light gray for dark backgrounds */
+      font-family: Roboto, 'Helvetica Neue', Arial, sans-serif; /* Body font */
       font-weight: 400;
       line-height: 1.6;
-      margin: 0 0 32px;
+      margin: 0 0 2rem;
+      max-width: 60ch;
+      opacity: 0;
+      animation: md-fade-up 0.8s var(--md-sys-motion-easing-decelerate) 0.1s forwards;
     }
 
+    /* Auto-switch text colors if no background image is used */
+    .hero-bg--fallback ~ .hero-inner .hero-title {
+      color: #202124; /* Google Text Primary */
+      text-shadow: none;
+    }
+    
+    .hero-bg--fallback ~ .hero-inner .hero-subtitle {
+      color: #5f6368; /* Google Text Secondary */
+      text-shadow: none;
+    }
+
+    /* --- Buttons (Material 3) --- */
     .hero-actions {
       display: flex;
-      gap: 12px;
+      gap: 1rem;
       flex-wrap: wrap;
+      opacity: 0;
+      animation: md-fade-up 0.8s var(--md-sys-motion-easing-decelerate) 0.2s forwards;
     }
-
-    .hero-content--center .hero-actions { justify-content: center; }
-    .hero-content--right  .hero-actions { justify-content: flex-end; }
 
     .hero-btn {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 14px 28px;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      font-weight: 700;
+      justify-content: center;
+      gap: 0.5rem;
+      height: 48px; /* Strict Material Touch Target Size */
+      padding: 0 24px;
+      border-radius: 100px; /* Fully rounded M3 buttons */
+      font-size: 1rem;
+      font-weight: 500; /* Material buttons use medium weight */
       text-decoration: none;
-      transition: all 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
+      transition: all 0.2s var(--md-sys-motion-easing-standard);
       letter-spacing: 0.01em;
     }
 
+    /* M3 Filled Button */
     .hero-btn--primary {
-      background: var(--theme-accent-primary, #2563eb);
-      color: #fff;
-      box-shadow: 0 4px 20px rgba(37,99,235,0.4);
-      &:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(37,99,235,0.5); }
+      background-color: var(--md-sys-color-primary);
+      color: #ffffff;
+      border: 1px solid transparent;
+      /* M3 Elevation Level 1 */
+      box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+      
+      &:hover { 
+        /* M3 Elevation Level 2 */
+        box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.3), 0 4px 8px 3px rgba(60, 64, 67, 0.15);
+        filter: brightness(0.95); /* State layer overlay */
+      }
+      
+      &:active {
+        box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+      }
     }
 
-    .hero-btn--secondary {
-      background: rgba(255,255,255,0.15);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,0.3);
-      backdrop-filter: blur(8px);
-      &:hover { background: rgba(255,255,255,0.25); }
+    /* M3 Outlined Button */
+    .hero-btn--secondary, .hero-btn--outline {
+      background-color: #ffffff;
+      color: var(--md-sys-color-primary);
+      border: 1px solid #dadce0; /* Exact Google border color */
+      
+      &:hover { 
+        background-color: #f8f9fa; /* Material hover state layer */
+        border-color: #d2e3fc; /* Soft blue tint on hover */
+      }
     }
 
-    .hero-btn--outline {
-      background: transparent;
-      color: #fff;
-      border: 2px solid #fff;
-      &:hover { background: #fff; color: #000; }
-    }
-
+    /* M3 Text Button */
     .hero-btn--ghost {
-      background: transparent;
-      color: rgba(255,255,255,0.85);
-      &:hover { color: #fff; }
+      background-color: transparent;
+      color: #ffffff;
+      padding: 0 16px;
+      
+      &:hover { 
+        background-color: rgba(255, 255, 255, 0.08); /* White state layer */
+      }
+    }
+
+    /* Adjust ghost button if on clean background */
+    .hero-bg--fallback ~ .hero-inner .hero-btn--ghost {
+      color: var(--md-sys-color-primary);
+      &:hover { background-color: rgba(26, 115, 232, 0.04); }
+    }
+
+    /* --- Keyframes --- */
+    @keyframes md-scale-in {
+      0% { transform: scale(1.04); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes md-fade-up {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
     }
   `]
 })
@@ -210,16 +295,251 @@ export class HeroBannerComponent implements OnInit {
   hostStyles: Record<string, string> = {};
 
   ngOnInit(): void {
-    const pt = PADDING_MAP[this.config.paddingTop ?? 'md'];
-    const pb = PADDING_MAP[this.config.paddingBottom ?? 'md'];
+    // Safe fallback padding 
+    const pt = PADDING_MAP ? PADDING_MAP[this.config.paddingTop ?? 'md'] : '64px';
+    const pb = PADDING_MAP ? PADDING_MAP[this.config.paddingBottom ?? 'md'] : '64px';
+
+    // Heights adjusted to feel grounded and structured
     const heightMap: Record<string, string> = {
-      small: '320px', medium: '520px', large: '700px', screen: '100vh', auto: 'auto'
+      small: '480px',
+      medium: '640px',
+      large: '800px',
+      screen: '100vh',
+      auto: 'auto'
     };
+
     this.hostStyles = {
       paddingTop: pt,
       paddingBottom: pb,
       minHeight: heightMap[this.config.height ?? 'medium'],
-      backgroundColor: this.config.backgroundColor || 'transparent',
+      backgroundColor: this.config.backgroundColor || 'var(--bg-primary, #f8f9fa)'
     };
   }
 }
+
+
+// // hero-banner.component.ts
+// import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core';
+// import { CommonModule } from '@angular/common';
+// import { PADDING_MAP, SectionBaseConfig, SectionButton } from '../../../storefront-admin/schema/section.types';
+
+// interface HeroBannerConfig extends SectionBaseConfig {
+//   title?: string;
+//   titleTag?: 'h1' | 'h2' | 'h3';
+//   subtitle?: string;
+//   alignment?: 'left' | 'center' | 'right';
+//   backgroundImage?: string;
+//   height?: 'auto' | 'small' | 'medium' | 'large' | 'screen';
+//   overlayOpacity?: number;
+//   ctaButtons?: SectionButton[];
+//   contentPosition?: 'left' | 'center' | 'right';
+// }
+
+// @Component({
+//   selector: 'app-hero-banner',
+//   standalone: true,
+//   imports: [CommonModule],
+//   changeDetection: ChangeDetectionStrategy.OnPush,
+//   template: `
+// <section class="hero-banner" [style]="hostStyles">
+//   <!-- Background image layer -->
+//   @if (config.backgroundImage) {
+//     <div class="hero-bg"
+//       [style.backgroundImage]="'url(' + config.backgroundImage + ')'">
+//     </div>
+//   } @else {
+//     <div class="hero-bg hero-bg--gradient"></div>
+//   }
+
+//   <!-- Overlay -->
+//   <div class="hero-overlay"
+//     [style.opacity]="(config.overlayOpacity ?? 20) / 100">
+//   </div>
+
+//   <!-- Content -->
+//   <div class="hero-inner" [ngClass]="'hero-inner--' + (config.contentPosition ?? 'center')">
+//     <div class="hero-content" [ngClass]="'hero-content--' + (config.alignment ?? 'left')">
+
+//       @if (config.title) {
+//         <ng-container [ngSwitch]="config.titleTag ?? 'h2'">
+//           <h1 *ngSwitchCase="'h1'" class="hero-title">{{ config.title }}</h1>
+//           <h2 *ngSwitchCase="'h2'" class="hero-title">{{ config.title }}</h2>
+//           <h3 *ngSwitchCase="'h3'" class="hero-title">{{ config.title }}</h3>
+//         </ng-container>
+//       }
+
+//       @if (config.subtitle) {
+//         <p class="hero-subtitle">{{ config.subtitle }}</p>
+//       }
+
+//       @if (config.ctaButtons?.length) {
+//         <div class="hero-actions">
+//           @for (btn of config.ctaButtons; track $index) {
+//             @if (btn.text) {
+//               <a [href]="btn.link || '#'"
+//                 class="hero-btn"
+//                 [ngClass]="'hero-btn--' + (btn.variant ?? 'primary')">
+//                 @if (btn.icon) {
+//                   <i [class]="btn.icon" aria-hidden="true"></i>
+//                 }
+//                 {{ btn.text }}
+//               </a>
+//             }
+//           }
+//         </div>
+//       }
+
+//     </div>
+//   </div>
+// </section>
+//   `,
+//   styles: [`
+//     :host { display: block; width: 100%; }
+
+//     .hero-banner {
+//       position: relative;
+//       width: 100%;
+//       overflow: hidden;
+//       font-family: var(--font-heading, 'Plus Jakarta Sans', sans-serif);
+//     }
+
+//     /* Height variants */
+//     :host-context(.hero-height--small)  .hero-banner { min-height: 320px; }
+//     :host-context(.hero-height--medium) .hero-banner { min-height: 520px; }
+//     :host-context(.hero-height--large)  .hero-banner { min-height: 700px; }
+//     :host-context(.hero-height--screen) .hero-banner { min-height: 100vh; }
+
+//     .hero-bg {
+//       position: absolute;
+//       inset: 0;
+//       background-size: cover;
+//       background-position: center;
+//       background-repeat: no-repeat;
+//       transform: scale(1.03);
+//       transition: transform 8s ease-out;
+//     }
+
+//     .hero-bg--gradient {
+//       background: linear-gradient(135deg,
+//         var(--theme-accent-primary, #2563eb) 0%,
+//         color-mix(in srgb, var(--theme-accent-primary, #2563eb) 60%, #000) 100%);
+//     }
+
+//     .hero-overlay {
+//       position: absolute;
+//       inset: 0;
+//       background: #000;
+//       pointer-events: none;
+//     }
+
+//     .hero-inner {
+//       position: relative;
+//       z-index: 2;
+//       width: 100%;
+//       min-height: inherit;
+//       display: flex;
+//       align-items: center;
+//       padding: 64px 5%;
+//     }
+
+//     .hero-inner--left   { justify-content: flex-start; }
+//     .hero-inner--center { justify-content: center; }
+//     .hero-inner--right  { justify-content: flex-end; }
+
+//     .hero-content {
+//       max-width: 680px;
+//     }
+
+//     .hero-content--center { text-align: center; }
+//     .hero-content--right  { text-align: right; }
+
+//     .hero-title {
+//       font-size: clamp(2rem, 5vw, 4rem);
+//       font-weight: 800;
+//       color: #fff;
+//       line-height: 1.1;
+//       letter-spacing: -0.02em;
+//       margin: 0 0 16px;
+//       text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+//     }
+
+//     .hero-subtitle {
+//       font-size: clamp(1rem, 2vw, 1.25rem);
+//       color: rgba(255,255,255,0.85);
+//       font-family: var(--font-body, 'Inter', sans-serif);
+//       font-weight: 400;
+//       line-height: 1.6;
+//       margin: 0 0 32px;
+//     }
+
+//     .hero-actions {
+//       display: flex;
+//       gap: 12px;
+//       flex-wrap: wrap;
+//     }
+
+//     .hero-content--center .hero-actions { justify-content: center; }
+//     .hero-content--right  .hero-actions { justify-content: flex-end; }
+
+//     .hero-btn {
+//       display: inline-flex;
+//       align-items: center;
+//       gap: 8px;
+//       padding: 14px 28px;
+//       border-radius: 8px;
+//       font-size: 0.9rem;
+//       font-weight: 700;
+//       text-decoration: none;
+//       transition: all 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
+//       letter-spacing: 0.01em;
+//     }
+
+//     .hero-btn--primary {
+//       background: var(--theme-accent-primary, #2563eb);
+//       color: #fff;
+//       box-shadow: 0 4px 20px rgba(37,99,235,0.4);
+//       &:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(37,99,235,0.5); }
+//     }
+
+//     .hero-btn--secondary {
+//       background: rgba(255,255,255,0.15);
+//       color: #fff;
+//       border: 1px solid rgba(255,255,255,0.3);
+//       backdrop-filter: blur(8px);
+//       &:hover { background: rgba(255,255,255,0.25); }
+//     }
+
+//     .hero-btn--outline {
+//       background: transparent;
+//       color: #fff;
+//       border: 2px solid #fff;
+//       &:hover { background: #fff; color: #000; }
+//     }
+
+//     .hero-btn--ghost {
+//       background: transparent;
+//       color: rgba(255,255,255,0.85);
+//       &:hover { color: #fff; }
+//     }
+//   `]
+// })
+// export class HeroBannerComponent implements OnInit {
+//   @Input() config: HeroBannerConfig = {};
+//   @Input() data: any = null;
+
+//   hostStyles: Record<string, string> = {};
+
+//   ngOnInit(): void {
+//     const pt = PADDING_MAP[this.config.paddingTop ?? 'md'];
+//     const pb = PADDING_MAP[this.config.paddingBottom ?? 'md'];
+//     const heightMap: Record<string, string> = {
+//       small: '320px', medium: '520px', large: '700px', screen: '100vh', auto: 'auto'
+//     };
+//     this.hostStyles = {
+//       paddingTop: pt,
+//       paddingBottom: pb,
+//       minHeight: heightMap[this.config.height ?? 'medium'],
+//       backgroundColor: this.config.backgroundColor || 'transparent',
+//     };
+//   }
+// }

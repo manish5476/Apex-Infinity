@@ -16,11 +16,11 @@ export const SECTION_COMPONENT_REGISTRY: Record<string, SectionRenderEntry> = {
   },
   product_slider: {
     load: () => import('../pages/product-slider/product-slider.component').then(m => m.ProductSliderComponent),
-    inputs: section => ({ config: section.config, products: resolver.resolveProducts(section) })
+    inputs: section => ({ config: section.config, data: resolver.resolveProducts(section) })
   },
   product_grid: {
     load: () => import('../pages/product-grid/product-grid.component').then(m => m.ProductGridComponent),
-    inputs: (section, orgSlug) => ({ config: section.config, products: resolver.resolveProducts(section), orgSlug })
+    inputs: (section, orgSlug) => ({ config: section.config, data: resolver.resolveProducts(section), orgSlug })
   },
   category_grid: {
     load: () => import('../pages/category-grid/category-grid.component').then(m => m.CategoryGridComponent),
@@ -84,7 +84,7 @@ export const SECTION_COMPONENT_REGISTRY: Record<string, SectionRenderEntry> = {
   },
   featured_product: {
     load: () => import('../pages/featured-product/featured-product').then(m => m.FeaturedProductComponent),
-    inputs: section => ({ config: section.config, product: resolver.resolveArrayData(section)[0] ?? null })
+    inputs: section => ({ config: section.config, product: resolver.resolveData(section) })
   },
   product_listing: {
     load: () => import('../pages/product-listing/product-listing.component').then(m => m.ProductListingComponent),

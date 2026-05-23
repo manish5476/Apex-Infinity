@@ -32,16 +32,14 @@
     @for (section of data.page.sections; track section.id) {
 
     @if ((section.config?.isActive ?? section.isActive) !== false) {
-    <!-- ✅ FIX: use section.id — 'position' does not exist on PageSection -->
     <section [id]="'section-' + section.id" class="section-block section-enter" [ngClass]="{
                'hidden md:block': section.config?.hideOnMobile && !section.config?.hideOnDesktop,
                'block md:hidden': section.config?.hideOnDesktop && !section.config?.hideOnMobile,
                '!hidden': section.config?.hideOnMobile && section.config?.hideOnDesktop
-             }"
-             [attr.data-padding-top]="section.config?.paddingTop || section.styles?.paddingTop || 'md'"
-             [attr.data-padding-bottom]="section.config?.paddingBottom || section.styles?.paddingBottom || 'md'"
-             [attr.data-theme-mode]="section.config?.themeMode || section.styles?.themeMode || 'auto'"
-             [style.--sf-section-bg]="section.config?.backgroundColor || section.styles?.backgroundColor || null">
+             }" [attr.data-padding-top]="section.config?.paddingTop || section.styles?.paddingTop || 'md'"
+      [attr.data-padding-bottom]="section.config?.paddingBottom || section.styles?.paddingBottom || 'md'"
+      [attr.data-theme-mode]="section.config?.themeMode || section.styles?.themeMode || 'auto'"
+      [style.--sf-section-bg]="section.config?.backgroundColor || section.styles?.backgroundColor || null">
 
       <app-storefront-section-renderer [section]="section" [orgSlug]="orgSlug" [isDev]="isDev" />
     </section>
