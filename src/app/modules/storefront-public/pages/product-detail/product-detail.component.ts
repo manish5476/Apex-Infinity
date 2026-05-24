@@ -29,6 +29,7 @@ import { TagModule } from 'primeng/tag';
 import { StorefrontPublicService } from '../../../../core/services/storefront-public.service';
 import { StorefrontStateService } from '../../../../core/services/storefront-state.service';
 import { AppMessageService } from '@core/services/message.service';
+import { StorefrontCartFacade } from '../../../../storefront/core/facades/storefront-cart.facade';
 
 @Component({
   selector: 'app-product-detail',
@@ -637,6 +638,7 @@ export class ProductDetailComponent implements OnInit {
   private stateService = inject(StorefrontStateService);
   private titleService = inject(Title);
   private messageService = inject(AppMessageService);
+  private cartFacade = inject(StorefrontCartFacade);
   private destroyRef = inject(DestroyRef);
 
   product = signal<any>(null);
@@ -736,6 +738,10 @@ export class ProductDetailComponent implements OnInit {
   addToCart() {
     const product = this.product();
     if (!product) return;
-    this.messageService.showSuccess(`Added ${this.quantity()}x ${product.name} to cart`);
+    const productId = product._id ?? product.id;
+    if (!productId) return;
+    this.cartFacade.add(this.orgSlug(), { productId, quantity: this.quantity() }).subscribe(cart => {
+      if (cart) this.messageService.showSuccess(`Added ${this.quantity()}x ${product.name} to cart`);
+    });
   }
 }

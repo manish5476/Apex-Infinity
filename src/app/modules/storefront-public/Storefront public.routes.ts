@@ -1,5 +1,8 @@
 // src/app/modules/storefront-public/storefront-public.routes.ts
 import { Routes } from '@angular/router';
+import { storefrontCustomerGuard } from '@core/services/storefront-customer.guard';
+import { storefrontCartResolver } from '../../storefront/core/resolvers/storefront-cart.resolver';
+import { storefrontCustomerResolver } from '../../storefront/core/resolvers/storefront-customer.resolver';
 
 const storefrontExperienceRoute = (path: string, pageKey: string, title: string): Routes[number] => ({
   path,
@@ -10,11 +13,17 @@ const storefrontExperienceRoute = (path: string, pageKey: string, title: string)
   title
 });
 
-const commerceFlowRoute = (path: string, mode: string, title: string): Routes[number] => ({
+const commerceFlowRoute = (path: string, mode: string, title: string, customerOnly = false): Routes[number] => ({
   path,
   loadComponent: () =>
     import('./pages/commerce-flow/commerce-flow.component')
       .then(m => m.CommerceFlowComponent),
+  canActivate: customerOnly ? [storefrontCustomerGuard] : undefined,
+  resolve: path === 'cart' || path === 'checkout'
+    ? { cart: storefrontCartResolver }
+    : customerOnly
+      ? { customer: storefrontCustomerResolver }
+      : undefined,
   data: { mode },
   title
 });
@@ -37,13 +46,13 @@ export const STOREFRONT_PUBLIC_ROUTES: Routes = [
   },
   commerceFlowRoute('cart', 'cart', 'Cart'),
   commerceFlowRoute('checkout', 'checkout', 'Checkout'),
-  commerceFlowRoute('account', 'account', 'Account'),
-  commerceFlowRoute('account/orders', 'orders', 'Orders'),
-  commerceFlowRoute('account/addresses', 'addresses', 'Saved Addresses'),
-  commerceFlowRoute('account/notifications', 'notifications', 'Notifications'),
+  commerceFlowRoute('account', 'account', 'Account', true),
+  commerceFlowRoute('account/orders', 'orders', 'Orders', true),
+  commerceFlowRoute('account/addresses', 'addresses', 'Saved Addresses', true),
+  commerceFlowRoute('account/notifications', 'notifications', 'Notifications', true),
   commerceFlowRoute('login', 'login', 'Store Login'),
   commerceFlowRoute('register', 'register', 'Create Account'),
-  commerceFlowRoute('wishlist', 'wishlist', 'Wishlist'),
+  commerceFlowRoute('wishlist', 'wishlist', 'Wishlist', true),
   commerceFlowRoute('track-order', 'track-order', 'Track Order'),
   ...[
     ['search', 'search', 'Search'],

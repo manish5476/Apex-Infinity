@@ -87,6 +87,8 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 // Import your custom preset
 // import { MyPreset } from './core/config/my-preset';
 import { jwtInterceptor } from './core/interceptors/jwt.interceptor';
+import { storefrontApiInterceptor } from './storefront/core/api/storefront-api.interceptor';
+import { storefrontErrorInterceptor } from './storefront/core/api/storefront-error.interceptor';
 import { loggingInterceptor } from './core/interceptors/logging.interceptor';
 import { AuthService } from './modules/auth/services/auth-service';
 import { DialogService } from 'primeng/dynamicdialog';
@@ -96,7 +98,7 @@ import { TabReuseStrategy } from './Tabbing';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideHttpClient(
-      withInterceptors([jwtInterceptor, successInterceptor, errorInterceptor]),//LoadingInterceptor
+      withInterceptors([jwtInterceptor, storefrontApiInterceptor, successInterceptor, storefrontErrorInterceptor, errorInterceptor]),//LoadingInterceptor
       withFetch()
     ),
     provideRouter(routes),

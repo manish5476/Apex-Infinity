@@ -88,8 +88,20 @@
               <button class="icon-action danger" type="button" (click)="removeItem(item)" aria-label="Remove item">
                 <i class="pi pi-trash"></i>
               </button>
+              <button class="save-link" type="button" (click)="saveForLater(item)">Save for later</button>
             </article>
           }
+        }
+        @if (savedForLater().length) {
+          <div class="saved-panel">
+            <h2>Saved for later</h2>
+            @for (item of savedForLater(); track item._id || item.id || item.productId) {
+              <article class="saved-line">
+                <span>{{ productName(item) }}</span>
+                <button type="button" (click)="moveSavedToCart(item)">Move to cart</button>
+              </article>
+            }
+          </div>
         }
       </div>
       <aside class="summary-card">
@@ -97,6 +109,7 @@
         <div class="summary-row"><span>Subtotal</span><strong>{{ subtotal() | currency: currency() }}</strong></div>
         <div class="summary-row"><span>Discount</span><strong>-{{ discount() | currency: currency() }}</strong></div>
         <div class="summary-row"><span>Shipping</span><strong>{{ shipping() ? (shipping() | currency: currency()) : 'Calculated next' }}</strong></div>
+        <div class="summary-row"><span>Tax</span><strong>{{ taxEstimate()?.total ? (taxEstimate().total | currency: currency()) : 'Estimated at checkout' }}</strong></div>
         <label class="coupon-box">
           Coupon
           <span>
@@ -104,6 +117,9 @@
             <button type="button" (click)="applyCoupon()">Apply</button>
           </span>
         </label>
+        <button class="secondary-action" type="button" (click)="estimateShipping()" [disabled]="!items().length">
+          <i class="pi pi-truck"></i> Estimate shipping and tax
+        </button>
         <div class="summary-total"><span>Total</span><strong>{{ total() | currency: currency() }}</strong></div>
         <button class="checkout-button" type="button" (click)="validateAndCheckout()" [disabled]="!items().length || validating()">
           @if (validating()) { <i class="pi pi-spin pi-spinner"></i> } @else { <i class="pi pi-lock"></i> }
@@ -140,6 +156,10 @@
           <label>Country<input name="country" [(ngModel)]="addressForm.country" required /></label>
         </div>
         <label class="check-row"><input name="saveAddress" type="checkbox" [(ngModel)]="checkoutContact.saveAddress" /> Save this address to storefront account</label>
+        <section class="payment-foundation">
+          <div><i class="pi pi-credit-card"></i><span>Payment</span><strong>Secure payment handoff ready</strong></div>
+          <p>Payment intent support is reserved in the checkout payload and can attach to Stripe, Razorpay, or COD rules from storefront settings.</p>
+        </section>
         <button class="checkout-button" type="submit" [disabled]="submitting() || !items().length">
           <i class="pi pi-credit-card"></i> Place order
         </button>
@@ -225,15 +245,15 @@
       } @else if (mode() === 'orders') {
         <div class="card-list">
           @for (order of orders(); track order._id || order.id) {
-            <article class="order-card"><strong>{{ order.orderNumber }}</strong><span>{{ order.orderStatus }} / {{ order.paymentStatus }}</span><b>{{ order.totals?.grandTotal | currency: order.totals?.currency || currency() }}</b></article>
+            <article class="order-card"><strong>{{ order.orderNumber }}</strong><span>{{ order.orderStatus }} / {{ order.paymentStatus }}</span><b>{{ order.totals.grandTotal | currency: order.totals.currency || currency() }}</b></article>
           } @empty {
             <div class="empty-state panel"><h2>No orders yet</h2><p>Your storefront orders will appear here.</p></div>
           }
         </div>
       } @else if (mode() === 'wishlist') {
         <div class="card-list">
-          @for (item of wishlist(); track item._id || item.productId?._id) {
-            <article class="account-card"><i class="pi pi-heart"></i><span>Saved</span><h3>{{ item.productId?.name || 'Saved item' }}</h3><p>Wishlist item saved to your storefront profile.</p></article>
+          @for (item of wishlist(); track wishlistTrack(item)) {
+            <article class="account-card"><i class="pi pi-heart"></i><span>Saved</span><h3>{{ wishlistName(item) }}</h3><p>Wishlist item saved to your storefront profile.</p></article>
           } @empty {
             <div class="empty-state panel"><h2>No wishlist items</h2><p>Save products you want to revisit later.</p></div>
           }
@@ -263,13 +283,13 @@
         <label>Email or phone<input name="trackVerify" [ngModel]="trackVerify()" (ngModelChange)="trackVerify.set($event)" /></label>
         <button class="checkout-button" type="submit" [disabled]="submitting()">Track</button>
       </form>
-      @if (trackedOrder()) {
+      @if (trackedOrder(); as order) {
         <article class="summary-card">
-          <h2>{{ trackedOrder().orderNumber }}</h2>
-          <div class="summary-row"><span>Order</span><strong>{{ trackedOrder().orderStatus }}</strong></div>
-          <div class="summary-row"><span>Payment</span><strong>{{ trackedOrder().paymentStatus }}</strong></div>
-          <div class="summary-row"><span>Fulfillment</span><strong>{{ trackedOrder().fulfillmentStatus }}</strong></div>
-          <div class="summary-total"><span>Total</span><strong>{{ trackedOrder().totals?.grandTotal | currency: trackedOrder().totals?.currency || currency() }}</strong></div>
+          <h2>{{ order.orderNumber }}</h2>
+          <div class="summary-row"><span>Order</span><strong>{{ order.orderStatus }}</strong></div>
+          <div class="summary-row"><span>Payment</span><strong>{{ order.paymentStatus }}</strong></div>
+          <div class="summary-row"><span>Fulfillment</span><strong>{{ order.fulfillmentStatus }}</strong></div>
+          <div class="summary-total"><span>Total</span><strong>{{ order.totals.grandTotal | currency: order.totals.currency || currency() }}</strong></div>
         </article>
       }
     </section>

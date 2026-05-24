@@ -1,7 +1,8 @@
 // src/app/core/services/storefront-cart.service.ts
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { BaseApiService } from './base-api.service';
+import { StorefrontCartStore } from './storefront-cart.store';
 
 // ---------------------------------------------------------------------------
 // DTOs
@@ -43,21 +44,19 @@ export interface CartValidationResult {
 export class StorefrontCartService extends BaseApiService {
 
   private readonly base = '/v1/store';
+  private readonly store = inject(StorefrontCartStore);
 
   // ── Reactive state ────────────────────────────────────────────────────────
 
   /** Latest cart snapshot. Updated automatically by methods that mutate the cart. */
-  readonly cart = signal<any>(null);
+  readonly cart = this.store.cart;
+  readonly items = this.store.items;
 
   /** Derived: total number of individual units across all line items. */
-  readonly itemCount = computed(() =>
-    (this.cart()?.itemCount) ?? 0
-  );
+  readonly itemCount = this.store.itemCount;
 
   /** Derived: grand total after discount. */
-  readonly grandTotal = computed(() =>
-    this.cart()?.totals?.total ?? this.cart()?.grandTotal ?? 0
-  );
+  readonly grandTotal = this.store.grandTotal;
 
   // ── Private helpers ───────────────────────────────────────────────────────
 
@@ -70,9 +69,13 @@ export class StorefrontCartService extends BaseApiService {
     return tap((res: any) => {
       const cart = res?.data ?? res;
       if (cart?.id || cart?.items) {
-        this.cart.set(cart);
+        this.store.setCart(cart);
       }
     });
+  }
+
+  setCart(cart: any): void {
+    this.store.setCart(cart);
   }
 
   // ── API methods ───────────────────────────────────────────────────────────
@@ -157,6 +160,6 @@ export class StorefrontCartService extends BaseApiService {
 
   /** Clear local signal state (call on logout). */
   resetCart(): void {
-    this.cart.set(null);
+    this.store.clear();
   }
 }

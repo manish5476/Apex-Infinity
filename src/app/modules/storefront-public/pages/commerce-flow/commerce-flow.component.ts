@@ -1,15 +1,21 @@
 import { CommonModule, CurrencyPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Subject, catchError, debounceTime, distinctUntilChanged, of, switchMap, takeUntil } from 'rxjs';
-import { StorefrontCartService } from '@core/services/storefront.cart.service';
 import { StorefrontPublicService } from '@core/services/storefront-public.service';
 import {
-  CheckoutDto,
   StorefrontAddressDto,
-  StorefrontCustomerService
-} from '@core/services/storefront-customer.service';
+  StorefrontCartItem,
+  StorefrontCheckoutDto,
+  StorefrontWishlistItem
+} from '@apx/storefront-contracts';
+import { StorefrontSessionService } from '@core/services/storefront-session.service';
+import { StorefrontCartFacade } from '../../../../storefront/core/facades/storefront-cart.facade';
+import { StorefrontAuthFacade } from '../../../../storefront/core/facades/storefront-auth.facade';
+import { StorefrontCustomerFacade } from '../../../../storefront/core/facades/storefront-customer.facade';
+import { StorefrontCheckoutFacade } from '../../../../storefront/core/facades/storefront-checkout.facade';
+import { StorefrontOrderFacade } from '../../../../storefront/core/facades/storefront-order.facade';
 
 type CommerceMode =
   | 'cart'
@@ -34,8 +40,12 @@ type CommerceMode =
 export class CommerceFlowComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly cartService = inject(StorefrontCartService);
-  private readonly customerService = inject(StorefrontCustomerService);
+  private readonly cartFacade = inject(StorefrontCartFacade);
+  private readonly storefrontAuth = inject(StorefrontAuthFacade);
+  private readonly customerFacade = inject(StorefrontCustomerFacade);
+  private readonly checkoutFacade = inject(StorefrontCheckoutFacade);
+  private readonly orderFacade = inject(StorefrontOrderFacade);
+  private readonly storefrontSession = inject(StorefrontSessionService);
   private readonly publicService = inject(StorefrontPublicService);
   private readonly search$ = new Subject<string>();
   private readonly destroy$ = new Subject<void>();
@@ -50,22 +60,25 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
   readonly searchTerm = signal('');
   readonly suggestions = signal<any[]>([]);
   readonly checkoutStep = signal<'contact' | 'delivery' | 'payment' | 'review'>('contact');
-  readonly trackedOrder = signal<any>(null);
+  readonly trackedOrder = this.orderFacade.trackedOrder;
+  readonly savedForLater = signal<StorefrontCartItem[]>([]);
+  readonly shippingEstimate = signal<any>(null);
+  readonly taxEstimate = signal<any>(null);
 
-  readonly cart = this.cartService.cart;
-  readonly dashboard = this.customerService.dashboard;
-  readonly customer = this.customerService.customer;
+  readonly cart = this.cartFacade.cart;
+  readonly dashboard = this.storefrontAuth.dashboard;
+  readonly customer = this.storefrontAuth.customer;
 
-  readonly items = computed<any[]>(() => this.cart()?.items ?? this.cart()?.lineItems ?? []);
-  readonly itemCount = this.cartService.itemCount;
-  readonly subtotal = computed(() => this.moneyValue(this.cart()?.totals?.subtotal ?? this.cart()?.subtotal));
-  readonly discount = computed(() => this.moneyValue(this.cart()?.discountTotals?.total ?? this.cart()?.discountAmount));
-  readonly shipping = computed(() => this.items().length ? this.moneyValue(this.cart()?.shippingTotals?.total) : 0);
-  readonly total = computed(() => this.moneyValue(this.cart()?.totals?.total ?? this.cart()?.grandTotal));
-  readonly currency = computed(() => this.cart()?.currency ?? this.cart()?.totals?.currency ?? 'INR');
-  readonly addresses = computed<any[]>(() => this.dashboard()?.addresses ?? []);
-  readonly orders = computed<any[]>(() => this.dashboard()?.orders ?? []);
-  readonly wishlist = computed<any[]>(() => this.dashboard()?.wishlist ?? []);
+  readonly items = this.cartFacade.items;
+  readonly itemCount = this.cartFacade.itemCount;
+  readonly subtotal = this.cartFacade.subtotal;
+  readonly discount = this.cartFacade.discount;
+  readonly shipping = this.cartFacade.shipping;
+  readonly total = this.cartFacade.total;
+  readonly currency = this.cartFacade.currency;
+  readonly addresses = this.customerFacade.addresses;
+  readonly orders = this.customerFacade.orders;
+  readonly wishlist = this.customerFacade.wishlist;
 
   readonly loginForm = {
     email: '',
@@ -119,6 +132,7 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
       const slug = params.get('orgSlug') ?? '';
       this.orgSlug.set(slug);
       if (slug) {
+        this.storefrontSession.setStore(slug);
         this.loadCart(slug);
         this.loadCustomer(slug);
       }
@@ -145,7 +159,7 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
   loadCart(orgSlug = this.orgSlug()): void {
     this.loading.set(true);
     this.error.set(null);
-    this.cartService.getCart(orgSlug).pipe(
+    this.cartFacade.load(orgSlug).pipe(
       catchError(() => {
         this.error.set('Cart is temporarily unavailable. You can keep browsing while we reconnect.');
         return of(null);
@@ -155,12 +169,12 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
   }
 
   loadCustomer(orgSlug = this.orgSlug()): void {
-    this.customerService.me(orgSlug).pipe(catchError(() => of(null)), takeUntil(this.destroy$)).subscribe();
+    this.storefrontAuth.restore(orgSlug).pipe(catchError(() => of(false)), takeUntil(this.destroy$)).subscribe();
   }
 
   login(): void {
     this.submitting.set(true);
-    this.customerService.login(this.orgSlug(), this.loginForm).pipe(
+    this.storefrontAuth.login(this.orgSlug(), this.loginForm).pipe(
       catchError(err => {
         this.error.set(err?.error?.message ?? 'Login failed.');
         return of(null);
@@ -176,7 +190,7 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
 
   register(): void {
     this.submitting.set(true);
-    this.customerService.register(this.orgSlug(), this.registerForm).pipe(
+    this.storefrontAuth.register(this.orgSlug(), this.registerForm).pipe(
       catchError(err => {
         this.error.set(err?.error?.message ?? 'Account creation failed.');
         return of(null);
@@ -191,15 +205,14 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
   }
 
   logout(): void {
-    this.customerService.logout(this.orgSlug()).subscribe(() => {
-      this.cartService.resetCart();
+    this.storefrontAuth.logout(this.orgSlug()).subscribe(() => {
       this.router.navigate(['/store', this.orgSlug(), 'login']);
     });
   }
 
   saveAddress(): void {
     this.submitting.set(true);
-    this.customerService.addAddress(this.orgSlug(), this.addressForm).pipe(
+    this.customerFacade.addAddress(this.orgSlug(), this.addressForm).pipe(
       catchError(err => {
         this.error.set(err?.error?.message ?? 'Could not save address.');
         return of(null);
@@ -213,7 +226,7 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
   }
 
   placeOrder(): void {
-    const payload: CheckoutDto = {
+    const payload: StorefrontCheckoutDto = {
       customer: { ...this.checkoutContact },
       shippingAddress: this.addressForm,
       billingAddress: this.addressForm,
@@ -222,14 +235,13 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
     };
 
     this.submitting.set(true);
-    this.customerService.checkout(this.orgSlug(), payload).pipe(
+    this.checkoutFacade.placeOrder(this.orgSlug(), payload).pipe(
       catchError(err => {
         this.error.set(err?.error?.message ?? 'Checkout could not be completed.');
         return of(null);
       })
-    ).subscribe((res: any) => {
+    ).subscribe(order => {
       this.submitting.set(false);
-      const order = res?.data ?? res;
       if (!order) return;
       this.success.set(`Order ${order.orderNumber} placed successfully.`);
       this.loadCart();
@@ -241,7 +253,7 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
 
   applyCoupon(): void {
     if (!this.couponCode().trim()) return;
-    this.cartService.applyCoupon(this.orgSlug(), this.couponCode()).pipe(
+    this.cartFacade.applyCoupon(this.orgSlug(), { couponCode: this.couponCode() }).pipe(
       catchError(err => {
         this.error.set(err?.error?.message ?? 'Coupon could not be applied.');
         return of(null);
@@ -252,38 +264,54 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
   }
 
   estimateShipping(): void {
-    this.cartService.estimateShipping(this.orgSlug(), { amount: 0, address: this.addressForm }).subscribe();
+    this.cartFacade.estimateShipping(this.orgSlug(), { amount: 0, address: this.addressForm }).subscribe(cart => {
+      this.shippingEstimate.set(cart?.shippingTotals ?? null);
+      this.taxEstimate.set(cart?.taxTotals ?? null);
+    });
   }
 
   trackOrder(): void {
     if (!this.trackOrderNumber().trim()) return;
     this.submitting.set(true);
-    this.customerService.trackOrder(this.orgSlug(), this.trackOrderNumber(), this.trackVerify()).pipe(
+    this.orderFacade.track(this.orgSlug(), this.trackOrderNumber(), this.trackVerify()).pipe(
       catchError(err => {
         this.error.set(err?.error?.message ?? 'Order not found.');
         return of(null);
       })
-    ).subscribe((res: any) => {
+    ).subscribe(order => {
       this.submitting.set(false);
-      this.trackedOrder.set(res?.data ?? res);
+      this.orderFacade.store.trackedOrder.set(order);
     });
   }
 
   updateQuantity(item: any, quantity: number): void {
     const id = this.itemId(item);
     if (!id || quantity < 1) return;
-    this.cartService.updateItemQuantity(this.orgSlug(), id, quantity).subscribe();
+    this.cartFacade.updateQuantity(this.orgSlug(), id, quantity).subscribe();
   }
 
   removeItem(item: any): void {
     const id = this.itemId(item);
     if (!id) return;
-    this.cartService.removeItem(this.orgSlug(), id).subscribe();
+    this.cartFacade.remove(this.orgSlug(), id).subscribe();
+  }
+
+  saveForLater(item: StorefrontCartItem): void {
+    this.savedForLater.set([item, ...this.savedForLater().filter(saved => this.itemId(saved) !== this.itemId(item))]);
+    this.removeItem(item);
+  }
+
+  moveSavedToCart(item: StorefrontCartItem): void {
+    const productId = item.productId;
+    if (!productId) return;
+    this.cartFacade.add(this.orgSlug(), { productId: String(productId), quantity: this.itemQuantity(item) }).subscribe(() => {
+      this.savedForLater.set(this.savedForLater().filter(saved => this.itemId(saved) !== this.itemId(item)));
+    });
   }
 
   validateAndCheckout(): void {
     this.validating.set(true);
-    this.cartService.validateCart(this.orgSlug()).pipe(
+    this.cartFacade.validate(this.orgSlug()).pipe(
       catchError((err) => of(err?.error ?? { valid: false }))
     ).subscribe(result => {
       this.validating.set(false);
@@ -319,6 +347,14 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
 
   addressLabel(address: any): string {
     return [address.addressLine1, address.city, address.state, address.postalCode].filter(Boolean).join(', ');
+  }
+
+  wishlistTrack(item: StorefrontWishlistItem): string {
+    return item._id ?? item.id ?? (typeof item.productId === 'string' ? item.productId : item.productId._id ?? item.productId.id ?? '');
+  }
+
+  wishlistName(item: StorefrontWishlistItem): string {
+    return typeof item.productId === 'string' ? 'Saved item' : item.productId.name;
   }
 
   private itemId(item: any): string {

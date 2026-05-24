@@ -11,10 +11,10 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
-import { StorefrontCartService } from '@core/services/storefront.cart.service';
 import { StorefrontPublicService } from '@core/services/storefront-public.service';
 import { StorefrontStateService } from '@core/services/storefront-state.service';
 import { ThemeService } from '@core/services/theme.service';
+import { StorefrontCartFacade } from '../../../../storefront/core/facades/storefront-cart.facade';
 import { Subject, catchError, debounceTime, distinctUntilChanged, filter, of, switchMap, takeUntil } from 'rxjs';
 
 @Component({
@@ -129,7 +129,7 @@ import { Subject, catchError, debounceTime, distinctUntilChanged, filter, of, sw
               <p>Find something beautiful and it will appear here.</p>
             </div>
           } @else {
-            @for (item of cartItems(); track item._id || item.id || item.product?._id) {
+            @for (item of cartItems(); track item._id || item.id || item.productId) {
               <article>
                 <img [src]="productImage(item)" [alt]="productName(item)" />
                 <div><h4>{{ productName(item) }}</h4><span>Qty {{ item.quantity || 1 }}</span></div>
@@ -168,7 +168,7 @@ import { Subject, catchError, debounceTime, distinctUntilChanged, filter, of, sw
 })
 export class NavbarSimpleComponent implements OnInit, OnDestroy {
   private readonly stateService = inject(StorefrontStateService);
-  private readonly cartService = inject(StorefrontCartService);
+  private readonly cartFacade = inject(StorefrontCartFacade);
   private readonly publicService = inject(StorefrontPublicService);
   private readonly themeService = inject(ThemeService);
   private readonly router = inject(Router);
@@ -190,10 +190,10 @@ export class NavbarSimpleComponent implements OnInit, OnDestroy {
   readonly activeMega = signal<any | null>(null);
   readonly searchQuery = signal('');
   readonly searchResults = signal<any[]>([]);
-  readonly itemCount = this.cartService.itemCount;
-  readonly grandTotal = this.cartService.grandTotal;
-  readonly cartItems = computed<any[]>(() => this.cartService.cart()?.items ?? []);
-  readonly currency = computed(() => this.cartService.cart()?.currency ?? 'INR');
+  readonly itemCount = this.cartFacade.itemCount;
+  readonly grandTotal = this.cartFacade.total;
+  readonly cartItems = this.cartFacade.items;
+  readonly currency = this.cartFacade.currency;
   readonly isDarkMode = signal(false);
 
   readonly defaultMegaLinks = [
@@ -246,7 +246,7 @@ export class NavbarSimpleComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe((res: any) => this.searchResults.set(res?.products ?? res?.data?.products ?? []));
 
-    if (this.slug()) this.cartService.getCart(this.slug()).pipe(catchError(() => of(null))).subscribe();
+    if (this.slug()) this.cartFacade.load(this.slug()).pipe(catchError(() => of(null))).subscribe();
   }
 
   ngOnDestroy(): void {

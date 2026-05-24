@@ -3,6 +3,7 @@ import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../modules/auth/services/auth-service'; // ✅ Import AuthService
+import { isStorefrontApiUrl } from '../services/storefront-request.util';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const messageService = inject(MessageService);
@@ -10,6 +11,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
+      const isStorefrontRequest = isStorefrontApiUrl(req.url);
+
+      if (isStorefrontRequest) {
+        return throwError(() => error);
+      }
 
       // 1. Handle 403 Forbidden (Permission Error)
       if (error.status === 403 || (error.status === 400 && error.error?.message?.includes('permission'))) {

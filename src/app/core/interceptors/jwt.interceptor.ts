@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { isStorefrontApiUrl } from '../services/storefront-request.util';
 
 export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
@@ -13,7 +14,7 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
     token = localStorage.getItem('apex_auth_token');
   } catch (e) { token = null }
   const isApiUrl = req.url.startsWith(environment.apiUrl);
-  if (token && isApiUrl) {
+  if (token && isApiUrl && !isStorefrontApiUrl(req.url)) {
     req = req.clone({
       setHeaders: {
         Authorization: `Bearer ${token}`,

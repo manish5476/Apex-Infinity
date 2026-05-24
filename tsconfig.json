@@ -9,6 +9,7 @@
       "@apx/ui-kit": ["./libs/ui-kit/src/index.ts"],
       "@apx/design-tokens/*": ["./libs/design-tokens/src/*"],
       "@apx/storefront-tokens": ["./libs/storefront-tokens/src/index.ts"],
+      "@apx/storefront-contracts": ["./libs/storefront-contracts/src/index.ts"],
       "@apx/storefront-theme": ["./libs/storefront-theme/src/index.ts"],
       "@apx/storefront-ui": ["./libs/storefront-ui/src/index.ts"],
       "@apx/theme-engine": ["./libs/theme-engine/src/lib/theme-engine.service.ts"]

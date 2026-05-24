@@ -1,6 +1,7 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { BaseApiService } from './base-api.service';
+import { StorefrontAuthStore } from './storefront-auth.store';
 
 export interface StorefrontRegisterDto {
   email: string;
@@ -48,32 +49,33 @@ export interface CheckoutDto {
 @Injectable({ providedIn: 'root' })
 export class StorefrontCustomerService extends BaseApiService {
   private readonly base = '/v1/store';
+  private readonly authStore = inject(StorefrontAuthStore);
 
-  readonly dashboard = signal<any>(null);
+  readonly dashboard = this.authStore.dashboard;
   readonly customer = computed(() => this.dashboard()?.customer ?? null);
   readonly isLoggedIn = computed(() => !!this.customer() && !this.customer()?.guestAccount);
 
   register(orgSlug: string, payload: StorefrontRegisterDto): Observable<any> {
     return this.post(`${this.base}/${orgSlug}/account/register`, payload).pipe(
-      tap((res: any) => this.dashboard.set({ customer: res?.data ?? res }))
+      tap((res: any) => this.authStore.setDashboard({ customer: res?.data ?? res }))
     );
   }
 
   login(orgSlug: string, payload: StorefrontLoginDto): Observable<any> {
     return this.post(`${this.base}/${orgSlug}/account/login`, payload).pipe(
-      tap((res: any) => this.dashboard.set({ customer: res?.data?.customer ?? res?.data ?? res }))
+      tap((res: any) => this.authStore.setDashboard({ customer: res?.data?.customer ?? res?.data ?? res }))
     );
   }
 
   logout(orgSlug: string): Observable<any> {
     return this.post(`${this.base}/${orgSlug}/account/logout`, {}).pipe(
-      tap(() => this.dashboard.set(null))
+      tap(() => this.authStore.clear())
     );
   }
 
   me(orgSlug: string): Observable<any> {
     return this.get(`${this.base}/${orgSlug}/account/me`).pipe(
-      tap((res: any) => this.dashboard.set(res?.data ?? res))
+      tap((res: any) => this.authStore.setDashboard(res?.data ?? res))
     );
   }
 
