@@ -1,7 +1,8 @@
-import { CommonModule, CurrencyPipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ChangeDetectorRef } from '@angular/core';
 import { Subject, catchError, debounceTime, distinctUntilChanged, of, switchMap, takeUntil } from 'rxjs';
 import { StorefrontPublicService } from '@core/services/storefront-public.service';
 import {
@@ -32,7 +33,7 @@ type CommerceMode =
 @Component({
   selector: 'app-commerce-flow',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, CurrencyPipe],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './commerce-flow.component.html',
   styleUrls: ['./commerce-flow.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -47,6 +48,7 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
   private readonly orderFacade = inject(StorefrontOrderFacade);
   private readonly storefrontSession = inject(StorefrontSessionService);
   private readonly publicService = inject(StorefrontPublicService);
+  private readonly cdr = inject(ChangeDetectorRef);
   private readonly search$ = new Subject<string>();
   private readonly destroy$ = new Subject<void>();
 
@@ -169,7 +171,19 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
   }
 
   loadCustomer(orgSlug = this.orgSlug()): void {
-    this.storefrontAuth.restore(orgSlug).pipe(catchError(() => of(false)), takeUntil(this.destroy$)).subscribe();
+    this.storefrontAuth.restore(orgSlug).pipe(
+      catchError(() => of(false)),
+      takeUntil(this.destroy$)
+    ).subscribe(res => {
+      const cust = this.customer();
+      if (cust) {
+        this.checkoutContact.email = cust.email || '';
+        this.checkoutContact.firstName = cust.firstName || '';
+        this.checkoutContact.lastName = cust.lastName || '';
+        this.checkoutContact.phone = cust.phone || '';
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   login(): void {

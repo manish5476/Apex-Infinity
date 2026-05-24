@@ -80,7 +80,7 @@ import { Subject, catchError, debounceTime, distinctUntilChanged, filter, of, sw
         @if (accountOpen()) {
           <div class="account-menu">
             <a [routerLink]="['/store', slug(), 'account']"><i class="pi pi-user"></i> Account dashboard</a>
-            <a [routerLink]="['/store', slug(), 'account/orders']"><i class="pi pi-history"></i> Orders</a>
+            <a [routerLink]="['/store', slug(), 'account', 'orders']"><i class="pi pi-history"></i> Orders</a>
             <a [routerLink]="['/store', slug(), 'wishlist']"><i class="pi pi-heart"></i> Wishlist</a>
             <a [routerLink]="['/store', slug(), 'login']"><i class="pi pi-sign-in"></i> Sign in</a>
           </div>

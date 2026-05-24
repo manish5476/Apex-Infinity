@@ -24,8 +24,9 @@ import { SliderModule } from 'primeng/slider';
 
 import { StorefrontPublicService, ProductListParams } from '../../../../core/services/storefront-public.service';
 import { StorefrontStateService } from '../../../../core/services/storefront-state.service';
+import { StorefrontCartFacade } from '../../../../storefront/core/facades/storefront-cart.facade';
 import { ProductCardComponent } from '../product-card/product-card';
-import { ProductListingConfig } from '@core/models/storefront.model';
+import { ProductListingConfig, PublicProduct } from '@core/models/storefront.model';
 
 export interface ProductListingFilters {
   category: string;
@@ -102,6 +103,7 @@ export class ProductListingComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private publicService = inject(StorefrontPublicService);
   public stateService = inject(StorefrontStateService);
+  private cartFacade = inject(StorefrontCartFacade);
   private destroy$ = new Subject<void>();
   private searchSubject = new Subject<string>();
 
@@ -225,6 +227,12 @@ export class ProductListingComponent implements OnInit, OnDestroy {
     const el = this.productsScrollArea?.nativeElement;
     if (el) {
       el.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  handleAddToCart(product: PublicProduct) {
+    if (this.orgSlug()) {
+      this.cartFacade.add(this.orgSlug(), { productId: product.id || (product as any)._id, quantity: 1 }).subscribe();
     }
   }
 

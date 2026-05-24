@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { SectionBaseConfig, SectionProduct, PADDING_MAP } from '../../dynamic-page/section.types';
 import { PublicProduct } from '@core/models/storefront.model';
 import { ProductCardComponent } from '../product-card/product-card';
+import { StorefrontCartFacade } from '../../../../storefront/core/facades/storefront-cart.facade';
+import { inject } from '@angular/core';
 
 export interface ProductGridConfig extends SectionBaseConfig {
   title?: string;
@@ -222,6 +224,8 @@ export class ProductGridComponent implements OnChanges {
 
   @Output() addToCart = new EventEmitter<PublicProduct>();
 
+  private cartFacade = inject(StorefrontCartFacade);
+
   mappedProducts: PublicProduct[] = [];
 
   readonly cfg = computed(() => ({
@@ -262,6 +266,9 @@ export class ProductGridComponent implements OnChanges {
   }
 
   handleAddToCart(product: PublicProduct) {
+    if (this.orgSlug) {
+      this.cartFacade.add(this.orgSlug, { productId: product.id || (product as any)._id, quantity: 1 }).subscribe();
+    }
     this.addToCart.emit(product);
   }
 

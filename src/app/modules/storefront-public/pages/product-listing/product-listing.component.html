@@ -206,7 +206,8 @@
         } @else {
         <div class="products-wrapper" [@listAnimation] [class.list-mode]="viewMode() === 'list'">
           @for (product of products(); track product.id) {
-          <app-product-card [product]="product" [orgSlug]="orgSlug()" [layout]="viewMode()">
+          <app-product-card [product]="product" [orgSlug]="orgSlug()" [layout]="viewMode()"
+            (addToCart)="handleAddToCart($event)">
           </app-product-card>
           }
         </div>

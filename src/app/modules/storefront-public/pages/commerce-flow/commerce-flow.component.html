@@ -14,28 +14,28 @@
       </span>
       <h1>
         @switch (mode()) {
-          @case ('checkout') { Checkout }
-          @case ('account') { Your Account }
-          @case ('addresses') { Saved Addresses }
-          @case ('notifications') { Notifications }
-          @case ('orders') { Orders }
-          @case ('login') { Welcome Back }
-          @case ('register') { Create Account }
-          @case ('wishlist') { Wishlist }
-          @case ('track-order') { Track Order }
-          @default { Your Cart }
+        @case ('checkout') { Checkout }
+        @case ('account') { Your Account }
+        @case ('addresses') { Saved Addresses }
+        @case ('notifications') { Notifications }
+        @case ('orders') { Orders }
+        @case ('login') { Welcome Back }
+        @case ('register') { Create Account }
+        @case ('wishlist') { Wishlist }
+        @case ('track-order') { Track Order }
+        @default { Your Cart }
         }
       </h1>
       <p>
         @switch (mode()) {
-          @case ('checkout') { Complete a guest or account checkout without creating an ERP customer record. }
-          @case ('account') { Manage your storefront identity, orders, addresses, wishlist, and activity. }
-          @case ('addresses') { Save delivery and billing addresses for faster future checkouts. }
-          @case ('orders') { Track storefront orders linked to your commerce profile. }
-          @case ('login') { Sign in to sync carts and view your storefront order history. }
-          @case ('register') { Create a storefront account separate from the store owner's CRM customers. }
-          @case ('track-order') { Check order status using your order number and email or phone. }
-          @default { Review items, apply coupons, and move into secure checkout. }
+        @case ('checkout') { Complete a guest or account checkout without creating an ERP customer record. }
+        @case ('account') { Manage your storefront identity, orders, addresses, wishlist, and activity. }
+        @case ('addresses') { Save delivery and billing addresses for faster future checkouts. }
+        @case ('orders') { Track storefront orders linked to your commerce profile. }
+        @case ('login') { Sign in to sync carts and view your storefront order history. }
+        @case ('register') { Create a storefront account separate from the store owner's CRM customers. }
+        @case ('track-order') { Check order status using your order number and email or phone. }
+        @default { Review items, apply coupons, and move into secure checkout. }
         }
       </p>
     </div>
@@ -43,14 +43,14 @@
       <i class="pi pi-search"></i>
       <input type="search" placeholder="Search products" [ngModel]="searchTerm()" (ngModelChange)="onSearch($event)" />
       @if (suggestions().length) {
-        <div class="suggestions">
-          @for (product of suggestions().slice(0, 4); track product._id || product.id || product.slug) {
-            <a [routerLink]="['/store', orgSlug(), 'products', product.slug || product._id || product.id]">
-              <span>{{ product.name }}</span>
-              <i class="pi pi-arrow-right"></i>
-            </a>
-          }
-        </div>
+      <div class="suggestions">
+        @for (product of suggestions().slice(0, 4); track product._id || product.id || product.slug) {
+        <a [routerLink]="['/store', orgSlug(), 'products', product.slug || product._id || product.id]">
+          <span>{{ product.name }}</span>
+          <i class="pi pi-arrow-right"></i>
+        </a>
+        }
+      </div>
       }
     </div>
   </section>
@@ -59,85 +59,104 @@
   @if (success()) { <div class="commerce-alert success sf-container">{{ success() }}</div> }
 
   @if (mode() === 'cart') {
-    <section class="commerce-grid sf-container">
-      <div class="line-panel">
-        @if (loading()) {
-          @for (i of [1,2,3]; track i) { <div class="line-skeleton apx-skeleton"></div> }
-        } @else if (!items().length) {
-          <div class="empty-state">
-            <div class="empty-icon"><i class="pi pi-shopping-bag"></i></div>
-            <h2>Your cart is ready when you are</h2>
-            <p>Browse products and come back here when something feels right.</p>
-            <a class="apx-button-primitive primary" [routerLink]="['/store', orgSlug(), 'products']">Shop products</a>
-          </div>
-        } @else {
-          @for (item of items(); track item._id || item.id || item.productId) {
-            <article class="cart-line">
-              <img [src]="productImage(item)" [alt]="productName(item)" />
-              <div class="line-copy">
-                <span>{{ item?.snapshot?.sku || 'Store pick' }}</span>
-                <h3>{{ productName(item) }}</h3>
-                <p>{{ itemPrice(item) | currency: currency() }}</p>
-              </div>
-              <div class="quantity-stepper">
-                <button type="button" (click)="updateQuantity(item, itemQuantity(item) - 1)" [disabled]="itemQuantity(item) <= 1">-</button>
-                <span>{{ itemQuantity(item) }}</span>
-                <button type="button" (click)="updateQuantity(item, itemQuantity(item) + 1)">+</button>
-              </div>
-              <strong>{{ itemLineTotal(item) | currency: currency() }}</strong>
-              <button class="icon-action danger" type="button" (click)="removeItem(item)" aria-label="Remove item">
-                <i class="pi pi-trash"></i>
-              </button>
-              <button class="save-link" type="button" (click)="saveForLater(item)">Save for later</button>
-            </article>
-          }
-        }
-        @if (savedForLater().length) {
-          <div class="saved-panel">
-            <h2>Saved for later</h2>
-            @for (item of savedForLater(); track item._id || item.id || item.productId) {
-              <article class="saved-line">
-                <span>{{ productName(item) }}</span>
-                <button type="button" (click)="moveSavedToCart(item)">Move to cart</button>
-              </article>
-            }
-          </div>
+  <section class="commerce-grid sf-container">
+    <div class="line-panel">
+      @if (loading()) {
+      @for (i of [1,2,3]; track i) { <div class="line-skeleton apx-skeleton"></div> }
+      } @else if (!items().length) {
+      <div class="empty-state">
+        <div class="empty-icon"><i class="pi pi-shopping-bag"></i></div>
+        <h2>Your cart is ready when you are</h2>
+        <p>Browse products and come back here when something feels right.</p>
+        <a class="apx-button-primitive primary" [routerLink]="['/store', orgSlug(), 'products']">Shop products</a>
+      </div>
+      } @else {
+      @for (item of items(); track item._id || item.id || item.productId) {
+      <article class="cart-line">
+        <img [src]="productImage(item)" [alt]="productName(item)" />
+        <div class="line-copy">
+          <span>{{ item?.snapshot?.sku || 'Store pick' }}</span>
+          <h3>{{ productName(item) }}</h3>
+          <p>{{ itemPrice(item) | currency: currency() }}</p>
+        </div>
+        <div class="quantity-stepper">
+          <button type="button" (click)="updateQuantity(item, itemQuantity(item) - 1)"
+            [disabled]="itemQuantity(item) <= 1">-</button>
+          <span>{{ itemQuantity(item) }}</span>
+          <button type="button" (click)="updateQuantity(item, itemQuantity(item) + 1)">+</button>
+        </div>
+        <strong>{{ itemLineTotal(item) | currency: currency() }}</strong>
+        <button class="icon-action danger" type="button" (click)="removeItem(item)" aria-label="Remove item">
+          <i class="pi pi-trash"></i>
+        </button>
+        <button class="save-link" type="button" (click)="saveForLater(item)">Save for later</button>
+      </article>
+      }
+      }
+      @if (savedForLater().length) {
+      <div class="saved-panel">
+        <h2>Saved for later</h2>
+        @for (item of savedForLater(); track item._id || item.id || item.productId) {
+        <article class="saved-line">
+          <span>{{ productName(item) }}</span>
+          <button type="button" (click)="moveSavedToCart(item)">Move to cart</button>
+        </article>
         }
       </div>
-      <aside class="summary-card">
-        <h2>Order Summary</h2>
-        <div class="summary-row"><span>Subtotal</span><strong>{{ subtotal() | currency: currency() }}</strong></div>
-        <div class="summary-row"><span>Discount</span><strong>-{{ discount() | currency: currency() }}</strong></div>
-        <div class="summary-row"><span>Shipping</span><strong>{{ shipping() ? (shipping() | currency: currency()) : 'Calculated next' }}</strong></div>
-        <div class="summary-row"><span>Tax</span><strong>{{ taxEstimate()?.total ? (taxEstimate().total | currency: currency()) : 'Estimated at checkout' }}</strong></div>
-        <label class="coupon-box">
-          Coupon
-          <span>
-            <input [ngModel]="couponCode()" (ngModelChange)="couponCode.set($event)" placeholder="WELCOME10" />
-            <button type="button" (click)="applyCoupon()">Apply</button>
-          </span>
-        </label>
-        <button class="secondary-action" type="button" (click)="estimateShipping()" [disabled]="!items().length">
-          <i class="pi pi-truck"></i> Estimate shipping and tax
-        </button>
-        <div class="summary-total"><span>Total</span><strong>{{ total() | currency: currency() }}</strong></div>
-        <button class="checkout-button" type="button" (click)="validateAndCheckout()" [disabled]="!items().length || validating()">
-          @if (validating()) { <i class="pi pi-spin pi-spinner"></i> } @else { <i class="pi pi-lock"></i> }
-          Continue checkout
-        </button>
-      </aside>
-    </section>
+      }
+    </div>
+    <aside class="summary-card">
+      <h2>Order Summary</h2>
+      <div class="summary-row"><span>Subtotal</span><strong>{{ subtotal() | currency: currency() }}</strong></div>
+      <div class="summary-row"><span>Discount</span><strong>-{{ discount() | currency: currency() }}</strong></div>
+      <div class="summary-row"><span>Shipping</span><strong>{{ shipping() ? (shipping() | currency: currency()) :
+          'Calculated next' }}</strong></div>
+      <div class="summary-row"><span>Tax</span><strong>{{ taxEstimate()?.total ? (taxEstimate().total | currency:
+          currency()) : 'Estimated at checkout' }}</strong></div>
+      <label class="coupon-box">
+        Coupon
+        <span>
+          <input [ngModel]="couponCode()" (ngModelChange)="couponCode.set($event)" placeholder="WELCOME10" />
+          <button type="button" (click)="applyCoupon()">Apply</button>
+        </span>
+      </label>
+      <button class="secondary-action" type="button" (click)="estimateShipping()" [disabled]="!items().length">
+        <i class="pi pi-truck"></i> Estimate shipping and tax
+      </button>
+      <div class="summary-total"><span>Total</span><strong>{{ total() | currency: currency() }}</strong></div>
+      <button class="checkout-button" type="button" (click)="validateAndCheckout()"
+        [disabled]="!items().length || validating()">
+        @if (validating()) { <i class="pi pi-spin pi-spinner"></i> } @else { <i class="pi pi-lock"></i> }
+        Continue checkout
+      </button>
+    </aside>
+  </section>
   }
 
   @if (mode() === 'checkout') {
-    <section class="checkout-grid sf-container">
-      <div class="checkout-steps">
-        @for (step of ['contact','delivery','payment','review']; track step) {
-          <button type="button" [class.active]="checkoutStep() === step" (click)="checkoutStep.set($any(step))">
-            <span></span>{{ step }}
-          </button>
-        }
+  <section class="checkout-grid sf-container">
+    <div class="checkout-steps">
+      @for (step of ['contact','delivery','payment','review']; track step) {
+      <button type="button" [class.active]="checkoutStep() === step" (click)="checkoutStep.set($any(step))">
+        <span></span>{{ step }}
+      </button>
+      }
+    </div>
+    <div class="checkout-main">
+      @if (!customer()) {
+      <div class="auth-prompt-panel"
+        style="margin-bottom: 2rem; padding: 1.5rem; background: var(--surface-card); border-radius: 8px; border: 1px solid var(--surface-border);">
+        <h3>Checkout faster with an account</h3>
+        <p>Log in or create an account to use saved addresses and track your orders easily.</p>
+        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+          <a class="apx-button-primitive secondary" [routerLink]="['/store', orgSlug(), 'login']">Log in</a>
+          <a class="apx-button-primitive secondary" [routerLink]="['/store', orgSlug(), 'register']">Create account</a>
+        </div>
+        <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--surface-border);">
+          <strong>Or continue as a guest below.</strong>
+        </div>
       </div>
+      }
       <form class="checkout-form" (ngSubmit)="placeOrder()">
         <div class="form-grid">
           <label>Email<input name="checkoutEmail" type="email" [(ngModel)]="checkoutContact.email" required /></label>
@@ -155,143 +174,215 @@
           <label>Postal code<input name="postalCode" [(ngModel)]="addressForm.postalCode" required /></label>
           <label>Country<input name="country" [(ngModel)]="addressForm.country" required /></label>
         </div>
-        <label class="check-row"><input name="saveAddress" type="checkbox" [(ngModel)]="checkoutContact.saveAddress" /> Save this address to storefront account</label>
+        <label class="check-row"><input name="saveAddress" type="checkbox" [(ngModel)]="checkoutContact.saveAddress" />
+          Save this address to storefront account</label>
         <section class="payment-foundation">
           <div><i class="pi pi-credit-card"></i><span>Payment</span><strong>Secure payment handoff ready</strong></div>
-          <p>Payment intent support is reserved in the checkout payload and can attach to Stripe, Razorpay, or COD rules from storefront settings.</p>
+          <p>Payment intent support is reserved in the checkout payload and can attach to Stripe, Razorpay, or COD rules
+            from storefront settings.</p>
         </section>
         <button class="checkout-button" type="submit" [disabled]="submitting() || !items().length">
           <i class="pi pi-credit-card"></i> Place order
         </button>
       </form>
-      <aside class="summary-card">
-        <h2>Review</h2>
-        @for (item of items(); track item.id || item._id) {
-          <div class="summary-row"><span>{{ productName(item) }} x {{ itemQuantity(item) }}</span><strong>{{ itemLineTotal(item) | currency: currency() }}</strong></div>
-        }
-        <div class="summary-total"><span>Total</span><strong>{{ total() | currency: currency() }}</strong></div>
-        <p class="muted">Orders are linked to storefront customers only. CRM conversion is manual from admin.</p>
-      </aside>
-    </section>
+    </div>
+    <aside class="summary-card">
+      <h2>Review</h2>
+      @for (item of items(); track item.id || item._id) {
+      <div class="summary-row"><span>{{ productName(item) }} x {{ itemQuantity(item) }}</span><strong>{{
+          itemLineTotal(item) | currency: currency() }}</strong></div>
+      }
+      <div class="summary-total"><span>Total</span><strong>{{ total() | currency: currency() }}</strong></div>
+      <p class="muted">Orders are linked to storefront customers only. CRM conversion is manual from admin.</p>
+    </aside>
+  </section>
   }
 
   @if (mode() === 'login' || mode() === 'register') {
-    <section class="auth-grid sf-container">
-      @if (mode() === 'login') {
-        <form class="checkout-form auth-card" (ngSubmit)="login()">
-          <h2>Sign in</h2>
-          <label>Email<input name="loginEmail" type="email" [(ngModel)]="loginForm.email" required /></label>
-          <label>Password<input name="loginPassword" type="password" [(ngModel)]="loginForm.password" required /></label>
-          <button class="checkout-button" type="submit" [disabled]="submitting()">Sign in</button>
-          <a [routerLink]="['/store', orgSlug(), 'register']">Create a storefront account</a>
-        </form>
-      } @else {
-        <form class="checkout-form auth-card" (ngSubmit)="register()">
-          <h2>Create account</h2>
-          <div class="form-grid">
-            <label>First name<input name="regFirstName" [(ngModel)]="registerForm.firstName" /></label>
-            <label>Last name<input name="regLastName" [(ngModel)]="registerForm.lastName" /></label>
-          </div>
-          <label>Email<input name="regEmail" type="email" [(ngModel)]="registerForm.email" required /></label>
-          <label>Phone<input name="regPhone" type="tel" [(ngModel)]="registerForm.phone" /></label>
-          <label>Password<input name="regPassword" type="password" [(ngModel)]="registerForm.password" required minlength="8" /></label>
-          <label class="check-row"><input name="marketingOptIn" type="checkbox" [(ngModel)]="registerForm.marketingOptIn" /> Email me offers and order updates</label>
-          <button class="checkout-button" type="submit" [disabled]="submitting()">Create account</button>
-          <a [routerLink]="['/store', orgSlug(), 'login']">Already have an account?</a>
-        </form>
-      }
-    </section>
+  <section class="auth-grid sf-container">
+    @if (mode() === 'login') {
+    <form class="checkout-form auth-card" (ngSubmit)="login()">
+      <h2>Sign in</h2>
+      <label>Email<input name="loginEmail" type="email" [(ngModel)]="loginForm.email" required /></label>
+      <label>Password<input name="loginPassword" type="password" [(ngModel)]="loginForm.password" required /></label>
+      <button class="checkout-button" type="submit" [disabled]="submitting()">Sign in</button>
+      <a [routerLink]="['/store', orgSlug(), 'register']">Create a storefront account</a>
+    </form>
+    } @else {
+    <form class="checkout-form auth-card" (ngSubmit)="register()">
+      <h2>Create account</h2>
+      <div class="form-grid">
+        <label>First name<input name="regFirstName" [(ngModel)]="registerForm.firstName" /></label>
+        <label>Last name<input name="regLastName" [(ngModel)]="registerForm.lastName" /></label>
+      </div>
+      <label>Email<input name="regEmail" type="email" [(ngModel)]="registerForm.email" required /></label>
+      <label>Phone<input name="regPhone" type="tel" [(ngModel)]="registerForm.phone" /></label>
+      <label>Password<input name="regPassword" type="password" [(ngModel)]="registerForm.password" required
+          minlength="8" /></label>
+      <label class="check-row"><input name="marketingOptIn" type="checkbox" [(ngModel)]="registerForm.marketingOptIn" />
+        Email me offers and order updates</label>
+      <button class="checkout-button" type="submit" [disabled]="submitting()">Create account</button>
+      <a [routerLink]="['/store', orgSlug(), 'login']">Already have an account?</a>
+    </form>
+    }
+  </section>
   }
 
-  @if (mode() === 'account' || mode() === 'orders' || mode() === 'addresses' || mode() === 'notifications' || mode() === 'wishlist') {
-    <section class="account-shell sf-container">
-      <nav class="account-nav">
-        <a [routerLink]="['/store', orgSlug(), 'account']">Overview</a>
-        <a [routerLink]="['/store', orgSlug(), 'account/orders']">Orders</a>
-        <a [routerLink]="['/store', orgSlug(), 'account/addresses']">Addresses</a>
-        <a [routerLink]="['/store', orgSlug(), 'wishlist']">Wishlist</a>
-        <button type="button" (click)="logout()">Logout</button>
-      </nav>
+  @if (mode() === 'account' || mode() === 'orders' || mode() === 'addresses' || mode() === 'notifications' || mode() ===
+  'wishlist') {
+  <section class="account-shell sf-container">
+    <nav class="account-nav">
+      <a [routerLink]="['/store', orgSlug(), 'account']">Overview</a>
+      <a [routerLink]="['/store', orgSlug(), 'account', 'orders']">Orders</a>
+      <a [routerLink]="['/store', orgSlug(), 'account', 'addresses']">Addresses</a>
+      <a [routerLink]="['/store', orgSlug(), 'wishlist']">Wishlist</a>
+      <button type="button" (click)="logout()">Logout</button>
+    </nav>
 
-      @if (!customer()) {
-        <div class="empty-state panel">
-          <h2>Sign in to manage your storefront account</h2>
-          <p>Guest checkout still works, but account features need a storefront login.</p>
-          <a class="apx-button-primitive primary" [routerLink]="['/store', orgSlug(), 'login']">Sign in</a>
+    @if (!customer()) {
+    <div class="empty-state panel">
+      <h2>Sign in to manage your storefront account</h2>
+      <p>Guest checkout still works, but account features need a storefront login.</p>
+      <a class="apx-button-primitive primary" [routerLink]="['/store', orgSlug(), 'login']">Sign in</a>
+    </div>
+    } @else if (mode() === 'addresses') {
+    <div class="account-grid two">
+      <form class="checkout-form" (ngSubmit)="saveAddress()">
+        <h2>Add address</h2>
+        <label>Full name<input name="saveFullName" [(ngModel)]="addressForm.fullName" required /></label>
+        <label>Phone<input name="savePhone" [(ngModel)]="addressForm.phone" required /></label>
+        <label>Address<input name="saveLine1" [(ngModel)]="addressForm.addressLine1" required /></label>
+        <div class="form-grid">
+          <label>City<input name="saveCity" [(ngModel)]="addressForm.city" required /></label>
+          <label>State<input name="saveState" [(ngModel)]="addressForm.state" required /></label>
+          <label>Postal code<input name="savePostal" [(ngModel)]="addressForm.postalCode" required /></label>
+          <label>Type<select name="addressType" [(ngModel)]="addressForm.addressType">
+              <option value="home">Home</option>
+              <option value="work">Work</option>
+              <option value="other">Other</option>
+            </select></label>
         </div>
-      } @else if (mode() === 'addresses') {
-        <div class="account-grid two">
-          <form class="checkout-form" (ngSubmit)="saveAddress()">
-            <h2>Add address</h2>
-            <label>Full name<input name="saveFullName" [(ngModel)]="addressForm.fullName" required /></label>
-            <label>Phone<input name="savePhone" [(ngModel)]="addressForm.phone" required /></label>
-            <label>Address<input name="saveLine1" [(ngModel)]="addressForm.addressLine1" required /></label>
-            <div class="form-grid">
-              <label>City<input name="saveCity" [(ngModel)]="addressForm.city" required /></label>
-              <label>State<input name="saveState" [(ngModel)]="addressForm.state" required /></label>
-              <label>Postal code<input name="savePostal" [(ngModel)]="addressForm.postalCode" required /></label>
-              <label>Type<select name="addressType" [(ngModel)]="addressForm.addressType"><option value="home">Home</option><option value="work">Work</option><option value="other">Other</option></select></label>
-            </div>
-            <button class="checkout-button" type="submit" [disabled]="submitting()">Save address</button>
-          </form>
-          <div class="card-list">
-            @for (address of addresses(); track address._id || address.id) {
-              <article class="account-card"><i class="pi pi-map-marker"></i><span>{{ address.isDefault ? 'Default' : address.addressType }}</span><h3>{{ address.fullName }}</h3><p>{{ addressLabel(address) }}</p></article>
-            } @empty {
-              <article class="account-card"><i class="pi pi-map-marker"></i><h3>No addresses yet</h3><p>Add your first saved delivery address.</p></article>
-            }
+        <button class="checkout-button" type="submit" [disabled]="submitting()">Save address</button>
+      </form>
+      <div class="card-list">
+        @for (address of addresses(); track address._id || address.id) {
+        <article class="account-card"><i class="pi pi-map-marker"></i><span>{{ address.isDefault ? 'Default' :
+            address.addressType }}</span>
+          <h3>{{ address.fullName }}</h3>
+          <p>{{ addressLabel(address) }}</p>
+        </article>
+        } @empty {
+        <article class="account-card"><i class="pi pi-map-marker"></i>
+          <h3>No addresses yet</h3>
+          <p>Add your first saved delivery address.</p>
+        </article>
+        }
+      </div>
+    </div>
+    } @else if (mode() === 'orders') {
+    <div class="card-list">
+      @for (order of orders(); track order._id || order.id) {
+      <article class="order-card-detailed panel">
+        <div class="order-header">
+          <div>
+            <strong>{{ order.orderNumber }}</strong>
+            <span class="muted">Placed on {{ order.createdAt | date:'mediumDate' }}</span>
+          </div>
+          <div class="order-badges">
+            <span class="badge">{{ order.orderStatus }}</span>
+            <span class="badge">{{ order.paymentStatus }}</span>
           </div>
         </div>
-      } @else if (mode() === 'orders') {
-        <div class="card-list">
-          @for (order of orders(); track order._id || order.id) {
-            <article class="order-card"><strong>{{ order.orderNumber }}</strong><span>{{ order.orderStatus }} / {{ order.paymentStatus }}</span><b>{{ order.totals.grandTotal | currency: order.totals.currency || currency() }}</b></article>
-          } @empty {
-            <div class="empty-state panel"><h2>No orders yet</h2><p>Your storefront orders will appear here.</p></div>
+        <div class="order-items-list">
+          @for (item of order.items; track item.snapshot?.name) {
+          <div class="order-item-mini">
+            <img [src]="item.snapshot?.image || 'assets/placeholder.png'" [alt]="item.snapshot?.name" />
+            <div>
+              <h4>{{ item.snapshot?.name || 'Product' }}</h4>
+              <span class="muted">Qty {{ item.quantity }}</span>
+            </div>
+            <strong>{{ item.lineTotal | currency: order.totals?.currency || currency() }}</strong>
+          </div>
           }
         </div>
-      } @else if (mode() === 'wishlist') {
-        <div class="card-list">
-          @for (item of wishlist(); track wishlistTrack(item)) {
-            <article class="account-card"><i class="pi pi-heart"></i><span>Saved</span><h3>{{ wishlistName(item) }}</h3><p>Wishlist item saved to your storefront profile.</p></article>
-          } @empty {
-            <div class="empty-state panel"><h2>No wishlist items</h2><p>Save products you want to revisit later.</p></div>
-          }
+        <div class="order-footer">
+          <span class="muted">{{ order.items?.length || 0 }} item(s)</span>
+          <b>{{ order.totals?.grandTotal | currency: order.totals?.currency || currency() }}</b>
         </div>
-      } @else if (mode() === 'notifications') {
-        <div class="account-grid">
-          @for (note of notifications; track note.title) {
-            <article class="account-card"><i [class]="note.icon"></i><span>Notification</span><h3>{{ note.title }}</h3><p>{{ note.body }}</p></article>
-          }
-        </div>
-      } @else {
-        <div class="account-grid">
-          <article class="account-card"><i class="pi pi-user"></i><span>Profile</span><h3>{{ customer()?.firstName || customer()?.email }}</h3><p>Storefront customer, separate from ERP CRM customers.</p></article>
-          <article class="account-card"><i class="pi pi-history"></i><span>{{ orders().length }}</span><h3>Orders</h3><p>Track order status and fulfillment.</p><a [routerLink]="['/store', orgSlug(), 'account/orders']">Open</a></article>
-          <article class="account-card"><i class="pi pi-map-marker"></i><span>{{ addresses().length }}</span><h3>Addresses</h3><p>Manage saved delivery locations.</p><a [routerLink]="['/store', orgSlug(), 'account/addresses']">Open</a></article>
-          <article class="account-card"><i class="pi pi-heart"></i><span>{{ wishlist().length }}</span><h3>Wishlist</h3><p>Saved products and future buys.</p><a [routerLink]="['/store', orgSlug(), 'wishlist']">Open</a></article>
-        </div>
+      </article>
+      } @empty {
+      <div class="empty-state panel">
+        <h2>No orders yet</h2>
+        <p>Your storefront orders will appear here.</p>
+      </div>
       }
-    </section>
+    </div>
+    } @else if (mode() === 'wishlist') {
+    <div class="card-list">
+      @for (item of wishlist(); track wishlistTrack(item)) {
+      <article class="account-card"><i class="pi pi-heart"></i><span>Saved</span>
+        <h3>{{ wishlistName(item) }}</h3>
+        <p>Wishlist item saved to your storefront profile.</p>
+      </article>
+      } @empty {
+      <div class="empty-state panel">
+        <h2>No wishlist items</h2>
+        <p>Save products you want to revisit later.</p>
+      </div>
+      }
+    </div>
+    } @else if (mode() === 'notifications') {
+    <div class="account-grid">
+      @for (note of notifications; track note.title) {
+      <article class="account-card"><i [class]="note.icon"></i><span>Notification</span>
+        <h3>{{ note.title }}</h3>
+        <p>{{ note.body }}</p>
+      </article>
+      }
+    </div>
+    } @else {
+    <div class="account-grid">
+      <article class="account-card"><i class="pi pi-user"></i><span>Profile</span>
+        <h3>{{ customer()?.firstName || customer()?.email }}</h3>
+        <p>Storefront customer, separate from ERP CRM customers.</p>
+      </article>
+      <article class="account-card"><i class="pi pi-history"></i><span>{{ orders().length }}</span>
+        <h3>Orders</h3>
+        <p>Track order status and fulfillment.</p><a [routerLink]="['/store', orgSlug(), 'account', 'orders']">Open</a>
+      </article>
+      <article class="account-card"><i class="pi pi-map-marker"></i><span>{{ addresses().length }}</span>
+        <h3>Addresses</h3>
+        <p>Manage saved delivery locations.</p><a [routerLink]="['/store', orgSlug(), 'account', 'addresses']">Open</a>
+      </article>
+      <article class="account-card"><i class="pi pi-heart"></i><span>{{ wishlist().length }}</span>
+        <h3>Wishlist</h3>
+        <p>Saved products and future buys.</p><a [routerLink]="['/store', orgSlug(), 'wishlist']">Open</a>
+      </article>
+    </div>
+    }
+  </section>
   }
 
   @if (mode() === 'track-order') {
-    <section class="auth-grid sf-container">
-      <form class="checkout-form auth-card" (ngSubmit)="trackOrder()">
-        <h2>Track order</h2>
-        <label>Order number<input name="trackOrderNumber" [ngModel]="trackOrderNumber()" (ngModelChange)="trackOrderNumber.set($event)" required /></label>
-        <label>Email or phone<input name="trackVerify" [ngModel]="trackVerify()" (ngModelChange)="trackVerify.set($event)" /></label>
-        <button class="checkout-button" type="submit" [disabled]="submitting()">Track</button>
-      </form>
-      @if (trackedOrder(); as order) {
-        <article class="summary-card">
-          <h2>{{ order.orderNumber }}</h2>
-          <div class="summary-row"><span>Order</span><strong>{{ order.orderStatus }}</strong></div>
-          <div class="summary-row"><span>Payment</span><strong>{{ order.paymentStatus }}</strong></div>
-          <div class="summary-row"><span>Fulfillment</span><strong>{{ order.fulfillmentStatus }}</strong></div>
-          <div class="summary-total"><span>Total</span><strong>{{ order.totals.grandTotal | currency: order.totals.currency || currency() }}</strong></div>
-        </article>
-      }
-    </section>
+  <section class="auth-grid sf-container">
+    <form class="checkout-form auth-card" (ngSubmit)="trackOrder()">
+      <h2>Track order</h2>
+      <label>Order number<input name="trackOrderNumber" [ngModel]="trackOrderNumber()"
+          (ngModelChange)="trackOrderNumber.set($event)" required /></label>
+      <label>Email or phone<input name="trackVerify" [ngModel]="trackVerify()"
+          (ngModelChange)="trackVerify.set($event)" /></label>
+      <button class="checkout-button" type="submit" [disabled]="submitting()">Track</button>
+    </form>
+    @if (trackedOrder(); as order) {
+    <article class="summary-card">
+      <h2>{{ order.orderNumber }}</h2>
+      <div class="summary-row"><span>Order</span><strong>{{ order.orderStatus }}</strong></div>
+      <div class="summary-row"><span>Payment</span><strong>{{ order.paymentStatus }}</strong></div>
+      <div class="summary-row"><span>Fulfillment</span><strong>{{ order.fulfillmentStatus }}</strong></div>
+      <div class="summary-total"><span>Total</span><strong>{{ order.totals.grandTotal | currency: order.totals.currency
+          || currency() }}</strong></div>
+    </article>
+    }
+  </section>
   }
 </main>

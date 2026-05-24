@@ -6,6 +6,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { SectionBaseConfig, SectionProduct, PADDING_MAP } from '../../dynamic-page/section.types';
 import { PublicProduct } from '@core/models/storefront.model';
 import { ProductCardComponent } from '../product-card/product-card';
+import { StorefrontCartFacade } from '../../../../storefront/core/facades/storefront-cart.facade';
 
 export interface ProductSliderConfig extends SectionBaseConfig {
   title?: string;
@@ -232,6 +233,7 @@ export class ProductSliderComponent implements OnInit, OnChanges, AfterViewInit,
   canScrollLeft = signal(false);
   canScrollRight = signal(true);
   
+  private cartFacade = inject(StorefrontCartFacade);
   private _autoPlayTimer: any;
 
   readonly cfg = computed(() => ({
@@ -343,7 +345,9 @@ export class ProductSliderComponent implements OnInit, OnChanges, AfterViewInit,
   }
 
   handleAddToCart(product: PublicProduct) {
-    console.log('Added to cart', product);
+    if (this.organizationSlug) {
+      this.cartFacade.add(this.organizationSlug, { productId: product.id || (product as any)._id, quantity: 1 }).subscribe();
+    }
   }
 
   private toPublicProduct(p: SectionProduct): PublicProduct {
