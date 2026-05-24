@@ -1,294 +1,519 @@
 <div class="page-root" [ngStyle]="sectionStyle()">
   <div class="ambient-layer"></div>
-  <div class="container">
-    <header class="listing-header" @fadeIn>
-      <div class="search-block">
-        <div class="input-wrapper">
-          <i class="pi pi-search"></i>
-          <input type="text" placeholder="Search products, brands..." [value]="filters().search"
-            (input)="onSearchInput($event)" />
-        </div>
-      </div>
-      <div class="controls-block">
-        <div class="desktop-sort">
-          <span class="text-label">Sort by:</span>
-          <p-select [options]="sortOptions" [ngModel]="filters().sort" (ngModelChange)="applyFilter('sort', $event)"
-            optionLabel="label" optionValue="value" appendTo="body" styleClass="minimal-select" [filter]="true"
-            filterBy="label">
 
-            <ng-template pTemplate="selectedItem" let-selectedOption>
-              <div class="flex align-items-center gap-2">
-                <i [class]="selectedOption.icon"></i>
-                <div>{{ selectedOption.label }}</div>
-              </div>
-            </ng-template>
-            <ng-template let-option pTemplate="item">
-              <div class="flex align-items-center gap-2">
-                <i [class]="option.icon"></i>
-                <div>{{ option.label }}</div>
-              </div>
-            </ng-template>
-          </p-select>
-        </div>
-        <div class="layout-toggle">
-          <button (click)="viewMode.set('grid')" [class.active]="viewMode() === 'grid'" pTooltip="Grid View"
-            tooltipPosition="bottom">
-            <i class="pi pi-th-large"></i>
-          </button>
-          <button (click)="viewMode.set('list')" [class.active]="viewMode() === 'list'" pTooltip="List View"
-            tooltipPosition="bottom">
-            <i class="pi pi-bars"></i>
-          </button>
-        </div>
-        <button class="mobile-filter-trigger" (click)="showMobileFilters.set(true)">
-          <i class="pi pi-sliders-h"></i>
-          <span>Filters</span>
-          @if (activeFilterCount() > 0) {
-          <span class="badge">{{ activeFilterCount() }}</span>
-          }
+  <!-- ═══ TOP HEADER BAR (never scrolls) ═══ -->
+  <header class="listing-header" @fadeIn>
+    <div class="search-block">
+      <div class="input-wrapper">
+        <i class="pi pi-search"></i>
+        <input type="text" placeholder="Search products, brands..." [value]="filters().search"
+          (input)="onSearchInput($event)" />
+      </div>
+    </div>
+
+    <div class="controls-block">
+      <div class="desktop-sort">
+        <span class="text-label">Sort</span>
+        <p-select [options]="sortOptions" [ngModel]="filters().sort" (ngModelChange)="applyFilter('sort', $event)"
+          optionLabel="label" optionValue="value" appendTo="body" styleClass="minimal-select" [filter]="true"
+          filterBy="label">
+          <ng-template pTemplate="selectedItem" let-selectedOption>
+            <div class="flex align-items-center gap-2">
+              <i [class]="selectedOption.icon"></i>
+              <div>{{ selectedOption.label }}</div>
+            </div>
+          </ng-template>
+          <ng-template let-option pTemplate="item">
+            <div class="flex align-items-center gap-2">
+              <i [class]="option.icon"></i>
+              <div>{{ option.label }}</div>
+            </div>
+          </ng-template>
+        </p-select>
+      </div>
+
+      <div class="layout-toggle">
+        <button (click)="viewMode.set('grid')" [class.active]="viewMode() === 'grid'" pTooltip="Grid"
+          tooltipPosition="bottom">
+          <i class="pi pi-th-large"></i>
+        </button>
+        <button (click)="viewMode.set('list')" [class.active]="viewMode() === 'list'" pTooltip="List"
+          tooltipPosition="bottom">
+          <i class="pi pi-bars"></i>
         </button>
       </div>
-    </header>
-    @if (activeFilterCount() > 0) {
-    <div class="active-filters-bar" @fadeIn>
-      <div class="filter-pills">
-        @if (filters().category) {
-        <span class="pill" (click)="applyFilter('category', null)">
-          Category Active <i class="pi pi-times"></i>
-        </span>
+
+      <!-- <button class="mobile-filter-trigger" (click)="showMobileFilters.set(true)">
+        <i class="pi pi-sliders-h"></i>
+        <span>Filters</span>
+        @if (activeFilterCount() > 0) {
+        <span class="badge">{{ activeFilterCount() }}</span>
         }
-        @if (filters().brand) {
-        <span class="pill" (click)="applyFilter('brand', null)">
-          Brand Active <i class="pi pi-times"></i>
-        </span>
-        }
-        @if (filters().minPrice != null || filters().maxPrice != null) {
-        <span class="pill" (click)="applyFilter('minPrice', null); applyFilter('maxPrice', null)">
-          Price Range <i class="pi pi-times"></i>
-        </span>
-        }
-        @if (filters().inStock) {
-        <span class="pill" (click)="applyFilter('inStock', false)">
-          In Stock Only <i class="pi pi-times"></i>
-        </span>
-        }
-        @if (filters().tags) {
-        <span class="pill" (click)="applyFilter('tags', null)">
-          Tags Active <i class="pi pi-times"></i>
-        </span>
-        }
-      </div>
-      <button class="clear-all" (click)="clearFilters()">Clear All</button>
+      </button> -->
     </div>
-    }
-    <div class="layout-grid">
-      @if (cfg().showSidebar) {
-      <aside class="sidebar-desktop">
-        <div class="sticky-content">
-          <div class="widget">
-            <h3>Categories</h3>
-            <div class="cat-list">
-              <div class="cat-row" [class.active]="!filters().category" (click)="applyFilter('category', null)">
-                <span class="label">All Categories</span>
-                <i class="pi pi-angle-right"></i>
-              </div>
-              @for (cat of categories(); track cat.id) {
-              <div class="cat-row" [class.active]="filters().category === cat.id"
-                (click)="applyFilter('category', cat.id)">
-                @if(cat.image) { <img [src]="cat.image" class="cat-thumb"> }
-                <span class="label">{{ cat.name }}</span>
-              </div>
-              }
-            </div>
+  </header>
+
+  <!-- ═══ ACTIVE FILTER PILLS (never scrolls) ═══ -->
+  @if (activeFilterCount() > 0) {
+  <div class="active-filters-bar" @fadeIn>
+    <div class="filter-pills">
+      @if (filters().category) {
+      <span class="pill" (click)="applyFilter('category', null)">
+        Category <i class="pi pi-times"></i>
+      </span>
+      }
+      @if (filters().brand) {
+      <span class="pill" (click)="applyFilter('brand', null)">
+        Brand <i class="pi pi-times"></i>
+      </span>
+      }
+      @if (filters().minPrice != null || filters().maxPrice != null) {
+      <span class="pill" (click)="applyFilter('minPrice', null); applyFilter('maxPrice', null)">
+        Price Range <i class="pi pi-times"></i>
+      </span>
+      }
+      @if (filters().inStock) {
+      <span class="pill" (click)="applyFilter('inStock', false)">
+        In Stock Only <i class="pi pi-times"></i>
+      </span>
+      }
+      @if (filters().tags) {
+      <span class="pill" (click)="applyFilter('tags', null)">
+        Tags <i class="pi pi-times"></i>
+      </span>
+      }
+    </div>
+    <button class="clear-all" (click)="clearFilters()">Clear All</button>
+  </div>
+  }
+
+  <!-- ═══ BODY: Sidebar + Products (scroll-isolated) ═══ -->
+  <div class="layout-grid">
+
+    <!-- Sidebar: scrolls on its own -->
+    @if (cfg().showSidebar) {
+    <aside class="sidebar-desktop">
+
+      <div class="widget">
+        <h3>Categories</h3>
+        <div class="cat-list">
+          <div class="cat-row" [class.active]="!filters().category" (click)="applyFilter('category', null)">
+            <span class="label">All Categories</span>
+            <i class="pi pi-angle-right"></i>
           </div>
-          @if (brands().length > 0) {
-          <div class="widget">
-            <h3>Brands</h3>
-            <div class="cat-list">
-              <div class="cat-row" [class.active]="!filters().brand" (click)="applyFilter('brand', null)">
-                <span class="label">All Brands</span>
-                <i class="pi pi-angle-right"></i>
-              </div>
-              @for (brand of brands(); track brand.id) {
-              <div class="cat-row" [class.active]="filters().brand === brand.id"
-                (click)="applyFilter('brand', brand.id)">
-                <span class="label">{{ brand.name }}</span>
-              </div>
-              }
-            </div>
-          </div>
-          }
-          <div class="widget">
-            <h3>Price Range</h3>
-            <div class="px-2 mb-3 mt-2">
-              <p-slider [ngModel]="rangeValues()" (ngModelChange)="rangeValues.set($event)" [min]="priceLimits().min"
-                [max]="priceLimits().max" [range]="true" (onSlideEnd)="onPriceChange($event)" styleClass="w-full">
-              </p-slider>
-            </div>
-            <div class="price-inputs">
-              <div class="input-group">
-                <span>₹</span>
-                <input type="number" [ngModel]="rangeValues()[0]" (ngModelChange)="patchRangeEnd(0, +$event)">
-              </div>
-              <span class="dash">—</span>
-              <div class="input-group">
-                <span>₹</span>
-                <input type="number" [ngModel]="rangeValues()[1]" (ngModelChange)="patchRangeEnd(1, +$event)">
-              </div>
-            </div>
-          </div>
-          @if (tags().length > 0) {
-          <div class="widget">
-            <h3>Trending Tags</h3>
-            <div class="tags-cloud">
-              @for (tag of tags(); track tag) {
-              <button class="tag-chip" [class.active]="filters().tags.includes(tag)" (click)="toggleTag(tag)" pRipple>
-                {{ tag }}
-              </button>
-              }
-            </div>
+          @for (cat of categories(); track cat.id) {
+          <div class="cat-row" [class.active]="filters().category === cat.id" (click)="applyFilter('category', cat.id)">
+            @if (cat.image) { <img [src]="cat.image" class="cat-thumb" /> }
+            <span class="label">{{ cat.name }}</span>
+            @if (cat.count !== undefined) { <span class="count">{{ cat.count }}</span> }
           </div>
           }
-          <div class="widget">
-            <div class="stock-toggle">
-              <p-checkbox [ngModel]="filters().inStock" (ngModelChange)="applyFilter('inStock', $event)" [binary]="true"
-                inputId="stock_desk"></p-checkbox>
-              <label for="stock_desk">Show In Stock Only</label>
-            </div>
+        </div>
+      </div>
+
+      @if (brands().length > 0) {
+      <div class="widget">
+        <h3>Brands</h3>
+        <div class="cat-list">
+          <div class="cat-row" [class.active]="!filters().brand" (click)="applyFilter('brand', null)">
+            <span class="label">All Brands</span>
+            <i class="pi pi-angle-right"></i>
+          </div>
+          @for (brand of brands(); track brand.id) {
+          <div class="cat-row" [class.active]="filters().brand === brand.id" (click)="applyFilter('brand', brand.id)">
+            <span class="label">{{ brand.name }}</span>
+            @if (brand.count !== undefined) { <span class="count">{{ brand.count }}</span> }
+          </div>
+          }
+        </div>
+      </div>
+      }
+
+      <div class="widget">
+        <h3>Price Range</h3>
+        <div class="px-2 mb-3 mt-2">
+          <p-slider [ngModel]="rangeValues()" (ngModelChange)="rangeValues.set($event)" [min]="priceLimits().min"
+            [max]="priceLimits().max" [range]="true" (onSlideEnd)="onPriceChange($event)" styleClass="w-full">
+          </p-slider>
+        </div>
+        <div class="price-inputs">
+          <div class="input-group">
+            <span>₹</span>
+            <input type="number" [ngModel]="rangeValues()[0]" (ngModelChange)="patchRangeEnd(0, +$event)" />
+          </div>
+          <span class="dash">—</span>
+          <div class="input-group">
+            <span>₹</span>
+            <input type="number" [ngModel]="rangeValues()[1]" (ngModelChange)="patchRangeEnd(1, +$event)" />
           </div>
         </div>
-      </aside>
+      </div>
+
+      @if (tags().length > 0) {
+      <div class="widget">
+        <h3>Tags</h3>
+        <div class="tags-cloud">
+          @for (tag of tags(); track tag) {
+          <button class="tag-chip" [class.active]="filters().tags.includes(tag)" (click)="toggleTag(tag)" pRipple>
+            {{ tag }}
+          </button>
+          }
+        </div>
+      </div>
       }
-      <main class="products-area" [class.w-full]="!cfg().showSidebar">
+
+      <div class="widget">
+        <div class="stock-toggle">
+          <p-checkbox [ngModel]="filters().inStock" (ngModelChange)="applyFilter('inStock', $event)" [binary]="true"
+            inputId="stock_desk">
+          </p-checkbox>
+          <label for="stock_desk">In Stock Only</label>
+        </div>
+      </div>
+
+    </aside>
+    }
+
+    <!-- Products area: flex column, only inner area scrolls -->
+    <main class="products-area" [class.w-full]="!cfg().showSidebar">
+
+      <!-- Scrollable products region (THIS is the only scroll) -->
+      <div class="products-scroll-area" #productsScrollArea>
+
         @if (loading()) {
         <div class="products-wrapper" [class.list-mode]="viewMode() === 'list'">
-          @for (i of [1,2,3,4,5,6,7,8]; track i) {
+          @for (i of [1,2,3,4,5,6,7,8,9,10,11,12]; track i) {
           <div class="skeleton-placeholder" [class.list-layout]="viewMode() === 'list'">
             <div class="skeleton-img">
               <p-skeleton width="100%" height="100%"></p-skeleton>
             </div>
             <div class="skeleton-content">
-              <p-skeleton width="80%" height="1.5rem" styleClass="mb-2"></p-skeleton>
-              <p-skeleton width="40%" height="1rem"></p-skeleton>
+              <p-skeleton width="75%" height="14px" styleClass="mb-2"></p-skeleton>
+              <p-skeleton width="40%" height="12px"></p-skeleton>
             </div>
           </div>
           }
         </div>
-        }
-        @else if (products().length === 0) {
+        } @else if (products().length === 0) {
         <div class="no-results" @fadeIn>
           <div class="icon-circle">
             <i class="pi pi-search"></i>
           </div>
           <h3>No matching products</h3>
           <p>Try changing your filters or search terms.</p>
-          <button pButton label="Reset Filters" class="btn-primary" (click)="clearFilters()"></button>
+          <button class="btn-primary" (click)="clearFilters()">Reset Filters</button>
         </div>
-        }
-        @else {
+        } @else {
         <div class="products-wrapper" [@listAnimation] [class.list-mode]="viewMode() === 'list'">
           @for (product of products(); track product.id) {
           <app-product-card [product]="product" [orgSlug]="orgSlug()" [layout]="viewMode()">
           </app-product-card>
           }
         </div>
-        <div class="paginator-wrapper">
-          <p-paginator (onPageChange)="onPageChange($event)" [first]="first()" [rows]="rows()"
-            [totalRecords]="totalItems()" [rowsPerPageOptions]="[12, 24, 48]" styleClass="custom-paginator">
-          </p-paginator>
+        }
+
+      </div><!-- /products-scroll-area -->
+
+      <!-- Paginator: fixed at bottom of products-area, never moves -->
+      @if (!loading() && products().length > 0) {
+      <div class="paginator-wrapper">
+        <p-paginator appendTo="body" (onPageChange)="onPageChange($event)" [first]="first()" [rows]="rows()"
+          [totalRecords]="totalItems()" [rowsPerPageOptions]="[12, 24, 48]" styleClass="custom-paginator">
+        </p-paginator>
+      </div>
+      }
+
+    </main>
+  </div><!-- /layout-grid -->
+
+  <!-- ═══ FILTER DIALOG — Two-panel: left nav + right scrollable content ═══ -->
+  <p-drawer [visible]="showMobileFilters()" (visibleChange)="showMobileFilters.set($event)" position="bottom"
+    styleClass="filter-drawer" [modal]="true" [dismissible]="true" [showCloseIcon]="false">
+
+    <!-- Header -->
+    <div class="fd-header">
+      <div class="fd-handle"></div>
+      <div class="fd-title-row">
+        <h3 class="fd-title">
+          Filters
+          @if (activeFilterCount() > 0) {
+          <span class="fd-count-badge">{{ activeFilterCount() }}</span>
+          }
+        </h3>
+        <button class="fd-close" (click)="showMobileFilters.set(false)">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Two-panel body -->
+    <div class="fd-body">
+
+      <!-- LEFT: Tab nav -->
+      <nav class="fd-nav">
+        <button class="fd-nav-item" [class.active]="activeFilterTab() === 'sort'" (click)="activeFilterTab.set('sort')">
+          <i class="pi pi-sort-alt"></i>
+          <span>Sort</span>
+          @if (filters().sort !== '-createdAt') {
+          <span class="fd-nav-dot"></span>
+          }
+        </button>
+
+        <button class="fd-nav-item" [class.active]="activeFilterTab() === 'category'"
+          (click)="activeFilterTab.set('category')">
+          <i class="pi pi-tag"></i>
+          <span>Category</span>
+          @if (filters().category) {
+          <span class="fd-nav-dot"></span>
+          }
+        </button>
+
+        @if (brands().length > 0) {
+        <button class="fd-nav-item" [class.active]="activeFilterTab() === 'brand'"
+          (click)="activeFilterTab.set('brand')">
+          <i class="pi pi-shop"></i>
+          <span>Brand</span>
+          @if (filters().brand) {
+          <span class="fd-nav-dot"></span>
+          }
+        </button>
+        }
+
+        <button class="fd-nav-item" [class.active]="activeFilterTab() === 'price'"
+          (click)="activeFilterTab.set('price')">
+          <i class="pi pi-indian-rupee"></i>
+          <span>Price</span>
+          @if (filters().minPrice != null || filters().maxPrice != null) {
+          <span class="fd-nav-dot"></span>
+          }
+        </button>
+
+        @if (tags().length > 0) {
+        <button class="fd-nav-item" [class.active]="activeFilterTab() === 'tags'" (click)="activeFilterTab.set('tags')">
+          <i class="pi pi-hashtag"></i>
+          <span>Tags</span>
+          @if (filters().tags) {
+          <span class="fd-nav-dot"></span>
+          }
+        </button>
+        }
+
+        <button class="fd-nav-item" [class.active]="activeFilterTab() === 'stock'"
+          (click)="activeFilterTab.set('stock')">
+          <i class="pi pi-check-square"></i>
+          <span>Availability</span>
+          @if (filters().inStock) {
+          <span class="fd-nav-dot"></span>
+          }
+        </button>
+      </nav>
+
+      <!-- RIGHT: Scrollable panel content -->
+      <div class="fd-panel">
+
+        <!-- SORT panel -->
+        @if (activeFilterTab() === 'sort') {
+        <div class="fd-panel-inner">
+          <p class="fd-panel-label">Sort By</p>
+          <div class="fd-sort-list">
+            @for (opt of sortOptions; track opt.value) {
+            <div class="fd-sort-row" [class.selected]="filters().sort === opt.value"
+              (click)="applyFilter('sort', opt.value)">
+              <div class="fd-sort-row-left">
+                <div class="fd-sort-icon">
+                  <i [class]="opt.icon"></i>
+                </div>
+                <span>{{ opt.label }}</span>
+              </div>
+              <div class="fd-radio" [class.checked]="filters().sort === opt.value">
+                @if (filters().sort === opt.value) {
+                <div class="fd-radio-dot"></div>
+                }
+              </div>
+            </div>
+            }
+          </div>
         </div>
         }
-      </main>
-    </div>
-  </div>
-  <p-drawer [visible]="showMobileFilters()" (visibleChange)="showMobileFilters.set($event)" position="bottom"
-    styleClass="expert-bottom-sheet" [modal]="true" [dismissible]="true" [showCloseIcon]="false">
-    <div class="sheet-handle"></div>
-    <div class="sheet-header">
-      <h3>Filters</h3>
-      <button class="close-btn" (click)="showMobileFilters.set(false)">
-        <i class="pi pi-times"></i>
+
+        <!-- CATEGORY panel -->
+        @if (activeFilterTab() === 'category') {
+        <div class="fd-panel-inner">
+          <p class="fd-panel-label">Select Category</p>
+          <div class="fd-select-list">
+            <div class="fd-select-row" [class.selected]="!filters().category" (click)="applyFilter('category', null)">
+              <span>All Categories</span>
+              <div class="fd-radio" [class.checked]="!filters().category">
+                @if (!filters().category) { <div class="fd-radio-dot"></div> }
+              </div>
+            </div>
+            @for (cat of categories(); track cat.id) {
+            <div class="fd-select-row" [class.selected]="filters().category === cat.id"
+              (click)="applyFilter('category', cat.id)">
+              <div class="fd-select-row-left">
+                @if (cat.image) {
+                <img [src]="cat.image" class="fd-thumb" />
+                }
+                <span>{{ cat.name }}</span>
+                @if (cat.count !== undefined) {
+                <span class="fd-count">({{ cat.count }})</span>
+                }
+              </div>
+              <div class="fd-radio" [class.checked]="filters().category === cat.id">
+                @if (filters().category === cat.id) { <div class="fd-radio-dot"></div> }
+              </div>
+            </div>
+            }
+          </div>
+        </div>
+        }
+
+        <!-- BRAND panel -->
+        @if (activeFilterTab() === 'brand') {
+        <div class="fd-panel-inner">
+          <p class="fd-panel-label">Select Brand</p>
+          <div class="fd-select-list">
+            <div class="fd-select-row" [class.selected]="!filters().brand" (click)="applyFilter('brand', null)">
+              <span>All Brands</span>
+              <div class="fd-radio" [class.checked]="!filters().brand">
+                @if (!filters().brand) { <div class="fd-radio-dot"></div> }
+              </div>
+            </div>
+            @for (brand of brands(); track brand.id) {
+            <div class="fd-select-row" [class.selected]="filters().brand === brand.id"
+              (click)="applyFilter('brand', brand.id)">
+              <div class="fd-select-row-left">
+                <span>{{ brand.name }}</span>
+                @if (brand.count !== undefined) {
+                <span class="fd-count">({{ brand.count }})</span>
+                }
+              </div>
+              <div class="fd-radio" [class.checked]="filters().brand === brand.id">
+                @if (filters().brand === brand.id) { <div class="fd-radio-dot"></div> }
+              </div>
+            </div>
+            }
+          </div>
+        </div>
+        }
+
+        <!-- PRICE panel -->
+        @if (activeFilterTab() === 'price') {
+        <div class="fd-panel-inner">
+          <p class="fd-panel-label">Price Range</p>
+          <div class="fd-price-display">
+            <span class="fd-price-val">₹{{ rangeValues()[0] | number }}</span>
+            <span class="fd-price-sep">–</span>
+            <span class="fd-price-val">₹{{ rangeValues()[1] | number }}</span>
+          </div>
+          <div class="fd-slider-wrap">
+            <p-slider [ngModel]="rangeValues()" (ngModelChange)="rangeValues.set($event)" [min]="priceLimits().min"
+              [max]="priceLimits().max" [range]="true" (onSlideEnd)="onPriceChange($event)" styleClass="fd-slider">
+            </p-slider>
+          </div>
+          <div class="fd-price-inputs">
+            <div class="fd-price-field">
+              <label>Min</label>
+              <div class="fd-price-input-wrap">
+                <span class="fd-currency">₹</span>
+                <input type="number" [ngModel]="rangeValues()[0]" (ngModelChange)="patchRangeEnd(0, +$event)"
+                  placeholder="0" />
+              </div>
+            </div>
+            <div class="fd-price-dash">—</div>
+            <div class="fd-price-field">
+              <label>Max</label>
+              <div class="fd-price-input-wrap">
+                <span class="fd-currency">₹</span>
+                <input type="number" [ngModel]="rangeValues()[1]" (ngModelChange)="patchRangeEnd(1, +$event)"
+                  placeholder="10000" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick price presets -->
+          <p class="fd-panel-label" style="margin-top: 20px">Quick Select</p>
+          <div class="fd-price-presets">
+            @for (preset of pricePresets(); track preset.label) {
+            <button class="fd-preset-chip"
+              [class.active]="rangeValues()[0] === preset.min && rangeValues()[1] === preset.max"
+              (click)="applyPreset(preset)">
+              {{ preset.label }}
+            </button>
+            }
+          </div>
+        </div>
+        }
+
+        <!-- TAGS panel -->
+        @if (activeFilterTab() === 'tags') {
+        <div class="fd-panel-inner">
+          <p class="fd-panel-label">Trending Tags</p>
+          <div class="fd-tags-grid">
+            @for (tag of tags(); track tag) {
+            <button class="fd-tag-chip" [class.active]="filters().tags.includes(tag)" (click)="toggleTag(tag)">
+              <i class="pi pi-hashtag"></i>
+              {{ tag }}
+              @if (filters().tags.includes(tag)) {
+              <i class="pi pi-check fd-tag-check"></i>
+              }
+            </button>
+            }
+          </div>
+        </div>
+        }
+
+        <!-- STOCK panel -->
+        @if (activeFilterTab() === 'stock') {
+        <div class="fd-panel-inner">
+          <p class="fd-panel-label">Availability</p>
+          <div class="fd-availability-card" [class.active]="filters().inStock"
+            (click)="applyFilter('inStock', !filters().inStock)">
+            <div class="fd-avail-left">
+              <div class="fd-avail-icon">
+                <i class="pi pi-box"></i>
+              </div>
+              <div>
+                <div class="fd-avail-title">In Stock Only</div>
+                <div class="fd-avail-sub">Show only products available now</div>
+              </div>
+            </div>
+            <div class="fd-toggle" [class.on]="filters().inStock">
+              <div class="fd-toggle-thumb"></div>
+            </div>
+          </div>
+
+          <div class="fd-availability-card" [class.active]="!filters().inStock" (click)="applyFilter('inStock', false)">
+            <div class="fd-avail-left">
+              <div class="fd-avail-icon">
+                <i class="pi pi-list"></i>
+              </div>
+              <div>
+                <div class="fd-avail-title">All Products</div>
+                <div class="fd-avail-sub">Include out of stock items</div>
+              </div>
+            </div>
+            <div class="fd-radio" [class.checked]="!filters().inStock">
+              @if (!filters().inStock) { <div class="fd-radio-dot"></div> }
+            </div>
+          </div>
+        </div>
+        }
+
+      </div><!-- /fd-panel -->
+    </div><!-- /fd-body -->
+
+    <!-- Footer -->
+    <div class="fd-footer">
+      <button class="fd-reset" (click)="clearFilters()">
+        <i class="pi pi-refresh"></i>
+        Reset All
+      </button>
+      <button class="fd-apply" (click)="showMobileFilters.set(false)">
+        View {{ totalItems() }} Results
+        <i class="pi pi-arrow-right"></i>
       </button>
     </div>
-    <div class="sheet-content">
-      <div class="sheet-section">
-        <h4 class="section-title">Sort By</h4>
-        <div class="sort-options-grid">
-          @for (opt of sortOptions; track opt.value) {
-          <div class="sort-card" [class.selected]="filters().sort === opt.value"
-            (click)="applyFilter('sort', opt.value)">
-            <i [class]="opt.icon"></i>
-            <span>{{ opt.label }}</span>
-            @if (filters().sort === opt.value) { <i class="pi pi-check-circle check"></i> }
-          </div>
-          }
-        </div>
-      </div>
-      <div class="sheet-section">
-        <h4 class="section-title">Categories</h4>
-        <div class="mobile-cat-scroll">
-          <div class="mobile-cat-chip" [class.active]="!filters().category" (click)="applyFilter('category', null)">
-            All
-          </div>
-          @for (cat of categories(); track cat.id) {
-          <div class="mobile-cat-chip" [class.active]="filters().category === cat.id"
-            (click)="applyFilter('category', cat.id)">
-            {{ cat.name }}
-          </div>
-          }
-        </div>
-      </div>
-      @if (brands().length > 0) {
-      <div class="sheet-section">
-        <h4 class="section-title">Brands</h4>
-        <div class="mobile-cat-scroll">
-          <div class="mobile-cat-chip" [class.active]="!filters().brand" (click)="applyFilter('brand', null)">
-            All
-          </div>
-          @for (brand of brands(); track brand.id) {
-          <div class="mobile-cat-chip" [class.active]="filters().brand === brand.id"
-            (click)="applyFilter('brand', brand.id)">
-            {{ brand.name }}
-          </div>
-          }
-        </div>
-      </div>
-      }
-      <div class="sheet-section">
-        <h4 class="section-title">Price Range</h4>
-        <div class="price-row flex gap-4 items-center">
-          <input pInputText type="number" placeholder="Min" class="w-full" [ngModel]="rangeValues()[0]"
-            (ngModelChange)="patchRangeEnd(0, +$event)">
-          <span class="divider font-bold text-gray-500">to</span>
-          <input pInputText type="number" placeholder="Max" class="w-full" [ngModel]="rangeValues()[1]"
-            (ngModelChange)="patchRangeEnd(1, +$event)">
-        </div>
-      </div>
-      @if (tags().length > 0) {
-      <div class="sheet-section">
-        <h4 class="section-title">Tags</h4>
-        <div class="tags-grid">
-          @for (tag of tags(); track tag) {
-          <div class="mobile-tag" [class.active]="filters().tags.includes(tag)" (click)="toggleTag(tag)">
-            {{ tag }}
-          </div>
-          }
-        </div>
-      </div>
-      }
-      <div class="sheet-section">
-        <div class="flex align-items-center justify-content-between p-3 surface-ground border-round shadow-1">
-          <label class="font-bold text-lg">In Stock Only</label>
-          <p-checkbox [ngModel]="filters().inStock" (ngModelChange)="applyFilter('inStock', $event)"
-            [binary]="true"></p-checkbox>
-        </div>
-      </div>
-    </div>
-    <div class="sheet-footer">
-      <button class="reset-btn" (click)="clearFilters()">Reset</button>
-      <button class="apply-btn" (click)="showMobileFilters.set(false)">
-        Show {{ totalItems() }} Results
-      </button>
-    </div>
+
   </p-drawer>
 </div>

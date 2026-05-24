@@ -1,107 +1,110 @@
+// ═══════════════════════════════════════════════════════════════
+// PRODUCT LISTING — Premium Commerce UI
+// Design: Refined editorial-commerce hybrid
+// Scroll: Page header fixed, sidebar fixed, ONLY products scroll
+// ═══════════════════════════════════════════════════════════════
 
-/* Assume common style.scss is imported or global */
-// @include apply-canonical-mapping;
-
+// ─── Page Shell ─────────────────────────────────────────────────
 .page-root {
-  // background-color: var(--bg-primary); /* Updated from --bg-page to canonical */
-  background-color: transparent;
-  min-height: 100vh;
-  position: relative;
-  font-family: var(--font-body);
-  padding-bottom: calc(var(--spacing-5xl) * 2); /* Increased for better footer spacing using common spacing */
+  display: flex;
+  flex-direction: column;
+  height: 100vh; // Lock the viewport — nothing outside scrolls
+  overflow: hidden;
+  background-color: var(--bg-primary);
   color: var(--text-primary);
-  transition: background-color var(--transition-base);
+  font-family: var(--font-body);
+  position: relative;
 }
 
 .ambient-layer {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: calc(var(--spacing-5xl) * 8); /* Taller for more immersive feel */
-  background: linear-gradient(to bottom, color-mix(in srgb, var(--accent-primary) 5%, transparent) 0%, var(--bg-primary) 100%); /* Subtle primary tint */
-  opacity: 1;
+  inset: 0;
+  height: 320px;
+  background: linear-gradient(160deg,
+      color-mix(in srgb, var(--accent-primary) 6%, transparent) 0%,
+      transparent 60%);
+  pointer-events: none;
   z-index: 0;
-  transition: background var(--transition-slow);
 }
 
-.container {
-  max-width: 1440px;
-  margin: 0 auto;
-  padding: 0 var(--spacing-2xl);
-  position: relative;
-  z-index: 1;
-  @media (max-width: 768px) {
-    padding: 0 var(--spacing-lg);
-  }
-}
-
-// ────────────────────────────────────────────
-// 2. HEADER - Enhanced with better alignment and subtle shadows
-// ────────────────────────────────────────────
+// ─── Top Header Bar ──────────────────────────────────────────────
 .listing-header {
+  flex-shrink: 0; // Never compress — stays at top
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-top: var(--spacing-3xl);
-  margin-bottom: var(--spacing-2xl);
-  gap: var(--spacing-xl);
+  gap: 12px;
+  padding: 14px 24px;
   background: var(--bg-primary);
-  padding: var(--spacing-lg);
-  border-radius: var(--radius-2xl);
-  box-shadow: var(--shadow-sm);
+  border-bottom: 1px solid var(--border-secondary);
+  z-index: 20;
+  position: relative;
+  backdrop-filter: blur(12px);
+
   @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--spacing-lg);
-    margin-top: var(--spacing-xl);
-    padding: var(--spacing-md);
+    flex-wrap: wrap;
+    padding: 12px 16px;
+    gap: 10px;
   }
 }
 
+// ─── Search ──────────────────────────────────────────────────────
 .search-block {
   flex: 1;
-  max-width: 600px; /* Wider for better usability */
+  min-width: 180px;
+  max-width: 420px;
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+    flex-basis: 100%;
+    order: -1;
+  }
 
   .input-wrapper {
     position: relative;
-    i {
+
+    i.pi-search {
       position: absolute;
-      left: var(--spacing-lg);
+      left: 14px;
       top: 50%;
       transform: translateY(-50%);
       color: var(--text-tertiary);
-      font-size: var(--font-size-xl);
+      font-size: 14px;
+      pointer-events: none;
     }
+
     input {
       width: 100%;
-      padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-lg) calc(var(--spacing-xl) * 2);
-      border: var(--ui-border-width) solid var(--border-secondary);
-      border-radius: 9999px; /* Fully rounded for modern look */
-      font-size: var(--font-size-xl);
+      padding: 10px 16px 10px 40px;
+      border: 1.5px solid var(--border-secondary);
+      border-radius: 10px;
+      font-size: 14px;
       background: var(--bg-secondary);
       color: var(--text-primary);
-      box-shadow: var(--shadow-sm);
-      transition: var(--transition-base);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+
       &::placeholder {
         color: var(--text-tertiary);
       }
+
       &:focus {
         border-color: var(--accent-primary);
-        box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
-        outline: none;
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary) 15%, transparent);
         background: var(--bg-primary);
       }
     }
   }
 }
 
+// ─── Controls Row ────────────────────────────────────────────────
 .controls-block {
   display: flex;
   align-items: center;
-  gap: var(--spacing-xl); /* Increased gap for breathing room */
+  gap: 8px;
+  flex-shrink: 0;
 
   @media (max-width: 768px) {
+    width: 100%;
     justify-content: space-between;
   }
 }
@@ -109,17 +112,38 @@
 .desktop-sort {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
+  gap: 8px;
+  padding: 8px 14px;
   background: var(--bg-secondary);
-  padding: var(--spacing-sm) var(--spacing-lg);
-  border-radius: var(--ui-border-radius-lg);
-  border: var(--ui-border-width) solid var(--border-secondary);
-  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-secondary);
+  border-radius: 10px;
 
   .text-label {
-    font-size: var(--font-size-md);
-    color: var(--text-secondary);
-    font-weight: var(--font-weight-medium);
+    font-size: 12px;
+    color: var(--text-tertiary);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  ::ng-deep .minimal-select {
+    .p-select {
+      border: none;
+      background: transparent;
+      box-shadow: none;
+      padding: 0;
+      min-width: 160px;
+    }
+
+    .p-select-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      padding: 0;
+    }
+
+    .p-select-dropdown {
+      color: var(--text-tertiary);
+    }
   }
 
   @media (max-width: 768px) {
@@ -130,113 +154,123 @@
 .layout-toggle {
   display: flex;
   background: var(--bg-secondary);
-  border: var(--ui-border-width) solid var(--border-secondary);
-  border-radius: var(--ui-border-radius-lg);
+  border: 1px solid var(--border-secondary);
+  border-radius: 10px;
   overflow: hidden;
-  box-shadow: var(--shadow-sm);
 
   button {
-    width: calc(var(--spacing-2xl) * 1.5);
-    height: calc(var(--spacing-2xl) * 1.5);
+    width: 38px;
+    height: 38px;
     border: none;
     background: transparent;
     color: var(--text-tertiary);
     cursor: pointer;
-    transition: var(--transition-base);
+    transition: background 0.15s, color 0.15s;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 14px;
 
     &:hover {
       background: var(--bg-ternary);
       color: var(--text-primary);
     }
+
     &.active {
       background: var(--accent-primary);
-      color: var(--text-primary);
+      color: white;
     }
   }
+
   @media (max-width: 768px) {
     display: none;
   }
 }
 
-// ────────────────────────────────────────────
-// 3. MOBILE TRIGGER - Premium button style
-// ────────────────────────────────────────────
 .mobile-filter-trigger {
   display: none;
   align-items: center;
-  gap: var(--spacing-md);
-  padding: var(--spacing-lg) var(--spacing-2xl);
+  gap: 8px;
+  padding: 10px 18px;
   background: var(--accent-primary);
-  color: var(--text-primary);
+  color: white;
   border: none;
-  border-radius: 9999px;
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-xl);
-  box-shadow: var(--shadow-md);
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
   cursor: pointer;
+  transition: opacity 0.2s;
   position: relative;
-  transition: var(--transition-transform);
 
   &:hover {
-    transform: translateY(-2px);
+    opacity: 0.9;
+  }
+
+  .badge {
+    background: white;
+    color: var(--accent-primary);
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    font-size: 10px;
+    display: grid;
+    place-items: center;
+    font-weight: 700;
   }
 
   @media (max-width: 768px) {
     display: flex;
-    width: 100%;
-    justify-content: center;
-  }
-
-  .badge {
-    background: var(--bg-primary);
-    color: var(--accent-primary);
-    width: var(--spacing-xl);
-    height: var(--spacing-xl);
-    border-radius: 50%;
-    font-size: var(--font-size-sm);
-    display: grid;
-    place-items: center;
-    box-shadow: var(--shadow-sm);
   }
 }
 
-// ────────────────────────────────────────────
-// 4. ACTIVE FILTERS - Chip-like with animations
-// ────────────────────────────────────────────
+// ─── Active Filters Bar ──────────────────────────────────────────
 .active-filters-bar {
+  flex-shrink: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--spacing-2xl);
-  padding: var(--spacing-lg);
-  background: var(--bg-secondary);
-  border-radius: var(--radius-2xl);
-  box-shadow: var(--shadow-sm);
+  padding: 8px 24px;
+  background: color-mix(in srgb, var(--accent-primary) 5%, var(--bg-primary));
+  border-bottom: 1px solid var(--border-secondary);
+  gap: 12px;
+  min-height: 44px;
+
+  @media (max-width: 768px) {
+    padding: 8px 16px;
+  }
 
   .filter-pills {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--spacing-md);
+    gap: 6px;
+    flex: 1;
 
     .pill {
-      background: var(--bg-primary);
-      border: var(--ui-border-width) solid var(--border-secondary);
-      padding: var(--spacing-sm) var(--spacing-lg);
-      border-radius: 9999px;
-      font-size: var(--font-size-md);
-      color: var(--text-secondary);
       display: flex;
       align-items: center;
-      gap: var(--spacing-sm);
+      gap: 6px;
+      padding: 4px 12px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-secondary);
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
       cursor: pointer;
-      transition: var(--transition-base);
+      transition: all 0.15s;
+
+      i {
+        font-size: 10px;
+        color: var(--text-tertiary);
+      }
+
       &:hover {
-        border-color: var(--color-error);
-        color: var(--color-error);
-        transform: scale(1.05);
+        border-color: #ef4444;
+        color: #ef4444;
+
+        i {
+          color: #ef4444;
+        }
       }
     }
   }
@@ -245,87 +279,143 @@
     background: none;
     border: none;
     color: var(--accent-primary);
-    text-decoration: underline;
-    font-size: var(--font-size-md);
+    font-size: 12px;
+    font-weight: 600;
     cursor: pointer;
-    transition: var(--transition-colors);
+    white-space: nowrap;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 0.15s;
+
     &:hover {
-      color: var(--color-error);
+      color: #ef4444;
     }
   }
 }
 
-// ────────────────────────────────────────────
-// 5. LAYOUT GRID - Improved responsiveness
-// ────────────────────────────────────────────
+// ─── Body: Sidebar + Products ─────────────────────────────────────
+// THIS IS THE KEY FIX: flex: 1 + overflow: hidden contains scroll
 .layout-grid {
+  flex: 1; // Takes remaining height after header
+  overflow: hidden; // Prevents page-level scroll
   display: grid;
-  grid-template-columns: calc(var(--spacing-5xl) * 6) 1fr; /* Wider sidebar for premium feel */
-  gap: var(--spacing-3xl);
+  grid-template-columns: 260px 1fr;
+  position: relative;
+  z-index: 1;
 
   @media (max-width: 992px) {
     grid-template-columns: 1fr;
   }
 }
 
-// ────────────────────────────────────────────
-// 6. SIDEBAR - Sticky with smooth scroll
-// ────────────────────────────────────────────
+// ─── Sidebar ─────────────────────────────────────────────────────
 .sidebar-desktop {
+  height: 100%;
+  overflow-y: auto; // Sidebar scrolls independently
+  overflow-x: hidden;
+  border-right: 1px solid var(--border-secondary);
+  background: var(--bg-primary);
+  padding: 20px 16px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-secondary) transparent;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-secondary);
+    border-radius: 4px;
+  }
+
   @media (max-width: 992px) {
     display: none;
   }
 
-  .sticky-content {
-    position: sticky;
-    top: calc(var(--spacing-3xl) * 2); /* Adjusted for header */
-    overflow-y: auto;
-    max-height: calc(100vh - calc(var(--spacing-3xl) * 2));
-    padding-right: var(--spacing-lg);
-  }
-
   .widget {
-    margin-bottom: var(--spacing-3xl);
-    background: var(--bg-primary);
-    padding: var(--spacing-xl);
-    border-radius: var(--radius-2xl);
-    box-shadow: var(--shadow-sm);
+    margin-bottom: 28px;
+
     h3 {
-      font-family: var(--font-heading);
-      font-size: var(--font-size-xl);
-      font-weight: var(--font-weight-semibold);
-      margin-bottom: var(--spacing-lg);
-      color: var(--text-primary);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-tertiary);
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-secondary);
     }
   }
 }
 
 .cat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
   .cat-row {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: var(--spacing-md) 0;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 8px;
     cursor: pointer;
+    font-size: 13.5px;
     color: var(--text-secondary);
-    font-size: var(--font-size-lg);
-    transition: var(--transition-base);
+    transition: background 0.15s, color 0.15s;
+    position: relative;
 
     &:hover {
-      color: var(--accent-primary);
-      transform: translateX(6px);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
     }
+
     &.active {
-      font-weight: var(--font-weight-semibold);
+      background: color-mix(in srgb, var(--accent-primary) 12%, transparent);
       color: var(--accent-primary);
+      font-weight: 600;
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 4px;
+        bottom: 4px;
+        width: 3px;
+        border-radius: 2px;
+        background: var(--accent-primary);
+      }
+    }
+
+    .label {
+      flex: 1;
     }
 
     .count {
+      font-size: 11px;
+      padding: 2px 7px;
       background: var(--bg-ternary);
-      padding: var(--spacing-xs) var(--spacing-md);
-      border-radius: 9999px;
-      font-size: var(--font-size-sm);
+      border-radius: 20px;
       color: var(--text-tertiary);
+      font-weight: 500;
+    }
+
+    .cat-thumb {
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    i.pi-angle-right {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      margin-left: auto;
     }
   }
 }
@@ -333,193 +423,344 @@
 .price-inputs {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
+  gap: 8px;
+  margin-top: 12px;
+
   .input-group {
     position: relative;
     flex: 1;
+
     span {
       position: absolute;
-      left: var(--spacing-md);
+      left: 9px;
       top: 50%;
       transform: translateY(-50%);
+      font-size: 12px;
       color: var(--text-tertiary);
-      font-size: var(--font-size-md);
+      font-weight: 600;
     }
+
     input {
       width: 100%;
-      padding: var(--spacing-md) var(--spacing-md) var(--spacing-md) calc(var(--spacing-md) * 2);
-      border: var(--ui-border-width) solid var(--border-secondary);
-      border-radius: var(--ui-border-radius-lg);
-      font-size: var(--font-size-md);
+      padding: 8px 8px 8px 22px;
+      border: 1px solid var(--border-secondary);
+      border-radius: 8px;
+      font-size: 13px;
       background: var(--bg-secondary);
       color: var(--text-primary);
-      transition: var(--transition-base);
+      outline: none;
+      transition: border-color 0.15s;
+
       &:focus {
         border-color: var(--accent-primary);
-        box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+      }
+
+      &::-webkit-inner-spin-button {
+        display: none;
       }
     }
   }
+
   .dash {
     color: var(--text-tertiary);
-    font-weight: var(--font-weight-bold);
+    font-size: 12px;
+    flex-shrink: 0;
   }
 }
 
 .tags-cloud {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--spacing-md);
+  gap: 6px;
+
   .tag-chip {
+    padding: 5px 12px;
     background: var(--bg-secondary);
-    border: var(--ui-border-width) solid var(--border-secondary);
-    padding: var(--spacing-sm) var(--spacing-lg);
-    border-radius: 9999px;
-    font-size: var(--font-size-md);
+    border: 1px solid var(--border-secondary);
+    border-radius: 20px;
+    font-size: 12px;
     color: var(--text-secondary);
     cursor: pointer;
-    transition: var(--transition-base);
+    transition: all 0.15s;
 
     &:hover {
       border-color: var(--accent-primary);
       color: var(--accent-primary);
-      box-shadow: var(--shadow-sm);
     }
+
     &.active {
       background: var(--accent-primary);
-      color: var(--text-primary);
+      color: white;
       border-color: var(--accent-primary);
     }
   }
 }
 
-// ────────────────────────────────────────────
-// 7. PRODUCT GRID - Masonry-like with hover effects
-// ────────────────────────────────────────────
+.stock-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    user-select: none;
+  }
+}
+
+// ─── Products Area ────────────────────────────────────────────────
+.products-area {
+  display: flex;
+  flex-direction: column;
+  height: 100%; // Fills grid cell
+  overflow: hidden; // Contains child scroll
+
+  &.w-full {
+    grid-column: 1 / -1;
+  }
+}
+
+// THE KEY: products wrapper area is the only thing that scrolls
+.products-scroll-area {
+  flex: 1;
+  overflow-y: auto; // ← ONLY THIS SCROLLS
+  overflow-x: hidden;
+  padding: 20px 20px 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-secondary) transparent;
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-secondary);
+    border-radius: 4px;
+  }
+
+  @media (max-width: 768px) {
+    padding: 12px 12px 0;
+  }
+}
+
+// ─── Results Meta Bar ─────────────────────────────────────────────
+.results-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-shrink: 0;
+
+  .results-count {
+    font-size: 13px;
+    color: var(--text-tertiary);
+
+    span {
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+  }
+}
+
+// ─── Products Grid ────────────────────────────────────────────────
 .products-wrapper {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(calc(var(--spacing-5xl) * 5), 1fr)); /* Wider cards */
-  gap: var(--spacing-2xl);
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
   width: 100%;
+  align-content: start;
 
-  @media (max-width: 576px) {
+  @media (max-width: 640px) {
     grid-template-columns: 1fr 1fr;
-    gap: var(--spacing-lg);
+    gap: 10px;
   }
 
   &.list-mode {
     grid-template-columns: 1fr;
-    gap: var(--spacing-xl);
+    gap: 10px;
   }
 }
 
+// ─── Skeleton ─────────────────────────────────────────────────────
 .skeleton-placeholder {
-  position: relative;
-  width: 100%;
-  border-radius: var(--radius-2xl);
+  border-radius: 14px;
   overflow: hidden;
-  background-color: var(--bg-ternary);
-  border: var(--ui-border-width) solid var(--border-secondary);
-  transition: box-shadow var(--transition-base);
-
-  /* GRID MODE */
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
   aspect-ratio: 3 / 4;
   display: flex;
   flex-direction: column;
 
-  /* LIST MODE */
   &.list-layout {
     aspect-ratio: auto;
-    height: calc(var(--spacing-4xl) * 6); /* Taller for premium feel */
+    height: 120px;
     flex-direction: row;
 
     .skeleton-img {
-      width: calc(var(--spacing-4xl) * 6);
+      width: 120px;
       height: 100%;
+      flex-shrink: 0;
     }
 
     .skeleton-content {
       flex: 1;
-      padding: var(--spacing-2xl);
+      padding: 16px;
       display: flex;
       flex-direction: column;
-      gap: var(--spacing-lg);
+      gap: 10px;
       justify-content: center;
     }
   }
 
-  /* GRID MODE INNER */
   &:not(.list-layout) {
     .skeleton-img {
       width: 100%;
-      height: 65%; /* Adjusted ratio */
+      height: 65%;
     }
+
     .skeleton-content {
-      height: 35%;
-      padding: var(--spacing-lg);
+      flex: 1;
+      padding: 12px;
       display: flex;
       flex-direction: column;
-      gap: var(--spacing-md);
+      gap: 8px;
     }
   }
 }
 
+// ─── No Results ───────────────────────────────────────────────────
 .no-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
   text-align: center;
-  padding: calc(var(--spacing-3xl) * 4) 0;
-  background: var(--bg-primary);
-  border-radius: var(--radius-2xl);
-  box-shadow: var(--shadow-lg);
+
   .icon-circle {
-    width: calc(var(--spacing-2xl) * 4);
-    height: calc(var(--spacing-2xl) * 4);
-    background: var(--bg-ternary);
+    width: 80px;
+    height: 80px;
+    background: var(--bg-secondary);
     border-radius: 50%;
-    margin: 0 auto var(--spacing-xl);
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-bottom: 20px;
+    border: 1px solid var(--border-secondary);
+
     i {
-      font-size: var(--font-size-3xl);
+      font-size: 28px;
       color: var(--text-tertiary);
     }
   }
+
   h3 {
-    font-family: var(--font-heading);
-    font-size: var(--font-size-3xl);
-    margin-bottom: var(--spacing-md);
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
     color: var(--text-primary);
   }
+
   p {
+    font-size: 14px;
     color: var(--text-secondary);
-    margin-bottom: var(--spacing-2xl);
-    font-size: var(--font-size-xl);
+    margin-bottom: 24px;
   }
 
   .btn-primary {
     background: var(--accent-primary);
-    color: var(--text-primary);
+    color: white;
     border: none;
-    padding: var(--spacing-lg) var(--spacing-2xl);
-    border-radius: 9999px;
-    font-weight: var(--font-weight-semibold);
-    box-shadow: var(--shadow-md);
-    transition: var(--transition-transform);
+    padding: 12px 28px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+
     &:hover {
-      transform: translateY(-2px);
+      opacity: 0.88;
     }
   }
 }
 
-// ────────────────────────────────────────────
-// 8. MOBILE DRAWER - Full-screen premium bottom sheet
-// ────────────────────────────────────────────
+// ─── Paginator — Fixed at bottom, never moves ─────────────────────
+.paginator-wrapper {
+  flex-shrink: 0; // Never gets squeezed
+  padding: 12px 20px;
+  border-top: 1px solid var(--border-secondary);
+  background: var(--bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  @media (max-width: 768px) {
+    padding: 10px 12px;
+  }
+
+  ::ng-deep .custom-paginator {
+    background: transparent;
+    border: none;
+    padding: 0;
+
+    .p-paginator-pages {
+      display: flex;
+      gap: 4px;
+    }
+
+    .p-paginator-page,
+    .p-paginator-first,
+    .p-paginator-prev,
+    .p-paginator-next,
+    .p-paginator-last {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 1px solid var(--border-secondary);
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover {
+        background: var(--bg-ternary);
+        border-color: var(--accent-primary);
+        color: var(--accent-primary);
+      }
+
+      &.p-highlight {
+        background: var(--accent-primary) !important;
+        color: white !important;
+        border-color: var(--accent-primary) !important;
+        font-weight: 700;
+      }
+    }
+
+    .p-paginator-rpp-dropdown {
+      height: 36px;
+      border-radius: 8px;
+      border: 1px solid var(--border-secondary);
+      background: var(--bg-secondary);
+      font-size: 13px;
+    }
+  }
+}
+
+// ─── Mobile Bottom Sheet ──────────────────────────────────────────
 ::ng-deep .expert-bottom-sheet {
-  height: 90vh !important;
-  border-radius: calc(var(--ui-border-radius-xl) * 2) calc(var(--ui-border-radius-xl) * 2) 0 0 !important;
+  height: 88vh !important;
+  border-radius: 20px 20px 0 0 !important;
   background: var(--bg-primary) !important;
-  box-shadow: var(--shadow-2xl) !important;
-  transition: transform var(--transition-slower);
+  box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.2) !important;
 
   .p-drawer-content {
     padding: 0 !important;
@@ -528,40 +769,51 @@
     height: 100%;
     background: var(--bg-primary) !important;
     color: var(--text-primary);
+    overflow: hidden;
   }
 }
 
 .sheet-handle {
-  width: calc(var(--spacing-xl) * 2.5);
-  height: var(--spacing-xs);
+  width: 36px;
+  height: 4px;
   background: var(--border-secondary);
-  border-radius: var(--ui-border-radius-sm);
-  margin: var(--spacing-lg) auto;
+  border-radius: 4px;
+  margin: 12px auto 0;
+  flex-shrink: 0;
 }
 
 .sheet-header {
-  padding: 0 var(--spacing-xl) var(--spacing-lg);
-  border-bottom: var(--ui-border-width) solid var(--border-secondary);
+  padding: 12px 20px 14px;
+  border-bottom: 1px solid var(--border-secondary);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0;
 
   h3 {
-    font-family: var(--font-heading);
-    font-size: var(--font-size-2xl);
-    font-weight: var(--font-weight-semibold);
+    font-size: 18px;
+    font-weight: 700;
     margin: 0;
     color: var(--text-primary);
   }
+
   .close-btn {
-    background: none;
-    border: none;
-    font-size: var(--font-size-2xl);
-    padding: var(--spacing-md);
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-secondary);
     color: var(--text-secondary);
-    transition: var(--transition-colors);
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s;
+
     &:hover {
-      color: var(--accent-primary);
+      background: var(--bg-ternary);
+      color: var(--text-primary);
     }
   }
 }
@@ -569,154 +821,184 @@
 .sheet-content {
   flex: 1;
   overflow-y: auto;
-  padding: var(--spacing-xl);
-  background: var(--bg-primary);
-}
+  padding: 16px 20px;
 
-.sheet-section {
-  margin-bottom: var(--spacing-3xl);
+  &::-webkit-scrollbar {
+    width: 3px;
+  }
 
-  .section-title {
-    font-size: var(--font-size-lg);
-    text-transform: uppercase;
-    color: var(--text-tertiary);
-    letter-spacing: 1.2px;
-    margin-bottom: var(--spacing-lg);
-    font-weight: var(--font-weight-semibold);
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-secondary);
+    border-radius: 4px;
   }
 }
 
-// SORT CARDS (Mobile) - Card-like with shadows
+.sheet-section {
+  margin-bottom: 24px;
+
+  .section-title {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-tertiary);
+    margin-bottom: 12px;
+  }
+}
+
 .sort-options-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-lg);
+  gap: 8px;
 
   .sort-card {
-    border: var(--ui-border-width) solid var(--border-secondary);
-    border-radius: var(--radius-2xl);
-    padding: var(--spacing-xl);
+    border: 1.5px solid var(--border-secondary);
+    border-radius: 12px;
+    padding: 14px 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--spacing-md);
+    gap: 6px;
     text-align: center;
     cursor: pointer;
     background: var(--bg-secondary);
     color: var(--text-secondary);
-    box-shadow: var(--shadow-sm);
-    transition: var(--transition-base);
+    transition: all 0.15s;
+    position: relative;
 
     i {
-      font-size: var(--font-size-2xl);
+      font-size: 20px;
       color: var(--text-tertiary);
     }
-    span {
-      font-size: var(--font-size-lg);
-      font-weight: var(--font-weight-medium);
-    }
 
-    &:hover {
-      box-shadow: var(--shadow-md);
-      transform: translateY(-4px);
+    span {
+      font-size: 12px;
+      font-weight: 500;
     }
 
     &.selected {
       border-color: var(--accent-primary);
-      background: var(--bg-primary);
+      background: color-mix(in srgb, var(--accent-primary) 8%, var(--bg-primary));
       color: var(--accent-primary);
-      box-shadow: var(--shadow-md);
+
       i {
         color: var(--accent-primary);
       }
+
       .check {
         position: absolute;
-        top: var(--spacing-md);
-        right: var(--spacing-md);
-        font-size: var(--font-size-xl);
+        top: 8px;
+        right: 8px;
+        font-size: 14px;
+        color: var(--accent-primary);
       }
     }
   }
 }
 
-// MOBILE CHIPS - Smooth scroll with premium styling
 .mobile-cat-scroll {
   display: flex;
-  gap: var(--spacing-md);
+  gap: 8px;
   overflow-x: auto;
-  padding-bottom: var(--spacing-sm);
-  scrollbar-width: none; /* Hide scrollbar */
+  padding-bottom: 4px;
+  scrollbar-width: none;
+
   &::-webkit-scrollbar {
     display: none;
   }
+
   .mobile-cat-chip {
     white-space: nowrap;
-    padding: var(--spacing-md) var(--spacing-xl);
+    padding: 8px 16px;
     background: var(--bg-secondary);
-    border-radius: 9999px;
-    font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-medium);
+    border: 1px solid var(--border-secondary);
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
     color: var(--text-secondary);
-    transition: var(--transition-base);
-    box-shadow: var(--shadow-sm);
-
-    &:hover {
-      background: var(--bg-ternary);
-    }
+    cursor: pointer;
+    transition: all 0.15s;
+    flex-shrink: 0;
 
     &.active {
       background: var(--accent-primary);
-      color: var(--text-primary);
-      box-shadow: var(--shadow-md);
-    }
-  }
-}
-
-// MOBILE TAGS - Grid with hover lifts
-.tags-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-md);
-  .mobile-tag {
-    padding: var(--spacing-md) var(--spacing-xl);
-    background: var(--bg-secondary);
-    border: var(--ui-border-width) solid var(--border-secondary);
-    border-radius: var(--ui-border-radius-lg);
-    font-size: var(--font-size-lg);
-    color: var(--text-secondary);
-    box-shadow: var(--shadow-sm);
-    transition: var(--transition-base);
-
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
-    }
-
-    &.active {
-      background: var(--accent-primary);
-      color: var(--text-primary);
+      color: white;
       border-color: var(--accent-primary);
     }
   }
 }
 
-// FOOTER - Gradient buttons
+.tags-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  .mobile-tag {
+    padding: 7px 14px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-secondary);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+
+    &.active {
+      background: var(--accent-primary);
+      color: white;
+      border-color: var(--accent-primary);
+    }
+  }
+}
+
+.price-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid var(--border-secondary);
+    border-radius: 10px;
+    font-size: 14px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    outline: none;
+    transition: border-color 0.15s;
+
+    &:focus {
+      border-color: var(--accent-primary);
+    }
+  }
+
+  .divider {
+    color: var(--text-tertiary);
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+}
+
 .sheet-footer {
-  padding: var(--spacing-lg) var(--spacing-xl);
-  border-top: var(--ui-border-width) solid var(--border-secondary);
+  flex-shrink: 0;
+  padding: 12px 20px;
+  border-top: 1px solid var(--border-secondary);
   background: var(--bg-primary);
   display: flex;
-  gap: var(--spacing-lg);
+  gap: 10px;
 
   .reset-btn {
     flex: 1;
     background: var(--bg-secondary);
-    border: var(--ui-border-width) solid var(--border-secondary);
+    border: 1px solid var(--border-secondary);
     color: var(--text-primary);
-    padding: var(--spacing-lg);
-    border-radius: var(--radius-2xl);
-    font-weight: var(--font-weight-semibold);
-    transition: var(--transition-base);
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.15s;
+
     &:hover {
       background: var(--bg-ternary);
     }
@@ -724,587 +1006,697 @@
 
   .apply-btn {
     flex: 2;
-    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-hover) 100%);
-    color: var(--text-primary);
+    background: var(--accent-primary);
+    color: white;
     border: none;
-    border-radius: var(--radius-2xl);
-    font-weight: var(--font-weight-semibold);
-    box-shadow: var(--shadow-lg);
-    transition: var(--transition-base);
+    border-radius: 10px;
+    padding: 12px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+
     &:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-2xl);
+      opacity: 0.9;
     }
   }
 }
 
+// ─── Animations ────────────────────────────────────────────────────
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
 
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
-// /* ============================================================
-//    PRODUCT LISTING PAGE
-//    Theme: Dynamic Tokens
-//    ============================================================ */
+// ═══════════════════════════════════════════════════════════════
+// FILTER DIALOG — Two-panel: left tabs + right scrollable content
+// Pattern: Myntra / Zomato style filter UX
+// ═══════════════════════════════════════════════════════════════
 
-// .page-root {
-//   // background-color: var(--bg-page);
-//   background-color: transparent;
-//   min-height: 100vh;
-//   position: relative;
-//   font-family: var(--font-body);
-//   padding-bottom: 80px;
-//   color: var(--text-primary);
-//   transition: background-color var(--transition-base);
-// }
+::ng-deep .filter-drawer {
+  height: 82vh !important;
+  border-radius: 20px 20px 0 0 !important;
+  background: var(--bg-primary) !important;
+  box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.18) !important;
 
-// .ambient-layer {
-//   position: absolute;
-//   top: 0; left: 0; width: 100%; height: 300px;
-//   background: linear-gradient(to bottom, var(--bg-page) 0%, var(--bg-page) 100%);
-//   opacity: 0.5;
-//   z-index: 0;
-// }
+  .p-drawer-content {
+    padding: 0 !important;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--bg-primary) !important;
+    color: var(--text-primary);
+    overflow: hidden; // key: drawer itself doesn't scroll
+  }
+}
 
-// .container {
-//   max-width: 1440px;
-//   margin: 0 auto;
-//   padding: 0 var(--spacing-xl);
-//   position: relative;
-//   z-index: 1;
+// ─── Header ──────────────────────────────────────────────────────
+.fd-header {
+  flex-shrink: 0;
+  padding: 0 20px 12px;
+  border-bottom: 1px solid var(--border-secondary);
+}
 
-//   @media (max-width: 768px) {
-//     padding: 0 var(--spacing-md);
-//   }
-// }
+.fd-handle {
+  width: 36px;
+  height: 4px;
+  background: var(--border-secondary);
+  border-radius: 4px;
+  margin: 12px auto 14px;
+}
 
-// // ────────────────────────────────────────────
-// // 2. HEADER
-// // ────────────────────────────────────────────
-// .listing-header {
-//   display: flex;
-//   justify-content: space-between;
-//   align-items: center;
-//   margin-top: var(--spacing-2xl);
-//   margin-bottom: var(--spacing-xl);
-//   gap: var(--spacing-lg);
+.fd-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
-//   @media (max-width: 768px) {
-//     flex-direction: column;
-//     align-items: stretch;
-//     gap: var(--spacing-md);
-//     margin-top: var(--spacing-lg);
-//   }
-// }
+.fd-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-// .search-block {
-//   flex: 1;
-//   max-width: 500px;
-  
-//   .input-wrapper {
-//     position: relative;
-//     i {
-//       position: absolute;
-//       left: 16px;
-//       top: 50%;
-//       transform: translateY(-50%);
-//       color: var(--text-tertiary);
-//       font-size: 1.1rem;
-//     }
-//     input {
-//       width: 100%;
-//       padding: 12px 16px 12px 44px;
-//       border: 1px solid var(--border-secondary);
-//       border-radius: 50px;
-//       font-size: 0.95rem;
-//       background: var(--bg-secondary);
-//       color: var(--text-primary);
-//       box-shadow: var(--shadow-sm);
-//       transition: all 0.2s;
-      
-//       &::placeholder { color: var(--text-tertiary); }
-      
-//       &:focus {
-//         border-color: var(--primary);
-//         box-shadow: 0 0 0 3px var(--focus-ring-color);
-//         outline: none;
-//         background: var(--bg-primary);
-//       }
-//     }
-//   }
-// }
+.fd-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: var(--accent-primary);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 50%;
+}
 
-// .controls-block {
-//   display: flex;
-//   align-items: center;
-//   gap: var(--spacing-md);
-  
-//   @media (max-width: 768px) {
-//     justify-content: space-between;
-//   }
-// }
+.fd-close {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
+  color: var(--text-secondary);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
 
-// .desktop-sort {
-//   display: flex;
-//   align-items: center;
-//   gap: 10px;
-//   background: var(--bg-secondary);
-//   padding: 4px 12px;
-//   border-radius: 8px;
-//   border: 1px solid var(--border-secondary);
-  
-//   .text-label { font-size: 0.85rem; color: var(--text-secondary); }
-  
-//   @media (max-width: 768px) { display: none; }
-// }
+  &:hover {
+    background: var(--bg-ternary);
+    color: var(--text-primary);
+  }
+}
 
-// .layout-toggle {
-//   display: flex;
-//   background: var(--bg-secondary);
-//   border: 1px solid var(--border-secondary);
-//   border-radius: 8px;
-//   overflow: hidden;
-  
-//   button {
-//     width: 36px; height: 36px;
-//     border: none;
-//     background: transparent;
-//     color: var(--text-tertiary);
-//     cursor: pointer;
-//     transition: all 0.2s;
-//     display: flex; align-items: center; justify-content: center;
-    
-//     &:hover { background: var(--bg-ternary); color: var(--text-primary); }
-//     &.active {
-//       background: var(--bg-primary);
-//       color: var(--primary);
-//     }
-//   }
-//   @media (max-width: 768px) { display: none; }
-// }
+// ─── Two-panel body ───────────────────────────────────────────────
+.fd-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 110px 1fr; // left nav fixed, right grows
+  overflow: hidden; // no outer scroll
+  min-height: 0; // allows children to scroll in flex
+}
 
-// // ────────────────────────────────────────────
-// // 3. MOBILE TRIGGER
-// // ────────────────────────────────────────────
-// .mobile-filter-trigger {
-//   display: none;
-//   align-items: center;
-//   gap: 8px;
-//   padding: 10px 20px;
-//   background: var(--text-primary);
-//   color: var(--bg-primary);
-//   border: none;
-//   border-radius: 50px;
-//   font-weight: 600;
-//   font-size: 0.9rem;
-//   box-shadow: var(--shadow-md);
-//   cursor: pointer;
-//   position: relative;
-  
-//   @media (max-width: 768px) { display: flex; width: 100%; justify-content: center; }
-  
-//   .badge {
-//     background: var(--color-error);
-//     color: var(--text-primary);
-//     width: 20px; height: 20px;
-//     border-radius: 50%;
-//     font-size: 0.7rem;
-//     display: grid; place-items: center;
-//   }
-// }
+// ─── Left nav tabs ────────────────────────────────────────────────
+.fd-nav {
+  border-right: 1px solid var(--border-secondary);
+  background: var(--bg-secondary);
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 0;
+  scrollbar-width: none;
 
-// // ────────────────────────────────────────────
-// // 4. ACTIVE FILTERS
-// // ────────────────────────────────────────────
-// .active-filters-bar {
-//   display: flex;
-//   justify-content: space-between;
-//   align-items: center;
-//   margin-bottom: var(--spacing-xl);
-  
-//   .filter-pills {
-//     display: flex;
-//     flex-wrap: wrap;
-//     gap: 8px;
-    
-//     .pill {
-//       background: var(--bg-secondary);
-//       border: 1px solid var(--border-secondary);
-//       padding: 6px 12px;
-//       border-radius: 6px;
-//       font-size: 0.8rem;
-//       color: var(--text-secondary);
-//       display: flex;
-//       align-items: center;
-//       gap: 6px;
-//       cursor: pointer;
-//       &:hover { border-color: var(--color-error); color: var(--color-error); }
-//     }
-//   }
-  
-//   .clear-all {
-//     background: none; border: none;
-//     color: var(--text-tertiary);
-//     text-decoration: underline;
-//     font-size: 0.85rem;
-//     cursor: pointer;
-//   }
-// }
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
 
-// // ────────────────────────────────────────────
-// // 5. LAYOUT GRID
-// // ────────────────────────────────────────────
-// .layout-grid {
-//   display: grid;
-//   grid-template-columns: 280px 1fr;
-//   gap: 40px;
-  
-//   @media (max-width: 992px) {
-//     grid-template-columns: 1fr;
-//   }
-// }
+.fd-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 14px 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  font-size: 11px;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.2;
+  transition: all 0.15s;
+  position: relative;
+  border-radius: 0;
 
-// // ────────────────────────────────────────────
-// // 6. SIDEBAR
-// // ────────────────────────────────────────────
-// .sidebar-desktop {
-//   @media (max-width: 992px) { display: none; }
-  
-//   .sticky-content {
-//     position: sticky;
-//     top: 100px;
-//   }
-  
-//   .widget {
-//     margin-bottom: 40px;
-//     h3 {
-//       font-size: 1rem;
-//       font-weight: 700;
-//       margin-bottom: 16px;
-//       color: var(--text-primary);
-//     }
-//   }
-// }
+  i {
+    font-size: 18px;
+    transition: color 0.15s;
+  }
 
-// .cat-list {
-//   .cat-row {
-//     display: flex; justify-content: space-between; align-items: center;
-//     padding: 8px 0;
-//     cursor: pointer;
-//     color: var(--text-secondary);
-//     font-size: 0.95rem;
-//     transition: 0.2s;
-    
-//     &:hover { color: var(--primary); transform: translateX(4px); }
-//     &.active { font-weight: 700; color: var(--primary); }
-    
-//     .count {
-//       background: var(--bg-ternary);
-//       padding: 2px 8px;
-//       border-radius: 12px;
-//       font-size: 0.75rem;
-//       color: var(--text-tertiary);
-//     }
-//   }
-// }
+  &:hover {
+    background: var(--bg-ternary);
+    color: var(--text-secondary);
+  }
 
-// .price-inputs {
-//   display: flex; align-items: center; gap: 10px;
-//   .input-group {
-//     position: relative; flex: 1;
-//     span { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-tertiary); font-size: 0.9rem; }
-//     input { 
-//       width: 100%; padding: 8px 8px 8px 24px; 
-//       border: 1px solid var(--border-secondary); 
-//       border-radius: 6px; 
-//       font-size: 0.9rem; 
-//       background: var(--bg-secondary);
-//       color: var(--text-primary);
-//     }
-//   }
-//   .dash { color: var(--text-tertiary); }
-// }
+  &.active {
+    background: var(--bg-primary);
+    color: var(--accent-primary);
+    font-weight: 700;
+    border-right: 3px solid var(--accent-primary);
 
-// .tags-cloud {
-//   display: flex; flex-wrap: wrap; gap: 8px;
-//   .tag-chip {
-//     background: var(--bg-secondary); 
-//     border: 1px solid var(--border-secondary);
-//     padding: 6px 14px; border-radius: 20px;
-//     font-size: 0.85rem; color: var(--text-secondary);
-//     cursor: pointer; transition: 0.2s;
-    
-//     &:hover { border-color: var(--text-primary); color: var(--text-primary); }
-//     &.active { background: var(--text-primary); color: var(--bg-primary); border-color: var(--text-primary); }
-//   }
-// }
+    i {
+      color: var(--accent-primary);
+    }
+  }
 
-// // ────────────────────────────────────────────
-// // 7. PRODUCT GRID
-// // ────────────────────────────────────────────
-// .products-wrapper {
-//   display: grid;
-//   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-//   gap: 24px;
-  
-//   @media (max-width: 576px) {
-//     grid-template-columns: 1fr 1fr; // 2 Columns Mobile
-//     gap: 12px;
-//   }
-  
-//   &.list-mode {
-//     grid-template-columns: 1fr;
-//   }
-// }
+  // Active indicator dot (has value set)
+  .fd-nav-dot {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    width: 7px;
+    height: 7px;
+    background: var(--accent-primary);
+    border-radius: 50%;
+    border: 1.5px solid var(--bg-secondary);
+  }
+}
 
-// .skeleton-placeholder {
-//   aspect-ratio: 3 / 4.2;
-//   border-radius: var(--radius-2xl);
-//   overflow: hidden;
-//   background: var(--bg-ternary);
-// }
+// ─── Right panel ─────────────────────────────────────────────────
+.fd-panel {
+  overflow-y: auto; // RIGHT PANEL scrolls independently
+  overflow-x: hidden;
+  background: var(--bg-primary);
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-secondary) transparent;
 
-// .no-results {
-//   text-align: center; padding: 80px 0;
-//   .icon-circle {
-//     width: 80px; height: 80px;
-//     background: var(--bg-ternary);
-//     border-radius: 50%;
-//     margin: 0 auto 20px;
-//     display: flex; align-items: center; justify-content: center;
-//     i { font-size: 2rem; color: var(--text-tertiary); }
-//   }
-//   h3 { font-size: 1.5rem; margin-bottom: 10px; color: var(--text-primary); }
-//   p { color: var(--text-secondary); margin-bottom: 30px; }
-  
-//   .btn-primary {
-//     background: var(--text-primary);
-//     color: var(--bg-primary);
-//     border: none;
-//     padding: 12px 24px;
-//     border-radius: 50px;
-//     font-weight: 600;
-//   }
-// }
+  &::-webkit-scrollbar {
+    width: 3px;
+  }
 
-// // ────────────────────────────────────────────
-// // 8. MOBILE DRAWER (Tokenized)
-// // ────────────────────────────────────────────
-// ::ng-deep .expert-bottom-sheet {
-//   height: 85vh !important;
-//   border-radius: 24px 24px 0 0 !important;
-//   background: var(--bg-primary) !important;
-//   box-shadow: var(--shadow-2xl) !important;
-  
-//   .p-drawer-content {
-//     padding: 0 !important;
-//     display: flex;
-//     flex-direction: column;
-//     height: 100%;
-//     background: var(--bg-primary) !important;
-//     color: var(--text-primary);
-//   }
-// }
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-secondary);
+    border-radius: 4px;
+  }
+}
 
-// .sheet-handle {
-//   width: 40px; height: 4px;
-//   background: var(--border-secondary);
-//   border-radius: 4px;
-//   margin: 12px auto;
-// }
+.fd-panel-inner {
+  padding: 16px 16px 24px;
+}
 
-// .sheet-header {
-//   padding: 0 20px 16px;
-//   border-bottom: 1px solid var(--border-secondary);
-//   display: flex; justify-content: space-between; align-items: center;
-  
-//   h3 { font-size: 1.25rem; font-weight: 700; margin: 0; color: var(--text-primary); }
-//   .close-btn { background: none; border: none; font-size: 1.2rem; padding: 8px; color: var(--text-secondary); }
-// }
+.fd-panel-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-tertiary);
+  margin: 0 0 12px;
+}
 
-// .sheet-content {
-//   flex: 1;
-//   overflow-y: auto;
-//   padding: 20px;
-//   background: var(--bg-primary);
-// }
+// ─── Sort list ────────────────────────────────────────────────────
+.fd-sort-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 
-// .sheet-section {
-//   margin-bottom: 32px;
-  
-//   .section-title {
-//     font-size: 0.9rem;
-//     text-transform: uppercase;
-//     color: var(--text-tertiary);
-//     letter-spacing: 1px;
-//     margin-bottom: 16px;
-//     font-weight: 700;
-//   }
-// }
+.fd-sort-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  transition: all 0.15s;
+  background: var(--bg-secondary);
 
-// // SORT CARDS (Mobile)
-// .sort-options-grid {
-//   display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
-  
-//   .sort-card {
-//     border: 1px solid var(--border-secondary);
-//     border-radius: 12px;
-//     padding: 16px;
-//     display: flex; flex-direction: column; align-items: center; gap: 8px;
-//     text-align: center;
-//     cursor: pointer;
-//     background: var(--bg-secondary);
-//     color: var(--text-secondary);
-    
-//     i { font-size: 1.2rem; color: var(--text-tertiary); }
-//     span { font-size: 0.85rem; font-weight: 500; }
-    
-//     &.selected {
-//       border-color: var(--primary);
-//       background: var(--bg-primary); // Check this contrast
-//       color: var(--primary);
-//       box-shadow: var(--shadow-sm);
-//       i { color: var(--primary); }
-//       .check { position: absolute; top: 8px; right: 8px; font-size: 1rem; }
-//     }
-//   }
-// }
+  &:hover {
+    background: var(--bg-ternary);
+  }
 
-// // MOBILE CHIPS
-// .mobile-cat-scroll {
-//   display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px;
-//   .mobile-cat-chip {
-//     white-space: nowrap;
-//     padding: 10px 20px;
-//     background: var(--bg-secondary);
-//     border-radius: 50px;
-//     font-size: 0.9rem;
-//     font-weight: 500;
-//     color: var(--text-secondary);
-    
-//     &.active {
-//       background: var(--text-primary);
-//       color: var(--bg-primary);
-//     }
-//   }
-// }
+  &.selected {
+    border-color: var(--accent-primary);
+    background: color-mix(in srgb, var(--accent-primary) 6%, var(--bg-primary));
+  }
+}
 
-// // MOBILE TAGS
-// .tags-grid {
-//   display: flex; flex-wrap: wrap; gap: 10px;
-//   .mobile-tag {
-//     padding: 8px 16px;
-//     background: var(--bg-secondary);
-//     border: 1px solid var(--border-secondary);
-//     border-radius: 8px;
-//     font-size: 0.9rem;
-//     color: var(--text-secondary);
-    
-//     &.active {
-//       background: var(--primary);
-//       color: var(--text-primary);
-//       border-color: var(--primary);
-//     }
-//   }
-// }
+.fd-sort-row-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
 
-// // FOOTER
-// .sheet-footer {
-//   padding: 16px 20px;
-//   border-top: 1px solid var(--border-secondary);
-//   background: var(--bg-primary);
-//   display: flex; gap: 16px;
-  
-//   .reset-btn {
-//     flex: 1;
-//     background: var(--bg-secondary);
-//     border: 1px solid var(--border-secondary);
-//     color: var(--text-primary);
-//     padding: 14px;
-//     border-radius: 12px;
-//     font-weight: 600;
-//   }
-  
-//   .apply-btn {
-//     flex: 2;
-//     background: var(--text-primary);
-//     color: var(--bg-primary);
-//     border: none;
-//     border-radius: 12px;
-//     font-weight: 600;
-//     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-//   }
-// }
+.fd-sort-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--bg-ternary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 
-// /* ... Keep existing styles ... */
+  i {
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+}
 
-// // ────────────────────────────────────────────
-// // 7. PRODUCT GRID & SKELETONS (FIXED)
-// // ────────────────────────────────────────────
-// .products-wrapper {
-//   display: grid;
-//   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-//   gap: 24px;
-//   width: 100%; /* Ensure it takes full width */
-  
-//   /* Mobile: 2 Columns */
-//   @media (max-width: 576px) {
-//     grid-template-columns: 1fr 1fr;
-//     gap: 12px;
-//   }
-  
-//   /* List Mode: 1 Column */
-//   &.list-mode {
-//     grid-template-columns: 1fr;
-//   }
-// }
+// ─── Radio button ─────────────────────────────────────────────────
+.fd-radio {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--border-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: border-color 0.15s;
 
-// /* SKELETON CARD STYLES */
-// .skeleton-placeholder {
-//   position: relative;
-//   width: 100%;
-//   border-radius: var(--radius-2xl);
-//   overflow: hidden;
-//   background-color: #e2e8f0; /* Fallback if var(--bg-ternary) fails */
-//   background-color: var(--bg-ternary);
-//   border: 1px solid var(--border-secondary);
-  
-//   /* GRID MODE (Default) */
-//   aspect-ratio: 4 / 5; /* Matches your new card size */
-//   display: flex;
-//   flex-direction: column;
+  &.checked {
+    border-color: var(--accent-primary);
+  }
+}
 
-//   /* LIST MODE (Specific Override) */
-//   &.list-layout {
-//     aspect-ratio: auto; /* Remove aspect ratio constraint */
-//     height: 200px;      /* Fixed height for list view */
-//     flex-direction: row;
-    
-//     .skeleton-img {
-//       width: 200px;
-//       height: 100%;
-//     }
-    
-//     .skeleton-content {
-//       flex: 1;
-//       padding: 24px;
-//       display: flex;
-//       flex-direction: column;
-//       gap: 12px;
-//       justify-content: center;
-//     }
-//   }
+.fd-radio-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+}
 
-//   /* GRID MODE INNER STRUCTURE */
-//   &:not(.list-layout) {
-//     .skeleton-img {
-//       width: 100%;
-//       height: 70%; /* Image takes top 70% */
-//     }
-//     .skeleton-content {
-//       height: 30%;
-//       padding: 12px;
-//       display: flex;
-//       flex-direction: column;
-//       gap: 8px;
-//     }
-//   }
-// }
+// ─── Category / Brand select list ────────────────────────────────
+.fd-select-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fd-select-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  transition: all 0.15s;
+  font-size: 13.5px;
+  color: var(--text-secondary);
+
+  &:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+  }
+
+  &.selected {
+    background: color-mix(in srgb, var(--accent-primary) 6%, var(--bg-primary));
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+    font-weight: 600;
+  }
+}
+
+.fd-select-row-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fd-thumb {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid var(--border-secondary);
+}
+
+.fd-count {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  font-weight: 400;
+}
+
+// ─── Price panel ─────────────────────────────────────────────────
+.fd-price-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  background: color-mix(in srgb, var(--accent-primary) 6%, var(--bg-primary));
+  border: 1.5px solid color-mix(in srgb, var(--accent-primary) 20%, transparent);
+  border-radius: 12px;
+}
+
+.fd-price-val {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent-primary);
+}
+
+.fd-price-sep {
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+.fd-slider-wrap {
+  padding: 0 6px;
+  margin-bottom: 20px;
+
+  ::ng-deep .fd-slider {
+    .p-slider-handle {
+      width: 20px !important;
+      height: 20px !important;
+      background: var(--accent-primary) !important;
+      border-color: var(--accent-primary) !important;
+      box-shadow: 0 2px 8px color-mix(in srgb, var(--accent-primary) 40%, transparent) !important;
+    }
+
+    .p-slider-range {
+      background: var(--accent-primary) !important;
+    }
+  }
+}
+
+.fd-price-inputs {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.fd-price-field {
+  flex: 1;
+
+  label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+}
+
+.fd-price-input-wrap {
+  position: relative;
+
+  .fd-currency {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-tertiary);
+  }
+
+  input {
+    width: 100%;
+    padding: 11px 12px 11px 26px;
+    border: 1.5px solid var(--border-secondary);
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    outline: none;
+    transition: border-color 0.15s;
+
+    &:focus {
+      border-color: var(--accent-primary);
+      background: var(--bg-primary);
+    }
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+    }
+  }
+}
+
+.fd-price-dash {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  padding-bottom: 10px;
+  flex-shrink: 0;
+}
+
+.fd-price-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fd-preset-chip {
+  padding: 8px 14px;
+  border: 1.5px solid var(--border-secondary);
+  border-radius: 20px;
+  background: var(--bg-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+  }
+
+  &.active {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: white;
+    font-weight: 600;
+  }
+}
+
+// ─── Tags panel ──────────────────────────────────────────────────
+.fd-tags-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fd-tag-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 9px 14px;
+  border: 1.5px solid var(--border-secondary);
+  border-radius: 20px;
+  background: var(--bg-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+
+  i {
+    font-size: 11px;
+    color: var(--text-tertiary);
+  }
+
+  .fd-tag-check {
+    font-size: 11px;
+    color: white;
+  }
+
+  &:hover {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+
+    i {
+      color: var(--accent-primary);
+    }
+  }
+
+  &.active {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: white;
+    font-weight: 600;
+
+    i {
+      color: rgba(255, 255, 255, 0.7);
+    }
+  }
+}
+
+// ─── Availability / Stock panel ───────────────────────────────────
+.fd-availability-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 14px;
+  border: 1.5px solid var(--border-secondary);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-bottom: 10px;
+  background: var(--bg-secondary);
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--accent-primary) 40%, transparent);
+    background: var(--bg-ternary);
+  }
+
+  &.active {
+    border-color: var(--accent-primary);
+    background: color-mix(in srgb, var(--accent-primary) 6%, var(--bg-primary));
+  }
+}
+
+.fd-avail-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.fd-avail-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--bg-ternary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  i {
+    font-size: 16px;
+    color: var(--text-secondary);
+  }
+}
+
+.fd-avail-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.fd-avail-sub {
+  font-size: 11.5px;
+  color: var(--text-tertiary);
+}
+
+// Toggle switch
+.fd-toggle {
+  width: 44px;
+  height: 26px;
+  border-radius: 13px;
+  background: var(--border-secondary);
+  position: relative;
+  transition: background 0.2s;
+  flex-shrink: 0;
+
+  &.on {
+    background: var(--accent-primary);
+  }
+}
+
+.fd-toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s;
+
+  .fd-toggle.on & {
+    transform: translateX(18px);
+  }
+}
+
+// ─── Footer ──────────────────────────────────────────────────────
+.fd-footer {
+  flex-shrink: 0;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border-secondary);
+  background: var(--bg-primary);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.fd-reset {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+
+  i {
+    font-size: 12px;
+  }
+
+  &:hover {
+    background: var(--bg-ternary);
+    color: var(--text-primary);
+  }
+}
+
+.fd-apply {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 20px;
+  background: var(--accent-primary);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
+
+  i {
+    font-size: 13px;
+  }
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
