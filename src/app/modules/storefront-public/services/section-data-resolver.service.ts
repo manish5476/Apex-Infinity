@@ -2,24 +2,10 @@ import { Injectable } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class SectionDataResolverService {
-  
-  /**
-   * Universal data resolution pipeline for generic arrays.
-   * Resolves in order:
-   * 1. section.data (hydrated by backend)
-   * 2. section.manualData (if it's an array)
-   * 3. section.hydratedData
-   * 4. section.config?.data
-   * 5. fallback to empty array
-   */
   resolveArrayData<T = any>(section: any): T[] {
     if (!section) return [];
-    
     if (Array.isArray(section.data)) return section.data;
-    
-    // Sometimes manualData is an array directly (e.g. locations)
     if (Array.isArray(section.manualData)) return section.manualData;
-    
     if (Array.isArray(section.hydratedData)) return section.hydratedData;
     if (Array.isArray(section.config?.data)) return section.config.data;
     if (Array.isArray(section.config?.items)) return section.config.items;
@@ -41,7 +27,7 @@ export class SectionDataResolverService {
    */
   resolveLocations(section: any): any[] {
     if (!section) return [];
-    
+
     const locations =
       this.firstArray(section.data)
       ?? this.firstArray(section.manualData)

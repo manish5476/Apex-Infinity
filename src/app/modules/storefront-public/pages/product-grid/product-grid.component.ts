@@ -67,10 +67,10 @@ export interface ProductGridConfig extends SectionBaseConfig {
       width: 100%;
       --md-sys-color-primary: var(--theme-accent-primary, #1a73e8);
       --md-sys-color-surface: var(--bg-primary, #ffffff);
-      --md-sys-color-surface-variant: #f8f9fa;
-      --md-sys-color-on-surface: #202124;
-      --md-sys-color-on-surface-variant: #5f6368;
-      --md-sys-color-outline: #dadce0;
+      --md-sys-color-surface-variant: var(--bg-secondary, #f8f9fa);
+      --md-sys-color-on-surface: var(--text-primary, #202124);
+      --md-sys-color-on-surface-variant: var(--text-secondary, #5f6368);
+      --md-sys-color-outline: var(--border-secondary, #dadce0);
       --md-sys-easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
       
       font-family: 'Google Sans', Roboto, 'Helvetica Neue', Arial, sans-serif;

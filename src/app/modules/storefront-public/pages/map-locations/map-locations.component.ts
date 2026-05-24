@@ -1,4 +1,8 @@
-import { Component, Input, OnInit, AfterViewInit, OnDestroy, OnChanges, SimpleChanges, Inject, PLATFORM_ID, ViewEncapsulation, ViewChild, ElementRef } from '@angular/core';
+import {
+  Component, Input, OnInit, AfterViewInit, OnDestroy, OnChanges,
+  SimpleChanges, Inject, PLATFORM_ID, ViewEncapsulation, ViewChild, ElementRef,
+  ChangeDetectionStrategy, ChangeDetectorRef
+} from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import * as L from 'leaflet';
@@ -23,17 +27,18 @@ export interface MapLocation {
   imports: [CommonModule, FormsModule],
   templateUrl: './map-locations.component.html',
   styleUrls: ['./map-locations.component.scss'],
-  encapsulation: ViewEncapsulation.None 
+  encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MapLocationsComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
   @Input() config: MapLocationsConfig = {
     title: 'Our Presence',
     clusterMarkers: true,
-    mapStyle: 'dark', // Default style
+    mapStyle: 'dark',
     zoom: 13,
-    animationDuration: 1.5
+    animationDuration: 1.2
   };
-  
+
   @Input() set locations(value: MapLocation[]) {
     this._locations = this.normalizeLocations(value ?? []);
     this.filteredLocations = [...this._locations];
@@ -41,28 +46,29 @@ export class MapLocationsComponent implements OnInit, AfterViewInit, OnChanges, 
   get locations(): MapLocation[] {
     return this._locations;
   }
-  
+
   @ViewChild('cardsContainer') cardsContainer!: ElementRef;
   @ViewChild('mapStage') mapStage!: ElementRef;
 
   public map: L.Map | undefined;
   public isLoadingMap = false;
   public mapError: string | null = null;
-  private markers: L.Marker[] = [];
+
   private markerLayer: L.LayerGroup | undefined;
-  private tileLayer: L.TileLayer | undefined; // To manage switching styles
+  private tileLayer: L.TileLayer | undefined;
+  private markers: L.Marker[] = [];
   private isAnimating = false;
-  
+  private initScheduled = false;
+
   selectedBranch: MapLocation | null = null;
   filteredLocations: MapLocation[] = [];
-  searchQuery: string = '';
-  private _locations: MapLocation[] = [];
-  
-  // Track current style for UI classes
+  searchQuery = '';
   currentStyle: 'dark' | 'light' | 'satellite' = 'dark';
 
-  // Basemap Configurations
-  private mapStyles = {
+  private _locations: MapLocation[] = [];
+
+  // Basemap configs
+  private readonly mapStyles = {
     dark: {
       url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
       options: { maxZoom: 20, subdomains: 'abcd', attribution: '© CartoDB' }
@@ -75,208 +81,201 @@ export class MapLocationsComponent implements OnInit, AfterViewInit, OnChanges, 
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
       options: { maxZoom: 19, attribution: 'Tiles © Esri' }
     }
-  };
+  } as const;
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private cdr: ChangeDetectorRef
+  ) { }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.filteredLocations = [...this.locations];
     if (this.config.mapStyle) {
-      this.currentStyle = this.config.mapStyle;
+      this.currentStyle = this.config.mapStyle as 'dark' | 'light' | 'satellite';
     }
   }
 
-  // Handle data arriving later (Async)
-  ngOnChanges(changes: SimpleChanges) {
+  ngOnChanges(changes: SimpleChanges): void {
     if (changes['locations'] && !changes['locations'].firstChange) {
       this.filteredLocations = [...this.locations];
-      
-      // If map exists, just update markers. If not, try init.
       if (this.map) {
         this.addMarkers();
         this.fitMapToMarkers();
       } else {
-        this.initMap();
+        this.scheduleMapInit();
       }
+      this.cdr.markForCheck();
     }
   }
 
   ngAfterViewInit(): void {
     if (isPlatformBrowser(this.platformId)) {
-      // Small delay to ensure DOM is ready
-      setTimeout(() => this.initMap(), 100);
+      // Use requestAnimationFrame instead of setTimeout for faster, frame-synced init
+      this.scheduleMapInit();
     }
   }
 
-  // --- Map Initialization (FIXED) ---
-  private initMap(): void {
-    // 1. Safety Checks
-    if (this.map || !this.mapStage || !isPlatformBrowser(this.platformId)) return;
-    this.isLoadingMap = true;
-    this.mapError = null;
+  private scheduleMapInit(): void {
+    if (this.initScheduled || this.map) return;
+    this.initScheduled = true;
 
-    // 2. Filter out invalid locations first
-    const validLocations = this.filteredLocations.filter(l => 
-      l.location && 
-      Number.isFinite(Number(l.location.lat)) && 
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        this.initMap();
+        this.initScheduled = false;
+      });
+    });
+  }
+
+  private initMap(): void {
+    if (this.map || !this.mapStage || !isPlatformBrowser(this.platformId)) return;
+
+    const validLocations = this.filteredLocations.filter(l =>
+      l.location &&
+      Number.isFinite(Number(l.location.lat)) &&
       Number.isFinite(Number(l.location.lng))
     );
 
-    // 3. If NO valid locations exist, gracefully stop (prevents crash)
     if (validLocations.length === 0) {
-      console.warn('Map initialization skipped: No locations with valid coordinates found.');
-      this.isLoadingMap = false;
-      return; 
+      console.warn('Map init skipped: no valid coordinates.');
+      return;
     }
 
-    const validLocation = validLocations[0];
+    this.isLoadingMap = true;
+    this.mapError = null;
 
-    // 4. Determine Start Point
-    const startLoc = (this.selectedBranch && this.selectedBranch.location?.lat) 
-      ? this.selectedBranch.location 
-      : validLocation.location;
-    
-    // 5. Create Map
+    const startLoc = this.selectedBranch?.location?.lat
+      ? this.selectedBranch.location
+      : validLocations[0].location;
+
     try {
       this.map = L.map(this.mapStage.nativeElement, {
         zoomControl: false,
         scrollWheelZoom: true,
         attributionControl: false,
-        fadeAnimation: true,
-        zoomAnimation: true
-      }).setView([startLoc.lat, startLoc.lng], this.config.zoom || 13);
-    } catch {
+        // Performance optimizations
+        fadeAnimation: false,      // Disable Leaflet's own fade (we handle our own)
+        markerZoomAnimation: true,
+        preferCanvas: false,       // Keep SVG for sharp markers
+        renderer: L.svg()
+      }).setView([startLoc.lat, startLoc.lng], this.config.zoom ?? 13);
+    } catch (e) {
       this.mapError = 'Map is temporarily unavailable.';
       this.isLoadingMap = false;
+      this.cdr.markForCheck();
       return;
     }
 
-    // 6. Set Initial Tile Layer
     this.setMapLayer(this.currentStyle);
-
-    // 7. Controls & Layers
     L.control.zoom({ position: 'topright' }).addTo(this.map);
     this.markerLayer = L.layerGroup().addTo(this.map);
-    
-    // 8. Add Markers
     this.addMarkers();
-    
-    // 9. Fit Bounds (if we have >1 location)
-    if (this.filteredLocations.length > 1) {
+
+    if (validLocations.length > 1) {
       this.fitMapToMarkers();
     }
+
     this.isLoadingMap = false;
+    this.cdr.markForCheck();
   }
 
-  // --- Theme Switcher Logic ---
-  setMapStyle(style: 'dark' | 'light' | 'satellite') {
+  setMapStyle(style: 'dark' | 'light' | 'satellite'): void {
     this.currentStyle = style;
     this.setMapLayer(style);
+    this.cdr.markForCheck();
   }
 
-  private setMapLayer(styleKey: string) {
+  private setMapLayer(styleKey: 'dark' | 'light' | 'satellite'): void {
     if (!this.map) return;
+    if (this.tileLayer) this.map.removeLayer(this.tileLayer);
 
-    // Remove old layer if exists
-    if (this.tileLayer) {
-      this.map.removeLayer(this.tileLayer);
-    }
-
-    const style = this.mapStyles[styleKey as keyof typeof this.mapStyles];
-    this.tileLayer = L.tileLayer(style.url, style.options)
+    const style = this.mapStyles[styleKey];
+    this.tileLayer = L.tileLayer(style.url, { ...style.options })
       .on('tileerror', () => {
-        this.mapError = 'Map tiles could not be loaded. Location cards are still available.';
+        this.mapError = 'Map tiles failed to load. Location cards are still available.';
+        this.cdr.markForCheck();
       })
       .addTo(this.map);
   }
 
-  // --- Marker Logic (FIXED) ---
   private addMarkers(): void {
     if (!this.map || !this.markerLayer) return;
 
     this.markerLayer.clearLayers();
     this.markers = [];
 
-    this.filteredLocations.forEach(location => {
-      // CRITICAL FIX: Skip locations with missing or invalid coordinates
-      if (!location.location || 
-          !Number.isFinite(Number(location.location.lat)) || 
-          !Number.isFinite(Number(location.location.lng))) {
-        return;
-      }
+    for (const location of this.filteredLocations) {
+      if (
+        !location.location ||
+        !Number.isFinite(Number(location.location.lat)) ||
+        !Number.isFinite(Number(location.location.lng))
+      ) continue;
 
       const isSelected = this.selectedBranch?._id === location._id;
-      
-      const customIcon = L.divIcon({
-        className: `luxury-marker ${isSelected ? 'selected' : ''}`,
+
+      const icon = L.divIcon({
+        // CRITICAL: empty className — do NOT put any class that has a background
+        className: `luxury-marker${isSelected ? ' selected' : ''}`,
         html: `
           <div class="marker-container">
-            <div class="pulse-ring ${isSelected ? 'active' : ''}"></div>
-            <div class="marker-dot ${location.isMainBranch ? 'headquarters' : ''}"></div>
+            <div class="pulse-ring${isSelected ? ' active' : ''}"></div>
+            <div class="marker-dot${location.isMainBranch ? ' headquarters' : ''}"></div>
             ${location.isMainBranch ? '<div class="crown-icon">👑</div>' : ''}
           </div>
         `,
         iconSize: [50, 50],
-        iconAnchor: [25, 25]
+        iconAnchor: [25, 25],
+        popupAnchor: [0, -25]
       });
 
       const marker = L.marker([location.location.lat, location.location.lng], {
-        icon: customIcon,
+        icon,
         title: location.name,
         riseOnHover: true
       });
 
       marker.on('click', () => this.selectLocation(location));
-      marker.addTo(this.markerLayer!);
+      this.markerLayer.addLayer(marker);
       this.markers.push(marker);
-    });
+    }
   }
 
-  // --- User Interaction ---
   selectLocation(location: MapLocation): void {
     if (this.isAnimating || !location.location) return;
-    
     this.isAnimating = true;
     this.selectedBranch = location;
-    
-    // Refresh markers to update "selected" CSS class
     this.addMarkers();
 
     if (this.map) {
       this.map.flyTo([location.location.lat, location.location.lng], 16, {
-        duration: this.config.animationDuration || 1.5,
+        duration: this.config.animationDuration ?? 1.2,
         easeLinearity: 0.25
       });
     }
 
     this.scrollToCard(location._id);
-
-    setTimeout(() => { this.isAnimating = false; }, 1500);
+    this.cdr.markForCheck();
+    setTimeout(() => { this.isAnimating = false; }, 1300);
   }
 
-  scrollToCard(locationId: string) {
-    if (this.cardsContainer) {
-      const card = document.getElementById('card-' + locationId);
-      if (card) {
-        card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-      }
-    }
+  scrollToCard(locationId: string): void {
+    const card = document.getElementById('card-' + locationId);
+    card?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
   }
 
-  // --- Utils ---
   searchLocations(): void {
-    if (!this.searchQuery.trim()) {
-      this.filteredLocations = [...this.locations];
-    } else {
-      const query = this.searchQuery.toLowerCase();
-      this.filteredLocations = this.locations.filter(l =>
+    const query = this.searchQuery.trim().toLowerCase();
+    this.filteredLocations = query
+      ? this.locations.filter(l =>
         (l.name ?? '').toLowerCase().includes(query) ||
         (l.address?.city ?? '').toLowerCase().includes(query) ||
         (l.address?.state ?? '').toLowerCase().includes(query)
-      );
-    }
+      )
+      : [...this.locations];
+
     this.addMarkers();
     if (this.filteredLocations.length > 0) this.fitMapToMarkers();
+    this.cdr.markForCheck();
   }
 
   clearSearch(): void {
@@ -286,15 +285,16 @@ export class MapLocationsComponent implements OnInit, AfterViewInit, OnChanges, 
 
   getDirections(location: MapLocation): void {
     if (!location.location) return;
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${location.location.lat},${location.location.lng}`;
-    window.open(url, '_blank');
+    window.open(
+      `https://www.google.com/maps/dir/?api=1&destination=${location.location.lat},${location.location.lng}`,
+      '_blank'
+    );
   }
 
   scrollCards(direction: number): void {
-    if (this.cardsContainer) {
-      const container = this.cardsContainer.nativeElement;
-      const scrollAmount = 450; 
-      container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+    const container = this.cardsContainer?.nativeElement;
+    if (container) {
+      container.scrollBy({ left: direction * 450, behavior: 'smooth' });
     }
   }
 
@@ -302,38 +302,38 @@ export class MapLocationsComponent implements OnInit, AfterViewInit, OnChanges, 
     if (!this.map || this.markers.length === 0) return;
     const group = L.featureGroup(this.markers);
     if (group.getLayers().length > 0) {
-      this.map.fitBounds(group.getBounds().pad(0.1));
+      this.map.fitBounds(group.getBounds().pad(0.15));
     }
   }
 
-  ngOnDestroy() {
-    if (this.map) {
-      this.map.remove();
-      this.map = undefined;
-    }
+  ngOnDestroy(): void {
+    this.map?.remove();
+    this.map = undefined;
   }
 
   private normalizeLocations(locations: MapLocation[]): MapLocation[] {
     return locations
       .map((location: any) => {
         const coordinates = location?.location?.coordinates;
-        const lat = location?.location?.lat ?? location?.lat ?? (Array.isArray(coordinates) ? coordinates[1] : undefined);
-        const lng = location?.location?.lng ?? location?.lng ?? (Array.isArray(coordinates) ? coordinates[0] : undefined);
+        const lat =
+          location?.location?.lat ??
+          location?.lat ??
+          (Array.isArray(coordinates) ? coordinates[1] : undefined);
+        const lng =
+          location?.location?.lng ??
+          location?.lng ??
+          (Array.isArray(coordinates) ? coordinates[0] : undefined);
 
         return {
           ...location,
-          _id: location?._id ?? location?.id ?? `${lat}-${lng}-${location?.name ?? 'location'}`,
+          _id: location?._id ?? location?.id ?? `${lat}-${lng}-${location?.name ?? 'loc'}`,
           address: location?.address ?? {},
-          location: {
-            ...location?.location,
-            lat: Number(lat),
-            lng: Number(lng)
-          }
+          location: { ...location?.location, lat: Number(lat), lng: Number(lng) }
         } as MapLocation;
       })
-      .filter(location =>
-        Number.isFinite(Number(location.location?.lat)) &&
-        Number.isFinite(Number(location.location?.lng))
+      .filter(l =>
+        Number.isFinite(Number(l.location?.lat)) &&
+        Number.isFinite(Number(l.location?.lng))
       );
   }
 }

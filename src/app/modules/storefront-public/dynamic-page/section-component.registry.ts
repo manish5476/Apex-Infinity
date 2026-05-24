@@ -16,7 +16,7 @@ export const SECTION_COMPONENT_REGISTRY: Record<string, SectionRenderEntry> = {
   },
   product_slider: {
     load: () => import('../pages/product-slider/product-slider.component').then(m => m.ProductSliderComponent),
-    inputs: section => ({ config: section.config, data: resolver.resolveProducts(section) })
+    inputs: (section, orgSlug) => ({ config: section.config, data: resolver.resolveProducts(section), organizationSlug: orgSlug })
   },
   product_grid: {
     load: () => import('../pages/product-grid/product-grid.component').then(m => m.ProductGridComponent),
