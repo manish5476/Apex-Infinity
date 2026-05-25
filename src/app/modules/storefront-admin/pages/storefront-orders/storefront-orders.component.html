@@ -74,7 +74,24 @@
         </div>
         <div class="status-block">
           <span class="label">Fulfillment</span>
+          <span class="badge" [attr.data-status]="order.fulfillmentStatus || 'unfulfilled'">{{ (order.fulfillmentStatus || 'unfulfilled') | titlecase }}</span>
+        </div>
+        <div class="status-block">
+          <span class="label">Order Status</span>
           <span class="badge" [attr.data-status]="order.orderStatus">{{ order.orderStatus | titlecase }}</span>
+        </div>
+      </section>
+
+      <!-- Status Actions -->
+      <section class="detail-section actions-section">
+        <h3>Update Status</h3>
+        <div class="action-buttons" style="display: flex; gap: 10px; margin-top: 10px;">
+          <button class="premium-btn primary-btn" *ngIf="order.fulfillmentStatus !== 'delivered' && order.orderStatus !== 'cancelled'" (click)="updateStatus('fulfillmentStatus', 'delivered')">
+            Mark as Delivered
+          </button>
+          <button class="premium-btn ghost-btn" *ngIf="order.orderStatus !== 'cancelled'" (click)="updateStatus('orderStatus', 'cancelled')" style="color: #ef4444; border-color: #ef4444;">
+            Cancel Order
+          </button>
         </div>
       </section>
 

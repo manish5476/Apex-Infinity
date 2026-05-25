@@ -110,6 +110,26 @@ export class StorefrontOrdersComponent implements OnInit {
     this.selectedOrder.set(order);
   }
 
+  updateStatus(field: 'orderStatus' | 'fulfillmentStatus' | 'paymentStatus', value: string): void {
+    const order = this.selectedOrder();
+    if (!order) return;
+    
+    this.loading.set(true);
+    this.adminService.updateOrderStatus(order._id, { [field]: value }).subscribe({
+      next: (res) => {
+        // Refresh grid
+        this.load();
+        // Update selected order details
+        this.selectedOrder.set(res.data);
+      },
+      error: (err) => {
+        console.error(err);
+        this.loading.set(false);
+        this.error.set(err?.error?.message ?? 'Failed to update order status');
+      }
+    });
+  }
+
   closePanel(): void {
     this.selectedOrder.set(null);
   }
