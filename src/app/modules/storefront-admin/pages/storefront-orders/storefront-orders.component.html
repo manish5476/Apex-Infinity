@@ -1,0 +1,123 @@
+<main class="storefront-orders-layout" [class.panel-open]="selectedOrder()">
+  <!-- Main Grid Section -->
+  <section class="grid-section">
+    <header class="page-header">
+      <div class="header-content">
+        <h1>Orders</h1>
+        <p class="subtitle">Manage storefront orders, fulfillments, and customer purchases.</p>
+      </div>
+      <div class="header-actions">
+        <button class="premium-btn ghost-btn" (click)="load()">
+          <i class="pi pi-refresh" [class.pi-spin]="loading()"></i> Refresh
+        </button>
+      </div>
+    </header>
+
+    <div class="grid-container">
+      @if (error()) {
+        <div class="error-state">
+          <i class="pi pi-exclamation-triangle"></i>
+          <p>{{ error() }}</p>
+          <button class="premium-btn" (click)="load()">Try Again</button>
+        </div>
+      } @else {
+        <app-shared-grid 
+          [columns]="columns" 
+          [data]="orders()" 
+          selectionMode="single"
+          [showActions]="false"
+          (gridEvent)="onGridEvent($event)">
+        </app-shared-grid>
+      }
+    </div>
+  </section>
+
+  <!-- Slide-in Detail Panel -->
+  <aside class="detail-panel" *ngIf="selectedOrder() as order">
+    <header class="panel-header">
+      <div class="title-group">
+        <h2>{{ order.orderNumber || 'Order Details' }}</h2>
+        <span class="date">{{ order.createdAt | date:'medium' }}</span>
+      </div>
+      <button class="close-btn" (click)="closePanel()">
+        <i class="pi pi-times"></i>
+      </button>
+    </header>
+
+    <div class="panel-scroll">
+      <!-- Customer Info -->
+      <section class="detail-section">
+        <h3>Customer</h3>
+        <div class="customer-card" *ngIf="order.customerId; else guest">
+          <div class="avatar">{{ order.customerId.firstName[0] }}{{ order.customerId.lastName[0] }}</div>
+          <div class="info">
+            <strong>{{ order.customerId.firstName }} {{ order.customerId.lastName }}</strong>
+            <span>{{ order.customerId.email }}</span>
+            <span *ngIf="order.customerId.phone">{{ order.customerId.phone }}</span>
+          </div>
+        </div>
+        <ng-template #guest>
+          <div class="customer-card guest">
+            <div class="avatar"><i class="pi pi-user"></i></div>
+            <div class="info">
+              <strong>Guest Customer</strong>
+            </div>
+          </div>
+        </ng-template>
+      </section>
+
+      <!-- Status Badges -->
+      <section class="detail-section row">
+        <div class="status-block">
+          <span class="label">Payment Status</span>
+          <span class="badge" [attr.data-status]="order.paymentStatus">{{ order.paymentStatus | titlecase }}</span>
+        </div>
+        <div class="status-block">
+          <span class="label">Fulfillment</span>
+          <span class="badge" [attr.data-status]="order.orderStatus">{{ order.orderStatus | titlecase }}</span>
+        </div>
+      </section>
+
+      <!-- Order Items -->
+      <section class="detail-section">
+        <h3>Items</h3>
+        <div class="item-list">
+          <div class="order-item" *ngFor="let item of order.items">
+            <div class="item-image">
+              <img *ngIf="item.snapshot?.image; else noImg" [src]="item.snapshot.image" alt="Product Image">
+              <ng-template #noImg><div class="img-placeholder"><i class="pi pi-image"></i></div></ng-template>
+            </div>
+            <div class="item-details">
+              <strong>{{ item.snapshot?.name }}</strong>
+              <span class="variant" *ngIf="item.snapshot?.variantTitle">{{ item.snapshot.variantTitle }}</span>
+              <div class="qty-price">
+                <span>{{ item.quantity }} × {{ item.unitPrice | currency:'INR' }}</span>
+                <strong>{{ item.lineTotal | currency:'INR' }}</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Totals -->
+      <section class="detail-section totals-section">
+        <div class="total-row">
+          <span>Subtotal</span>
+          <span>{{ order.totals?.subtotal | currency:'INR' }}</span>
+        </div>
+        <div class="total-row">
+          <span>Tax</span>
+          <span>{{ order.totals?.tax | currency:'INR' }}</span>
+        </div>
+        <div class="total-row">
+          <span>Shipping</span>
+          <span>{{ order.totals?.shipping | currency:'INR' }}</span>
+        </div>
+        <div class="total-row grand-total">
+          <span>Total</span>
+          <span>{{ order.totals?.grandTotal | currency:'INR' }}</span>
+        </div>
+      </section>
+    </div>
+  </aside>
+</main>

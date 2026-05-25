@@ -1,90 +1,242 @@
-<main class="sf-admin-customers">
-  <header class="sf-admin-header">
-    <div>
-      <span>Commerce identity</span>
-      <h1>Storefront Customers</h1>
-      <p>Shoppers, guests, carts, orders, addresses, and manual CRM conversion stay separate from ERP customers.</p>
-    </div>
-    <button type="button" (click)="load()"><i class="pi pi-refresh"></i> Refresh</button>
-  </header>
-
-  @if (error()) { <div class="admin-alert">{{ error() }}</div> }
-
-  <section class="toolbar">
-    <label>
-      <i class="pi pi-search"></i>
-      <input placeholder="Search email, phone, name" [ngModel]="search()" (ngModelChange)="search.set($event)" (keyup.enter)="load()" />
-    </label>
-    <button type="button" [class.active]="guestOnly()" (click)="guestOnly.set(!guestOnly()); load()">Guest shoppers</button>
-    <button type="button" [class.active]="unconvertedOnly()" (click)="unconvertedOnly.set(!unconvertedOnly()); load()">Not converted</button>
-  </section>
-
-  <section class="customer-layout">
-    <div class="customer-list">
-      @if (loading()) {
-        @for (i of [1,2,3,4]; track i) { <div class="customer-row skeleton"></div> }
-      } @else {
-        @for (customer of customers(); track customer._id || customer.id) {
-          <article class="customer-row" [class.active]="(selected()?._id || selected()?.id) === (customer._id || customer.id)" (click)="open(customer)">
-            <div class="avatar">{{ displayName(customer).charAt(0) }}</div>
-            <div>
-              <h3>{{ displayName(customer) }}</h3>
-              <p>{{ customer.email || customer.phone || 'Guest identity' }}</p>
-            </div>
-            <span [class.converted]="customer.convertedToMainCustomer">
-              {{ customer.convertedToMainCustomer ? 'CRM linked' : customer.guestAccount ? 'Guest' : 'Account' }}
-            </span>
-          </article>
-        } @empty {
-          <div class="empty-panel">No storefront customers found.</div>
-        }
-      }
-    </div>
-
-    <aside class="customer-detail">
-      @if (!selected()) {
-        <div class="empty-panel">Select a storefront customer to inspect orders, addresses, carts, and conversion status.</div>
-      } @else {
-        <div class="detail-head">
-          <div>
-            <span>{{ selected().guestAccount ? 'Guest shopper' : 'Storefront account' }}</span>
-            <h2>{{ displayName(selected()) }}</h2>
-            <p>{{ selected().email || 'No email' }} · {{ selected().phone || 'No phone' }}</p>
+<main class="storefront-customers-layout" [class.panel-open]="selected()">
+  <section class="grid-section">
+    <header class="page-header">
+      <div class="header-content">
+        <h1>Storefront Customers</h1>
+        <p class="subtitle">Manage shoppers, view live carts, and migrate profiles.</p>
+      </div>
+      <div class="header-actions">
+        <div class="filters">
+          <div class="search-box">
+            <i class="pi pi-search"></i>
+            <input type="text" placeholder="Search..." [ngModel]="search()"
+              (ngModelChange)="search.set($event); load()" />
           </div>
-          <button type="button" (click)="convert(selected())" [disabled]="selected().convertedToMainCustomer || converting() === (selected()._id || selected().id)">
-            @if (converting() === (selected()._id || selected().id)) { <i class="pi pi-spin pi-spinner"></i> }
-            @else { <i class="pi pi-user-plus"></i> }
-            {{ selected().convertedToMainCustomer ? 'Converted' : 'Convert to CRM Customer' }}
+          <button class="filter-chip" [class.active]="guestOnly()" (click)="toggleGuest()">
+            Guest
+          </button>
+          <button class="filter-chip" [class.active]="unconvertedOnly()" (click)="toggleUnconverted()">
+            Unlinked
           </button>
         </div>
+        <button class="premium-btn ghost-btn" (click)="load()">
+          <i class="pi pi-refresh" [class.pi-spin]="loading()"></i>
+        </button>
+      </div>
+    </header>
 
-        <div class="metric-grid">
-          <div><span>Orders</span><strong>{{ selected().orderCount || 0 }}</strong></div>
-          <div><span>Total spent</span><strong>{{ selected().totalSpent || 0 | currency:'INR' }}</strong></div>
-          <div><span>Last seen</span><strong>{{ selected().lastSeenAt | date:'mediumDate' }}</strong></div>
-        </div>
-
-        @if (detail(); as data) {
-          <section class="detail-section">
-            <h3>Addresses</h3>
-            @for (address of data.addresses || []; track address._id || address.id) {
-              <p>{{ address.fullName }} · {{ address.addressLine1 }}, {{ address.city }}, {{ address.state }}</p>
-            } @empty { <p>No addresses saved.</p> }
-          </section>
-
-          <section class="detail-section">
-            <h3>Orders</h3>
-            @for (order of data.orders || []; track order._id || order.id) {
-              <p><strong>{{ order.orderNumber }}</strong> · {{ order.orderStatus }} · {{ order.totals?.grandTotal | currency: order.totals?.currency || 'INR' }}</p>
-            } @empty { <p>No orders yet.</p> }
-          </section>
-
-          <section class="detail-section">
-            <h3>Wishlist</h3>
-            <p>{{ (data.wishlist || []).length }} saved item(s)</p>
-          </section>
+    <div class="grid-container">
+      @if (error()) {
+      <div class="error-state">
+        <i class="pi pi-exclamation-triangle"></i>
+        <p>{{ error() }}</p>
+        <button class="premium-btn" (click)="load()">Try Again</button>
+      </div>
+      } @else {
+      <div class="classic-list">
+        @for (customer of customers(); track customer._id || customer.id) {
+        <article class="customer-row"
+          [class.active]="(selected()?._id || selected()?.id) === (customer._id || customer.id)"
+          (click)="open(customer)">
+          <div class="avatar">{{ customer.displayName.charAt(0).toUpperCase() }}</div>
+          <div class="info">
+            <h3>{{ customer.displayName }}</h3>
+            <p>{{ customer.email || customer.phone || 'Guest Shopper' }}</p>
+          </div>
+          <span class="status-badge" [class.converted]="customer.convertedToMainCustomer">
+            {{ customer.convertedToMainCustomer ? 'CRM' : 'Store' }}
+          </span>
+        </article>
+        } @empty {
+        <div class="empty-panel">No customers found.</div>
         }
+      </div>
       }
-    </aside>
+    </div>
   </section>
+
+  <aside class="detail-panel" *ngIf="selected() as customer">
+    <header class="panel-header">
+      <div class="title-group">
+        <h2>Customer Profile Workspace</h2>
+      </div>
+      <button class="close-btn" (click)="closePanel()">
+        <i class="pi pi-times"></i>
+      </button>
+    </header>
+
+    <div class="panel-scroll" *ngIf="detail() as d; else loadingTpl">
+
+      <div class="bento-top-row">
+        <section class="bento-block profile-card">
+          <div class="avatar-large">{{ customer.displayName.charAt(0).toUpperCase() }}</div>
+          <div class="profile-info">
+            <h3>{{ customer.displayName }}</h3>
+            <p class="email" *ngIf="d.customer?.email || customer.email">
+              <i class="pi pi-envelope"></i> {{ d.customer?.email || customer.email }}
+            </p>
+            <p class="phone" *ngIf="d.customer?.phone || customer.phone">
+              <i class="pi pi-phone"></i> {{ d.customer?.phone || customer.phone }}
+            </p>
+            <div class="crm-badge" [class.linked]="d.customer?.convertedToMainCustomer">
+              <i class="pi" [class.pi-check-circle]="d.customer?.convertedToMainCustomer"
+                [class.pi-sync]="!d.customer?.convertedToMainCustomer"></i>
+              {{ d.customer?.convertedToMainCustomer ? 'Linked to CRM' : 'Storefront Only' }}
+            </div>
+          </div>
+        </section>
+
+        <section class="bento-block action-block" *ngIf="!d.customer?.convertedToMainCustomer">
+          <div class="info-banner">
+            <i class="pi pi-shield"></i>
+            <div>
+              <h4>Convert Profile</h4>
+              <p>issue manual invoices, track comprehensive lifetime values, and manage customer ledgers directly.</p>
+            </div>
+          </div>
+          <button class="premium-btn full-width-action" (click)="convert(customer)"
+            [disabled]="converting() === customer._id">
+            <i class="pi pi-sync" [class.pi-spin]="converting() === customer._id"></i>
+            Convert to CRM Customer
+          </button>
+        </section>
+      </div>
+
+      <div class="bento-metrics-row">
+        <div class="bento-block stat-box highlight">
+          <span class="label">Total Value Spent</span>
+          <span class="value">{{ (d.customer?.totalSpent || 0) | currency:'INR':'symbol':'1.0-0' }}</span>
+        </div>
+        <div class="bento-block stat-box">
+          <span class="label">Completed Orders</span>
+          <span class="value">{{ d.customer?.orderCount || 0 }} Orders</span>
+        </div>
+        <div class="bento-block stat-box">
+          <span class="label">Last Activity Tracking</span>
+          <span class="value date">{{ (d.customer?.lastSeenAt || customer.lastSeenAt) | date:'mediumDate' }}</span>
+        </div>
+      </div>
+
+      <div class="bento-dashboard-grid">
+
+        <section class="bento-block functional-list-block"
+          *ngIf="d.carts && d.carts.length > 0 && d.carts[0].cartItems?.length > 0; else emptyCartTpl">
+          <div class="block-header">
+            <h3><i class="pi pi-shopping-cart"></i> Live Shopping Cart Items</h3>
+            <span class="cart-total-badge">{{ d.carts[0].totals?.grandTotal | currency:'INR':'symbol':'1.0-0' }}</span>
+          </div>
+          <div class="item-list">
+            <div class="order-item" *ngFor="let item of d.carts[0].cartItems">
+              <div class="item-image">
+                <img *ngIf="item.snapshot?.image; else noImg" [src]="item.snapshot.image" alt="Product Image">
+                <ng-template #noImg>
+                  <div class="img-placeholder"><i class="pi pi-box"></i></div>
+                </ng-template>
+              </div>
+              <div class="item-details">
+                <strong>{{ item.snapshot?.name || 'Product Item' }}</strong>
+                <div class="qty-price">
+                  <span>Quantity: {{ item.quantity }} × {{ item.unitPrice | currency:'INR':'symbol':'1.0-0' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <ng-template #emptyCartTpl>
+          <section class="bento-block functional-list-block empty-state-block">
+            <h3><i class="pi pi-shopping-cart"></i> Live Shopping Cart</h3>
+            <div class="empty-msg"><i class="pi pi-info-circle"></i> No items inside current cart session.</div>
+          </section>
+        </ng-template>
+
+        <section class="bento-block functional-list-block" *ngIf="d.orders && d.orders.length > 0; else emptyOrdersTpl">
+          <div class="block-header">
+            <h3><i class="pi pi-history"></i> Recent Order History</h3>
+          </div>
+          <div class="mini-order-list">
+            <div class="mini-order" *ngFor="let order of d.orders | slice:0:3">
+              <div class="order-head">
+                <span class="order-number">{{ order.orderNumber }}</span>
+                <span class="order-date">{{ order.createdAt | date:'shortDate' }}</span>
+              </div>
+              <div class="order-foot">
+                <span class="badge" [attr.data-status]="order.paymentStatus">
+                  <span class="status-dot"></span> {{ order.paymentStatus | titlecase }}
+                </span>
+                <strong class="order-price">{{ order.totals?.grandTotal | currency:'INR':'symbol':'1.0-0' }}</strong>
+              </div>
+            </div>
+          </div>
+        </section>
+        <ng-template #emptyOrdersTpl>
+          <section class="bento-block functional-list-block empty-state-block">
+            <h3><i class="pi pi-history"></i> Recent Order History</h3>
+            <div class="empty-msg"><i class="pi pi-calendar"></i> No recent purchases linked to this user.</div>
+          </section>
+        </ng-template>
+
+        <section class="bento-block functional-list-block"
+          *ngIf="d.addresses && d.addresses.length > 0; else emptyAddrTpl">
+          <div class="block-header">
+            <h3><i class="pi pi-map-marker"></i> Saved Shipping Addresses</h3>
+          </div>
+          <div class="address-grid">
+            <div class="address-card" *ngFor="let addr of d.addresses" [class.default]="addr.isDefault">
+              <div class="address-header">
+                <span class="type-tag">{{ addr.addressType || 'Home' }}</span>
+                <span class="default-badge" *ngIf="addr.isDefault">Default</span>
+              </div>
+              <p class="address-text">{{ addr.addressLine1 }}</p>
+              <p class="city-zip">{{ addr.city }}, {{ addr.state }} - {{ addr.postalCode }}</p>
+            </div>
+          </div>
+        </section>
+        <ng-template #emptyAddrTpl>
+          <section class="bento-block functional-list-block empty-state-block">
+            <h3><i class="pi pi-map-marker"></i> Saved Addresses</h3>
+            <div class="empty-msg"><i class="pi pi-map"></i> No registered profile addresses found.</div>
+          </section>
+        </ng-template>
+
+        <section class="bento-block functional-list-block"
+          *ngIf="d.wishlist && d.wishlist.length > 0; else emptyWishTpl">
+          <div class="block-header">
+            <h3><i class="pi pi-heart"></i> Saved Wishlist ({{ d.wishlist.length }})</h3>
+          </div>
+          <div class="item-list">
+            <div class="order-item" *ngFor="let item of d.wishlist | slice:0:3">
+              <div class="item-image">
+                <img *ngIf="item.productId?.images?.[0]; else noWishImg" [src]="item.productId.images[0]"
+                  alt="Product Image">
+                <ng-template #noWishImg>
+                  <div class="img-placeholder"><i class="pi pi-image"></i></div>
+                </ng-template>
+              </div>
+              <div class="item-details">
+                <strong>{{ item.productId?.name || 'Product Title' }}</strong>
+                <div class="qty-price">
+                  <span>{{ (item.productId?.discountedPrice || item.productId?.sellingPrice || 0) |
+                    currency:'INR':'symbol':'1.0-0' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <ng-template #emptyWishTpl>
+          <section class="bento-block functional-list-block empty-state-block">
+            <h3><i class="pi pi-heart"></i> Saved Wishlist</h3>
+            <div class="empty-msg"><i class="pi pi-heart"></i> Wishlist folder is currently empty.</div>
+          </section>
+        </ng-template>
+
+      </div>
+    </div>
+
+    <ng-template #loadingTpl>
+      <div class="panel-loading">
+        <i class="pi pi-spin pi-spinner"></i>
+        <p>Loading Customer Context Workspace...</p>
+      </div>
+    </ng-template>
+  </aside>
 </main>

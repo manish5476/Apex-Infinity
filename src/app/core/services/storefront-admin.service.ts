@@ -129,6 +129,16 @@ export class StorefrontAdminService extends BaseApiService {
     return this.get(`${this.base}/pages/${pageId}/analytics`, { period });
   }
 
+  getStorefrontOrders(params?: {
+    status?: string;
+    paymentStatus?: string;
+    search?: string;
+    page?: number;
+    limit?: number;
+  }): Observable<any> {
+    return this.get(`${this.base}/orders`, params ?? {});
+  }
+
   getStorefrontCustomers(params?: {
     status?: string;
     converted?: boolean;

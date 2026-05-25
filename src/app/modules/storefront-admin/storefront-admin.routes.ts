@@ -45,6 +45,15 @@ export const STOREFRONT_ADMIN_ROUTES: Routes = [
     canActivate: [permissionGuard],
     data: { permissions: [PERMISSIONS.STOREFRONT.READ] }
   },
+  {
+    path: 'orders',
+    loadComponent: () =>
+      import('./pages/storefront-orders/storefront-orders.component')
+        .then(m => m.StorefrontOrdersComponent),
+    title: 'Storefront Orders',
+    canActivate: [permissionGuard],
+    data: { permissions: [PERMISSIONS.STOREFRONT.READ] }
+  },
   ...[
     ['activity', 'activity-logs', 'Activity Logs'],
     ['notifications', 'notifications-center', 'Notifications Center'],
@@ -69,3 +78,4 @@ export const STOREFRONT_ADMIN_ROUTES: Routes = [
     ['settings', 'settings', 'Storefront Settings']
   ].map(([path, surfaceKey, title]) => adminSurfaceRoute(path, surfaceKey, title))
 ];
+

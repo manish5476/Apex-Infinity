@@ -280,7 +280,31 @@ export const SIDEBAR_MENU: MenuItem[] = [
   },
 
   // ==========================
-  // 9. SYSTEM ADMINISTRATION
+  // 9. STOREFRONT ADMIN
+  // ==========================
+  {
+    label: 'Storefront',
+    icon: 'pi pi-shopping-bag',
+    permissions: [PERMISSIONS.ORG.MANAGE, PERMISSIONS.STOREFRONT.READ],
+    items: [
+      { label: 'Command Center', icon: 'pi pi-home', routerLink: ['/storefront/overview'], permissions: [PERMISSIONS.STOREFRONT.READ] },
+      { label: 'Page Builder', icon: 'pi pi-sitemap', routerLink: ['/storefront/pages'], permissions: [PERMISSIONS.STOREFRONT.READ] },
+      { label: 'Orders', icon: 'pi pi-receipt', routerLink: ['/storefront/orders'], permissions: [PERMISSIONS.STOREFRONT.READ] },
+      { label: 'Customers', icon: 'pi pi-users', routerLink: ['/storefront/customers'], permissions: [PERMISSIONS.STOREFRONT.READ] },
+      {
+        label: 'Design & Layout',
+        icon: 'pi pi-palette',
+        permissions: [PERMISSIONS.STOREFRONT.LAYOUT_MANAGE, PERMISSIONS.STOREFRONT.THEME_MANAGE],
+        items: [
+          { label: 'Themes', icon: 'pi pi-images', routerLink: ['/storefront/themes'], permissions: [PERMISSIONS.STOREFRONT.THEME_MANAGE] },
+          { label: 'Master Layout', icon: 'pi pi-desktop', routerLink: ['/storefront/settings/layout'], permissions: [PERMISSIONS.STOREFRONT.LAYOUT_MANAGE] }
+        ]
+      }
+    ]
+  },
+
+  // ==========================
+  // 10. SYSTEM ADMINISTRATION
   // ==========================
   {
     label: 'Administration',
@@ -288,7 +312,6 @@ export const SIDEBAR_MENU: MenuItem[] = [
     permissions: [PERMISSIONS.ORG.MANAGE, PERMISSIONS.ROLE.MANAGE, PERMISSIONS.MASTER.READ, PERMISSIONS.SESSION.VIEW_ALL, PERMISSIONS.ASSET.READ],
     items: [
       { label: 'Organization', icon: 'pi pi-building', routerLink: ['/admin/organization'], permissions: [PERMISSIONS.ORG.MANAGE] },
-      { label: 'Storefront Pages', icon: 'pi pi-pages', routerLink: ['/storefront/pages'], permissions: [PERMISSIONS.ORG.MANAGE] },
       { label: 'Branches', icon: 'pi pi-map-marker', routerLink: ['/branches'], permissions: [PERMISSIONS.BRANCH.READ] },
       { label: 'Roles & Permissions', icon: 'pi pi-lock', routerLink: ['/admin/roles'], permissions: [PERMISSIONS.ROLE.MANAGE] },
       { label: 'Master Data', icon: 'pi pi-database', routerLink: ['/masterList'], permissions: [PERMISSIONS.MASTER.READ] },
