@@ -20,6 +20,7 @@ import { TooltipModule } from 'primeng/tooltip';
 
 import { ThemeService, ThemeSettings } from '../../../core/services/theme.service';
 import { StorefrontStateService } from '@core/services/storefront-state.service';
+import { StorefrontPublicService } from '@core/services/storefront-public.service';
 import { LayoutSectionRendererComponent } from './layout-section-renderer.component';
 
 // ---------------------------------------------------------------------------
@@ -61,6 +62,7 @@ export class StorefrontLayoutComponent implements OnInit, OnDestroy {
   public state = inject(StorefrontStateService);
   private themeService = inject(ThemeService);
   private router = inject(Router);
+  private publicService = inject(StorefrontPublicService);
   private destroy$ = new Subject<void>();
 
   // ── Theme state signals ───────────────────────────────────────────────────
@@ -133,10 +135,18 @@ export class StorefrontLayoutComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ── Lifecycle ─────────────────────────────────────────────────────────────
-
   ngOnInit(): void {
     this._buildThemeGroups();
+
+    // If layout is missing (e.g., direct navigation to /cart), fetch the home page to populate the layout
+    const slug = this.state.organization()?.slug || this.router.url.split('/')[2];
+    if (slug && (!this.state.layout() || !this.state.organization())) {
+      this.publicService.getPage(slug, 'home').subscribe({
+        next: (res) => {
+          if (res?.data) this.state.setState(res.data);
+        }
+      });
+    }
 
     this.themeService.settings$
       .pipe(takeUntil(this.destroy$))

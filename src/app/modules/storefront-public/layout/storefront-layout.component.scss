@@ -5,7 +5,7 @@
 .storefront-shell {
   font-family: var(--apx-font-sans);
   color: var(--text-primary);
-  background: var(--apx-color-canvas);
+  background: var(--bg-primary);
 }
 
 .storefront-shell__backdrop {
@@ -125,3 +125,4 @@
     border-color: rgba(255, 255, 255, 0.1);
   }
 }
+

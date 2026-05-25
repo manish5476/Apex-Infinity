@@ -517,4 +517,13 @@
     </div>
 
   </p-drawer>
+
+  <!-- ═══ AUTH GATE MODAL — shown when an unauthenticated user hits Add to Cart ═══ -->
+  <app-storefront-auth-modal
+    [visible]="showAuthModal()"
+    [orgSlug]="orgSlug()"
+    (visibleChange)="showAuthModal.set($event)"
+    (authenticated)="onAuthenticated()">
+  </app-storefront-auth-modal>
+
 </div>

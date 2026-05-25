@@ -67,6 +67,10 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
   readonly shippingEstimate = signal<any>(null);
   readonly taxEstimate = signal<any>(null);
 
+  // Flow State
+  readonly selectedAddressId = signal<string | null | undefined>(null);
+  readonly showAddressForm = signal(false);
+
   readonly cart = this.cartFacade.cart;
   readonly dashboard = this.storefrontAuth.dashboard;
   readonly customer = this.storefrontAuth.customer;
@@ -181,6 +185,12 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
         this.checkoutContact.firstName = cust.firstName || '';
         this.checkoutContact.lastName = cust.lastName || '';
         this.checkoutContact.phone = cust.phone || '';
+        
+        if (cust.defaultAddressId) {
+          this.selectedAddressId.set(cust.defaultAddressId);
+        } else if (this.addresses().length > 0) {
+          this.selectedAddressId.set(this.addresses()[0]._id || this.addresses()[0].id || null);
+        }
         this.cdr.markForCheck();
       }
     });
@@ -235,15 +245,27 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
       this.submitting.set(false);
       if (!res) return;
       this.success.set('Address saved.');
+      this.showAddressForm.set(false);
       this.loadCustomer();
     });
   }
 
   placeOrder(): void {
+    const addresses = this.addresses();
+    const selectedId = this.selectedAddressId();
+    let finalAddress = this.addressForm;
+
+    if (selectedId && addresses.length) {
+      const saved = addresses.find(a => (a as any)._id === selectedId || (a as any).id === selectedId);
+      if (saved) {
+        finalAddress = saved as any;
+      }
+    }
+
     const payload: StorefrontCheckoutDto = {
       customer: { ...this.checkoutContact },
-      shippingAddress: this.addressForm,
-      billingAddress: this.addressForm,
+      shippingAddress: finalAddress,
+      billingAddress: finalAddress,
       saveAddress: this.checkoutContact.saveAddress,
       defaultAddress: true
     };

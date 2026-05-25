@@ -8,7 +8,7 @@
   color: var(--text-primary);
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--color-primary) 7%, transparent), transparent 28rem),
-    var(--apx-color-canvas);
+    var(--bg-primary);
 }
 
 .sf-hero {
@@ -253,3 +253,4 @@
     min-height: 220px;
   }
 }
+

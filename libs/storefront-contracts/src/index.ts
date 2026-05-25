@@ -324,3 +324,159 @@ export interface ProductListParams {
   readonly tags?: string;
   readonly inStock?: boolean;
 }
+
+// ── Store / Org info ──────────────────────────────────────────────────────────
+
+export interface StorefrontOrganizationInfo {
+  readonly _id?: StorefrontId;
+  readonly id?: StorefrontId;
+  readonly name: string;
+  readonly slug: string;
+  readonly logo?: string | null;
+  readonly email?: string | null;
+  readonly phone?: string | null;
+  readonly address?: Partial<StorefrontAddressDto> | null;
+  readonly settings?: JsonObject;
+  readonly theme?: JsonObject;
+}
+
+export interface StorefrontSitemapEntry {
+  readonly slug: string;
+  readonly name: string;
+  readonly pageType?: string;
+  readonly updatedAt?: string;
+}
+
+export interface StorefrontSitemap {
+  readonly pages: readonly StorefrontSitemapEntry[];
+}
+
+// ── Catalogue metadata ────────────────────────────────────────────────────────
+
+export interface StorefrontCategory {
+  readonly _id?: StorefrontId;
+  readonly id?: StorefrontId;
+  readonly name: string;
+  readonly slug?: string;
+  readonly image?: string | null;
+  readonly description?: string | null;
+  readonly productCount?: number;
+  readonly parentCategory?: StorefrontId | null;
+  readonly children?: readonly StorefrontCategory[];
+}
+
+export interface StorefrontBrand {
+  readonly _id?: StorefrontId;
+  readonly id?: StorefrontId;
+  readonly name: string;
+  readonly slug?: string;
+  readonly logo?: string | null;
+  readonly productCount?: number;
+}
+
+export interface StorefrontTag {
+  readonly _id?: StorefrontId;
+  readonly id?: StorefrontId;
+  readonly name: string;
+  readonly slug?: string;
+  readonly productCount?: number;
+}
+
+export interface StorefrontPriceRange {
+  readonly min: number;
+  readonly max: number;
+  readonly currency?: CurrencyCode;
+}
+
+/** Response shape of GET /meta */
+export interface StorefrontMeta {
+  readonly categories?: readonly StorefrontCategory[];
+  readonly brands?: readonly StorefrontBrand[];
+  readonly tags?: readonly StorefrontTag[];
+  readonly priceRange?: StorefrontPriceRange;
+  readonly productCount?: number;
+}
+
+/** Response shape of GET /filters — lighter version of meta */
+export interface StorefrontFilters {
+  readonly categories?: readonly StorefrontCategory[];
+  readonly brands?: readonly StorefrontBrand[];
+  readonly priceRange?: StorefrontPriceRange;
+}
+
+// ── Page rendering ────────────────────────────────────────────────────────────
+
+export interface StorefrontSection {
+  readonly _id?: StorefrontId;
+  readonly id?: StorefrontId;
+  readonly sectionType: string;
+  readonly config?: JsonObject;
+  readonly data?: JsonValue;
+  readonly hydratedData?: JsonValue;
+  readonly manualData?: JsonValue;
+  readonly order?: number;
+}
+
+export interface StorefrontPage {
+  readonly _id?: StorefrontId;
+  readonly id?: StorefrontId;
+  readonly name: string;
+  readonly slug: string;
+  readonly pageType?: string;
+  readonly status?: 'draft' | 'published' | 'archived';
+  readonly isHomepage?: boolean;
+  readonly sections?: readonly StorefrontSection[];
+  readonly seo?: {
+    readonly title?: string;
+    readonly description?: string;
+    readonly ogImage?: string;
+    readonly noIndex?: boolean;
+  };
+  readonly themeOverride?: JsonObject;
+  readonly updatedAt?: string;
+  readonly publishedAt?: string;
+}
+
+/** Full page render response: org + layout + page + settings */
+export interface StorefrontPageRender {
+  readonly organization: StorefrontOrganizationInfo;
+  readonly layout: {
+    readonly header?: readonly StorefrontSection[];
+    readonly footer?: readonly StorefrontSection[];
+  };
+  readonly settings?: JsonObject;
+  readonly page: StorefrontPage;
+}
+
+// ── Form submission ───────────────────────────────────────────────────────────
+
+export type StorefrontFormFieldValue = string | number | boolean | null | readonly string[];
+
+export interface StorefrontFormSubmission {
+  readonly formId?: StorefrontId;
+  readonly formTitle?: string;
+  readonly fields: Record<string, StorefrontFormFieldValue>;
+  readonly submittedAt?: string;
+  readonly ipAddress?: string;
+  readonly userAgent?: string;
+  readonly pageSlug?: string;
+}
+
+export interface StorefrontFormSubmitDto {
+  readonly formId?: StorefrontId;
+  readonly fields: Record<string, StorefrontFormFieldValue>;
+  readonly pageSlug?: string;
+  readonly source?: string;
+}
+
+export type StorefrontSubmissionStatus = 'new' | 'read' | 'replied' | 'spam' | 'archived';
+
+export interface StorefrontSubmissionListParams {
+  readonly status?: StorefrontSubmissionStatus;
+  readonly formId?: StorefrontId;
+  readonly page?: number;
+  readonly limit?: number;
+  readonly search?: string;
+  readonly startDate?: string;
+  readonly endDate?: string;
+}

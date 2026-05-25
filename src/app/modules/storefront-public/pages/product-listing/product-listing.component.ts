@@ -25,6 +25,8 @@ import { SliderModule } from 'primeng/slider';
 import { StorefrontPublicService, ProductListParams } from '../../../../core/services/storefront-public.service';
 import { StorefrontStateService } from '../../../../core/services/storefront-state.service';
 import { StorefrontCartFacade } from '../../../../storefront/core/facades/storefront-cart.facade';
+import { StorefrontAuthStore } from '../../../../storefront/core/state/storefront-auth.store';
+import { StorefrontAuthModalComponent } from '../../components/storefront-auth-modal/storefront-auth-modal.component';
 import { ProductCardComponent } from '../product-card/product-card';
 import { ProductListingConfig, PublicProduct } from '@core/models/storefront.model';
 
@@ -52,7 +54,7 @@ function defaultListingFilters(limit: number): ProductListingFilters {
   selector: 'app-product-listing',
   standalone: true,
   imports: [
-    CommonModule, RouterModule, FormsModule, ProductCardComponent,
+    CommonModule, RouterModule, FormsModule, ProductCardComponent, StorefrontAuthModalComponent,
     SelectModule, CheckboxModule, PaginatorModule, ButtonModule,
     DrawerModule, BadgeModule, InputTextModule, AccordionModule,
     RippleModule, SkeletonModule, TooltipModule, SliderModule
@@ -104,8 +106,15 @@ export class ProductListingComponent implements OnInit, OnDestroy {
   private publicService = inject(StorefrontPublicService);
   public stateService = inject(StorefrontStateService);
   private cartFacade = inject(StorefrontCartFacade);
+  private authStore = inject(StorefrontAuthStore);
   private destroy$ = new Subject<void>();
   private searchSubject = new Subject<string>();
+
+  // ── Auth-gate for Add to Cart ──────────────────────────────────────────────
+  /** Controls visibility of the login/register modal */
+  readonly showAuthModal = signal(false);
+  /** Product waiting to be added after the user authenticates */
+  private pendingProduct = signal<PublicProduct | null>(null);
 
   products = signal<any[]>([]);
   categories = signal<any[]>([]);
@@ -231,9 +240,30 @@ export class ProductListingComponent implements OnInit, OnDestroy {
   }
 
   handleAddToCart(product: PublicProduct) {
-    if (this.orgSlug()) {
-      this.cartFacade.add(this.orgSlug(), { productId: product.id || (product as any)._id, quantity: 1 }).subscribe();
+    if (!this.orgSlug()) return;
+
+    if (this.authStore.isAuthenticated()) {
+      // Customer already logged in → add immediately
+      this.addProductToCart(product);
+    } else {
+      // Not logged in → hold the product and show auth modal
+      this.pendingProduct.set(product);
+      this.showAuthModal.set(true);
     }
+  }
+
+  /** Called by the auth modal's (authenticated) event after successful login/register. */
+  onAuthenticated() {
+    const product = this.pendingProduct();
+    if (product) {
+      this.addProductToCart(product);
+      this.pendingProduct.set(null);
+    }
+  }
+
+  private addProductToCart(product: PublicProduct) {
+    const productId = (product as any)._id ?? product.id ?? '';
+    this.cartFacade.add(this.orgSlug(), { productId, quantity: 1 }).subscribe();
   }
 
   onSearchInput(event: Event) {

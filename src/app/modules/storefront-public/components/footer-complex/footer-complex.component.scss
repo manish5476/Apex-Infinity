@@ -2,7 +2,7 @@
   border-top: 1px solid var(--border-secondary);
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--accent-primary) 7%, transparent), transparent 22rem),
-    var(--bg-page, var(--apx-color-canvas));
+    var(--bg-page, var(--bg-primary));
   padding: clamp(3rem, 7vw, 5rem) 1rem 1.2rem;
   color: var(--text-primary, var(--text-primary));
 }
@@ -147,3 +147,4 @@
     grid-template-columns: 1fr;
   }
 }
+
