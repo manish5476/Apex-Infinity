@@ -54,6 +54,22 @@ export const STOREFRONT_ADMIN_ROUTES: Routes = [
     canActivate: [permissionGuard],
     data: { permissions: [PERMISSIONS.STOREFRONT.READ] }
   },
+    {
+    path: 'themes',
+    loadComponent: () =>
+      import('./pages/theme-marketplace/theme-marketplace.component').then(m => m.ThemeMarketplaceComponent),
+    title: 'Theme Marketplace',
+    canActivate: [permissionGuard],
+    data: { permissions: [PERMISSIONS.STOREFRONT.THEME_MANAGE] }
+  },
+  {
+    path: 'settings/layout',
+    loadComponent: () =>
+      import('./pages/storefront-layout/storefront-layout.component').then(m => m.StorefrontLayoutComponent),
+    title: 'Storefront Layout',
+    canActivate: [permissionGuard],
+    data: { permissions: [PERMISSIONS.STOREFRONT.LAYOUT_MANAGE] }
+  },
   ...[
     ['activity', 'activity-logs', 'Activity Logs'],
     ['notifications', 'notifications-center', 'Notifications Center'],
@@ -78,4 +94,5 @@ export const STOREFRONT_ADMIN_ROUTES: Routes = [
     ['settings', 'settings', 'Storefront Settings']
   ].map(([path, surfaceKey, title]) => adminSurfaceRoute(path, surfaceKey, title))
 ];
+
 
