@@ -456,25 +456,46 @@
       }
     </div>
     } @else if (mode() === 'wishlist') {
-    <div class="card-list">
+    <div class="account-grid">
       @for (item of wishlist(); track wishlistTrack(item)) {
-      <article class="account-card">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-          <div style="width: 3rem; height: 3rem; border-radius: 0.75rem; background: var(--component-bg-hover); display: grid; place-items: center; border: 1px solid var(--border-secondary);">
-            <i class="pi pi-heart-fill" style="font-size: 1.2rem; color: var(--color-primary);"></i>
+      <article class="account-card wishlist-product-card">
+        <!-- Product Image -->
+        <div class="wl-img-wrap">
+          @if (wishlistImage(item)) {
+          <img [src]="wishlistImage(item)" [alt]="wishlistName(item)" />
+          } @else {
+          <div class="wl-img-placeholder"><i class="pi pi-image"></i></div>
+          }
+          <!-- Remove from wishlist button -->
+          <button type="button" class="wl-remove-btn"
+            (click)="removeFromWishlist(item)"
+            title="Remove from wishlist">
+            <i class="pi pi-heart-fill"></i>
+          </button>
+        </div>
+
+        <!-- Product Details -->
+        <div class="wl-body">
+          <h3 class="wl-name">{{ wishlistName(item) }}</h3>
+          <div class="wl-pricing">
+            <span class="wl-price">{{ wishlistCurrentPrice(item) | currency:'INR':'symbol':'1.0-0' }}</span>
+            @if (wishlistOriginalPrice(item) > wishlistCurrentPrice(item)) {
+            <span class="wl-price-old">{{ wishlistOriginalPrice(item) | currency:'INR':'symbol':'1.0-0' }}</span>
+            }
           </div>
-          <span style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; background: var(--bg-primary); padding: 0.35rem 0.75rem; border-radius: 2rem; color: var(--text-secondary); border: 1px solid var(--border-secondary);">Saved</span>
         </div>
-        <div>
-          <h3 style="margin: 0.75rem 0 0.25rem;">{{ wishlistName(item) }}</h3>
-          <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;">Wishlist item saved to your storefront profile.</p>
-        </div>
-        <button type="button" class="checkout-button" style="margin-top: auto; font-size: 0.85rem; padding: 0.6rem; min-height: auto; width: 100%;">View Product</button>
+
+        <!-- CTA -->
+        <a class="wl-view-btn" [routerLink]="['/store', orgSlug(), 'products', wishlistSlug(item)]">
+          <i class="pi pi-arrow-right"></i>
+          View Product
+        </a>
       </article>
       } @empty {
-      <div class="empty-state panel">
+      <div class="empty-state panel" style="grid-column: 1/-1; text-align: center; padding: 4rem 2rem;">
+        <i class="pi pi-heart" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
         <h2>No wishlist items</h2>
-        <p>Save products you want to revisit later.</p>
+        <p style="color: var(--text-secondary); max-width: 360px; margin: 0 auto;">Save products you love to revisit them later.</p>
       </div>
       }
     </div>

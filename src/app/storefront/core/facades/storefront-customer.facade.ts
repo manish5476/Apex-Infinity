@@ -6,15 +6,18 @@ import {
   StorefrontAddressDto,
   StorefrontApiError,
   StorefrontDashboard,
-  StorefrontOrder
+  StorefrontOrder,
+  StorefrontWishlistItem
 } from '@apx/storefront-contracts';
 import { StorefrontCustomerApi } from '../api/storefront-customer.api';
 import { StorefrontAuthStore } from '../state/storefront-auth.store';
 import { StorefrontCustomerStore } from '../state/storefront-customer.store';
+import { StorefrontWishlistApi, WishlistToggleResult } from '../api/storefront-wishlist.api';
 
 @Injectable({ providedIn: 'root' })
 export class StorefrontCustomerFacade {
   private readonly api = inject(StorefrontCustomerApi);
+  private readonly wishlistApi = inject(StorefrontWishlistApi);
   private readonly authStore = inject(StorefrontAuthStore);
   readonly store = inject(StorefrontCustomerStore);
 
@@ -68,6 +71,35 @@ export class StorefrontCustomerFacade {
       map(response => response.data),
       catchError(error => this.handleError<readonly StorefrontOrder[]>(error)),
       finalize(() => this.store.loading.set(false))
+    );
+  }
+
+  /**
+   * POST /api/v1/store/:organizationSlug/account/wishlist/toggle
+   * Optimistically adds or removes a product from the wishlist.
+   */
+  toggleWishlist(orgSlug: string, productId: string): Observable<WishlistToggleResult | null> {
+    // Optimistic update: immediately reflect the change in local state
+    const current = this.authStore.dashboard();
+    if (current) {
+      const alreadyInList = current.wishlist?.some((i: StorefrontWishlistItem) => {
+        const id = (i as any).productId?._id || (i as any).productId || '';
+        return id === productId;
+      });
+      const updatedWishlist = alreadyInList
+        ? (current.wishlist ?? []).filter((i: StorefrontWishlistItem) => {
+            const id = (i as any).productId?._id || (i as any).productId || '';
+            return id !== productId;
+          })
+        : [...(current.wishlist ?? []), { productId } as unknown as StorefrontWishlistItem];
+      this.authStore.setDashboard({ ...current, wishlist: updatedWishlist });
+    }
+
+    return this.wishlistApi.toggle(orgSlug, productId).pipe(
+      map(response => response.data),
+      // Refresh dashboard after toggle to keep state accurate
+      tap(() => this.loadDashboard(orgSlug).subscribe()),
+      catchError(error => this.handleError<WishlistToggleResult>(error))
     );
   }
 

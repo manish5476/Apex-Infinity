@@ -386,11 +386,42 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
   }
 
   wishlistTrack(item: StorefrontWishlistItem): string {
-    return item._id ?? item.id ?? (typeof item.productId === 'string' ? item.productId : item.productId._id ?? item.productId.id ?? '');
+    return item._id ?? item.id ?? (typeof item.productId === 'string' ? item.productId : (item.productId as any)?._id ?? '');
   }
 
   wishlistName(item: StorefrontWishlistItem): string {
-    return typeof item.productId === 'string' ? 'Saved item' : item.productId.name;
+    if (typeof item.productId === 'string') return 'Saved item';
+    return (item.productId as any)?.name ?? 'Saved item';
+  }
+
+  wishlistImage(item: StorefrontWishlistItem): string | null {
+    if (typeof item.productId === 'string') return null;
+    const imgs = (item.productId as any)?.images;
+    return (imgs && imgs.length > 0) ? imgs[0] : null;
+  }
+
+  wishlistCurrentPrice(item: StorefrontWishlistItem): number {
+    if (typeof item.productId === 'string') return 0;
+    const p = item.productId as any;
+    return p?.discountedPrice || p?.sellingPrice || 0;
+  }
+
+  wishlistOriginalPrice(item: StorefrontWishlistItem): number {
+    if (typeof item.productId === 'string') return 0;
+    return (item.productId as any)?.sellingPrice || 0;
+  }
+
+  wishlistSlug(item: StorefrontWishlistItem): string {
+    if (typeof item.productId === 'string') return '';
+    return (item.productId as any)?.slug ?? '';
+  }
+
+  removeFromWishlist(item: StorefrontWishlistItem): void {
+    const productId = typeof item.productId === 'string'
+      ? item.productId
+      : (item.productId as any)?._id ?? '';
+    if (!productId) return;
+    this.customerFacade.toggleWishlist(this.orgSlug(), productId).subscribe();
   }
 
   private itemId(item: any): string {

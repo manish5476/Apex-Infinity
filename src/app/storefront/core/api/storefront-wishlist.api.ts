@@ -1,10 +1,22 @@
-import { Injectable } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
-import { NormalizedStorefrontResponse, StorefrontWishlistItem } from '@apx/storefront-contracts';
+import { Injectable, inject } from '@angular/core';
+import { Observable } from 'rxjs';
+import { NormalizedStorefrontResponse } from '@apx/storefront-contracts';
+import { StorefrontApiClient } from './storefront-api.client';
+
+export interface WishlistToggleResult {
+  action: 'added' | 'removed';
+  productId: string;
+}
 
 @Injectable({ providedIn: 'root' })
 export class StorefrontWishlistApi {
-  list(): Observable<NormalizedStorefrontResponse<readonly StorefrontWishlistItem[]>> {
-    return throwError(() => new Error('Storefront wishlist CRUD endpoints are not mounted yet. Dashboard wishlist is available through account/me.'));
+  private readonly api = inject(StorefrontApiClient);
+
+  toggle(orgSlug: string, productId: string): Observable<NormalizedStorefrontResponse<WishlistToggleResult>> {
+    return this.api.post<WishlistToggleResult, { productId: string }>(
+      orgSlug,
+      'account/wishlist/toggle',
+      { productId }
+    );
   }
 }
