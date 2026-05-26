@@ -163,6 +163,16 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
           takeUntil(this.destroy$)
         ).subscribe();
       }
+
+      // Pre-fill order number from query param (e.g. from "Track" link on orders page)
+      if (mode === 'track-order') {
+        this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe(qp => {
+          const orderNum = qp.get('order');
+          if (orderNum) {
+            this.trackOrderNumber.set(orderNum);
+          }
+        });
+      }
     });
 
     this.search$.pipe(
@@ -392,6 +402,36 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
       this.submitting.set(false);
       this.orderFacade.store.trackedOrder.set(order);
     });
+  }
+
+  // ── Stepper helpers ──────────────────────────────────────────
+  private readonly ORDER_STATUS_RANK: Record<string, number> = {
+    draft: 0, placed: 1, confirmed: 2, processing: 3, closed: 4, cancelled: -1
+  };
+  private readonly FULFILLMENT_RANK: Record<string, number> = {
+    unfulfilled: 0, partial: 1, fulfilled: 2, shipped: 3, delivered: 4, returned: 5
+  };
+
+  isStepDone(order: any, step: string): boolean {
+    if (order.orderStatus === 'cancelled') return false;
+    const current = this.ORDER_STATUS_RANK[order.orderStatus] ?? 0;
+    const target = this.ORDER_STATUS_RANK[step] ?? 0;
+    return current >= target;
+  }
+
+  isStepActive(order: any, step: string): boolean {
+    if (order.orderStatus === 'cancelled') return false;
+    return order.orderStatus === step;
+  }
+
+  isFulfillmentAtOrPast(order: any, status: string): boolean {
+    const current = this.FULFILLMENT_RANK[order.fulfillmentStatus] ?? 0;
+    const target = this.FULFILLMENT_RANK[status] ?? 0;
+    return current >= target;
+  }
+
+  isFulfillmentExact(order: any, status: string): boolean {
+    return order.fulfillmentStatus === status;
   }
 
   updateQuantity(item: any, quantity: number): void {

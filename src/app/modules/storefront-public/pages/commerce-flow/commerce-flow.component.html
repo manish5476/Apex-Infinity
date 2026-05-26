@@ -506,6 +506,10 @@
           <div class="order-footer">
             <span class="muted">{{ order.items.length || 0 }} item(s)</span>
             <b>{{ order.totals.grandTotal | currency: order.totals.currency || currency() }}</b>
+            <a class="track-order-link" [routerLink]="['/store', orgSlug(), 'track-order']"
+              [queryParams]="{order: order.orderNumber}">
+              <i class="pi pi-map"></i> Track
+            </a>
           </div>
         </article>
         } @empty {
@@ -616,10 +620,11 @@
     </div>
     <div>
       @if (trackedOrder(); as order) {
-      <article class="order-card-detailed">
-        <div class="order-header">
-          <div>
-            <strong>{{ order.orderNumber }}</strong>
+      <div class="tracking-result">
+        <!-- ── Header ── -->
+        <div class="tracking-header">
+          <div class="tracking-header-left">
+            <span class="tracking-order-number">{{ order.orderNumber }}</span>
             <span class="muted">Placed {{ order.createdAt | date:'mediumDate' }}</span>
           </div>
           <div class="order-badges">
@@ -631,29 +636,201 @@
             }">{{ order.orderStatus }}</span>
             <span class="badge" [ngClass]="{
               'success': order.paymentStatus === 'paid',
-              'danger': order.paymentStatus === 'failed'
+              'danger': order.paymentStatus === 'failed',
+              'pending': order.paymentStatus === 'pending'
             }">{{ order.paymentStatus }}</span>
           </div>
         </div>
-        <div class="order-items-list">
-          <div class="summary-row"><span>Fulfillment</span><strong>{{ order.fulfillmentStatus || 'Pending' }}</strong>
+
+        <!-- ── Progress Stepper ── -->
+        <div class="order-stepper">
+          <!-- Step 1: Order Placed -->
+          <div class="step" [class.step-done]="isStepDone(order, 'placed')"
+            [class.step-active]="isStepActive(order, 'placed')"
+            [class.step-cancelled]="order.orderStatus === 'cancelled'">
+            <div class="step-circle">
+              @if (order.orderStatus === 'cancelled') {
+              <i class="pi pi-times"></i>
+              } @else if (isStepDone(order, 'placed')) {
+              <i class="pi pi-check"></i>
+              } @else {
+              <i class="pi pi-shopping-bag"></i>
+              }
+            </div>
+            <div class="step-label">
+              <span>Order Placed</span>
+              <small>{{ order.createdAt | date:'d MMM, h:mm a' }}</small>
+            </div>
           </div>
-          @if (order.shippingAddress) {
-          <div class="summary-row">
-            <span>Ship to</span>
-            <strong style="text-align: right; max-width: 60%; font-size: 0.85rem;">
-              {{ order.shippingAddress.fullName }},
-              {{ order.shippingAddress.city }},
-              {{ order.shippingAddress.state }}
-            </strong>
+          <div class="step-connector"
+            [class.connector-done]="isStepDone(order, 'confirmed') && order.orderStatus !== 'cancelled'"></div>
+
+          <!-- Step 2: Confirmed -->
+          <div class="step" [class.step-done]="isStepDone(order, 'confirmed')"
+            [class.step-active]="isStepActive(order, 'confirmed')"
+            [class.step-cancelled]="order.orderStatus === 'cancelled'">
+            <div class="step-circle">
+              @if (order.orderStatus === 'cancelled') {
+              <i class="pi pi-times"></i>
+              } @else if (isStepDone(order, 'confirmed')) {
+              <i class="pi pi-check"></i>
+              } @else {
+              <i class="pi pi-check-circle"></i>
+              }
+            </div>
+            <div class="step-label">
+              <span>Confirmed</span>
+              <small>{{ order.orderStatus === 'cancelled' ? 'Cancelled' : (isStepDone(order, 'confirmed') ? 'Verified' :
+                'Awaiting') }}</small>
+            </div>
           </div>
-          }
+          <div class="step-connector"
+            [class.connector-done]="isStepDone(order, 'processing') && order.orderStatus !== 'cancelled'"></div>
+
+          <!-- Step 3: Processing / Packed -->
+          <div class="step" [class.step-done]="isStepDone(order, 'processing')"
+            [class.step-active]="isStepActive(order, 'processing')">
+            <div class="step-circle">
+              @if (isStepDone(order, 'processing')) {
+              <i class="pi pi-check"></i>
+              } @else {
+              <i class="pi pi-box"></i>
+              }
+            </div>
+            <div class="step-label">
+              <span>Packed</span>
+              <small>{{ isStepDone(order, 'processing') ? 'Ready to ship' : 'Preparing' }}</small>
+            </div>
+          </div>
+          <div class="step-connector" [class.connector-done]="isFulfillmentAtOrPast(order, 'shipped')"></div>
+
+          <!-- Step 4: Shipped -->
+          <div class="step" [class.step-done]="isFulfillmentAtOrPast(order, 'shipped')"
+            [class.step-active]="isFulfillmentExact(order, 'shipped')">
+            <div class="step-circle">
+              @if (isFulfillmentAtOrPast(order, 'shipped')) {
+              <i class="pi pi-check"></i>
+              } @else {
+              <i class="pi pi-truck"></i>
+              }
+            </div>
+            <div class="step-label">
+              <span>Shipped</span>
+              <small>{{ isFulfillmentAtOrPast(order, 'shipped') ? 'In transit' : 'Not yet' }}</small>
+            </div>
+          </div>
+          <div class="step-connector" [class.connector-done]="isFulfillmentAtOrPast(order, 'delivered')"></div>
+
+          <!-- Step 5: Delivered -->
+          <div class="step" [class.step-done]="isFulfillmentAtOrPast(order, 'delivered')"
+            [class.step-active]="isFulfillmentExact(order, 'delivered')">
+            <div class="step-circle">
+              @if (isFulfillmentAtOrPast(order, 'delivered')) {
+              <i class="pi pi-check"></i>
+              } @else {
+              <i class="pi pi-home"></i>
+              }
+            </div>
+            <div class="step-label">
+              <span>Delivered</span>
+              <small>{{ isFulfillmentAtOrPast(order, 'delivered') ? 'Completed' : 'Pending' }}</small>
+            </div>
+          </div>
         </div>
-        <div class="order-footer">
-          <span class="muted">Order total</span>
-          <b>{{ order.totals.grandTotal | currency: order.totals.currency || currency() }}</b>
+
+        <!-- ── Two-column body ── -->
+        <div class="tracking-body">
+          <!-- Timeline -->
+          <div class="tracking-timeline-panel">
+            <h3 class="tracking-panel-title"><i class="pi pi-history"></i> Activity Timeline</h3>
+            @if (order.timeline && order.timeline.length) {
+            <div class="timeline-feed">
+              @for (event of order.timeline | slice:0:8; track $index) {
+              <div class="timeline-event">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                  <span class="timeline-message">{{ event.message }}</span>
+                  <span class="timeline-time">{{ event.at | date:'d MMM yyyy, h:mm a' }}</span>
+                </div>
+              </div>
+              }
+            </div>
+            } @else {
+            <div class="timeline-empty">
+              <i class="pi pi-clock"></i>
+              <p>Timeline updates will appear as your order progresses.</p>
+            </div>
+            }
+          </div>
+
+          <!-- Right: Delivery + Items -->
+          <div class="tracking-side">
+            <!-- Tracking Information -->
+            @if (order.deliveryAgent || order.trackingNumber || order.carrierName || order.estimatedDeliveryDate) {
+            <div class="tracking-info-card" style="margin-bottom: 1.5rem;">
+              <h3 class="tracking-panel-title"><i class="pi pi-box"></i> Tracking Details</h3>
+              <div class="tracking-address">
+                @if (order.deliveryAgent) {
+                  <p style="margin-bottom: 0.5rem;"><strong>Delivery Agent:</strong> {{ order.deliveryAgent?.name || 'Assigned' }}</p>
+                }
+                @if (order.carrierName) {
+                  <p style="margin-bottom: 0.5rem;"><strong>Carrier:</strong> {{ order.carrierName }}</p>
+                }
+                @if (order.trackingNumber) {
+                  <p style="margin-bottom: 0.5rem;">
+                    <strong>Tracking No:</strong> <span style="user-select: all; font-family: monospace; background: var(--bg-alt); padding: 0.2rem 0.4rem; border-radius: 4px;">{{ order.trackingNumber }}</span>
+                  </p>
+                }
+                @if (order.estimatedDeliveryDate) {
+                  <p><strong>Est. Delivery:</strong> {{ order.estimatedDeliveryDate | date:'mediumDate' }}</p>
+                }
+              </div>
+            </div>
+            }
+
+            <!-- Delivery Info -->
+            @if (order.shippingAddress) {
+            <div class="tracking-info-card">
+              <h3 class="tracking-panel-title"><i class="pi pi-map-marker"></i> Delivery Address</h3>
+              <div class="tracking-address">
+                <strong>{{ order.shippingAddress.fullName }}</strong>
+                <p>{{ order.shippingAddress.addressLine1 }}</p>
+                @if (order.shippingAddress.addressLine2) {
+                <p>{{ order.shippingAddress.addressLine2 }}</p>
+                }
+                <p>{{ order.shippingAddress.city }}, {{ order.shippingAddress.state }} {{
+                  order.shippingAddress.postalCode }}</p>
+                @if (order.shippingAddress.phone) {
+                <p class="tracking-phone"><i class="pi pi-phone"></i> {{ order.shippingAddress.phone }}</p>
+                }
+              </div>
+            </div>
+            }
+
+            <!-- Order Items Summary -->
+            <div class="tracking-info-card">
+              <h3 class="tracking-panel-title"><i class="pi pi-box"></i> Items in this Order</h3>
+              <div class="tracking-items-list">
+                @for (item of order.items; track item.snapshot?.name) {
+                <div class="tracking-item-row">
+                  <img [src]="item.snapshot.image || 'assets/placeholder.png'" [alt]="item.snapshot.name"
+                    class="tracking-item-img" />
+                  <div class="tracking-item-info">
+                    <span>{{ item.snapshot.name }}</span>
+                    <small>Qty: {{ item.quantity }}</small>
+                  </div>
+                  <strong>{{ item.lineTotal | currency: order.totals.currency || currency() }}</strong>
+                </div>
+                }
+              </div>
+              <div class="tracking-total-row">
+                <span>Order Total</span>
+                <strong>{{ order.totals.grandTotal | currency: order.totals.currency || currency() }}</strong>
+              </div>
+            </div>
+          </div>
         </div>
-      </article>
+      </div>
       } @else if (!submitting() && trackOrderNumber()) {
       <div class="empty-state panel" style="min-height: 12rem; padding: 2rem;">
         <div class="empty-icon"><i class="pi pi-inbox"></i></div>

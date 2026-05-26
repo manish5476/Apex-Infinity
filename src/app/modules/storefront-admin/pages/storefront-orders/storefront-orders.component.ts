@@ -1,5 +1,6 @@
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { StorefrontAdminService } from '@core/services/storefront-admin.service';
 import { catchError, of } from 'rxjs';
 import { AppSharedGrid } from '../../../shared/AgGrid/grid/app-shared-grid/app-shared-grid';
@@ -8,7 +9,7 @@ import { GridColDef } from '../../../shared/AgGrid/grid/grid.types';
 @Component({
   selector: 'app-storefront-orders',
   standalone: true,
-  imports: [CommonModule, AppSharedGrid, CurrencyPipe, DatePipe],
+  imports: [CommonModule, AppSharedGrid, CurrencyPipe, DatePipe, FormsModule],
   templateUrl: './storefront-orders.component.html',
   styleUrls: ['./storefront-orders.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -20,6 +21,16 @@ export class StorefrontOrdersComponent implements OnInit {
   readonly error = signal<string | null>(null);
   readonly orders = signal<any[]>([]);
   readonly selectedOrder = signal<any | null>(null);
+  
+  readonly availableAgents = signal<any[]>([]);
+  
+  deliveryAssignment = {
+    deliveryAgent: null as string | null,
+    carrierName: '',
+    trackingNumber: '',
+    estimatedDeliveryDate: '',
+    deliveryNotes: ''
+  };
 
   readonly columns: GridColDef[] = [
     {
@@ -74,6 +85,7 @@ export class StorefrontOrdersComponent implements OnInit {
 
   ngOnInit(): void {
     this.load();
+    this.loadAgents();
   }
 
   load(): void {
@@ -95,6 +107,13 @@ export class StorefrontOrdersComponent implements OnInit {
     });
   }
 
+  loadAgents(): void {
+    this.adminService.getDeliveryAgents({ limit: 100 }).subscribe({
+      next: (res) => this.availableAgents.set(res.data || []),
+      error: (err) => console.error('Failed to load agents', err)
+    });
+  }
+
   onGridEvent(event: any): void {
     if (event.type === 'selectionChanged') {
       const selected = event.rows[0];
@@ -108,6 +127,13 @@ export class StorefrontOrdersComponent implements OnInit {
 
   openOrder(order: any): void {
     this.selectedOrder.set(order);
+    this.deliveryAssignment = {
+      deliveryAgent: order.deliveryAgent || null,
+      carrierName: order.carrierName || '',
+      trackingNumber: order.trackingNumber || '',
+      estimatedDeliveryDate: order.estimatedDeliveryDate ? order.estimatedDeliveryDate.split('T')[0] : '',
+      deliveryNotes: order.deliveryNotes || ''
+    };
   }
 
   updateStatus(field: 'orderStatus' | 'fulfillmentStatus' | 'paymentStatus', value: string): void {
@@ -126,6 +152,24 @@ export class StorefrontOrdersComponent implements OnInit {
         console.error(err);
         this.loading.set(false);
         this.error.set(err?.error?.message ?? 'Failed to update order status');
+      }
+    });
+  }
+
+  assignDelivery(): void {
+    const order = this.selectedOrder();
+    if (!order) return;
+    
+    this.loading.set(true);
+    this.adminService.assignDeliveryAgent(order._id, this.deliveryAssignment).subscribe({
+      next: (res) => {
+        this.load();
+        this.selectedOrder.set(res.data);
+      },
+      error: (err) => {
+        console.error(err);
+        this.loading.set(false);
+        this.error.set(err?.error?.message ?? 'Failed to assign delivery');
       }
     });
   }

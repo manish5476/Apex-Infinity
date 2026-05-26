@@ -60,6 +60,15 @@ export const routes: Routes = [
   },
 
   // ============================================================
+  // 3.5 DELIVERY AGENT PORTAL (standalone login & dashboard)
+  // ============================================================
+  {
+    path: 'delivery',
+    loadChildren: () =>
+      import('./modules/delivery/delivery.routes').then(m => m.deliveryRoutes)
+  },
+
+  // ============================================================
   // 4. SECURE ERP APP  (authGuard required)
   // ============================================================
   {

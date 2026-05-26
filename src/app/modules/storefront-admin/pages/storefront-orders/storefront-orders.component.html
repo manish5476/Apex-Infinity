@@ -82,6 +82,48 @@
         </div>
       </section>
 
+      <!-- Delivery Assignment -->
+      <section class="detail-section delivery-section">
+        <h3>Delivery Assignment</h3>
+        <div class="delivery-form">
+          <div class="form-group">
+            <label>Internal Delivery Agent</label>
+            <select [(ngModel)]="deliveryAssignment.deliveryAgent" class="premium-input">
+              <option [ngValue]="null">-- Select Agent --</option>
+              <option *ngFor="let agent of availableAgents()" [ngValue]="agent._id">{{ agent.name }} ({{ agent.phone }})</option>
+            </select>
+          </div>
+          
+          <div class="divider-text"><span>OR EXTERNAL CARRIER</span></div>
+          
+          <div class="form-group">
+            <label>Carrier Name</label>
+            <input type="text" [(ngModel)]="deliveryAssignment.carrierName" class="premium-input" placeholder="e.g. Delhivery, DTDC">
+          </div>
+          
+          <div class="form-group">
+            <label>Tracking Number</label>
+            <input type="text" [(ngModel)]="deliveryAssignment.trackingNumber" class="premium-input" placeholder="Enter tracking number">
+          </div>
+          
+          <div class="form-group">
+            <label>Estimated Delivery</label>
+            <input type="date" [(ngModel)]="deliveryAssignment.estimatedDeliveryDate" class="premium-input">
+          </div>
+          
+          <div class="form-group">
+            <label>Internal Notes</label>
+            <textarea [(ngModel)]="deliveryAssignment.deliveryNotes" class="premium-input" placeholder="Any notes for delivery..."></textarea>
+          </div>
+          
+          <button class="premium-btn primary-btn" style="width: 100%; margin-top: 10px;" 
+                  (click)="assignDelivery()" 
+                  [disabled]="!deliveryAssignment.deliveryAgent && !deliveryAssignment.carrierName">
+            Save Delivery Details
+          </button>
+        </div>
+      </section>
+
       <!-- Status Actions -->
       <section class="detail-section actions-section">
         <h3>Update Status</h3>

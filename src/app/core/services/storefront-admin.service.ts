@@ -143,6 +143,14 @@ export class StorefrontAdminService extends BaseApiService {
     return this.put(`${this.base}/orders/${orderId}/status`, data);
   }
 
+  getDeliveryAgents(params?: { search?: string; page?: number; limit?: number }): Observable<any> {
+    return this.get(`${this.base}/delivery-agents`, params ?? {});
+  }
+
+  assignDeliveryAgent(orderId: string, data: any): Observable<any> {
+    return this.patch(`${this.base}/orders/${orderId}/assign-agent`, data);
+  }
+
   getStorefrontCustomers(params?: {
     status?: string;
     converted?: boolean;

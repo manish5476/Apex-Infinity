@@ -243,6 +243,14 @@ export interface StorefrontOrderItem {
   readonly lineTotal: number;
 }
 
+export interface StorefrontOrderTimelineEvent {
+  readonly type: string;
+  readonly message: string;
+  readonly at: string;
+  readonly actorId?: string | null;
+  readonly metadata?: Record<string, unknown>;
+}
+
 export interface StorefrontOrder {
   readonly _id?: StorefrontId;
   readonly id?: StorefrontId;
@@ -256,6 +264,13 @@ export interface StorefrontOrder {
   readonly paymentStatus: 'pending' | 'authorized' | 'paid' | 'failed' | 'partially_refunded' | 'refunded';
   readonly fulfillmentStatus: 'unfulfilled' | 'partial' | 'fulfilled' | 'shipped' | 'delivered' | 'returned';
   readonly orderStatus: 'draft' | 'placed' | 'confirmed' | 'processing' | 'cancelled' | 'closed';
+  readonly timeline?: readonly StorefrontOrderTimelineEvent[];
+  readonly deliveryAgent?: any; // Populated agent object or string ID
+  readonly trackingNumber?: string;
+  readonly carrierName?: string;
+  readonly estimatedDeliveryDate?: string;
+  readonly deliveryNotes?: string;
+  readonly notes?: string;
   readonly createdAt?: string;
   readonly updatedAt?: string;
 }
