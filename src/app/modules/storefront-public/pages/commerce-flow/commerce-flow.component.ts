@@ -165,7 +165,7 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
         return this.publicService.searchProducts(slug, term).pipe(catchError(() => of({ products: [] })));
       }),
       takeUntil(this.destroy$)
-    ).subscribe((res: any) => this.suggestions.set(res?.products ?? res?.data?.products ?? []));
+    ).subscribe((res: any) => this.suggestions.set(res?.results ?? res?.data?.results ?? res?.products ?? res?.data?.products ?? []));
   }
 
   loadCart(orgSlug = this.orgSlug()): void {

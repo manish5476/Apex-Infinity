@@ -278,7 +278,7 @@ export class NavbarSimpleComponent implements OnInit, OnDestroy {
         return this.publicService.searchProducts(this.slug(), term).pipe(catchError(() => of({ products: [] })));
       }),
       takeUntil(this.destroy$)
-    ).subscribe((res: any) => this.searchResults.set(res?.products ?? res?.data?.products ?? []));
+    ).subscribe((res: any) => this.searchResults.set(res?.results ?? res?.data?.results ?? res?.products ?? res?.data?.products ?? []));
 
     if (this.slug()) this.cartFacade.load(this.slug()).pipe(catchError(() => of(null))).subscribe();
   }
