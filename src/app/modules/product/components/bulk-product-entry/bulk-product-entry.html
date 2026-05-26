@@ -48,7 +48,7 @@
 
     </p-toolbar>
 
-    <div class="master-grid-wrapper" style="height: calc(100vh - 200px);">
+    <div class="premium-grid-container" style="height: calc(100vh - 200px); flex: none;">
       <app-shared-grid [columns]="columns" [data]="products()" [showActions]="true" [selectionMode]="'multiple'"
         (gridEvent)="onGridEvent($event)">
       </app-shared-grid>

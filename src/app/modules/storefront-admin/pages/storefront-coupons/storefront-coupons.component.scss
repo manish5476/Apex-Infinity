@@ -45,25 +45,7 @@
     }
   }
 
-  .grid-container {
-    flex: 1;
-    background: var(--component-bg, rgba(17, 24, 39, 0.7));
-    border: 1px solid var(--border-primary, rgba(255, 255, 255, 0.08));
-    border-radius: 1.25rem;
-    padding: 1.5rem;
-    backdrop-filter: blur(16px);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-    display: flex;
-    flex-direction: column;
 
-    app-shared-grid {
-      display: block;
-      flex: 1;
-      height: 100%;
-      width: 100%;
-      min-height: 0;
-    }
-  }
 
   // Toast Success Alert
   .toast-success {
