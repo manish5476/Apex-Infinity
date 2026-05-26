@@ -1,5 +1,5 @@
 import { Injectable, computed, signal } from '@angular/core';
-import { StorefrontApiError, StorefrontCustomer, StorefrontDashboard } from '@apx/storefront-contracts';
+import { StorefrontApiError, StorefrontCustomer, StorefrontDashboard, StorefrontOrder } from '@apx/storefront-contracts';
 
 @Injectable({ providedIn: 'root' })
 export class StorefrontAuthStore {
@@ -25,6 +25,14 @@ export class StorefrontAuthStore {
   setCustomer(customer: StorefrontCustomer): void {
     this.customer.set(customer);
     this.error.set(null);
+  }
+
+  /** Merge a fresh orders list into the existing dashboard snapshot without refetching everything. */
+  setOrders(orders: readonly StorefrontOrder[]): void {
+    const current = this.dashboard();
+    if (current) {
+      this.dashboard.set({ ...current, orders: orders as StorefrontOrder[] });
+    }
   }
 
   clear(): void {

@@ -82,6 +82,9 @@ export class StorefrontCustomerFacade {
   }): Observable<readonly StorefrontOrder[] | null> {
     this.store.loading.set(true);
     return this.api.getOrders(orgSlug, params).pipe(
+      tap(response => {
+        if (response.data) this.authStore.setOrders(response.data);
+      }),
       map(response => response.data),
       catchError(error => this.handleError<readonly StorefrontOrder[]>(error)),
       finalize(() => this.store.loading.set(false))

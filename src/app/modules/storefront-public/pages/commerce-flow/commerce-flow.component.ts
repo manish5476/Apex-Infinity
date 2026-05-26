@@ -151,9 +151,18 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
     });
 
     this.route.data.pipe(takeUntil(this.destroy$)).subscribe(data => {
-      this.mode.set((data['mode'] as CommerceMode) ?? 'cart');
+      const mode = (data['mode'] as CommerceMode) ?? 'cart';
+      this.mode.set(mode);
       this.error.set(null);
       this.success.set(null);
+
+      // Eagerly load orders when navigating to the orders page
+      if (mode === 'orders' && this.orgSlug()) {
+        this.customerFacade.loadOrders(this.orgSlug()).pipe(
+          catchError(() => of(null)),
+          takeUntil(this.destroy$)
+        ).subscribe();
+      }
     });
 
     this.search$.pipe(

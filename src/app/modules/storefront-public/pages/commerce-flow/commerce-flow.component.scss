@@ -1221,6 +1221,24 @@
     color: #166534;
     border-color: color-mix(in srgb, #166534 25%, transparent);
   }
+
+  &.warning {
+    background: color-mix(in srgb, #92400e 10%, transparent);
+    color: #92400e;
+    border-color: color-mix(in srgb, #92400e 25%, transparent);
+  }
+
+  &.danger {
+    background: color-mix(in srgb, #991b1b 10%, transparent);
+    color: #991b1b;
+    border-color: color-mix(in srgb, #991b1b 25%, transparent);
+  }
+
+  &.pending {
+    background: color-mix(in srgb, #1e40af 10%, transparent);
+    color: #1e40af;
+    border-color: color-mix(in srgb, #1e40af 25%, transparent);
+  }
 }
 
 .order-items-list {

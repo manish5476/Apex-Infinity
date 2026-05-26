@@ -117,13 +117,13 @@
           currency()) : 'Estimated at checkout' }}</strong></div>
       <label class="coupon-box">
         Coupon
-        <span>
+        <div class="coupon-inner">
           <input [ngModel]="couponCode()" (ngModelChange)="couponCode.set($event)" placeholder="WELCOME10" />
           <button type="button" (click)="applyCoupon()">Apply</button>
-        </span>
+        </div>
       </label>
       <button class="secondary-action" type="button" (click)="estimateShipping()" [disabled]="!items().length">
-        <i class="pi pi-truck"></i> Estimate shipping and tax
+        <i class="pi pi-truck"></i> Estimate shipping &amp; tax
       </button>
       <div class="summary-total"><span>Total</span><strong>{{ total() | currency: currency() }}</strong></div>
       <button class="checkout-button" type="button" (click)="validateAndCheckout()"
@@ -441,8 +441,17 @@
             <span class="muted">Placed on {{ order.createdAt | date:'mediumDate' }}</span>
           </div>
           <div class="order-badges">
-            <span class="badge">{{ order.orderStatus }}</span>
-            <span class="badge">{{ order.paymentStatus }}</span>
+            <span class="badge" [ngClass]="{
+              'success': order.orderStatus === 'closed' || order.fulfillmentStatus === 'delivered',
+              'pending': order.orderStatus === 'draft',
+              'warning': order.orderStatus === 'processing' || order.orderStatus === 'confirmed' || order.orderStatus === 'placed' || order.fulfillmentStatus === 'shipped',
+              'danger': order.orderStatus === 'cancelled'
+            }">{{ order.orderStatus }}</span>
+            <span class="badge" [ngClass]="{
+              'success': order.paymentStatus === 'paid',
+              'danger': order.paymentStatus === 'failed',
+              'pending': order.paymentStatus === 'pending'
+            }">{{ order.paymentStatus }}</span>
           </div>
         </div>
         <div class="order-items-list">
@@ -547,25 +556,80 @@
   }
 
   @if (mode() === 'track-order') {
-  <section class="auth-grid sf-container">
-    <form class="checkout-form auth-card" (ngSubmit)="trackOrder()">
-      <h2>Track order</h2>
-      <label>Order number<input name="trackOrderNumber" [ngModel]="trackOrderNumber()"
-          (ngModelChange)="trackOrderNumber.set($event)" required /></label>
-      <label>Email or phone<input name="trackVerify" [ngModel]="trackVerify()"
-          (ngModelChange)="trackVerify.set($event)" /></label>
-      <button class="checkout-button" type="submit" [disabled]="submitting()">Track</button>
-    </form>
-    @if (trackedOrder(); as order) {
-    <article class="summary-card">
-      <h2>{{ order.orderNumber }}</h2>
-      <div class="summary-row"><span>Order</span><strong>{{ order.orderStatus }}</strong></div>
-      <div class="summary-row"><span>Payment</span><strong>{{ order.paymentStatus }}</strong></div>
-      <div class="summary-row"><span>Fulfillment</span><strong>{{ order.fulfillmentStatus }}</strong></div>
-      <div class="summary-total"><span>Total</span><strong>{{ order.totals.grandTotal | currency: order.totals.currency
-          || currency() }}</strong></div>
-    </article>
-    }
+  <section class="track-grid sf-container">
+    <div>
+      <form class="checkout-form auth-card" (ngSubmit)="trackOrder()">
+        <h2><i class="pi pi-search" style="color: var(--cf-primary); margin-right: 0.5rem;"></i>Track your order</h2>
+        <p style="margin: 0; color: var(--cf-text-2); font-size: 0.9rem;">Enter your order number to check delivery status and fulfillment updates.</p>
+        <label>Order number
+          <input name="trackOrderNumber" [ngModel]="trackOrderNumber()"
+            (ngModelChange)="trackOrderNumber.set($event)" required
+            placeholder="e.g. ORD-2024-00123" />
+        </label>
+        <label>Email or phone (for verification)
+          <input name="trackVerify" [ngModel]="trackVerify()"
+            (ngModelChange)="trackVerify.set($event)"
+            placeholder="you&#64;example.com or +91 98765 43210" />
+        </label>
+        <button class="checkout-button" type="submit" [disabled]="submitting() || !trackOrderNumber()">
+          @if (submitting()) { <i class="pi pi-spin pi-spinner"></i> } @else { <i class="pi pi-search"></i> }
+          Track Order
+        </button>
+      </form>
+    </div>
+    <div>
+      @if (trackedOrder(); as order) {
+      <article class="order-card-detailed">
+        <div class="order-header">
+          <div>
+            <strong>{{ order.orderNumber }}</strong>
+            <span class="muted">Placed {{ order.createdAt | date:'mediumDate' }}</span>
+          </div>
+          <div class="order-badges">
+            <span class="badge" [ngClass]="{
+              'success': order.orderStatus === 'closed' || order.fulfillmentStatus === 'delivered',
+              'pending': order.orderStatus === 'draft',
+              'warning': order.orderStatus === 'processing' || order.orderStatus === 'confirmed' || order.orderStatus === 'placed' || order.fulfillmentStatus === 'shipped',
+              'danger': order.orderStatus === 'cancelled'
+            }">{{ order.orderStatus }}</span>
+            <span class="badge" [ngClass]="{
+              'success': order.paymentStatus === 'paid',
+              'danger': order.paymentStatus === 'failed'
+            }">{{ order.paymentStatus }}</span>
+          </div>
+        </div>
+        <div class="order-items-list">
+          <div class="summary-row"><span>Fulfillment</span><strong>{{ order.fulfillmentStatus || 'Pending' }}</strong></div>
+          @if (order.shippingAddress) {
+          <div class="summary-row">
+            <span>Ship to</span>
+            <strong style="text-align: right; max-width: 60%; font-size: 0.85rem;">
+              {{ order.shippingAddress.fullName }},
+              {{ order.shippingAddress.city }},
+              {{ order.shippingAddress.state }}
+            </strong>
+          </div>
+          }
+        </div>
+        <div class="order-footer">
+          <span class="muted">Order total</span>
+          <b>{{ order.totals?.grandTotal | currency: order.totals?.currency || currency() }}</b>
+        </div>
+      </article>
+      } @else if (!submitting() && trackOrderNumber()) {
+      <div class="empty-state panel" style="min-height: 12rem; padding: 2rem;">
+        <div class="empty-icon"><i class="pi pi-inbox"></i></div>
+        <h2>No order found</h2>
+        <p>Check your order number and email/phone, then try again.</p>
+      </div>
+      } @else {
+      <div class="empty-state" style="min-height: 12rem; border: 1px dashed var(--cf-border); border-radius: var(--cf-radius-lg); padding: 2rem;">
+        <div class="empty-icon"><i class="pi pi-truck"></i></div>
+        <h2>Enter order details</h2>
+        <p>Your order status, fulfillment updates, and delivery info will appear here.</p>
+      </div>
+      }
+    </div>
   </section>
   }
 </main>
