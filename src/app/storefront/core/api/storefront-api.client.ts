@@ -36,6 +36,13 @@ export class StorefrontApiClient {
     }).pipe(map(response => this.normalizer.normalize<T>(response)));
   }
 
+  put<T, B extends object>(orgSlug: string, path: string, body: B, options?: StorefrontRequestOptions): Observable<NormalizedStorefrontResponse<T>> {
+    return this.http.put<StorefrontApiResponse<T> | T>(this.url(orgSlug, path), body, {
+      withCredentials: true,
+      context: options?.context
+    }).pipe(map(response => this.normalizer.normalize<T>(response)));
+  }
+
   patch<T, B extends object>(orgSlug: string, path: string, body: B, options?: StorefrontRequestOptions): Observable<NormalizedStorefrontResponse<T>> {
     return this.http.patch<StorefrontApiResponse<T> | T>(this.url(orgSlug, path), body, {
       withCredentials: true,

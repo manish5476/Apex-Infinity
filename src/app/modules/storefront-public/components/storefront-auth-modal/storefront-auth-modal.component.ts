@@ -26,7 +26,7 @@ import {
 } from '@angular/animations';
 import { StorefrontAuthFacade } from '../../../../storefront/core/facades/storefront-auth.facade';
 
-type AuthTab = 'login' | 'register';
+type AuthTab = 'login' | 'register' | 'forgot';
 
 const slideLeft = [
   query(':enter', [style({ opacity: 0, transform: 'translateX(32px)' })], { optional: true }),
@@ -49,6 +49,8 @@ const slideRight = [
     trigger('tabSlide', [
       transition('login => register', slideLeft),
       transition('register => login', slideRight),
+      transition('login => forgot', slideLeft),
+      transition('forgot => login', slideRight),
     ])
   ],
   template: `
@@ -71,11 +73,13 @@ const slideRight = [
       </div>
       <div>
         <p class="apx-auth-kicker">Storefront commerce</p>
-        <h2 class="apx-auth-title">{{ tab() === 'login' ? 'Welcome back' : 'Create account' }}</h2>
+        <h2 class="apx-auth-title">{{ tab() === 'login' ? 'Welcome back' : tab() === 'forgot' ? 'Reset password' : 'Create account' }}</h2>
         <p class="apx-auth-subtitle">
           {{ tab() === 'login'
             ? 'Sign in to sync your cart and view order history.'
-            : 'Create a storefront account to track orders and save addresses.' }}
+            : tab() === 'forgot'
+              ? 'Enter your email and we will send you a reset link.'
+              : 'Create a storefront account to track orders and save addresses.' }}
         </p>
       </div>
     </div>
@@ -126,6 +130,7 @@ const slideRight = [
           <label class="apx-field">
             <div class="apx-field__label-row">
               <span class="apx-field__label">Password</span>
+              <button type="button" class="apx-auth-link" style="font-size: 0.75rem" (click)="switchTab('forgot')">Forgot?</button>
             </div>
             <div class="apx-field__input-wrap">
               <i class="pi pi-lock apx-field__icon"></i>
@@ -157,6 +162,52 @@ const slideRight = [
             Don't have an account?
             <button type="button" class="apx-auth-link" (click)="switchTab('register')">
               Create one free →
+            </button>
+          </p>
+        </form>
+      }
+
+      <!-- FORGOT PASSWORD -->
+      @if (tab() === 'forgot') {
+        <form #forgotForm="ngForm" (ngSubmit)="submitForgot(forgotForm)" class="apx-auth-form" novalidate>
+          @if (forgotSuccess()) {
+            <div class="apx-auth-alert" style="background: #ecfdf5; border-color: #a7f3d0; color: #047857;">
+              <i class="pi pi-check-circle"></i>
+              <span>If an account exists with that email, we've sent password reset instructions.</span>
+            </div>
+            <button type="button" class="apx-auth-cta" (click)="switchTab('login')" style="margin-top: 1rem">
+              Back to Sign In
+            </button>
+          } @else {
+            <label class="apx-field">
+              <span class="apx-field__label">Email address</span>
+              <div class="apx-field__input-wrap">
+                <i class="pi pi-envelope apx-field__icon"></i>
+                <input id="sf-forgot-email" name="email" type="email"
+                  placeholder="you@example.com"
+                  ngModel required email #forgotEmail="ngModel"
+                  [class.invalid]="forgotEmail.invalid && forgotEmail.touched" />
+              </div>
+              @if (forgotEmail.invalid && forgotEmail.touched) {
+                <span class="apx-field__error">Please enter a valid email address</span>
+              }
+            </label>
+
+            <button type="submit" class="apx-auth-cta" [disabled]="forgotForm.invalid || auth.loading()">
+              @if (auth.loading()) {
+                <i class="pi pi-spin pi-spinner"></i>
+                <span>Sending…</span>
+              } @else {
+                <i class="pi pi-envelope"></i>
+                <span>Send Reset Link</span>
+              }
+            </button>
+          }
+          
+          <p class="apx-auth-switch">
+            Remember your password?
+            <button type="button" class="apx-auth-link" (click)="switchTab('login')">
+              Sign in →
             </button>
           </p>
         </form>
@@ -583,10 +634,12 @@ export class StorefrontAuthModalComponent {
   // ── Local state ─────────────────────────────────────────────────────────────
   readonly tab          = signal<AuthTab>('login');
   readonly errorMsg     = signal<string | null>(null);
+  readonly forgotSuccess = signal(false);
   readonly showPassword = signal(false);
 
   switchTab(t: AuthTab) {
     this.errorMsg.set(null);
+    this.forgotSuccess.set(false);
     this.showPassword.set(false);
     this.tab.set(t);
   }
@@ -618,6 +671,20 @@ export class StorefrontAuthModalComponent {
         }
       },
       error: err => this.errorMsg.set(err?.error?.message ?? 'Registration failed. Please try again.')
+    });
+  }
+
+  submitForgot(form: NgForm) {
+    if (form.invalid) { form.form.markAllAsTouched(); return; }
+    this.errorMsg.set(null);
+    this.auth.forgotPassword(this.orgSlug(), { email: form.value.email }).subscribe({
+      next: success => {
+        if (success) {
+          this.forgotSuccess.set(true);
+        } else {
+          this.errorMsg.set('Failed to process request. Please try again.');
+        }
+      }
     });
   }
 }

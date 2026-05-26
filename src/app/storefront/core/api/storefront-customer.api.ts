@@ -31,6 +31,14 @@ export class StorefrontCustomerApi {
   }
 
   /**
+   * PUT /api/v1/store/:organizationSlug/account/addresses/:addressId
+   * Update an existing address in the authenticated customer's address book.
+   */
+  updateAddress(orgSlug: string, addressId: string, dto: StorefrontAddressDto): Observable<NormalizedStorefrontResponse<StorefrontAddress>> {
+    return this.api.put<StorefrontAddress, StorefrontAddressDto>(orgSlug, `account/addresses/${addressId}`, dto);
+  }
+
+  /**
    * GET /api/v1/store/:organizationSlug/account/orders
    * Paginated list of orders for the authenticated customer.
    */

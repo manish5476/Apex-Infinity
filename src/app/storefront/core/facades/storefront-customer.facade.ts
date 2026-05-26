@@ -58,6 +58,20 @@ export class StorefrontCustomerFacade {
   }
 
   /**
+   * PUT /api/v1/store/:organizationSlug/account/addresses/:addressId
+   * Update an existing address; then re-fetches dashboard to keep state fresh.
+   */
+  updateAddress(orgSlug: string, addressId: string, dto: StorefrontAddressDto): Observable<StorefrontAddress | null> {
+    this.store.loading.set(true);
+    return this.api.updateAddress(orgSlug, addressId, dto).pipe(
+      map(response => response.data),
+      tap(() => this.loadDashboard(orgSlug).subscribe()),
+      catchError(error => this.handleError<StorefrontAddress>(error)),
+      finalize(() => this.store.loading.set(false))
+    );
+  }
+
+  /**
    * GET /api/v1/store/:organizationSlug/account/orders
    * Paginated order list for the authenticated customer.
    */

@@ -51,7 +51,15 @@ export const STOREFRONT_PUBLIC_ROUTES: Routes = [
   commerceFlowRoute('account/addresses', 'addresses', 'Saved Addresses', true),
   commerceFlowRoute('account/notifications', 'notifications', 'Notifications', true),
   commerceFlowRoute('login', 'login', 'Store Login'),
+  commerceFlowRoute('forgot-password', 'forgot', 'Forgot Password'),
   commerceFlowRoute('register', 'register', 'Create Account'),
+  {
+    path: 'reset-password',
+    loadComponent: () =>
+      import('./pages/reset-password/reset-password.component')
+        .then(m => m.ResetPasswordComponent),
+    title: 'Reset Password'
+  },
   commerceFlowRoute('wishlist', 'wishlist', 'Wishlist', true),
   commerceFlowRoute('track-order', 'track-order', 'Track Order'),
   ...[
@@ -70,21 +78,21 @@ export const STOREFRONT_PUBLIC_ROUTES: Routes = [
     loadComponent: () =>
       import('./pages/product-detail/product-detail.component')
         .then(m => m.ProductDetailComponent),
-    title: 'Product'
+      title: 'Product'
   },
-  {
-    path: ':pageSlug',
+{
+  path: ':pageSlug',
     loadComponent: () =>
       import('./dynamic-page/dynamic-page.component')
         .then(m => m.DynamicPageComponent),
-    title: 'Store'
-  },
-  {
-    path: '**',
+      title: 'Store'
+},
+{
+  path: '**',
     loadComponent: () =>
       import('./dynamic-page/dynamic-page.component')
         .then(m => m.DynamicPageComponent),
-    data: { notFoundFallback: true },
-    title: 'Store'
-  }
+      data: { notFoundFallback: true },
+  title: 'Store'
+}
 ];

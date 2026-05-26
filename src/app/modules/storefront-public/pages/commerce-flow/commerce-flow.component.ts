@@ -27,6 +27,7 @@ type CommerceMode =
   | 'orders'
   | 'login'
   | 'register'
+  | 'forgot'
   | 'wishlist'
   | 'track-order';
 
@@ -70,6 +71,7 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
   // Flow State
   readonly selectedAddressId = signal<string | null | undefined>(null);
   readonly showAddressForm = signal(false);
+  readonly editAddressId = signal<string | null>(null);
 
   readonly cart = this.cartFacade.cart;
   readonly dashboard = this.storefrontAuth.dashboard;
@@ -100,7 +102,11 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
     marketingOptIn: true
   };
 
-  readonly addressForm: StorefrontAddressDto = {
+  readonly forgotForm = {
+    email: ''
+  };
+
+  readonly addressForm = {
     fullName: '',
     phone: '',
     country: 'India',
@@ -185,7 +191,7 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
         this.checkoutContact.firstName = cust.firstName || '';
         this.checkoutContact.lastName = cust.lastName || '';
         this.checkoutContact.phone = cust.phone || '';
-        
+
         if (cust.defaultAddressId) {
           this.selectedAddressId.set(cust.defaultAddressId);
         } else if (this.addresses().length > 0) {
@@ -228,6 +234,23 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
     });
   }
 
+  submitForgot(): void {
+    if (!this.forgotForm.email) return;
+    this.submitting.set(true);
+    this.storefrontAuth.forgotPassword(this.orgSlug(), { email: this.forgotForm.email }).pipe(
+      catchError(err => {
+        this.error.set(err?.error?.message ?? 'Failed to process request.');
+        return of(null);
+      })
+    ).subscribe(res => {
+      this.submitting.set(false);
+      if (res) {
+        this.success.set('If an account exists with that email, we have sent password reset instructions.');
+        this.forgotForm.email = '';
+      }
+    });
+  }
+
   logout(): void {
     this.storefrontAuth.logout(this.orgSlug()).subscribe(() => {
       this.router.navigate(['/store', this.orgSlug(), 'login']);
@@ -236,7 +259,11 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
 
   saveAddress(): void {
     this.submitting.set(true);
-    this.customerFacade.addAddress(this.orgSlug(), this.addressForm).pipe(
+    const req$ = this.editAddressId()
+      ? this.customerFacade.updateAddress(this.orgSlug(), this.editAddressId()!, this.addressForm as StorefrontAddressDto)
+      : this.customerFacade.addAddress(this.orgSlug(), this.addressForm as StorefrontAddressDto);
+
+    req$.pipe(
       catchError(err => {
         this.error.set(err?.error?.message ?? 'Could not save address.');
         return of(null);
@@ -246,8 +273,41 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
       if (!res) return;
       this.success.set('Address saved.');
       this.showAddressForm.set(false);
+      this.editAddressId.set(null);
       this.loadCustomer();
     });
+  }
+
+  editAddress(address: any): void {
+    this.editAddressId.set(address._id || address.id);
+    this.addressForm.fullName = address.fullName || '';
+    this.addressForm.phone = address.phone || '';
+    this.addressForm.country = address.country || 'India';
+    this.addressForm.state = address.state || '';
+    this.addressForm.city = address.city || '';
+    this.addressForm.postalCode = address.postalCode || '';
+    this.addressForm.addressLine1 = address.addressLine1 || '';
+    this.addressForm.addressLine2 = address.addressLine2 || '';
+    this.addressForm.landmark = address.landmark || '';
+    this.addressForm.addressType = address.addressType || 'home';
+    this.addressForm.isDefault = !!address.isDefault;
+    this.showAddressForm.set(true);
+  }
+
+  cancelEditAddress(): void {
+    this.showAddressForm.set(false);
+    this.editAddressId.set(null);
+    this.addressForm.fullName = '';
+    this.addressForm.phone = '';
+    this.addressForm.country = 'India';
+    this.addressForm.state = '';
+    this.addressForm.city = '';
+    this.addressForm.postalCode = '';
+    this.addressForm.addressLine1 = '';
+    this.addressForm.addressLine2 = '';
+    this.addressForm.landmark = '';
+    this.addressForm.addressType = 'home';
+    this.addressForm.isDefault = true;
   }
 
   placeOrder(): void {
@@ -264,8 +324,8 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
 
     const payload: StorefrontCheckoutDto = {
       customer: { ...this.checkoutContact },
-      shippingAddress: finalAddress,
-      billingAddress: finalAddress,
+      shippingAddress: finalAddress as StorefrontAddressDto,
+      billingAddress: finalAddress as StorefrontAddressDto,
       saveAddress: this.checkoutContact.saveAddress,
       defaultAddress: true
     };
@@ -300,7 +360,7 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
   }
 
   estimateShipping(): void {
-    this.cartFacade.estimateShipping(this.orgSlug(), { amount: 0, address: this.addressForm }).subscribe(cart => {
+    this.cartFacade.estimateShipping(this.orgSlug(), { amount: 0, address: this.addressForm as StorefrontAddressDto }).subscribe(cart => {
       this.shippingEstimate.set(cart?.shippingTotals ?? null);
       this.taxEstimate.set(cart?.taxTotals ?? null);
     });

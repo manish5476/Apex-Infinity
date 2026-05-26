@@ -7,8 +7,6 @@ import { StorefrontAdminService, CreatePageDto } from '@core/services/storefront
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 
-// import { AdminPage } from '@core/models/storefront.model';
-
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -38,150 +36,140 @@ function getOrgSlug(): string {
   imports: [CommonModule, RouterModule, ReactiveFormsModule, DatePipe],
   template: `
     <div class="page-container">
-
       <div class="content-relative">
 
-        <!-- Header -->
         <header class="page-header">
           <div class="header-left">
             <h1 class="page-title">Storefront Pages</h1>
-            <p class="page-subtitle">Design, publish, and manage your storefront campaigns.</p>
+            <p class="page-subtitle">Design, publish, and optimize your storefront landing campaigns.</p>
           </div>
-          <button type="button" (click)="openCreateModal()" class="btn btn-primary">
-            <i class="pi pi-plus icon"></i>
-            <span>New Page</span>
+          <button type="button" (click)="openCreateModal()" class="btn-primary-action">
+            <i class="pi pi-plus"></i>
+            <span>Create New Page</span>
           </button>
         </header>
 
-        <!-- Error banner -->
         @if (error()) {
           <div class="error-banner">
-            <i class="pi pi-exclamation-triangle"></i>
-            <span>{{ error() }}</span>
-            <button (click)="error.set(null)" class="error-close">
+            <div class="error-banner-content">
+              <i class="pi pi-exclamation-triangle"></i>
+              <span>{{ error() }}</span>
+            </div>
+            <button (click)="error.set(null)" class="error-close" type="button">
               <i class="pi pi-times"></i>
             </button>
           </div>
         }
 
-        <!-- Loading -->
         @if (isLoading()) {
           <div class="loader-container">
             <div class="spinner-ring"></div>
-            <span class="loading-text">Loading pages…</span>
+            <span class="loading-text">Assembling customer workspaces...</span>
           </div>
         } @else {
 
-          <!-- Stats row -->
           @if (pages().length > 0) {
             <div class="stats-row">
               <div class="stat-chip">
                 <span class="stat-value">{{ pages().length }}</span>
-                <span class="stat-label">Total</span>
+                <span class="stat-label">Total Folders</span>
               </div>
-              <div class="stat-chip">
+              <div class="stat-chip live">
                 <span class="stat-value">{{ publishedCount() }}</span>
-                <span class="stat-label">Live</span>
+                <span class="stat-label">Live Channels</span>
               </div>
-              <div class="stat-chip">
+              <div class="stat-chip draft">
                 <span class="stat-value">{{ draftCount() }}</span>
-                <span class="stat-label">Drafts</span>
+                <span class="stat-label">Draft Profiles</span>
               </div>
             </div>
           }
 
-          <!-- Grid -->
           <div class="card-grid">
 
-            <!-- Create card -->
             <button (click)="openCreateModal()" class="create-card" type="button">
               <div class="create-icon-ring">
                 <i class="pi pi-plus"></i>
               </div>
-              <span class="create-label">Create New Page</span>
-              <span class="create-hint">Start from scratch</span>
+              <span class="create-label">Blank Slate Workspace</span>
+              <span class="create-hint">Start a new layout structure</span>
             </button>
 
-            <!-- Page cards -->
             @for (page of pages(); track page._id) {
               <div class="page-card">
-
-                <!-- Image -->
-                <div class="card-image-wrapper">
+                
+                <div class="card-media-segment">
                   <img
                     src="https://images.unsplash.com/photo-1768409427465-01320d46963e?q=80&w=800&auto=format&fit=crop"
-                    alt="Page Preview"
+                    alt="Layout Preview Template"
                     class="card-image"
                     loading="lazy" />
                   <div class="card-image-overlay"></div>
-                </div>
 
-                <!-- Status pill -->
-                <div class="status-badge" [class.published]="page.isPublished">
-                  <span class="status-dot"></span>
-                  {{ page.isPublished ? 'Live' : 'Draft' }}
-                </div>
-
-                <!-- Homepage crown -->
-                @if (page.isHomepage) {
-                  <div class="homepage-badge">
-                    <i class="pi pi-home"></i>
+                  <div class="status-badge" [class.published]="page.isPublished">
+                    <span class="status-dot"></span>
+                    {{ page.isPublished ? 'Live' : 'Draft' }}
                   </div>
-                }
 
-                <!-- Glass pane -->
-                <div class="glass-pane">
+                  @if (page.isHomepage) {
+                    <div class="homepage-badge" title="Primary Store Homepage Routing">
+                      <i class="pi pi-home"></i>
+                    </div>
+                  }
+                </div>
+
+                <div class="card-content-segment">
                   <div class="card-top-row">
                     <h3 class="card-title" [title]="page.name">{{ page.name }}</h3>
                     <button
                       (click)="viewLive(page.slug)"
                       class="external-link-btn"
-                      title="View live page"
+                      title="Open external channel"
                       type="button">
                       <i class="pi pi-external-link"></i>
                     </button>
                   </div>
 
-                  <code class="slug-pill">/{{ page.slug }}</code>
-
-                  <div class="card-meta-row">
+                  <div class="meta-tags-row">
+                    <code class="slug-pill">/{{ page.slug }}</code>
                     <span class="card-meta-badge">{{ page.pageType }}</span>
-                    <span class="card-meta-badge">{{ (page.sectionsCount ?? 0) }} sections</span>
+                    <span class="card-meta-badge">{{ (page.sectionsCount ?? 0) }} Blocks</span>
                   </div>
 
-                  <div class="card-actions">
-                    <a [routerLink]="[page._id, 'builder']" class="btn btn-sm btn-primary btn-block">
+                  <div class="card-actions-wrapper">
+                    <a [routerLink]="[page._id, 'builder']" class="btn-edit-action">
                       <i class="pi pi-pencil"></i>
-                      Edit
+                      <span>Design Layout</span>
                     </a>
-                    <div class="icon-group">
+                    
+                    <div class="icon-actions-group">
                       <button
                         (click)="togglePublish(page)"
-                        class="icon-btn"
+                        class="icon-action-btn"
                         [class.active]="page.isPublished"
-                        [title]="page.isPublished ? 'Unpublish' : 'Publish'"
+                        [title]="page.isPublished ? 'Unpublish Channel' : 'Publish Channel'"
                         type="button">
                         <i class="pi" [class]="page.isPublished ? 'pi-eye' : 'pi-eye-slash'"></i>
                       </button>
                       <button
                         (click)="duplicatePage(page)"
-                        class="icon-btn"
-                        title="Duplicate"
+                        class="icon-action-btn"
+                        title="Duplicate Profile Schema"
                         type="button">
                         <i class="pi pi-copy"></i>
                       </button>
                       <button
                         (click)="deletePage(page)"
-                        class="icon-btn danger"
-                        title="Delete"
+                        class="icon-action-btn danger"
+                        title="Purge Profile Segment"
                         type="button">
                         <i class="pi pi-trash"></i>
                       </button>
                     </div>
                   </div>
 
-                  <div class="meta-info">
-                    Updated {{ page.updatedAt | date:'MMM d, y' }}
+                  <div class="meta-timestamp">
+                    Sync trace: {{ page.updatedAt | date:'MMM d, y, h:mm a' }}
                   </div>
                 </div>
 
@@ -190,23 +178,21 @@ function getOrgSlug(): string {
 
           </div>
 
-          <!-- Empty state -->
           @if (pages().length === 0 && !isLoading()) {
             <div class="empty-state">
               <div class="empty-icon">
-                <i class="pi pi-file-edit"></i>
+                <i class="pi pi-folder-open"></i>
               </div>
-              <h3 class="empty-title">No pages yet</h3>
-              <p class="empty-subtitle">Create your first storefront page to get started.</p>
-              <button type="button" (click)="openCreateModal()" class="btn btn-primary">
-                <i class="pi pi-plus icon"></i> Create First Page
+              <h3 class="empty-title">Workspace is Empty</h3>
+              <p class="empty-subtitle">Initialize your core distribution channels by spinning up your first custom layout profile container.</p>
+              <button type="button" (click)="openCreateModal()" class="btn-primary-action">
+                <i class="pi pi-plus"></i> Create First Page
               </button>
             </div>
           }
         }
       </div>
 
-      <!-- Create modal -->
       @if (showCreateModal()) {
         <div class="modal-backdrop" (click)="closeCreateModal()">
           <div class="modal-card" (click)="$event.stopPropagation()">
@@ -216,7 +202,7 @@ function getOrgSlug(): string {
                 <div class="modal-icon">
                   <i class="pi pi-file-plus"></i>
                 </div>
-                <h2 class="modal-title">New Page</h2>
+                <h2 class="modal-title">New Workspace Node</h2>
               </div>
               <button type="button" (click)="closeCreateModal()" class="close-btn">
                 <i class="pi pi-times"></i>
@@ -226,63 +212,63 @@ function getOrgSlug(): string {
             <form [formGroup]="createForm" (ngSubmit)="createPage()">
               <div class="form-body">
                 <div class="form-group">
-                  <label class="label" for="page-name">Page Name</label>
+                  <label class="label" for="page-name">Workspace Descriptor / Title</label>
                   <input
                     id="page-name"
                     formControlName="name"
                     class="input"
-                    placeholder="e.g. Summer Sale"
+                    placeholder="e.g. Winter Catalog Launch"
                     autocomplete="off" />
                   @if (createForm.get('name')?.invalid && createForm.get('name')?.touched) {
-                    <span class="field-error">Page name is required</span>
+                    <span class="field-error">A unique descriptive name string is required.</span>
                   }
                 </div>
 
                 <div class="form-group">
-                  <label class="label" for="page-slug">URL Slug</label>
+                  <label class="label" for="page-slug">Routing Uniform URL Slug</label>
                   <div class="slug-input-wrapper">
                     <span class="slug-prefix">/</span>
                     <input
                       id="page-slug"
                       formControlName="slug"
                       class="input slug-input"
-                      placeholder="summer-sale"
+                      placeholder="winter-catalog-launch"
                       autocomplete="off" />
                   </div>
                   @if (createForm.get('slug')?.invalid && createForm.get('slug')?.touched) {
                     <span class="field-error">
-                      Slug must only contain lowercase letters, numbers, and hyphens
+                      Slugs are constrained to lowercase text alphanumeric vectors and uniform hyphens.
                     </span>
                   }
                 </div>
 
                 <div class="form-group">
-                  <label class="label" for="page-type">Page Type</label>
+                  <label class="label" for="page-type">Functional Page Type Module</label>
                   <select id="page-type" formControlName="pageType" class="input select-input">
-                    <option value="custom">Custom</option>
-                    <option value="home">Home</option>
-                    <option value="landing">Landing Page</option>
-                    <option value="about">About</option>
-                    <option value="contact">Contact</option>
-                    <option value="products">Products</option>
+                    <option value="custom">Custom Framework Layer</option>
+                    <option value="home">Primary System Home Dashboard</option>
+                    <option value="landing">Marketing Conversion Landing Target</option>
+                    <option value="about">Corporate About Matrix Profile</option>
+                    <option value="contact">Support Touchpoint Pipeline Gateway</option>
+                    <option value="products">Product Directory Module Mesh</option>
                   </select>
                 </div>
               </div>
 
               <div class="modal-footer">
-                <button type="button" (click)="closeCreateModal()" class="btn btn-text">
-                  Cancel
+                <button type="button" (click)="closeCreateModal()" class="btn-text-dismiss">
+                  Dismiss
                 </button>
                 <button
                   type="submit"
                   [disabled]="createForm.invalid || isSubmitting()"
-                  class="btn btn-primary">
+                  class="btn-primary-action min-w-btn">
                   @if (isSubmitting()) {
-                    <i class="pi pi-spin pi-spinner icon"></i>
+                    <i class="pi pi-spin pi-spinner"></i>
                   } @else {
-                    <i class="pi pi-plus icon"></i>
+                    <i class="pi pi-plus"></i>
                   }
-                  Create Page
+                  <span>Initialize Matrix Node</span>
                 </button>
               </div>
             </form>
@@ -294,462 +280,356 @@ function getOrgSlug(): string {
     </div>
   `,
   styles: [`
-    /* ── Root ── */
+    /* ── High-End SaaS Workspace Grid Canvas Foundation ── */
     .page-container {
       min-height: 100vh;
       position: relative;
-      background-image: url('https://images.unsplash.com/photo-1741153633519-f8af72ed1f0c?q=80&w=764&auto=format&fit=crop');
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
-      padding: var(--spacing-3xl);
-      font-family: var(--font-body);
-      color: var(--text-color);
+      background-color: #f8fafc; // Pristine enterprise studio color matrix backdrop layer
+      padding: 24px;
+      box-sizing: border-box;
+      overflow-x: hidden;
     }
-    .bg-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(160deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.65) 100%);
-      z-index: 0;
-    }
-    .content-relative { position: relative; z-index: 1; }
+    .content-relative { position: relative; z-index: 1; width: 100%; max-width: 1600px; margin: 0 auto; }
 
-    /* ── Header ── */
+    /* ── Structural Grid Responsive Ribbon Headboards ── */
     .page-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: var(--spacing-2xl);
-      padding: var(--spacing-xl) var(--spacing-2xl);
-      background: rgba(255,255,255,0.08);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255,255,255,0.18);
-      border-radius: var(--radius-2xl);
+      margin-bottom: 24px;
+      padding: 20px 24px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.02);
+      gap: 16px;
+      flex-wrap: wrap;
     }
+    .header-left { min-width: 250px; }
     .page-title {
-      font-family: var(--font-heading);
-      font-size: var(--font-size-3xl);
-      font-weight: var(--font-weight-bold);
-      color: #fff;
+      font-size: 24px;
+      font-weight: 600;
+      color: #0f172a;
       margin: 0;
       letter-spacing: -0.02em;
     }
     .page-subtitle {
-      margin-top: var(--spacing-xs);
-      color: rgba(255,255,255,0.6);
-      font-size: var(--font-size-sm);
+      margin: 4px 0 0 0;
+      color: #64748b;
+      font-size: 13px;
     }
 
-    /* ── Error banner ── */
+    /* ── Resilient Global Notification Action Banners ── */
     .error-banner {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      background: rgba(239,68,68,0.15);
-      border: 1px solid rgba(239,68,68,0.3);
-      border-radius: 10px;
-      color: #fca5a5;
-      font-size: var(--font-size-sm);
-      margin-bottom: var(--spacing-xl);
-      backdrop-filter: blur(8px);
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 20px;
+      background: #fef2f2;
+      border: 1px solid #fca5a5;
+      border-radius: 12px;
+      color: #991b1b;
+      font-size: 13px;
+      margin-bottom: 20px;
+      font-weight: 500;
     }
+    .error-banner-content { display: flex; align-items: center; gap: 10px; }
     .error-close {
-      margin-left: auto;
-      background: none;
-      border: none;
-      color: inherit;
-      cursor: pointer;
-      opacity: 0.7;
+      background: none; border: none; color: #b91c1c; cursor: pointer; padding: 4px;
+      display: flex; align-items: center; justify-content: center; opacity: 0.8;
+      &:hover { opacity: 1; }
     }
-    .error-close:hover { opacity: 1; }
 
-    /* ── Loader ── */
+    /* ── System State Loader Framework Animation Loops ── */
     .loader-container {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 300px;
+      min-height: 400px;
       gap: 16px;
     }
     .spinner-ring {
-      width: 44px;
-      height: 44px;
-      border: 3px solid rgba(255,255,255,0.15);
-      border-top-color: #ffffff;
+      width: 40px; height: 40px;
+      border: 3px solid #e2e8f0;
+      border-top-color: #0f172a;
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+      animation: spin 0.65s linear infinite;
     }
-    .loading-text {
-      color: rgba(255,255,255,0.6);
-      font-size: var(--font-size-sm);
-      font-weight: 500;
-    }
+    .loading-text { color: #64748b; font-size: 13px; font-weight: 500; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── Stats row ── */
+    /* ── Unified Analytical Stats Bento Counters ── */
     .stats-row {
       display: flex;
-      gap: 10px;
-      margin-bottom: var(--spacing-xl);
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
     }
     .stat-chip {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       padding: 6px 14px;
-      background: rgba(255,255,255,0.1);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255,255,255,0.15);
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
       border-radius: 20px;
-    }
-    .stat-value {
-      font-size: var(--font-size-sm);
-      font-weight: 700;
-      color: #fff;
-      font-family: var(--font-mono);
-    }
-    .stat-label {
-      font-size: 11px;
-      color: rgba(255,255,255,0.55);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.01);
+
+      .stat-value { font-size: 13px; font-weight: 700; color: #0f172a; font-family: monospace; }
+      .stat-label { font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.03em; }
+
+      &.live { background: #f0fdf4; border-color: #bbf7d0; .stat-value { color: #166534; } .stat-label { color: #15803d; } }
+      &.draft { background: #f8fafc; border-color: #cbd5e1; .stat-value { color: #334155; } .stat-label { color: #475569; } }
     }
 
-    /* ── Grid ── */
+    /* ── Dynamic Layout Resilient Grid Sheet Infrastructure ── */
     .card-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: var(--spacing-xl);
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+      width: 100%;
     }
 
-    /* ── Create card ── */
+    /* ── Creation Module Bento Base Card ── */
     .create-card {
-      background: rgba(255,255,255,0.05);
-      backdrop-filter: blur(10px);
-      border: 2px dashed rgba(255,255,255,0.25);
-      border-radius: var(--radius-2xl);
+      background: #ffffff;
+      border: 2px dashed #cbd5e1;
+      border-radius: 16px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 340px;
+      padding: 32px 24px;
+      min-height: 360px;
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.2, 0.9, 0.2, 1);
+      box-sizing: border-box;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
       gap: 8px;
-    }
-    .create-card:hover {
-      background: rgba(255,255,255,0.12);
-      border-color: rgba(255,255,255,0.7);
-      transform: translateY(-4px);
+      width: 100%;
+
+      &:hover {
+        background: #f8fafc; border-color: #0f172a; transform: translateY(-4px);
+        box-shadow: 0 12px 24px -10px rgba(15, 23, 42, 0.06);
+      }
     }
     .create-icon-ring {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.3);
-      background: rgba(255,255,255,0.1);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.25rem;
-      transition: all 0.3s;
-      margin-bottom: 4px;
+      width: 48px; height: 48px; border-radius: 12px; border: 1px solid #e2e8f0;
+      background: #f8fafc; color: #0f172a; display: flex; align-items: center; justify-content: center;
+      font-size: 16px; transition: all 0.2s; margin-bottom: 4px;
     }
-    .create-card:hover .create-icon-ring {
-      border-color: rgba(255,255,255,0.8);
-      background: rgba(255,255,255,0.2);
-      transform: scale(1.1);
-    }
-    .create-label {
-      color: #fff;
-      font-weight: 700;
-      font-size: var(--font-size-base);
-    }
-    .create-hint {
-      color: rgba(255,255,255,0.45);
-      font-size: 12px;
-    }
+    .create-card:hover .create-icon-ring { border-color: #0f172a; background: #0f172a; color: #ffffff; transform: scale(1.05); }
+    .create-label { color: #0f172a; font-weight: 600; font-size: 14px; }
+    .create-hint { color: #64748b; font-size: 12px; }
 
-    /* ── Page card ── */
+    /* ── Production Node Container Blocks (Dynamic Flex Height - Zoom Proof!) ── */
     .page-card {
-      position: relative;
-      height: 340px;
-      border-radius: var(--radius-2xl);
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-      transition: all 0.3s cubic-bezier(0.2, 0.9, 0.2, 1);
-      border: 1px solid rgba(255,255,255,0.12);
-    }
-    .page-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-      border-color: rgba(255,255,255,0.4);
-    }
-    .card-image-wrapper { position: absolute; inset: 0; z-index: 0; }
-    .card-image {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-    }
-    .page-card:hover .card-image { transform: scale(1.08); }
-    .card-image-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.05) 60%);
-    }
-
-    /* ── Badges ── */
-    .status-badge {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      z-index: 2;
-      background: rgba(0,0,0,0.55);
-      backdrop-filter: blur(6px);
-      border: 1px solid rgba(255,255,255,0.12);
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 10px;
-      font-weight: 700;
-      color: rgba(255,255,255,0.75);
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-    .status-badge.published {
-      background: rgba(34,197,94,0.2);
-      border-color: rgba(34,197,94,0.4);
-      color: #86efac;
-    }
-    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-
-    .homepage-badge {
-      position: absolute;
-      top: 12px;
-      left: 12px;
-      z-index: 2;
-      background: rgba(234,179,8,0.2);
-      border: 1px solid rgba(234,179,8,0.4);
-      color: #fde68a;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      backdrop-filter: blur(4px);
-    }
-
-    /* ── Glass pane ── */
-    .glass-pane {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      z-index: 2;
-      background: rgba(15,23,42,0.6);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-top: 1px solid rgba(255,255,255,0.1);
-      padding: var(--spacing-lg);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.01), 0 10px 20px -12px rgba(15, 23, 42, 0.03);
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      width: 100%;
+      box-sizing: border-box;
+
+      &:hover {
+        transform: translateY(-4px);
+        border-color: #cbd5e1;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.01), 0 16px 32px -10px rgba(15, 23, 42, 0.08);
+      }
     }
-    .card-top-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-    .card-title {
-      font-family: var(--font-heading);
-      font-size: var(--font-size-md);
-      font-weight: 700;
-      color: #fff;
-      margin: 0;
-      flex: 1;
-      white-space: nowrap;
+
+    /* Media Wrapper Blocks */
+    .card-media-segment {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9; // Forces solid image box sizing bounds under high zoom variables
+      background: #f1f5f9;
       overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .slug-pill {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      color: rgba(255,255,255,0.5);
-      background: rgba(255,255,255,0.07);
-      padding: 2px 7px;
-      border-radius: 4px;
-      align-self: flex-start;
-    }
-    .card-meta-row { display: flex; gap: 6px; }
-    .card-meta-badge {
-      font-size: 9px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: rgba(255,255,255,0.4);
-      background: rgba(255,255,255,0.06);
-      padding: 2px 7px;
-      border-radius: 4px;
-    }
-    .card-actions { display: flex; gap: 6px; align-items: center; }
-    .icon-group { display: flex; gap: 4px; }
-
-    /* ── Buttons ── */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: var(--spacing-md) var(--spacing-xl);
-      border-radius: var(--ui-border-radius-lg);
-      font-size: var(--font-size-base);
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      transition: all 0.2s;
-      gap: 8px;
-      line-height: 1;
-      text-decoration: none;
-    }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn-sm { padding: 7px 12px; font-size: var(--font-size-sm); }
-    .btn-block { flex: 1; }
-    .btn-primary { background: #fff; color: #0f172a; }
-    .btn-primary:hover:not(:disabled) { background: #f1f5f9; transform: translateY(-1px); }
-    .btn-text { background: none; border: none; color: #64748b; font-weight: 600; cursor: pointer; padding: 8px 12px; border-radius: 8px; }
-    .btn-text:hover { background: #f1f5f9; }
-
-    .icon-btn, .external-link-btn {
-      width: 32px; height: 32px;
-      display: flex; align-items: center; justify-content: center;
-      border-radius: 8px; border: none;
-      background: rgba(255,255,255,0.1);
-      color: rgba(255,255,255,0.75);
-      cursor: pointer; transition: all 0.2s;
       flex-shrink: 0;
     }
-    .icon-btn:hover, .external-link-btn:hover { background: rgba(255,255,255,0.25); color: #fff; }
-    .icon-btn.active { background: rgba(34,197,94,0.3); color: #86efac; }
-    .icon-btn.danger:hover { background: rgba(239,68,68,0.35); color: #fca5a5; }
+    .card-image { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+    .page-card:hover .card-image { transform: scale(1.04); }
+    .card-image-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(15,23,42,0.08) 0%, transparent 100%); }
 
-    .meta-info { font-size: 10px; color: rgba(255,255,255,0.3); text-align: right; }
+    /* Floating Media Component Tags */
+    .status-badge {
+      position: absolute; top: 12px; right: 12px; z-index: 5;
+      background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(4px);
+      border: 1px solid #e2e8f0; padding: 4px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 600; color: #475569;
+      display: inline-flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.03em;
+      
+      &.published { background: #dcfce7; border-color: #bbf7d0; color: #15803d; }
+      .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    }
+    .homepage-badge {
+      position: absolute; top: 12px; left: 12px; z-index: 5;
+      background: #fef3c7; border: 1px solid #fde68a; color: #b45309;
+      width: 26px; height: 26px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; font-size: 12px;
+    }
 
-    /* ── Empty state ── */
-    .empty-state {
+    /* Core Content Block Matrices */
+    .card-content-segment {
+      padding: 18px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 80px 40px;
-      color: rgba(255,255,255,0.7);
+      flex-grow: 1; // Content box automatically expands/shrinks to securely absorb changing font size heights
+      gap: 14px;
+      min-width: 0;
+    }
+    .card-top-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .card-title {
+      font-size: 16px; font-weight: 600; color: #0f172a; margin: 0; flex: 1;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    .meta-tags-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; min-width: 0; }
+    .slug-pill {
+      font-family: monospace; font-size: 11px; color: #475569; background: #f1f5f9;
+      padding: 2px 8px; border-radius: 6px; font-weight: 500;
+      max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .card-meta-badge {
+      font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.02em;
+      color: #64748b; background: #f8fafc; padding: 2px 8px; border-radius: 6px; border: 1px solid #f1f5f9;
+    }
+
+    /* Actions Arrays Section Layouts */
+    .card-actions-wrapper {
+      display: flex; gap: 8px; align-items: center; margin-top: auto; padding-top: 4px;
+      @media (max-width: 360px) { flex-direction: column; .btn-edit-action { width: 100%; } }
+    }
+    .icon-actions-group { display: flex; gap: 4px; align-items: center; }
+
+    /* ── Action Framework Buttons Core Styling Sheet ── */
+    .btn-primary-action {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 10px 18px; border-radius: 10px; font-size: 13px; font-weight: 500;
+      cursor: pointer; border: none; background: #0f172a; color: #ffffff;
+      gap: 8px; line-height: 1; transition: background 0.15s ease;
+      
+      &:hover:not([disabled]) { background: #1e293b; }
+      &:disabled { opacity: 0.5; cursor: not-allowed; }
+    }
+    .btn-edit-action {
+      flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 500;
+      background: #f1f5f9; color: #1e293b; text-decoration: none; transition: background 0.15s;
+      border: 1px solid transparent;
+      &:hover { background: #e2e8f0; border-color: #cbd5e1; }
+    }
+    .btn-text-dismiss {
+      background: transparent; border: none; color: #64748b; font-weight: 500;
+      cursor: pointer; padding: 10px 16px; border-radius: 8px; font-size: 13px;
+      &:hover { background: #f1f5f9; color: #0f172a; }
+    }
+
+    .icon-action-btn, .external-link-btn {
+      width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+      border-radius: 8px; border: 1px solid #e2e8f0; background: #ffffff; color: #475569;
+      cursor: pointer; transition: all 0.15s ease; flex-shrink: 0; font-size: 13px;
+      
+      &:hover { background: #f8fafc; color: #0f172a; border-color: #cbd5e1; }
+      &.active { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+      &.danger:hover { background: #fef2f2; color: #991b1b; border-color: #fca5a5; }
+    }
+
+    .meta-timestamp { font-size: 10px; color: #94a3b8; text-align: left; }
+
+    /* ── Screen Empty Display Formats ── */
+    .empty-state {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 80px 24px; color: #475569; max-width: 500px; margin: 0 auto;
     }
     .empty-icon {
-      width: 80px; height: 80px;
-      border-radius: 20px;
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.12);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 2rem; margin-bottom: 20px; color: rgba(255,255,255,0.4);
+      width: 64px; height: 64px; border-radius: 16px; background: #ffffff;
+      border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center;
+      font-size: 24px; margin-bottom: 16px; color: #94a3b8;
     }
-    .empty-title { font-size: var(--font-size-xl); font-weight: 700; color: #fff; margin: 0 0 8px; }
-    .empty-subtitle { color: rgba(255,255,255,0.5); font-size: var(--font-size-sm); margin-bottom: 24px; }
+    .empty-title { font-size: 18px; font-weight: 600; color: #0f172a; margin: 0 0 8px; }
+    .empty-subtitle { color: #64748b; font-size: 13px; margin-bottom: 20px; line-height: 1.5; }
 
-    /* ── Modal ── */
+    /* ── Creation Overlay Dialog Backdrops ── */
     .modal-backdrop {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(8px);
-      z-index: 1000;
-      display: flex; align-items: center; justify-content: center;
-      padding: var(--spacing-2xl);
-      animation: fadeIn 0.15s ease;
+      position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4);
+      backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+      z-index: 1000; display: flex; align-items: center; justify-content: center;
+      padding: 24px; animation: fadeIn 0.15s ease;
     }
     .modal-card {
-      background: #fff;
-      width: 100%; max-width: 460px;
-      border-radius: 20px;
-      box-shadow: 0 24px 80px rgba(0,0,0,0.35);
-      animation: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-      overflow: hidden;
+      background: #ffffff; width: 100%; max-width: 480px; border-radius: 16px;
+      box-shadow: 0 24px 48px -12px rgba(15, 23, 42, 0.18);
+      animation: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1); overflow: hidden;
+      border: 1px solid #e2e8f0;
     }
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 24px 24px 0;
-    }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 24px 24px 16px; border-bottom: 1px solid #f1f5f9; }
     .modal-header-left { display: flex; align-items: center; gap: 12px; }
     .modal-icon {
-      width: 36px; height: 36px;
-      border-radius: 10px;
-      background: #f1f5f9;
-      display: flex; align-items: center; justify-content: center;
-      color: #0f172a; font-size: 1rem;
+      width: 36px; height: 36px; border-radius: 10px; background: #f8fafc;
+      display: flex; align-items: center; justify-content: center; color: #0f172a; font-size: 15px; border: 1px solid #e2e8f0;
     }
-    .modal-title { font-size: 1.15rem; font-weight: 700; color: #0f172a; margin: 0; }
+    .modal-title { font-size: 16px; font-weight: 600; color: #0f172a; margin: 0; }
     .close-btn {
-      background: #f1f5f9; border: none;
-      width: 32px; height: 32px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; color: #64748b; transition: all 0.2s;
+      background: #f1f5f9; border: none; width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; cursor: pointer; color: #64748b; transition: all 0.15s;
+      &:hover { background: #e2e8f0; color: #0f172a; }
     }
-    .close-btn:hover { background: #e2e8f0; color: #0f172a; }
-    .form-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; }
+    .form-body { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
     .form-group { display: flex; flex-direction: column; gap: 6px; }
-    .label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #64748b; }
+    .label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: #475569; }
     .input {
-      width: 100%; padding: 10px 12px;
-      border: 1px solid #e2e8f0; border-radius: 8px;
-      font-size: 0.9rem; outline: none;
-      transition: border-color 0.2s; box-sizing: border-box;
-      font-family: inherit;
+      width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px;
+      font-size: 13px; outline: none; transition: border-color 0.15s; box-sizing: border-box; font-family: inherit; color: #0f172a;
+      &::placeholder { color: #cbd5e1; }
+      &:focus { border-color: #0f172a; box-shadow: 0 0 0 1px #0f172a; }
     }
-    .input:focus { border-color: #0f172a; }
-    .select-input { cursor: pointer; background: #fff; }
+    .select-input { cursor: pointer; background: #ffffff; padding-right: 24px; }
     .slug-input-wrapper { position: relative; }
-    .slug-prefix { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 0.9rem; }
-    .slug-input { padding-left: 22px; }
-    .field-error { font-size: 11px; color: #ef4444; }
+    .slug-prefix { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 13px; font-family: monospace; }
+    .slug-input { padding-left: 24px; font-family: monospace; }
+    .field-error { font-size: 11px; color: #ef4444; font-weight: 400; margin-top: 2px; }
     .modal-footer {
-      display: flex; justify-content: flex-end; gap: 8px;
-      padding: 16px 24px;
-      border-top: 1px solid #f1f5f9;
-      background: #fafafa;
+      display: flex; justify-content: flex-end; gap: 8px; padding: 16px 24px;
+      border-top: 1px solid #f1f5f9; background: #f8fafc;
     }
+    .min-w-btn { min-width: 140px; }
 
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @keyframes scaleIn { from { transform: scale(0.96); opacity: 0; } to { transform: scale(1); opacity: 1; } }
   `]
 })
 export class PageListComponent implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   private adminService = inject(StorefrontAdminService);
-  private fb           = inject(FormBuilder);
-  private router       = inject(Router);
+  private fb = inject(FormBuilder);
+  private router = inject(Router);
 
-  pages         = signal<any[]>([]);
-  isLoading     = signal(true);
-  isSubmitting  = signal(false);
+  pages = signal<any[]>([]);
+  isLoading = signal(true);
+  isSubmitting = signal(false);
   showCreateModal = signal(false);
-  error         = signal<string | null>(null);
+  error = signal<string | null>(null);
 
-  // Computed stats
+  // Computed channel status maps
   publishedCount = computed(() => this.pages().filter(p => p.isPublished).length);
-  draftCount     = computed(() => this.pages().filter(p => !p.isPublished).length);
+  draftCount = computed(() => this.pages().filter(p => !p.isPublished).length);
 
   createForm = this.fb.group({
-    name:     ['', Validators.required],
-    slug:     ['', [Validators.required, Validators.pattern(/^[a-z0-9-]+$/)]],
+    name: ['', Validators.required],
+    slug: ['', [Validators.required, Validators.pattern(/^[a-z0-9-]+$/)]],
     pageType: ['custom']
   });
 
   ngOnInit(): void {
     this.loadPages();
 
-    // Auto-slugify from name while slug is untouched
+    // Auto-slugify channel definitions on form interaction arrays
     this.createForm.get('name')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(name => {
       const slugCtrl = this.createForm.get('slug')!;
       if (name && !slugCtrl.dirty) {
@@ -767,7 +647,7 @@ export class PageListComponent implements OnInit, OnDestroy {
         this.isLoading.set(false);
       },
       error: () => {
-        this.error.set('Failed to load pages. Please try again.');
+        this.error.set('Failed to read current storefront page matrices. Please retry.');
         this.isLoading.set(false);
       }
     });
@@ -790,17 +670,13 @@ export class PageListComponent implements OnInit, OnDestroy {
       next: (res: any) => {
         this.closeCreateModal();
         this.isSubmitting.set(false);
-        // ✅ FIX: relativeTo: null is wrong here — it navigates from the app root
-        // which means the segments [id, 'builder'] go to /id/builder instead of
-        // the correct storefront-admin nested path. Navigate using the current URL
-        // prefix to preserve the admin module segment.
-        const currentUrl = this.router.url; // e.g. /admin/storefront/pages
+        const currentUrl = this.router.url;
         const baseSegment = currentUrl.substring(0, currentUrl.lastIndexOf('/'));
         this.router.navigateByUrl(`${baseSegment}/${res.data._id}/builder`);
         this.loadPages();
       },
       error: (err: any) => {
-        this.error.set(err?.error?.message ?? 'Failed to create page.');
+        this.error.set(err?.error?.message ?? 'Initialization pipeline failure.');
         this.isSubmitting.set(false);
       }
     });
@@ -808,12 +684,12 @@ export class PageListComponent implements OnInit, OnDestroy {
 
   viewLive(slug: string): void {
     const org = getOrgSlug();
-    if (!org) { this.error.set('Organization slug not found in localStorage.'); return; }
+    if (!org) { this.error.set('Target operational organization mapping token slice missing.'); return; }
     window.open(`/store/${org}/${slug}`, '_blank', 'noopener');
   }
 
   togglePublish(page: any): void {
-    const action  = page.isPublished ? 'unpublish' : 'publish';
+    const action = page.isPublished ? 'unpublish' : 'publish';
     const request$ = page.isPublished
       ? this.adminService.unpublishPage(page._id)
       : this.adminService.publishPage(page._id);
@@ -824,590 +700,35 @@ export class PageListComponent implements OnInit, OnDestroy {
           list.map(p => p._id === page._id ? { ...p, isPublished: !page.isPublished } : p)
         );
       },
-      error: (err: any) => this.error.set(err?.error?.message ?? `Failed to ${action} page.`)
+      error: (err: any) => this.error.set(err?.error?.message ?? `Failed to complete state shift to ${action}.`)
     });
   }
 
   duplicatePage(page: any): void {
     this.adminService.duplicatePage(page._id).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => this.loadPages(),
-      error: (err: any) => this.error.set(err?.error?.message ?? 'Failed to duplicate page.')
+      error: (err: any) => this.error.set(err?.error?.message ?? 'Cloning configuration error.')
     });
   }
 
   deletePage(page: any): void {
     if (page.isPublished) {
-      this.error.set(`Unpublish "${page.name}" before deleting it.`);
+      this.error.set(`Unpublish active channel segment "${page.name}" prior to executing removal sequences.`);
       return;
     }
     if (page.isHomepage || page.pageType === 'home' || page.pageType === 'products') {
-      this.error.set('Cannot delete core system pages (Home or Products).');
+      this.error.set('Immutable core system layouts (Home or Products) cannot be purged.');
       return;
     }
-    if (!confirm(`Permanently delete "${page.name}"? This cannot be undone.`)) return;
+    if (!confirm(`Permanently delete "${page.name}"? This transaction is irreversible.`)) return;
     this.adminService.deletePage(page._id).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => this.pages.update(list => list.filter(p => p._id !== page._id)),
-      error: (err: any) => this.error.set(err?.error?.message ?? 'Failed to delete page.')
+      error: (err: any) => this.error.set(err?.error?.message ?? 'Purge execution block fault.')
     });
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }
-
-
-
-
-// import { Component, OnInit, inject, signal } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-// import { Router, RouterModule } from '@angular/router';
-// import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-// import { StorefrontAdminService, CreatePageDto } from '../../../../core/services/storefront-admin.service';
-
-// @Component({
-//   selector: 'app-page-list',
-//   standalone: true,
-//   imports: [CommonModule, RouterModule, ReactiveFormsModule],
-//   template: `
-//     <div class="page-container">
-//       <div class="bg-overlay"></div> <div class="content-relative">
-        
-//         <header class="page-header">
-//           <div class="header-content">
-//             <h1 class="page-title">Storefront Pages</h1>
-//             <p class="page-subtitle">Design, publish, and manage your campaigns.</p>
-//           </div>
-
-//           <button type="button" (click)="openCreateModal()" class="btn btn-primary">
-//             <i class="pi pi-plus icon"></i>
-//             <span>New Page</span>
-//           </button>
-//         </header>
-
-//         @if (isLoading()) {
-//           <div class="loader-container">
-//             <div class="spinner"></div>
-//           </div>
-//         } @else {
-
-//           <div class="card-grid">
-
-//             <button (click)="openCreateModal()" class="create-card">
-//               <div class="create-icon-wrapper">
-//                 <i class="pi pi-plus"></i>
-//               </div>
-//               <span class="create-label">Create New Page</span>
-//             </button>
-
-//             @for (page of pages(); track page._id) {
-//               <div class="page-card group">
-                
-//                 <div class="card-image-wrapper">
-//                   <img src="https://images.unsplash.com/photo-1768409427465-01320d46963e?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
-//                        alt="Page Preview" 
-//                        class="card-image">
-//                   <div class="card-image-overlay"></div>
-//                 </div>
-
-//                 <div class="status-badge" [class.published]="page.isPublished">
-//                   <span class="status-dot"></span>
-//                   {{ page.isPublished ? 'Live' : 'Draft' }}
-//                 </div>
-
-//                 <div class="glass-pane">
-                  
-//                   <div class="card-top-row">
-//                     <h3 class="card-title" [title]="page.name">
-//                       <i class="pi" [class]="page.isHomepage ? 'pi-home' : 'pi-file'" style="font-size: 0.8rem; opacity: 0.7; margin-right: 4px;"></i>
-//                       {{ page.name }}
-//                     </h3>
-//                     <button (click)="viewLive(page.slug)" class="external-link-btn" title="View Live">
-//                       <i class="pi pi-external-link"></i>
-//                     </button>
-//                   </div>
-
-//                   <code class="slug-pill">/{{ page.slug }}</code>
-
-//                   <div class="card-actions">
-//                     <a [routerLink]="[page._id, 'builder']" class="btn btn-sm btn-primary btn-block">
-//                       <i class="pi pi-pencil"></i> Edit
-//                     </a>
-                    
-//                     <div class="icon-group">
-//                       <button (click)="togglePublish(page)" 
-//                               class="icon-btn" 
-//                               [class.active]="page.isPublished"
-//                               [title]="page.isPublished ? 'Unpublish' : 'Publish'">
-//                         <i class="pi" [class]="page.isPublished ? 'pi-eye' : 'pi-eye-slash'"></i>
-//                       </button>
-//                       <button (click)="deletePage(page._id)" class="icon-btn danger" title="Delete">
-//                         <i class="pi pi-trash"></i>
-//                       </button>
-//                     </div>
-//                   </div>
-
-//                   <div class="meta-info">
-//                     Updated {{ page.updatedAt | date:'MMM d' }}
-//                   </div>
-
-//                 </div>
-//               </div>
-//             }
-
-//           </div>
-//         }
-//       </div>
-
-//       @if (showCreateModal()) {
-//         <div class="modal-backdrop">
-//           <div class="modal-card">
-//             <div class="modal-header">
-//               <h2 class="modal-title">New Page</h2>
-//               <button type="button" (click)="closeCreateModal()" class="close-btn">
-//                 <i class="pi pi-times"></i>
-//               </button>
-//             </div>
-//             <form [formGroup]="createForm" (ngSubmit)="createPage()">
-//               <div class="form-group">
-//                 <label class="label">Page Name</label>
-//                 <input formControlName="name" class="input" placeholder="e.g. Summer Sale" />
-//               </div>
-//               <div class="form-group">
-//                 <label class="label">URL Slug</label>
-//                 <div class="slug-input-wrapper">
-//                   <span class="slug-prefix">/</span>
-//                   <input formControlName="slug" class="input slug-input" placeholder="summer-sale" />
-//                 </div>
-//               </div>
-              
-//               <div class="modal-footer">
-//                 <button type="button" (click)="closeCreateModal()" class="btn btn-text">Cancel</button>
-//                 <button type="submit" [disabled]="createForm.invalid || isSubmitting()" class="btn btn-primary">
-//                   @if (isSubmitting()) { <i class="pi pi-spin pi-spinner icon"></i> }
-//                   Create Page
-//                 </button>
-//               </div>
-//             </form>
-//           </div>
-//         </div>
-//       }
-//     </div>
-//   `,
-//   styles: [`
-//     /* ===== PAGE BACKGROUND ===== */
-//     .page-container {
-//       min-height: 100vh;
-//       position: relative;
-//       /* The Canyon Image provided */
-//       background-image: url('https://images.unsplash.com/photo-1741153633519-f8af72ed1f0c?q=80&w=764&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
-//       background-size: cover;
-//       background-position: center;
-//       background-attachment: fixed;
-//       padding: var(--spacing-3xl);
-//       font-family: var(--font-body);
-//       color: var(--text-color);
-//     }
-
-//     .bg-overlay {
-//       position: absolute;
-//       inset: 0;
-//       background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6));
-//       z-index: 0;
-//     }
-
-//     .content-relative {
-//       position: relative;
-//       z-index: 1;
-//     }
-
-//     /* ===== HEADER (Glass) ===== */
-//     .page-header {
-//       display: flex;
-//       justify-content: space-between;
-//       align-items: center;
-//       margin-bottom: var(--spacing-4xl);
-//       padding: var(--spacing-xl) var(--spacing-2xl);
-//       background: rgba(255, 255, 255, 0.1);
-//       backdrop-filter: blur(12px);
-//       border: 1px solid rgba(255, 255, 255, 0.2);
-//       border-radius: var(--radius-2xl);
-//       box-shadow: var(--shadow-lg);
-//     }
-    
-//     .page-title {
-//       font-family: var(--font-heading);
-//       font-size: var(--font-size-3xl);
-//       font-weight: var(--font-weight-bold);
-//       color: #ffffff; /* White text on dark img */
-//       margin: 0;
-//       text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-//     }
-    
-//     .page-subtitle {
-//       margin-top: var(--spacing-xs);
-//       color: rgba(255, 255, 255, 0.7);
-//       font-size: var(--font-size-sm);
-//     }
-
-//     /* ===== BUTTONS ===== */
-//     .btn {
-//       display: inline-flex;
-//       align-items: center;
-//       justify-content: center;
-//       padding: var(--spacing-md) var(--spacing-xl);
-//       border-radius: var(--ui-border-radius-lg);
-//       font-size: var(--font-size-base);
-//       font-weight: var(--font-weight-semibold);
-//       cursor: pointer;
-//       border: none;
-//       transition: var(--transition-base);
-//       gap: var(--spacing-md);
-//       line-height: 1;
-//     }
-
-//     .btn-sm {
-//       padding: var(--spacing-sm) var(--spacing-md);
-//       font-size: var(--font-size-sm);
-//     }
-
-//     .btn-primary {
-//       background-color: #ffffff;
-//       color: #0f172a;
-//       box-shadow: var(--shadow-md);
-//     }
-//     .btn-primary:hover {
-//       background-color: #f8fafc;
-//       transform: translateY(-1px);
-//       box-shadow: var(--shadow-lg);
-//     }
-
-//     .btn-block { width: 100%; }
-
-//     /* ===== GRID ===== */
-//     .card-grid {
-//       display: grid;
-//       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-//       gap: var(--spacing-2xl);
-//     }
-
-//     /* ===== CREATE CARD (Glass Dashed) ===== */
-//     .create-card {
-//       background: rgba(255, 255, 255, 0.05);
-//       backdrop-filter: blur(10px);
-//       border: 2px dashed rgba(255, 255, 255, 0.3);
-//       border-radius: var(--radius-2xl);
-//       display: flex;
-//       flex-direction: column;
-//       align-items: center;
-//       justify-content: center;
-//       min-height: 320px;
-//       cursor: pointer;
-//       transition: var(--transition-base);
-//     }
-//     .create-card:hover {
-//       background: rgba(255, 255, 255, 0.15);
-//       border-color: rgba(255, 255, 255, 0.8);
-//       transform: translateY(-4px);
-//     }
-//     .create-icon-wrapper {
-//       width: 56px;
-//       height: 56px;
-//       border-radius: 50%;
-//       background: rgba(255, 255, 255, 0.2);
-//       color: #ffffff;
-//       display: flex;
-//       align-items: center;
-//       justify-content: center;
-//       margin-bottom: var(--spacing-md);
-//       font-size: var(--font-size-2xl);
-//     }
-//     .create-label {
-//       color: #ffffff;
-//       font-weight: var(--font-weight-bold);
-//     }
-
-//     /* ===== IMAGE PAGE CARD ===== */
-//     .page-card {
-//       position: relative;
-//       height: 320px;
-//       border-radius: var(--radius-2xl);
-//       overflow: hidden;
-//       box-shadow: var(--shadow-xl);
-//       transition: var(--transition-base);
-//       border: 1px solid rgba(255,255,255,0.2);
-//     }
-//     .page-card:hover {
-//       transform: translateY(-5px);
-//       box-shadow: var(--shadow-2xl);
-//       border-color: rgba(255,255,255,0.6);
-//     }
-
-//     /* 1. Image Background */
-//     .card-image-wrapper {
-//       position: absolute;
-//       inset: 0;
-//       z-index: 0;
-//     }
-//     .card-image {
-//       width: 100%;
-//       height: 100%;
-//       object-fit: cover;
-//       transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-//     }
-//     .page-card:hover .card-image {
-//       transform: scale(1.1); /* Zoom effect */
-//     }
-//     .card-image-overlay {
-//       position: absolute;
-//       inset: 0;
-//       background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.1));
-//     }
-
-//     /* 2. Status Badge */
-//     .status-badge {
-//       position: absolute;
-//       top: 12px;
-//       right: 12px;
-//       z-index: 2;
-//       background: rgba(0, 0, 0, 0.6);
-//       backdrop-filter: blur(4px);
-//       border: 1px solid rgba(255, 255, 255, 0.1);
-//       padding: 4px 10px;
-//       border-radius: 20px;
-//       font-size: var(--font-size-xs);
-//       font-weight: var(--font-weight-bold);
-//       color: #e2e8f0;
-//       display: flex;
-//       align-items: center;
-//       gap: 6px;
-//       text-transform: uppercase;
-//       letter-spacing: 0.05em;
-//     }
-//     .status-badge.published {
-//       background: rgba(34, 197, 94, 0.2); /* Green tint */
-//       color: #86efac;
-//       border-color: rgba(34, 197, 94, 0.4);
-//     }
-//     .status-dot {
-//       width: 6px;
-//       height: 6px;
-//       border-radius: 50%;
-//       background-color: currentColor;
-//     }
-
-//     /* 3. Glass Content Pane */
-//     .glass-pane {
-//       position: absolute;
-//       bottom: 0;
-//       left: 0;
-//       right: 0;
-//       z-index: 2;
-//       background: rgba(255, 255, 255, 0.15); /* Frosted glass */
-//       backdrop-filter: blur(15px);
-//       -webkit-backdrop-filter: blur(15px);
-//       border-top: 1px solid rgba(255, 255, 255, 0.2);
-//       padding: var(--spacing-lg);
-//       display: flex;
-//       flex-direction: column;
-//       gap: var(--spacing-md);
-//     }
-
-//     .card-top-row {
-//       display: flex;
-//       justify-content: space-between;
-//       align-items: center;
-//     }
-//     .card-title {
-//       font-family: var(--font-heading);
-//       font-size: var(--font-size-md);
-//       font-weight: var(--font-weight-bold);
-//       color: #ffffff;
-//       margin: 0;
-//       white-space: nowrap;
-//       overflow: hidden;
-//       text-overflow: ellipsis;
-//     }
-    
-//     .slug-pill {
-//       font-family: var(--font-mono);
-//       font-size: var(--font-size-xs);
-//       color: rgba(255,255,255,0.7);
-//       background: rgba(0,0,0,0.3);
-//       padding: 2px 6px;
-//       border-radius: 4px;
-//       align-self: flex-start;
-//     }
-
-//     .card-actions {
-//       display: flex;
-//       gap: var(--spacing-sm);
-//       margin-top: var(--spacing-xs);
-//     }
-//     .icon-group {
-//       display: flex;
-//       gap: 4px;
-//     }
-    
-//     .icon-btn, .external-link-btn {
-//       width: 32px;
-//       height: 32px;
-//       display: flex;
-//       align-items: center;
-//       justify-content: center;
-//       border-radius: 8px;
-//       border: none;
-//       background: rgba(255, 255, 255, 0.1);
-//       color: rgba(255, 255, 255, 0.8);
-//       cursor: pointer;
-//       transition: all 0.2s;
-//     }
-//     .icon-btn:hover, .external-link-btn:hover {
-//       background: rgba(255, 255, 255, 0.3);
-//       color: #ffffff;
-//     }
-//     .icon-btn.active {
-//       background: rgba(34, 197, 94, 0.4);
-//       color: #ffffff;
-//     }
-//     .icon-btn.danger:hover {
-//       background: rgba(239, 68, 68, 0.4);
-//       color: #ffffff;
-//     }
-
-//     .meta-info {
-//       font-size: 10px;
-//       color: rgba(255, 255, 255, 0.4);
-//       text-align: right;
-//       margin-top: -4px;
-//     }
-
-//     /* ===== MODAL (Standard, not glass) ===== */
-//     .modal-backdrop {
-//       position: fixed;
-//       inset: 0;
-//       background: rgba(0, 0, 0, 0.7);
-//       backdrop-filter: blur(8px);
-//       z-index: var(--z-modal-backdrop);
-//       display: flex;
-//       align-items: center;
-//       justify-content: center;
-//       padding: var(--spacing-2xl);
-//     }
-//     .modal-card {
-//       background: #ffffff; /* Modal remains clean white */
-//       width: 100%;
-//       max-width: 450px;
-//       border-radius: var(--radius-2xl);
-//       padding: var(--spacing-3xl);
-//       box-shadow: var(--shadow-2xl);
-//       animation: scaleIn 0.2s ease-out;
-//     }
-//     /* Modal styles remain similar to previous iteration for readability */
-//     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-//     .modal-title { font-size: 1.25rem; font-weight: bold; color: #0f172a; }
-//     .close-btn { background: #f1f5f9; border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #64748b; }
-//     .form-group { margin-bottom: 16px; }
-//     .label { display: block; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; color: #64748b; margin-bottom: 6px; }
-//     .input { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; }
-//     .input:focus { border-color: #0f172a; ring: 2px solid rgba(15,23,42,0.1); }
-//     .slug-input-wrapper { position: relative; }
-//     .slug-prefix { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
-//     .slug-input { padding-left: 24px; }
-//     .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
-//     .btn-text { background: none; border: none; color: #64748b; font-weight: 600; cursor: pointer; }
-
-//     @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-//   `]
-// })
-// export class PageListComponent implements OnInit {
-//   private adminService = inject(StorefrontAdminService);
-//   private fb = inject(FormBuilder);
-//   private router = inject(Router);
-
-//   pages = signal<any[]>([]);
-//   isLoading = signal(true);
-//   isSubmitting = signal(false);
-//   showCreateModal = signal(false);
-//   currentOrgSlug = 'shivam';
-
-//   createForm = this.fb.group({
-//     name: ['', Validators.required],
-//     slug: ['', [Validators.required, Validators.pattern(/^[a-z0-9-]+$/)]]
-//   });
-
-//   ngOnInit() {
-//     this.loadPages();
-//     this.createForm.get('name')?.valueChanges.subscribe(name => {
-//       if (name && !this.createForm.get('slug')?.dirty) {
-//         this.createForm.get('slug')?.setValue(
-//           name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
-//         );
-//       }
-//     });
-//   }
-
-//   loadPages() {
-//     this.isLoading.set(true);
-//     this.adminService.getPages().subscribe({
-//       next: (res: any) => {
-//         // FIX: Map res.data to pages signal because backend returns { results: number, data: any[] }
-//         this.pages.set(res.data || []);
-//         this.isLoading.set(false);
-//       },
-//       error: () => this.isLoading.set(false)
-//     });
-//   }
-
-//   openCreateModal() { this.showCreateModal.set(true); }
-//   closeCreateModal() {
-//     this.showCreateModal.set(false);
-//     this.createForm.reset();
-//   }
-
-//   createPage() {
-//     if (!this.createForm.valid) return;
-//     this.isSubmitting.set(true);
-//     this.adminService.createPage(this.createForm.getRawValue() as CreatePageDto).subscribe({
-//       next: () => {
-//         this.closeCreateModal();
-//         this.loadPages();
-//         this.isSubmitting.set(false);
-//       },
-//       error: () => this.isSubmitting.set(false)
-//     });
-//   }
-
-//   viewLive(slug: string) {
-//     window.open(`/store/${this.currentOrgSlug}/${slug}`, '_blank', 'noopener');
-//   }
-
-//   togglePublish(page: any) {
-//     const action = page.isPublished ? 'unpublish' : 'publish';
-//     if (!confirm(`Are you sure you want to ${action} "${page.name}"?`)) return;
-
-//     const request$ = page.isPublished
-//       ? this.adminService.unpublishPage(page._id)
-//       : this.adminService.publishPage(page._id);
-
-//     request$.subscribe({
-//       next: () => {
-//         this.pages.update(currentPages =>
-//           currentPages.map(p =>
-//             p._id === page._id ? { ...p, isPublished: !page.isPublished } : p
-//           )
-//         );
-//       },
-//       error: () => alert(`Failed to ${action} page.`)
-//     });
-//   }
-
-//   deletePage(id: string) {
-//     if (!confirm('Are you sure you want to delete this page permanently?')) return;
-//     this.adminService.deletePage(id).subscribe({
-//       next: () => this.pages.update(currentPages => currentPages.filter(p => p._id !== id)),
-//       error: () => alert('Failed to delete page.')
-//     });
-//   }
-// }

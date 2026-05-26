@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, finalize, map, of, tap } from 'rxjs';
-import { StorefrontApiError, StorefrontCustomer, StorefrontDashboard, StorefrontLoginDto, StorefrontRegisterDto } from '@apx/storefront-contracts';
+import { ForgotPasswordDto, ResetPasswordDto, StorefrontApiError, StorefrontCustomer, StorefrontDashboard, StorefrontLoginDto, StorefrontRegisterDto } from '@apx/storefront-contracts';
 import { StorefrontAuthApi } from '../api/storefront-auth.api';
 import { StorefrontAuthStore } from '../state/storefront-auth.store';
 import { StorefrontCartFacade } from './storefront-cart.facade';
@@ -61,6 +61,30 @@ export class StorefrontAuthFacade {
         this.store.clear();
         return of(true);
       })
+    );
+  }
+
+  forgotPassword(orgSlug: string, dto: ForgotPasswordDto): Observable<boolean> {
+    this.store.loading.set(true);
+    return this.api.forgotPassword(orgSlug, dto).pipe(
+      map(() => true),
+      catchError(error => {
+        this.store.error.set(error as StorefrontApiError);
+        return of(false);
+      }),
+      finalize(() => this.store.loading.set(false))
+    );
+  }
+
+  resetPassword(orgSlug: string, dto: ResetPasswordDto): Observable<boolean> {
+    this.store.loading.set(true);
+    return this.api.resetPassword(orgSlug, dto).pipe(
+      map(() => true),
+      catchError(error => {
+        this.store.error.set(error as StorefrontApiError);
+        return of(false);
+      }),
+      finalize(() => this.store.loading.set(false))
     );
   }
 
