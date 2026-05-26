@@ -13,47 +13,102 @@
       </div>
     </header>
 
-    <div class="premium-grid-container">
-      @if (error()) {
-        <div class="error-state">
-          <i class="pi pi-exclamation-triangle"></i>
-          <p>{{ error() }}</p>
-          <button class="premium-btn" (click)="load()">Try Again</button>
-        </div>
-      } @else {
-        <app-shared-grid 
-          [columns]="columns" 
-          [data]="orders()" 
-          selectionMode="single"
-          [showActions]="false"
-          (gridEvent)="onGridEvent($event)">
-        </app-shared-grid>
-      }
+    <div class="premium-table-wrapper">
+      <div *ngIf="error()" class="error-state">
+        <i class="pi pi-exclamation-triangle"></i>
+        <p>{{ error() }}</p>
+        <button class="premium-btn" (click)="load()">Try Again</button>
+      </div>
+      <ng-container *ngIf="!error()">
+        <p-table [value]="orders()" selectionMode="single" dataKey="_id" [selection]="selectedOrder()"
+          (onRowSelect)="onRowSelect($event)" (onRowUnselect)="onRowUnselect()" styleClass="p-datatable-glassmorphic"
+          [paginator]="true" [rows]="10" [showCurrentPageReport]="true"
+          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} orders">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Order #</th>
+              <th>Customer</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Payment</th>
+              <th>Total</th>
+              <th class="text-right">Actions</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-order>
+            <tr [pSelectableRow]="order">
+              <td><strong>{{ order.orderNumber }}</strong></td>
+              <td>{{ order.customerName }}</td>
+              <td>{{ order.createdAt | date:'mediumDate' }}</td>
+              <td>
+                <p-tag [value]="order.orderStatus | uppercase" [severity]="getOrderSeverity(order.orderStatus)"></p-tag>
+              </td>
+              <td>
+                <p-tag [value]="order.paymentStatus | uppercase"
+                  [severity]="getPaymentSeverity(order.paymentStatus)"></p-tag>
+              </td>
+              <td><strong>{{ order.totals?.grandTotal | currency:'INR' }}</strong></td>
+              <td class="text-right quick-actions">
+                <button *ngIf="order.orderStatus === 'placed' || order.orderStatus === 'draft'"
+                  class="action-btn accept-btn" pTooltip="Confirm Order" tooltipPosition="left"
+                  (click)="acceptOrder(order, $event)">
+                  <i class="pi pi-check"></i>
+                </button>
+                <button
+                  *ngIf="order.orderStatus === 'placed' || order.orderStatus === 'confirmed' || order.orderStatus === 'processing'"
+                  class="action-btn cancel-btn" pTooltip="Cancel Order" tooltipPosition="left"
+                  (click)="cancelOrder(order, $event)">
+                  <i class="pi pi-times"></i>
+                </button>
+                <button class="action-btn view-btn" pTooltip="Manage Details" tooltipPosition="left"
+                  (click)="openOrder(order)">
+                  <i class="pi pi-angle-right"></i>
+                </button>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="empty">
+            <tr>
+              <td colspan="7" class="text-center p-4">No orders found.</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </ng-container>
     </div>
   </section>
 
-  <!-- Slide-in Detail Panel -->
-  <aside class="detail-panel" *ngIf="selectedOrder() as order">
-    <header class="panel-header">
-      <div class="title-group">
-        <h2>{{ order.orderNumber || 'Order Details' }}</h2>
-        <span class="date">{{ order.createdAt | date:'medium' }}</span>
+  <!-- Slide-in Detail Panel using PrimeNG Sidebar -->
+  <p-drawer [(visible)]="sidebarVisible" position="right" [style]="{width: '45vw', 'min-width': '500px'}"
+    styleClass="premium-sidebar-panel" (onHide)="closePanel()" [showCloseIcon]="false">
+    <ng-template pTemplate="header">
+      <div class="panel-header" style="width: 100%; display: flex; justify-content: space-between; align-items: center;"
+        *ngIf="selectedOrder() as order">
+        <div class="title-group">
+          <h2 style="margin: 0; font-family: var(--font-heading); font-size: 22px; color: var(--text-primary);">{{
+            order.orderNumber || 'Order Details' }}</h2>
+          <span class="date" style="font-size: 14px; color: var(--text-tertiary);">{{ order.createdAt | date:'medium'
+            }}</span>
+        </div>
+        <button class="close-btn" (click)="closePanel()"
+          style="background: transparent; border: none; color: var(--text-secondary); cursor: pointer; padding: 8px; border-radius: 8px;">
+          <i class="pi pi-times" style="font-size: 1.2rem;"></i>
+        </button>
       </div>
-      <button class="close-btn" (click)="closePanel()">
-        <i class="pi pi-times"></i>
-      </button>
-    </header>
+    </ng-template>
 
-    <div class="panel-scroll">
+    <div class="panel-scroll" *ngIf="selectedOrder() as order" style="padding-top: 10px;">
       <!-- Customer Info -->
       <section class="detail-section">
-        <h3>Customer</h3>
+        <h3>Customer Details</h3>
         <div class="customer-card" *ngIf="order.customerId; else guest">
-          <div class="avatar">{{ order.customerId.firstName[0] }}{{ order.customerId.lastName[0] }}</div>
+          <div class="avatar">{{ order.customerId.firstName[0] | uppercase }}{{ order.customerId.lastName[0] | uppercase
+            }}</div>
           <div class="info">
             <strong>{{ order.customerId.firstName }} {{ order.customerId.lastName }}</strong>
-            <span>{{ order.customerId.email }}</span>
-            <span *ngIf="order.customerId.phone">{{ order.customerId.phone }}</span>
+            <span><i class="pi pi-envelope" style="font-size: 0.8rem; margin-right: 4px;"></i> {{ order.customerId.email
+              }}</span>
+            <span *ngIf="order.customerId.phone"><i class="pi pi-phone"
+                style="font-size: 0.8rem; margin-right: 4px;"></i> {{ order.customerId.phone }}</span>
           </div>
         </div>
         <ng-template #guest>
@@ -61,90 +116,163 @@
             <div class="avatar"><i class="pi pi-user"></i></div>
             <div class="info">
               <strong>Guest Customer</strong>
+              <span>No account details provided.</span>
             </div>
           </div>
         </ng-template>
       </section>
 
+      <!-- Addresses -->
+      <section class="detail-section row" style="gap: 20px; display: flex;">
+        <div class="address-card" style="flex: 1;" *ngIf="order.shippingAddress">
+          <h3>Shipping Address</h3>
+          <div class="card-content">
+            <strong>{{ order.shippingAddress.fullName }}</strong>
+            <p>{{ order.shippingAddress.addressLine1 }}</p>
+            <p *ngIf="order.shippingAddress.addressLine2">{{ order.shippingAddress.addressLine2 }}</p>
+            <p>{{ order.shippingAddress.city }}, {{ order.shippingAddress.state }} {{ order.shippingAddress.postalCode
+              }}</p>
+            <p>{{ order.shippingAddress.country }}</p>
+            <p style="margin-top: 12px; color: var(--text-primary);"><i class="pi pi-phone"></i> {{
+              order.shippingAddress.phone }}</p>
+          </div>
+        </div>
+
+        <div class="address-card" style="flex: 1;" *ngIf="order.billingAddress">
+          <h3>Billing Address</h3>
+          <div class="card-content">
+            <strong>{{ order.billingAddress.fullName }}</strong>
+            <p>{{ order.billingAddress.addressLine1 }}</p>
+            <p *ngIf="order.billingAddress.addressLine2">{{ order.billingAddress.addressLine2 }}</p>
+            <p>{{ order.billingAddress.city }}, {{ order.billingAddress.state }} {{ order.billingAddress.postalCode }}
+            </p>
+            <p>{{ order.billingAddress.country }}</p>
+            <p style="margin-top: 12px; color: var(--text-primary);"><i class="pi pi-phone"></i> {{
+              order.billingAddress.phone }}</p>
+          </div>
+        </div>
+      </section>
+
       <!-- Status Badges -->
-      <section class="detail-section row">
-        <div class="status-block">
-          <span class="label">Payment Status</span>
+      <section class="detail-section row" style="display: flex; gap: 16px; margin-top: 8px;">
+        <div class="status-block"
+          style="flex: 1; background: var(--bg-primary); padding: 16px; border-radius: 12px; border: 1px solid var(--border-primary);">
+          <span class="label"
+            style="display: block; margin-bottom: 8px; font-size: 12px; text-transform: uppercase; color: var(--text-tertiary);">Payment
+            Status</span>
           <span class="badge" [attr.data-status]="order.paymentStatus">{{ order.paymentStatus | titlecase }}</span>
         </div>
-        <div class="status-block">
-          <span class="label">Fulfillment</span>
-          <span class="badge" [attr.data-status]="order.fulfillmentStatus || 'unfulfilled'">{{ (order.fulfillmentStatus || 'unfulfilled') | titlecase }}</span>
+        <div class="status-block"
+          style="flex: 1; background: var(--bg-primary); padding: 16px; border-radius: 12px; border: 1px solid var(--border-primary);">
+          <span class="label"
+            style="display: block; margin-bottom: 8px; font-size: 12px; text-transform: uppercase; color: var(--text-tertiary);">Fulfillment</span>
+          <span class="badge" [attr.data-status]="order.fulfillmentStatus || 'unfulfilled'">{{ (order.fulfillmentStatus
+            || 'unfulfilled') | titlecase }}</span>
         </div>
-        <div class="status-block">
-          <span class="label">Order Status</span>
+        <div class="status-block"
+          style="flex: 1; background: var(--bg-primary); padding: 16px; border-radius: 12px; border: 1px solid var(--border-primary);">
+          <span class="label"
+            style="display: block; margin-bottom: 8px; font-size: 12px; text-transform: uppercase; color: var(--text-tertiary);">Order
+            Status</span>
           <span class="badge" [attr.data-status]="order.orderStatus">{{ order.orderStatus | titlecase }}</span>
+        </div>
+      </section>
+
+      <!-- Status Actions -->
+      <section class="detail-section actions-section">
+        <h3>Quick Actions</h3>
+        <div class="action-buttons" style="display: flex; gap: 12px; margin-top: 8px;">
+          <button class="premium-btn primary-btn"
+            *ngIf="order.orderStatus === 'placed' || order.orderStatus === 'draft'"
+            (click)="updateStatus('orderStatus', 'confirmed')"
+            style="flex: 1; background: var(--theme-success, #22c55e); border-color: var(--theme-success, #22c55e); justify-content: center;">
+            <i class="pi pi-check"></i> Accept Order
+          </button>
+          <button class="premium-btn primary-btn"
+            *ngIf="order.fulfillmentStatus !== 'delivered' && order.orderStatus !== 'cancelled'"
+            (click)="updateStatus('fulfillmentStatus', 'delivered')" style="flex: 1; justify-content: center;">
+            <i class="pi pi-box"></i> Mark Delivered
+          </button>
+          <button class="premium-btn ghost-btn" *ngIf="order.orderStatus !== 'cancelled'"
+            (click)="updateStatus('orderStatus', 'cancelled')"
+            style="flex: 1; color: #ef4444; border-color: #ef4444; justify-content: center;">
+            <i class="pi pi-times"></i> Cancel Order
+          </button>
         </div>
       </section>
 
       <!-- Delivery Assignment -->
       <section class="detail-section delivery-section">
         <h3>Delivery Assignment</h3>
-        <div class="delivery-form">
-          <div class="form-group">
-            <label>Internal Delivery Agent</label>
-            <select [(ngModel)]="deliveryAssignment.deliveryAgent" class="premium-input">
+        <div class="delivery-form"
+          style="background: var(--bg-primary); padding: 20px; border-radius: 12px; border: 1px solid var(--border-primary);">
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Internal Delivery
+              Agent</label>
+            <select [(ngModel)]="deliveryAssignment.deliveryAgent" class="premium-input"
+              style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-primary); background: var(--bg-secondary);">
               <option [ngValue]="null">-- Select Agent --</option>
-              <option *ngFor="let agent of availableAgents()" [ngValue]="agent._id">{{ agent.name }} ({{ agent.phone }})</option>
+              <option *ngFor="let agent of availableAgents()" [ngValue]="agent._id">{{ agent.name }} ({{ agent.phone }})
+              </option>
             </select>
           </div>
-          
-          <div class="divider-text"><span>OR EXTERNAL CARRIER</span></div>
-          
-          <div class="form-group">
-            <label>Carrier Name</label>
-            <input type="text" [(ngModel)]="deliveryAssignment.carrierName" class="premium-input" placeholder="e.g. Delhivery, DTDC">
-          </div>
-          
-          <div class="form-group">
-            <label>Tracking Number</label>
-            <input type="text" [(ngModel)]="deliveryAssignment.trackingNumber" class="premium-input" placeholder="Enter tracking number">
-          </div>
-          
-          <div class="form-group">
-            <label>Estimated Delivery</label>
-            <input type="date" [(ngModel)]="deliveryAssignment.estimatedDeliveryDate" class="premium-input">
-          </div>
-          
-          <div class="form-group">
-            <label>Internal Notes</label>
-            <textarea [(ngModel)]="deliveryAssignment.deliveryNotes" class="premium-input" placeholder="Any notes for delivery..."></textarea>
-          </div>
-          
-          <button class="premium-btn primary-btn" style="width: 100%; margin-top: 10px;" 
-                  (click)="assignDelivery()" 
-                  [disabled]="!deliveryAssignment.deliveryAgent && !deliveryAssignment.carrierName">
-            Save Delivery Details
-          </button>
-        </div>
-      </section>
 
-      <!-- Status Actions -->
-      <section class="detail-section actions-section">
-        <h3>Update Status</h3>
-        <div class="action-buttons" style="display: flex; gap: 10px; margin-top: 10px;">
-          <button class="premium-btn primary-btn" *ngIf="order.fulfillmentStatus !== 'delivered' && order.orderStatus !== 'cancelled'" (click)="updateStatus('fulfillmentStatus', 'delivered')">
-            Mark as Delivered
-          </button>
-          <button class="premium-btn ghost-btn" *ngIf="order.orderStatus !== 'cancelled'" (click)="updateStatus('orderStatus', 'cancelled')" style="color: #ef4444; border-color: #ef4444;">
-            Cancel Order
+          <div class="divider-text" style="display: flex; align-items: center; text-align: center; margin: 20px 0;">
+            <hr style="flex: 1; border: none; border-top: 1px solid var(--border-primary);">
+            <span
+              style="padding: 0 10px; color: var(--text-tertiary); font-size: 12px; font-weight: 600; letter-spacing: 0.05em;">OR
+              EXTERNAL CARRIER</span>
+            <hr style="flex: 1; border: none; border-top: 1px solid var(--border-primary);">
+          </div>
+
+          <div style="display: flex; gap: 16px; margin-bottom: 16px;">
+            <div class="form-group" style="flex: 1;">
+              <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Carrier Name</label>
+              <input type="text" [(ngModel)]="deliveryAssignment.carrierName" class="premium-input"
+                placeholder="e.g. Delhivery, DTDC"
+                style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-primary); background: var(--bg-secondary);">
+            </div>
+            <div class="form-group" style="flex: 1;">
+              <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Tracking
+                Number</label>
+              <input type="text" [(ngModel)]="deliveryAssignment.trackingNumber" class="premium-input"
+                placeholder="Enter tracking number"
+                style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-primary); background: var(--bg-secondary);">
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Estimated
+              Delivery</label>
+            <input type="date" [(ngModel)]="deliveryAssignment.estimatedDeliveryDate" class="premium-input"
+              style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-primary); background: var(--bg-secondary);">
+          </div>
+
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Internal Notes</label>
+            <textarea [(ngModel)]="deliveryAssignment.deliveryNotes" class="premium-input"
+              placeholder="Any notes for delivery..."
+              style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-primary); background: var(--bg-secondary); min-height: 80px;"></textarea>
+          </div>
+
+          <button class="premium-btn primary-btn"
+            style="width: 100%; justify-content: center; padding: 12px; font-size: 15px;" (click)="assignDelivery()"
+            [disabled]="!deliveryAssignment.deliveryAgent && !deliveryAssignment.carrierName">
+            Save Delivery Details
           </button>
         </div>
       </section>
 
       <!-- Order Items -->
       <section class="detail-section">
-        <h3>Items</h3>
+        <h3>Order Items</h3>
         <div class="item-list">
           <div class="order-item" *ngFor="let item of order.items">
             <div class="item-image">
               <img *ngIf="item.snapshot?.image; else noImg" [src]="item.snapshot.image" alt="Product Image">
-              <ng-template #noImg><div class="img-placeholder"><i class="pi pi-image"></i></div></ng-template>
+              <ng-template #noImg>
+                <div class="img-placeholder"><i class="pi pi-image"></i></div>
+              </ng-template>
             </div>
             <div class="item-details">
               <strong>{{ item.snapshot?.name }}</strong>
@@ -178,5 +306,5 @@
         </div>
       </section>
     </div>
-  </aside>
+  </p-drawer>
 </main>

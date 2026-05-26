@@ -3,13 +3,16 @@ import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@ang
 import { FormsModule } from '@angular/forms';
 import { StorefrontAdminService } from '@core/services/storefront-admin.service';
 import { catchError, of } from 'rxjs';
-import { AppSharedGrid } from '../../../shared/AgGrid/grid/app-shared-grid/app-shared-grid';
-import { GridColDef } from '../../../shared/AgGrid/grid/grid.types';
+import { TableModule } from 'primeng/table';
+import { TagModule } from 'primeng/tag';
+import { TooltipModule } from 'primeng/tooltip';
+import { DrawerModule } from 'primeng/drawer';
+import { SplitterModule } from 'primeng/splitter';
 
 @Component({
   selector: 'app-storefront-orders',
   standalone: true,
-  imports: [CommonModule, AppSharedGrid, CurrencyPipe, DatePipe, FormsModule],
+  imports: [CommonModule, TableModule, TagModule, TooltipModule, DrawerModule, SplitterModule, CurrencyPipe, DatePipe, FormsModule],
   templateUrl: './storefront-orders.component.html',
   styleUrls: ['./storefront-orders.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -21,9 +24,10 @@ export class StorefrontOrdersComponent implements OnInit {
   readonly error = signal<string | null>(null);
   readonly orders = signal<any[]>([]);
   readonly selectedOrder = signal<any | null>(null);
-  
+  readonly sidebarVisible = signal(false);
+
   readonly availableAgents = signal<any[]>([]);
-  
+
   deliveryAssignment = {
     deliveryAgent: null as string | null,
     carrierName: '',
@@ -32,55 +36,14 @@ export class StorefrontOrdersComponent implements OnInit {
     deliveryNotes: ''
   };
 
-  readonly columns: GridColDef[] = [
-    {
-      headerName: 'Order',
-      field: 'orderNumber',
-      flex: 1,
-      minWidth: 150,
-      cellConfig: { type: 'text' }
-    },
-    {
-      headerName: 'Customer',
-      field: 'customerId.firstName',
-      flex: 1.5,
-      minWidth: 200,
-      cellConfig: { type: 'text' }
-    },
-    {
-      headerName: 'Date',
-      field: 'createdAt',
-      flex: 1,
-      minWidth: 150,
-      cellConfig: { type: 'datetime' }
-    },
-    {
-      headerName: 'Payment',
-      field: 'paymentStatus',
-      flex: 1,
-      minWidth: 120,
-      cellConfig: {
-        type: 'badge',
-        badgeMap: { paid: 'success', pending: 'warning', failed: 'danger' }
-      }
-    },
-    {
-      headerName: 'Fulfillment',
-      field: 'orderStatus',
-      flex: 1,
-      minWidth: 140,
-      cellConfig: {
-        type: 'badge',
-        badgeMap: { fulfilled: 'success', unfulfilled: 'warning', cancelled: 'danger' }
-      }
-    },
-    {
-      headerName: 'Total',
-      field: 'totals.grandTotal',
-      flex: 1,
-      minWidth: 120,
-      cellConfig: { type: 'currency', currencyCode: 'INR' }
-    }
+  // PrimeNG table columns (informational)
+  readonly cols = [
+    { field: 'orderNumber', header: 'Order' },
+    { field: 'customer', header: 'Customer' },
+    { field: 'createdAt', header: 'Date' },
+    { field: 'paymentStatus', header: 'Payment' },
+    { field: 'orderStatus', header: 'Status' },
+    { field: 'total', header: 'Total' }
   ];
 
   ngOnInit(): void {
@@ -100,7 +63,7 @@ export class StorefrontOrdersComponent implements OnInit {
       // Map nested customer data for grid display
       const mapped = (res?.data ?? []).map((o: any) => ({
         ...o,
-        'customerId.firstName': o.customerId ? `${o.customerId.firstName} ${o.customerId.lastName}` : 'Guest'
+        customerName: o.customerId ? `${o.customerId.firstName} ${o.customerId.lastName}` : 'Guest'
       }));
       this.orders.set(mapped);
       this.loading.set(false);
@@ -114,19 +77,62 @@ export class StorefrontOrdersComponent implements OnInit {
     });
   }
 
-  onGridEvent(event: any): void {
-    if (event.type === 'selectionChanged') {
-      const selected = event.rows[0];
-      if (selected) {
-        this.openOrder(selected);
-      } else {
-        this.selectedOrder.set(null);
-      }
+  onRowSelect(event: any): void {
+    this.openOrder(event.data);
+  }
+
+  onRowUnselect(): void {
+    this.sidebarVisible.set(false);
+  }
+
+  getPaymentSeverity(status: string): 'success' | 'warn' | 'danger' | 'info' {
+    switch (status) {
+      case 'paid': return 'success';
+      case 'pending': return 'warn';
+      case 'failed': return 'danger';
+      default: return 'info';
     }
+  }
+
+  getOrderSeverity(status: string): 'success' | 'warn' | 'danger' | 'info' {
+    switch (status) {
+      case 'closed': case 'confirmed': return 'success';
+      case 'placed': case 'processing': return 'warn';
+      case 'cancelled': return 'danger';
+      default: return 'info';
+    }
+  }
+
+  getFulfillmentSeverity(status: string): 'success' | 'warn' | 'danger' | 'info' {
+    switch (status) {
+      case 'fulfilled': case 'shipped': case 'delivered': return 'success';
+      case 'partial': return 'info';
+      case 'unfulfilled': return 'warn';
+      default: return 'info';
+    }
+  }
+
+  acceptOrder(order: any, event: Event): void {
+    event.stopPropagation();
+    this.loading.set(true);
+    this.adminService.updateOrderStatus(order._id, { orderStatus: 'confirmed' }).subscribe({
+      next: () => this.load(),
+      error: () => this.loading.set(false)
+    });
+  }
+
+  cancelOrder(order: any, event: Event): void {
+    event.stopPropagation();
+    this.loading.set(true);
+    this.adminService.updateOrderStatus(order._id, { orderStatus: 'cancelled' }).subscribe({
+      next: () => this.load(),
+      error: () => this.loading.set(false)
+    });
   }
 
   openOrder(order: any): void {
     this.selectedOrder.set(order);
+    this.sidebarVisible.set(true);
     this.deliveryAssignment = {
       deliveryAgent: order.deliveryAgent || null,
       carrierName: order.carrierName || '',
@@ -139,7 +145,7 @@ export class StorefrontOrdersComponent implements OnInit {
   updateStatus(field: 'orderStatus' | 'fulfillmentStatus' | 'paymentStatus', value: string): void {
     const order = this.selectedOrder();
     if (!order) return;
-    
+
     this.loading.set(true);
     this.adminService.updateOrderStatus(order._id, { [field]: value }).subscribe({
       next: (res) => {
@@ -159,7 +165,7 @@ export class StorefrontOrdersComponent implements OnInit {
   assignDelivery(): void {
     const order = this.selectedOrder();
     if (!order) return;
-    
+
     this.loading.set(true);
     this.adminService.assignDeliveryAgent(order._id, this.deliveryAssignment).subscribe({
       next: (res) => {
@@ -175,6 +181,6 @@ export class StorefrontOrdersComponent implements OnInit {
   }
 
   closePanel(): void {
-    this.selectedOrder.set(null);
+    this.sidebarVisible.set(false);
   }
 }
