@@ -290,6 +290,7 @@ export const SIDEBAR_MENU: MenuItem[] = [
       { label: 'Command Center', icon: 'pi pi-home', routerLink: ['/storefront/overview'], permissions: [PERMISSIONS.STOREFRONT.READ] },
       { label: 'Page Builder', icon: 'pi pi-sitemap', routerLink: ['/storefront/pages'], permissions: [PERMISSIONS.STOREFRONT.READ] },
       { label: 'Orders', icon: 'pi pi-receipt', routerLink: ['/storefront/orders'], permissions: [PERMISSIONS.STOREFRONT.READ] },
+      { label: 'Delivery Agents', icon: 'pi pi-truck', routerLink: ['/storefront/delivery-agents'], permissions: [PERMISSIONS.STOREFRONT.READ] },
       { label: 'Customers', icon: 'pi pi-users', routerLink: ['/storefront/customers'], permissions: [PERMISSIONS.STOREFRONT.READ] },
       { label: 'Coupons', icon: 'pi pi-ticket', routerLink: ['/storefront/coupons'], permissions: [PERMISSIONS.STOREFRONT.READ] },
       {

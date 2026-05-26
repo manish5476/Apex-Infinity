@@ -1,0 +1,170 @@
+<main class="page-container glass-container">
+  <!-- Header -->
+  <header class="page-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1>Internal Delivery Agents</h1>
+        <p class="subtitle">Manage your internal fleet for storefront deliveries</p>
+      </div>
+      <div class="actions">
+        <button class="premium-btn primary" (click)="openNew()">
+          <i class="fi fi-rr-plus"></i> Add Agent
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Error / Loading -->
+  <div *ngIf="error()" class="alert error">
+    <i class="fi fi-rr-exclamation"></i>
+    <span>{{ error() }}</span>
+  </div>
+
+  <!-- Main Content -->
+  <section class="content-section">
+    <div class="premium-table-container">
+      <p-table 
+        [value]="agents()" 
+        [columns]="cols" 
+        [loading]="loading()" 
+        [paginator]="true" 
+        [rows]="20"
+        styleClass="premium-table"
+        [rowHover]="true">
+        
+        <ng-template pTemplate="header" let-columns>
+          <tr>
+            <th *ngFor="let col of columns">{{ col.header }}</th>
+            <th style="width: 100px; text-align: center;">Actions</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-agent let-columns="columns">
+          <tr>
+            <td>
+              <div class="agent-name-cell">
+                <div class="avatar-circle">
+                  {{ agent.name.charAt(0).toUpperCase() }}
+                </div>
+                <div class="agent-info">
+                  <span class="name">{{ agent.name }}</span>
+                  <span class="email" *ngIf="agent.email">{{ agent.email }}</span>
+                </div>
+              </div>
+            </td>
+            <td>{{ agent.phone }}</td>
+            <td style="text-transform: capitalize;">{{ agent.vehicleType || 'N/A' }}</td>
+            <td>
+              <span class="mono-text" *ngIf="agent.vehicleRegistrationNumber">{{ agent.vehicleRegistrationNumber }}</span>
+              <span class="empty-text" *ngIf="!agent.vehicleRegistrationNumber">—</span>
+            </td>
+            <td>
+              <p-tag [value]="agent.isActive ? 'Active' : 'Inactive'" [severity]="getStatusSeverity(agent.isActive)"></p-tag>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button class="icon-btn edit-btn" pTooltip="Edit Agent" tooltipPosition="left" (click)="openEdit(agent)">
+                  <i class="fi fi-rr-edit"></i>
+                </button>
+                <button class="icon-btn delete-btn" pTooltip="Delete Agent" tooltipPosition="left" (click)="deleteAgent(agent, $event)">
+                  <i class="fi fi-rr-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="empty">
+          <tr>
+            <td colspan="6" class="empty-state">
+              <div class="empty-content">
+                <i class="fi fi-rr-truck-side"></i>
+                <h3>No Delivery Agents Found</h3>
+                <p>Add an internal delivery agent to assign them to orders.</p>
+                <button class="premium-btn primary" (click)="openNew()">
+                  <i class="fi fi-rr-plus"></i> Add Your First Agent
+                </button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </section>
+
+  <!-- Drawer for Add/Edit -->
+  <p-drawer [visible]="drawerVisible()" (visibleChange)="drawerVisible.set($event)" position="right" [style]="{width: '400px'}" styleClass="premium-sidebar-panel" (onHide)="closeDrawer()" [showCloseIcon]="false">
+    <ng-template pTemplate="header">
+      <div class="panel-header" style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+        <div class="title-group">
+          <h2>{{ selectedAgent() ? 'Edit Delivery Agent' : 'Add Delivery Agent' }}</h2>
+          <p class="subtitle">{{ selectedAgent() ? 'Update agent details' : 'Create a new internal agent' }}</p>
+        </div>
+        <button class="icon-btn close-btn" (click)="closeDrawer()">
+          <i class="fi fi-rr-cross"></i>
+        </button>
+      </div>
+    </ng-template>
+
+    <div class="drawer-content-scroll" style="padding: 24px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; flex: 1;">
+      
+      <div class="form-group">
+        <label>Full Name <span class="required">*</span></label>
+        <input type="text" [(ngModel)]="formAgent.name" class="premium-input" placeholder="e.g. John Doe" />
+      </div>
+
+      <div class="form-group">
+        <label>Phone Number <span class="required">*</span></label>
+        <input type="text" [(ngModel)]="formAgent.phone" class="premium-input" placeholder="+1 234 567 8900" />
+      </div>
+
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" [(ngModel)]="formAgent.email" class="premium-input" placeholder="john@example.com" />
+      </div>
+
+      <div class="form-group">
+        <label>Password <span class="required" *ngIf="!selectedAgent()">*</span></label>
+        <input type="password" [(ngModel)]="formAgent.password" class="premium-input" placeholder="Enter password..." />
+        <small style="color: var(--text-muted); margin-top: 4px; display: block;" *ngIf="selectedAgent()">Leave blank to keep current password.</small>
+      </div>
+
+      <div class="form-group">
+        <label>Vehicle Type</label>
+        <select [(ngModel)]="formAgent.vehicleType" class="premium-input">
+          <option value="bike">Bike</option>
+          <option value="motorcycle">Motorcycle</option>
+          <option value="van">Van</option>
+          <option value="truck">Truck</option>
+          <option value="car">Car</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Vehicle Registration (Plate #)</label>
+        <input type="text" [(ngModel)]="formAgent.vehicleRegistrationNumber" class="premium-input" placeholder="XYZ 1234" />
+      </div>
+
+      <div class="form-group toggle-group" style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: rgba(0,0,0,0.02); border-radius: 8px; border: 1px solid var(--border-primary);">
+        <div>
+          <label style="margin: 0; display: block; font-weight: 500;">Active Status</label>
+          <small style="color: var(--text-muted);">Can be assigned to orders</small>
+        </div>
+        <label class="switch">
+          <input type="checkbox" [(ngModel)]="formAgent.isActive">
+          <span class="slider round"></span>
+        </label>
+      </div>
+
+    </div>
+
+    <ng-template pTemplate="footer">
+      <div class="panel-footer" style="padding: 16px 24px; border-top: 1px solid var(--border-primary); display: flex; justify-content: flex-end; gap: 12px;">
+        <button class="premium-btn secondary" (click)="closeDrawer()">Cancel</button>
+        <button class="premium-btn primary" (click)="saveAgent()" [disabled]="loading()">
+          {{ loading() ? 'Saving...' : 'Save Agent' }}
+        </button>
+      </div>
+    </ng-template>
+  </p-drawer>
+</main>

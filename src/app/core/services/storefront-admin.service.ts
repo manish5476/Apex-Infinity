@@ -147,6 +147,22 @@ export class StorefrontAdminService extends BaseApiService {
     return this.get(`${this.base}/delivery-agents`, params ?? {});
   }
 
+  createDeliveryAgent(data: any): Observable<any> {
+    return this.post(`${this.base}/delivery-agents`, data);
+  }
+
+  getDeliveryAgentById(agentId: string): Observable<any> {
+    return this.get(`${this.base}/delivery-agents/${agentId}`);
+  }
+
+  updateDeliveryAgent(agentId: string, data: any): Observable<any> {
+    return this.put(`${this.base}/delivery-agents/${agentId}`, data);
+  }
+
+  deleteDeliveryAgent(agentId: string): Observable<any> {
+    return this.delete(`${this.base}/delivery-agents/${agentId}`);
+  }
+
   assignDeliveryAgent(orderId: string, data: any): Observable<any> {
     return this.patch(`${this.base}/orders/${orderId}/assign-agent`, data);
   }

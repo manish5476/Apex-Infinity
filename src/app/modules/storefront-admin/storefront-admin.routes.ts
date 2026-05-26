@@ -63,7 +63,16 @@ export const STOREFRONT_ADMIN_ROUTES: Routes = [
     canActivate: [permissionGuard],
     data: { permissions: [PERMISSIONS.STOREFRONT.READ] }
   },
-    {
+  {
+    path: 'delivery-agents',
+    loadComponent: () =>
+      import('./pages/storefront-delivery-agents/storefront-delivery-agents.component')
+        .then(m => m.StorefrontDeliveryAgentsComponent),
+    title: 'Storefront Delivery Agents',
+    canActivate: [permissionGuard],
+    data: { permissions: [PERMISSIONS.STOREFRONT.READ] }
+  },
+  {
     path: 'themes',
     loadComponent: () =>
       import('./pages/theme-marketplace/theme-marketplace.component').then(m => m.ThemeMarketplaceComponent),
