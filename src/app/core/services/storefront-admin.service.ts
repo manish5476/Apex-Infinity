@@ -165,6 +165,28 @@ export class StorefrontAdminService extends BaseApiService {
   convertStorefrontCustomerToCrm(customerId: string): Observable<any> {
     return this.post(`${this.base}/customers/${customerId}/convert-to-crm`, {});
   }
+
+  // ── Coupons ───────────────────────────────────────────────────────────────
+
+  getCoupons(params?: { search?: string; page?: number; limit?: number }): Observable<any> {
+    return this.get(`${this.base}/coupons`, params ?? {});
+  }
+
+  createCoupon(data: any): Observable<any> {
+    return this.post(`${this.base}/coupons`, data);
+  }
+
+  getCouponById(couponId: string): Observable<any> {
+    return this.get(`${this.base}/coupons/${couponId}`);
+  }
+
+  updateCoupon(couponId: string, data: any): Observable<any> {
+    return this.put(`${this.base}/coupons/${couponId}`, data);
+  }
+
+  deleteCoupon(couponId: string): Observable<any> {
+    return this.delete(`${this.base}/coupons/${couponId}`);
+  }
 }
 
 // import { Injectable, inject } from '@angular/core';

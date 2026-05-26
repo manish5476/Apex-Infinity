@@ -291,6 +291,7 @@ export const SIDEBAR_MENU: MenuItem[] = [
       { label: 'Page Builder', icon: 'pi pi-sitemap', routerLink: ['/storefront/pages'], permissions: [PERMISSIONS.STOREFRONT.READ] },
       { label: 'Orders', icon: 'pi pi-receipt', routerLink: ['/storefront/orders'], permissions: [PERMISSIONS.STOREFRONT.READ] },
       { label: 'Customers', icon: 'pi pi-users', routerLink: ['/storefront/customers'], permissions: [PERMISSIONS.STOREFRONT.READ] },
+      { label: 'Coupons', icon: 'pi pi-ticket', routerLink: ['/storefront/coupons'], permissions: [PERMISSIONS.STOREFRONT.READ] },
       {
         label: 'Design & Layout',
         icon: 'pi pi-palette',

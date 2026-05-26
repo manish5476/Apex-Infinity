@@ -178,7 +178,7 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
           <h2 style="margin: 0;">Delivery address</h2>
           @if (addresses().length > 0 && !showAddressForm()) {
-          <button type="button" class="secondary-action" (click)="showAddressForm.set(true)"
+          <button type="button" class="secondary-action" (click)="addNewAddress()"
             style="padding: 0 1rem; min-height: 2.2rem;">Add new</button>
           }
         </div>
@@ -187,11 +187,13 @@
         <div class="account-grid">
           @for (addr of addresses(); track addr._id || addr.id) {
           <article class="account-card selectable" [class.selected]="selectedAddressId() === (addr._id || addr.id)"
-            (click)="selectedAddressId.set(addr._id || addr.id)" style="min-height: auto; padding: 1rem;">
+            (click)="selectedAddressId.set(addr._id || addr.id)" style="min-height: auto; padding: 1rem 1rem 3rem; position: relative;">
             <i class="pi pi-check-circle" *ngIf="selectedAddressId() === (addr._id || addr.id)"
-              style="position: absolute; right: 1rem; color: var(--color-primary);"></i>
+              style="position: absolute; right: 1rem; top: 1rem; color: var(--color-primary);"></i>
             <strong>{{ addr.fullName }}</strong>
-            <p style="font-size: 0.9rem;">{{ addressLabel(addr) }}</p>
+            <p style="font-size: 0.9rem; margin-bottom: 0;">{{ addressLabel(addr) }}</p>
+            <button type="button" class="secondary-action" (click)="editAddress(addr); $event.stopPropagation()"
+              style="font-size: 0.75rem; padding: 0.25rem 0.75rem; min-height: auto; position: absolute; bottom: 0.75rem; right: 0.75rem;">Edit</button>
           </article>
           }
         </div>
@@ -212,17 +214,26 @@
           Save this address to storefront account</label>
         }
         @if (addresses().length > 0) {
-        <button type="button" class="secondary-action" (click)="showAddressForm.set(false)"
+        <button type="button" class="secondary-action" (click)="cancelEditAddress()"
           style="margin-top: 1rem;">Cancel</button>
         }
         }
 
+        @if (editAddressId()) {
+        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+          <button class="secondary-action" type="button" (click)="cancelEditAddress()"
+            style="flex: 1;">Cancel</button>
+          <button class="checkout-button" type="button" (click)="saveAddress()" [disabled]="submitting()"
+            style="flex: 2;">Save Changes</button>
+        </div>
+        } @else {
         <div style="display: flex; gap: 1rem; margin-top: 1rem;">
           <button class="secondary-action" type="button" (click)="checkoutStep.set('contact')"
             style="flex: 1;">Back</button>
           <button class="checkout-button" type="button" (click)="checkoutStep.set('payment')" style="flex: 2;"
             [disabled]="!selectedAddressId() && !addressForm.addressLine1">Continue to Payment</button>
         </div>
+        }
         }
 
         @if (checkoutStep() === 'payment') {
@@ -400,7 +411,7 @@
         <button class="checkout-button" type="submit" [disabled]="submitting()">Save address</button>
       </form>
       } @else {
-      <article class="account-card selectable" (click)="showAddressForm.set(true)"
+      <article class="account-card selectable" (click)="addNewAddress()"
         style="place-content: center; text-align: center; border-style: dashed;">
         <i class="pi pi-plus"
           style="margin: 0 auto; width: 3rem; height: 3rem; background: var(--component-bg-hover); border-radius: 50%; display: grid; place-items: center; font-size: 1.2rem;"></i>

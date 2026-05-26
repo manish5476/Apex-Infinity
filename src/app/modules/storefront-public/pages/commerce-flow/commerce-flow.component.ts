@@ -287,6 +287,11 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
     });
   }
 
+  addNewAddress(): void {
+    this.cancelEditAddress();
+    this.showAddressForm.set(true);
+  }
+
   editAddress(address: any): void {
     this.editAddressId.set(address._id || address.id);
     this.addressForm.fullName = address.fullName || '';

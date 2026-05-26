@@ -54,6 +54,15 @@ export const STOREFRONT_ADMIN_ROUTES: Routes = [
     canActivate: [permissionGuard],
     data: { permissions: [PERMISSIONS.STOREFRONT.READ] }
   },
+  {
+    path: 'coupons',
+    loadComponent: () =>
+      import('./pages/storefront-coupons/storefront-coupons.component')
+        .then(m => m.StorefrontCouponsComponent),
+    title: 'Storefront Coupons',
+    canActivate: [permissionGuard],
+    data: { permissions: [PERMISSIONS.STOREFRONT.READ] }
+  },
     {
     path: 'themes',
     loadComponent: () =>
