@@ -135,44 +135,6 @@
           <ng-template pTemplate>
             <main id="preview-container" class="builder-workbench__canvas h-full w-full min-h-0 overflow-y-auto relative custom-scrollbar scroll-smooth">
               
-              @if (showAddMenu()) {
-                <div class="absolute inset-0 z-50 backdrop-blur-sm bg-surface-900/40 flex items-start justify-center pt-10 animate-fade-in" (click)="showAddMenu.set(false)">
-                  <div class="w-full max-w-4xl bg-white rounded-xl shadow-2xl border border-surface-200 overflow-hidden animate-scale-in mx-4" (click)="$event.stopPropagation()">
-                    
-                    <div class="px-5 py-3 border-b border-surface-100 flex justify-between items-center bg-surface-50">
-                      <div>
-                        <h3 class="font-heading font-bold text-sm text-surface-900 leading-none">Component Library</h3>
-                      </div>
-                      <button (click)="showAddMenu.set(false)" class="w-6 h-6 rounded-full hover:bg-surface-200 flex items-center justify-center transition-colors">
-                        <i class="pi pi-times text-surface-500 text-xs"></i>
-                      </button>
-                    </div>
-
-                    <div class="p-5 overflow-y-auto max-h-[60vh] custom-scrollbar bg-white">
-                      @for (categoryGroup of groupedTypes; track categoryGroup.category) {
-                        <div class="mb-5 last:mb-0">
-                          <div class="flex items-center gap-2 mb-2.5">
-                            <span class="text-[9px] font-black uppercase tracking-widest text-surface-400">{{ categoryGroup.category }}</span>
-                            <div class="flex-1 h-px bg-surface-100"></div>
-                          </div>
-                          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5">
-                            @for (item of categoryGroup.items; track item.type) {
-                              <button (click)="addSection(item.type)" class="library-card group text-left">
-                                <div class="icon-wrapper mb-2">
-                                  <i [ngClass]="item.icon || 'pi pi-wrench'" class="text-lg"></i>
-                                </div>
-                                <span class="block font-bold text-[11px] text-surface-700 group-hover:text-primary-600 mb-0.5 leading-snug">{{ item.name }}</span>
-                                <span class="block text-[9px] text-surface-400 leading-relaxed line-clamp-2">{{ item.description }}</span>
-                              </button>
-                            }
-                          </div>
-                        </div>
-                      }
-                    </div>
-                  </div>
-                </div>
-              }
-
               <div class="px-4 pt-4 pb-20">
                 <div class="w-full max-w-[1024px] mx-auto flex flex-col shadow-xl bg-white rounded-lg overflow-hidden ring-1 ring-surface-200 transition-all duration-300">
 
@@ -254,3 +216,44 @@
     </p-splitter>
   </div>
 </div>
+
+<p-dialog 
+  [(visible)]="showAddMenu" 
+  (visibleChange)="showAddMenu.set($event)"
+  [modal]="true" 
+  appendTo="body" 
+  [draggable]="false" 
+  [resizable]="false" 
+  styleClass="component-library-dialog"
+  [style]="{ width: '850px', maxWidth: '95vw' }"
+  [breakpoints]="{ '960px': '75vw', '640px': '100vw' }">
+
+  <ng-template pTemplate="header">
+    <div class="flex flex-col">
+      <h3 class="font-heading font-bold text-lg text-surface-900 leading-none m-0">Component Library</h3>
+      <p class="text-[11px] text-surface-500 mt-1.5 mb-0">Select a section block to append to your current layout</p>
+    </div>
+  </ng-template>
+
+  <div class="p-2 custom-scrollbar">
+    @for (categoryGroup of groupedTypes; track categoryGroup.category) {
+      <div class="mb-6 last:mb-0">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-[10px] font-black uppercase tracking-widest text-surface-400">{{ categoryGroup.category }}</span>
+          <div class="flex-1 h-px bg-surface-100"></div>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+          @for (item of categoryGroup.items; track item.type) {
+            <button (click)="addSection(item.type)" class="library-card group text-left w-full">
+              <div class="icon-wrapper mb-2.5">
+                <i [ngClass]="item.icon || 'pi pi-wrench'" class="text-[20px]"></i>
+              </div>
+              <span class="block font-bold text-xs text-surface-800 group-hover:text-primary-600 mb-1 leading-snug">{{ item.name }}</span>
+              <span class="block text-[10px] text-surface-400 leading-relaxed line-clamp-2">{{ item.description }}</span>
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</p-dialog>
