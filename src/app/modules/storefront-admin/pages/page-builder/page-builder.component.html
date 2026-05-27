@@ -1,31 +1,22 @@
-<!-- page-builder.component.html -->
-<div class="builder-layout builder-workbench h-full flex flex-col bg-surface-50">
+<div class="builder-layout builder-workbench h-full flex flex-col">
 
-  <!-- ══════════════════════════════════════════════════════════════════════
-       HEADER
-  ═══════════════════════════════════════════════════════════════════════ -->
-  <header
-    class="builder-header builder-workbench__header shrink-0 h-16 bg-white border-b border-surface-200 px-6 flex items-center justify-between shadow-sm z-20">
+  <header class="builder-header builder-workbench__header shrink-0 h-14 bg-white border-b border-surface-200 px-5 flex items-center justify-between shadow-sm z-20">
 
-    <div class="flex items-center gap-4">
-      <a routerLink="../../"
-        class="flex items-center justify-center w-8 h-8 text-surface-400 hover:text-primary-600 hover:bg-surface-50 rounded-full transition-colors">
-        <i class="pi pi-arrow-left text-sm"></i>
+    <div class="flex items-center gap-3">
+      <a routerLink="../../" class="flex items-center justify-center w-7 h-7 text-surface-400 hover:text-primary-600 hover:bg-surface-50 rounded-full transition-colors">
+        <i class="pi pi-arrow-left text-xs"></i>
       </a>
 
       <div class="flex flex-col">
-        <h1
-          class="builder-workbench__title text-sm font-heading font-bold text-surface-800 leading-none tracking-tight">
+        <h1 class="builder-workbench__title text-[13px] font-heading font-bold text-surface-800 leading-none tracking-tight">
           {{ page()?.name || 'Untitled Page' }}
         </h1>
-        <div class="flex items-center gap-2 mt-1.5">
-          <span class="flex h-2 w-2 relative">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
-              [ngClass]="page()?.isPublished ? 'bg-green-400' : 'bg-amber-400'"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2"
-              [ngClass]="page()?.isPublished ? 'bg-green-500' : 'bg-amber-500'"></span>
+        <div class="flex items-center gap-1.5 mt-1">
+          <span class="flex h-1.5 w-1.5 relative">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" [ngClass]="page()?.isPublished ? 'bg-green-400' : 'bg-amber-400'"></span>
+            <span class="relative inline-flex rounded-full h-1.5 w-1.5" [ngClass]="page()?.isPublished ? 'bg-green-500' : 'bg-amber-500'"></span>
           </span>
-          <span class="text-[10px] font-bold text-surface-400 uppercase tracking-widest">
+          <span class="text-[9px] font-bold text-surface-400 uppercase tracking-widest">
             {{ page()?.status || 'Draft' }}
           </span>
         </div>
@@ -34,343 +25,206 @@
 
     <div class="flex gap-2 items-center">
 
-      <!-- Save error toast -->
       @if (saveError()) {
-      <div
-        class="flex items-center gap-2 px-3 py-1.5 bg-red-50 border border-red-200 rounded-lg text-red-600 text-xs font-medium mr-2 max-w-xs">
-        <i class="pi pi-exclamation-triangle text-xs shrink-0"></i>
-        <span class="truncate">{{ saveError() }}</span>
-        <button (click)="saveError.set(null)" class="shrink-0 hover:text-red-800">
-          <i class="pi pi-times text-xs"></i>
-        </button>
-      </div>
+        <div class="flex items-center gap-2 px-2.5 py-1 bg-red-50 border border-red-200 rounded-md text-red-600 text-[10px] font-medium mr-1">
+          <i class="pi pi-exclamation-triangle text-[10px] shrink-0"></i>
+          <span class="truncate max-w-[150px]">{{ saveError() }}</span>
+          <button (click)="saveError.set(null)" class="shrink-0 hover:text-red-800"><i class="pi pi-times text-[10px]"></i></button>
+        </div>
       }
 
-      <!-- Saving indicator -->
       @if (isSaving()) {
-      <span class="text-[11px] text-surface-400 font-medium flex items-center gap-1.5 mr-1 animate-pulse">
-        <i class="pi pi-sync pi-spin text-primary-500 text-xs"></i> Saving…
-      </span>
+        <span class="text-[10px] text-surface-400 font-medium flex items-center gap-1 mr-1 animate-pulse">
+          <i class="pi pi-sync pi-spin text-primary-500 text-[10px]"></i> Saving…
+        </span>
       }
 
-      <button (click)="deletePage()" [disabled]="isSaving()"
-        class="action-btn-secondary text-surface-400 hover:text-red-600 hover:bg-red-50" pTooltip="Delete Page"
-        tooltipPosition="bottom">
-        <i class="pi pi-trash text-xs"></i>
+      <button (click)="deletePage()" [disabled]="isSaving()" class="action-btn-secondary text-surface-400 hover:text-red-600 hover:bg-red-50" pTooltip="Delete Page" tooltipPosition="bottom">
+        <i class="pi pi-trash text-[11px]"></i>
       </button>
 
-      <button (click)="togglePublish()" [disabled]="isSaving()"
-        class="action-btn-secondary flex items-center gap-2 px-3">
-        <i class="pi text-xs" [ngClass]="page()?.isPublished ? 'pi-eye-slash' : 'pi-cloud-upload'"></i>
+      <button (click)="togglePublish()" [disabled]="isSaving()" class="action-btn-secondary flex items-center gap-1.5 px-3 text-[11px]">
+        <i class="pi text-[10px]" [ngClass]="page()?.isPublished ? 'pi-eye-slash' : 'pi-cloud-upload'"></i>
         <span>{{ page()?.isPublished ? 'Unpublish' : 'Publish' }}</span>
       </button>
 
-      <button (click)="savePage()" [disabled]="isSaving()"
-        class="action-btn-primary flex items-center gap-2 px-4 shadow-md shadow-primary-500/20">
-        <i class="pi pi-save text-xs"></i>
+      <button (click)="savePage()" [disabled]="isSaving()" class="action-btn-primary flex items-center gap-1.5 px-3.5 shadow-md shadow-primary-500/20 text-[11px]">
+        <i class="pi pi-save text-[10px]"></i>
         <span>Save</span>
       </button>
 
     </div>
   </header>
 
-  <!-- ══════════════════════════════════════════════════════════════════════
-       BODY — Horizontal Splitter: Sidebar | Canvas
-       FIX: Added explicit overflow:hidden + h-full to the body wrapper so
-            the splitter gets a real bounded height to work within.
-  ═══════════════════════════════════════════════════════════════════════ -->
-  <div class="flex-1 overflow-hidden relative min-h-0">
+  <div class="flex-1 overflow-hidden relative min-h-0 bg-surface-100">
 
-    <!-- FIX: Added min-h-0 to styleClass so the splitter doesn't overflow its flex parent -->
-    <p-splitter [panelSizes]="[25, 75]" [minSizes]="[18, 50]" [gutterSize]="5" stateKey="builder-main-splitter"
-      stateStorage="local" styleClass="h-full border-none bg-surface-100 custom-splitter">
+    <p-splitter [panelSizes]="[25, 75]" [minSizes]="[20, 50]" [gutterSize]="4" stateKey="builder-main-splitter" stateStorage="local" styleClass="h-full border-none custom-splitter">
 
-      <!-- ── LEFT PANEL: Layers + Config ── -->
       <ng-template pTemplate>
-        @if (viewMode() === 'sidebar') {
-        <div
-          class="builder-workbench__sidebar h-full w-full flex flex-col bg-white border-r border-surface-200 z-10 overflow-hidden">
+        <div class="builder-workbench__sidebar h-full w-full flex flex-col bg-white border-r border-surface-200 z-10 overflow-hidden">
 
-          <p-splitter layout="vertical" styleClass="h-full border-none"
-            [panelSizes]="sidebarState() === 'full' ? [0, 100] : [40, 60]" [minSizes]="[10, 10]"
-            [gutterSize]="sidebarState() === 'full' ? 0 : 4">
+          <div class="builder-workbench__layers flex flex-col w-full border-b border-surface-200" [ngStyle]="{'max-height': selectedSection() ? '35%' : '100%', 'flex': selectedSection() ? '0 0 auto' : '1'}">
+            
+            <div class="px-3 py-2 border-b border-surface-100 flex justify-between items-center bg-surface-50 shrink-0">
+              <span class="text-[9px] font-black text-surface-400 uppercase tracking-widest">Page Layers</span>
+              <span class="badge-count">{{ sections().length }}</span>
+            </div>
 
-            <!-- Layer list -->
-            <ng-template pTemplate>
-              <div class="builder-workbench__layers h-full flex flex-col w-full overflow-hidden"
-                [class.hidden]="sidebarState() === 'full' && selectedSection()">
-
-                <div
-                  class="px-4 py-2.5 border-b border-surface-100 flex justify-between items-center bg-surface-50/60 shrink-0">
-                  <span class="text-[10px] font-black text-surface-400 uppercase tracking-widest">Layers</span>
-                  <span class="badge-count">{{ sections().length }}</span>
-                </div>
-
-                <!-- FIX: overflow-y-auto + flex-1 + min-h-0 so the list scrolls properly -->
-                <div class="p-3 flex-1 overflow-y-auto min-h-0 custom-scrollbar flex flex-col gap-1.5" cdkDropList
-                  (cdkDropListDropped)="drop($event)">
-
-                  @for (section of sections(); track section.id) {
-                  <div cdkDrag class="layer-card group" [class.active]="selectedSection()?.id === section.id"
-                    (click)="selectSection(section)">
-
-                    <div class="drag-handle" cdkDragHandle>
-                      <i class="pi pi-ellipsis-v text-surface-300 text-xs"></i>
-                      <i class="pi pi-ellipsis-v text-surface-300 -ml-1 text-xs"></i>
-                    </div>
-
-                    <!-- Section type icon -->
-                    <div
-                      class="w-7 h-7 rounded-md bg-surface-50 border border-surface-100 flex items-center justify-center shrink-0">
-                      <i [ngClass]="sectionRegistry[section.type]?.icon || 'pi pi-box'"
-                        class="text-[10px] text-surface-400"></i>
-                    </div>
-
-                    <div class="flex-1 min-w-0 flex flex-col py-0.5">
-                      <span class="layer-title">{{ sectionRegistry[section.type]?.name || section.type }}</span>
-                      @if (section.config['title']) {
-                      <span class="layer-subtitle">{{ section.config['title'] }}</span>
-                      }
-                    </div>
-
-                    <!-- Active indicator -->
-                    <div class="w-1.5 h-1.5 rounded-full shrink-0 transition-colors"
-                      [ngClass]="section.isActive ? 'bg-green-400' : 'bg-surface-200'"></div>
-
-                    <button (click)="deleteSection(section.id, $event)" class="delete-btn">
-                      <i class="pi pi-trash text-[10px]"></i>
-                    </button>
+            <div class="p-2 flex-1 overflow-y-auto min-h-0 custom-scrollbar flex flex-col gap-1" cdkDropList (cdkDropListDropped)="drop($event)">
+              @for (section of sections(); track section.id) {
+                <div cdkDrag class="layer-card group" [class.active]="selectedSection()?.id === section.id" (click)="selectSection(section)">
+                  
+                  <div class="drag-handle" cdkDragHandle>
+                    <i class="pi pi-ellipsis-v text-surface-300 text-[10px]"></i>
                   </div>
-                  }
 
-                  <!-- Add section button -->
-                  <button (click)="showAddMenu.set(true)" class="btn-dashed mt-1">
-                    <i class="pi pi-plus-circle text-primary-500 text-sm"></i>
-                    <span>Add Component</span>
+                  <div class="w-6 h-6 rounded-md bg-surface-50 border border-surface-100 flex items-center justify-center shrink-0">
+                    <i [ngClass]="sectionRegistry[section.type]?.icon || 'pi pi-box'" class="text-[9px] text-surface-400"></i>
+                  </div>
+
+                  <div class="flex-1 min-w-0 flex flex-col">
+                    <span class="layer-title text-[11px]">{{ sectionRegistry[section.type]?.name || section.type }}</span>
+                    @if (section.config['title']) { <span class="layer-subtitle text-[9px]">{{ section.config['title'] }}</span> }
+                  </div>
+
+                  <div class="w-1.5 h-1.5 rounded-full shrink-0 transition-colors" [ngClass]="section.isActive ? 'bg-green-400' : 'bg-surface-200'"></div>
+
+                  <button (click)="deleteSection(section.id, $event)" class="delete-btn">
+                    <i class="pi pi-trash text-[10px]"></i>
                   </button>
-
                 </div>
-              </div>
-            </ng-template>
-
-            <!-- Config panel -->
-            <ng-template pTemplate>
-              @if (selectedSection()) {
-              <div class="h-full w-full flex flex-col bg-white overflow-hidden">
-
-                <div class="config-header shrink-0">
-                  <div class="flex items-center gap-2">
-                    <span class="w-1.5 h-1.5 rounded-full bg-primary-500 shrink-0"></span>
-                    <span class="text-[10px] font-black text-surface-700 uppercase tracking-widest truncate">
-                      {{ sectionRegistry[selectedSection()!.type]?.name }}
-                    </span>
-                  </div>
-                  <div class="flex items-center gap-1">
-                    <button (click)="toggleViewMode()" pTooltip="Pop Out" tooltipPosition="bottom" class="icon-btn">
-                      <i class="pi pi-external-link text-[10px]"></i>
-                    </button>
-                    <button (click)="toggleSidebarState()" pTooltip="Toggle Full" tooltipPosition="bottom"
-                      class="icon-btn">
-                      <i class="pi text-[10px]" [class.pi-window-maximize]="sidebarState() === 'split'"
-                        [class.pi-window-minimize]="sidebarState() === 'full'"></i>
-                    </button>
-                    <button (click)="deselectSection()" class="icon-btn hover:text-red-500 hover:bg-red-50">
-                      <i class="pi pi-times text-[10px]"></i>
-                    </button>
-                  </div>
-                </div>
-
-                <!-- FIX: flex-1 + overflow-y-auto + min-h-0 ensures config form scrolls independently -->
-                <div class="flex-1 overflow-y-auto min-h-0 custom-scrollbar bg-surface-50/30">
-                  <app-config-form [config]="selectedSection()!.config"
-                    [schema]="sectionRegistry[selectedSection()!.type]?.schema || {}" [masters]="mastersData()"
-                    (configChange)="onConfigChange($event)">
-                  </app-config-form>
-                </div>
-
-              </div>
-              } @else {
-              <div class="h-full flex flex-col items-center justify-center text-surface-300 bg-surface-50/40 gap-3">
-                <div
-                  class="w-14 h-14 rounded-2xl bg-surface-100 border border-surface-200 flex items-center justify-center">
-                  <i class="pi pi-sliders-h text-xl opacity-30"></i>
-                </div>
-                <span class="text-[11px] font-medium tracking-wide text-surface-400">
-                  Select a layer to configure
-                </span>
-              </div>
               }
-            </ng-template>
 
-          </p-splitter>
+              <button (click)="showAddMenu.set(true)" class="btn-dashed mt-1 py-1.5">
+                <i class="pi pi-plus text-primary-500 text-[10px]"></i>
+                <span class="text-[10px]">Add Component</span>
+              </button>
+            </div>
+          </div>
+
+          @if (selectedSection()) {
+            <div class="flex-1 flex flex-col bg-white overflow-hidden min-h-0 relative">
+              <div class="config-header shrink-0 shadow-sm z-10">
+                <div class="flex items-center gap-2">
+                  <span class="w-1.5 h-1.5 rounded-full bg-primary-500 shrink-0"></span>
+                  <span class="text-[9px] font-black text-surface-700 uppercase tracking-widest truncate">
+                    Editing: {{ sectionRegistry[selectedSection()!.type]?.name }}
+                  </span>
+                </div>
+                <button (click)="deselectSection()" class="icon-btn hover:text-red-500 hover:bg-red-50" pTooltip="Close Settings" tooltipPosition="left">
+                  <i class="pi pi-times text-[10px]"></i>
+                </button>
+              </div>
+
+              <div class="flex-1 overflow-y-auto min-h-0 custom-scrollbar bg-surface-50/30">
+                <app-config-form 
+                  [config]="selectedSection()!.config"
+                  [schema]="sectionRegistry[selectedSection()!.type]?.schema || {}" 
+                  [masters]="mastersData()"
+                  (configChange)="onConfigChange($event)">
+                </app-config-form>
+              </div>
+            </div>
+          }
         </div>
-        } @else {
-        <div class="h-full w-full bg-surface-50 flex items-center justify-center">
-          <span class="text-surface-300 text-xs italic">Sidebar docked</span>
-        </div>
-        }
       </ng-template>
 
-      <!-- ══════════════════════════════════════════════════════════════════
-           RIGHT PANEL: Vertical Splitter → Canvas (top) | Status Bar (bottom)
-           FIX: Wrapped in a vertical p-splitter so users can resize the
-                canvas preview vs the bottom status bar by dragging the gutter.
-                The canvas panel itself now gets h-full + overflow-y-auto so
-                ALL stacked sections are reachable by scrolling.
-      ════════════════════════════════════════════════════════════════════ -->
       <ng-template pTemplate>
+        <p-splitter layout="vertical" [panelSizes]="[94, 6]" [minSizes]="[50, 4]" [gutterSize]="4" stateKey="builder-canvas-splitter" stateStorage="local" styleClass="h-full border-none custom-splitter canvas-v-splitter">
 
-        <p-splitter layout="vertical" [panelSizes]="[92, 8]" [minSizes]="[50, 5]" [gutterSize]="5"
-          stateKey="builder-canvas-splitter" stateStorage="local"
-          styleClass="h-full border-none custom-splitter canvas-v-splitter">
-
-          <!-- ── TOP: Scrollable canvas ── -->
           <ng-template pTemplate>
-
-            <!--
-              FIX SUMMARY for scroll issue:
-              ─────────────────────────────
-              1. Removed `flex flex-col` from <main> — those caused the inner
-                 content to flex-stretch rather than scroll.
-              2. Added `min-h-0` alongside `h-full` so the element respects
-                 the splitter panel's bounded height instead of growing past it.
-              3. `overflow-y-auto` now works correctly because the parent
-                 (splitter panel) provides a real, constrained height.
-            -->
-            <main id="preview-container"
-              class="builder-workbench__canvas h-full w-full min-h-0 bg-surface-100 overflow-y-auto relative custom-scrollbar scroll-smooth">
-
-              <!-- ── Component Library Overlay ── -->
+            <main id="preview-container" class="builder-workbench__canvas h-full w-full min-h-0 overflow-y-auto relative custom-scrollbar scroll-smooth">
+              
               @if (showAddMenu()) {
-              <div appendTo="body"
-                class="absolute inset-0 z-50 backdrop-blur-sm bg-white/70 flex items-start justify-center pt-16 animate-fade-in"
-                (click)="showAddMenu.set(false)">
-
-                <div
-                  class="w-full max-w-4xl bg-white rounded-2xl shadow-2xl border border-surface-100 overflow-hidden animate-scale-in mx-4"
-                  (click)="$event.stopPropagation()">
-
-                  <!-- Library header -->
-                  <div class="px-6 py-4 border-b border-surface-100 flex justify-between items-center">
-                    <div>
-                      <h3 class="font-heading font-bold text-lg text-surface-900 leading-none">Component Library</h3>
-                      <p class="text-xs text-surface-400 mt-1.5">Choose a section to add to your page</p>
-                    </div>
-                    <button (click)="showAddMenu.set(false)"
-                      class="w-8 h-8 rounded-full hover:bg-surface-100 flex items-center justify-center transition-colors">
-                      <i class="pi pi-times text-surface-400 text-sm"></i>
-                    </button>
-                  </div>
-
-                  <!-- Library grid -->
-                  <div class="p-6 overflow-y-auto max-h-[58vh] custom-scrollbar">
-                    @for (categoryGroup of groupedTypes; track categoryGroup.category) {
-                    <div class="mb-6 last:mb-0">
-                      <div class="flex items-center gap-2 mb-3">
-                        <span class="text-[10px] font-black uppercase tracking-widest text-surface-400">
-                          {{ categoryGroup.category }}
-                        </span>
-                        <div class="flex-1 h-px bg-surface-100"></div>
-                        <span class="text-[10px] text-surface-300">{{ categoryGroup.items.length }}</span>
+                <div class="absolute inset-0 z-50 backdrop-blur-sm bg-surface-900/40 flex items-start justify-center pt-10 animate-fade-in" (click)="showAddMenu.set(false)">
+                  <div class="w-full max-w-4xl bg-white rounded-xl shadow-2xl border border-surface-200 overflow-hidden animate-scale-in mx-4" (click)="$event.stopPropagation()">
+                    
+                    <div class="px-5 py-3 border-b border-surface-100 flex justify-between items-center bg-surface-50">
+                      <div>
+                        <h3 class="font-heading font-bold text-sm text-surface-900 leading-none">Component Library</h3>
                       </div>
-                      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                        @for (item of categoryGroup.items; track item.type) {
-                        <button (click)="addSection(item.type)" class="library-card group text-left">
-                          <div class="icon-wrapper mb-3">
-                            <i [ngClass]="item.icon || 'pi pi-wrench'" class="text-2xl"></i>
+                      <button (click)="showAddMenu.set(false)" class="w-6 h-6 rounded-full hover:bg-surface-200 flex items-center justify-center transition-colors">
+                        <i class="pi pi-times text-surface-500 text-xs"></i>
+                      </button>
+                    </div>
+
+                    <div class="p-5 overflow-y-auto max-h-[60vh] custom-scrollbar bg-white">
+                      @for (categoryGroup of groupedTypes; track categoryGroup.category) {
+                        <div class="mb-5 last:mb-0">
+                          <div class="flex items-center gap-2 mb-2.5">
+                            <span class="text-[9px] font-black uppercase tracking-widest text-surface-400">{{ categoryGroup.category }}</span>
+                            <div class="flex-1 h-px bg-surface-100"></div>
                           </div>
-                          <span
-                            class="block font-bold text-xs text-surface-700 group-hover:text-primary-600 mb-1 leading-snug">
-                            {{ item.name }}
-                          </span>
-                          <span class="block text-[10px] text-surface-400 leading-relaxed line-clamp-2">
-                            {{ item.description }}
-                          </span>
-                        </button>
-                        }
-                      </div>
+                          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5">
+                            @for (item of categoryGroup.items; track item.type) {
+                              <button (click)="addSection(item.type)" class="library-card group text-left">
+                                <div class="icon-wrapper mb-2">
+                                  <i [ngClass]="item.icon || 'pi pi-wrench'" class="text-lg"></i>
+                                </div>
+                                <span class="block font-bold text-[11px] text-surface-700 group-hover:text-primary-600 mb-0.5 leading-snug">{{ item.name }}</span>
+                                <span class="block text-[9px] text-surface-400 leading-relaxed line-clamp-2">{{ item.description }}</span>
+                              </button>
+                            }
+                          </div>
+                        </div>
+                      }
                     </div>
-                    }
                   </div>
-
                 </div>
-              </div>
               }
 
-              <!-- ── Browser chrome mock ── -->
-              <div class="px-6 pt-4 pb-24">
-                <div
-                  class="w-full max-w-[1024px] mx-auto flex flex-col shadow-2xl bg-white transition-all duration-300 rounded-lg overflow-hidden ring-1 ring-black/5"
-                  [class.translate-x-4]="selectedSection() && viewMode() === 'sidebar'">
+              <div class="px-4 pt-4 pb-20">
+                <div class="w-full max-w-[1024px] mx-auto flex flex-col shadow-xl bg-white rounded-lg overflow-hidden ring-1 ring-surface-200 transition-all duration-300">
 
-                  <!-- Browser bar -->
-                  <div
-                    class="h-10 border-b border-surface-100 flex items-center px-4 justify-between bg-surface-50/90 shrink-0">
+                  <div class="h-8 border-b border-surface-100 flex items-center px-3 justify-between bg-surface-50 shrink-0">
                     <div class="flex gap-1.5">
-                      <div class="w-3 h-3 bg-red-400 rounded-full"></div>
-                      <div class="w-3 h-3 bg-amber-400 rounded-full"></div>
-                      <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                      <div class="w-2.5 h-2.5 bg-red-400 rounded-full"></div>
+                      <div class="w-2.5 h-2.5 bg-amber-400 rounded-full"></div>
+                      <div class="w-2.5 h-2.5 bg-green-400 rounded-full"></div>
                     </div>
-                    <div class="flex-1 mx-6">
-                      <div class="h-6 bg-surface-200/60 rounded-md max-w-xs mx-auto flex items-center justify-center">
-                        <span class="text-[10px] text-surface-400 font-mono">
-                          /{{ page()?.slug || 'page' }}
-                        </span>
+                    <div class="flex-1 mx-4">
+                      <div class="h-5 bg-white border border-surface-200 rounded max-w-xs mx-auto flex items-center justify-center">
+                        <span class="text-[9px] text-surface-400 font-mono">/{{ page()?.slug || 'page' }}</span>
                       </div>
                     </div>
-                    <div class="w-16"></div>
+                    <div class="w-12"></div>
                   </div>
 
-                  <!-- Canvas content -->
-                  <div class="bg-white relative">
-
-                    <!-- Empty canvas state -->
+                  <div class="bg-white relative min-h-[400px]">
                     @if (sections().length === 0) {
-                    <div class="flex flex-col items-center justify-center text-surface-300 gap-4 py-36">
-                      <div
-                        class="w-20 h-20 bg-surface-50 rounded-full flex items-center justify-center border border-surface-100">
-                        <i class="pi pi-box text-3xl opacity-25"></i>
+                      <div class="flex flex-col items-center justify-center text-surface-300 gap-3 py-32">
+                        <div class="w-16 h-16 bg-surface-50 rounded-full flex items-center justify-center border border-surface-100">
+                          <i class="pi pi-box text-2xl opacity-25"></i>
+                        </div>
+                        <div class="text-center">
+                          <p class="text-[10px] font-black uppercase tracking-widest opacity-50 mb-1.5">Canvas Empty</p>
+                          <button (click)="showAddMenu.set(true)" class="px-4 py-1.5 bg-primary-50 text-primary-600 font-bold rounded-full hover:bg-primary-100 transition-colors text-[10px]">
+                            + Add First Section
+                          </button>
+                        </div>
                       </div>
-                      <div class="text-center">
-                        <p class="text-xs font-black uppercase tracking-widest opacity-50 mb-2">Canvas Empty</p>
-                        <p class="text-xs text-surface-300 mb-4">Add your first section to get started</p>
-                        <button (click)="showAddMenu.set(true)"
-                          class="px-5 py-2 bg-primary-50 text-primary-600 font-bold rounded-full hover:bg-primary-100 transition-colors text-xs">
-                          + Add First Section
-                        </button>
-                      </div>
-                    </div>
                     }
 
-                    <!-- Sections — all of them render here and the canvas scrolls to show them all -->
                     @for (section of sections(); track section.id) {
-                    <div class="relative group outline outline-2 outline-transparent transition-all duration-150"
-                      [class.outline-primary-500]="selectedSection()?.id === section.id"
-                      [class.z-20]="selectedSection()?.id === section.id" (click)="selectSection(section)">
+                      <div class="relative group outline outline-2 outline-transparent transition-all duration-150"
+                           [class.outline-primary-500]="selectedSection()?.id === section.id"
+                           [class.z-20]="selectedSection()?.id === section.id" 
+                           (click)="selectSection(section)">
 
-                      <!-- Hover overlay -->
-                      @if (selectedSection()?.id !== section.id) {
-                      <div
-                        class="absolute inset-0 bg-primary-500/[0.03] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                        @if (selectedSection()?.id !== section.id) {
+                          <div class="absolute inset-0 bg-primary-500/[0.02] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-10"></div>
+                        }
+
+                        <div class="absolute top-0 right-0 z-30 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity -translate-y-full"
+                             [class.opacity-100]="selectedSection()?.id === section.id">
+                          <span class="bg-primary-600 text-white text-[8px] px-2 py-0.5 font-black uppercase tracking-wider rounded-t-md whitespace-nowrap shadow-sm">
+                            {{ sectionRegistry[section.type]?.name || section.type }}
+                          </span>
+                        </div>
+
+                        <app-storefront-section-renderer [section]="section" [orgSlug]="''" [isDev]="true" />
                       </div>
-                      }
-
-                      <!-- Section type label -->
-                      <div
-                        class="absolute top-0 right-0 z-30 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity -translate-y-full"
-                        [class.opacity-100]="selectedSection()?.id === section.id">
-                        <span
-                          class="bg-primary-600 text-white text-[9px] px-2.5 py-1 font-black uppercase tracking-wider rounded-t-md whitespace-nowrap">
-                          {{ sectionRegistry[section.type]?.name || section.type }}
-                        </span>
-                      </div>
-
-                      <!-- Section renderer: same registry-driven lazy runtime used by public storefront pages. -->
-                      <app-storefront-section-renderer [section]="section" [orgSlug]="''" [isDev]="true" />
-
-                    </div>
                     }
-
                   </div>
                 </div>
               </div>
@@ -378,88 +232,25 @@
             </main>
           </ng-template>
 
-          <!-- ── BOTTOM: Status / quick-action bar (resizable by dragging gutter) ── -->
           <ng-template pTemplate>
-            <div class="h-full w-full bg-white border-t border-surface-200 flex items-center px-5 gap-4 shrink-0">
-
-              <!-- Section count -->
-              <div class="flex items-center gap-2">
-                <i class="pi pi-layers text-surface-300 text-xs"></i>
-                <span class="text-[10px] font-black text-surface-400 uppercase tracking-widest">
+            <div class="h-full w-full bg-white border-t border-surface-200 flex items-center px-4 gap-3 shrink-0 shadow-[0_-2px_4px_rgba(0,0,0,0.02)] z-10">
+              <div class="flex items-center gap-1.5">
+                <i class="pi pi-layers text-surface-300 text-[10px]"></i>
+                <span class="text-[9px] font-black text-surface-400 uppercase tracking-widest">
                   {{ sections().length }} Section{{ sections().length !== 1 ? 's' : '' }}
                 </span>
               </div>
-
-              <div class="w-px h-4 bg-surface-100"></div>
-
-              <!-- Page status pill -->
-              <div class="flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full"
-                  [ngClass]="page()?.isPublished ? 'bg-green-400' : 'bg-amber-400'"></span>
-                <span class="text-[10px] font-bold text-surface-400 uppercase tracking-widest">
-                  {{ page()?.isPublished ? 'Published' : 'Draft' }}
-                </span>
-              </div>
-
-              <!-- Spacer -->
+              <div class="w-px h-3 bg-surface-200"></div>
               <div class="flex-1"></div>
-
-              <!-- Quick scroll to top -->
-              <button (click)="scrollToTop()"
-                class="text-[10px] font-bold text-surface-400 hover:text-primary-600 flex items-center gap-1.5 transition-colors"
-                pTooltip="Scroll to top" tooltipPosition="top">
-                <i class="pi pi-arrow-up text-xs"></i>
-                <span>Top</span>
+              <button (click)="scrollToTop()" class="text-[9px] font-bold text-surface-400 hover:text-primary-600 flex items-center gap-1 transition-colors uppercase tracking-wider" pTooltip="Scroll to top" tooltipPosition="top">
+                <i class="pi pi-arrow-up text-[9px]"></i> Top
               </button>
-
-              <!-- Quick add button -->
-              <button (click)="showAddMenu.set(true)"
-                class="flex items-center gap-1.5 px-3 py-1 bg-primary-50 text-primary-600 hover:bg-primary-100 font-bold rounded-full transition-colors text-[10px] uppercase tracking-wide">
-                <i class="pi pi-plus text-xs"></i>
-                Add Component
-              </button>
-
             </div>
           </ng-template>
 
         </p-splitter>
-
       </ng-template>
 
     </p-splitter>
-
-    <!-- ── Floating Dialog (dialog view mode) ── -->
-    <p-dialog appendTo="body" [visible]="viewMode() === 'dialog' && !!selectedSection()" [modal]="false"
-      [resizable]="true" [draggable]="true" [maximizable]="true"
-      [style]="{ width: '560px', height: '70vh', right: '24px', top: '80px', margin: '0' }"
-      styleClass="builder-floating-panel" (onHide)="onDialogHide()">
-
-      <ng-template pTemplate="header">
-        <div class="flex items-center gap-2 w-full">
-          <div class="w-5 h-5 rounded bg-primary-50 flex items-center justify-center shrink-0">
-            <i class="pi text-primary-500 text-[9px]"
-              [ngClass]="sectionRegistry[selectedSection()?.type ?? '']?.icon || 'pi-cog'"></i>
-          </div>
-          <span class="font-heading font-bold text-sm text-surface-800 truncate">
-            {{ sectionRegistry[selectedSection()?.type ?? '']?.name || 'Configuration' }}
-          </span>
-          <button (click)="toggleViewMode()"
-            class="ml-auto text-[10px] uppercase font-bold text-surface-400 hover:text-primary-600 bg-surface-50 hover:bg-primary-50 px-2 py-1 rounded-md transition-colors whitespace-nowrap">
-            Dock <i class="pi pi-arrow-left ml-1 text-[9px]"></i>
-          </button>
-        </div>
-      </ng-template>
-
-      <div class="h-full overflow-y-auto custom-scrollbar p-1">
-        @if (selectedSection()) {
-        <app-config-form [config]="selectedSection()!.config"
-          [schema]="sectionRegistry[selectedSection()!.type]?.schema || {}" [masters]="mastersData()"
-          (configChange)="onConfigChange($event)">
-        </app-config-form>
-        }
-      </div>
-
-    </p-dialog>
-
   </div>
 </div>
