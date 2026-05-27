@@ -1,731 +1,32 @@
 /* ==========================================================================
-   PAGE BUILDER STYLES
-   ViewEncapsulation.None — styles pierce all child components.
+   PAGE BUILDER STYLES (Strict Token Mapping applied)
    ========================================================================== */
 
 :host {
   display: block;
   height: 100vh;
   width: 100%;
-  // FIX: Prevent the host from ever growing taller than the viewport.
-  // Without this, flex children can push past 100vh and break scroll containment.
   overflow: hidden;
 }
 
 // ── Force all section preview components to render as block ───────────────
-// Prevents inline stacking inside the builder canvas.
-app-hero-banner,
-app-product-slider,
-app-product-grid,
-app-category-grid,
-app-feature-grid,
-app-text-content,
-app-video-hero,
-app-split-content,
-app-testimonial-slider,
-app-logo-cloud,
-app-stats-counter,
-app-newsletter-signup,
-app-contact-form,
-app-pricing-table,
-app-faq-accordion,
-app-countdown-timer,
-app-blog-feed,
-app-product-listing,
-app-map-locations,
-app-storefront-section-renderer {
+app-hero-banner, app-product-slider, app-product-grid, app-category-grid,
+app-feature-grid, app-text-content, app-video-hero, app-split-content,
+app-testimonial-slider, app-logo-cloud, app-stats-counter, app-newsletter-signup,
+app-contact-form, app-pricing-table, app-faq-accordion, app-countdown-timer,
+app-blog-feed, app-product-listing, app-map-locations, app-storefront-section-renderer {
   display: block !important;
   width: 100%;
 }
 
 // ── Layout shell ─────────────────────────────────────────────────────────────
-
-.builder-layout {
-  font-family: var(--font-body);
-  color: var(--text-secondary);
-  // FIX: Ensure the layout itself is bounded to the host's height.
-  // flex + h-full inside a height:100vh :host means the header + body
-  // never exceed the viewport — scroll containment works correctly.
-  height: 100%;
-  overflow: hidden;
-}
-
-.builder-header {
-  background: var(--bg-primary);
-  border-bottom: 1px solid var(--border-primary);
-}
-
-// ── Header action buttons ─────────────────────────────────────────────────────
-
-.action-btn-secondary {
-  height: 32px;
-  border-radius: var(--ui-border-radius);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
-  text-transform: uppercase;
-  letter-spacing: 0.025em;
-  background: var(--bg-primary);
-  border: 1px solid var(--border-secondary);
-  color: var(--text-secondary);
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-  }
-
-  &:disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
-  }
-}
-
-.action-btn-primary {
-  @extend .action-btn-secondary;
-  background: var(--text-primary);
-  color: #fff;
-  border: none;
-
-  &:hover:not(:disabled) {
-    background: var(--accent-primary);
-    color: #fff;
-  }
-}
-
-// ── Sidebar layer panel ───────────────────────────────────────────────────────
-
-.badge-count {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  background: var(--bg-primary);
-  border: 1px solid var(--border-primary);
-  padding: 2px 6px;
-  border-radius: 4px;
-  color: var(--text-tertiary);
-}
-
-.layer-card {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 10px;
-  background: var(--bg-primary);
-  border: 1px solid var(--border-primary);
-  border-radius: var(--ui-border-radius);
-  cursor: pointer;
-  transition: all 0.15s ease;
-  position: relative;
-  overflow: hidden;
-  // FIX: Prevent layer cards from shrinking when the list is long.
-  // Without flex-shrink: 0 the cards compress and become unclickable.
-  flex-shrink: 0;
-
-  &:hover {
-    border-color: var(--accent-tertiary, var(--border-secondary));
-    box-shadow: var(--shadow-sm);
-
-    .delete-btn { opacity: 1; }
-  }
-
-  &.active {
-    background: var(--bg-primary);
-    border-color: var(--accent-primary);
-    box-shadow: 0 0 0 2px var(--accent-focus, rgba(99,102,241,0.12));
-
-    .layer-title { color: var(--accent-primary); }
-  }
-}
-
-.drag-handle {
-  display: flex;
-  cursor: grab;
-  padding: 2px;
-  color: var(--text-tertiary);
-
-  &:active { cursor: grabbing; }
-}
-
-.layer-title {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  color: var(--text-primary);
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.layer-subtitle {
-  font-size: 10px;
-  color: var(--text-tertiary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.delete-btn {
-  width: 22px;
-  height: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  color: var(--color-error, #e11d48);
-  opacity: 0;
-  transition: all 0.15s;
-  background: none;
-  border: none;
-  cursor: pointer;
-  flex-shrink: 0;
-
-  &:hover { background: rgba(239, 68, 68, 0.1); }
-}
-
-.btn-dashed {
-  width: 100%;
-  padding: 10px;
-  border: 1px dashed var(--border-secondary);
-  border-radius: var(--ui-border-radius);
-  background: transparent;
-  color: var(--text-tertiary);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: all 0.2s;
-  cursor: pointer;
-  // FIX: Prevent the add button from shrinking in a long list.
-  flex-shrink: 0;
-
-  &:hover {
-    border-color: var(--accent-primary);
-    color: var(--accent-primary);
-    background: var(--accent-focus, rgba(99,102,241,0.06));
-  }
-}
-
-// ── Config panel header ───────────────────────────────────────────────────────
-
-.config-header {
-  height: 40px;
-  padding: 0 12px;
-  border-bottom: 1px solid var(--border-primary);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--bg-secondary);
-  flex-shrink: 0;
-}
-
-.icon-btn {
-  width: 26px;
-  height: 26px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  color: var(--text-tertiary);
-  background: none;
-  border: none;
-  cursor: pointer;
-  transition: background 0.15s;
-
-  &:hover {
-    background: var(--bg-primary);
-    color: var(--text-primary);
-  }
-}
-
-// ── Component library modal ───────────────────────────────────────────────────
-
-.library-card {
-  display: flex;
-  flex-direction: column;
-  padding: 14px;
-  background: #fff;
-  border: 1px solid var(--border-primary);
-  border-radius: var(--ui-border-radius-lg);
-  text-align: left;
-  transition: all 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
-  cursor: pointer;
-
-  &:hover {
-    border-color: var(--accent-primary);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-
-    .icon-wrapper {
-      background: var(--accent-primary);
-      color: #fff;
-      transform: scale(1.08);
-    }
-  }
-}
-
-.icon-wrapper {
-  width: 44px;
-  height: 44px;
-  background: var(--bg-secondary);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-secondary);
-  transition: all 0.25s ease;
-  margin-bottom: 8px;
-  flex-shrink: 0;
-}
-
-// ── Animations ────────────────────────────────────────────────────────────────
-
-@keyframes fade-in  { from { opacity: 0; } to { opacity: 1; } }
-@keyframes scale-in { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
-
-.animate-fade-in  { animation: fade-in  0.15s ease-out forwards; }
-.animate-scale-in { animation: scale-in 0.18s ease-out forwards; }
-
-// ── PrimeNG Splitter overrides ────────────────────────────────────────────────
-// ViewEncapsulation.None is required for these to pierce the shadow DOM.
-
-.custom-splitter {
-
-  // ── HORIZONTAL gutter (between sidebar and canvas panels) ────────────────
-  &.p-splitter-horizontal > .p-splitter-gutter {
-    background: var(--bg-secondary) !important;
-    width: 5px !important;
-    cursor: col-resize;
-    transition: background 0.2s;
-
-    &:hover,
-    &:active {
-      background: var(--accent-primary) !important;
-    }
-  }
-
-  &.p-splitter-horizontal > .p-splitter-gutter > .p-splitter-gutter-handle {
-    width: 2px !important;
-    background: var(--border-secondary) !important;
-    border-radius: 2px;
-    height: 40px !important;
-    margin: auto;
-  }
-
-  // ── VERTICAL gutter (between canvas top/bottom panels) ───────────────────
-  // FIX: Added full vertical gutter styles — these were missing entirely,
-  //      so users had no way to resize the canvas vs the status bar.
-  &.p-splitter-vertical > .p-splitter-gutter {
-    background: var(--bg-secondary) !important;
-    height: 5px !important;
-    cursor: row-resize;
-    transition: background 0.2s;
-
-    &:hover,
-    &:active {
-      background: var(--accent-primary) !important;
-    }
-  }
-
-  &.p-splitter-vertical > .p-splitter-gutter > .p-splitter-gutter-handle {
-    height: 2px !important;
-    width: 40px !important;
-    background: var(--border-secondary) !important;
-    border-radius: 2px;
-    margin: auto;
-  }
-
-}
-
-// ── Canvas vertical splitter specific overrides ───────────────────────────────
-// The canvas splitter panels must use overflow:hidden so the scroll container
-// inside (main#preview-container) is the only thing that scrolls.
-// Without this, PrimeNG's default overflow:auto on panels competes with the
-// inner scroll and sections appear cut off or duplicated in scroll position.
-
-.canvas-v-splitter {
-  // FIX: Force splitter panels to clip overflow so the inner <main>
-  //      with overflow-y:auto is the SOLE scroll surface for the canvas.
-  .p-splitter-panel {
-    overflow: hidden !important;
-  }
-}
-
-// ── Floating dialog panel ─────────────────────────────────────────────────────
-
-.builder-floating-panel {
-  border-radius: var(--ui-border-radius-lg) !important;
-  box-shadow: var(--shadow-2xl) !important;
-  overflow: hidden;
-  border: 1px solid var(--border-primary);
-
-  .p-dialog-header {
-    padding: 10px 14px !important;
-    background: #fff !important;
-    border-bottom: 1px solid var(--border-primary);
-
-    .p-dialog-title { font-size: 0.9rem; }
-    .p-dialog-header-icons { display: none !important; }
-  }
-
-  .p-dialog-content {
-    padding: 0 !important;
-    background: var(--bg-secondary) !important;
-    height: 100%;
-  }
-
-  .p-resizable-handle { opacity: 0.4; }
-}
-
-// ── Custom scrollbar (shared across sidebar + canvas) ─────────────────────────
-
-.custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: var(--border-secondary) transparent;
-
-  &::-webkit-scrollbar       { width: 4px; height: 4px; }
-  &::-webkit-scrollbar-track { background: transparent; }
-  &::-webkit-scrollbar-thumb {
-    background: var(--border-secondary);
-    border-radius: 4px;
-
-    &:hover { background: var(--border-primary); }
-  }
-}
-
-// ── PrimeNG Splitter panel height fix ─────────────────────────────────────────
-// PrimeNG sets .p-splitter and .p-splitter-panel to height: auto by default.
-// This breaks scroll containment when nested inside a flex container.
-// FIX: Force the root splitter and all panels to fill their allocated space.
-
-.p-splitter {
-  &.h-full {
-    height: 100% !important;
-  }
-
-  // FIX: Splitter panels must be block-level and fill their allocated size.
-  // This is the root cause of the "sections not visible" bug — panels were
-  // collapsing to auto height, so the canvas never had a bounded height to
-  // scroll within.
-  .p-splitter-panel {
-    min-height: 0;  // Required so flex children can shrink below content height
-    overflow: hidden; // Delegate scrolling to inner elements, not the panel
-  }
-}
-
-// /* ==========================================================================
-//    COMPONENT STYLES
-//    ========================================================================== */
-   
-// /* Apply Token Mapping */
-// :host {
-//   // @include apply-canonical-mapping;
-//   display: block;
-//   height: 100vh;
-//   width: 100%;
-// }
-
-// // ── Force all section preview components to render as block elements ──────
-// // Angular custom elements default to `display: inline` unless :host defines
-// // `display: block`. The section components had this commented out, so they
-// // weren't stacking vertically in the canvas. This rule overrides that at the
-// // builder level (ViewEncapsulation.None) without touching each component.
-// app-hero-banner,
-// app-product-slider,
-// app-product-grid,
-// app-category-grid,
-// app-feature-grid,
-// app-text-content,
-// app-video-hero,
-// app-split-content,
-// app-testimonial-slider,
-// app-logo-cloud,
-// app-stats-counter,
-// app-newsletter-signup,
-// app-contact-form,
-// app-pricing-table,
-// app-faq-accordion,
-// app-countdown-timer,
-// app-blog-feed,
-// app-product-listing,
-// app-map-locations {
-//   display: block !important;
-//   width: 100%;
-// }
-
-// /* --- Layout Utils --- */
-// .builder-layout {
-//   font-family: var(--font-body);
-//   color: var(--text-secondary);
-// }
-
-// .builder-header {
-//   background: var(--bg-primary);
-//   border-bottom: 1px solid var(--border-primary);
-// }
-
-// .action-btn-secondary {
-//   height: 32px;
-//   border-radius: var(--ui-border-radius);
-//   font-size: var(--font-size-xs);
-//   font-weight: var(--font-weight-bold);
-//   text-transform: uppercase;
-//   letter-spacing: 0.025em;
-//   background: var(--bg-primary);
-//   border: 1px solid var(--theme-border-secondary);
-//   color: var(--text-secondary);
-//   transition: all 0.2s ease;
-  
-//   &:hover {
-//     background: var(--bg-secondary);
-//     color: var(--text-primary);
-//   }
-// }
-
-// .action-btn-primary {
-//   @extend .action-btn-secondary;
-//   background: var(--theme-text-primary);
-//   color: white;
-//   border: none;
-  
-//   &:hover {
-//     background: black;
-//     color: white;
-//   }
-// }
-
-// /* --- Sidebar --- */
-// .badge-count {
-//   font-family: var(--font-mono);
-//   font-size: 10px;
-//   background: var(--bg-primary);
-//   border: 1px solid var(--border-primary);
-//   padding: 2px 6px;
-//   border-radius: 4px;
-//   color: var(--text-tertiary);
-// }
-
-// .layer-card {
-//   display: flex;
-//   align-items: center;
-//   gap: 12px;
-//   padding: 10px;
-//   background: var(--bg-primary);
-//   border: 1px solid var(--border-primary);
-//   border-radius: var(--ui-border-radius);
-//   cursor: pointer;
-//   transition: all 0.2s ease;
-//   position: relative;
-//   overflow: hidden;
-
-//   &:hover {
-//     border-color: var(--accent-tertiary);
-//     box-shadow: var(--shadow-sm);
-    
-//     .delete-btn { opacity: 1; }
-//   }
-
-//   &.active {
-//     background: var(--bg-primary);
-//     border-color: var(--accent-primary);
-//     box-shadow: 0 0 0 2px var(--accent-focus);
-    
-//     .layer-title { color: var(--accent-primary); }
-//     .drag-handle i { color: var(--accent-primary) !important; }
-//   }
-// }
-
-// .drag-handle {
-//   display: flex;
-//   cursor: grab;
-//   padding: 4px;
-  
-//   &:active { cursor: grabbing; }
-// }
-
-// .layer-title {
-//   font-size: var(--font-size-sm);
-//   font-weight: var(--font-weight-semibold);
-//   color: var(--text-primary);
-//   line-height: 1.2;
-// }
-
-// .layer-subtitle {
-//   font-size: 10px;
-//   color: var(--text-tertiary);
-//   white-space: nowrap;
-//   overflow: hidden;
-//   text-overflow: ellipsis;
-// }
-
-// .delete-btn {
-//   width: 24px;
-//   height: 24px;
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   border-radius: 4px;
-//   color: var(--theme-error);
-//   opacity: 0;
-//   transition: all 0.2s;
-  
-//   &:hover {
-//     background: rgba(239, 68, 68, 0.1);
-//   }
-// }
-
-// .btn-dashed {
-//   width: 100%;
-//   padding: 12px;
-//   border: 1px dashed var(--theme-border-secondary);
-//   border-radius: var(--ui-border-radius);
-//   background: transparent;
-//   color: var(--text-tertiary);
-//   font-size: var(--font-size-xs);
-//   font-weight: var(--font-weight-semibold);
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   gap: 8px;
-//   transition: all 0.2s;
-  
-//   &:hover {
-//     border-color: var(--accent-primary);
-//     color: var(--accent-primary);
-//     background: var(--accent-focus);
-//   }
-// }
-
-// /* --- Config Area --- */
-// .config-header {
-//   height: 40px;
-//   padding: 0 12px;
-//   border-bottom: 1px solid var(--border-primary);
-//   display: flex;
-//   justify-content: space-between;
-//   align-items: center;
-//   background: var(--bg-secondary);
-// }
-
-// .icon-btn {
-//   width: 28px;
-//   height: 28px;
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   border-radius: 4px;
-//   color: var(--text-tertiary);
-//   transition: background 0.2s;
-  
-//   &:hover {
-//     background: var(--component-bg-hover);
-//     color: var(--text-primary);
-//   }
-// }
-
-// /* --- Library Modal --- */
-// .library-card {
-//   display: flex;
-//   flex-direction: column;
-//   padding: 16px;
-//   background: white;
-//   border: 1px solid var(--border-primary);
-//   border-radius: var(--ui-border-radius-lg);
-//   text-align: left;
-//   transition: all 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
-  
-//   &:hover {
-//     border-color: var(--accent-primary);
-//     transform: translateY(-2px);
-//     box-shadow: var(--shadow-lg);
-    
-//     .icon-wrapper {
-//       background: var(--accent-primary);
-//       color: white;
-//       transform: scale(1.1);
-//     }
-//   }
-// }
-
-// .icon-wrapper {
-//   width: 48px;
-//   height: 48px;
-//   background: var(--bg-secondary);
-//   border-radius: 12px;
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   color: var(--text-label);
-//   transition: all 0.3s ease;
-//   margin-bottom: 8px;
-// }
-
-// /* --- Animations --- */
-// @keyframes slide-up {
-//   from { opacity: 0; transform: translateY(20px); }
-//   to { opacity: 1; transform: translateY(0); }
-// }
-
-// @keyframes fade-in {
-//   from { opacity: 0; }
-//   to { opacity: 1; }
-// }
-
-// @keyframes scale-in {
-//   from { opacity: 0; transform: scale(0.95); }
-//   to { opacity: 1; transform: scale(1); }
-// }
-
-// .animate-slide-up { animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-// .animate-fade-in { animation: fade-in 0.2s ease-out forwards; }
-// .animate-scale-in { animation: scale-in 0.2s ease-out forwards; }
-
-// /* --- PrimeNG Overrides (ViewEncapsulation.None required) --- */
-// .custom-splitter {
-//   .p-splitter-gutter {
-//     background: var(--bg-secondary) !important;
-//     width: 1px !important;
-//     transition: background 0.2s;
-    
-//     &:hover { background: var(--accent-primary) !important; }
-//   }
-//   .p-splitter-gutter-handle { display: none !important; }
-// }
-
-// /* Floating Dialog Styling */
-// .builder-floating-panel {
-//   border-radius: var(--ui-border-radius-lg) !important;
-//   box-shadow: var(--shadow-2xl) !important;
-//   overflow: hidden;
-//   border: 1px solid var(--border-primary);
-
-//   .p-dialog-header {
-//     padding: 12px 16px !important;
-//     background: white !important;
-//     border-bottom: 1px solid var(--border-primary);
-    
-//     .p-dialog-title { font-size: 1rem; }
-//     .p-dialog-header-icons { display: none; } /* We use custom header */
-//   }
-
-//   .p-dialog-content {
-//     padding: 0 !important;
-//     background: var(--bg-secondary) !important;
-//   }
-  
-//   .p-resizable-handle { opacity: 0.5; }
-// }
-
 .builder-workbench {
   --builder-bg: #f4f6fb;
-  --builder-surface: rgba(255, 255, 255, 0.92);
+  --builder-surface: rgba(255, 255, 255, 0.95);
   --builder-border: var(--apx-color-border);
   --builder-ink: var(--apx-color-ink);
-  --builder-muted: var(--apx-color-muted);
-  min-height: calc(100vh - 64px);
-  background:
-    linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0)),
-    var(--builder-bg);
+  min-height: calc(100vh - 56px); /* Adjusted for tighter header */
+  background: linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0)), var(--builder-bg);
   color: var(--builder-ink);
   font-family: var(--apx-font-sans);
 }
@@ -734,59 +35,145 @@ app-storefront-section-renderer {
   background: var(--builder-surface) !important;
   backdrop-filter: var(--apx-glass-blur);
   border-color: var(--builder-border) !important;
-  box-shadow: var(--apx-shadow-xs) !important;
 }
 
-.builder-workbench__title {
-  letter-spacing: 0;
+// ── Header action buttons ─────────────────────────────────────────────────────
+.action-btn-secondary {
+  height: 28px;
+  border-radius: var(--apx-radius-md);
+  font-size: 10px;
+  font-weight: var(--apx-font-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  background: #ffffff;
+  border: 1px solid var(--builder-border);
+  transition: all var(--apx-duration-fast) var(--apx-ease-standard);
+
+  &:hover { background: #f8fafc; color: var(--apx-color-ink); }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
+.action-btn-primary {
+  @extend .action-btn-secondary;
+  background: var(--apx-color-ink);
+  color: #fff;
+  border: none;
+  &:hover:not(:disabled) { background: var(--apx-color-primary); color: #fff; }
+}
+
+// ── Sidebar layer panel ───────────────────────────────────────────────────────
 .builder-workbench__sidebar {
-  background: color-mix(in srgb, var(--apx-color-surface) 92%, transparent) !important;
-  backdrop-filter: blur(18px);
+  background: color-mix(in srgb, var(--apx-color-surface) 95%, transparent) !important;
+  backdrop-filter: blur(12px);
 }
 
-.builder-workbench__layers .layer-card {
-  min-height: 3rem;
-  border-radius: var(--apx-radius-md);
-  border: 1px solid transparent;
-  transition:
-    transform var(--apx-duration-fast) var(--apx-ease-standard),
-    border-color var(--apx-duration-base) var(--apx-ease-standard),
-    background var(--apx-duration-base) var(--apx-ease-standard),
-    box-shadow var(--apx-duration-base) var(--apx-ease-standard);
+.badge-count {
+  font-family: var(--apx-font-mono);
+  font-size: 9px;
+  background: #ffffff;
+  border: 1px solid var(--builder-border);
+  padding: 1px 5px;
+  border-radius: 4px;
+  color: var(--apx-color-muted);
 }
 
-.builder-workbench__layers .layer-card:hover,
-.builder-workbench__layers .layer-card.active {
-  transform: translateY(-1px);
-  border-color: color-mix(in srgb, var(--apx-color-primary) 30%, var(--builder-border));
-  background: color-mix(in srgb, var(--apx-color-primary) 6%, #fff);
-  box-shadow: var(--apx-shadow-xs);
+.layer-card {
+  display: flex; align-items: center; gap: 8px; padding: 6px 8px;
+  background: #ffffff; border: 1px solid transparent; border-radius: var(--apx-radius-sm);
+  cursor: pointer; transition: all 0.15s ease; position: relative; flex-shrink: 0;
+
+  &:hover {
+    border-color: var(--builder-border); box-shadow: var(--apx-shadow-xs);
+    .delete-btn { opacity: 1; }
+  }
+
+  &.active {
+    background: color-mix(in srgb, var(--apx-color-primary) 4%, #fff);
+    border-color: color-mix(in srgb, var(--apx-color-primary) 30%, var(--builder-border));
+    box-shadow: 0 0 0 1px var(--apx-color-primary) inset;
+    .layer-title { color: var(--apx-color-primary); font-weight: 700; }
+  }
 }
 
-.builder-workbench__canvas {
-  background:
-    linear-gradient(90deg, rgba(17,24,39,0.045) 1px, transparent 1px),
-    linear-gradient(180deg, rgba(17,24,39,0.045) 1px, transparent 1px),
-    #eef1f6 !important;
-  background-size: 24px 24px;
+.drag-handle { display: flex; cursor: grab; padding: 2px; color: var(--apx-color-muted); &:active { cursor: grabbing; } }
+
+.layer-title { font-weight: var(--apx-font-semibold); color: var(--apx-color-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.layer-subtitle { color: var(--apx-color-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.delete-btn {
+  width: 20px; height: 20px; display: grid; place-items: center; border-radius: 4px; color: var(--apx-color-error, #e11d48);
+  opacity: 0; transition: all 0.15s; background: none; border: none; cursor: pointer; flex-shrink: 0;
+  &:hover { background: rgba(239, 68, 68, 0.1); }
 }
 
-.builder-workbench .action-btn-primary,
-.builder-workbench .action-btn-secondary,
-.builder-workbench .icon-btn,
-.builder-workbench .btn-dashed {
-  border-radius: var(--apx-radius-md);
-  transition:
-    transform var(--apx-duration-fast) var(--apx-ease-standard),
-    box-shadow var(--apx-duration-base) var(--apx-ease-standard),
-    background var(--apx-duration-base) var(--apx-ease-standard);
+.btn-dashed {
+  width: 100%; padding: 8px; border: 1px dashed var(--builder-border); border-radius: var(--apx-radius-sm);
+  background: transparent; color: var(--apx-color-muted); font-weight: var(--apx-font-semibold);
+  display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s; cursor: pointer; flex-shrink: 0;
+  &:hover { border-color: var(--apx-color-primary); color: var(--apx-color-primary); background: color-mix(in srgb, var(--apx-color-primary) 4%, transparent); }
 }
 
-.builder-workbench .action-btn-primary:hover,
-.builder-workbench .action-btn-secondary:hover,
-.builder-workbench .icon-btn:hover,
-.builder-workbench .btn-dashed:hover {
-  transform: translateY(-1px);
+// ── Config panel header ───────────────────────────────────────────────────────
+.config-header {
+  height: 36px; padding: 0 12px; border-bottom: 1px solid var(--builder-border);
+  display: flex; justify-content: space-between; align-items: center; background: #f8fafc; flex-shrink: 0;
+}
+
+.icon-btn {
+  width: 24px; height: 24px; display: grid; place-items: center; border-radius: 4px;
+  color: var(--apx-color-muted); background: none; border: none; cursor: pointer; transition: background 0.15s;
+  &:hover { background: #ffffff; color: var(--apx-color-ink); box-shadow: var(--apx-shadow-xs); }
+}
+
+// ── Component library modal ───────────────────────────────────────────────────
+.library-card {
+  display: flex; flex-direction: column; padding: 12px; background: #fff;
+  border: 1px solid var(--builder-border); border-radius: var(--apx-radius-md);
+  transition: all 0.2s cubic-bezier(0.2, 0.9, 0.2, 1); cursor: pointer;
+
+  &:hover {
+    border-color: var(--apx-color-primary); transform: translateY(-2px); box-shadow: var(--apx-shadow-md);
+    .icon-wrapper { background: var(--apx-color-primary); color: #fff; transform: scale(1.05); }
+  }
+}
+
+.icon-wrapper {
+  width: 36px; height: 36px; background: #f8fafc; border-radius: 8px; display: grid; place-items: center;
+  color: var(--apx-color-muted); transition: all 0.25s ease; flex-shrink: 0;
+}
+
+// ── Animations ────────────────────────────────────────────────────────────────
+@keyframes fade-in  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes scale-in { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+
+.animate-fade-in  { animation: fade-in  0.15s ease-out forwards; }
+.animate-scale-in { animation: scale-in 0.18s ease-out forwards; }
+
+// ── PrimeNG Splitter overrides (Cleaned up) ──────────────────────────────────
+.custom-splitter {
+  &.p-splitter-horizontal > .p-splitter-gutter {
+    background: var(--builder-border) !important; width: 4px !important; cursor: col-resize; transition: background 0.2s;
+    &:hover, &:active { background: var(--apx-color-primary) !important; }
+  }
+  &.p-splitter-horizontal > .p-splitter-gutter > .p-splitter-gutter-handle { display: none !important; }
+
+  &.p-splitter-vertical > .p-splitter-gutter {
+    background: var(--builder-border) !important; height: 4px !important; cursor: row-resize; transition: background 0.2s;
+    &:hover, &:active { background: var(--apx-color-primary) !important; }
+  }
+  &.p-splitter-vertical > .p-splitter-gutter > .p-splitter-gutter-handle { display: none !important; }
+}
+
+.canvas-v-splitter .p-splitter-panel { overflow: hidden !important; }
+
+.custom-scrollbar {
+  scrollbar-width: thin; scrollbar-color: var(--apx-color-muted) transparent;
+  &::-webkit-scrollbar       { width: 4px; height: 4px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: var(--apx-color-muted); border-radius: 4px; &:hover { background: var(--apx-color-ink); } }
+}
+
+.p-splitter {
+  &.h-full { height: 100% !important; }
+  .p-splitter-panel { min-height: 0; overflow: hidden; }
 }
