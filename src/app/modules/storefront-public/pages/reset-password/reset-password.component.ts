@@ -83,7 +83,7 @@ import { StorefrontAuthFacade } from '../../../../storefront/core/facades/storef
     .apx-reset-card {
       width: 100%;
       max-width: 420px;
-      background: var(--bg-primary, #ffffff);
+      background: var(--bg-primary, var(--bg-primary));
       border: 1px solid var(--border-secondary, #e5e7eb);
       border-radius: 1.5rem;
       box-shadow: 0 24px 64px -12px rgba(0,0,0,0.1);
@@ -132,7 +132,7 @@ import { StorefrontAuthFacade } from '../../../../storefront/core/facades/storef
       margin: 1.5rem 2rem 0;
       padding: 0.85rem 1rem;
       border-radius: 0.85rem;
-      background: #fff7ed;
+      background: var(--bg-primary)7ed;
       border: 1px solid #fed7aa;
       color: #9a3412;
       font-size: 0.875rem;
@@ -156,7 +156,7 @@ import { StorefrontAuthFacade } from '../../../../storefront/core/facades/storef
     .apx-field__error { font-size: 0.75rem; color: #ea580c; font-weight: 600; }
     
     /* CTA */
-    .apx-reset-cta { display: flex; align-items: center; justify-content: center; gap: 0.6rem; width: 100%; min-height: 3rem; border: 0; border-radius: 0.9rem; background: var(--apx-gradient-commerce, linear-gradient(135deg, #6366f1, #8b5cf6)); color: #fff; font-size: 1rem; font-weight: 900; cursor: pointer; transition: opacity 0.2s, transform 0.15s; }
+    .apx-reset-cta { display: flex; align-items: center; justify-content: center; gap: 0.6rem; width: 100%; min-height: 3rem; border: 0; border-radius: 0.9rem; background: var(--apx-gradient-commerce, linear-gradient(135deg, #6366f1, #8b5cf6)); color: var(--bg-primary); font-size: 1rem; font-weight: 900; cursor: pointer; transition: opacity 0.2s, transform 0.15s; }
     .apx-reset-cta:hover:not([disabled]) { opacity: 0.92; transform: translateY(-1px); }
     .apx-reset-cta[disabled] { opacity: 0.5; cursor: not-allowed; }
   `]

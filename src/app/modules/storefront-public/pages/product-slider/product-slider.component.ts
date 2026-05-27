@@ -127,7 +127,7 @@ export interface ProductSliderConfig extends SectionBaseConfig {
         height: 48px;
         border-radius: 50%;
         border: 1px solid var(--border-secondary, #e5e7eb);
-        background: var(--bg-primary, #fff);
+        background: var(--bg-primary, var(--bg-primary));
         color: var(--text-primary, #111);
         display: flex;
         align-items: center;
@@ -136,9 +136,9 @@ export interface ProductSliderConfig extends SectionBaseConfig {
         transition: all 0.2s ease;
 
         &:hover:not(:disabled) {
-          border-color: var(--color-primary, #2563eb);
-          background: var(--color-primary, #2563eb);
-          color: #fff;
+          border-color: var(--color-primary, var(--accent-primary));
+          background: var(--color-primary, var(--accent-primary));
+          color: var(--bg-primary);
           transform: scale(1.05);
         }
 
@@ -205,7 +205,7 @@ export interface ProductSliderConfig extends SectionBaseConfig {
 
       .progress-bar {
         height: 100%;
-        background: var(--color-primary, #2563eb);
+        background: var(--color-primary, var(--accent-primary));
         width: 25%;
         border-radius: 10px;
         animation: slideIndicate 2s infinite ease-in-out;
@@ -496,7 +496,7 @@ export class ProductSliderComponent implements OnInit, OnChanges, AfterViewInit,
 //         font-weight: 700;
 //         text-transform: uppercase;
 //         letter-spacing: 2px;
-//         color: var(--color-primary, #2563eb);
+//         color: var(--color-primary, var(--accent-primary));
 //         margin-bottom: var(--spacing-sm, 0.5rem);
 //       }
 
@@ -528,7 +528,7 @@ export class ProductSliderComponent implements OnInit, OnChanges, AfterViewInit,
 //         height: 48px;
 //         border-radius: 50%;
 //         border: 1px solid var(--border-secondary, #e5e7eb);
-//         background: var(--bg-primary, #fff);
+//         background: var(--bg-primary, var(--bg-primary));
 //         color: var(--text-primary, #111);
 
 //         display: flex;
@@ -538,9 +538,9 @@ export class ProductSliderComponent implements OnInit, OnChanges, AfterViewInit,
 //         transition: all 0.2s ease;
 
 //         &:hover:not(:disabled) {
-//           border-color: var(--color-primary, #2563eb);
-//           background: var(--color-primary, #2563eb);
-//           color: #fff;
+//           border-color: var(--color-primary, var(--accent-primary));
+//           background: var(--color-primary, var(--accent-primary));
+//           color: var(--bg-primary);
 //           transform: scale(1.05);
 //         }
 
@@ -635,7 +635,7 @@ export class ProductSliderComponent implements OnInit, OnChanges, AfterViewInit,
 
 //       .progress-bar {
 //         height: 100%;
-//         background: var(--color-primary, #2563eb);
+//         background: var(--color-primary, var(--accent-primary));
 //         width: 25%;
 //         border-radius: 10px;
 //         animation: slideIndicate 2s infinite ease-in-out;
@@ -857,7 +857,7 @@ export class ProductSliderComponent implements OnInit, OnChanges, AfterViewInit,
 // //       display: block;
 // //       width: 100%;
 // //       --md-sys-color-primary: var(--theme-accent-primary, #1a73e8);
-// //       --md-sys-color-surface: var(--bg-primary, #ffffff);
+// //       --md-sys-color-surface: var(--bg-primary, var(--bg-primary));
 // //       --md-sys-color-on-surface: #202124;
 // //       --md-sys-color-outline: #dadce0;
 // //       --md-sys-easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
@@ -938,7 +938,7 @@ export class ProductSliderComponent implements OnInit, OnChanges, AfterViewInit,
 // //       width: 48px;
 // //       height: 48px;
 // //       border-radius: 50%;
-// //       background: #ffffff;
+// //       background: var(--bg-primary);
 // //       color: #5f6368;
 // //       border: 1px solid var(--md-sys-color-outline);
 // //       box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);

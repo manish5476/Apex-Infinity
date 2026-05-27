@@ -24,9 +24,9 @@ import { StorefrontStateService } from '@core/services/storefront-state.service'
     :host { display: block; }
 
     .footer-minimal {
-      border-top: 1px solid var(--apx-color-border);
-      background: var(--apx-color-surface);
-      color: var(--apx-color-muted);
+      border-top: 1px solid var(--border-primary);
+      background: var(--bg-primary);
+      color: var(--text-secondary);
     }
 
     .footer-minimal__inner {
@@ -43,7 +43,7 @@ import { StorefrontStateService } from '@core/services/storefront-state.service'
     }
 
     .brand {
-      color: var(--apx-color-ink);
+      color: var(--text-primary);
       font-family: var(--apx-font-display);
       font-weight: 900;
     }
@@ -60,7 +60,7 @@ import { StorefrontStateService } from '@core/services/storefront-state.service'
     }
 
     a:hover {
-      color: var(--apx-color-primary);
+      color: var(--accent-primary);
     }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush

@@ -121,11 +121,11 @@ export interface FeaturedProductConfig extends SectionBaseConfig {
     }
 
     .prem-featured {
-      background-color: var(--bg-primary, #ffffff);
+      background-color: var(--bg-primary, var(--bg-primary));
       overflow: hidden;
       transition: background-color 0.5s var(--ease-smooth);
       font-family: var(--font-heading, 'Inter', -apple-system, sans-serif);
-      color: var(--text-primary, #0f172a);
+      color: var(--text-primary, var(--text-primary));
     }
 
     .prem-featured__container {
@@ -165,7 +165,7 @@ export interface FeaturedProductConfig extends SectionBaseConfig {
     .prem-media__glow {
       position: absolute;
       inset: -10%;
-      background: radial-gradient(circle at center, color-mix(in srgb, var(--theme-accent-primary, #2563eb) 40%, transparent), transparent 60%);
+      background: radial-gradient(circle at center, color-mix(in srgb, var(--theme-accent-primary, var(--accent-primary)) 40%, transparent), transparent 60%);
       filter: blur(60px);
       opacity: 0.3;
       z-index: 0;
@@ -184,8 +184,8 @@ export interface FeaturedProductConfig extends SectionBaseConfig {
       width: 100%;
       aspect-ratio: 1 / 1;
       border-radius: 2rem; /* Smooth Apple-like corners */
-      background-color: var(--bg-secondary, #f8fafc);
-      border: 1px solid color-mix(in srgb, var(--border-secondary, #e2e8f0) 50%, transparent);
+      background-color: var(--bg-secondary, var(--bg-secondary));
+      border: 1px solid color-mix(in srgb, var(--border-secondary, var(--border-primary)) 50%, transparent);
       box-shadow: 
         0 4px 6px -1px rgba(0, 0, 0, 0.05),
         0 20px 40px -10px rgba(0, 0, 0, 0.1);
@@ -204,7 +204,7 @@ export interface FeaturedProductConfig extends SectionBaseConfig {
       transform: translateY(-8px);
       box-shadow: 
         0 10px 15px -3px rgba(0, 0, 0, 0.05),
-        0 30px 60px -15px color-mix(in srgb, var(--theme-accent-primary, #2563eb) 20%, rgba(0,0,0,0.15));
+        0 30px 60px -15px color-mix(in srgb, var(--theme-accent-primary, var(--accent-primary)) 20%, rgba(0,0,0,0.15));
     }
 
     .prem-media__img {
@@ -224,7 +224,7 @@ export interface FeaturedProductConfig extends SectionBaseConfig {
       top: 1.5rem;
       left: 1.5rem;
       background: rgba(255, 255, 255, 0.8);
-      color: #ef4444; /* Premium Rose/Red */
+      color: var(--color-error); /* Premium Rose/Red */
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.5);
@@ -249,7 +249,7 @@ export interface FeaturedProductConfig extends SectionBaseConfig {
       font-family: var(--font-mono, monospace);
       font-size: 0.8125rem;
       font-weight: 600;
-      color: var(--text-tertiary, #64748b);
+      color: var(--text-tertiary, var(--text-secondary));
       text-transform: uppercase;
       letter-spacing: 0.15em;
       margin-bottom: 1rem;
@@ -261,9 +261,9 @@ export interface FeaturedProductConfig extends SectionBaseConfig {
       letter-spacing: -0.03em;
       line-height: 1.05;
       margin: 0 0 1.5rem 0;
-      color: var(--text-primary, #0f172a);
+      color: var(--text-primary, var(--text-primary));
       /* Subtle text gradient for a highly polished feel */
-      background: linear-gradient(to right bottom, var(--text-primary, #0f172a) 30%, color-mix(in srgb, var(--text-primary, #0f172a) 60%, transparent));
+      background: linear-gradient(to right bottom, var(--text-primary, var(--text-primary)) 30%, color-mix(in srgb, var(--text-primary, var(--text-primary)) 60%, transparent));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
@@ -278,21 +278,21 @@ export interface FeaturedProductConfig extends SectionBaseConfig {
     .prem-price-current {
       font-size: 2.25rem;
       font-weight: 700;
-      color: var(--text-primary, #0f172a);
+      color: var(--text-primary, var(--text-primary));
       letter-spacing: -0.02em;
     }
 
     .prem-price-old {
       font-size: 1.25rem;
       font-weight: 500;
-      color: var(--text-tertiary, #94a3b8);
+      color: var(--text-tertiary, var(--text-secondary));
       text-decoration: line-through;
     }
 
     .prem-desc {
       font-size: 1.125rem;
       line-height: 1.6;
-      color: var(--text-secondary, #475569);
+      color: var(--text-secondary, var(--text-secondary));
       margin: 0 0 2.5rem 0;
       max-width: 500px;
     }
@@ -325,27 +325,27 @@ export interface FeaturedProductConfig extends SectionBaseConfig {
     }
 
     .prem-btn--primary {
-      background-color: var(--theme-accent-primary, #0f172a);
-      color: var(--bg-primary, #ffffff);
+      background-color: var(--theme-accent-primary, var(--text-primary));
+      color: var(--bg-primary, var(--bg-primary));
       border: 1px solid transparent;
-      box-shadow: 0 4px 14px color-mix(in srgb, var(--theme-accent-primary, #0f172a) 25%, transparent);
+      box-shadow: 0 4px 14px color-mix(in srgb, var(--theme-accent-primary, var(--text-primary)) 25%, transparent);
     }
 
     .prem-btn--primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 20px color-mix(in srgb, var(--theme-accent-primary, #0f172a) 40%, transparent);
+      box-shadow: 0 8px 20px color-mix(in srgb, var(--theme-accent-primary, var(--text-primary)) 40%, transparent);
       filter: brightness(1.1);
     }
 
     .prem-btn--secondary {
       background-color: transparent;
-      color: var(--text-primary, #0f172a);
-      border: 1px solid color-mix(in srgb, var(--text-primary, #0f172a) 20%, transparent);
+      color: var(--text-primary, var(--text-primary));
+      border: 1px solid color-mix(in srgb, var(--text-primary, var(--text-primary)) 20%, transparent);
     }
 
     .prem-btn--secondary:hover {
-      background-color: color-mix(in srgb, var(--text-primary, #0f172a) 5%, transparent);
-      border-color: color-mix(in srgb, var(--text-primary, #0f172a) 40%, transparent);
+      background-color: color-mix(in srgb, var(--text-primary, var(--text-primary)) 5%, transparent);
+      border-color: color-mix(in srgb, var(--text-primary, var(--text-primary)) 40%, transparent);
     }
 
     /* --- Trust Indicators --- */
@@ -354,7 +354,7 @@ export interface FeaturedProductConfig extends SectionBaseConfig {
       grid-template-columns: repeat(3, 1fr);
       gap: 1.5rem;
       padding-top: 2rem;
-      border-top: 1px solid color-mix(in srgb, var(--border-secondary, #e2e8f0) 60%, transparent);
+      border-top: 1px solid color-mix(in srgb, var(--border-secondary, var(--border-primary)) 60%, transparent);
     }
 
     .prem-trust__item {
@@ -362,25 +362,25 @@ export interface FeaturedProductConfig extends SectionBaseConfig {
       flex-direction: column;
       align-items: flex-start;
       gap: 0.75rem;
-      color: var(--text-secondary, #475569);
+      color: var(--text-secondary, var(--text-secondary));
     }
 
     .prem-trust__icon {
       width: 2.5rem;
       height: 2.5rem;
       border-radius: 50%;
-      background: color-mix(in srgb, var(--text-primary, #0f172a) 5%, transparent);
+      background: color-mix(in srgb, var(--text-primary, var(--text-primary)) 5%, transparent);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--text-primary, #0f172a);
+      color: var(--text-primary, var(--text-primary));
       transition: transform 0.3s var(--ease-spring);
     }
 
     .prem-trust__item:hover .prem-trust__icon {
       transform: scale(1.1) rotate(5deg);
-      background: color-mix(in srgb, var(--theme-accent-primary, #2563eb) 10%, transparent);
-      color: var(--theme-accent-primary, #2563eb);
+      background: color-mix(in srgb, var(--theme-accent-primary, var(--accent-primary)) 10%, transparent);
+      color: var(--theme-accent-primary, var(--accent-primary));
     }
 
     .prem-trust__item i { font-size: 1rem; }
@@ -398,9 +398,9 @@ export interface FeaturedProductConfig extends SectionBaseConfig {
       align-items: center;
       justify-content: center;
       padding: 6rem 2rem;
-      background: color-mix(in srgb, var(--bg-secondary, #f8fafc) 50%, transparent);
+      background: color-mix(in srgb, var(--bg-secondary, var(--bg-secondary)) 50%, transparent);
       border-radius: 2rem;
-      border: 1px dashed color-mix(in srgb, var(--border-secondary, #e2e8f0) 80%, transparent);
+      border: 1px dashed color-mix(in srgb, var(--border-secondary, var(--border-primary)) 80%, transparent);
       text-align: center;
     }
 
@@ -408,18 +408,18 @@ export interface FeaturedProductConfig extends SectionBaseConfig {
       width: 5rem;
       height: 5rem;
       border-radius: 50%;
-      background: var(--bg-primary, #ffffff);
+      background: var(--bg-primary, var(--bg-primary));
       display: flex;
       align-items: center;
       justify-content: center;
       margin-bottom: 1.5rem;
       box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-      color: var(--text-tertiary, #94a3b8);
+      color: var(--text-tertiary, var(--text-secondary));
     }
 
     .prem-empty__icon i { font-size: 2rem; }
-    .prem-empty__title { font-size: 1.5rem; font-weight: 700; color: var(--text-primary, #0f172a); margin: 0 0 0.5rem 0; }
-    .prem-empty__desc { color: var(--text-secondary, #64748b); max-width: 400px; }
+    .prem-empty__title { font-size: 1.5rem; font-weight: 700; color: var(--text-primary, var(--text-primary)); margin: 0 0 0.5rem 0; }
+    .prem-empty__desc { color: var(--text-secondary, var(--text-secondary)); max-width: 400px; }
   `]
 })
 export class FeaturedProductComponent implements OnChanges {

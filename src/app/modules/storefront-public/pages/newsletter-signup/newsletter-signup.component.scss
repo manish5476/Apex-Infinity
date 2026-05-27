@@ -109,7 +109,7 @@
   }
 
   &.nl-input-error {
-    border-color: var(--color-error, #e11d48);
+    border-color: var(--color-error, var(--color-error));
   }
 }
 
@@ -163,7 +163,7 @@
 .nl-error-msg {
   margin: 8px 0 0;
   font-size: 11px;
-  color: var(--color-error, #e11d48);
+  color: var(--color-error, var(--color-error));
   display: flex;
   align-items: center;
   gap: 4px;

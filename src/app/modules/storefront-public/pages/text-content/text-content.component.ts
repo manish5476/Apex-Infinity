@@ -63,11 +63,11 @@ const PADDING: Record<string, string> = {
 
     .prem-tc-section {
       position: relative;
-      background-color: var(--bg-primary, #ffffff);
+      background-color: var(--bg-primary, var(--bg-primary));
       transition: background-color 0.5s cubic-bezier(0.16, 1, 0.3, 1), 
                   padding 0.5s cubic-bezier(0.16, 1, 0.3, 1);
       font-family: var(--font-body, 'Inter', -apple-system, sans-serif);
-      color: var(--text-primary, #0f172a);
+      color: var(--text-primary, var(--text-primary));
     }
 
     .prem-tc-container {
@@ -100,7 +100,7 @@ const PADDING: Record<string, string> = {
       letter-spacing: -0.03em;
       line-height: 1.1;
       margin: 0 0 2rem 0;
-      color: var(--text-primary, #0f172a);
+      color: var(--text-primary, var(--text-primary));
       animation: prem-fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
@@ -109,7 +109,7 @@ const PADDING: Record<string, string> = {
     .prem-prose {
       font-size: clamp(1.125rem, 1.5vw, 1.25rem); /* 18px to 20px */
       line-height: 1.75;
-      color: var(--text-secondary, #475569);
+      color: var(--text-secondary, var(--text-secondary));
       animation: prem-fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
       opacity: 0;
     }
@@ -124,7 +124,7 @@ const PADDING: Record<string, string> = {
     }
 
     .prem-prose h1, .prem-prose h2, .prem-prose h3, .prem-prose h4 {
-      color: var(--text-primary, #0f172a);
+      color: var(--text-primary, var(--text-primary));
       font-family: var(--font-heading, sans-serif);
       font-weight: 700;
       line-height: 1.2;
@@ -139,14 +139,14 @@ const PADDING: Record<string, string> = {
     .prem-prose h4 { font-size: 1.25em; }
 
     .prem-prose a {
-      color: var(--theme-accent-primary, #2563eb);
+      color: var(--theme-accent-primary, var(--accent-primary));
       text-decoration: none;
-      border-bottom: 1px solid color-mix(in srgb, var(--theme-accent-primary, #2563eb) 30%, transparent);
+      border-bottom: 1px solid color-mix(in srgb, var(--theme-accent-primary, var(--accent-primary)) 30%, transparent);
       transition: border-color 0.2s;
     }
 
     .prem-prose a:hover {
-      border-bottom-color: var(--theme-accent-primary, #2563eb);
+      border-bottom-color: var(--theme-accent-primary, var(--accent-primary));
     }
 
     .prem-prose ul, .prem-prose ol {
@@ -163,17 +163,17 @@ const PADDING: Record<string, string> = {
       font-size: 1.25em;
       font-style: italic;
       font-weight: 500;
-      color: var(--text-primary, #0f172a);
-      border-left: 4px solid var(--theme-accent-primary, #2563eb);
+      color: var(--text-primary, var(--text-primary));
+      border-left: 4px solid var(--theme-accent-primary, var(--accent-primary));
       padding-left: 1.5em;
       margin: 2em 0;
-      background: linear-gradient(to right, color-mix(in srgb, var(--theme-accent-primary, #2563eb) 5%, transparent), transparent);
+      background: linear-gradient(to right, color-mix(in srgb, var(--theme-accent-primary, var(--accent-primary)) 5%, transparent), transparent);
       padding: 1.5em;
       border-radius: 0 1rem 1rem 0;
     }
 
     .prem-prose strong, .prem-prose b {
-      color: var(--text-primary, #0f172a);
+      color: var(--text-primary, var(--text-primary));
       font-weight: 700;
     }
 
@@ -191,9 +191,9 @@ const PADDING: Record<string, string> = {
       align-items: center;
       justify-content: center;
       padding: 6rem 2rem;
-      background: color-mix(in srgb, var(--bg-secondary, #f8fafc) 50%, transparent);
+      background: color-mix(in srgb, var(--bg-secondary, var(--bg-secondary)) 50%, transparent);
       border-radius: 2rem;
-      border: 1px dashed color-mix(in srgb, var(--border-secondary, #e2e8f0) 80%, transparent);
+      border: 1px dashed color-mix(in srgb, var(--border-secondary, var(--border-primary)) 80%, transparent);
       text-align: center;
     }
 
@@ -201,18 +201,18 @@ const PADDING: Record<string, string> = {
       width: 5rem;
       height: 5rem;
       border-radius: 50%;
-      background: var(--bg-primary, #ffffff);
+      background: var(--bg-primary, var(--bg-primary));
       display: flex;
       align-items: center;
       justify-content: center;
       margin-bottom: 1.5rem;
       box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-      color: var(--text-tertiary, #94a3b8);
+      color: var(--text-tertiary, var(--text-secondary));
     }
 
     .prem-empty__icon i { font-size: 2rem; }
-    .prem-empty__title { font-size: 1.5rem; font-weight: 700; color: var(--text-primary, #0f172a); margin: 0 0 0.5rem 0; }
-    .prem-empty__desc { color: var(--text-secondary, #64748b); max-width: 400px; }
+    .prem-empty__title { font-size: 1.5rem; font-weight: 700; color: var(--text-primary, var(--text-primary)); margin: 0 0 0.5rem 0; }
+    .prem-empty__desc { color: var(--text-secondary, var(--text-secondary)); max-width: 400px; }
 
     /* --- Animations --- */
     @keyframes prem-fade-up {

@@ -28,7 +28,7 @@
     width: 700px;
     height: 700px;
     border-radius: 50%;
-    background: var(--accent-primary, #2563eb);
+    background: var(--accent-primary, var(--accent-primary));
     opacity: 0.04;
     filter: blur(100px);
     pointer-events: none;
@@ -60,7 +60,7 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 3px;
-  color: var(--accent-primary, #2563eb);
+  color: var(--accent-primary, var(--accent-primary));
   margin-bottom: 8px;
   font-family: var(--font-mono, monospace);
 }
@@ -339,7 +339,7 @@
 
     .card-read-more {
       letter-spacing: 2.5px;
-      color: var(--accent-primary, #2563eb);
+      color: var(--accent-primary, var(--accent-primary));
     }
   }
 }
@@ -445,7 +445,7 @@
 
     .card-side-arrow {
       transform: translateX(3px);
-      color: var(--accent-primary, #2563eb);
+      color: var(--accent-primary, var(--accent-primary));
     }
 
     .img-cover {
@@ -481,7 +481,7 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: var(--accent-primary, #2563eb);
+  color: var(--accent-primary, var(--accent-primary));
   font-family: var(--font-mono, monospace);
   margin-bottom: 5px;
 }

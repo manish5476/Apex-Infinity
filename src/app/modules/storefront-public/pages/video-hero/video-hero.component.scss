@@ -145,7 +145,7 @@
   /* Variant: Solid White */
   &.variant-primary {
     background: var(--bg-primary);
-    color: #0f172a;
+    color: var(--text-primary);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 
     &:hover {

@@ -17,7 +17,7 @@ import { combineLatest, of } from 'rxjs';
 import { switchMap, tap, catchError } from 'rxjs/operators';
 import { trigger, transition, style, animate } from '@angular/animations';
 
-// PrimeNG Imports (Kept for your app's compatibility)
+// PrimeNG Imports
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { ToastModule } from 'primeng/toast';
@@ -51,18 +51,24 @@ import { StorefrontCartFacade } from '../../../../storefront/core/facades/storef
   animations: [
     trigger('fadeUp', [
       transition(':enter', [
-        style({ opacity: 0, transform: 'translateY(20px)' }),
-        animate('0.6s cubic-bezier(0.4, 0.0, 0.2, 1)', style({ opacity: 1, transform: 'translateY(0)' }))
+        style({ opacity: 0, transform: 'translateY(16px)' }),
+        animate('500ms cubic-bezier(0.1, 0.76, 0.55, 0.94)', style({ opacity: 1, transform: 'translateY(0)' }))
       ])
     ]),
     trigger('expandCollapse', [
       transition(':enter', [
         style({ height: '0', opacity: 0, overflow: 'hidden' }),
-        animate('300ms cubic-bezier(0.4, 0.0, 0.2, 1)', style({ height: '*', opacity: 1 }))
+        animate('250ms cubic-bezier(0.2, 0, 0, 1)', style({ height: '*', opacity: 1 }))
       ]),
       transition(':leave', [
         style({ height: '*', opacity: 1, overflow: 'hidden' }),
-        animate('300ms cubic-bezier(0.4, 0.0, 0.2, 1)', style({ height: '0', opacity: 0 }))
+        animate('200ms cubic-bezier(0.2, 0, 0, 1)', style({ height: '0', opacity: 0 }))
+      ])
+    ]),
+    trigger('imageSwitch', [
+      transition('* => *', [
+        style({ opacity: 0.6 }),
+        animate('200ms ease-out', style({ opacity: 1 }))
       ])
     ])
   ],
@@ -72,13 +78,21 @@ import { StorefrontCartFacade } from '../../../../storefront/core/facades/storef
     <main class="m3-pdp-root">
       @if (loading()) {
         <div class="m3-container m3-pdp-grid">
-          <div class="m3-gallery-skeleton"></div>
+          <div class="m3-gallery-skeleton-wrapper">
+            <div class="m3-gallery-skeleton"></div>
+            <div class="m3-thumbnails-skeleton">
+              <div class="skel-thumb"></div>
+              <div class="skel-thumb"></div>
+              <div class="skel-thumb"></div>
+            </div>
+          </div>
           <div class="m3-info-skeleton">
-            <div class="skel-line w-30"></div>
+            <div class="skel-line w-20"></div>
             <div class="skel-line w-80 h-xl"></div>
             <div class="skel-line w-40 h-lg"></div>
-            <div class="skel-line w-100"></div>
+            <div class="skel-line w-100 mt-md"></div>
             <div class="skel-line w-90"></div>
+            <div class="skel-line w-95"></div>
             <div class="skel-button mt-xl"></div>
           </div>
         </div>
@@ -99,7 +113,7 @@ import { StorefrontCartFacade } from '../../../../storefront/core/facades/storef
               <div class="m3-gallery-sticky">
                 
                 <div class="m3-main-image-surface">
-                  <img [src]="selectedImage()" [alt]="product().name" class="m3-main-img" />
+                  <img [@imageSwitch]="selectedImage()" [src]="selectedImage()" [alt]="product().name" class="m3-main-img" />
                   
                   @if (product().price?.hasDiscount) {
                     <div class="m3-badge-sale">
@@ -109,16 +123,18 @@ import { StorefrontCartFacade } from '../../../../storefront/core/facades/storef
                 </div>
 
                 @if (product().images && product().images.length > 1) {
-                  <div class="m3-thumbnails">
-                    @for (img of product().images; track img) {
-                      <button 
-                        class="m3-thumb-btn" 
-                        [class.active]="selectedImage() === img"
-                        (click)="changeImage(img)"
-                        aria-label="View product image">
-                        <img [src]="img" alt="Thumbnail" />
-                      </button>
-                    }
+                  <div class="m3-thumbnails-track">
+                    <div class="m3-thumbnails">
+                      @for (img of product().images; track img) {
+                        <button 
+                          class="m3-thumb-btn" 
+                          [class.active]="selectedImage() === img"
+                          (click)="changeImage(img)"
+                          aria-label="View alternative product image">
+                          <img [src]="img" alt="" loading="lazy" />
+                        </button>
+                      }
+                    </div>
                   </div>
                 }
 
@@ -147,7 +163,7 @@ import { StorefrontCartFacade } from '../../../../storefront/core/facades/storef
                 <span class="m3-stock-chip" 
                       [class.in-stock]="product().stock?.available" 
                       [class.out-of-stock]="!product().stock?.available">
-                  <i class="pi" [ngClass]="product().stock?.available ? 'pi-check-circle' : 'pi-times-circle'"></i>
+                  <span class="stock-dot"></span>
                   {{ product().stock?.available ? 'In Stock' : 'Out of Stock' }}
                 </span>
               </div>
@@ -156,26 +172,32 @@ import { StorefrontCartFacade } from '../../../../storefront/core/facades/storef
                 {{ product().description }}
               </p>
 
-              <div class="m3-controls">
+              <div class="m3-action-panel">
                 
                 @if (product().stock?.available) {
-                  <div class="m3-qty-selector">
-                    <button class="m3-qty-btn" (click)="updateQuantity(-1)" [disabled]="quantity() <= 1" aria-label="Decrease quantity">
-                      <i class="pi pi-minus"></i>
-                    </button>
-                    <span class="m3-qty-value">{{ quantity() }}</span>
-                    <button class="m3-qty-btn" (click)="updateQuantity(1)" [disabled]="quantity() >= (product().stock?.quantity || 10)" aria-label="Increase quantity">
-                      <i class="pi pi-plus"></i>
+                  <div class="m3-controls-group">
+                    <div class="m3-qty-selector-wrapper">
+                      <span class="qty-label">Quantity</span>
+                      <div class="m3-qty-selector">
+                        <button class="m3-qty-btn" (click)="updateQuantity(-1)" [disabled]="quantity() <= 1" aria-label="Decrease quantity">
+                          <i class="pi pi-minus"></i>
+                        </button>
+                        <span class="m3-qty-value" aria-live="polite" aria-label="Current quantity selection">{{ quantity() }}</span>
+                        <button class="m3-qty-btn" (click)="updateQuantity(1)" [disabled]="quantity() >= (product().stock?.quantity || 10)" aria-label="Increase quantity">
+                          <i class="pi pi-plus"></i>
+                        </button>
+                      </div>
+                    </div>
+
+                    <button class="m3-btn-primary" (click)="addToCart()" pRipple>
+                      <i class="pi pi-shopping-bag"></i>
+                      <span>Add to Cart</span>
                     </button>
                   </div>
-
-                  <button class="m3-btn-primary" (click)="addToCart()">
-                    <i class="pi pi-shopping-bag"></i>
-                    Add to Cart
-                  </button>
                 } @else {
                   <button class="m3-btn-disabled" disabled>
-                    Out of Stock
+                    <i class="pi pi-ban"></i>
+                    <span>Temporarily Out of Stock</span>
                   </button>
                 }
 
@@ -183,43 +205,60 @@ import { StorefrontCartFacade } from '../../../../storefront/core/facades/storef
 
               <div class="m3-perks">
                 <div class="m3-perk">
-                  <i class="pi pi-verified"></i>
-                  <span>Official Warranty</span>
+                  <div class="perk-icon-box"><i class="pi pi-verified"></i></div>
+                  <div class="perk-text">
+                    <span class="perk-title">Official Warranty</span>
+                    <span class="perk-sub">100% authentic insurance protection</span>
+                  </div>
                 </div>
                 <div class="m3-perk">
-                  <i class="pi pi-box"></i>
-                  <span>Secure Packaging</span>
+                  <div class="perk-icon-box"><i class="pi pi-box"></i></div>
+                  <div class="perk-text">
+                    <span class="perk-title">Secure Packaging</span>
+                    <span class="perk-sub">Damage-proof layered shipment</span>
+                  </div>
                 </div>
                 <div class="m3-perk">
-                  <i class="pi pi-refresh"></i>
-                  <span>Easy Returns</span>
+                  <div class="perk-icon-box"><i class="pi pi-refresh"></i></div>
+                  <div class="perk-text">
+                    <span class="perk-title">Easy Returns</span>
+                    <span class="perk-sub">Hassle-free 30-day structural claim</span>
+                  </div>
                 </div>
               </div>
 
               <div class="m3-accordions">
                 
-                <div class="m3-accordion">
+                <div class="m3-accordion" [class.open]="openAccordion() === 'details'">
                   <button class="m3-acc-header" (click)="toggleAccordion('details')" [attr.aria-expanded]="openAccordion() === 'details'">
-                    <span>Product Details</span>
-                    <i class="pi pi-chevron-down" [class.rotated]="openAccordion() === 'details'"></i>
+                    <span>Product Specifications</span>
+                    <span class="icon-circle">
+                      <i class="pi pi-chevron-down"></i>
+                    </span>
                   </button>
                   @if (openAccordion() === 'details') {
                     <div class="m3-acc-content" @expandCollapse>
-                      <p>SKU: {{ product().sku || 'N/A' }}</p>
-                      <p>Category: {{ product().category?.name || 'General' }}</p>
-                      <p>Unit: {{ product().unit || 'Piece' }}</p>
+                      <div class="specs-table">
+                        <div class="specs-row"><span class="spec-label">SKU Tracking</span><span class="spec-value">{{ product().sku || 'N/A' }}</span></div>
+                        <div class="specs-row"><span class="spec-label">Classification</span><span class="spec-value">{{ product().category?.name || 'General' }}</span></div>
+                        <div class="specs-row"><span class="spec-label">Packaging Unit</span><span class="spec-value">{{ product().unit || 'Piece' }}</span></div>
+                      </div>
                     </div>
                   }
                 </div>
 
-                <div class="m3-accordion">
+                <div class="m3-accordion" [class.open]="openAccordion() === 'shipping'">
                   <button class="m3-acc-header" (click)="toggleAccordion('shipping')" [attr.aria-expanded]="openAccordion() === 'shipping'">
-                    <span>Shipping & Returns</span>
-                    <i class="pi pi-chevron-down" [class.rotated]="openAccordion() === 'shipping'"></i>
+                    <span>Fulfillment & Dispatch Logistics</span>
+                    <span class="icon-circle">
+                      <i class="pi pi-chevron-down"></i>
+                    </span>
                   </button>
                   @if (openAccordion() === 'shipping') {
                     <div class="m3-acc-content" @expandCollapse>
-                      <p>Free standard shipping on eligible orders. Returns are accepted within 30 days of delivery in original packaging.</p>
+                      <p class="shipping-notice">
+                        Complimentary premium tracking logistics map enabled across all regions. Deliveries are dispatched within 24-48 business hours, arriving in optimal condition via temperature-monitored distribution streams.
+                      </p>
                     </div>
                   }
                 </div>
@@ -232,332 +271,425 @@ import { StorefrontCartFacade } from '../../../../storefront/core/facades/storef
 
       } @else {
         <div class="m3-not-found" @fadeUp>
-          <i class="pi pi-box m3-not-found-icon"></i>
+          <div class="not-found-illustration">
+            <i class="pi pi-search m3-not-found-icon"></i>
+          </div>
           <h2>Product Not Found</h2>
-          <p>We couldn't find the product you're looking for.</p>
-          <a [routerLink]="['/store', orgSlug()]" class="m3-btn-tonal">Return to Store</a>
+          <p>The parameter address identifier path requested is currently missing or moved.</p>
+          <a [routerLink]="['/store', orgSlug()]" class="m3-btn-tonal">
+            <i class="pi pi-home"></i>
+            <span>Return to Storefront</span>
+          </a>
         </div>
       }
     </main>
+   onscreen backdrop filters -->
   `,
   styles: [`
     /* ==========================================================================
-       GOOGLE STORE (MATERIAL DESIGN 3) PDP AESTHETIC
+       MATERIAL DESIGN 3 - LUXURY EDITORIAL E-COMMERCE THEME 
        ========================================================================== */
     :host {
       display: block;
       width: 100%;
       
-      --md-sys-color-primary: #1a73e8; /* Google Blue */
-      --md-sys-color-on-primary: var(--bg-primary, #ffffff);
-      --md-sys-color-surface: var(--bg-primary, #ffffff);
-      --md-sys-color-surface-variant: var(--bg-secondary, #f8f9fa);
-      --md-sys-color-on-surface: var(--text-primary, #202124);
-      --md-sys-color-on-surface-variant: var(--text-secondary, #5f6368);
-      --md-sys-color-outline: var(--border-secondary, #dadce0);
+      --m3-color-primary: #1a73e8;
+      --m3-color-primary-hover: #1557b0;
+      --m3-color-surface: var(--bg-primary, #ffffff);
+      --m3-color-surface-variant: var(--bg-secondary, #f8f9fa);
+      --m3-color-on-surface: var(--text-primary, #1f2937);
+      --m3-color-on-surface-variant: var(--text-secondary, #4b5563);
+      --m3-color-outline: var(--border-secondary, #e5e7eb);
+      --m3-color-sale-bg: #e8f0fe;
+      --m3-color-sale-text: #1a73e8;
       
-      --md-sys-easing-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
-      font-family: 'Google Sans', Roboto, Arial, sans-serif;
-      color: var(--md-sys-color-on-surface);
+      --m3-radius-xl: 28px;
+      --m3-radius-md: 16px;
+      --m3-radius-sm: 12px;
+      --m3-easing: cubic-bezier(0.2, 0, 0, 1);
+      
+      font-family: 'Google Sans', system-ui, -apple-system, sans-serif;
+      color: var(--m3-color-on-surface);
+      background-color: var(--m3-color-surface);
       -webkit-font-smoothing: antialiased;
     }
 
     .m3-pdp-root {
-      background-color: var(--md-sys-color-surface);
       min-height: 100vh;
-      padding-bottom: 5rem;
+      padding-bottom: 8rem;
     }
 
     .m3-container {
-      max-width: 1440px;
+      max-width: 1300px;
       margin: 0 auto;
-      padding: 0 5%;
+      padding: 0 24px;
+      @media (max-width: 640px) { padding: 0 16px; }
     }
 
-    /* --- Navigation --- */
+    /* ─── Breadcrumbs navigation ────────────────────────────────── */
     .m3-breadcrumb {
-      padding: 1.5rem 0;
+      padding: 24px 0;
+      @media (max-width: 768px) { padding: 16px 0; }
     }
 
     .m3-back-link {
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      color: var(--md-sys-color-on-surface-variant);
+      gap: 10px;
+      color: var(--m3-color-on-surface-variant);
       text-decoration: none;
-      font-weight: 500;
-      font-size: 0.875rem;
-      transition: color 0.2s;
-    }
-
-    .m3-back-link:hover {
-      color: var(--md-sys-color-primary);
-    }
-
-    /* --- Grid Layout --- */
-    .m3-pdp-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 2rem;
-    }
-
-    @media (min-width: 1024px) {
-      .m3-pdp-grid {
-        grid-template-columns: 1.2fr 1fr;
-        gap: 5rem;
-        align-items: flex-start; /* Crucial for sticky behavior */
+      font-weight: 600;
+      font-size: 14px;
+      padding: 8px 16px 8px 12px;
+      border-radius: 100px;
+      background: var(--m3-color-surface-variant);
+      transition: all 0.25s var(--m3-easing);
+      
+      i { font-size: 12px; transition: transform 0.2s ease; }
+      &:hover {
+        color: var(--m3-color-primary);
+        background: color-mix(in srgb, var(--m3-color-primary) 8%, var(--m3-color-surface-variant));
+        i { transform: translateX(-3px); }
       }
     }
 
-    /* --- Left: Gallery --- */
+    /* ─── Structural Workspace Grid Breakdown ───────────────────── */
+    .m3-pdp-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 32px;
+      
+      @media (min-width: 1024px) {
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 64px;
+        align-items: start;
+      }
+    }
+
+    /* ─── Left Canvas Gallery Engine Styles ──────────────────────── */
     .m3-gallery-sticky {
-      position: sticky;
-      top: 2rem; /* Sticks slightly below the top of the viewport */
+      @media (min-width: 1024px) {
+        position: sticky;
+        top: 40px;
+      }
     }
 
     .m3-main-image-surface {
       position: relative;
       width: 100%;
       aspect-ratio: 1 / 1;
-      background-color: var(--md-sys-color-surface-variant);
-      border-radius: 24px;
+      background-color: var(--m3-color-surface-variant);
+      border-radius: var(--m3-radius-xl);
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 2rem;
+      padding: 40px;
+      border: 1px solid var(--m3-color-outline);
+      box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.015);
       overflow: hidden;
+      @media (max-width: 640px) { border-radius: var(--m3-radius-md); padding: 20px; }
     }
 
     .m3-main-img {
       max-width: 100%;
       max-height: 100%;
       object-fit: contain;
-      mix-blend-mode: multiply; /* Melts white image backgrounds into the gray surface */
+      filter: drop-shadow(0 8px 24px rgba(0,0,0,0.04));
     }
 
     .m3-badge-sale {
       position: absolute;
-      top: 1.5rem;
-      left: 1.5rem;
-      background-color: #e8f0fe;
-      color: #1967d2;
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 0.875rem;
-      font-weight: 600;
-      letter-spacing: 0.02em;
+      top: 20px;
+      left: 20px;
+      background-color: var(--m3-color-sale-bg);
+      color: var(--m3-color-sale-text);
+      padding: 6px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      box-shadow: 0 2px 8px rgba(26, 115, 232, 0.08);
+    }
+
+    .m3-thumbnails-track {
+      position: relative;
+      margin-top: 16px;
+      width: 100%;
     }
 
     .m3-thumbnails {
       display: flex;
-      gap: 1rem;
-      margin-top: 1rem;
+      gap: 12px;
       overflow-x: auto;
-      padding-bottom: 0.5rem;
+      padding-bottom: 4px;
       scrollbar-width: none;
+      &::-webkit-scrollbar { display: none; }
     }
-    .m3-thumbnails::-webkit-scrollbar { display: none; }
 
     .m3-thumb-btn {
       flex-shrink: 0;
-      width: 80px;
-      height: 80px;
-      border-radius: 12px;
+      width: 76px;
+      height: 76px;
+      border-radius: var(--m3-radius-sm);
       border: 2px solid transparent;
-      background-color: var(--md-sys-color-surface-variant);
-      padding: 0.5rem;
+      background-color: var(--m3-color-surface-variant);
+      padding: 6px;
       cursor: pointer;
-      transition: border-color 0.2s;
+      transition: all 0.2s var(--m3-easing);
+      
+      img { width: 100%; height: 100%; object-fit: contain; }
+      
+      &:hover {
+        background-color: var(--m3-color-outline);
+      }
+      
+      &.active {
+        border-color: var(--m3-color-primary);
+        background-color: var(--m3-color-surface);
+        box-shadow: 0 4px 12px rgba(26, 115, 232, 0.1);
+      }
     }
 
-    .m3-thumb-btn.active {
-      border-color: var(--md-sys-color-primary);
-    }
-
-    .m3-thumb-btn img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      mix-blend-mode: multiply;
-    }
-
-    /* --- Right: Info --- */
+    /* ─── Right Side Information Systems Meta Frame ───────────────── */
     .m3-info-section {
       display: flex;
       flex-direction: column;
-      padding-top: 1rem;
+    }
+
+    .m3-info-header {
+      margin-bottom: 16px;
     }
 
     .m3-eyebrow {
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: var(--md-sys-color-on-surface-variant);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--m3-color-primary);
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 0.5rem;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
       display: block;
     }
 
     .m3-title {
-      font-size: clamp(2rem, 3.5vw, 3rem);
+      font-size: clamp(24px, 4vw, 38px);
       font-weight: 500;
-      color: var(--md-sys-color-on-surface);
-      line-height: 1.1;
-      letter-spacing: -0.02em;
-      margin: 0 0 1.5rem 0;
+      color: var(--m3-color-on-surface);
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin: 0;
     }
 
     .m3-price-stock-row {
       display: flex;
-      flex-wrap: wrap;
       align-items: center;
-      gap: 1.5rem;
-      margin-bottom: 1.5rem;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--m3-color-outline);
+      margin-bottom: 24px;
     }
 
     .m3-price-block {
       display: flex;
       align-items: baseline;
-      gap: 1rem;
+      gap: 12px;
     }
 
     .m3-price-current {
-      font-size: 2rem;
+      font-size: 32px;
       font-weight: 500;
+      letter-spacing: -0.02em;
+      color: var(--m3-color-on-surface);
     }
 
     .m3-price-original {
-      font-size: 1.25rem;
-      color: var(--md-sys-color-on-surface-variant);
+      font-size: 18px;
+      color: var(--m3-color-on-surface-variant);
       text-decoration: line-through;
+      font-weight: 400;
     }
 
     .m3-stock-chip {
       display: inline-flex;
       align-items: center;
-      gap: 0.35rem;
-      padding: 0.35rem 0.75rem;
+      gap: 8px;
+      padding: 6px 14px;
       border-radius: 100px;
-      font-size: 0.875rem;
-      font-weight: 500;
+      font-size: 13px;
+      font-weight: 600;
+      
+      .stock-dot { width: 8px; height: 8px; border-radius: 50%; }
+      
+      &.in-stock {
+        background: #e6f4ea; color: #137333;
+        .stock-dot { background: #137333; }
+      }
+      &.out-of-stock {
+        background: #fce8e6; color: #d93025;
+        .stock-dot { background: #d93025; }
+      }
     }
-
-    .m3-stock-chip.in-stock { background: #e6f4ea; color: #137333; }
-    .m3-stock-chip.out-of-stock { background: #fce8e6; color: #d93025; }
 
     .m3-description {
-      font-size: 1rem;
-      line-height: 1.6;
-      color: var(--md-sys-color-on-surface-variant);
-      margin: 0 0 2.5rem 0;
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--m3-color-on-surface-variant);
+      margin: 0 0 32px 0;
     }
 
-    /* --- Controls --- */
-    .m3-controls {
+    /* ─── Control Panels & Layout Actions Triggers ───────────────── */
+    .m3-action-panel {
+      background: var(--m3-color-surface-variant);
+      padding: 20px;
+      border-radius: var(--m3-radius-md);
+      margin-bottom: 32px;
+      border: 1px solid var(--m3-color-outline);
+    }
+
+    .m3-controls-group {
+      display: flex;
+      align-items: flex-end;
+      gap: 16px;
+      flex-wrap: wrap;
+      @media (max-width: 640px) { flex-direction: column; align-items: stretch; }
+    }
+
+    .m3-qty-selector-wrapper {
       display: flex;
       flex-direction: column;
-      gap: 1rem;
-      margin-bottom: 2.5rem;
-    }
-
-    @media (min-width: 640px) {
-      .m3-controls { flex-direction: row; }
+      gap: 8px;
+      
+      .qty-label { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--m3-color-on-surface-variant); letter-spacing: 0.05em; }
     }
 
     .m3-qty-selector {
       display: inline-flex;
       align-items: center;
-      border: 1px solid var(--md-sys-color-outline);
+      border: 1px solid var(--m3-color-outline);
       border-radius: 100px;
-      height: 56px; /* Google Store standard touch height */
-      background: var(--md-sys-color-surface);
+      height: 48px;
+      background: var(--m3-color-surface);
+      padding: 2px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
     }
 
     .m3-qty-btn {
-      width: 56px;
-      height: 100%;
+      width: 44px;
+      height: 44px;
       display: flex;
       align-items: center;
       justify-content: center;
       background: transparent;
       border: none;
-      color: var(--md-sys-color-on-surface);
+      color: var(--m3-color-on-surface);
       cursor: pointer;
-      border-radius: 100px;
-      transition: background 0.2s;
+      border-radius: 50%;
+      transition: all 0.2s var(--m3-easing);
+      
+      &:hover:not(:disabled) { background: var(--m3-color-surface-variant); color: var(--m3-color-primary); }
+      &:disabled { color: #cbd5e1; cursor: not-allowed; }
     }
 
-    .m3-qty-btn:hover:not(:disabled) { background: var(--md-sys-color-surface-variant); }
-    .m3-qty-btn:disabled { color: var(--md-sys-color-outline); cursor: not-allowed; }
-    
     .m3-qty-value {
-      font-weight: 500;
-      min-width: 2.5rem;
+      font-size: 15px;
+      font-weight: 700;
+      min-width: 32px;
       text-align: center;
     }
 
     .m3-btn-primary {
       flex: 1;
-      height: 56px;
+      height: 48px;
       border-radius: 100px;
-      background-color: var(--md-sys-color-primary);
-      color: var(--md-sys-color-on-primary);
+      background-color: var(--m3-color-primary);
+      color: #ffffff;
       border: none;
-      font-family: 'Google Sans', sans-serif;
-      font-size: 1.125rem;
-      font-weight: 500;
+      font-size: 15px;
+      font-weight: 600;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
+      gap: 10px;
       cursor: pointer;
-      transition: background 0.2s;
+      box-shadow: 0 4px 14px color-mix(in srgb, var(--m3-color-primary) 25%, transparent);
+      transition: all 0.2s var(--m3-easing);
+      
+      &:hover { background-color: var(--m3-color-primary-hover); transform: translateY(-1px); box-shadow: 0 6px 20px color-mix(in srgb, var(--m3-color-primary) 35%, transparent); }
+      &:active { transform: translateY(0); }
     }
-    .m3-btn-primary:hover { background-color: #1557b0; }
 
     .m3-btn-disabled {
-      flex: 1;
-      height: 56px;
+      width: 100%;
+      height: 48px;
       border-radius: 100px;
-      background-color: var(--bg-secondary, #f1f3f4);
-      color: var(--text-tertiary, #9aa0a6);
+      background-color: #e2e8f0;
+      color: #94a3b8;
       border: none;
-      font-family: 'Google Sans', sans-serif;
-      font-size: 1.125rem;
-      font-weight: 500;
+      font-size: 15px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
       cursor: not-allowed;
     }
 
-    /* --- Perks --- */
+    /* ─── Perks Blueprint Layout ────────────────────────────────── */
     .m3-perks {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
-      padding: 1.5rem 0;
-      border-top: 1px solid var(--md-sys-color-outline);
-      border-bottom: 1px solid var(--md-sys-color-outline);
-      margin-bottom: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 24px 0;
+      border-top: 1px solid var(--m3-color-outline);
+      border-bottom: 1px solid var(--m3-color-outline);
+      margin-bottom: 32px;
     }
 
     .m3-perk {
       display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.5rem;
-      color: var(--md-sys-color-on-surface-variant);
+      align-items: center;
+      gap: 16px;
     }
 
-    .m3-perk i { font-size: 1.25rem; color: var(--md-sys-color-on-surface); }
-    .m3-perk span { font-size: 0.75rem; font-weight: 500; }
+    .perk-icon-box {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--m3-color-surface-variant);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--m3-color-outline);
+      i { font-size: 16px; color: var(--m3-color-primary); }
+    }
 
-    /* --- Accordions --- */
+    .perk-text {
+      display: flex;
+      flex-direction: column;
+      .perk-title { font-size: 13.5px; font-weight: 600; color: var(--m3-color-on-surface); }
+      .perk-sub { font-size: 11.5px; color: var(--m3-color-on-surface-variant); }
+    }
+
+    /* ─── Premium Spec Disclosures / Accordions ─────────────────── */
     .m3-accordions {
       display: flex;
       flex-direction: column;
+      gap: 12px;
     }
 
     .m3-accordion {
-      border-bottom: 1px solid var(--md-sys-color-outline);
+      border: 1px solid var(--m3-color-outline);
+      border-radius: var(--m3-radius-sm);
+      overflow: hidden;
+      background: var(--m3-color-surface);
+      transition: all 0.2s ease;
+      
+      &.open {
+        border-color: var(--m3-color-on-surface);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+        .icon-circle { background: var(--m3-color-on-surface); color: var(--m3-color-surface); }
+      }
     }
 
     .m3-acc-header {
@@ -565,71 +697,77 @@ import { StorefrontCartFacade } from '../../../../storefront/core/facades/storef
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 1.5rem 0;
+      padding: 18px 20px;
       background: transparent;
       border: none;
-      font-family: 'Google Sans', sans-serif;
-      font-size: 1.125rem;
-      font-weight: 500;
-      color: var(--md-sys-color-on-surface);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--m3-color-on-surface);
       cursor: pointer;
-    }
-
-    .m3-acc-header i {
-      transition: transform 0.3s var(--md-sys-easing-standard);
-    }
-    .m3-acc-header i.rotated {
-      transform: rotate(180deg);
+      text-align: left;
+      
+      .icon-circle {
+        width: 28px; height: 28px; border-radius: 50%; background: var(--m3-color-surface-variant); display: flex; align-items: center; justify-content: center; transition: all 0.25s ease;
+        i { font-size: 10px; transition: transform 0.25s var(--m3-easing); }
+      }
+      
+      i.rotated { transform: rotate(180deg); }
     }
 
     .m3-acc-content {
-      padding-bottom: 1.5rem;
-      color: var(--md-sys-color-on-surface-variant);
+      padding: 0 20px 20px 20px;
+      color: var(--m3-color-on-surface-variant);
+      font-size: 14px;
       line-height: 1.6;
     }
 
-    /* --- Skeletons --- */
-    .m3-gallery-skeleton {
-      width: 100%;
-      aspect-ratio: 1;
-      background: var(--bg-secondary, #f1f3f4);
-      border-radius: 24px;
-      animation: pulse 1.5s infinite;
+    .specs-table {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
-    .m3-info-skeleton { display: flex; flex-direction: column; gap: 1rem; padding-top: 1rem; }
-    .skel-line { background: var(--bg-secondary, #f1f3f4); height: 1.5rem; border-radius: 4px; animation: pulse 1.5s infinite; }
-    .skel-line.w-30 { width: 30%; }
+
+    .specs-row {
+      display: flex;
+      justify-content: space-between;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed var(--m3-color-outline);
+      &:last-child { border: none; padding: 0; }
+      .spec-label { color: var(--m3-color-on-surface-variant); font-weight: 500; }
+      .spec-value { color: var(--m3-color-on-surface); font-weight: 600; }
+    }
+
+    /* ─── Skeleton Pulse Modules ────────────────────────────────── */
+    .m3-gallery-skeleton-wrapper { display: flex; flex-direction: column; gap: 16px; }
+    .m3-gallery-skeleton { width: 100%; aspect-ratio: 1; background: #f1f3f4; border-radius: var(--m3-radius-xl); animation: pulse 1.5s infinite; }
+    .m3-thumbnails-skeleton { display: flex; gap: 12px; .skel-thumb { width: 72px; height: 72px; border-radius: var(--m3-radius-sm); background: #f1f3f4; animation: pulse 1.5s infinite; } }
+    .m3-info-skeleton { display: flex; flex-direction: column; gap: 12px; }
+    .skel-line { background: #f1f3f4; height: 16px; border-radius: 4px; animation: pulse 1.5s infinite; }
+    .skel-line.w-20 { width: 20%; }
     .skel-line.w-40 { width: 40%; }
     .skel-line.w-80 { width: 80%; }
     .skel-line.w-90 { width: 90%; }
+    .skel-line.w-95 { width: 95%; }
     .skel-line.w-100 { width: 100%; }
-    .skel-line.h-xl { height: 3rem; }
-    .skel-line.h-lg { height: 2rem; }
-    .skel-button { background: var(--bg-secondary, #f1f3f4); height: 56px; border-radius: 100px; width: 100%; animation: pulse 1.5s infinite; }
-    .mt-xl { margin-top: 2rem; }
+    .skel-line.h-xl { height: 40px; border-radius: 8px; }
+    .skel-line.h-lg { height: 28px; border-radius: 6px; }
+    .skel-button { background: #f1f3f4; height: 50px; border-radius: 100px; width: 100%; animation: pulse 1.5s infinite; }
+    .mt-md { margin-top: 12px; }
+    .mt-xl { margin-top: 24px; }
 
-    @keyframes pulse {
-      0% { opacity: 1; }
-      50% { opacity: 0.5; }
-      100% { opacity: 1; }
-    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-    /* --- 404 --- */
+    /* ─── 404 Fallback Canvas Container ─────────────────────────── */
     .m3-not-found {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 10rem 2rem;
-      text-align: center;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8rem 24px; text-align: center;
+      h2 { font-size: 24px; font-weight: 600; margin: 16px 0 8px 0; }
+      p { font-size: 15px; color: var(--m3-color-on-surface-variant); margin-bottom: 24px; }
     }
-    .m3-not-found-icon { font-size: 4rem; color: var(--md-sys-color-outline); margin-bottom: 1rem; }
+    .not-found-illustration { width: 80px; height: 80px; border-radius: 50%; background: var(--m3-color-surface-variant); display: flex; align-items: center; justify-content: center; border: 1px solid var(--m3-color-outline); .m3-not-found-icon { font-size: 28px; color: var(--m3-color-on-surface-variant); } }
     .m3-btn-tonal {
-      display: inline-flex; padding: 0 1.5rem; height: 48px; border-radius: 100px;
-      background: #e8f0fe; color: #1967d2; font-weight: 500; align-items: center;
-      text-decoration: none; margin-top: 1.5rem; transition: background 0.2s;
+      display: inline-flex; align-items: center; gap: 8px; padding: 0 24px; height: 48px; border-radius: 100px; background: var(--m3-color-sale-bg); color: var(--m3-color-sale-text); font-weight: 600; font-size: 14px; text-decoration: none; transition: background 0.2s;
+      &:hover { background: color-mix(in srgb, var(--m3-color-primary) 15%, var(--m3-color-sale-bg)); }
     }
-    .m3-btn-tonal:hover { background: #d2e3fc; }
   `]
 })
 export class ProductDetailComponent implements OnInit {
@@ -652,7 +790,6 @@ export class ProductDetailComponent implements OnInit {
     const p = this.product();
     if (!p || !p.price?.hasDiscount) return 0;
 
-    // Safely parse original and current from JSON structure
     const original = Number(p.price.original);
     const current = Number(p.price.current);
 
@@ -718,7 +855,9 @@ export class ProductDetailComponent implements OnInit {
   }
 
   changeImage(url: string) {
-    this.selectedImage.set(url);
+    if (this.selectedImage() !== url) {
+      this.selectedImage.set(url);
+    }
   }
 
   updateQuantity(delta: number) {

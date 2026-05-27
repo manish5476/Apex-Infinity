@@ -322,7 +322,7 @@ const slideRight = [
     .apx-auth-shell {
       background:
         radial-gradient(circle at 90% 0%, color-mix(in srgb, var(--color-primary, #6366f1) 10%, transparent), transparent 24rem),
-        var(--bg-secondary, #ffffff);
+        var(--bg-secondary, var(--bg-primary));
       border: 1px solid var(--border-secondary, #e5e7eb);
       border-radius: 1.5rem;
       overflow: hidden;
@@ -403,7 +403,7 @@ const slideRight = [
     }
 
     .apx-auth-tab.active {
-      background: var(--bg-secondary, #ffffff);
+      background: var(--bg-secondary, var(--bg-primary));
       color: var(--text-primary, #111827);
       box-shadow: 0 1px 4px rgba(0,0,0,0.1), 0 0 0 1px var(--border-secondary, #e5e7eb);
     }
@@ -421,7 +421,7 @@ const slideRight = [
       margin: 0.75rem 1.5rem 0;
       padding: 0.85rem 1rem;
       border-radius: 0.85rem;
-      background: #fff7ed;
+      background: var(--bg-primary)7ed;
       border: 1px solid #fed7aa;
       color: #9a3412;
       font-size: 0.875rem;
@@ -505,7 +505,7 @@ const slideRight = [
 
     .apx-field__input-wrap input:focus {
       border-color: var(--color-primary, #6366f1);
-      background: var(--bg-secondary, #ffffff);
+      background: var(--bg-secondary, var(--bg-primary));
       box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary, #6366f1) 15%, transparent);
     }
 
@@ -551,7 +551,7 @@ const slideRight = [
       border: 0;
       border-radius: 0.9rem;
       background: var(--apx-gradient-commerce, linear-gradient(135deg, #6366f1, #8b5cf6));
-      color: #fff;
+      color: var(--bg-primary);
       font-size: 1rem;
       font-weight: 900;
       font-family: inherit;

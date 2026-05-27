@@ -173,7 +173,7 @@ export interface HeroBannerConfig extends SectionBaseConfig {
       /* Fluid scaling matching Google Store headers */
       font-size: clamp(2.75rem, 5vw + 1rem, 4.5rem);
       font-weight: 700; /* Google Sans looks best at 700 */
-      color: #ffffff;
+      color: var(--bg-primary);
       line-height: 1.1;
       letter-spacing: -0.04em;
       margin: 0 0 1rem;
@@ -231,7 +231,7 @@ export interface HeroBannerConfig extends SectionBaseConfig {
     /* M3 Filled Button */
     .hero-btn--primary {
       background-color: var(--md-sys-color-primary);
-      color: #ffffff;
+      color: var(--bg-primary);
       border: 1px solid transparent;
       /* M3 Elevation Level 1 */
       box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
@@ -249,7 +249,7 @@ export interface HeroBannerConfig extends SectionBaseConfig {
 
     /* M3 Outlined Button */
     .hero-btn--secondary, .hero-btn--outline {
-      background-color: var(--bg-primary, #ffffff);
+      background-color: var(--bg-primary, var(--bg-primary));
       color: var(--md-sys-color-primary);
       border: 1px solid var(--border-secondary, #dadce0);
       
@@ -262,7 +262,7 @@ export interface HeroBannerConfig extends SectionBaseConfig {
     /* M3 Text Button */
     .hero-btn--ghost {
       background-color: transparent;
-      color: #ffffff;
+      color: var(--bg-primary);
       padding: 0 16px;
       
       &:hover { 

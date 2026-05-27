@@ -52,8 +52,8 @@
 .glass-dock {
   background: var(--apx-glass-bg);
   border-color: var(--apx-glass-border);
-  backdrop-filter: var(--apx-glass-blur);
-  -webkit-backdrop-filter: var(--apx-glass-blur);
+  backdrop-filter: var(--glass-blur-c);
+  -webkit-backdrop-filter: var(--glass-blur-c);
 }
 
 .dock-item {
@@ -81,8 +81,8 @@
 /* Settings Popover Glass */
 ::ng-deep .glass-popover .p-popover {
   background: var(--apx-glass-bg) !important;
-  backdrop-filter: var(--apx-glass-blur) !important;
-  -webkit-backdrop-filter: var(--apx-glass-blur) !important;
+  backdrop-filter: var(--glass-blur-c) !important;
+  -webkit-backdrop-filter: var(--glass-blur-c) !important;
   border: 1px solid var(--apx-glass-border) !important;
   border-radius: var(--apx-radius-2xl) !important;
   box-shadow: var(--shadow-lg) !important;
@@ -91,7 +91,7 @@
 
 ::ng-deep .glass-trigger {
   background: var(--apx-glass-bg);
-  backdrop-filter: var(--apx-glass-blur);
+  backdrop-filter: var(--glass-blur-c);
   &:hover {
     background: var(--bg-secondary-raised);
   }
@@ -113,7 +113,7 @@
   ::ng-deep .glass-trigger {
     background: rgba(30, 41, 59, 0.5);
     border-color: rgba(255, 255, 255, 0.1);
-    color: #cbd5e1;
+    color: var(--text-secondary);
     &:hover {
       background: rgba(30, 41, 59, 0.9);
       color: var(--text-primary);

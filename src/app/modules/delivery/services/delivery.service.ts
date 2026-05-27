@@ -10,22 +10,30 @@ export class DeliveryService {
   private http = inject(HttpClient);
   private base = `${environment.apiUrl}/v1/delivery-agent`;
 
-  private get headers() {
-    const token = localStorage.getItem('delivery_token');
+  private getHeaders(orgSlug: string) {
+    const token = localStorage.getItem(`delivery_token_${orgSlug}`);
     return {
       headers: { Authorization: `Bearer ${token}` }
     };
   }
 
-  login(phone: string, password: string):Observable<any> {
-    return this.http.post(`${this.base}/login`, { phone, password });
+  login(orgSlug: string, phone: string, password: string):Observable<any> {
+    return this.http.post(`${this.base}/login`, { orgSlug, phone, password });
   }
 
-  getOrders(): Observable<any> {
-    return this.http.get(`${this.base}/orders`, this.headers);
+  getOrders(orgSlug: string): Observable<any> {
+    return this.http.get(`${this.base}/orders`, this.getHeaders(orgSlug));
   }
 
-  updateOrderStatus(orderId: string, status: string): Observable<any> {
-    return this.http.patch(`${this.base}/orders/${orderId}/status`, { status }, this.headers);
+  scanOrder(orgSlug: string, identifier: string): Observable<any> {
+    return this.http.get(`${this.base}/scan/${identifier}`, this.getHeaders(orgSlug));
+  }
+
+  updateOrderStatus(orgSlug: string, orderId: string, status: string, paymentCollected?: boolean): Observable<any> {
+    return this.http.patch(`${this.base}/orders/${orderId}/status`, { status, paymentCollected }, this.getHeaders(orgSlug));
+  }
+
+  updatePassword(orgSlug: string, oldPassword: string, newPassword: string): Observable<any> {
+    return this.http.patch(`${this.base}/update-password`, { oldPassword, newPassword }, this.getHeaders(orgSlug));
   }
 }

@@ -11,7 +11,7 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: #0f172a;
+  background: var(--text-primary);
   animation: p-pulse 1.5s infinite;
 }
 

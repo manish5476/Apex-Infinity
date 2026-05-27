@@ -320,7 +320,7 @@ type TagSeverity = "success" | "secondary" | "info" | "warn" | "danger" | "contr
     }
     .pc__badge--out {
       background: rgba(220,38,38,0.15);
-      color: #dc2626;
+      color: var(--color-error);
       border: 1px solid rgba(220,38,38,0.3);
     }
     .pc__badge--low {
@@ -354,12 +354,12 @@ type TagSeverity = "success" | "secondary" | "info" | "warn" | "danger" | "contr
       opacity: 1; transform: scale(1);
       background: rgba(239,68,68,0.15);
       border-color: rgba(239,68,68,0.35);
-      color: #ef4444;
+      color: var(--color-error);
     }
     .pc__heart:hover {
       transform: scale(1.15) !important;
       background: rgba(239,68,68,0.2) !important;
-      color: #ef4444 !important;
+      color: var(--color-error) !important;
       border-color: rgba(239,68,68,0.4) !important;
     }
 
@@ -606,12 +606,12 @@ type TagSeverity = "success" | "secondary" | "info" | "warn" | "danger" | "contr
     }
     .pl__stock-chip--in {
       background: rgba(21,128,61,0.08);
-      color: #15803d;
+      color: var(--color-success);
       border-color: rgba(21,128,61,0.22);
     }
     .pl__stock-chip--out {
       background: rgba(220,38,38,0.08);
-      color: #dc2626;
+      color: var(--color-error);
       border-color: rgba(220,38,38,0.22);
     }
     .pl__stock-chip--low {
@@ -678,7 +678,7 @@ type TagSeverity = "success" | "secondary" | "info" | "warn" | "danger" | "contr
     .pl__heart--active {
       background: rgba(239,68,68,0.1);
       border-color: rgba(239,68,68,0.3);
-      color: #ef4444;
+      color: var(--color-error);
     }
 
     .pl__atc {
@@ -848,8 +848,8 @@ type TagSeverity = "success" | "secondary" | "info" | "warn" | "danger" | "contr
       background: var(--component-bg-hover);
       color: var(--text-secondary);
     }
-    .pc-qv__chip--green { color: #15803d; background: rgba(21,128,61,0.1); border-color: rgba(21,128,61,0.25); }
-    .pc-qv__chip--red   { color: #dc2626; background: rgba(220,38,38,0.1); border-color: rgba(220,38,38,0.25); }
+    .pc-qv__chip--green { color: var(--color-success); background: rgba(21,128,61,0.1); border-color: rgba(21,128,61,0.25); }
+    .pc-qv__chip--red   { color: var(--color-error); background: rgba(220,38,38,0.1); border-color: rgba(220,38,38,0.25); }
     .pc-qv__chip--amber { color: #92400e; background: rgba(234,179,8,0.12); border-color: rgba(234,179,8,0.3); }
 
     .pc-qv__divider {
@@ -1272,7 +1272,7 @@ export class ProductCardComponent {
 //     }
 //     .pc__badge--out {
 //       background: rgba(220, 38, 38, 0.15);
-//       color: #dc2626;
+//       color: var(--color-error);
 //       border: 1px solid rgba(220, 38, 38, 0.3);
 //     }
 //     .pc__badge--low {
@@ -1313,13 +1313,13 @@ export class ProductCardComponent {
 //       transform: scale(1);
 //       background: rgba(239, 68, 68, 0.15);
 //       border-color: rgba(239, 68, 68, 0.35);
-//       color: #ef4444;
+//       color: var(--color-error);
 //     }
 
 //     .pc__heart:hover {
 //       transform: scale(1.15) !important;
 //       background: rgba(239, 68, 68, 0.2) !important;
-//       color: #ef4444 !important;
+//       color: var(--color-error) !important;
 //       border-color: rgba(239, 68, 68, 0.4) !important;
 //     }
 
@@ -1580,8 +1580,8 @@ export class ProductCardComponent {
 //       background: var(--component-bg-hover);
 //       color: var(--text-secondary);
 //     }
-//     .pc-qv__chip--green { color: #15803d; background: rgba(21,128,61,0.1); border-color: rgba(21,128,61,0.25); }
-//     .pc-qv__chip--red { color: #dc2626; background: rgba(220,38,38,0.1); border-color: rgba(220,38,38,0.25); }
+//     .pc-qv__chip--green { color: var(--color-success); background: rgba(21,128,61,0.1); border-color: rgba(21,128,61,0.25); }
+//     .pc-qv__chip--red { color: var(--color-error); background: rgba(220,38,38,0.1); border-color: rgba(220,38,38,0.25); }
 //     .pc-qv__chip--amber { color: #92400e; background: rgba(234,179,8,0.12); border-color: rgba(234,179,8,0.3); }
 
 //     .pc-qv__divider {

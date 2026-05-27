@@ -52,9 +52,8 @@ export const STOREFRONT_PUBLIC_ROUTES: Routes = [
   commerceFlowRoute('account/notifications', 'notifications', 'Notifications', true),
   commerceFlowRoute('login', 'login', 'Store Login'),
   {
-    path: 'delivery-agent',
-    redirectTo: '/delivery/login',
-    pathMatch: 'full'
+    path: 'delivery',
+    loadChildren: () => import('../delivery/delivery.routes').then(m => m.deliveryRoutes)
   },
   commerceFlowRoute('forgot-password', 'forgot', 'Forgot Password'),
   commerceFlowRoute('register', 'register', 'Create Account'),

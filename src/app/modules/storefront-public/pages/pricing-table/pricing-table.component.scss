@@ -197,7 +197,7 @@
 
 .check-icon {
   font-size: 1.1rem;
-  color: var(--color-success, #10b981);
+  color: var(--color-success, var(--color-success));
   flex-shrink: 0;
 }
 

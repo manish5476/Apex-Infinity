@@ -265,11 +265,11 @@
       }
 
       &:hover {
-        border-color: #ef4444;
-        color: #ef4444;
+        border-color: var(--color-error);
+        color: var(--color-error);
 
         i {
-          color: #ef4444;
+          color: var(--color-error);
         }
       }
     }
@@ -288,7 +288,7 @@
     transition: color 0.15s;
 
     &:hover {
-      color: #ef4444;
+      color: var(--color-error);
     }
   }
 }

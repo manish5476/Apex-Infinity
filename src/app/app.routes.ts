@@ -60,12 +60,12 @@ export const routes: Routes = [
   },
 
   // ============================================================
-  // 3.5 DELIVERY AGENT PORTAL (standalone login & dashboard)
+  // 3.5 APEX GLOBAL DELIVERY NETWORK (Platform-Fulfilled)
   // ============================================================
   {
-    path: 'delivery',
+    path: 'apex-delivery',
     loadChildren: () =>
-      import('./modules/delivery/delivery.routes').then(m => m.deliveryRoutes)
+      import('./modules/platform-delivery/platform-delivery.routes').then(m => m.platformDeliveryRoutes)
   },
 
   // ============================================================

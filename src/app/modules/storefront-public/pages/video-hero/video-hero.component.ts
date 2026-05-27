@@ -165,7 +165,7 @@ export interface VideoHeroConfig extends SectionBaseConfig {
     .video-hero__title {
       font-size: clamp(2.75rem, 5vw + 1rem, 4.5rem);
       font-weight: 700;
-      color: #ffffff;
+      color: var(--bg-primary);
       margin: 0 0 1rem;
       line-height: 1.1;
       letter-spacing: -0.04em;
@@ -211,7 +211,7 @@ export interface VideoHeroConfig extends SectionBaseConfig {
     /* M3 Filled Button (Primary) */
     .vhero-btn--primary {
       background-color: var(--md-sys-color-primary);
-      color: #ffffff;
+      color: var(--bg-primary);
       border: 1px solid transparent;
       box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
 
@@ -228,19 +228,19 @@ export interface VideoHeroConfig extends SectionBaseConfig {
     /* M3 Outlined Button (Secondary) */
     .vhero-btn--secondary, .vhero-btn--outline {
       background-color: transparent;
-      color: #ffffff; 
+      color: var(--bg-primary); 
       border: 1px solid #dadce0; /* Exact Google border color */
       
       &:hover { 
         background-color: rgba(255, 255, 255, 0.08); /* White state layer */
-        border-color: #ffffff;
+        border-color: var(--bg-primary);
       }
     }
 
     /* M3 Text Button (Ghost) */
     .vhero-btn--ghost {
       background-color: transparent;
-      color: #ffffff;
+      color: var(--bg-primary);
       padding: 0 16px;
       
       &:hover { 

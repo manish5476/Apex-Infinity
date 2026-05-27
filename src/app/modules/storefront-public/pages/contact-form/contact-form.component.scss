@@ -270,7 +270,7 @@
   }
 
   &.is-error {
-    border-bottom-color: var(--color-error, #e11d48);
+    border-bottom-color: var(--color-error, var(--color-error));
   }
 }
 
@@ -292,7 +292,7 @@
 }
 
 .cf-required {
-  color: var(--color-error, #e11d48);
+  color: var(--color-error, var(--color-error));
   margin-left: 2px;
 }
 
@@ -331,7 +331,7 @@
   gap: 4px;
   margin-top: 5px;
   font-size: 11px;
-  color: var(--color-error, #e11d48);
+  color: var(--color-error, var(--color-error));
   font-weight: 600;
 
   i {

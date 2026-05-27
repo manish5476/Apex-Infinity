@@ -27,10 +27,10 @@ import {
       margin: 0.75rem auto;
       width: min(100% - 2rem, 960px);
       padding: 0.85rem 1rem;
-      border: 1px dashed var(--apx-color-danger, #dc2626);
+      border: 1px dashed var(--apx-color-danger, var(--color-error));
       border-radius: var(--apx-radius-md, 0.5rem);
-      color: var(--apx-color-danger, #dc2626);
-      background: color-mix(in srgb, var(--apx-color-danger, #dc2626) 8%, transparent);
+      color: var(--apx-color-danger, var(--color-error));
+      background: color-mix(in srgb, var(--apx-color-danger, var(--color-error)) 8%, transparent);
       display: flex;
       align-items: center;
       justify-content: center;

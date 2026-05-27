@@ -68,7 +68,7 @@ export interface ProductGridConfig extends SectionBaseConfig {
       display: block;
       width: 100%;
       --md-sys-color-primary: var(--theme-accent-primary, #1a73e8);
-      --md-sys-color-surface: var(--bg-primary, #ffffff);
+      --md-sys-color-surface: var(--bg-primary, var(--bg-primary));
       --md-sys-color-surface-variant: var(--bg-secondary, #f8f9fa);
       --md-sys-color-on-surface: var(--text-primary, #202124);
       --md-sys-color-on-surface-variant: var(--text-secondary, #5f6368);

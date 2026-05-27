@@ -20,8 +20,8 @@ import { RouterModule } from '@angular/router';
     :host { display: block; position: relative; z-index: 45; }
 
     .announcement {
-      color: #fff;
-      background: #0f172a;
+      color: var(--bg-primary);
+      background: var(--text-primary);
       font-family: var(--apx-font-sans);
     }
 

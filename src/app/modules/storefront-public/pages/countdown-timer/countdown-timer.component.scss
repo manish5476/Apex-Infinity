@@ -77,7 +77,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--accent-primary, #e11d48);
+  background: var(--accent-primary, var(--color-error));
   animation: ct-pulse 1.8s ease-in-out infinite;
   flex-shrink: 0;
 }
@@ -157,7 +157,7 @@
 
 // Seconds column always in accent colour
 .ct-unit-secs .ct-number {
-  color: var(--accent-primary, #e11d48);
+  color: var(--accent-primary, var(--color-error));
   text-shadow: 0 0 24px rgba(225, 29, 72, 0.4);
 
   .ct-units:not(.plain-style) & {
@@ -242,7 +242,7 @@
   }
 
   &:hover {
-    background: var(--accent-primary, #e11d48);
+    background: var(--accent-primary, var(--color-error));
     color: var(--text-primary);
     transform: translateY(-2px);
     box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);

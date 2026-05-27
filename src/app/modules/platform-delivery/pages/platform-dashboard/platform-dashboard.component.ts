@@ -2,19 +2,19 @@ import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { DeliveryService } from '../../services/delivery.service';
+import { PlatformDeliveryService } from '../../services/platform-delivery.service';
 import { Html5QrcodeScanner, Html5QrcodeScanType } from 'html5-qrcode';
 
 @Component({
-  selector: 'app-delivery-dashboard',
+  selector: 'app-platform-dashboard',
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
     <div class="dashboard-container">
-      <header class="app-header">
+      <header class="header">
         <div class="brand">
-          <i class="pi pi-box brand-icon"></i>
-          <h1>My Deliveries</h1>
+          <i class="pi pi-globe brand-icon"></i>
+          <h1>Platform Deliveries</h1>
         </div>
         <div class="header-actions" style="display: flex; gap: 10px;">
           <button class="icon-btn" (click)="showPasswordModal = true" title="Change Password">
@@ -252,21 +252,14 @@ import { Html5QrcodeScanner, Html5QrcodeScanType } from 'html5-qrcode';
       overflow-x: hidden;
     }
     
-    .app-header {
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-      color: white;
-      padding: 15px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    .header {
+      padding: 20px; background: linear-gradient(135deg, #4c1d95 0%, #0f172a 100%); color: white;
+      display: flex; justify-content: space-between; align-items: center;
+      border-radius: 0 0 20px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
     }
     
     .brand { display: flex; align-items: center; gap: 10px; }
-    .brand-icon { color: #38bdf8; font-size: 1.5rem; }
+    .brand-icon { color: #a78bfa; font-size: 1.5rem; }
     h1 { margin: 0; font-size: 1.2rem; font-weight: 600; }
     
     .icon-btn {
@@ -298,9 +291,9 @@ import { Html5QrcodeScanner, Html5QrcodeScanType } from 'html5-qrcode';
     .orders-list { display: flex; flex-direction: column; gap: 15px; }
     
     .order-card {
-      background: white; border-radius: 16px; padding: 15px;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
-      border: 1px solid #f1f5f9; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer;
+      background: white; border-radius: 16px; padding: 16px; margin-bottom: 15px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); cursor: pointer; transition: all 0.2s ease;
+      border-left: 4px solid #a78bfa;
     }
     .order-card:active { transform: scale(0.98); }
     
@@ -428,8 +421,8 @@ import { Html5QrcodeScanner, Html5QrcodeScanType } from 'html5-qrcode';
     .payment-actions .premium-btn { flex: 1; }
   `]
 })
-export class DeliveryDashboardComponent implements OnInit, OnDestroy {
-  private deliveryService = inject(DeliveryService);
+export class PlatformDashboardComponent implements OnInit, OnDestroy {
+  private platformService = inject(PlatformDeliveryService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -459,21 +452,7 @@ export class DeliveryDashboardComponent implements OnInit, OnDestroy {
   passwordSuccess = '';
 
   ngOnInit() {
-    // Traverse up the route tree to find orgSlug because we are inside a lazily loaded module
-    let currentRoute: import('@angular/router').ActivatedRouteSnapshot | null = this.route.snapshot;
-    while (currentRoute) {
-      if (currentRoute.paramMap.has('orgSlug')) {
-        this.orgSlug = currentRoute.paramMap.get('orgSlug') || '';
-        break;
-      }
-      currentRoute = currentRoute.parent;
-    }
-
-    if (this.orgSlug) {
-      this.loadOrders();
-    } else {
-      this.logout();
-    }
+    this.loadOrders();
   }
 
   ngOnDestroy() {
@@ -482,7 +461,7 @@ export class DeliveryDashboardComponent implements OnInit, OnDestroy {
 
   loadOrders() {
     this.loading = true;
-    this.deliveryService.getOrders(this.orgSlug).subscribe({
+    this.platformService.getOrders().subscribe({
       next: (res) => {
         this.orders = res.data || [];
         this.loading = false;
@@ -569,7 +548,7 @@ export class DeliveryDashboardComponent implements OnInit, OnDestroy {
     this.searchingScan = true;
     this.scanError = '';
 
-    this.deliveryService.scanOrder(this.orgSlug, this.manualIdentifier.trim()).subscribe({
+    this.platformService.scanOrder(this.manualIdentifier.trim()).subscribe({
       next: (res) => {
         this.searchingScan = false;
         this.closeScanner();
@@ -610,7 +589,7 @@ export class DeliveryDashboardComponent implements OnInit, OnDestroy {
 
   updateStatus(orderId: string, status: string, paymentCollected = false) {
     this.updating = true;
-    this.deliveryService.updateOrderStatus(this.orgSlug, orderId, status, paymentCollected).subscribe({
+    this.platformService.updateOrderStatus(orderId, status, paymentCollected).subscribe({
       next: (res) => {
         this.updating = false;
         // Update local array
@@ -637,7 +616,7 @@ export class DeliveryDashboardComponent implements OnInit, OnDestroy {
     this.passwordSuccess = '';
     this.updatingPassword = true;
 
-    this.deliveryService.updatePassword(this.orgSlug, this.passwordForm.oldPassword, this.passwordForm.newPassword).subscribe({
+    this.platformService.updatePassword(this.passwordForm.oldPassword, this.passwordForm.newPassword).subscribe({
       next: (res) => {
         this.updatingPassword = false;
         this.passwordSuccess = 'Password updated successfully!';
@@ -655,11 +634,7 @@ export class DeliveryDashboardComponent implements OnInit, OnDestroy {
   }
 
   logout() {
-    if (this.orgSlug) {
-      localStorage.removeItem(`delivery_token_${this.orgSlug}`);
-      this.router.navigate(['/store', this.orgSlug, 'delivery', 'login']);
-    } else {
-      this.router.navigate(['/']);
-    }
+    localStorage.removeItem('platform_delivery_token');
+    this.router.navigate(['/apex-delivery/login']);
   }
 }

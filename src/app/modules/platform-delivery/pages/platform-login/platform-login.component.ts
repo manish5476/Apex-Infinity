@@ -1,20 +1,20 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
-import { DeliveryService } from '../../services/delivery.service';
+import { Router, RouterModule } from '@angular/router';
+import { PlatformDeliveryService } from '../../services/platform-delivery.service';
 
 @Component({
-  selector: 'app-delivery-login',
+  selector: 'app-platform-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   template: `
     <div class="login-container">
       <div class="login-card glass-panel">
         <div class="brand">
-          <i class="pi pi-box brand-icon"></i>
-          <h1>Delivery Portal</h1>
-          <p>Login to manage your assigned orders.</p>
+          <i class="pi pi-globe brand-icon"></i>
+          <h1>Apex Global Delivery</h1>
+          <p>Login to manage platform orders.</p>
         </div>
         
         <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
@@ -34,6 +34,10 @@ import { DeliveryService } from '../../services/delivery.service';
             <i class="pi pi-spin pi-spinner" *ngIf="loading"></i>
             <span *ngIf="!loading">Login</span>
           </button>
+
+          <div class="links">
+             <a routerLink="/apex-delivery/register">Don't have an account? Sign up</a>
+          </div>
         </form>
       </div>
     </div>
@@ -44,7 +48,7 @@ import { DeliveryService } from '../../services/delivery.service';
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      background: linear-gradient(135deg, #4c1d95 0%, #0f172a 100%);
       padding: 20px;
     }
     
@@ -71,7 +75,7 @@ import { DeliveryService } from '../../services/delivery.service';
     
     .brand-icon {
       font-size: 3rem;
-      color: #38bdf8;
+      color: #a78bfa;
       margin-bottom: 15px;
       display: inline-block;
     }
@@ -84,7 +88,7 @@ import { DeliveryService } from '../../services/delivery.service';
     
     p {
       margin: 0;
-      color: #94a3b8;
+      color: #cbd5e1;
       font-size: 0.95rem;
     }
     
@@ -95,7 +99,7 @@ import { DeliveryService } from '../../services/delivery.service';
     label {
       display: block;
       margin-bottom: 8px;
-      color: #cbd5e1;
+      color: #e2e8f0;
       font-size: 0.9rem;
       font-weight: 500;
     }
@@ -113,8 +117,8 @@ import { DeliveryService } from '../../services/delivery.service';
     
     .premium-input:focus {
       outline: none;
-      border-color: #38bdf8;
-      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+      border-color: #a78bfa;
+      box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.2);
     }
     
     .premium-btn {
@@ -131,14 +135,14 @@ import { DeliveryService } from '../../services/delivery.service';
     }
     
     .primary-btn {
-      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+      background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
       color: white;
       border: none;
     }
     
     .primary-btn:hover:not([disabled]) {
       transform: translateY(-2px);
-      box-shadow: 0 10px 20px -10px rgba(37, 99, 235, 0.6);
+      box-shadow: 0 10px 20px -10px rgba(124, 58, 237, 0.6);
     }
     
     .primary-btn[disabled] {
@@ -159,44 +163,37 @@ import { DeliveryService } from '../../services/delivery.service';
       padding: 10px;
       border-radius: 8px;
     }
+
+    .links {
+        margin-top: 20px;
+        text-align: center;
+    }
+    .links a {
+        color: #a78bfa;
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+    .links a:hover {
+        text-decoration: underline;
+    }
   `]
 })
-export class DeliveryLoginComponent implements OnInit {
-  private deliveryService = inject(DeliveryService);
+export class PlatformLoginComponent {
+  private platformService = inject(PlatformDeliveryService);
   private router = inject(Router);
-  private route = inject(ActivatedRoute);
 
   credentials = { phone: '', password: '' };
   loading = false;
   error = '';
-  orgSlug = '';
-
-  ngOnInit() {
-    // Traverse up the route tree to find orgSlug because we are inside a lazily loaded module
-    let currentRoute: import('@angular/router').ActivatedRouteSnapshot | null = this.route.snapshot;
-    while (currentRoute) {
-      if (currentRoute.paramMap.has('orgSlug')) {
-        this.orgSlug = currentRoute.paramMap.get('orgSlug') || '';
-        break;
-      }
-      currentRoute = currentRoute.parent;
-    }
-  }
 
   onSubmit() {
-    if (!this.orgSlug) {
-      this.error = 'Invalid organization scope.';
-      return;
-    }
-
     this.loading = true;
     this.error = '';
     
-    this.deliveryService.login(this.orgSlug, this.credentials.phone, this.credentials.password).subscribe({
+    this.platformService.login(this.credentials.phone, this.credentials.password).subscribe({
       next: (res) => {
-        // Store token scoped to this org
-        localStorage.setItem(`delivery_token_${this.orgSlug}`, res.token);
-        this.router.navigate(['/store', this.orgSlug, 'delivery', 'dashboard']);
+        localStorage.setItem('platform_delivery_token', res.token);
+        this.router.navigate(['/apex-delivery/dashboard']);
       },
       error: (err) => {
         this.loading = false;

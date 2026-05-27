@@ -12,11 +12,11 @@
   width: 100%;
   display: flex;
   align-items: center;
-  background: var(--bg-primary, #0f172a);
+  background: var(--bg-primary, var(--text-primary));
   background-size: cover;
   background-position: center;
   overflow: hidden;
-  color: #ffffff; /* Force white text for contrast in hero */
+  color: var(--bg-primary); /* Force white text for contrast in hero */
 }
 
 /* Background & Ken Burns */
@@ -129,8 +129,8 @@
     display: inline-block;
     width: 32px;
     height: 2px;
-    background: var(--accent-primary, #3b82f6);
-    box-shadow: 0 0 10px var(--accent-primary, #3b82f6);
+    background: var(--accent-primary, var(--accent-primary));
+    box-shadow: 0 0 10px var(--accent-primary, var(--accent-primary));
     border-radius: 2px;
   }
 }
@@ -204,7 +204,7 @@
 
   /* Variants */
   &-primary {
-    background: #ffffff;
+    background: var(--bg-primary);
     color: #000000;
     box-shadow: 0 4px 15px rgba(255,255,255,0.2);
     
@@ -215,25 +215,25 @@
   }
 
   &-secondary {
-    background: var(--accent-primary, #3b82f6);
-    color: #ffffff;
-    box-shadow: 0 4px 15px color-mix(in srgb, var(--accent-primary, #3b82f6) 40%, transparent);
+    background: var(--accent-primary, var(--accent-primary));
+    color: var(--bg-primary);
+    box-shadow: 0 4px 15px color-mix(in srgb, var(--accent-primary, var(--accent-primary)) 40%, transparent);
 
     &:hover {
-      box-shadow: 0 8px 25px color-mix(in srgb, var(--accent-primary, #3b82f6) 60%, transparent);
+      box-shadow: 0 8px 25px color-mix(in srgb, var(--accent-primary, var(--accent-primary)) 60%, transparent);
       transform: translateY(-3px);
     }
   }
 
   &-outline {
     background: rgba(255,255,255,0.05);
-    color: #ffffff;
+    color: var(--bg-primary);
     border-color: rgba(255,255,255,0.3);
     backdrop-filter: blur(4px);
 
     &:hover {
       background: rgba(255,255,255,0.15);
-      border-color: #ffffff;
+      border-color: var(--bg-primary);
       transform: translateY(-3px);
     }
   }
@@ -245,7 +245,7 @@
     &::before { display: none; }
 
     &:hover {
-      color: #ffffff;
+      color: var(--bg-primary);
       transform: translateY(-2px);
     }
   }
