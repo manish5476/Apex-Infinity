@@ -27,30 +27,32 @@
 
     <div class="grid-container">
       @if (error()) {
-      <div class="error-state">
-        <i class="pi pi-exclamation-triangle"></i>
-        <p>{{ error() }}</p>
-        <button class="premium-btn" (click)="load()">Try Again</button>
-      </div>
+        <div class="error-state">
+          <i class="pi pi-exclamation-triangle"></i>
+          <p>{{ error() }}</p>
+          <button class="premium-btn" (click)="load()">Try Again</button>
+        </div>
       } @else {
-      <div class="classic-list">
-        @for (customer of customers(); track customer._id || customer.id) {
-        <article class="customer-row"
-          [class.active]="(selected()?._id || selected()?.id) === (customer._id || customer.id)"
-          (click)="open(customer)">
-          <div class="avatar">{{ customer.displayName.charAt(0).toUpperCase() }}</div>
-          <div class="info">
-            <h3>{{ customer.displayName }}</h3>
-            <p>{{ customer.email || customer.phone || 'Guest Shopper' }}</p>
+        <div class="classic-list-wrapper">
+          <div class="classic-list">
+            @for (customer of customers(); track customer._id || customer.id) {
+              <article class="customer-row"
+                [class.active]="(selected()?._id || selected()?.id) === (customer._id || customer.id)"
+                (click)="open(customer)">
+                <div class="avatar">{{ customer.displayName.charAt(0).toUpperCase() }}</div>
+                <div class="info">
+                  <h3>{{ customer.displayName }}</h3>
+                  <p>{{ customer.email || customer.phone || 'Guest Shopper' }}</p>
+                </div>
+                <span class="status-badge" [class.converted]="customer.convertedToMainCustomer">
+                  {{ customer.convertedToMainCustomer ? 'CRM' : 'Store' }}
+                </span>
+              </article>
+            } @empty {
+              <div class="empty-panel">No customers found.</div>
+            }
           </div>
-          <span class="status-badge" [class.converted]="customer.convertedToMainCustomer">
-            {{ customer.convertedToMainCustomer ? 'CRM' : 'Store' }}
-          </span>
-        </article>
-        } @empty {
-        <div class="empty-panel">No customers found.</div>
-        }
-      </div>
+        </div>
       }
     </div>
   </section>
@@ -66,7 +68,7 @@
     </header>
 
     <div class="panel-scroll" *ngIf="detail() as d; else loadingTpl">
-
+      
       <div class="bento-top-row">
         <section class="bento-block profile-card">
           <div class="avatar-large">{{ customer.displayName.charAt(0).toUpperCase() }}</div>
@@ -91,7 +93,7 @@
             <i class="pi pi-shield"></i>
             <div>
               <h4>Convert Profile</h4>
-              <p>issue manual invoices, track comprehensive lifetime values, and manage customer ledgers directly.</p>
+              <p>Issue manual invoices, track comprehensive lifetime values, and manage customer ledgers directly.</p>
             </div>
           </div>
           <button class="premium-btn full-width-action" (click)="convert(customer)"
@@ -118,7 +120,6 @@
       </div>
 
       <div class="bento-dashboard-grid">
-
         <section class="bento-block functional-list-block"
           *ngIf="d.carts && d.carts.length > 0 && d.carts[0].cartItems?.length > 0; else emptyCartTpl">
           <div class="block-header">
@@ -228,7 +229,6 @@
             <div class="empty-msg"><i class="pi pi-heart"></i> Wishlist folder is currently empty.</div>
           </section>
         </ng-template>
-
       </div>
     </div>
 
