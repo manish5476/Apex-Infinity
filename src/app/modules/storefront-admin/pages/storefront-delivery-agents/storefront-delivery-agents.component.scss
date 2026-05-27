@@ -8,15 +8,42 @@
   box-sizing: border-box;
   font-family: 'Inter', sans-serif;
 
+  /* --- 60/40 Master Detail Split Logic --- */
   .grid-section {
     flex: 1 1 100%;
     display: flex;
     flex-direction: column;
     height: 100%;
     padding: 24px;
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     min-width: 0;
   }
 
+  &.panel-open {
+    .grid-section {
+      flex: 0 0 60%;
+      max-width: 60%;
+      padding-right: 12px;
+
+      @media (max-width: 1024px) {
+        display: none; /* Hide grid entirely on mobile when panel opens */
+      }
+    }
+
+    .detail-panel {
+      display: flex; /* Overrides display: none */
+      flex: 0 0 40%;
+      max-width: 40%;
+
+      @media (max-width: 1024px) {
+        flex: 1 1 100%;
+        max-width: 100%;
+        padding-left: 24px;
+      }
+    }
+  }
+
+  /* --- Header --- */
   .page-header {
     display: flex;
     flex-wrap: wrap;
@@ -50,7 +77,7 @@
     }
   }
 
-  /* Main Grid Wrappers */
+  /* --- Grid Wrappers --- */
   .grid-container {
     flex: 1;
     overflow: hidden;
@@ -64,12 +91,19 @@
     border-radius: 14px;
     border: 1px solid #e2e8f0;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 
-  /* PrimeNG Table Customization to match Bento style */
+  /* --- PrimeNG Table Overrides --- */
   ::ng-deep .premium-p-table {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
     .p-datatable-wrapper {
-      border-radius: 14px;
+      flex: 1;
+      overflow: auto;
     }
     
     .p-datatable-thead > tr > th {
@@ -82,6 +116,9 @@
       padding: 16px;
       border: none;
       border-bottom: 1px solid #e2e8f0;
+      position: sticky;
+      top: 0;
+      z-index: 1;
     }
 
     .p-datatable-tbody > tr > td {
@@ -97,17 +134,15 @@
       background: #f8fafc;
     }
 
-    /* Paginator Styling */
     .p-paginator {
       background: #ffffff;
       border: none;
       border-top: 1px solid #e2e8f0;
       padding: 12px;
-      border-radius: 0 0 14px 14px;
     }
   }
 
-  /* Custom Cells */
+  /* --- Grid Cells --- */
   .agent-name-cell {
     display: flex;
     align-items: center;
@@ -147,7 +182,6 @@
     font-size: 12px;
     font-weight: 500;
     text-transform: capitalize;
-    
     i { color: #94a3b8; }
   }
 
@@ -180,102 +214,67 @@
     }
   }
 
-  /* Empty State Overrides */
-  .empty-state-block {
-    display: flex;
+  /* --- Side Panel (Right Slide-in) --- */
+  .detail-panel {
+    display: none; // Managed by .panel-open rule block
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 48px 24px;
-    text-align: center;
-    
-    .empty-icon-wrapper {
-      width: 64px; height: 64px; border-radius: 16px;
-      background: #f1f5f9; color: #94a3b8;
-      display: grid; place-items: center; font-size: 28px;
-      margin-bottom: 16px;
-    }
-    
-    h3 { margin: 0 0 8px 0; font-size: 16px; font-weight: 600; color: #0f172a; }
-    p { margin: 0; font-size: 13px; color: #64748b; max-width: 300px; }
-  }
+    height: 100%;
+    padding: 24px 24px 24px 12px;
+    min-width: 0;
 
-  .error-state {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    padding: 40px; background: #ffffff; border-radius: 14px; border: 1px solid #fecdd3;
-    color: #e11d48; gap: 12px; text-align: center;
-    i { font-size: 28px; }
-    p { font-size: 14px; margin: 0; font-weight: 500; }
-  }
+    .panel-header {
+      padding: 16px 24px;
+      border: 1px solid #e2e8f0;
+      border-bottom: none;
+      background: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-radius: 16px 16px 0 0;
 
-  /* Shared Button Styles */
-  .premium-btn {
-    display: inline-flex; align-items: center; justify-content: center;
-    gap: 8px; font-weight: 500; font-size: 13px; padding: 10px 16px;
-    border-radius: 8px; border: 1px solid transparent; cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      .title-group {
+        display: flex;
+        flex-direction: column;
+        
+        .eyebrow {
+          font-size: 10px; font-weight: 700; text-transform: uppercase;
+          letter-spacing: 0.05em; color: #3b82f6; margin-bottom: 2px;
+        }
+        h2 { margin: 0; font-size: 16px; font-weight: 600; color: #0f172a; }
+      }
 
-    &.primary-btn {
-      background: #0f172a; color: #ffffff;
-      &:hover { background: #1e293b; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1); }
-      &[disabled] { opacity: 0.6; cursor: not-allowed; }
+      .close-btn {
+        background: #f1f5f9; border: none; color: #475569; cursor: pointer;
+        width: 28px; height: 28px; border-radius: 50%;
+        display: grid; place-items: center; transition: all 0.2s ease;
+        &:hover { background: #e2e8f0; color: #0f172a; }
+      }
     }
 
-    &.ghost-btn {
-      background: #ffffff; border: 1px solid #e2e8f0; color: #475569;
-      &:hover { background: #f8fafc; color: #0f172a; }
-    }
-  }
-
-  /* PrimeNG Drawer Overrides to match Bento Panel */
-  ::ng-deep .premium-sidebar-panel.p-drawer {
-    background: #f1f5f9;
-    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.15);
-    border-left: 1px solid #e2e8f0;
-    padding: 0;
-    
-    .p-drawer-header { display: none; } /* Hide default to use our custom one */
-    .p-drawer-content { padding: 0; display: flex; flex-direction: column; height: 100%; overflow: hidden; }
-    .p-drawer-footer { padding: 0; }
-  }
-
-  /* Form & Panel Internals */
-  .panel-header {
-    padding: 16px 24px;
-    border-bottom: 1px solid #e2e8f0;
-    background: #ffffff;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-radius: 16px 16px 0 0;
-
-    .title-group {
+    .panel-form-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      background: #f1f5f9;
+      border-left: 1px solid #e2e8f0;
+      border-right: 1px solid #e2e8f0;
       display: flex;
       flex-direction: column;
-      
-      .eyebrow {
-        font-size: 10px; font-weight: 700; text-transform: uppercase;
-        letter-spacing: 0.05em; color: #3b82f6; margin-bottom: 2px;
-      }
-      h2 { margin: 0; font-size: 16px; font-weight: 600; color: #0f172a; }
     }
 
-    .close-btn {
-      background: #f1f5f9; border: none; color: #475569; cursor: pointer;
-      width: 28px; height: 28px; border-radius: 50%;
-      display: grid; place-items: center; transition: all 0.2s ease;
-      &:hover { background: #e2e8f0; color: #0f172a; }
+    .sticky-actions {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-top: none;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      border-radius: 0 0 16px 16px;
     }
   }
 
-  .panel-form-scroll {
-    flex: 1;
-    overflow-y: auto;
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-  }
-
+  /* --- Form & Bento Blocks --- */
   .agent-form-grid {
     display: flex;
     flex-direction: column;
@@ -310,6 +309,7 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
+      @media (max-width: 600px) { grid-template-columns: 1fr; }
     }
 
     .form-label {
@@ -382,13 +382,44 @@
     }
   }
 
-  .sticky-actions {
-    background: #ffffff;
-    border-top: 1px solid #e2e8f0;
-    padding: 16px 24px;
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    border-radius: 0 0 16px 16px;
+  /* Shared Button Styles */
+  .premium-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 8px; font-weight: 500; font-size: 13px; padding: 10px 16px;
+    border-radius: 8px; border: 1px solid transparent; cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &.primary-btn {
+      background: #0f172a; color: #ffffff;
+      &:hover { background: #1e293b; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1); }
+      &[disabled] { opacity: 0.6; cursor: not-allowed; }
+    }
+
+    &.ghost-btn {
+      background: #ffffff; border: 1px solid #e2e8f0; color: #475569;
+      &:hover { background: #f8fafc; color: #0f172a; }
+    }
+  }
+
+  .empty-state-block {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 48px 24px; text-align: center;
+    
+    .empty-icon-wrapper {
+      width: 64px; height: 64px; border-radius: 16px; background: #f1f5f9;
+      color: #94a3b8; display: grid; place-items: center; font-size: 28px;
+      margin-bottom: 16px;
+    }
+    
+    h3 { margin: 0 0 8px 0; font-size: 16px; font-weight: 600; color: #0f172a; }
+    p { margin: 0; font-size: 13px; color: #64748b; max-width: 300px; }
+  }
+
+  .error-state {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 40px; background: #ffffff; border-radius: 14px; border: 1px solid #fecdd3;
+    color: #e11d48; gap: 12px; text-align: center;
+    i { font-size: 28px; }
+    p { font-size: 14px; margin: 0; font-weight: 500; }
   }
 }
