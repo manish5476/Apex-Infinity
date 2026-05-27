@@ -1,7 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { StorefrontAdminService } from '@core/services/storefront-admin.service';
+import { forkJoin } from 'rxjs';
+
+interface PageReference {
+  _id: string;
+  name: string;
+  slug: string;
+  isPublished: boolean;
+  pageType: string;
+}
 
 @Component({
   selector: 'app-storefront-layout',
@@ -12,12 +21,13 @@ import { StorefrontAdminService } from '@core/services/storefront-admin.service'
       <header class="page-header">
         <div class="header-content">
           <h1>Master Layout Settings</h1>
-          <p class="subtitle">Configure your global header, footer, and brand settings.</p>
+          <p class="subtitle">Configure your global header, footer, brand settings, and manage routing links.</p>
         </div>
         <div class="actions">
-          <button class="premium-btn" (click)="saveLayout()" [disabled]="saving()">
+          <button class="premium-btn primary-btn" (click)="saveLayout()" [disabled]="saving() || loading()">
             <i class="pi pi-spin pi-spinner" *ngIf="saving()"></i>
-            {{ saving() ? 'Saving...' : 'Save Changes' }}
+            <i class="pi pi-check" *ngIf="!saving()"></i>
+            {{ saving() ? 'Syncing...' : 'Save Configuration' }}
           </button>
         </div>
       </header>
@@ -25,168 +35,308 @@ import { StorefrontAdminService } from '@core/services/storefront-admin.service'
       @if (loading()) {
         <div class="loading-state">
           <i class="pi pi-spin pi-spinner"></i>
-          <p>Loading layout...</p>
+          <p>Assembling core layout schema...</p>
         </div>
       } @else if (error()) {
         <div class="error-state">
+          <i class="pi pi-exclamation-triangle"></i>
           <p>{{ error() }}</p>
+          <button class="premium-btn ghost-btn" (click)="fetchCoreData()">Retry</button>
         </div>
       } @else {
         <div class="settings-grid">
           
-          <!-- Global Settings -->
-          <section class="config-card">
-            <div class="card-header">
-              <h2>Brand Settings</h2>
-              <i class="pi pi-palette"></i>
-            </div>
-            <div class="card-body row-layout">
-              <div class="form-group">
-                <label>Primary Color</label>
-                <div style="display: flex; gap: 8px;">
-                  <input type="color" [(ngModel)]="colors.primary" style="height: 42px; width: 42px; padding: 0; border: none; cursor: pointer;" />
-                  <input type="text" [(ngModel)]="colors.primary" class="premium-input" style="flex: 1" />
-                </div>
+          <div class="bento-row two-col">
+            
+            <section class="config-card bento-block">
+              <div class="card-header">
+                <h2><i class="pi pi-palette"></i> Brand Settings</h2>
               </div>
-              <div class="form-group">
-                <label>Currency</label>
-                <input type="text" [(ngModel)]="commerce.currency" class="premium-input" placeholder="e.g. INR, USD" />
-              </div>
-            </div>
-          </section>
-
-          <!-- Header Config -->
-          <section class="config-card">
-            <div class="card-header">
-              <h2>Header Navigation (Menu)</h2>
-              <i class="pi pi-compass"></i>
-            </div>
-            <div class="card-body">
-              <div class="form-group">
-                <label>Navigation Links</label>
-                <p class="hint">These links appear at the top of your store. Use URLs like <code>/products</code> or <code>/about</code></p>
-                <div class="link-builder">
-                  <div class="link-row" *ngFor="let link of headerLinks; let i = index">
-                    <i class="pi pi-bars drag-handle"></i>
-                    <input type="text" [(ngModel)]="link.label" placeholder="Link Label (e.g. Home)" class="premium-input" />
-                    <input type="text" [(ngModel)]="link.url" placeholder="URL (e.g. /)" class="premium-input" />
-                    <button class="icon-btn" (click)="removeHeaderLink(i)"><i class="pi pi-trash"></i></button>
+              <div class="card-body">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Primary Theme Color</label>
+                    <div class="color-picker-wrapper">
+                      <input type="color" [(ngModel)]="colors.primary" class="color-wheel" />
+                      <input type="text" [(ngModel)]="colors.primary" class="premium-input hex-input" />
+                    </div>
                   </div>
-                  <button class="premium-btn ghost-btn" (click)="addHeaderLink()"><i class="pi pi-plus"></i> Add Header Link</button>
+                  <div class="form-group">
+                    <label>Storefront Currency</label>
+                    <input type="text" [(ngModel)]="commerce.currency" class="premium-input uppercase-input" placeholder="e.g. INR" />
+                  </div>
                 </div>
+              </div>
+            </section>
+
+            <section class="config-card bento-block page-manager-block">
+              <div class="card-header">
+                <h2><i class="pi pi-file"></i> Page Routing Status</h2>
+                <span class="badge">{{ pages().length }} Pages Found</span>
+              </div>
+              <div class="card-body scrollable-body">
+                @if (pages().length === 0) {
+                  <p class="empty-hint">No pages found. Create pages in the Page Builder first.</p>
+                } @else {
+                  <div class="page-list-compact">
+                    @for (page of pages(); track page._id) {
+                      <div class="compact-page-row">
+                        <div class="page-ident">
+                          <span class="p-name">{{ page.name }}</span>
+                          <span class="p-slug">/{{ page.slug }}</span>
+                        </div>
+                        <button 
+                          class="icon-action-btn" 
+                          [class.active]="page.isPublished"
+                          (click)="togglePagePublishState(page)"
+                          [title]="page.isPublished ? 'Unpublish' : 'Publish'">
+                          <i class="pi" [class]="page.isPublished ? 'pi-eye' : 'pi-eye-slash'"></i>
+                        </button>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </section>
+          </div>
+
+          <section class="config-card bento-block">
+            <div class="card-header">
+              <h2><i class="pi pi-compass"></i> Header Navigation Bar</h2>
+            </div>
+            <div class="card-body">
+              <p class="hint">Map external URLs or select existing storefront pages.</p>
+              
+              <div class="link-builder">
+                <div class="link-row" *ngFor="let link of headerLinks; let i = index">
+                  <i class="pi pi-bars drag-handle"></i>
+                  
+                  <div class="input-group">
+                    <input type="text" [(ngModel)]="link.label" placeholder="Display Label (e.g. Shop All)" class="premium-input" />
+                  </div>
+                  
+                  <div class="input-group suggestion-container">
+                    <input 
+                      type="text" 
+                      [(ngModel)]="link.url" 
+                      (focus)="activeSuggestionIndex.set('header-' + i)"
+                      (input)="filterPages(link.url)"
+                      placeholder="URL Routing (e.g. /products)" 
+                      class="premium-input mono-input" />
+                    
+                    @if (activeSuggestionIndex() === 'header-' + i && filteredPages().length > 0) {
+                      <div class="suggestions-dropdown">
+                        <div class="suggestion-header">Storefront Pages</div>
+                        @for (p of filteredPages(); track p._id) {
+                          <div class="suggestion-item" (click)="selectSuggestion(p, link, 'header-' + i)">
+                            <div class="s-main">
+                              <i class="pi pi-file"></i> {{ p.name }}
+                            </div>
+                            <span class="s-slug">/{{ p.slug }}</span>
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+                  
+                  <button class="icon-btn danger" (click)="removeHeaderLink(i)"><i class="pi pi-trash"></i></button>
+                </div>
+                
+                <button class="premium-btn ghost-btn dashed-btn" (click)="addHeaderLink()">
+                  <i class="pi pi-plus"></i> Add Nav Link
+                </button>
               </div>
             </div>
           </section>
 
-          <!-- Footer Config -->
-          <section class="config-card">
+          <section class="config-card bento-block">
             <div class="card-header">
-              <h2>Footer Settings</h2>
-              <i class="pi pi-align-bottom"></i>
+              <h2><i class="pi pi-align-bottom"></i> Footer Configuration</h2>
             </div>
             <div class="card-body">
               <div class="form-group">
-                <label>Copyright Text</label>
-                <input type="text" [(ngModel)]="footerCopyright" placeholder="© 2026 Your Company" class="premium-input" />
+                <label>Copyright Declaration</label>
+                <input type="text" [(ngModel)]="footerCopyright" placeholder="© 2026 Your Store Name" class="premium-input" />
               </div>
               
               <hr class="divider" />
               
               <div class="form-group">
-                <label>Footer Links (Quick Links)</label>
+                <label>Footer Matrix (Quick Links)</label>
                 <div class="link-builder">
                   <div class="link-row" *ngFor="let link of footerLinks; let i = index">
                     <i class="pi pi-bars drag-handle"></i>
-                    <input type="text" [(ngModel)]="link.label" placeholder="Link Label" class="premium-input" />
-                    <input type="text" [(ngModel)]="link.url" placeholder="URL" class="premium-input" />
-                    <button class="icon-btn" (click)="removeFooterLink(i)"><i class="pi pi-trash"></i></button>
+                    
+                    <div class="input-group">
+                      <input type="text" [(ngModel)]="link.label" placeholder="Display Label" class="premium-input" />
+                    </div>
+
+                    <div class="input-group suggestion-container">
+                      <input 
+                        type="text" 
+                        [(ngModel)]="link.url" 
+                        (focus)="activeSuggestionIndex.set('footer-' + i)"
+                        (input)="filterPages(link.url)"
+                        placeholder="URL Routing" 
+                        class="premium-input mono-input" />
+                      
+                      @if (activeSuggestionIndex() === 'footer-' + i && filteredPages().length > 0) {
+                        <div class="suggestions-dropdown">
+                          <div class="suggestion-header">Storefront Pages</div>
+                          @for (p of filteredPages(); track p._id) {
+                            <div class="suggestion-item" (click)="selectSuggestion(p, link, 'footer-' + i)">
+                              <div class="s-main">
+                                <i class="pi pi-file"></i> {{ p.name }}
+                              </div>
+                              <span class="s-slug">/{{ p.slug }}</span>
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+
+                    <button class="icon-btn danger" (click)="removeFooterLink(i)"><i class="pi pi-trash"></i></button>
                   </div>
-                  <button class="premium-btn ghost-btn" (click)="addFooterLink()"><i class="pi pi-plus"></i> Add Footer Link</button>
+                  
+                  <button class="premium-btn ghost-btn dashed-btn" (click)="addFooterLink()">
+                    <i class="pi pi-plus"></i> Add Footer Link
+                  </button>
                 </div>
               </div>
             </div>
           </section>
+
         </div>
       }
     </main>
   `,
   styles: [`
     .layout-settings {
-      padding: 24px; background: var(--bg-primary); height: 100%; overflow-y: auto;
+      padding: 24px; background: #f8fafc; height: 100%; overflow-y: auto; font-family: 'Inter', sans-serif;
     }
+    
     .page-header {
-      display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px;
-      h1 { font-size: 28px; margin: 0 0 8px 0; color: var(--text-primary); font-family: var(--font-heading); }
-      .subtitle { color: var(--text-secondary); margin: 0; }
+      display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px; gap: 16px; flex-wrap: wrap;
+      h1 { font-size: 24px; font-weight: 600; margin: 0 0 4px 0; color: #0f172a; letter-spacing: -0.02em; }
+      .subtitle { color: #64748b; margin: 0; font-size: 13px; }
     }
+
     .loading-state, .error-state {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      padding: 64px; color: var(--text-secondary);
-      i { font-size: 32px; margin-bottom: 16px; }
+      padding: 80px 24px; color: #64748b; gap: 16px;
+      i { font-size: 28px; }
+      p { margin: 0; font-size: 14px; font-weight: 500; }
     }
-    .error-state { color: var(--theme-danger, #ef4444); }
+    .error-state { color: #e11d48; background: #ffffff; border-radius: 14px; border: 1px solid #fecdd3; }
     
     .settings-grid {
-      display: flex; flex-direction: column; gap: 24px; max-width: 800px; padding-bottom: 60px;
+      display: flex; flex-direction: column; gap: 24px; max-width: 900px; padding-bottom: 60px;
     }
+
+    .bento-row {
+      display: grid; gap: 24px;
+      &.two-col { grid-template-columns: 1fr 1fr; @media (max-width: 800px) { grid-template-columns: 1fr; } }
+    }
+
+    .bento-block {
+      background: #ffffff; border: 1px solid rgba(226, 232, 240, 0.9); border-radius: 16px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.01), 0 8px 16px -10px rgba(15, 23, 42, 0.04); display: flex; flex-direction: column;
+    }
+
     .config-card {
-      border: 1px solid var(--border-primary); border-radius: 12px; background: var(--bg-secondary);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
       .card-header {
-        display: flex; justify-content: space-between; align-items: center;
-        padding: 16px 20px; border-bottom: 1px solid var(--border-primary);
-        background: var(--bg-tertiary); border-radius: 12px 12px 0 0;
-        h2 { margin: 0; font-size: 16px; font-weight: 600; color: var(--text-primary); }
-        i { color: var(--text-tertiary); }
+        display: flex; justify-content: space-between; align-items: center; padding: 16px 20px;
+        border-bottom: 1px solid #f1f5f9;
+        h2 { margin: 0; font-size: 14px; font-weight: 600; color: #0f172a; display: flex; align-items: center; gap: 8px; i { color: #64748b; } }
+        .badge { background: #f1f5f9; color: #475569; font-size: 11px; padding: 2px 8px; border-radius: 6px; font-weight: 600; }
       }
-      .card-body {
-        padding: 24px 20px; display: flex; flex-direction: column; gap: 24px;
-        &.row-layout { flex-direction: row; gap: 32px; }
-      }
+      .card-body { padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+      
+      .scrollable-body { max-height: 240px; overflow-y: auto; }
     }
     
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; @media (max-width: 500px) { grid-template-columns: 1fr; } }
     .form-group {
-      display: flex; flex-direction: column; gap: 8px; flex: 1;
-      label { font-size: 14px; font-weight: 600; color: var(--text-primary); }
-      .hint { font-size: 13px; color: var(--text-secondary); margin: 0 0 8px 0; }
-      .premium-input {
-        padding: 10px 14px; border: 1px solid var(--border-primary); border-radius: 8px;
-        background: var(--bg-primary); color: var(--text-primary); outline: none;
-        transition: border-color 0.2s;
-        &:focus { border-color: var(--theme-primary, #3b82f6); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
-      }
+      display: flex; flex-direction: column; gap: 6px;
+      label { font-size: 12px; font-weight: 600; color: #334155; }
+      .hint { font-size: 12px; color: #64748b; margin: 0 0 4px 0; }
     }
     
-    .divider { border: 0; border-top: 1px dashed var(--border-primary); margin: 8px 0; }
+    /* Inputs */
+    .premium-input {
+      padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc;
+      color: #0f172a; outline: none; font-size: 13px; font-family: inherit; transition: all 0.2s; width: 100%; box-sizing: border-box;
+      &::placeholder { color: #94a3b8; }
+      &:focus { border-color: #3b82f6; background: #ffffff; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+      &.uppercase-input { text-transform: uppercase; }
+      &.mono-input { font-family: monospace; }
+    }
+
+    .color-picker-wrapper {
+      display: flex; gap: 8px; align-items: center;
+      .color-wheel { height: 40px; width: 44px; padding: 0; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; background: #ffffff; }
+      .hex-input { flex: 1; font-family: monospace; text-transform: uppercase; }
+    }
     
+    .divider { border: 0; border-top: 1px dashed #e2e8f0; margin: 4px 0; }
+    
+    /* Link Builder & Suggestions */
     .link-builder {
       display: flex; flex-direction: column; gap: 12px;
       .link-row {
-        display: flex; gap: 12px; align-items: center;
-        padding: 12px; background: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: 8px;
-        .drag-handle { color: var(--text-tertiary); cursor: grab; padding: 0 4px; }
-        input { flex: 1; }
-        .icon-btn {
-          background: transparent; border: none; border-radius: 8px;
-          width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
-          color: var(--text-secondary); cursor: pointer; transition: all 0.2s;
-          &:hover { color: var(--theme-danger, #ef4444); background: rgba(239, 68, 68, 0.1); }
-        }
+        display: flex; gap: 12px; align-items: center; padding: 12px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px;
+        .drag-handle { color: #94a3b8; cursor: grab; padding: 0 4px; font-size: 14px; }
+        .input-group { flex: 1; position: relative; }
+      }
+    }
+
+    .suggestion-container { position: relative; }
+    .suggestions-dropdown {
+      position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px;
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.1); z-index: 100; max-height: 200px; overflow-y: auto; display: flex; flex-direction: column;
+      
+      .suggestion-header { padding: 8px 12px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; background: #f8fafc; border-bottom: 1px solid #f1f5f9; }
+      .suggestion-item {
+        padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-bottom: 1px solid #f1f5f9;
+        &:last-child { border-bottom: none; }
+        &:hover { background: #f1f5f9; }
+        .s-main { font-size: 12px; font-weight: 500; color: #0f172a; display: flex; align-items: center; gap: 8px; i { color: #3b82f6; } }
+        .s-slug { font-size: 11px; font-family: monospace; color: #64748b; }
       }
     }
     
-    .premium-btn {
-      padding: 10px 20px; border-radius: 8px; font-weight: 500; cursor: pointer; border: none;
-      background: var(--theme-primary, #3b82f6); color: white; display: inline-flex; align-items: center; gap: 8px;
-      transition: opacity 0.2s, transform 0.1s;
-      &:hover { opacity: 0.9; }
-      &:active { transform: scale(0.98); }
-      &:disabled { opacity: 0.7; cursor: not-allowed; }
-      &.ghost-btn {
-        background: transparent; border: 1px dashed var(--border-primary); color: var(--text-primary);
-        justify-content: center; padding: 12px;
-        &:hover { border-color: var(--theme-primary, #3b82f6); color: var(--theme-primary, #3b82f6); background: rgba(59, 130, 246, 0.05); }
+    /* Inline Page Manager */
+    .page-list-compact {
+      display: flex; flex-direction: column; gap: 8px;
+      .compact-page-row {
+        display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: #f8fafc; border: 1px solid #f1f5f9; border-radius: 8px;
+        .page-ident { display: flex; flex-direction: column; gap: 2px; .p-name { font-size: 13px; font-weight: 600; color: #0f172a; } .p-slug { font-size: 11px; font-family: monospace; color: #64748b; } }
       }
+    }
+
+    /* Buttons */
+    .premium-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 500; font-size: 13px; padding: 10px 16px;
+      border-radius: 8px; border: 1px solid transparent; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      
+      &.primary-btn { background: #0f172a; color: #ffffff; &:hover:not([disabled]) { background: #1e293b; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1); } }
+      &.ghost-btn { background: #ffffff; border: 1px solid #e2e8f0; color: #475569; &:hover:not([disabled]) { background: #f8fafc; color: #0f172a; } }
+      &.dashed-btn { border-style: dashed; border-color: #cbd5e1; width: 100%; &:hover { border-color: #3b82f6; color: #3b82f6; background: #eff6ff; } }
+      &:disabled { opacity: 0.6; cursor: not-allowed; }
+    }
+
+    .icon-btn {
+      width: 36px; height: 36px; border-radius: 8px; border: 1px solid transparent; background: transparent; color: #64748b;
+      display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s ease; font-size: 14px; flex-shrink: 0;
+      &:hover { background: #f1f5f9; color: #0f172a; }
+      &.danger:hover { background: #fef2f2; color: #e11d48; }
+    }
+
+    .icon-action-btn {
+      width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: 1px solid #e2e8f0;
+      background: #ffffff; color: #475569; cursor: pointer; transition: all 0.15s ease;
+      &:hover { background: #f8fafc; color: #0f172a; }
+      &.active { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
     }
   `]
 })
@@ -197,10 +347,15 @@ export class StorefrontLayoutComponent implements OnInit {
   readonly saving = signal(false);
   readonly error = signal<string | null>(null);
 
-  // Raw layout reference
+  // Raw API state
   private rawLayout: any = null;
+  readonly pages = signal<PageReference[]>([]);
+  
+  // UI Suggestion State
+  readonly activeSuggestionIndex = signal<string | null>(null);
+  readonly filteredPages = signal<PageReference[]>([]);
 
-  // Editable State
+  // Editable Layout State
   headerLinks: Array<{label: string, url: string}> = [];
   footerLinks: Array<{label: string, url: string}> = [];
   footerCopyright = '';
@@ -208,19 +363,37 @@ export class StorefrontLayoutComponent implements OnInit {
   commerce = { currency: 'INR' };
 
   ngOnInit() {
-    this.fetchLayout();
+    this.fetchCoreData();
   }
 
-  fetchLayout() {
+  // Close suggestions when clicking outside
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: Event) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.suggestion-container')) {
+      this.activeSuggestionIndex.set(null);
+    }
+  }
+
+  fetchCoreData() {
     this.loading.set(true);
     this.error.set(null);
-    this.adminService.getLayout().subscribe({
-      next: (res) => {
-        // Backend returns layout in res.data or direct res
-        const layout = res?.data ?? res;
+    
+    // Fetch both Layout Config and Pages list simultaneously
+    forkJoin({
+      layoutRes: this.adminService.getLayout(),
+      pagesRes: this.adminService.getPages()
+    }).subscribe({
+      next: ({ layoutRes, pagesRes }) => {
+        // Handle Pages mapping
+        const pageData = (pagesRes as any)?.data ?? [];
+        this.pages.set(pageData);
+        this.filteredPages.set(pageData); // initialize filter
+
+        // Handle Layout mapping
+        const layout = (layoutRes as any)?.data ?? layoutRes;
         this.rawLayout = layout;
         
-        // Parse Header Links safely
         try {
           const navConfig = layout.header?.[0]?.config;
           if (navConfig && navConfig.links) {
@@ -228,7 +401,6 @@ export class StorefrontLayoutComponent implements OnInit {
           }
         } catch(e) {}
 
-        // Parse Footer safely
         try {
           const footConfig = layout.footer?.[0]?.config;
           if (footConfig) {
@@ -239,7 +411,6 @@ export class StorefrontLayoutComponent implements OnInit {
           }
         } catch(e) {}
 
-        // Parse Globals safely
         try {
           if (layout.globalSettings?.colors) {
             this.colors = { ...this.colors, ...layout.globalSettings.colors };
@@ -252,50 +423,86 @@ export class StorefrontLayoutComponent implements OnInit {
         this.loading.set(false);
       },
       error: (err) => {
-        console.error(err);
-        this.error.set('Failed to load layout configuration.');
+        console.error('Data sync failed:', err);
+        this.error.set('Failed to initialize storefront configuration parameters.');
         this.loading.set(false);
       }
     });
   }
 
-  addHeaderLink() {
-    this.headerLinks.push({ label: 'New Link', url: '/' });
+  // -------------------------------------------------------------
+  // Suggestion & Link Handlers
+  // -------------------------------------------------------------
+
+  filterPages(searchTerm: string) {
+    const term = searchTerm.toLowerCase().replace('/', '');
+    if (!term) {
+      this.filteredPages.set(this.pages());
+      return;
+    }
+    const filtered = this.pages().filter(p => 
+      p.name.toLowerCase().includes(term) || p.slug.toLowerCase().includes(term)
+    );
+    this.filteredPages.set(filtered);
   }
 
-  removeHeaderLink(index: number) {
-    this.headerLinks.splice(index, 1);
+  selectSuggestion(page: PageReference, linkObj: any, indexId: string) {
+    // If user hasn't typed a custom label yet, auto-fill it with the page name
+    if (!linkObj.label || linkObj.label === 'New Link' || linkObj.label === 'Display Label') {
+      linkObj.label = page.name;
+    }
+    linkObj.url = '/' + page.slug;
+    this.activeSuggestionIndex.set(null); // Close dropdown
   }
 
-  addFooterLink() {
-    this.footerLinks.push({ label: 'New Link', url: '/' });
+  addHeaderLink() { this.headerLinks.push({ label: 'New Link', url: '/' }); }
+  removeHeaderLink(index: number) { this.headerLinks.splice(index, 1); }
+  
+  addFooterLink() { this.footerLinks.push({ label: 'New Link', url: '/' }); }
+  removeFooterLink(index: number) { this.footerLinks.splice(index, 1); }
+
+  // -------------------------------------------------------------
+  // Inline Page Manager
+  // -------------------------------------------------------------
+
+  togglePagePublishState(page: PageReference) {
+    const request$ = page.isPublished
+      ? this.adminService.unpublishPage(page._id)
+      : this.adminService.publishPage(page._id);
+
+    request$.subscribe({
+      next: () => {
+        this.pages.update(list =>
+          list.map(p => p._id === page._id ? { ...p, isPublished: !page.isPublished } : p)
+        );
+      },
+      error: (err) => {
+        console.error(err);
+        alert('Failed to sync page status block.');
+      }
+    });
   }
 
-  removeFooterLink(index: number) {
-    this.footerLinks.splice(index, 1);
-  }
+  // -------------------------------------------------------------
+  // Save Operations
+  // -------------------------------------------------------------
 
   saveLayout() {
     if (!this.rawLayout) return;
-
     this.saving.set(true);
 
-    // Deep clone to avoid mutating raw before success
     const payload = JSON.parse(JSON.stringify(this.rawLayout));
 
-    // Inject updated header
     if (!payload.header) payload.header = [{}];
     if (!payload.header[0].config) payload.header[0].config = {};
     payload.header[0].config.links = this.headerLinks;
 
-    // Inject updated footer
     if (!payload.footer) payload.footer = [{}];
     if (!payload.footer[0].config) payload.footer[0].config = {};
     payload.footer[0].config.copyright = this.footerCopyright;
     if (!payload.footer[0].config.columns) payload.footer[0].config.columns = [{ title: 'Quick Links', links: [] }];
     payload.footer[0].config.columns[0].links = this.footerLinks;
 
-    // Inject global settings
     if (!payload.globalSettings) payload.globalSettings = {};
     payload.globalSettings.colors = { ...(payload.globalSettings.colors || {}), ...this.colors };
     payload.globalSettings.commerce = { ...(payload.globalSettings.commerce || {}), ...this.commerce };
@@ -303,14 +510,327 @@ export class StorefrontLayoutComponent implements OnInit {
     this.adminService.updateLayout(payload).subscribe({
       next: () => {
         this.saving.set(false);
-        // Optionally show a toast here
-        alert('Layout updated successfully! The storefront will now reflect these changes.');
       },
       error: (err) => {
         console.error(err);
         this.saving.set(false);
-        alert('Error saving layout.');
+        alert('Error saving layout configuration to matrix.');
       }
     });
   }
-}
+}// import { CommonModule } from '@angular/common';
+// import { Component, OnInit, inject, signal } from '@angular/core';
+// import { FormsModule } from '@angular/forms';
+// import { StorefrontAdminService } from '@core/services/storefront-admin.service';
+
+// @Component({
+//   selector: 'app-storefront-layout',
+//   standalone: true,
+//   imports: [CommonModule, FormsModule],
+//   template: `
+//     <main class="layout-settings">
+//       <header class="page-header">
+//         <div class="header-content">
+//           <h1>Master Layout Settings</h1>
+//           <p class="subtitle">Configure your global header, footer, and brand settings.</p>
+//         </div>
+//         <div class="actions">
+//           <button class="premium-btn" (click)="saveLayout()" [disabled]="saving()">
+//             <i class="pi pi-spin pi-spinner" *ngIf="saving()"></i>
+//             {{ saving() ? 'Saving...' : 'Save Changes' }}
+//           </button>
+//         </div>
+//       </header>
+
+//       @if (loading()) {
+//         <div class="loading-state">
+//           <i class="pi pi-spin pi-spinner"></i>
+//           <p>Loading layout...</p>
+//         </div>
+//       } @else if (error()) {
+//         <div class="error-state">
+//           <p>{{ error() }}</p>
+//         </div>
+//       } @else {
+//         <div class="settings-grid">
+          
+//           <!-- Global Settings -->
+//           <section class="config-card">
+//             <div class="card-header">
+//               <h2>Brand Settings</h2>
+//               <i class="pi pi-palette"></i>
+//             </div>
+//             <div class="card-body row-layout">
+//               <div class="form-group">
+//                 <label>Primary Color</label>
+//                 <div style="display: flex; gap: 8px;">
+//                   <input type="color" [(ngModel)]="colors.primary" style="height: 42px; width: 42px; padding: 0; border: none; cursor: pointer;" />
+//                   <input type="text" [(ngModel)]="colors.primary" class="premium-input" style="flex: 1" />
+//                 </div>
+//               </div>
+//               <div class="form-group">
+//                 <label>Currency</label>
+//                 <input type="text" [(ngModel)]="commerce.currency" class="premium-input" placeholder="e.g. INR, USD" />
+//               </div>
+//             </div>
+//           </section>
+
+//           <!-- Header Config -->
+//           <section class="config-card">
+//             <div class="card-header">
+//               <h2>Header Navigation (Menu)</h2>
+//               <i class="pi pi-compass"></i>
+//             </div>
+//             <div class="card-body">
+//               <div class="form-group">
+//                 <label>Navigation Links</label>
+//                 <p class="hint">These links appear at the top of your store. Use URLs like <code>/products</code> or <code>/about</code></p>
+//                 <div class="link-builder">
+//                   <div class="link-row" *ngFor="let link of headerLinks; let i = index">
+//                     <i class="pi pi-bars drag-handle"></i>
+//                     <input type="text" [(ngModel)]="link.label" placeholder="Link Label (e.g. Home)" class="premium-input" />
+//                     <input type="text" [(ngModel)]="link.url" placeholder="URL (e.g. /)" class="premium-input" />
+//                     <button class="icon-btn" (click)="removeHeaderLink(i)"><i class="pi pi-trash"></i></button>
+//                   </div>
+//                   <button class="premium-btn ghost-btn" (click)="addHeaderLink()"><i class="pi pi-plus"></i> Add Header Link</button>
+//                 </div>
+//               </div>
+//             </div>
+//           </section>
+
+//           <!-- Footer Config -->
+//           <section class="config-card">
+//             <div class="card-header">
+//               <h2>Footer Settings</h2>
+//               <i class="pi pi-align-bottom"></i>
+//             </div>
+//             <div class="card-body">
+//               <div class="form-group">
+//                 <label>Copyright Text</label>
+//                 <input type="text" [(ngModel)]="footerCopyright" placeholder="© 2026 Your Company" class="premium-input" />
+//               </div>
+              
+//               <hr class="divider" />
+              
+//               <div class="form-group">
+//                 <label>Footer Links (Quick Links)</label>
+//                 <div class="link-builder">
+//                   <div class="link-row" *ngFor="let link of footerLinks; let i = index">
+//                     <i class="pi pi-bars drag-handle"></i>
+//                     <input type="text" [(ngModel)]="link.label" placeholder="Link Label" class="premium-input" />
+//                     <input type="text" [(ngModel)]="link.url" placeholder="URL" class="premium-input" />
+//                     <button class="icon-btn" (click)="removeFooterLink(i)"><i class="pi pi-trash"></i></button>
+//                   </div>
+//                   <button class="premium-btn ghost-btn" (click)="addFooterLink()"><i class="pi pi-plus"></i> Add Footer Link</button>
+//                 </div>
+//               </div>
+//             </div>
+//           </section>
+//         </div>
+//       }
+//     </main>
+//   `,
+//   styles: [`
+//     .layout-settings {
+//       padding: 24px; background: var(--bg-primary); height: 100%; overflow-y: auto;
+//     }
+//     .page-header {
+//       display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px;
+//       h1 { font-size: 28px; margin: 0 0 8px 0; color: var(--text-primary); font-family: var(--font-heading); }
+//       .subtitle { color: var(--text-secondary); margin: 0; }
+//     }
+//     .loading-state, .error-state {
+//       display: flex; flex-direction: column; align-items: center; justify-content: center;
+//       padding: 64px; color: var(--text-secondary);
+//       i { font-size: 32px; margin-bottom: 16px; }
+//     }
+//     .error-state { color: var(--theme-danger, #ef4444); }
+    
+//     .settings-grid {
+//       display: flex; flex-direction: column; gap: 24px; max-width: 800px; padding-bottom: 60px;
+//     }
+//     .config-card {
+//       border: 1px solid var(--border-primary); border-radius: 12px; background: var(--bg-secondary);
+//       box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+//       .card-header {
+//         display: flex; justify-content: space-between; align-items: center;
+//         padding: 16px 20px; border-bottom: 1px solid var(--border-primary);
+//         background: var(--bg-tertiary); border-radius: 12px 12px 0 0;
+//         h2 { margin: 0; font-size: 16px; font-weight: 600; color: var(--text-primary); }
+//         i { color: var(--text-tertiary); }
+//       }
+//       .card-body {
+//         padding: 24px 20px; display: flex; flex-direction: column; gap: 24px;
+//         &.row-layout { flex-direction: row; gap: 32px; }
+//       }
+//     }
+    
+//     .form-group {
+//       display: flex; flex-direction: column; gap: 8px; flex: 1;
+//       label { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+//       .hint { font-size: 13px; color: var(--text-secondary); margin: 0 0 8px 0; }
+//       .premium-input {
+//         padding: 10px 14px; border: 1px solid var(--border-primary); border-radius: 8px;
+//         background: var(--bg-primary); color: var(--text-primary); outline: none;
+//         transition: border-color 0.2s;
+//         &:focus { border-color: var(--theme-primary, #3b82f6); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+//       }
+//     }
+    
+//     .divider { border: 0; border-top: 1px dashed var(--border-primary); margin: 8px 0; }
+    
+//     .link-builder {
+//       display: flex; flex-direction: column; gap: 12px;
+//       .link-row {
+//         display: flex; gap: 12px; align-items: center;
+//         padding: 12px; background: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: 8px;
+//         .drag-handle { color: var(--text-tertiary); cursor: grab; padding: 0 4px; }
+//         input { flex: 1; }
+//         .icon-btn {
+//           background: transparent; border: none; border-radius: 8px;
+//           width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+//           color: var(--text-secondary); cursor: pointer; transition: all 0.2s;
+//           &:hover { color: var(--theme-danger, #ef4444); background: rgba(239, 68, 68, 0.1); }
+//         }
+//       }
+//     }
+    
+//     .premium-btn {
+//       padding: 10px 20px; border-radius: 8px; font-weight: 500; cursor: pointer; border: none;
+//       background: var(--theme-primary, #3b82f6); color: white; display: inline-flex; align-items: center; gap: 8px;
+//       transition: opacity 0.2s, transform 0.1s;
+//       &:hover { opacity: 0.9; }
+//       &:active { transform: scale(0.98); }
+//       &:disabled { opacity: 0.7; cursor: not-allowed; }
+//       &.ghost-btn {
+//         background: transparent; border: 1px dashed var(--border-primary); color: var(--text-primary);
+//         justify-content: center; padding: 12px;
+//         &:hover { border-color: var(--theme-primary, #3b82f6); color: var(--theme-primary, #3b82f6); background: rgba(59, 130, 246, 0.05); }
+//       }
+//     }
+//   `]
+// })
+// export class StorefrontLayoutComponent implements OnInit {
+//   private readonly adminService = inject(StorefrontAdminService);
+  
+//   readonly loading = signal(true);
+//   readonly saving = signal(false);
+//   readonly error = signal<string | null>(null);
+
+//   // Raw layout reference
+//   private rawLayout: any = null;
+
+//   // Editable State
+//   headerLinks: Array<{label: string, url: string}> = [];
+//   footerLinks: Array<{label: string, url: string}> = [];
+//   footerCopyright = '';
+//   colors = { primary: '#2563eb', secondary: '#475569', accent: '#f59e0b' };
+//   commerce = { currency: 'INR' };
+
+//   ngOnInit() {
+//     this.fetchLayout();
+//   }
+
+//   fetchLayout() {
+//     this.loading.set(true);
+//     this.error.set(null);
+//     this.adminService.getLayout().subscribe({
+//       next: (res) => {
+//         // Backend returns layout in res.data or direct res
+//         const layout = res?.data ?? res;
+//         this.rawLayout = layout;
+        
+//         // Parse Header Links safely
+//         try {
+//           const navConfig = layout.header?.[0]?.config;
+//           if (navConfig && navConfig.links) {
+//             this.headerLinks = JSON.parse(JSON.stringify(navConfig.links));
+//           }
+//         } catch(e) {}
+
+//         // Parse Footer safely
+//         try {
+//           const footConfig = layout.footer?.[0]?.config;
+//           if (footConfig) {
+//             this.footerCopyright = footConfig.copyright || '';
+//             if (footConfig.columns && footConfig.columns[0]?.links) {
+//               this.footerLinks = JSON.parse(JSON.stringify(footConfig.columns[0].links));
+//             }
+//           }
+//         } catch(e) {}
+
+//         // Parse Globals safely
+//         try {
+//           if (layout.globalSettings?.colors) {
+//             this.colors = { ...this.colors, ...layout.globalSettings.colors };
+//           }
+//           if (layout.globalSettings?.commerce) {
+//             this.commerce = { ...this.commerce, ...layout.globalSettings.commerce };
+//           }
+//         } catch(e) {}
+
+//         this.loading.set(false);
+//       },
+//       error: (err) => {
+//         console.error(err);
+//         this.error.set('Failed to load layout configuration.');
+//         this.loading.set(false);
+//       }
+//     });
+//   }
+
+//   addHeaderLink() {
+//     this.headerLinks.push({ label: 'New Link', url: '/' });
+//   }
+
+//   removeHeaderLink(index: number) {
+//     this.headerLinks.splice(index, 1);
+//   }
+
+//   addFooterLink() {
+//     this.footerLinks.push({ label: 'New Link', url: '/' });
+//   }
+
+//   removeFooterLink(index: number) {
+//     this.footerLinks.splice(index, 1);
+//   }
+
+//   saveLayout() {
+//     if (!this.rawLayout) return;
+
+//     this.saving.set(true);
+
+//     // Deep clone to avoid mutating raw before success
+//     const payload = JSON.parse(JSON.stringify(this.rawLayout));
+
+//     // Inject updated header
+//     if (!payload.header) payload.header = [{}];
+//     if (!payload.header[0].config) payload.header[0].config = {};
+//     payload.header[0].config.links = this.headerLinks;
+
+//     // Inject updated footer
+//     if (!payload.footer) payload.footer = [{}];
+//     if (!payload.footer[0].config) payload.footer[0].config = {};
+//     payload.footer[0].config.copyright = this.footerCopyright;
+//     if (!payload.footer[0].config.columns) payload.footer[0].config.columns = [{ title: 'Quick Links', links: [] }];
+//     payload.footer[0].config.columns[0].links = this.footerLinks;
+
+//     // Inject global settings
+//     if (!payload.globalSettings) payload.globalSettings = {};
+//     payload.globalSettings.colors = { ...(payload.globalSettings.colors || {}), ...this.colors };
+//     payload.globalSettings.commerce = { ...(payload.globalSettings.commerce || {}), ...this.commerce };
+
+//     this.adminService.updateLayout(payload).subscribe({
+//       next: () => {
+//         this.saving.set(false);
+//         // Optionally show a toast here
+//         alert('Layout updated successfully! The storefront will now reflect these changes.');
+//       },
+//       error: (err) => {
+//         console.error(err);
+//         this.saving.set(false);
+//         alert('Error saving layout.');
+//       }
+//     });
+//   }
+// }
