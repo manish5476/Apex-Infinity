@@ -1,4 +1,4 @@
-<main class="storefront-agents-layout">
+<main class="storefront-agents-layout" [class.panel-open]="drawerVisible()">
   <section class="grid-section">
     <header class="page-header">
       <div class="header-content">
@@ -104,21 +104,18 @@
     </div>
   </section>
 
-  <p-drawer [visible]="drawerVisible()" (visibleChange)="drawerVisible.set($event)" position="right" [style]="{width: '450px'}" styleClass="premium-sidebar-panel" (onHide)="closeDrawer()" [showCloseIcon]="false">
-    
-    <ng-template pTemplate="header">
-      <div class="panel-header">
-        <div class="title-group">
-          <span class="eyebrow">Fleet Management</span>
-          <h2>{{ selectedAgent() ? 'Edit Delivery Agent' : 'Add Delivery Agent' }}</h2>
-        </div>
-        <button class="close-btn" (click)="closeDrawer()">
-          <i class="pi pi-times"></i>
-        </button>
+  <aside class="detail-panel" *ngIf="drawerVisible()">
+    <header class="panel-header">
+      <div class="title-group">
+        <span class="eyebrow">Fleet Management</span>
+        <h2>{{ selectedAgent() ? 'Edit Delivery Agent' : 'Add Delivery Agent' }}</h2>
       </div>
-    </ng-template>
+      <button class="close-btn" (click)="closeDrawer()">
+        <i class="pi pi-times"></i>
+      </button>
+    </header>
 
-    <div class="panel-form-scroll">
+    <div class="panel-scroll panel-form-scroll">
       <div class="agent-form-grid">
         
         <div class="bento-block form-block">
@@ -186,15 +183,12 @@
       </div>
     </div>
 
-    <ng-template pTemplate="footer">
-      <div class="sticky-actions">
-        <button class="premium-btn ghost-btn" (click)="closeDrawer()">Cancel</button>
-        <button class="premium-btn primary-btn" (click)="saveAgent()" [disabled]="loading()">
-          <i class="pi" [class.pi-spin]="loading()" [class.pi-spinner]="loading()" [class.pi-check]="!loading()"></i>
-          {{ loading() ? 'Saving...' : 'Save Agent' }}
-        </button>
-      </div>
-    </ng-template>
-
-  </p-drawer>
+    <div class="sticky-actions">
+      <button class="premium-btn ghost-btn" (click)="closeDrawer()">Cancel</button>
+      <button class="premium-btn primary-btn" (click)="saveAgent()" [disabled]="loading()">
+        <i class="pi" [class.pi-spin]="loading()" [class.pi-spinner]="loading()" [class.pi-check]="!loading()"></i>
+        {{ loading() ? 'Saving...' : 'Save Agent' }}
+      </button>
+    </div>
+  </aside>
 </main>
