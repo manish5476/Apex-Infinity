@@ -68,7 +68,7 @@ import { MessageService } from 'primeng/api';
       gap: 24px;
     }
     .theme-card {
-      border: 1px solid var(--border-primary, #e2e8f0);
+      border: 1px solid var(--border-primary, var(--border-primary));
       border-radius: 12px;
       overflow: hidden;
       background: var(--bg-secondary);
@@ -81,7 +81,7 @@ import { MessageService } from 'primeng/api';
 
       .theme-preview {
         height: 180px;
-        background: var(--bg-tertiary, #e2e8f0);
+        background: var(--bg-tertiary, var(--border-primary));
         display: flex;
         align-items: center;
         justify-content: center;
@@ -102,7 +102,7 @@ import { MessageService } from 'primeng/api';
 
         button {
           padding: 8px 16px; border-radius: 6px; font-weight: 500; cursor: pointer;
-          border: 1px solid var(--border-primary, #e2e8f0); background: transparent; color: var(--text-primary);
+          border: 1px solid var(--border-primary, var(--border-primary)); background: transparent; color: var(--text-primary);
           transition: all 0.2s;
           white-space: nowrap;
           
@@ -168,7 +168,7 @@ export class ThemeMarketplaceComponent implements OnInit {
       globalSettings: {
         colors: {
           primary: theme.color,
-          secondary: '#475569',
+          secondary: 'var(--text-secondary)',
           accent: theme.color // map accent to the same color for now
         }
       }

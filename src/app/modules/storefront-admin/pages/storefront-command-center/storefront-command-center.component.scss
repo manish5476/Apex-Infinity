@@ -5,10 +5,10 @@
 .admin-console {
   min-height: 100vh;
   padding: clamp(1rem, 3vw, 2rem);
-  color: var(--apx-color-ink);
+  color: var(--text-primary);
   background:
-    radial-gradient(circle at 16% 0%, color-mix(in srgb, var(--apx-color-primary) 14%, transparent), transparent 28rem),
-    linear-gradient(180deg, #f8fafc, var(--apx-color-canvas));
+    radial-gradient(circle at 16% 0%, color-mix(in srgb, var(--accent-primary) 14%, transparent), transparent 28rem),
+    linear-gradient(180deg, var(--bg-secondary), var(--bg-secondary));
 }
 
 .admin-hero,
@@ -28,8 +28,8 @@
   align-items: end;
   padding: clamp(1.25rem, 4vw, 3rem);
   border-radius: 2rem;
-  color: #fff;
-  box-shadow: var(--apx-shadow-xl);
+  color: var(--bg-primary);
+  box-shadow: var(--shadow-xl);
 }
 
 .hero-card::after {
@@ -64,9 +64,9 @@
 }
 
 .console-kicker.muted {
-  color: var(--apx-color-primary);
-  background: var(--apx-color-primary-soft);
-  border-color: color-mix(in srgb, var(--apx-color-primary) 18%, transparent);
+  color: var(--accent-primary);
+  background: var(--accent-focus);
+  border-color: color-mix(in srgb, var(--accent-primary) 18%, transparent);
 }
 
 .hero-copy h1 {
@@ -117,13 +117,13 @@
 
 .console-btn.primary,
 .console-btn.dark {
-  background: #fff;
-  color: #0f172a;
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 .console-btn.dark {
-  border-color: var(--apx-color-border);
-  box-shadow: var(--apx-shadow-xs);
+  border-color: var(--border-primary);
+  box-shadow: var(--shadow-xs);
 }
 
 .hero-preview {
@@ -146,9 +146,9 @@
   padding: 0 1rem;
   border-radius: 0.9rem;
   background: rgba(255,255,255,0.92);
-  color: #64748b;
+  color: var(--text-secondary);
   font-weight: 750;
-  box-shadow: var(--apx-shadow-md);
+  box-shadow: var(--shadow-md);
 }
 
 .preview-bars {
@@ -173,9 +173,9 @@
 
 .metric-tile,
 .workflow-panel {
-  border: 1px solid var(--apx-color-border);
-  background: var(--apx-color-surface);
-  box-shadow: var(--apx-shadow-xs);
+  border: 1px solid var(--border-primary);
+  background: var(--bg-primary);
+  box-shadow: var(--shadow-xs);
 }
 
 .metric-tile {
@@ -193,12 +193,12 @@
   display: grid;
   place-items: center;
   border-radius: 0.8rem;
-  color: var(--apx-color-primary);
-  background: var(--apx-color-primary-soft);
+  color: var(--accent-primary);
+  background: var(--accent-focus);
 }
 
 .metric-tile span {
-  color: var(--apx-color-muted);
+  color: var(--text-secondary);
   font-size: 0.78rem;
   font-weight: 850;
   text-transform: uppercase;
@@ -212,7 +212,7 @@
 
 .metric-tile p {
   margin: 0;
-  color: var(--apx-color-muted);
+  color: var(--text-secondary);
   line-height: 1.55;
 }
 
@@ -248,9 +248,9 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 1rem;
-  border: 1px solid var(--apx-color-border);
+  border: 1px solid var(--border-primary);
   border-radius: 1rem;
-  background: color-mix(in srgb, var(--apx-color-canvas) 48%, var(--apx-color-surface));
+  background: color-mix(in srgb, var(--bg-secondary) 48%, var(--bg-primary));
 }
 
 .workflow-row h3 {
@@ -260,7 +260,7 @@
 
 .workflow-row p {
   margin: 0;
-  color: var(--apx-color-muted);
+  color: var(--text-secondary);
   line-height: 1.55;
 }
 
@@ -269,8 +269,8 @@
   white-space: nowrap;
   padding: 0.35rem 0.65rem;
   border-radius: 999px;
-  color: var(--apx-color-success);
-  background: color-mix(in srgb, var(--apx-color-success) 12%, transparent);
+  color: var(--color-success);
+  background: color-mix(in srgb, var(--color-success) 12%, transparent);
   font-size: 0.72rem;
   font-weight: 850;
   text-transform: uppercase;

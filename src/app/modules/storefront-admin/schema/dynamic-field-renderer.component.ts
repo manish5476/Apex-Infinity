@@ -134,7 +134,7 @@ import { DynamicFieldDefinition } from './section-schema.types';
               </p-select>
             } @else if (field.type === 'color') {
               <p-inputgroup>
-                <p-inputgroup-addon [style.background]="parentGroup.get(field.key)?.value || '#fff'" class="!w-10">
+                <p-inputgroup-addon [style.background]="parentGroup.get(field.key)?.value || 'var(--bg-primary)'" class="!w-10">
                   <p-colorpicker [formControlName]="field.key" appendTo="body"></p-colorpicker>
                 </p-inputgroup-addon>
                 <input type="text" pInputText [formControlName]="field.key" placeholder="#000000" />

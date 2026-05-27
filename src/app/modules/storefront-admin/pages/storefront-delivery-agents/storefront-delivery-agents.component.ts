@@ -11,20 +11,17 @@ import { DrawerModule } from 'primeng/drawer';
 @Component({
   selector: 'app-storefront-delivery-agents',
   standalone: true,
-  imports: [CommonModule, FormsModule, TableModule, TagModule, TooltipModule, DrawerModule, DatePipe],
+  imports: [CommonModule, FormsModule, TableModule, TagModule, TooltipModule, DrawerModule],
   templateUrl: './storefront-delivery-agents.component.html',
   styleUrls: ['./storefront-delivery-agents.component.scss']
 })
 export class StorefrontDeliveryAgentsComponent implements OnInit {
   private readonly adminService = inject(StorefrontAdminService);
-
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly agents = signal<any[]>([]);
-  
   readonly drawerVisible = signal(false);
   readonly selectedAgent = signal<any | null>(null);
-  
   formAgent = {
     name: '',
     phone: '',
