@@ -9,12 +9,27 @@ import { environment } from '../../../../environments/environment';
 export class PlatformDeliveryService {
   private http = inject(HttpClient);
   private base = `${environment.apiUrl}/v1/platform-delivery`;
+  readonly tokenKey = 'apex_platform_token';
 
   private get headers() {
-    const token = localStorage.getItem('platform_delivery_token');
+    const token = localStorage.getItem(this.tokenKey);
     return {
       headers: { Authorization: `Bearer ${token}` }
     };
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem(this.tokenKey);
+  }
+
+  setToken(token: string): void {
+    localStorage.setItem(this.tokenKey, token);
+    localStorage.removeItem('platform_delivery_token');
+  }
+
+  logout(): void {
+    localStorage.removeItem(this.tokenKey);
+    localStorage.removeItem('platform_delivery_token');
   }
 
   register(data: any): Observable<any> {

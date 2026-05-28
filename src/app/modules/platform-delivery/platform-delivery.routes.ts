@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { platformDeliveryGuard } from './guards/platform-delivery.guard';
 
 export const platformDeliveryRoutes: Routes = [
   {
@@ -19,6 +20,7 @@ export const platformDeliveryRoutes: Routes = [
   {
     path: 'dashboard',
     loadComponent: () => import('./pages/platform-dashboard/platform-dashboard.component').then(m => m.PlatformDashboardComponent),
+    canActivate: [platformDeliveryGuard],
     title: 'Dashboard - Apex Delivery'
   }
 ];

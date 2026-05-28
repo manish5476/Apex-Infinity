@@ -634,7 +634,7 @@ export class PlatformDashboardComponent implements OnInit, OnDestroy {
   }
 
   logout() {
-    localStorage.removeItem('platform_delivery_token');
+    this.platformService.logout();
     this.router.navigate(['/apex-delivery/login']);
   }
 }
