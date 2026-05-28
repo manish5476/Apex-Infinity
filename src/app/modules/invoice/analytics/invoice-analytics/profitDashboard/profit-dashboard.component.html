@@ -1,299 +1,293 @@
-<div class="dash-container">
+<div class="page-layout">
+  <div class="dashboard-container custom-scrollbar">
 
-  <!-- ══ HEADER ═══════════════════════════════════════════════════════════ -->
-  <div class="dash-header">
-    <div class="header-left">
-      <h1 class="page-title">Profit Dashboard</h1>
-      @if (data(); as d) {
-        <p class="page-sub">
-          <span class="trend-dot" [ngClass]="'dot-' + d.trends.status"></span>
-          <span>{{ formatPeriodLabel(d.period) }}</span>
-          <span class="period-chip">{{ d.trends.status }}</span>
-        </p>
-      } @else if (!loading()) {
-        <p class="page-sub"><span>Select a period to load data</span></p>
-      }
-    </div>
-
-    <div class="controls">
-      <div class="ctrl-group">
-        <label class="ctrl-label">Time period</label>
-        <p-select
-          appendTo="body"
-          [options]="periodOptions"
-          [(ngModel)]="selectedPeriod"
-          optionLabel="label"
-          optionValue="value"
-          (onChange)="onPeriodChange()"
-          styleClass="dash-select">
-        </p-select>
-      </div>
-
-      <div class="ctrl-group">
-        <label class="ctrl-label">Compare with</label>
-        <p-select
-          appendTo="body"
-          [options]="compareOptions"
-          [(ngModel)]="selectedCompare"
-          optionLabel="label"
-          optionValue="value"
-          (onChange)="fetchDashboard()"
-          styleClass="dash-select"
-          [disabled]="selectedPeriod === 'custom'">
-        </p-select>
-      </div>
-
-      <button pButton icon="pi pi-refresh" class="refresh-btn p-button-rounded p-button-text"
-        (click)="fetchDashboard()" [disabled]="loading()"
-        pTooltip="Refresh" tooltipPosition="bottom">
-      </button>
-    </div>
-  </div>
-
-  <!-- ══ LOADING ══════════════════════════════════════════════════════════ -->
-  @if (loading()) {
-    <div class="loading-state">
-      <p-progressSpinner strokeWidth="3" animationDuration=".7s" styleClass="w-10 h-10"></p-progressSpinner>
-      <p class="loading-text">Crunching financial data...</p>
-    </div>
-  }
-
-  @else if (data(); as d) {
-
-    <!-- ══ KPI CARDS ════════════════════════════════════════════════════ -->
-    <div class="kpi-row">
-
-      <div class="kpi-card">
-        <div class="kpi-head">
-          <span class="kpi-label">Total revenue</span>
-          @if (growth(); as g) {
-            <span class="badge" [ngClass]="badgeClass(g.revenue)">
-              <i class="pi" [ngClass]="badgeIcon(g.revenue)" style="font-size:9px"></i>
-              {{ formatGrowth(g.revenue) }}
-            </span>
-          }
-        </div>
-        <div class="kpi-value kpi-primary">{{ d.overview.period.totalRevenue | currency:'INR':'symbol':'1.0-0' }}</div>
-        @if (compSummary(); as c) {
-          <div class="kpi-footer">vs {{ c.totalRevenue | currency:'INR':'symbol':'1.0-0' }} prev</div>
+    <div class="dash-header">
+      <div class="header-left">
+        <h1 class="page-title">Profit Dashboard</h1>
+        @if (data(); as d) {
+          <p class="page-sub">
+            <span class="trend-dot" [ngClass]="'dot-' + d.trends.status"></span>
+            <span>{{ formatPeriodLabel(d.period) }}</span>
+            <span class="period-chip">{{ d.trends.status }}</span>
+          </p>
+        } @else if (!loading()) {
+          <p class="page-sub"><span>Select a period to load data</span></p>
         }
       </div>
 
-      <div class="kpi-card">
-        <div class="kpi-head">
-          <span class="kpi-label">Total cost</span>
+      <div class="controls">
+        <div class="ctrl-group">
+          <label class="ctrl-label">Time period</label>
+          <p-select
+            appendTo="body"
+            [options]="periodOptions"
+            [(ngModel)]="selectedPeriod"
+            optionLabel="label"
+            optionValue="value"
+            (onChange)="onPeriodChange()"
+            styleClass="dash-select theme-control">
+          </p-select>
         </div>
-        <div class="kpi-value kpi-muted">{{ d.overview.period.totalCost | currency:'INR':'symbol':'1.0-0' }}</div>
-        <div class="kpi-footer">Procurement & expenses</div>
-      </div>
 
-      <div class="kpi-card">
-        <div class="kpi-head">
-          <span class="kpi-label">Net profit</span>
-          @if (growth(); as g) {
-            <span class="badge" [ngClass]="badgeClass(g.profit)">
-              <i class="pi" [ngClass]="badgeIcon(g.profit)" style="font-size:9px"></i>
-              {{ formatGrowth(g.profit) }}
-            </span>
-          }
+        <div class="ctrl-group">
+          <label class="ctrl-label">Compare with</label>
+          <p-select
+            appendTo="body"
+            [options]="compareOptions"
+            [(ngModel)]="selectedCompare"
+            optionLabel="label"
+            optionValue="value"
+            (onChange)="fetchDashboard()"
+            styleClass="dash-select theme-control"
+            [disabled]="selectedPeriod === 'custom'">
+          </p-select>
         </div>
-        <div class="kpi-value kpi-success">{{ d.overview.period.netProfit | currency:'INR':'symbol':'1.0-0' }}</div>
-        <div class="kpi-footer">Daily avg {{ d.overview.period.averageDailyProfit | currency:'INR':'symbol':'1.0-0' }}</div>
-      </div>
 
-      <div class="kpi-card">
-        <div class="kpi-head">
-          <span class="kpi-label">Net margin</span>
-          @if (growth(); as g) {
-            <span class="badge badge-neutral">{{ formatGrowth(g.margin) }} pp</span>
-          }
-        </div>
-        <div class="kpi-value kpi-info">{{ d.overview.period.profitMargin | number:'1.1-1' }}%</div>
-        <div class="margin-track">
-          <div class="margin-fill" [style.width.%]="d.overview.period.profitMargin"></div>
-        </div>
-        <div class="kpi-footer">Markup {{ d.overview.period.markup | number:'1.1-1' }}%</div>
-      </div>
-
-    </div>
-
-    <!-- ══ INSIGHT CHIPS ════════════════════════════════════════════════ -->
-    <div class="insight-row">
-      <div class="insight-chip">
-        <span class="ic-label">Rev / invoice</span>
-        <span class="ic-val">{{ d.overview.period.averageRevenuePerInvoice | currency:'INR':'symbol':'1.0-0' }}</span>
-      </div>
-      <div class="insight-chip">
-        <span class="ic-label">Profit / invoice</span>
-        <span class="ic-val ic-green">{{ d.overview.period.averageProfitPerInvoice | currency:'INR':'symbol':'1.0-0' }}</span>
-      </div>
-      <div class="insight-chip">
-        <span class="ic-label">Items / invoice</span>
-        <span class="ic-val">{{ d.overview.period.averageItemsPerInvoice | number:'1.1-1' }}</span>
-      </div>
-      <div class="insight-chip">
-        <span class="ic-label">Total invoices</span>
-        <span class="ic-val">{{ d.overview.period.totalInvoices }}</span>
-      </div>
-      <div class="insight-chip">
-        <span class="ic-label">Units sold</span>
-        <span class="ic-val">{{ d.overview.period.totalQuantity }}</span>
-      </div>
-      <div class="insight-chip">
-        <span class="ic-label">Avg daily profit</span>
-        <span class="ic-val">{{ d.overview.period.averageDailyProfit | currency:'INR':'symbol':'1.0-0' }}</span>
+        <button pButton icon="pi pi-refresh" class="refresh-btn p-button-rounded p-button-text theme-btn-secondary"
+          (click)="fetchDashboard()" [disabled]="loading()"
+          pTooltip="Refresh" tooltipPosition="bottom">
+        </button>
       </div>
     </div>
 
-    <!-- ══ MID: Metrics + Trend ═══════════════════════════════════════ -->
-    <div class="mid-grid">
+    @if (loading()) {
+      <div class="loading-state">
+        <p-progressSpinner strokeWidth="3" animationDuration=".7s" styleClass="w-10 h-10"></p-progressSpinner>
+        <p class="loading-text">Crunching financial data...</p>
+      </div>
+    }
 
-      <div class="content-card">
-        <div class="card-head"><span class="card-title">Operational metrics</span></div>
-        <div class="metric-list">
-          <div class="metric-row">
-            <span class="m-label">Gross profit</span>
-            <span class="m-val m-green">{{ d.overview.period.grossProfit | currency:'INR':'symbol':'1.0-0' }}</span>
+    @else if (data(); as d) {
+
+      <div class="kpi-row">
+
+        <div class="kpi-card elevation-card">
+          <div class="kpi-head">
+            <span class="kpi-label">Total revenue</span>
+            @if (growth(); as g) {
+              <span class="badge" [ngClass]="badgeClass(g.revenue)">
+                <i class="pi" [ngClass]="badgeIcon(g.revenue)"></i>
+                {{ formatGrowth(g.revenue) }}
+              </span>
+            }
           </div>
-          <div class="metric-row">
-            <span class="m-label">Net profit</span>
-            <span class="m-val m-green">{{ d.overview.period.netProfit | currency:'INR':'symbol':'1.0-0' }}</span>
+          <div class="kpi-value kpi-primary">{{ d.overview.period.totalRevenue | currency:'INR':'symbol':'1.0-0' }}</div>
+          @if (compSummary(); as c) {
+            <div class="kpi-footer">vs {{ c.totalRevenue | currency:'INR':'symbol':'1.0-0' }} prev</div>
+          }
+        </div>
+
+        <div class="kpi-card elevation-card">
+          <div class="kpi-head">
+            <span class="kpi-label">Total cost</span>
           </div>
-          <div class="metric-row">
-            <span class="m-label">Profit margin</span>
-            <span class="m-val">{{ d.overview.period.profitMargin | number:'1.1-1' }}%</span>
+          <div class="kpi-value kpi-muted">{{ d.overview.period.totalCost | currency:'INR':'symbol':'1.0-0' }}</div>
+          <div class="kpi-footer">Procurement & expenses</div>
+        </div>
+
+        <div class="kpi-card elevation-card">
+          <div class="kpi-head">
+            <span class="kpi-label">Net profit</span>
+            @if (growth(); as g) {
+              <span class="badge" [ngClass]="badgeClass(g.profit)">
+                <i class="pi" [ngClass]="badgeIcon(g.profit)"></i>
+                {{ formatGrowth(g.profit) }}
+              </span>
+            }
           </div>
-          <div class="metric-row">
-            <span class="m-label">Markup</span>
-            <span class="m-val">{{ d.overview.period.markup | number:'1.1-1' }}%</span>
+          <div class="kpi-value kpi-success">{{ d.overview.period.netProfit | currency:'INR':'symbol':'1.0-0' }}</div>
+          <div class="kpi-footer">Daily avg {{ d.overview.period.averageDailyProfit | currency:'INR':'symbol':'1.0-0' }}</div>
+        </div>
+
+        <div class="kpi-card elevation-card">
+          <div class="kpi-head">
+            <span class="kpi-label">Net margin</span>
+            @if (growth(); as g) {
+              <span class="badge badge-neutral">{{ formatGrowth(g.margin) }} pp</span>
+            }
           </div>
-          <div class="metric-row">
-            <span class="m-label">Total discount</span>
-            <span class="m-val">{{ d.overview.period.totalDiscount | currency:'INR':'symbol':'1.0-0' }}</span>
+          <div class="kpi-value kpi-info">{{ d.overview.period.profitMargin | number:'1.1-1' }}%</div>
+          <div class="margin-track">
+            <div class="margin-fill" [style.width.%]="d.overview.period.profitMargin"></div>
           </div>
-          <div class="metric-row">
-            <span class="m-label">Total tax</span>
-            <span class="m-val">{{ d.overview.period.totalTax | currency:'INR':'symbol':'1.0-0' }}</span>
-          </div>
+          <div class="kpi-footer">Markup {{ d.overview.period.markup | number:'1.1-1' }}%</div>
+        </div>
+
+      </div>
+
+      <div class="insight-row">
+        <div class="insight-chip elevation-card">
+          <span class="ic-label">Rev / invoice</span>
+          <span class="ic-val">{{ d.overview.period.averageRevenuePerInvoice | currency:'INR':'symbol':'1.0-0' }}</span>
+        </div>
+        <div class="insight-chip elevation-card">
+          <span class="ic-label">Profit / invoice</span>
+          <span class="ic-val ic-green">{{ d.overview.period.averageProfitPerInvoice | currency:'INR':'symbol':'1.0-0' }}</span>
+        </div>
+        <div class="insight-chip elevation-card">
+          <span class="ic-label">Items / invoice</span>
+          <span class="ic-val">{{ d.overview.period.averageItemsPerInvoice | number:'1.1-1' }}</span>
+        </div>
+        <div class="insight-chip elevation-card">
+          <span class="ic-label">Total invoices</span>
+          <span class="ic-val">{{ d.overview.period.totalInvoices }}</span>
+        </div>
+        <div class="insight-chip elevation-card">
+          <span class="ic-label">Units sold</span>
+          <span class="ic-val">{{ d.overview.period.totalQuantity }}</span>
+        </div>
+        <div class="insight-chip elevation-card">
+          <span class="ic-label">Avg daily profit</span>
+          <span class="ic-val">{{ d.overview.period.averageDailyProfit | currency:'INR':'symbol':'1.0-0' }}</span>
         </div>
       </div>
 
-      <div class="content-card chart-card">
-        <div class="card-head">
-          <span class="card-title">Daily profit trend</span>
-          <span class="card-sub">{{ d.trends.daily.length }} day{{ d.trends.daily.length !== 1 ? 's' : '' }}</span>
-        </div>
-        <div class="simple-chart">
-          @for (day of d.trends.daily; track day.period.date) {
-            <div class="bar-group" [pTooltip]="'Revenue: ' + (day.revenue | currency:'INR':'symbol':'1.0-0') + ' | Profit: ' + (day.profit | currency:'INR':'symbol':'1.0-0')" tooltipPosition="top">
-              <div class="bar-track">
-                <div class="bar-fill" [style.height.%]="barHeight(day.profit)"></div>
-              </div>
-              <span class="bar-label">{{ formatDate(day.period.date) }}</span>
+      <div class="mid-grid">
+
+        <div class="content-card elevation-card">
+          <div class="card-head"><span class="card-title">Operational metrics</span></div>
+          <div class="metric-list">
+            <div class="metric-row">
+              <span class="m-label">Gross profit</span>
+              <span class="m-val m-green">{{ d.overview.period.grossProfit | currency:'INR':'symbol':'1.0-0' }}</span>
             </div>
-          }
-          @if (d.trends.daily.length === 0) {
-            <div class="chart-empty">No daily data for this period</div>
-          }
+            <div class="metric-row">
+              <span class="m-label">Net profit</span>
+              <span class="m-val m-green">{{ d.overview.period.netProfit | currency:'INR':'symbol':'1.0-0' }}</span>
+            </div>
+            <div class="metric-row">
+              <span class="m-label">Profit margin</span>
+              <span class="m-val">{{ d.overview.period.profitMargin | number:'1.1-1' }}%</span>
+            </div>
+            <div class="metric-row">
+              <span class="m-label">Markup</span>
+              <span class="m-val">{{ d.overview.period.markup | number:'1.1-1' }}%</span>
+            </div>
+            <div class="metric-row">
+              <span class="m-label">Total discount</span>
+              <span class="m-val">{{ d.overview.period.totalDiscount | currency:'INR':'symbol':'1.0-0' }}</span>
+            </div>
+            <div class="metric-row">
+              <span class="m-label">Total tax</span>
+              <span class="m-val">{{ d.overview.period.totalTax | currency:'INR':'symbol':'1.0-0' }}</span>
+            </div>
+          </div>
         </div>
+
+        <div class="content-card elevation-card chart-card">
+          <div class="card-head">
+            <div class="flex gap-2 items-center">
+              <span class="card-title">Daily profit trend</span>
+              <span class="card-sub">{{ d.trends.daily.length }} day{{ d.trends.daily.length !== 1 ? 's' : '' }}</span>
+            </div>
+          </div>
+          <div class="simple-chart">
+            @for (day of d.trends.daily; track day.period.date) {
+              <div class="bar-group" [pTooltip]="'Revenue: ' + (day.revenue | currency:'INR':'symbol':'1.0-0') + ' | Profit: ' + (day.profit | currency:'INR':'symbol':'1.0-0')" tooltipPosition="top">
+                <div class="bar-track">
+                  <div class="bar-fill" [style.height.%]="barHeight(day.profit)"></div>
+                </div>
+                <span class="bar-label">{{ formatDate(day.period.date) }}</span>
+              </div>
+            }
+            @if (d.trends.daily.length === 0) {
+              <div class="chart-empty">No daily data for this period</div>
+            }
+          </div>
+        </div>
+
       </div>
 
-    </div>
+      <div class="tables-grid">
 
-    <!-- ══ BOTTOM TABLES ══════════════════════════════════════════════ -->
-    <div class="tables-grid">
-
-      <!-- Top products -->
-      <div class="content-card">
-        <div class="card-head"><span class="card-title">Top products by profit</span></div>
-        <div class="table-wrap">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Product</th>
-                <th class="r">Revenue</th>
-                <th class="r">Profit</th>
-                <th class="r">Margin</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (p of d.topPerformers.products; track p.productId) {
+        <div class="content-card elevation-card">
+          <div class="card-head"><span class="card-title">Top products by profit</span></div>
+          <div class="table-wrap custom-scrollbar">
+            <table class="data-table">
+              <thead>
                 <tr>
-                  <td>
-                    <div class="t-main">{{ p.productName }}</div>
-                    <div class="t-sub">{{ p.sku || 'No SKU' }} · Qty {{ p.totalQuantity }}</div>
-                  </td>
-                  <td class="t-val r">{{ p.totalRevenue | currency:'INR':'symbol':'1.0-0' }}</td>
-                  <td class="t-val r t-green">{{ p.totalProfit | currency:'INR':'symbol':'1.0-0' }}</td>
-                  <td class="t-val r">{{ p.profitMargin | number:'1.1-1' }}%</td>
+                  <th>Product</th>
+                  <th class="r">Revenue</th>
+                  <th class="r">Profit</th>
+                  <th class="r">Margin</th>
                 </tr>
-              }
-              @if (d.topPerformers.products.length === 0) {
-                <tr><td colspan="4" class="t-empty">No product data</td></tr>
-              }
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                @for (p of d.topPerformers.products; track p.productId) {
+                  <tr>
+                    <td>
+                      <div class="t-main">{{ p.productName }}</div>
+                      <div class="t-sub">{{ p.sku || 'No SKU' }} · Qty {{ p.totalQuantity }}</div>
+                    </td>
+                    <td class="t-val r">{{ p.totalRevenue | currency:'INR':'symbol':'1.0-0' }}</td>
+                    <td class="t-val r t-green">{{ p.totalProfit | currency:'INR':'symbol':'1.0-0' }}</td>
+                    <td class="t-val r">{{ p.profitMargin | number:'1.1-1' }}%</td>
+                  </tr>
+                }
+                @if (d.topPerformers.products.length === 0) {
+                  <tr><td colspan="4" class="t-empty">No product data</td></tr>
+                }
+              </tbody>
+            </table>
+          </div>
         </div>
+
+        <div class="content-card elevation-card">
+          <div class="card-head">
+            <span class="card-title">Period comparison</span>
+            <span class="badge badge-neutral lowercase-badge">{{ selectedCompare === 'previous_year' ? 'vs prev year' : 'vs prev period' }}</span>
+          </div>
+          <div class="table-wrap custom-scrollbar">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Metric</th>
+                  <th class="r">This period</th>
+                  <th class="r">Prev period</th>
+                  <th class="r">Change</th>
+                </tr>
+              </thead>
+              <tbody>
+                @if (compSummary(); as c) {
+                  <tr>
+                    <td class="t-main">Revenue</td>
+                    <td class="t-val r">{{ d.overview.period.totalRevenue | currency:'INR':'symbol':'1.0-0' }}</td>
+                    <td class="t-val r">{{ c.totalRevenue | currency:'INR':'symbol':'1.0-0' }}</td>
+                    <td class="t-val r" [ngClass]="(growth()?.revenue ?? 0) >= 0 ? 't-green' : 't-red'">
+                      {{ formatGrowth(growth()?.revenue ?? 0) }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="t-main">Profit</td>
+                    <td class="t-val r">{{ d.overview.period.netProfit | currency:'INR':'symbol':'1.0-0' }}</td>
+                    <td class="t-val r">{{ c.netProfit | currency:'INR':'symbol':'1.0-0' }}</td>
+                    <td class="t-val r" [ngClass]="(growth()?.profit ?? 0) >= 0 ? 't-green' : 't-red'">
+                      {{ formatGrowth(growth()?.profit ?? 0) }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="t-main">Margin</td>
+                    <td class="t-val r">{{ d.overview.period.profitMargin | number:'1.1-1' }}%</td>
+                    <td class="t-val r">{{ c.profitMargin | number:'1.1-1' }}%</td>
+                    <td class="t-val r" [ngClass]="(growth()?.margin ?? 0) >= 0 ? 't-green' : 't-red'">
+                      {{ formatGrowth(growth()?.margin ?? 0) }} pp
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="t-main">Invoices</td>
+                    <td class="t-val r">{{ d.overview.period.totalInvoices }}</td>
+                    <td class="t-val r">{{ c.totalInvoices }}</td>
+                    <td class="t-val r" [ngClass]="d.overview.period.totalInvoices >= c.totalInvoices ? 't-green' : 't-red'">
+                      {{ d.overview.period.totalInvoices - c.totalInvoices >= 0 ? '+' : '' }}{{ d.overview.period.totalInvoices - c.totalInvoices }}
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
-
-      <!-- Period comparison -->
-      <div class="content-card">
-        <div class="card-head">
-          <span class="card-title">Period comparison</span>
-          <span class="badge badge-neutral" style="text-transform:none">{{ selectedCompare === 'previous_year' ? 'vs prev year' : 'vs prev period' }}</span>
-        </div>
-        <div class="table-wrap">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Metric</th>
-                <th class="r">This period</th>
-                <th class="r">Prev period</th>
-                <th class="r">Change</th>
-              </tr>
-            </thead>
-            <tbody>
-              @if (compSummary(); as c) {
-                <tr>
-                  <td class="t-main">Revenue</td>
-                  <td class="t-val r">{{ d.overview.period.totalRevenue | currency:'INR':'symbol':'1.0-0' }}</td>
-                  <td class="t-val r">{{ c.totalRevenue | currency:'INR':'symbol':'1.0-0' }}</td>
-                  <td class="t-val r" [ngClass]="(growth()?.revenue ?? 0) >= 0 ? 't-green' : 't-red'">
-                    {{ formatGrowth(growth()?.revenue ?? 0) }}
-                  </td>
-                </tr>
-                <tr>
-                  <td class="t-main">Profit</td>
-                  <td class="t-val r">{{ d.overview.period.netProfit | currency:'INR':'symbol':'1.0-0' }}</td>
-                  <td class="t-val r">{{ c.netProfit | currency:'INR':'symbol':'1.0-0' }}</td>
-                  <td class="t-val r" [ngClass]="(growth()?.profit ?? 0) >= 0 ? 't-green' : 't-red'">
-                    {{ formatGrowth(growth()?.profit ?? 0) }}
-                  </td>
-                </tr>
-                <tr>
-                  <td class="t-main">Margin</td>
-                  <td class="t-val r">{{ d.overview.period.profitMargin | number:'1.1-1' }}%</td>
-                  <td class="t-val r">{{ c.profitMargin | number:'1.1-1' }}%</td>
-                  <td class="t-val r" [ngClass]="(growth()?.margin ?? 0) >= 0 ? 't-green' : 't-red'">
-                    {{ formatGrowth(growth()?.margin ?? 0) }} pp
-                  </td>
-                </tr>
-                <tr>
-                  <td class="t-main">Invoices</td>
-                  <td class="t-val r">{{ d.overview.period.totalInvoices }}</td>
-                  <td class="t-val r">{{ c.totalInvoices }}</td>
-                  <td class="t-val r" [ngClass]="d.overview.period.totalInvoices >= c.totalInvoices ? 't-green' : 't-red'">
-                    {{ d.overview.period.totalInvoices - c.totalInvoices >= 0 ? '+' : '' }}{{ d.overview.period.totalInvoices - c.totalInvoices }}
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-    </div>
-
-  }
-
+    }
+  </div>
 </div>
