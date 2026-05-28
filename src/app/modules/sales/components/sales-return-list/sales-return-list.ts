@@ -194,7 +194,7 @@ export class ActionButtonsRenderer {
         @if (isLoading() && data().length === 0) {
           <div class="overlay-state blur-backdrop">
             <div class="flex-center-col gap-sm">
-              <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-10 h-10"></p-progressSpinner>
+              // <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-10 h-10"></p-progressSpinner>
               <p class="overlay-text">FETCHING RETURNS...</p>
             </div>
           </div>
