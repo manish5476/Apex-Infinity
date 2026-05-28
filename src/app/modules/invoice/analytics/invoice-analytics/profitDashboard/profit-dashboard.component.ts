@@ -2,15 +2,14 @@ import { Component, OnInit, inject, signal, computed, OnDestroy } from '@angular
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { finalize, Subject } from 'rxjs';
+import { takeUntil } from "rxjs/operators";
 
 import { SelectModule } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { InvoiceService } from '../../../services/invoice-service';
-import { takeUntil } from "rxjs/operators";
 
-// ── Typed exactly to match your API response ──────────────────────────────
 export interface PeriodInfo {
   name: string;
   start: string;
@@ -120,10 +119,9 @@ export interface DashboardData {
   styleUrls: ['./profit-dashboard.component.scss'],
 })
 export class ProfitDashboardComponentNew implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   private invoiceService = inject(InvoiceService);
 
-  // ── State ─────────────────────────────────────────────────────────────────
   data = signal<DashboardData | null>(null);
   loading = signal(false);
 
@@ -131,18 +129,15 @@ export class ProfitDashboardComponentNew implements OnInit, OnDestroy {
   selectedCompare = 'previous_period';
   customDates = { startDate: '', endDate: '' };
 
-  // ── Computed helpers ──────────────────────────────────────────────────────
   periodMetrics = computed(() => this.data()?.overview?.period ?? null);
   growth = computed(() => this.data()?.comparison?.growth ?? null);
   compSummary = computed(() => this.data()?.comparison?.summary ?? null);
 
-  /** Max profit across daily entries — for bar-height normalisation */
   maxDailyProfit = computed(() => {
     const days = this.data()?.trends?.daily ?? [];
     return Math.max(...days.map(d => d.profit), 1);
   });
 
-  // ── Options ───────────────────────────────────────────────────────────────
   periodOptions = [
     { label: 'Today', value: 'today' },
     { label: 'Yesterday', value: 'yesterday' },
@@ -167,7 +162,10 @@ export class ProfitDashboardComponentNew implements OnInit, OnDestroy {
   }
 
   onPeriodChange(): void {
-    if (this.selectedPeriod === 'custom') { this.data.set(null); return; }
+    if (this.selectedPeriod === 'custom') { 
+      this.data.set(null); 
+      return; 
+    }
     this.fetchDashboard();
   }
 
@@ -188,16 +186,20 @@ export class ProfitDashboardComponentNew implements OnInit, OnDestroy {
 
     this.invoiceService
       .getProfitDashboard(this.selectedPeriod, filters)
-      .pipe(finalize(() => this.loading.set(false)), takeUntil(this.destroy$))
+      .pipe(
+        finalize(() => this.loading.set(false)), 
+        takeUntil(this.destroy$)
+      )
       .subscribe({
         next: (res: any) => {
-          if (res.status === 'success') this.data.set(res.data as DashboardData);
+          if (res.status === 'success') {
+            this.data.set(res.data as DashboardData);
+          }
         },
         error: err => console.error('Dashboard fetch failed', err),
       });
   }
 
-  // ── Template helpers ──────────────────────────────────────────────────────
   barHeight(profit: number): number {
     const max = this.maxDailyProfit();
     return Math.max(4, Math.round((profit / max) * 100));
@@ -208,7 +210,7 @@ export class ProfitDashboardComponentNew implements OnInit, OnDestroy {
   }
 
   badgeIcon(growth: number): string {
-    return growth >= 0 ? 'pi-arrow-up' : 'pi-arrow-down';
+    return growth >= 0 ? 'pi pi-arrow-up' : 'pi pi-arrow-down';
   }
 
   formatGrowth(v: number): string {
@@ -216,17 +218,19 @@ export class ProfitDashboardComponentNew implements OnInit, OnDestroy {
   }
 
   formatDate(dateStr: string): string {
+    if (!dateStr) return '';
     return new Date(dateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
   }
 
   formatPeriodLabel(p: PeriodInfo): string {
+    if (!p || !p.start || !p.end) return '';
     const s = new Date(p.start).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
     const e = new Date(p.end).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
     return `${s} – ${e} · ${p.days} days`;
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }
