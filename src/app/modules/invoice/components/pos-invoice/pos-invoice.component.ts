@@ -1,4 +1,3 @@
-
 import { ProductService } from "./../../../product/services/product-service";
 import { Component, OnInit, inject, signal, OnDestroy, computed, effect, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -9,7 +8,6 @@ import { Subject, EMPTY } from 'rxjs';
 
 // Services
 import { InvoiceService } from '../../services/invoice-service';
-// import { MasterListService } from '../../../../core/services/master-list.service';
 import { MasterDropdownComponent } from '../../../shared/components/masterFilterDropdown/master-dropdown.component';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
@@ -50,7 +48,6 @@ export class PosInvoiceComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private invoiceService = inject(InvoiceService);
-  // private masterList = inject(MasterListService);
   private messageService = inject(AppMessageService);
   private productService = inject(ProductService);
   private confirmationService = inject(ConfirmationService);
@@ -69,15 +66,10 @@ export class PosInvoiceComponent implements OnInit, OnDestroy {
   selectionMode = signal<'scan' | 'manual'>('scan');
   isScanning = signal(false);
   private scanSubject = new Subject<string>();
-  manualSearchValue = signal<any>(null); // Used to clear the manual dropdown after selection
+  manualSearchValue = signal<any>(null);
 
   // --- Computed ---
   formTitle = computed(() => this.editMode() ? `Edit Invoice #${this.invoiceForm.get('invoiceNumber')?.value || ''}` : 'New Smart Invoice');
-
-  // --- Master Data ---
-  // customerOptions = computed(() => this.masterList.customers());
-  // productOptions = computed(() => this.masterList.products());
-  // branchOptions = computed(() => this.masterList.branches());
 
   gstTypeOptions = [
     { label: 'Intra-State (CGST/SGST)', value: 'intra-state' },
@@ -94,7 +86,6 @@ export class PosInvoiceComponent implements OnInit, OnDestroy {
     { label: 'Other', value: 'other' },
   ];
 
-
   // --- Totals (Reactive Signals) ---
   subTotal = signal(0);
   totalDiscount = signal(0);
@@ -104,15 +95,11 @@ export class PosInvoiceComponent implements OnInit, OnDestroy {
 
   invoiceForm!: FormGroup;
   manualSearchControl = new FormControl(null);
+
   ngOnInit(): void {
     this.buildForm();
     this.setupTotalsCalculation();
     this.setupScannerQueue();
-
-    // const defaultBranch = this.masterList.branches()[0]?._id;
-    // if (defaultBranch && !this.editMode()) {
-    //   this.invoiceForm.patchValue({ branchId: defaultBranch });
-    // }
 
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
@@ -123,7 +110,6 @@ export class PosInvoiceComponent implements OnInit, OnDestroy {
       } else {
         this.isLoading.set(false);
         this.generateInvoiceNumber();
-        // Removed this.addItem() - A POS starts with an empty cart until an item is scanned
       }
     });
   }
@@ -137,7 +123,6 @@ export class PosInvoiceComponent implements OnInit, OnDestroy {
   // HYBRID POS SELECTION ARCHITECTURE
   // ==========================================
 
-  // 1. Setup RXJS Queue for rapid scanning
   private setupScannerQueue(): void {
     this.scanSubject.pipe(
       takeUntil(this.destroy$),
@@ -150,7 +135,6 @@ export class PosInvoiceComponent implements OnInit, OnDestroy {
           this.isScanning.set(false);
           return EMPTY;
         }
-        //  branchId: branchId
         return this.productService.scanProduct({ barcode: code }).pipe(
           catchError(err => {
             this.messageService.showError(err);
@@ -169,23 +153,22 @@ export class PosInvoiceComponent implements OnInit, OnDestroy {
     });
   }
 
-  // 2. Scan Event Handler
   onScan(event: Event, inputElement: HTMLInputElement): void {
-    event.preventDefault(); // <-- ADD THIS: Stops the form from submitting or routing!
+    event.preventDefault(); 
     const code = inputElement.value.trim();
     if (code) {
       this.scanSubject.next(code);
-      inputElement.value = ''; // Instant clear
+      inputElement.value = ''; 
     }
   }
 
-  // 3. Mode Toggle Handler
   toggleSelectionMode(mode: 'scan' | 'manual'): void {
     this.selectionMode.set(mode);
     if (mode === 'scan') {
       this.focusScanner();
     }
   }
+
   onManualProductSelect(product: any): void {
     if (!product) return;
     const productId = product._id;
@@ -240,7 +223,6 @@ export class PosInvoiceComponent implements OnInit, OnDestroy {
     }
   }
 
-  // 6. Focus Utility
   private focusScanner(): void {
     setTimeout(() => {
       if (this.scannerInput?.nativeElement) {
@@ -323,7 +305,7 @@ export class PosInvoiceComponent implements OnInit, OnDestroy {
 
   removeItem(index: number): void {
     this.items.removeAt(index);
-    this.focusScanner(); // Snap back to scanner after deleting an item
+    this.focusScanner(); 
   }
 
   onCustomerSelect(customer: any): void {
@@ -426,7 +408,7 @@ export class PosInvoiceComponent implements OnInit, OnDestroy {
       };
       this.invoiceService.checkStock(checkPayload).subscribe({
         next: (res: any) => {
-          const validation = res.data; // Corrected: use res.data
+          const validation = res.data; 
           const isValid = validation.isValid;
 
           if (isValid) {
@@ -438,7 +420,6 @@ export class PosInvoiceComponent implements OnInit, OnDestroy {
           } else {
             let msg = 'Insufficient stock for the following items: ';
             if (validation.items && validation.items.length > 0) {
-              // Corrected: filter using availableStock and requestedQuantity
               const outOfStockItems = validation.items.filter((i: any) => (i.availableStock ?? 0) < (i.requestedQuantity ?? 0));
               msg += outOfStockItems
                 .map((i: any) => `${i.name}: Need ${i.requestedQuantity}, have ${i.availableStock}`)
