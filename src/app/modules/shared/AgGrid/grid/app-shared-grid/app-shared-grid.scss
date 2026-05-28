@@ -27,8 +27,8 @@
   justify-content: space-between;
   
   /* Compact Height & Padding */
-  min-height: 48px; 
-  padding: var(--spacing-xs) var(--spacing-md);
+  min-height: 40px; 
+  padding: 4px var(--spacing-sm);
   
   /* Visuals: Slightly different bg to distinguish from grid */
   background: var(--theme-bg-secondary);
@@ -71,7 +71,7 @@
 .toolbar-actions {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-xs);
 }
 
 .divider-vertical {

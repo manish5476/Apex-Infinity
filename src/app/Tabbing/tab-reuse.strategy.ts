@@ -42,54 +42,23 @@ export class TabReuseStrategy implements RouteReuseStrategy {
   }
 
   shouldDetach(route: ActivatedRouteSnapshot): boolean {
-    return this.shouldCache(route);
+    return false;
   }
 
   store(route: ActivatedRouteSnapshot, handle: DetachedRouteHandle | null): void {
-    const key = this.reuseKey(route);
-    if (!handle) {
-      this.evict(key);
-      return;
-    }
-
-    this.cache.set(key, {
-      key,
-      handle,
-      createdAt: Date.now(),
-      lastAccessedAt: Date.now()
-    });
-    this.evictStaleEntries();
+    if (handle) this.destroyHandle(handle);
   }
 
   shouldAttach(route: ActivatedRouteSnapshot): boolean {
-    const key = this.reuseKey(route);
-    const entry = this.cache.get(key);
-    if (!entry) return false;
-
-    if (Date.now() - entry.createdAt > MAX_CACHE_AGE_MS) {
-      this.evict(key);
-      return false;
-    }
-
-    return true;
+    return false;
   }
 
   retrieve(route: ActivatedRouteSnapshot): DetachedRouteHandle | null {
-    const key = this.reuseKey(route);
-    const entry = this.cache.get(key);
-    if (!entry) return null;
-
-    entry.lastAccessedAt = Date.now();
-    this.notifyReattached(entry.handle);
-    return entry.handle;
+    return null;
   }
 
   shouldReuseRoute(future: ActivatedRouteSnapshot, curr: ActivatedRouteSnapshot): boolean {
-    if (future.routeConfig !== curr.routeConfig) return false;
-
-    const futureKey = this.reuseKey(future);
-    const currentKey = this.reuseKey(curr);
-    return futureKey === currentKey;
+    return future.routeConfig === curr.routeConfig;
   }
 
   evict(key: string): void {

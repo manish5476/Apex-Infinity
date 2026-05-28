@@ -9,7 +9,6 @@ import { ApiService } from '../../../core/services/api';
 import { OrganizationService } from './../../organization/organization.service';
 import { User, Session, LoginResponse, SignupResponse, VerifyTokenResponse } from './auth.types';
 import { TabService } from '../../../Tabbing/Service/tab.service';
-import { RouteReuseStrategy } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService implements OnDestroy {
@@ -31,7 +30,6 @@ export class AuthService implements OnDestroy {
   private messageService = inject(AppMessageService);
   private router = inject(Router);
   private tabService = inject(TabService);
-  private routeReuseStrategy = inject(RouteReuseStrategy);
   private _token: string | null = null;
   private isLoggingOut = signal(false)
 
@@ -149,9 +147,6 @@ export class AuthService implements OnDestroy {
     }
 
     this.tabService.reset();
-    if (typeof (this.routeReuseStrategy as any).evictAll === 'function') {
-      (this.routeReuseStrategy as any).evictAll();
-    }
 
     this._token = null; // ✅ Kill the token state
     this._currentUser.set(null); // ✅ Triggers app.component socket disconnect

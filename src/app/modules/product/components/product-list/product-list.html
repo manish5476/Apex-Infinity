@@ -25,9 +25,6 @@
         label="Delete Product" icon="pi pi-trash" (onClick)="deleteProduct()"
         styleClass="p-button-danger p-button-outlined">
       </p-button>
-
-      <p-button *hasPermission="PERMISSIONS.PRODUCT.CREATE" label="New Product" icon="pi pi-plus" routerLink="create"
-        styleClass="p-button-primary"></p-button>
       <p-button *hasPermission="[PERMISSIONS.PRODUCT.CREATE, PERMISSIONS.PRODUCT.UPDATE]"
         [label]="selectedRows().length > 0 ? 'Edit Product' : 'New Product'" (onClick)="bulkDialogVisible.set(true)"
         styleClass="p-button-primary">
@@ -38,7 +35,7 @@
   <div class="container-body flex flex-col h-full gap-4">
 
     <!-- Standard Filter Panel -->
-    <div class="app-filter-panel">
+    <div class="app-filter-panel single-row">
 
       <div class="filter-field" style="flex: 2">
         <label for="name">Product Name</label>
