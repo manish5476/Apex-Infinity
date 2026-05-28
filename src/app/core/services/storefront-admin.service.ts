@@ -139,6 +139,10 @@ export class StorefrontAdminService extends BaseApiService {
     return this.get(`${this.base}/orders`, params ?? {});
   }
 
+  getCommandCenter(): Observable<any> {
+    return this.get(`${this.base}/command-center`);
+  }
+
   updateOrderStatus(orderId: string, data: { orderStatus?: string; fulfillmentStatus?: string; paymentStatus?: string }): Observable<any> {
     return this.put(`${this.base}/orders/${orderId}/status`, data);
   }
