@@ -1,12 +1,14 @@
 <p-toast></p-toast>
 <p-confirmDialog [style]="{width: '400px'}" rejectButtonStyleClass="p-button-text"></p-confirmDialog>
+
 <div class="page-layout">
   <form [formGroup]="invoiceForm" class="invoice-container">
+    
     <header class="invoice-header">
       <div class="header-left">
-        <button pButton icon="pi pi-arrow-left" class="back-btn" routerLink="/invoices"></button>
+        <button pButton icon="pi pi-arrow-left" class="back-btn p-button-text" routerLink="/invoices"></button>
         <div class="header-titles">
-          <div class="flex items-center gap-3">
+          <div class="title-row">
             <h1>{{ formTitle() }}</h1>
             @if (editMode()) {
               <span class="status-badge"
@@ -33,10 +35,9 @@
     </header>
 
     <div class="invoice-body custom-scrollbar">
-
-      <section class="form-section">
+      
+      <section class="form-section elevation-card">
         <div class="form-grid">
-
           <div class="form-group span-4">
             <label>Customer <span class="required">*</span></label>
             <app-master-dropdown 
@@ -49,206 +50,176 @@
 
           <div class="form-group span-2">
             <label>Invoice #</label>
-            <input pInputText formControlName="invoiceNumber" placeholder="Auto-gen"
-              class="w-full theme-control font-mono" />
-            </div>
-
-            <div class="form-group span-2">
-              <label>Branch</label>
-              <app-master-dropdown 
-                endpoint="branches" 
-                formControlName="branchId" 
-                placeholder="Select Branch">
-              </app-master-dropdown>
-            </div>
-
-            <div class="form-group span-2">
-              <label>Invoice Date</label>
-              <p-datepicker formControlName="invoiceDate" dateFormat="dd/mm/yy" styleClass="w-full theme-control"
-              [showIcon]="true"></p-datepicker>
-            </div>
-
-            <div class="form-group span-2">
-              <label>Due Date</label>
-              <p-datepicker formControlName="dueDate" dateFormat="dd/mm/yy" styleClass="w-full theme-control"
-              [showIcon]="true"></p-datepicker>
-            </div>
-
-          </div>
-        </section>
-
-        <section class="form-section p-0">
-          <div class="section-toolbar">
-            <span class="toolbar-title">Itemization</span>
-            <button pButton label="Add Line Item" icon="pi pi-plus"
-            class="p-button-sm p-button-outlined theme-btn-secondary" (click)="addItem()"></button>
+            <input pInputText formControlName="invoiceNumber" placeholder="Auto-gen" class="w-full theme-control font-mono" />
           </div>
 
-          <div formArrayName="items" class="table-wrapper">
-            <table class="theme-table">
-              <thead>
-                <tr>
-                  <th width="5%">#</th>
-                  <th width="30%">Product / Service</th>
-                  <th width="10%" class="text-center">Stock</th>
-                  <th width="10%">Qty</th>
-                  <th width="12%" class="text-right">Price</th>
-                  <th width="10%" class="text-right">Disc</th>
-                  <th width="10%" class="text-center">Tax %</th>
-                  <th width="13%" class="text-right">Total</th>
-                  <th width="5%"></th>
+          <div class="form-group span-2">
+            <label>Branch</label>
+            <app-master-dropdown 
+              endpoint="branches" 
+              formControlName="branchId" 
+              placeholder="Select Branch">
+            </app-master-dropdown>
+          </div>
+
+          <div class="form-group span-2">
+            <label>Invoice Date</label>
+            <p-datepicker formControlName="invoiceDate" dateFormat="dd/mm/yy" styleClass="w-full theme-control" [showIcon]="true"></p-datepicker>
+          </div>
+
+          <div class="form-group span-2">
+            <label>Due Date</label>
+            <p-datepicker formControlName="dueDate" dateFormat="dd/mm/yy" styleClass="w-full theme-control" [showIcon]="true"></p-datepicker>
+          </div>
+        </div>
+      </section>
+
+      <section class="form-section elevation-card p-0 overflow-hidden">
+        <div class="section-toolbar">
+          <span class="toolbar-title">Itemization</span>
+          <button pButton label="Add Line Item" icon="pi pi-plus" class="p-button-sm p-button-outlined theme-btn-secondary" (click)="addItem()"></button>
+        </div>
+
+        <div formArrayName="items" class="table-wrapper custom-scrollbar">
+          <table class="theme-table">
+            <thead>
+              <tr>
+                <th width="5%" class="text-center">#</th>
+                <th width="30%">Product / Service</th>
+                <th width="10%" class="text-center">Stock</th>
+                <th width="10%">Qty</th>
+                <th width="12%" class="text-right">Price</th>
+                <th width="10%" class="text-right">Disc</th>
+                <th width="10%" class="text-center">Tax %</th>
+                <th width="13%" class="text-right">Total</th>
+                <th width="5%"></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of items.controls; track $index; let i = $index) {
+                <tr [formGroupName]="i">
+                  <td class="text-center index-col">{{ i + 1 }}</td>
+                  <td>
+                    <app-master-dropdown 
+                      endpoint="products" 
+                      formControlName="productId" 
+                      (onSelect)="onProductSelect($event, i)" 
+                      placeholder="Select Item">
+                    </app-master-dropdown>
+                    @if (items.at(i).get('name')?.value) {
+                      <div class="item-meta">HSN: {{ items.at(i).get('sku')?.value || '--' }}</div>
+                    }
+                  </td>
+                  
+                  <td class="text-center align-middle">
+                    <span class="stock-pill" 
+                          [class.stock-checking]="items.at(i).get('isCheckingStock')?.value"
+                          [ngClass]="items.at(i).get('isLowStock')?.value ? 'stock-low' : 'stock-ok'">
+                      {{ items.at(i).get('currentStock')?.value ?? '--' }}
+                    </span>
+                  </td>
+
+                  <td>
+                    <p-inputNumber formControlName="quantity" [min]="1" styleClass="w-full table-input" inputStyleClass="text-center font-bold w-full"></p-inputNumber>
+                  </td>
+
+                  <td>
+                    <p-inputNumber formControlName="price" mode="decimal" [minFractionDigits]="2" styleClass="w-full table-input" inputStyleClass="text-right w-full"></p-inputNumber>
+                  </td>
+
+                  <td>
+                    <p-inputNumber formControlName="discount" mode="decimal" [minFractionDigits]="2" styleClass="w-full table-input" inputStyleClass="text-right text-danger w-full"></p-inputNumber>
+                  </td>
+
+                  <td>
+                    <p-inputNumber formControlName="taxRate" suffix="%" [min]="0" [max]="100" styleClass="w-full table-input" inputStyleClass="text-center text-primary w-full"></p-inputNumber>
+                  </td>
+
+                  <td class="text-right font-bold text-primary align-middle">
+                    {{ (((items.at(i).get('quantity')?.value || 0) * (items.at(i).get('price')?.value || 0)) - (items.at(i).get('discount')?.value || 0)) * (1 + ((items.at(i).get('taxRate')?.value || 0) / 100)) | currency:'INR' }}
+                  </td>
+
+                  <td class="text-center align-middle">
+                    <button pButton icon="pi pi-trash" class="p-button-text p-button-danger p-button-rounded p-button-sm" (click)="removeItem(i)"></button>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                @for (item of items.controls; track $index; let i = $index) {
-                  <tr [formGroupName]="i">
-                    <td class="text-center index-col">{{ i + 1 }}</td>
+              }
+            </tbody>
+          </table>
 
-                    <td>
-                      <app-master-dropdown 
-                        endpoint="products" 
-                        formControlName="productId" 
-                        (onSelect)="onProductSelect($event, i)" 
-                        placeholder="Select Item">
-                      </app-master-dropdown>
-                      @if (items.at(i).get('name')?.value) {
-                        <div class="item-meta">HSN: {{ items.at(i).get('sku')?.value || '--' }}</div>
-                      }
-                    </td>
-
-                    <td class="text-center align-middle">
-                      @if (items.at(i).get('isCheckingStock')?.value) {
-                        <i class="pi pi-spin pi-spinner text-primary"></i>
-                      } @else {
-                        <span class="stock-pill" [ngClass]="items.at(i).get('isLowStock')?.value ? 'stock-low' : 'stock-ok'">
-                          {{ items.at(i).get('currentStock')?.value ?? '--' }}
-                        </span>
-                      }
-                    </td>
-
-                    <td>
-                      <p-inputNumber formControlName="quantity" [min]="1"
-                        styleClass="w-full table-input"
-                      inputStyleClass="text-center font-bold w-full"></p-inputNumber>
-                    </td>
-
-                    <td>
-                      <p-inputNumber formControlName="price" mode="decimal" [minFractionDigits]="2"
-                      styleClass="w-full table-input" inputStyleClass="text-right w-full"></p-inputNumber>
-                    </td>
-
-                    <td>
-                      <p-inputNumber formControlName="discount" mode="decimal" [minFractionDigits]="2"
-                      styleClass="w-full table-input" inputStyleClass="text-right text-danger w-full"></p-inputNumber>
-                    </td>
-
-                    <td>
-                      <p-inputNumber formControlName="taxRate" suffix="%" [min]="0" [max]="100"
-                      styleClass="w-full table-input" inputStyleClass="text-center text-primary w-full"></p-inputNumber>
-                    </td>
-
-                    <td class="text-right font-bold text-primary align-middle">
-                      {{ (((items.at(i).get('quantity')?.value || 0) * (items.at(i).get('price')?.value || 0)) -
-                      (items.at(i).get('discount')?.value || 0)) * (1 + ((items.at(i).get('taxRate')?.value || 0) / 100)) |
-                      currency:'INR' }}
-                    </td>
-
-                    <td class="text-center align-middle">
-                      <button pButton icon="pi pi-trash" class="p-button-text p-button-danger p-button-rounded p-button-sm"
-                      (click)="removeItem(i)"></button>
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-
-            @if (items.controls.length === 0) {
-              <div class="empty-state">
-                <i class="pi pi-shopping-cart"></i>
-                <p>No items added. Start billing.</p>
-              </div>
-            }
-          </div>
-        </section>
-
-        <div class="footer-grid">
-
-          <div class="left-panel">
-            <div class="form-section">
-              <label>Notes & Terms</label>
-              <textarea pInputTextarea formControlName="notes" rows="3" class="w-full theme-control"
-              placeholder="Payment terms, delivery notes..."></textarea>
+          @if (items.controls.length === 0) {
+            <div class="empty-state">
+              <i class="pi pi-shopping-cart"></i>
+              <p>No items added. Start billing.</p>
             </div>
-
-            <div class="quick-pay-card">
-              <div class="icon-circle"><i class="pi pi-wallet"></i></div>
-              <div class="pay-inputs">
-                <label>Quick Payment Received</label>
-                <div class="input-row">
-                  <p-inputNumber formControlName="paidAmount" mode="currency" currency="INR" locale="en-IN"
-                  placeholder="0.00" styleClass="w-full theme-control"></p-inputNumber>
-                  <p-select appendTo="body" appendTo="body" formControlName="paymentMethod"
-                    [options]="paymentMethodOptions" placeholder="Mode" styleClass="w-full theme-control" [filter]="true"
-                  filterBy="label"></p-select>
-
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="right-panel">
-            <div class="totals-card">
-              <div class="summary-row">
-                <span>Subtotal</span>
-                <span class="val">{{ subTotal() | currency:'INR' }}</span>
-              </div>
-              <div class="summary-row">
-                <span>Discount</span>
-                <span class="val text-danger">- {{ totalDiscount() | currency:'INR' }}</span>
-              </div>
-              <div class="summary-row">
-                <span>Tax (GST)</span>
-                <span class="val text-success">+ {{ totalTax() | currency:'INR' }}</span>
-              </div>
-
-              <div class="summary-divider"></div>
-
-              <div class="summary-row grand-total-row">
-                <span>Grand Total</span>
-                <span class="val">{{ grandTotal() | currency:'INR' }}</span>
-              </div>
-
-              <div class="balance-row" [ngClass]="balanceAmount() > 0 ? 'bg-warn' : 'bg-success'">
-                <span>{{ balanceAmount() > 0 ? 'Balance Due' : 'Paid in Full' }}</span>
-                <span>{{ balanceAmount() | currency:'INR' }}</span>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
-      <footer class="invoice-footer">
-        <div class="footer-info">
-          <i class="pi pi-info-circle"></i>
-          <span>Stock is deducted only upon "Issue".</span>
-        </div>
-        <div class="footer-buttons">
-          <button pButton type="button" label="Cancel" class="p-button-text p-button-secondary"
-          routerLink="/invoices"></button>
-
-          @if (!editMode() || invoiceForm.get('status')?.value === 'draft') {
-            <button pButton type="button" label="Save Draft" icon="pi pi-save" class="p-button-outlined theme-btn-secondary"
-            (click)="handleSubmit('draft')" [loading]="isSubmitting()"></button>
           }
-
-          <button pButton type="submit"
-            [label]="editMode() && invoiceForm.get('status')?.value !== 'draft' ? 'Update Invoice' : 'Issue Invoice'"
-            icon="pi pi-check" class="p-button-primary" (click)="handleSubmit('issued')"
-          [loading]="isSubmitting()"></button>
         </div>
-      </footer>
+      </section>
 
-    </form>
-  </div>
+      <div class="footer-grid">
+        <div class="left-panel">
+          <div class="form-section elevation-card">
+            <label class="section-label">Notes & Terms</label>
+            <textarea pInputTextarea formControlName="notes" rows="3" class="w-full theme-control" placeholder="Payment terms, delivery notes..."></textarea>
+          </div>
+
+          <div class="quick-pay-card elevation-card">
+            <div class="icon-circle"><i class="pi pi-wallet"></i></div>
+            <div class="pay-inputs">
+              <label class="section-label">Quick Payment Received</label>
+              <div class="input-row">
+                <p-inputNumber formControlName="paidAmount" mode="currency" currency="INR" locale="en-IN" placeholder="0.00" styleClass="w-full theme-control"></p-inputNumber>
+                <p-select appendTo="body" formControlName="paymentMethod" [options]="paymentMethodOptions" optionLabel="label" optionValue="value" placeholder="Mode" styleClass="w-full theme-control" [filter]="true" filterBy="label"></p-select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="right-panel">
+          <div class="totals-card elevation-card">
+            <div class="summary-row">
+              <span>Subtotal</span>
+              <span class="val">{{ subTotal() | currency:'INR' }}</span>
+            </div>
+            <div class="summary-row">
+              <span>Discount</span>
+              <span class="val text-danger">- {{ totalDiscount() | currency:'INR' }}</span>
+            </div>
+            <div class="summary-row">
+              <span>Tax (GST)</span>
+              <span class="val text-success">+ {{ totalTax() | currency:'INR' }}</span>
+            </div>
+
+            <div class="summary-divider"></div>
+
+            <div class="summary-row grand-total-row">
+              <span>Grand Total</span>
+              <span class="val">{{ grandTotal() | currency:'INR' }}</span>
+            </div>
+
+            <div class="balance-row" [ngClass]="balanceAmount() > 0 ? 'bg-warn' : 'bg-success'">
+              <span>{{ balanceAmount() > 0 ? 'Balance Due' : 'Paid in Full' }}</span>
+              <span>{{ balanceAmount() | currency:'INR' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="invoice-footer">
+      <div class="footer-info">
+        <i class="pi pi-info-circle"></i>
+        <span>Stock is deducted only upon "Issue".</span>
+      </div>
+      <div class="footer-buttons">
+        <button pButton type="button" label="Cancel" class="p-button-text p-button-secondary" routerLink="/invoices"></button>
+        
+        @if (!editMode() || invoiceForm.get('status')?.value === 'draft') {
+          <button pButton type="button" label="Save Draft" icon="pi pi-save" class="p-button-outlined theme-btn-secondary" (click)="handleSubmit('draft')" [loading]="isSubmitting()"></button>
+        }
+        
+        <button pButton type="submit" [label]="editMode() && invoiceForm.get('status')?.value !== 'draft' ? 'Update Invoice' : 'Issue Invoice'" icon="pi pi-check" class="p-button-primary" (click)="handleSubmit('issued')" [loading]="isSubmitting()"></button>
+      </div>
+    </footer>
+  </form>
+</div>
