@@ -5,7 +5,6 @@ import { of, Subject } from 'rxjs';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 
-// PrimeNG Imports
 import { ButtonModule } from 'primeng/button';
 import { AvatarModule } from 'primeng/avatar';
 import { TagModule } from 'primeng/tag';
@@ -16,7 +15,6 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
-// Services & Components
 import { CustomerService } from '../../services/customer-service';
 import { InvoiceService } from '../../../invoice/services/invoice-service';
 import { PaymentService } from '../../../payment/services/payment-service';
@@ -67,8 +65,7 @@ interface TabState {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CustomerDetails implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
-  // --- Dependencies ---
+  private readonly destroy$ = new Subject<void>();
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private customerService = inject(CustomerService);
@@ -94,14 +91,12 @@ export class CustomerDetails implements OnInit, OnDestroy {
     returnPermission: PERMISSIONS.SALES_RETURN.MANAGE
   };
 
-  // --- State Signals ---
   loadingProfile = signal(true);
   isError = signal(false);
   isDialog = signal(false);
   customerId = signal<string | null>(null);
   customer = signal<any | null>(null);
 
-  // --- Pagination & Tab State ---
   activeTab = signal<TabType>('ledger');
   private pageSize = 50;
 
@@ -112,20 +107,16 @@ export class CustomerDetails implements OnInit, OnDestroy {
     feed: { loaded: false, loading: false, page: 1, total: 0 }
   });
 
-  // Data Signals
   invoices = signal<any[]>([]);
   payments = signal<any[]>([]);
   ledgerHistory = signal<any[]>([]);
 
-  // Column Definitions
   ledgerColumns: any[] = [];
   invoiceColumns: any[] = [];
   paymentColumns: any[] = [];
 
-  // Dialogs
   showTransactionsDialog = false;
 
-  // Stats
   closingBalance = signal(0);
   totalInvoiced = computed(() => this.invoices().reduce((acc, inv) => acc + (inv.grandTotal || 0), 0));
   totalPaid = computed(() => this.payments().reduce((acc, pay) => acc + (pay.amount || 0), 0));
@@ -133,7 +124,6 @@ export class CustomerDetails implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.initColumns();
 
-    // 1. Check Dialog Data first
     const dialogId = this.dialogConfig?.data?.id;
     if (dialogId) {
       this.isDialog.set(true);
@@ -142,7 +132,6 @@ export class CustomerDetails implements OnInit, OnDestroy {
       return;
     }
 
-    // 2. Fallback to Route Params
     this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const id = params.get('id');
       if (!id) {
@@ -196,7 +185,6 @@ export class CustomerDetails implements OnInit, OnDestroy {
   switchTab(tab: TabType) {
     this.activeTab.set(tab);
     const status = this.tabStatus()[tab];
-    // Initial load for the tab if not already loaded
     if (!status.loaded && !status.loading) {
       this.fetchDataForTab(tab, true);
     }
@@ -223,7 +211,6 @@ export class CustomerDetails implements OnInit, OnDestroy {
     else if (tab === 'payments') this.fetchPayments(id, params, isReset);
   }
 
-  // --- Data Fetching Methods ---
   onGridEvent(event: any, tab: TabType) {
     if (event.type === 'reachedBottom') {
       this.onScrolledToBottom(tab);
@@ -249,7 +236,6 @@ export class CustomerDetails implements OnInit, OnDestroy {
     }
   }
 
-
   private finishTabLoad(tab: TabType) {
     this.tabStatus.update(s => ({ 
       ...s, 
@@ -257,142 +243,114 @@ export class CustomerDetails implements OnInit, OnDestroy {
     }));
   }
 
-  // --- Initialization & Renderers ---
-
-
-
   initColumns() {
     this.ledgerColumns = [
       { field: 'date', headerName: 'Date', width: 120, valueFormatter: (p: any) => p.value ? new Date(p.value).toLocaleDateString('en-IN') : '' },
       {
-        // No direct reference number in history, potentially construct from invoiceId/paymentId or use description
         headerName: 'Reference', field: 'description', width: 220,
-        cellRenderer: (p: any) => p.value ? `<span style="color:var(--text-primary);font-weight:500;">${p.value}</span>` : ''
+        cellClass: 'text-primary font-bold'
       },
       {
         field: 'referenceType', headerName: 'Type', width: 110,
         cellRenderer: (p: any) => {
-          const map: any = { invoice: { bg: '#e0f2fe', text: '#0369a1' }, payment: { bg: '#dcfce7', text: '#15803d' } };
-          const theme = map[p.value?.toLowerCase()] || map.invoice;
-          return `<span style="background:${theme.bg};color:${theme.text};padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;text-transform:uppercase;">${p.value}</span>`;
+          const type = (p.value || '').toLowerCase();
+          return `<div class="status-pill status-${type === 'invoice' ? 'info' : 'success'}"><span class="dot"></span>${type}</div>`;
         }
       },
       { field: 'accountName', headerName: 'Account', flex: 1, minWidth: 150 },
-      { field: 'debit', headerName: 'Debit', width: 130, type: 'rightAligned', valueFormatter: (p: any) => p.value > 0 ? this.common.formatCurrency(p.value) : '', cellStyle: { color: '#dc2626', fontWeight: '700' } },
-      { field: 'credit', headerName: 'Credit', width: 130, type: 'rightAligned', valueFormatter: (p: any) => p.value > 0 ? this.common.formatCurrency(p.value) : '', cellStyle: { color: '#059669', fontWeight: '700' } },
-      { field: 'balance', headerName: 'Balance', width: 150, type: 'rightAligned', valueFormatter: (p: any) => this.common.formatCurrency(p.value), cellStyle: { fontWeight: '800', fontFamily: 'monospace', background: 'var(--bg-ternary)' } }
+      { field: 'debit', headerName: 'Debit', width: 130, type: 'rightAligned', valueFormatter: (p: any) => p.value > 0 ? this.common.formatCurrency(p.value) : '', cellClass: 'text-error font-bold font-mono text-right' },
+      { field: 'credit', headerName: 'Credit', width: 130, type: 'rightAligned', valueFormatter: (p: any) => p.value > 0 ? this.common.formatCurrency(p.value) : '', cellClass: 'text-success font-bold font-mono text-right' },
+      { field: 'balance', headerName: 'Balance', width: 150, type: 'rightAligned', valueFormatter: (p: any) => this.common.formatCurrency(p.value), cellClass: 'font-bold font-mono bg-ternary text-right' }
     ];
 
     this.invoiceColumns = [
       { field: 'invoiceNumber', headerName: 'Invoice #', width: 160, cellStyle: { color: 'var(--accent-primary)', fontWeight: '700', cursor: 'pointer' } },
       { field: 'invoiceDate', headerName: 'Date', width: 120, valueFormatter: (p: any) => p.value ? new Date(p.value).toLocaleDateString('en-IN') : '' },
-      { field: 'status', headerName: 'Status', width: 110, cellRenderer: (p: any) => this.statusBadgeRenderer(p.value) },
-      { field: 'paymentStatus', headerName: 'Payment', width: 110, cellRenderer: (p: any) => this.statusBadgeRenderer(p.value) },
-      { field: 'grandTotal', headerName: 'Total', width: 140, type: 'rightAligned', valueFormatter: (p: any) => this.common.formatCurrency(p.value), cellStyle: { fontWeight: '700', fontFamily: 'monospace' } },
-      { field: 'balanceAmount', headerName: 'Due', width: 140, type: 'rightAligned', valueFormatter: (p: any) => this.common.formatCurrency(p.value), cellStyle: (p: any) => ({ color: p.value > 0 ? '#dc2626' : '#059669', fontWeight: '700', fontFamily: 'monospace' }) }
+      { field: 'status', headerName: 'Status', width: 130, cellRenderer: (p: any) => this.statusBadgeRenderer(p.value) },
+      { field: 'paymentStatus', headerName: 'Payment', width: 130, cellRenderer: (p: any) => this.statusBadgeRenderer(p.value) },
+      { field: 'grandTotal', headerName: 'Total', width: 140, type: 'rightAligned', valueFormatter: (p: any) => this.common.formatCurrency(p.value), cellClass: 'font-bold font-mono text-right' },
+      { field: 'balanceAmount', headerName: 'Due', width: 140, type: 'rightAligned', valueFormatter: (p: any) => this.common.formatCurrency(p.value), cellClass: (p: any) => p.value > 0 ? 'text-error font-bold font-mono text-right' : 'text-success font-bold font-mono text-right' }
     ];
 
-this.paymentColumns = [
-  { 
-    field: 'paymentDate', 
-    headerName: 'Date', 
-    width: 130, 
-    pinned: 'left',
-    valueFormatter: (p: any) => p.value ? new Date(p.value).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '',
-    cellClass: 'text-secondary font-medium'
-  },
-  {
-    headerName: 'Reference & Source',
-    children: [
+    this.paymentColumns = [
       { 
-        field: 'invoiceId.invoiceNumber', 
-        headerName: 'Invoice No.', 
-        width: 160,
-        valueGetter: (p: any) => p.data.invoiceId?.invoiceNumber || 'Advance Payment',
-        cellRenderer: (p: any) => `
-          <div class="flex-align gap-2">
-            <i class="pi ${p.value === 'Advance Payment' ? 'pi-star-fill text-warning' : 'pi-file-text text-info'}" style="font-size: 10px"></i>
-            <span class="font-bold">${p.value}</span>
-          </div>
-        `
+        field: 'paymentDate', 
+        headerName: 'Date', 
+        width: 130, 
+        pinned: 'left',
+        valueFormatter: (p: any) => p.value ? new Date(p.value).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '',
+        cellClass: 'text-secondary font-bold'
+      },
+      {
+        headerName: 'Reference & Source',
+        children: [
+          { 
+            field: 'invoiceId.invoiceNumber', 
+            headerName: 'Invoice No.', 
+            width: 160,
+            valueGetter: (p: any) => p.data.invoiceId?.invoiceNumber || 'Advance Payment',
+            cellRenderer: (p: any) => `
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <i class="pi ${p.value === 'Advance Payment' ? 'pi-star-fill text-warning' : 'pi-file-text text-info'}" style="font-size: 10px"></i>
+                <span class="font-bold text-primary">${p.value}</span>
+              </div>
+            `
+          },
+          { 
+            field: 'referenceNumber', 
+            headerName: 'Ref #', 
+            width: 140,
+            cellClass: 'font-mono text-xs text-tertiary',
+            valueFormatter: (p: any) => p.value || p.data._id.slice(-8).toUpperCase()
+          }
+        ]
       },
       { 
-        field: 'referenceNumber', 
-        headerName: 'Ref #', 
-        width: 140,
-        cellClass: 'font-mono text-xs text-tertiary',
-        valueFormatter: (p: any) => p.value || p.data._id.slice(-8).toUpperCase()
+        field: 'paymentMethod', 
+        headerName: 'Method', 
+        width: 130,
+        cellRenderer: (p: any) => {
+          const method = (p.value || 'other').toLowerCase();
+          const icons: any = { cash: 'pi-money-bill', cheque: 'pi-id-card', upi: 'pi-mobile', card: 'pi-credit-card' };
+          return `
+            <div class="method-badge badge-${method}">
+              <i class="pi ${icons[method] || 'pi-wallet'}"></i>
+              <span>${method.toUpperCase()}</span>
+            </div>
+          `;
+        }
+      },
+      { 
+        field: 'allocationStatus', 
+        headerName: 'Allocation', 
+        width: 160,
+        cellRenderer: (p: any) => {
+          const status = p.value || 'unallocated';
+          const isFull = status === 'fully_allocated';
+          return `
+            <div class="status-pill status-${isFull ? 'success' : 'warning'}">
+              <span class="dot"></span>
+              ${status.replace('_', ' ')}
+            </div>
+          `;
+        }
+      },
+      { 
+        field: 'amount', 
+        headerName: 'Amount', 
+        width: 150, 
+        pinned: 'right',
+        type: 'rightAligned', 
+        cellClass: 'font-mono font-bold text-success text-right',
+        valueFormatter: (p: any) => this.common.formatCurrency(p.value)
       }
-    ]
-  },
-  { 
-    field: 'paymentMethod', 
-    headerName: 'Method', 
-    width: 130,
-    cellRenderer: (p: any) => {
-      const method = (p.value || 'other').toLowerCase();
-      const icons: any = { cash: 'pi-money-bill', cheque: 'pi-id-card', upi: 'pi-mobile', card: 'pi-credit-card' };
-      return `
-        <div class="method-badge badge-${method}">
-          <i class="pi ${icons[method] || 'pi-wallet'}"></i>
-          <span>${method.toUpperCase()}</span>
-        </div>
-      `;
-    }
-  },
-  { 
-    field: 'allocationStatus', 
-    headerName: 'Allocation', 
-    width: 140,
-    cellRenderer: (p: any) => {
-      const status = p.value || 'unallocated';
-      const isFull = status === 'fully_allocated';
-      return `
-        <div class="status-pill status-${isFull ? 'success' : 'warning'}">
-          <span class="dot"></span>
-          ${status.replace('_', ' ')}
-        </div>
-      `;
-    }
-  },
-  { 
-    field: 'amount', 
-    headerName: 'Amount', 
-    width: 150, 
-    pinned: 'right',
-    type: 'rightAligned', 
-    cellClass: 'font-mono font-bold text-lg',
-    valueFormatter: (p: any) => this.common.formatCurrency(p.value),
-    cellStyle: (p: any) => ({
-      color: 'var(--color-success-dark, #059669)',
-      background: 'color-mix(in srgb, var(--color-success) 5%, transparent)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'flex-end',
-      paddingRight: '16px'
-    })
-  }
-];
-    // this.paymentColumns = [
-    //   { field: 'paymentDate', headerName: 'Date', width: 120, valueFormatter: (p: any) => p.value ? new Date(p.value).toLocaleDateString('en-IN') : '' },
-    //   { field: 'paymentMethod', headerName: 'Method', width: 120, valueFormatter: (p: any) => (p.value || '').toUpperCase() },
-    //   { field: 'transactionId', headerName: 'Reference', width: 160, cellStyle: { fontFamily: 'monospace', color: 'var(--text-secondary)' } },
-    //   { field: 'amount', headerName: 'Amount', width: 140, type: 'rightAligned', valueFormatter: (p: any) => this.common.formatCurrency(p.value), cellStyle: { color: '#059669', fontWeight: '800', fontFamily: 'monospace' } }
-    // ];
+    ];
   }
 
   private statusBadgeRenderer(val: string): string {
     if (!val) return '';
-    const colors: any = {
-      draft: { bg: '#f3f4f6', text: '#374151' },
-      issued: { bg: '#e0f2fe', text: '#0369a1' },
-      paid: { bg: '#dcfce7', text: '#15803d' },
-      unpaid: { bg: '#fee2e2', text: '#b91c1c' },
-      partial: { bg: '#fef9c3', text: '#854d0e' },
-      cancelled: { bg: '#f1f5f9', text: '#64748b' }
-    };
-    const theme = colors[val.toLowerCase()] || colors.draft;
-    return `<span style="background:${theme.bg};color:${theme.text};padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">${val}</span>`;
+    const formattedVal = val.toLowerCase();
+    return `<div class="status-pill status-${formattedVal}"><span class="dot"></span>${val}</div>`;
   }
 
   openPhotoUpload() {
@@ -400,14 +358,13 @@ this.paymentColumns = [
     if (!custId) return;
 
     this.dialogServices.openImageUpload({
-            header: 'Update Customer Photo',
-            description: 'Upload a new avatar for this customer.',
-            uploadFn: (file: File) => this.customerService.uploadCustomerPhoto(custId, file)
-          })?.onClose.pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
-      // The ImageUploaderComponent ensures 'res' is the exact response from our uploadFn on success
+      header: 'Update Customer Photo',
+      description: 'Upload a new avatar for this customer.',
+      uploadFn: (file: File) => this.customerService.uploadCustomerPhoto(custId, file)
+    })?.onClose.pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
       if (res?.data?.customer?.photo) {
         this.customer.update(c => ({ ...c, avatar: res.data.customer.photo }));
-        this.cdr.detectChanges(); // ensure view updates if binding doesn't catch the signal fast enough
+        this.cdr.detectChanges(); 
       }
     });
   }
@@ -417,10 +374,7 @@ this.paymentColumns = [
     this.customerService.getCustomerDataWithId(id)
       .pipe(
         catchError(err => {
-          // Passed the actual HTTP error to your global handler!
           this.messageService.handleHttpError(err);
-
-          // Added this so your UI can display a fallback state if the profile fails
           this.isError.set(true);
           return of(null);
         }),
@@ -430,7 +384,7 @@ this.paymentColumns = [
         if (res?.data) {
           const data = res.data.data || res.data;
           this.customer.set(data);
-          this.switchTab('ledger'); // Auto-load first tab
+          this.switchTab('ledger'); 
         }
       });
   }
@@ -438,18 +392,16 @@ this.paymentColumns = [
   private fetchLedger(id: string, params: any, isReset: boolean) {
     this.financialService.getCustomerLedger(id, params).pipe(
       catchError((err) => {
-        // Stop the silent failure! Let the user know the ledger couldn't be loaded.
         this.messageService.handleHttpError(err);
         return of({ history: [], closingBalance: 0, count: 0 });
       }),
       finalize(() => this.tabStatus.update(s => ({ ...s, ledger: { ...s.ledger, loading: false } }))), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
-      // Use the history array directly as per the JSON structure
       const history = res.history || [];
       this.ledgerHistory.update(old => isReset ? history : [...old, ...history]);
 
       this.tabStatus.update(s => ({ ...s, ledger: { ...s.ledger, total: res.count || 0 } }));
-      this.closingBalance.set(res.closingBalance || 0); // Use closingBalance directly
+      this.closingBalance.set(res.closingBalance || 0); 
 
       this.finishTabLoad('ledger');
     });
@@ -458,7 +410,6 @@ this.paymentColumns = [
   private fetchInvoices(id: string, params: any, isReset: boolean) {
     this.invoiceService.getInvoicesByCustomer(id).pipe(
       catchError((err: any) => {
-        // Alert the user if the invoice tab fails to populate
         this.messageService.handleHttpError(err);
         return of({ data: { invoices: [] }, total: 0 });
       }),
@@ -475,7 +426,6 @@ this.paymentColumns = [
   private fetchPayments(id: string, params: any, isReset: boolean) {
     this.paymentService.getPaymentsByCustomer(id).pipe(
       catchError((err) => {
-        // Alert the user if the payment tab fails to populate
         this.messageService.handleHttpError(err);
         return of({ data: { payments: [] }, total: 0 });
       }),
@@ -489,13 +439,12 @@ this.paymentColumns = [
     });
   }
 
-
   retryLoad() {
     if (this.customerId()) this.loadProfile(this.customerId()!);
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }
