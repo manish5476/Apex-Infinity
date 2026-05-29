@@ -14,6 +14,7 @@ export interface NormalizedTypography {
   fontWeight?: string | number;
   letterSpacing?: string;
   lineHeight?: string | number;
+  textTransform?: string;
   alignment: 'left' | 'center' | 'right';
 }
 
@@ -70,6 +71,12 @@ export const FONT_FAMILY_OPTIONS = [
   'system-ui',
   'serif',
   'sans-serif',
+  'Space Grotesk',
+  'Syne',
+  'Outfit',
+  'Clash Display',
+  'Cormorant Garamond',
+  'Cinzel'
 ] as const;
 
 const FONT_FAMILY_SET = new Set<string>(FONT_FAMILY_OPTIONS.map(font => font.toLowerCase()));
@@ -123,6 +130,7 @@ export function normalizeTypography(config: unknown): NormalizedTypography {
     fontWeight: asString(typography['fontWeight']) ?? asNumber(typography['fontWeight']),
     letterSpacing: asString(typography['letterSpacing']),
     lineHeight: asString(typography['lineHeight']) ?? asNumber(typography['lineHeight']),
+    textTransform: asString(typography['textTransform']),
     alignment: alignment === 'left' || alignment === 'center' || alignment === 'right' ? alignment : DEFAULT_TYPOGRAPHY.alignment,
   };
 }
@@ -176,6 +184,7 @@ export function headingStyle(config: unknown, overrides: Record<string, string |
     'font-weight': typography.fontWeight,
     'letter-spacing': typography.letterSpacing,
     'line-height': typography.lineHeight,
+    'text-transform': typography.textTransform,
     ...overrides,
   });
 }

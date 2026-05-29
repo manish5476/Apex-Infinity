@@ -77,10 +77,10 @@ export interface HeroBannerConfig extends SectionBaseConfig {
     </section>
   `,
   styles: [`
-    :host { display: block; width: 100%; }
+    app-hero-banner { display: block; width: 100%; }
 
     /* --- Material Design Standard Easing --- */
-    :host {
+    .hero-banner {
       --md-sys-motion-easing-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
       --md-sys-motion-easing-decelerate: cubic-bezier(0.0, 0.0, 0.2, 1);
       --md-sys-color-primary: var(--theme-accent-primary, #1a73e8); /* Google Blue */
@@ -237,7 +237,7 @@ export class HeroBannerComponent {
     if (btn.variant === 'primary') {
       return {
         'background-color': btnColor,
-        'color': this.cfg().backgroundImage ? 'var(--text-primary)' : 'var(--bg-primary)'
+        'color': this.cfg().backgroundImage ? 'var(--text-primary, #111827)' : 'var(--bg-primary, #ffffff)'
       };
     }
 

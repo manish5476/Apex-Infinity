@@ -26,6 +26,7 @@ export interface SectionFieldSchema {
   enum?: unknown[];
   min?: number;
   max?: number;
+  step?: number;
   maxLength?: number;
   maxItems?: number;
   ref?: string;

@@ -181,6 +181,7 @@ import { FONT_FAMILY_OPTIONS } from '../../storefront-public/dynamic-page/sectio
               <textarea pTextarea [formControlName]="field.key" [rows]="4" [autoResize]="true" [placeholder]="'Enter ' + field.label"></textarea>
             } @else if (field.type === 'number') {
               <p-inputnumber [formControlName]="field.key" [showButtons]="true" [min]="field.min" [max]="field.max"
+                [step]="field.step || 1" [minFractionDigits]="field.step && field.step < 1 ? 2 : 0"
                 buttonLayout="horizontal" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"
                 [placeholder]="field.label">
               </p-inputnumber>
