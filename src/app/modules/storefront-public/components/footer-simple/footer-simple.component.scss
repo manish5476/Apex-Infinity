@@ -9,7 +9,7 @@
 
 .footer-root {
   position: relative;
-  background-color: var(--bg-primary)216; /* Intentionally dark for contrast */
+  background-color: var(--bg-secondary, #111827);
   color: var(--text-tertiary); /* Muted text */
   padding-top: var(--spacing-4xl);
   padding-bottom: var(--spacing-3xl);
@@ -36,7 +36,7 @@
     @media (min-width: 768px) { height: 120px; }
     
     path {
-      fill: var(--bg-primary)216; /* Matches footer bg */
+      fill: var(--bg-secondary, #111827);
     }
   }
 }

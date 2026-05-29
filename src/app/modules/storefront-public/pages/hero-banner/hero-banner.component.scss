@@ -73,7 +73,7 @@
   position: relative;
   z-index: var(--hero-z-content);
   width: 100%;
-  padding: 120px 5% 100px;
+  padding: clamp(5rem, 12vh, 7.5rem) clamp(1rem, 5vw, 4rem) clamp(4rem, 10vh, 6.25rem);
   display: flex;
 
   &.align-left   { justify-content: flex-start; }
@@ -141,7 +141,7 @@
   font-size: clamp(2.5rem, 6vw, 5.5rem);
   font-weight: 800;
   line-height: 1.05;
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
   text-shadow: 0 10px 30px rgba(0,0,0,0.5);
   animation-delay: 0.3s;
 }
@@ -286,10 +286,15 @@
 
 @media (max-width: 768px) {
   .hero-content {
-    padding: 80px 5% 60px;
+    padding: 5.5rem 1rem 4rem;
+  }
+  .hero-inner {
+    max-width: 100%;
   }
   .hero-title {
+    font-size: clamp(2rem, 12vw, 3.5rem);
     margin-bottom: 1.5rem;
+    overflow-wrap: anywhere;
   }
   .hero-actions {
     flex-direction: column;
@@ -298,5 +303,7 @@
   }
   .hero-btn {
     width: 100%;
+    min-height: 3rem;
+    padding-inline: 1.25rem;
   }
 }

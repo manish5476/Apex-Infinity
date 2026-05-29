@@ -16,6 +16,7 @@ import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 import { DynamicFormEngineService } from './dynamic-form-engine.service';
 import { DynamicFieldDefinition } from './section-schema.types';
+import { FONT_FAMILY_OPTIONS } from '../../storefront-public/dynamic-page/section-config.utils';
 
 @Component({
   selector: 'app-dynamic-field-renderer',
@@ -128,6 +129,18 @@ import { DynamicFieldDefinition } from './section-schema.types';
               <p-multiselect [options]="options" [formControlName]="field.key" optionLabel="label"
                 optionValue="value" display="chip" placeholder="Select..." appendTo="body" [filter]="true" [showClear]="true">
               </p-multiselect>
+            } @else if (field.type === 'font') {
+              <p-inputgroup>
+                <p-inputgroup-addon>
+                  <i class="pi pi-font"></i>
+                </p-inputgroup-addon>
+                <input pInputText [formControlName]="field.key" [attr.list]="fontListId(field)" placeholder="Select or type a font family" />
+              </p-inputgroup>
+              <datalist [id]="fontListId(field)">
+                @for (option of fontOptions(field); track option) {
+                  <option [value]="option"></option>
+                }
+              </datalist>
             } @else if (field.enum || field.type === 'reference') {
               <p-select [options]="options" [formControlName]="field.key" optionLabel="label" optionValue="value"
                 placeholder="Select..." appendTo="body" [filter]="true" filterBy="label" [showClear]="!field.required">
@@ -275,6 +288,17 @@ export class DynamicFieldRendererComponent implements OnChanges {
     }
 
     return [];
+  }
+
+  fontOptions(field: DynamicFieldDefinition): string[] {
+    const schemaOptions = Array.isArray(field.enum)
+      ? field.enum.filter((value): value is string => typeof value === 'string')
+      : [];
+    return Array.from(new Set([...schemaOptions, ...FONT_FAMILY_OPTIONS]));
+  }
+
+  fontListId(field: DynamicFieldDefinition): string {
+    return `font-options-${field.key.replace(/[^a-z0-9_-]/gi, '-')}`;
   }
 
   asFormGroup(control: AbstractControl | null): FormGroup {

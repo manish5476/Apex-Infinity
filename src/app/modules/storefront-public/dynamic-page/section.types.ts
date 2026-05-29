@@ -69,7 +69,32 @@ export interface SectionButton {
     text?: string | null;
     link?: string | null;
     variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
+    buttonColor?: string | null;
     icon?: string | null;
+}
+
+export interface SectionTypographyConfig {
+    headingText?: string;
+    subText?: string;
+    subHeadingText?: string;
+    title?: string;
+    subtitle?: string;
+    headingFont?: string;
+    bodyFont?: string;
+    headingColor?: string;
+    bodyColor?: string;
+    headingSize?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'display' | string;
+    fontSize?: string;
+    fontWeight?: string | number;
+    letterSpacing?: string;
+    lineHeight?: string | number;
+    alignment?: 'left' | 'center' | 'right';
+}
+
+export interface SectionDesignConfig {
+    customBackground?: string;
+    borderRadius?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full' | string;
+    boxShadow?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | string;
 }
 
 export interface SectionLocation {
@@ -128,6 +153,8 @@ export interface SectionBaseConfig {
     paddingBottom?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
     backgroundColor?: string;
     themeMode?: 'auto' | 'light' | 'dark' | 'glass';
+    typography?: SectionTypographyConfig;
+    design?: SectionDesignConfig;
 }
 
 // Padding map — converts schema token to px value
@@ -137,4 +164,5 @@ export const PADDING_MAP: Record<string, string> = {
     md: '48px',
     lg: '72px',
     xl: '96px',
+    '2xl': '128px',
 };

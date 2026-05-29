@@ -7,6 +7,7 @@ export type SectionFieldType =
   | 'boolean'
   | 'number'
   | 'color'
+  | 'font'
   | 'image'
   | 'array'
   | 'object'

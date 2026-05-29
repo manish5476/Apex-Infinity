@@ -55,11 +55,11 @@ export class SchemaToFormMapper {
 
     for (const field of fields) {
       const key = field.key.toLowerCase();
-      const styleKeys = ['color', 'padding', 'margin', 'gap', 'theme', 'align', 'height', 'width', 'opacity', 'background'];
+      const styleKeys = ['color', 'font', 'padding', 'margin', 'gap', 'theme', 'align', 'height', 'width', 'opacity', 'background'];
       const settingKeys = ['isactive', 'hideon', 'limit', 'ruletype', 'itemsper', 'columns', 'pagination', 'sticky', 'autoplay', 'show'];
 
       if (field.type === 'boolean') tabs.booleans.push(field);
-      else if (styleKeys.some(token => key.includes(token)) || field.type === 'color') tabs.style.push(field);
+      else if (styleKeys.some(token => key.includes(token)) || field.type === 'color' || field.type === 'font') tabs.style.push(field);
       else if (settingKeys.some(token => key.includes(token))) tabs.settings.push(field);
       else tabs.content.push(field);
     }
