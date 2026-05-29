@@ -1,312 +1,281 @@
-import { Injectable, computed, effect, inject, signal, OnDestroy } from '@angular/core';
-import { Router, NavigationExtras, NavigationEnd } from '@angular/router'; // 👈 Added NavigationEnd
+import { Injectable, OnDestroy, computed, effect, inject, signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
+import {
+  Event,
+  NavigationCancel,
+  NavigationEnd,
+  NavigationError,
+  NavigationExtras,
+  NavigationStart,
+  Router
+} from '@angular/router';
 import { Observable, Subject } from 'rxjs';
-import { filter, takeUntil } from 'rxjs/operators'; // 👈 Added filter
-import { TabId, TabMeta, TabState, OpenTabOptions } from '../tab.types';
+import { filter, takeUntil } from 'rxjs/operators';
+import { OpenTabOptions, TabId, TabMeta, TabState } from '../tab.types';
+import { RouteStateService } from './route-state.service';
+import { TabPersistenceService } from './tab-persistence.service';
+import { TabReuseStrategy } from '../tab-reuse.strategy';
 
-const STORAGE_KEY = 'apex__tab_state';
-const MAX_TABS = 20;
+const MAX_TABS = 24;
+const MAX_RECENTLY_CLOSED = 10;
 
 @Injectable({ providedIn: 'root' })
 export class TabService implements OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   private readonly router = inject(Router);
-  private readonly _state = signal<TabState>(this._loadPersistedState());
+  private readonly routeState = inject(RouteStateService);
+  private readonly persistence = inject(TabPersistenceService);
 
-  // ── Selectors ────────────────────────────────────────────────────────────────
+  private readonly _state = signal<TabState>(this.hydrateInitialState());
+  private pendingNavigationUrl: string | null = null;
+  private suppressNextRouterSync = false;
+
   readonly state = this._state.asReadonly();
   readonly tabs = computed(() => this._state().tabs);
   readonly activeTab = computed(() =>
-    this._state().tabs.find(t => t.id === this._state().activeTabId) ?? null
+    this._state().tabs.find(tab => tab.id === this._state().activeTabId) ?? null
   );
   readonly tabCount = computed(() => this._state().tabs.length);
+  readonly recentlyClosed = computed(() => this._state().recentlyClosed ?? []);
 
-  // ── RxJS mirrors ─────────────────────────────────────────────────────────────
   readonly tabs$: Observable<TabMeta[]> = toObservable(this.tabs);
   readonly activeTab$: Observable<TabMeta | null> = toObservable(this.activeTab);
-  readonly activeTabId$: Observable<TabId | null> =
-    toObservable(computed(() => this._state().activeTabId));
+  readonly activeTabId$: Observable<TabId | null> = toObservable(computed(() => this._state().activeTabId));
+
+  openNewTab?: () => void;
 
   constructor() {
-    effect(() => {
-      try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(this._state())); }
-      catch { /* storage full / private mode */ }
-    });
+    effect(() => this.persistence.save(this._state()));
 
-    // Clean, standard RxJS implementation
     this.router.events.pipe(
-      filter((e): e is NavigationEnd => e instanceof NavigationEnd), takeUntil(this.destroy$)
-    ).subscribe((e: NavigationEnd) => {
-      this.handleNavigationEnd(e);
-    });
+      filter((event): event is NavigationStart | NavigationEnd | NavigationCancel | NavigationError =>
+        event instanceof NavigationStart ||
+        event instanceof NavigationEnd ||
+        event instanceof NavigationCancel ||
+        event instanceof NavigationError
+      ),
+      takeUntil(this.destroy$)
+    ).subscribe(event => this.handleRouterEvent(event));
   }
 
-  private handleNavigationEnd(e: NavigationEnd): void {
-    let route = this.router.routerState.root;
-    while (route.firstChild) {
-      route = route.firstChild;
-    }
-
-    const data = route.snapshot.data || {};
-    const routeConfig = route.snapshot.routeConfig;
-
-    const hasTarget = !!route.component ||
-      !!routeConfig?.loadComponent ||
-      !!routeConfig?.loadChildren ||
-      !!data['tabLabel'];
-
-    const fullUrl = e.urlAfterRedirects.split('?')[0];
-
-    // Get exact queryParams from the snapshot
-    const rawQueryParams = route.snapshot.queryParams;
-    const qp: Record<string, string> = {};
-    for (const key of Object.keys(rawQueryParams)) {
-      qp[key] = String(rawQueryParams[key]);
-    }
-
-    const lowUrl = fullUrl.toLowerCase();
-    const componentName = (routeConfig?.component as any)?.name || '';
-    
-    const isAuth = lowUrl.includes('login') || lowUrl.includes('signup') || lowUrl.includes('auth') || lowUrl.includes('password') || lowUrl.includes('verification') || componentName.includes('Login');
-    const isError = lowUrl.includes('error') || lowUrl.includes('unauthorized') || lowUrl.includes('notfound') || routeConfig?.path === '**' || componentName.includes('NotFound') || componentName.includes('Unauthorized');
-
-    if (!hasTarget || isAuth || isError || fullUrl === '/' || data['disableTab'] === true) {
-      this.syncFromRouter(fullUrl, qp);
-      return;
-    }
-
-    let label = (data['tabLabel'] as string | undefined);
-    if (!label) {
-      const segments = fullUrl.split('/').filter(Boolean);
-      let lastSegment = segments.pop() || 'Home';
-      // Strip matrix parameters (;) or encoded matrix parameters (%3b)
-      lastSegment = lastSegment.split(';')[0].split('%3b')[0];
-      
-      label = lastSegment
-        .split('-')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-        .join(' ');
-    }
-
-    const options: Pick<OpenTabOptions, 'icon' | 'pinned' | 'data'> = {
-      icon: (data['tabIcon'] as string) || 'pi pi-file',
-      pinned: !!data['tabPinned'],
-      data: data
-    };
-
-    this.registerTab(fullUrl, label, qp, options);
-  }
-
-  /**
-   * Open or activate a tab, then navigate.
-   * If a tab with the same id exists → activates it (no duplicate).
-   */
   openTab(
     path: string,
     label: string,
     options: OpenTabOptions = {},
     navigationExtras: NavigationExtras = {}
   ): void {
-    const params = (navigationExtras.queryParams as Record<string, string>) ?? {};
-    const id = this.buildTabId(path, params);
-    const existing = this._findById(id);
+    const url = options.url ?? this.router.serializeUrl(this.router.createUrlTree([path], navigationExtras));
+    const queryParams = this.stringifyRecord((navigationExtras.queryParams ?? {}) as Record<string, unknown>);
+    const id = options.id ?? this.routeState.buildTabId('fullUrl', path, url, path, queryParams, navigationExtras.fragment);
+    const existing = this.findById(id);
 
     if (existing && !options.replace) {
-      if (options.data) this._patchTab(id, { data: { ...existing.data, ...options.data } });
-      this._activate(id);
-      this.router.navigate([path], navigationExtras);
+      this.activateTab(id);
       return;
     }
 
-    this._evictOldestIfFull();
-
+    const now = Date.now();
     const tab: TabMeta = {
       id,
       label: options.label ?? label,
       icon: options.icon,
       path,
+      url,
+      routePattern: path,
       params: {},
-      queryParams: params,
+      queryParams,
+      fragment: navigationExtras.fragment ?? null,
       data: options.data ?? {},
-      openedAt: Date.now(),
-      active: false,
+      openedAt: now,
+      active: true,
       pinned: options.pinned ?? false,
       loading: true,
-      count: undefined
+      dirty: options.dirty ?? false,
+      cache: options.cache !== false,
+      lastAccessedAt: now
     };
 
-    this._state.update(s => ({
-      tabs: [...s.tabs.map(t => ({ ...t, active: false })), tab],
-      activeTabId: id,
-    }));
-
-    this.router.navigate([path], navigationExtras).then(() => {
-      this._patchTab(id, { active: true, loading: false });
-    });
+    this.upsertTab(tab, { replace: options.replace });
+    this.navigateByUrl(url);
   }
 
-  openNewTab?: () => void;
-
-  registerTab(path: string, label: string, queryParams: Record<string, string>, options: Pick<OpenTabOptions, 'icon' | 'pinned' | 'data'> = {}
+  registerTab(
+    path: string,
+    label: string,
+    queryParams: Record<string, string>,
+    options: Pick<OpenTabOptions, 'icon' | 'pinned' | 'data' | 'cache'> = {}
   ): void {
-    const id = this.buildTabId(path, queryParams);
-    const existing = this._findById(id);
-
-    if (existing) {
-      const patch: Partial<TabMeta> = {};
-      if (label && label !== existing.label && !label.toLowerCase().includes('notes')) {
-        patch.label = label;
-      }
-      if (options.icon && options.icon !== existing.icon) patch.icon = options.icon;
-      if (options.data) patch.data = { ...existing.data, ...options.data };
-
-      if (Object.keys(patch).length > 0) this._patchTab(id, patch);
-
-      this._activate(id);
-      return;
-    }
-
-    this._evictOldestIfFull();
-
-    const tab: TabMeta = {
-      id,
+    const url = this.composeUrl(path, queryParams);
+    const now = Date.now();
+    this.upsertTab({
+      id: this.routeState.buildTabId('fullUrl', path, url, path, queryParams),
       label,
       icon: options.icon,
       path,
+      url,
+      routePattern: path,
       params: {},
       queryParams,
+      fragment: null,
       data: options.data ?? {},
-      openedAt: Date.now(),
+      openedAt: now,
       active: true,
       pinned: options.pinned ?? false,
       loading: false,
-      count: undefined
-    };
-
-    this._state.update(s => ({
-      tabs: [...s.tabs.map(t => ({ ...t, active: false })), tab],
-      activeTabId: id,
-    }));
-  }
-
-  /** Activate an existing tab by id and navigate to its route */
-  activateTab(id: TabId): void {
-    const tab = this._findById(id);
-    if (!tab) return;
-    this._activate(id);
-    this.router.navigate([tab.path], { queryParams: tab.queryParams });
-  }
-
-  /** FIX #2 — Keyboard: cycle to next tab (wraps) */
-  activateNext(): void {
-    const { tabs, activeTabId } = this._state();
-    if (tabs.length < 2) return;
-    const idx = tabs.findIndex(t => t.id === activeTabId);
-    const next = tabs[(idx + 1) % tabs.length];
-    this.activateTab(next.id);
-  }
-
-  /** FIX #2 — Keyboard: cycle to previous tab (wraps) */
-  activatePrev(): void {
-    const { tabs, activeTabId } = this._state();
-    if (tabs.length < 2) return;
-    const idx = tabs.findIndex(t => t.id === activeTabId);
-    const prev = tabs[(idx - 1 + tabs.length) % tabs.length];
-    this.activateTab(prev.id);
-  }
-
-  /** Close a tab; activates nearest neighbour if it was active */
-  closeTab(id: TabId): void {
-    const tab = this._findById(id);
-    if (!tab || tab.pinned) return;
-
-    const s = this._state();
-    const idx = s.tabs.findIndex(t => t.id === id);
-    const wasActive = s.activeTabId === id;
-    const remaining = s.tabs.filter(t => t.id !== id);
-
-    let nextId: TabId | null = s.activeTabId;
-
-    if (wasActive && remaining.length > 0) {
-      const candidate = remaining[Math.min(idx, remaining.length - 1)];
-      nextId = candidate.id;
-      this.router.navigate([candidate.path], { queryParams: candidate.queryParams });
-    } else if (remaining.length === 0) {
-      nextId = null;
-      this.router.navigate(['/']);
-    }
-
-    this._state.set({
-      tabs: remaining.map(t => ({ ...t, active: t.id === nextId })),
-      activeTabId: nextId,
+      dirty: false,
+      cache: options.cache !== false,
+      lastAccessedAt: now
     });
   }
 
-  /** FIX #2 — Keyboard Ctrl+W: close the currently active tab */
+  activateTab(id: TabId): void {
+    const tab = this.findById(id);
+    if (!tab) return;
+    this.activateLocal(id);
+    this.navigateByUrl(tab.url);
+  }
+
+  activateNext(): void {
+    const { tabs, activeTabId } = this._state();
+    if (tabs.length < 2) return;
+    const currentIndex = Math.max(0, tabs.findIndex(tab => tab.id === activeTabId));
+    this.activateTab(tabs[(currentIndex + 1) % tabs.length].id);
+  }
+
+  activatePrev(): void {
+    const { tabs, activeTabId } = this._state();
+    if (tabs.length < 2) return;
+    const currentIndex = Math.max(0, tabs.findIndex(tab => tab.id === activeTabId));
+    this.activateTab(tabs[(currentIndex - 1 + tabs.length) % tabs.length].id);
+  }
+
+  closeTab(id: TabId): void {
+    const state = this._state();
+    const tab = state.tabs.find(item => item.id === id);
+    if (!tab || tab.pinned) return;
+    if (tab.dirty && !this.confirmClose(tab)) return;
+
+    const index = state.tabs.findIndex(item => item.id === id);
+    const remaining = state.tabs.filter(item => item.id !== id);
+    const recentlyClosed = [tab, ...(state.recentlyClosed ?? [])].slice(0, MAX_RECENTLY_CLOSED);
+    this.evictTab(tab);
+
+    let activeTabId = state.activeTabId;
+    if (state.activeTabId === id) {
+      activeTabId = remaining[Math.min(index, remaining.length - 1)]?.id ?? null;
+    }
+
+    this._state.set({
+      ...state,
+      tabs: remaining.map(item => ({ ...item, active: item.id === activeTabId })),
+      activeTabId,
+      recentlyClosed
+    });
+
+    const next = remaining.find(item => item.id === activeTabId);
+    this.navigateByUrl(next?.url ?? '/create-dashboard');
+  }
+
   closeActiveTab(): void {
     const id = this._state().activeTabId;
     if (id) this.closeTab(id);
   }
 
   closeOtherTabs(exceptId?: TabId): void {
-    const id = exceptId ?? this._state().activeTabId;
-    this._state.update(s => ({
-      tabs: s.tabs.filter(t => t.pinned || t.id === id).map(t => ({ ...t, active: t.id === id })),
-      activeTabId: id,
-    }));
+    const state = this._state();
+    const activeId = exceptId ?? state.activeTabId;
+    if (!activeId) return;
+
+    const closing = state.tabs.filter(tab => !tab.pinned && tab.id !== activeId);
+    if (closing.some(tab => tab.dirty) && !this.confirmCloseMany(closing)) return;
+    closing.forEach(tab => this.evictTab(tab));
+
+    const keep = state.tabs.filter(tab => tab.pinned || tab.id === activeId);
+    const recentlyClosed = [...closing, ...(state.recentlyClosed ?? [])].slice(0, MAX_RECENTLY_CLOSED);
+    this._state.set({
+      ...state,
+      tabs: keep.map(tab => ({ ...tab, active: tab.id === activeId })),
+      activeTabId: activeId,
+      recentlyClosed
+    });
   }
 
   closeTabsToRight(fromId: TabId): void {
-    const s = this._state();
-    const idx = s.tabs.findIndex(t => t.id === fromId);
-    if (idx === -1) return;
-    const keep = s.tabs.filter((_, i) => i <= idx || s.tabs[i].pinned);
-    const activeStillHere = keep.some(t => t.id === s.activeTabId);
-    const newActiveId = activeStillHere ? s.activeTabId : (keep[keep.length - 1]?.id ?? null);
+    const state = this._state();
+    const index = state.tabs.findIndex(tab => tab.id === fromId);
+    if (index < 0) return;
+
+    const closing = state.tabs.filter((tab, tabIndex) => tabIndex > index && !tab.pinned);
+    if (closing.some(tab => tab.dirty) && !this.confirmCloseMany(closing)) return;
+    closing.forEach(tab => this.evictTab(tab));
+
+    const keep = state.tabs.filter((tab, tabIndex) => tabIndex <= index || tab.pinned);
+    const activeStillOpen = keep.some(tab => tab.id === state.activeTabId);
+    const activeTabId = activeStillOpen ? state.activeTabId : keep.at(-1)?.id ?? null;
+
     this._state.set({
-      tabs: keep.map(t => ({ ...t, active: t.id === newActiveId })),
-      activeTabId: newActiveId,
+      ...state,
+      tabs: keep.map(tab => ({ ...tab, active: tab.id === activeTabId })),
+      activeTabId,
+      recentlyClosed: [...closing, ...(state.recentlyClosed ?? [])].slice(0, MAX_RECENTLY_CLOSED)
     });
+
+    const next = keep.find(tab => tab.id === activeTabId);
+    if (next) this.navigateByUrl(next.url);
   }
 
   closeAllTabs(): void {
-    const pinned = this._state().tabs.filter(t => t.pinned);
-    const newActive = pinned[pinned.length - 1]?.id ?? null;
+    const state = this._state();
+    const closing = state.tabs.filter(tab => !tab.pinned);
+    if (closing.some(tab => tab.dirty) && !this.confirmCloseMany(closing)) return;
+    closing.forEach(tab => this.evictTab(tab));
+
+    const pinned = state.tabs.filter(tab => tab.pinned);
+    const activeTabId = pinned.at(-1)?.id ?? null;
     this._state.set({
-      tabs: pinned.map(t => ({ ...t, active: t.id === newActive })),
-      activeTabId: newActive,
+      ...state,
+      tabs: pinned.map(tab => ({ ...tab, active: tab.id === activeTabId })),
+      activeTabId,
+      recentlyClosed: [...closing, ...(state.recentlyClosed ?? [])].slice(0, MAX_RECENTLY_CLOSED)
     });
-    const tab = pinned.find(t => t.id === newActive);
-    this.router.navigate(tab ? [tab.path] : ['/']);
+
+    this.navigateByUrl(pinned.find(tab => tab.id === activeTabId)?.url ?? '/create-dashboard');
   }
 
-  /**
-   * Update the currently active tab's metadata
-   */
+  reopenClosedTab(): void {
+    const [tab, ...rest] = this._state().recentlyClosed ?? [];
+    if (!tab) return;
+    this._state.update(state => ({ ...state, recentlyClosed: rest }));
+    this.upsertTab({ ...tab, active: true, loading: false, lastAccessedAt: Date.now() }, { replace: true });
+    this.navigateByUrl(tab.url);
+  }
+
   updateActiveTab(options: Partial<Omit<TabMeta, 'id' | 'path'>>): void {
     const activeId = this._state().activeTabId;
-    if (activeId) {
-      this.updateTab(activeId, options);
-    }
+    if (activeId) this.updateTab(activeId, options);
   }
 
-  /**
-   * Update a specific tab's metadata
-   */
   updateTab(id: TabId, options: Partial<Omit<TabMeta, 'id' | 'path'>>): void {
-    this._patchTab(id, options);
+    this.patchTab(id, options);
+  }
+
+  setDirty(id: TabId, dirty = true): void {
+    this.patchTab(id, { dirty });
   }
 
   togglePin(id: TabId): void {
-    this._patchTab(id, { pinned: !this._findById(id)?.pinned });
+    const tab = this.findById(id);
+    if (tab) this.patchTab(id, { pinned: !tab.pinned });
   }
 
   moveTab(fromIndex: number, toIndex: number): void {
-    const tabs = [...this._state().tabs];
-    const [moved] = tabs.splice(fromIndex, 1);
-    tabs.splice(toIndex, 0, moved);
-    this._state.update(s => ({ ...s, tabs }));
+    this._state.update(state => {
+      const tabs = [...state.tabs];
+      const [moved] = tabs.splice(fromIndex, 1);
+      if (!moved) return state;
+      tabs.splice(toIndex, 0, moved);
+      return { ...state, tabs };
+    });
   }
 
   isActive(id: TabId): boolean {
@@ -314,72 +283,178 @@ export class TabService implements OnDestroy {
   }
 
   syncFromRouter(path: string, queryParams: Record<string, string> = {}): void {
-    const id = this.buildTabId(path, queryParams);
-    if (!this._findById(id)) return;
-    this._activate(id);
+    const url = this.composeUrl(path, queryParams);
+    const tab = this._state().tabs.find(item => item.url === url || item.id === url);
+    if (tab) this.activateLocal(tab.id);
   }
 
-  /**
-   * Reset all tabs (useful for logout)
-   */
   reset(): void {
-    this._state.set({ tabs: [], activeTabId: null });
-    try { sessionStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
+    this._state().tabs.forEach(tab => this.evictTab(tab));
+    TabReuseStrategy.evictAllCached();
+    this._state.set({ tabs: [], activeTabId: null, recentlyClosed: [], version: 2 });
+    this.persistence.clear();
   }
 
-  /**
-   * Build a deterministic tab id from path + sorted query params.
-   * Exposed so TabRouterGuard can compute the same key without internal access.
-   */
   buildTabId(path: string, params: Record<string, string>): TabId {
-    const sorted = Object.entries(params).sort(([a], [b]) => a.localeCompare(b));
-    const suffix = sorted.length ? '?' + sorted.map(([k, v]) => `${k}=${v}`).join('&') : '';
-    return `${path}${suffix}`;
+    return this.routeState.buildTabId('fullUrl', path, this.composeUrl(path, params), path, params);
   }
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // PRIVATE HELPERS
-  // ─────────────────────────────────────────────────────────────────────────
-
-  private _findById(id: TabId): TabMeta | undefined {
-    return this._state().tabs.find(t => t.id === id);
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
-  private _activate(id: TabId): void {
-    this._state.update(s => ({
-      tabs: s.tabs.map(t => ({ ...t, active: t.id === id })),
-      activeTabId: id,
-    }));
-  }
-
-  private _patchTab(id: TabId, patch: Partial<TabMeta>): void {
-    this._state.update(s => ({
-      ...s,
-      tabs: s.tabs.map(t => t.id === id ? { ...t, ...patch } : t),
-    }));
-  }
-
-  private _evictOldestIfFull(): void {
-    if (this.tabs().length < MAX_TABS) return;
-    const oldest = [...this.tabs()]
-      .filter(t => !t.pinned && !t.active)
-      .sort((a, b) => a.openedAt - b.openedAt)[0];
-    if (oldest) this._state.update(s => ({ ...s, tabs: s.tabs.filter(t => t.id !== oldest.id) }));
-  }
-
-  private _loadPersistedState(): TabState {
-    try {
-      const raw = sessionStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as TabState;
-        return { ...parsed, tabs: parsed.tabs.map(t => ({ ...t, active: false, loading: false })) };
-      }
-    } catch { /* corrupted */ }
-    return { tabs: [], activeTabId: null };
-  }
-
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
+  private handleRouterEvent(event: Event): void {
+    if (event instanceof NavigationStart) {
+      this.pendingNavigationUrl = event.url;
+      this.markActiveLoading(true);
+      this.captureActiveScrollPosition();
+      return;
     }
+
+    if (event instanceof NavigationCancel || event instanceof NavigationError) {
+      this.pendingNavigationUrl = null;
+      this.markActiveLoading(false);
+      return;
+    }
+
+    if (event instanceof NavigationEnd) {
+      this.pendingNavigationUrl = null;
+      this.markActiveLoading(false);
+      if (this.suppressNextRouterSync) {
+        this.suppressNextRouterSync = false;
+      }
+      const tab = this.routeState.createTabFromNavigation(event);
+      if (tab) this.upsertTab(tab);
+      this.restoreActiveScrollPosition();
+    }
+  }
+
+  private upsertTab(tab: TabMeta, options: { replace?: boolean } = {}): void {
+    this._state.update(state => {
+      const existing = state.tabs.find(item => item.id === tab.id);
+      let tabs = existing && !options.replace
+        ? state.tabs.map(item => item.id === tab.id ? this.mergeTab(item, tab) : item)
+        : [...state.tabs.filter(item => item.id !== tab.id), tab];
+
+      tabs = this.enforceMaxTabs(tabs, tab.id);
+      return {
+        ...state,
+        tabs: tabs.map(item => ({ ...item, active: item.id === tab.id, loading: item.id === tab.id ? tab.loading : false })),
+        activeTabId: tab.id
+      };
+    });
+    this.syncReuseCacheWithTabs();
+  }
+
+  private mergeTab(existing: TabMeta, incoming: TabMeta): TabMeta {
+    return {
+      ...existing,
+      ...incoming,
+      openedAt: existing.openedAt,
+      pinned: existing.pinned || incoming.pinned,
+      dirty: existing.dirty,
+      data: { ...(existing.data ?? {}), ...(incoming.data ?? {}) },
+      lastAccessedAt: Date.now()
+    };
+  }
+
+  private activateLocal(id: TabId): void {
+    this._state.update(state => ({
+      ...state,
+      tabs: state.tabs.map(tab => ({
+        ...tab,
+        active: tab.id === id,
+        loading: tab.id === id && this.pendingNavigationUrl !== null,
+        lastAccessedAt: tab.id === id ? Date.now() : tab.lastAccessedAt
+      })),
+      activeTabId: id
+    }));
+  }
+
+  private patchTab(id: TabId, patch: Partial<TabMeta>): void {
+    this._state.update(state => ({
+      ...state,
+      tabs: state.tabs.map(tab => tab.id === id ? { ...tab, ...patch } : tab)
+    }));
+  }
+
+  private markActiveLoading(loading: boolean): void {
+    const activeId = this._state().activeTabId;
+    if (!activeId) return;
+    this.patchTab(activeId, { loading });
+  }
+
+  private navigateByUrl(url: string): void {
+    if (this.router.url === url) return;
+    this.suppressNextRouterSync = true;
+    void this.router.navigateByUrl(url);
+  }
+
+  private findById(id: TabId): TabMeta | undefined {
+    return this._state().tabs.find(tab => tab.id === id);
+  }
+
+  private enforceMaxTabs(tabs: TabMeta[], activeId: TabId): TabMeta[] {
+    let next = [...tabs];
+    while (next.length > MAX_TABS) {
+      const evictable = next
+        .filter(tab => !tab.pinned && tab.id !== activeId && !tab.dirty)
+        .sort((a, b) => (a.lastAccessedAt ?? a.openedAt) - (b.lastAccessedAt ?? b.openedAt))[0];
+      if (!evictable) break;
+      this.evictTab(evictable);
+      next = next.filter(tab => tab.id !== evictable.id);
+    }
+    return next;
+  }
+
+  private evictTab(tab: TabMeta): void {
+    TabReuseStrategy.evictCached(tab.id);
+  }
+
+  private syncReuseCacheWithTabs(): void {
+    TabReuseStrategy.evictExceptCached(new Set(this._state().tabs.filter(tab => tab.cache !== false).map(tab => tab.id)));
+  }
+
+  private captureActiveScrollPosition(): void {
+    const activeId = this._state().activeTabId;
+    if (!activeId || typeof window === 'undefined') return;
+    this.patchTab(activeId, { scrollPosition: { x: window.scrollX, y: window.scrollY } });
+  }
+
+  private restoreActiveScrollPosition(): void {
+    const tab = this.activeTab();
+    if (!tab?.scrollPosition || typeof window === 'undefined') return;
+    setTimeout(() => window.scrollTo(tab.scrollPosition?.x ?? 0, tab.scrollPosition?.y ?? 0), 0);
+  }
+
+  private confirmClose(tab: TabMeta): boolean {
+    if (typeof window === 'undefined') return true;
+    return window.confirm(`"${tab.label}" has unsaved changes. Close it anyway?`);
+  }
+
+  private confirmCloseMany(tabs: TabMeta[]): boolean {
+    if (typeof window === 'undefined') return true;
+    return window.confirm(`${tabs.length} tabs have unsaved changes. Close them anyway?`);
+  }
+
+  private hydrateInitialState(): TabState {
+    const state = this.persistence.load();
+    return {
+      ...state,
+      tabs: state.tabs.map(tab => ({ ...tab, active: tab.id === state.activeTabId, loading: false }))
+    };
+  }
+
+  private stringifyRecord(record: Record<string, unknown>): Record<string, string> {
+    return Object.fromEntries(Object.entries(record ?? {}).map(([key, value]) => [key, String(value)]));
+  }
+
+  private composeUrl(path: string, queryParams: Record<string, string>, fragment?: string | null): string {
+    const query = Object.entries(queryParams)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+      .join('&');
+    return `${path}${query ? `?${query}` : ''}${fragment ? `#${fragment}` : ''}`;
+  }
 }

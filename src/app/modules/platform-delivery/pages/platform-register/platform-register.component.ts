@@ -214,7 +214,7 @@ export class PlatformRegisterComponent {
     
     this.platformService.register(this.form).subscribe({
       next: (res) => {
-        localStorage.setItem('platform_delivery_token', res.token);
+        this.platformService.setToken(res.token);
         this.router.navigate(['/apex-delivery/dashboard']);
       },
       error: (err) => {

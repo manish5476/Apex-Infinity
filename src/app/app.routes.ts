@@ -152,6 +152,12 @@ export const routes: Routes = [
       // HRMS
       { path: 'hrms', loadChildren: () => import('./modules/hrms/hrms.routes').then(m => m.HRMS_ROUTES) },
 
+      // Logistics Orchestration Platform
+      {
+        path: 'logistics',
+        loadChildren: () => import('./modules/logistics/logistics.routes').then(m => m.LOGISTICS_ROUTES)
+      },
+
       // Administration
       {
         path: 'admin/organization',

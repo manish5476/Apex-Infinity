@@ -3,7 +3,7 @@ import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../modules/auth/services/auth-service'; // ✅ Import AuthService
-import { isStorefrontApiUrl } from '../services/storefront-request.util';
+import { isMerchantDeliveryApiUrl, isPlatformDeliveryApiUrl, isStorefrontApiUrl } from '../services/storefront-request.util';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const messageService = inject(MessageService);
@@ -11,7 +11,10 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      const isStorefrontRequest = isStorefrontApiUrl(req.url);
+      const isStorefrontRequest =
+        isStorefrontApiUrl(req.url) ||
+        isPlatformDeliveryApiUrl(req.url) ||
+        isMerchantDeliveryApiUrl(req.url);
 
       if (isStorefrontRequest) {
         return throwError(() => error);

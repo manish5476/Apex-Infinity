@@ -71,7 +71,7 @@
 import { ApplicationConfig, provideAppInitializer, inject } from '@angular/core';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { provideHttpClient, withInterceptors, withFetch } from '@angular/common/http';
-import { provideRouter, RouteReuseStrategy } from '@angular/router';
+import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideClientHydration, withEventReplay, withHttpTransferCacheOptions, withIncrementalHydration } from '@angular/platform-browser';
@@ -92,7 +92,6 @@ import { storefrontErrorInterceptor } from './storefront/core/api/storefront-err
 import { loggingInterceptor } from './core/interceptors/logging.interceptor';
 import { AuthService } from './modules/auth/services/auth-service';
 import { DialogService } from 'primeng/dynamicdialog';
-import { TabReuseStrategy } from './Tabbing';
 // import { ConfirmationService } from '@core/services/confirmationService';
 
 export const appConfig: ApplicationConfig = {
@@ -122,8 +121,6 @@ export const appConfig: ApplicationConfig = {
     //     }
     //   }
     // })
-    { provide: RouteReuseStrategy, useClass: TabReuseStrategy },
-
     providePrimeNG({
       ripple: true,
       theme: {

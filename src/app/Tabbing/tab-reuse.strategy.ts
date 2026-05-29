@@ -1,106 +1,168 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// tab-reuse.strategy.ts  –  Cache component trees keyed by route + params
-// ─────────────────────────────────────────────────────────────────────────────
-//
-// Drop-in RouteReuseStrategy that stores a detached component tree for every
-// unique tab (path + query params).  Attach/detach happens in O(1) via a Map.
-//
-// Registration (app.config.ts):
-//   { provide: RouteReuseStrategy, useClass: TabReuseStrategy }
-//
-// ─────────────────────────────────────────────────────────────────────────────
-
 import {
-  RouteReuseStrategy,
   ActivatedRouteSnapshot,
   DetachedRouteHandle,
+  RouteReuseStrategy
 } from '@angular/router';
 
-export class TabReuseStrategy implements RouteReuseStrategy {
+interface CacheEntry {
+  key: string;
+  handle: DetachedRouteHandle;
+  createdAt: number;
+  lastAccessedAt: number;
+}
 
-  /** Map of route-key → detached handle */
-  private readonly cache = new Map<string, DetachedRouteHandle>();
+const MAX_CACHED_HANDLES = 24;
+const MAX_CACHE_AGE_MS = 60 * 60 * 1000;
+
+export class TabReuseStrategy implements RouteReuseStrategy {
+  private static readonly instances = new Set<TabReuseStrategy>();
+
+  static evictCached(key: string): void {
+    for (const strategy of this.instances) {
+      strategy.evict(key);
+    }
+  }
+
+  static evictExceptCached(keys: Set<string>): void {
+    for (const strategy of this.instances) {
+      strategy.evictExcept(keys);
+    }
+  }
+
+  static evictAllCached(): void {
+    for (const strategy of this.instances) {
+      strategy.evictAll();
+    }
+  }
+
+  private readonly cache = new Map<string, CacheEntry>();
+
+  constructor() {
+    TabReuseStrategy.instances.add(this);
+  }
 
   shouldDetach(route: ActivatedRouteSnapshot): boolean {
-    // Do not cache parent routes or routes without components
-    if (!route.routeConfig || !route.routeConfig.component) return false;
-    if (route.firstChild) return false;
-
-    // Only cache leaf routes that belong to tabs (opt-out available via route data)
-    return route.data?.['reuseTab'] !== false;
+    return false;
   }
 
   store(route: ActivatedRouteSnapshot, handle: DetachedRouteHandle | null): void {
-    const key = this._key(route);
-    if (handle) {
-      this.cache.set(key, handle);
-    } else {
-      this.cache.delete(key);
-    }
+    if (handle) this.destroyHandle(handle);
   }
 
-  // ── Decide whether to reattach a stored route ───────────────────────────────
   shouldAttach(route: ActivatedRouteSnapshot): boolean {
-    if (!route.routeConfig || !route.routeConfig.component) return false;
-    if (route.firstChild) return false;
-
-    return this.cache.has(this._key(route));
+    return false;
   }
 
   retrieve(route: ActivatedRouteSnapshot): DetachedRouteHandle | null {
-    const handle = this.cache.get(this._key(route));
-    if (handle) {
-      const compRef = (handle as any).componentRef;
-      if (compRef?.instance) {
-        if (typeof compRef.instance.onTabReattached === 'function') {
-          setTimeout(() => compRef.instance.onTabReattached(), 10);
-        } else if (typeof compRef.instance.getData === 'function') {
-          setTimeout(() => compRef.instance.getData(true), 10);
-        } else if (typeof compRef.instance.loadData === 'function') {
-          setTimeout(() => compRef.instance.loadData(true), 10);
-        }
-      }
-    }
-    return handle ?? null;
+    return null;
   }
 
-  // ── Decide whether to reuse the same component instance ────────────────────
-  shouldReuseRoute(
-    future: ActivatedRouteSnapshot,
-    curr: ActivatedRouteSnapshot
-  ): boolean {
-    // Reuse when navigating within the same route config node
+  shouldReuseRoute(future: ActivatedRouteSnapshot, curr: ActivatedRouteSnapshot): boolean {
     return future.routeConfig === curr.routeConfig;
   }
 
-  // ── Public helpers (called by TabService when closing tabs) ─────────────────
-
-  /** Evict a cached handle by route key so it can be GC'd */
   evict(key: string): void {
+    const entry = this.cache.get(key);
+    if (!entry) return;
+    this.destroyHandle(entry.handle);
     this.cache.delete(key);
   }
 
+  evictExcept(keys: Set<string>): void {
+    for (const key of [...this.cache.keys()]) {
+      if (!keys.has(key)) this.evict(key);
+    }
+  }
+
   evictAll(): void {
-    this.cache.clear();
+    for (const key of [...this.cache.keys()]) this.evict(key);
   }
 
-  /** Build the same key TabService uses so callers can cross-reference */
   static buildKey(path: string, params: Record<string, string>): string {
-    const sorted = Object.entries(params).sort(([a], [b]) => a.localeCompare(b));
-    const suffix = sorted.length ? '?' + sorted.map(([k, v]) => `${k}=${v}`).join('&') : '';
-    return `${path}${suffix}`;
+    const query = Object.entries(params)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+      .join('&');
+    return `${path}${query ? `?${query}` : ''}`;
   }
 
-  // ─────────────────────────────────────────────────────────────────────────
-  private _key(route: ActivatedRouteSnapshot): string {
+  private evictStaleEntries(): void {
+    const now = Date.now();
+    for (const [key, entry] of [...this.cache.entries()]) {
+      if (now - entry.createdAt > MAX_CACHE_AGE_MS) this.evict(key);
+    }
+
+    while (this.cache.size > MAX_CACHED_HANDLES) {
+      const oldest = [...this.cache.values()]
+        .sort((a, b) => a.lastAccessedAt - b.lastAccessedAt)[0];
+      if (!oldest) break;
+      this.evict(oldest.key);
+    }
+  }
+
+  private notifyReattached(handle: DetachedRouteHandle): void {
+    const instance = (handle as any)?.componentRef?.instance;
+    if (!instance) return;
+    setTimeout(() => {
+      if (typeof instance.onTabReattached === 'function') instance.onTabReattached();
+      else if (typeof instance.onWorkspaceReattached === 'function') instance.onWorkspaceReattached();
+    }, 0);
+  }
+
+  private destroyHandle(handle: DetachedRouteHandle): void {
+    const componentRef = (handle as any)?.componentRef;
+    if (componentRef && typeof componentRef.destroy === 'function' && !componentRef.destroyed) {
+      componentRef.destroy();
+    }
+  }
+
+  private shouldCache(route: ActivatedRouteSnapshot): boolean {
+    const data = this.mergedData(route);
+    if (data['disableTab'] === true || data['cacheTab'] === false || data['reuseTab'] === false) return false;
+    return !!route.routeConfig && !route.firstChild && (!!route.component || !!route.routeConfig.loadComponent);
+  }
+
+  private reuseKey(route: ActivatedRouteSnapshot): string {
+    const data = this.mergedData(route);
+    const idMode = data['tabIdMode'] ?? (data['reuseTab'] === true ? 'routePattern' : 'fullUrl');
+    const path = this.snapshotPath(route);
+    const queryParams = this.stringifyRecord(route.queryParams);
+
+    if (idMode === 'routePattern') return this.routePattern(route);
+    if (idMode === 'path') return this.composeUrl(path, queryParams, route.fragment);
+    return this.composeUrl(path, queryParams, route.fragment);
+  }
+
+  private mergedData(route: ActivatedRouteSnapshot): Record<string, unknown> {
+    return route.pathFromRoot.reduce((acc, snapshot) => ({ ...acc, ...snapshot.data }), {});
+  }
+
+  private routePattern(route: ActivatedRouteSnapshot): string {
+    const pattern = route.pathFromRoot
+      .map(snapshot => snapshot.routeConfig?.path)
+      .filter(Boolean)
+      .join('/');
+    return `/${pattern}`.replace(/\/+/g, '/');
+  }
+
+  private snapshotPath(route: ActivatedRouteSnapshot): string {
     const segments = route.pathFromRoot
-      .flatMap(r => r.url)
-      .map(s => s.toString())
-      .filter(Boolean);
+      .flatMap(snapshot => snapshot.url)
+      .map(segment => segment.toString())
+      .filter(Boolean)
+      .join('/');
+    return `/${segments}`;
+  }
 
-    const path = '/' + segments.join('/');
-    const qp = route.queryParams as Record<string, string>;
+  private stringifyRecord(record: Record<string, unknown>): Record<string, string> {
+    return Object.fromEntries(Object.entries(record ?? {}).map(([key, value]) => [key, String(value)]));
+  }
 
-    return TabReuseStrategy.buildKey(path, qp);
+  private composeUrl(path: string, queryParams: Record<string, string>, fragment?: string | null): string {
+    const query = Object.entries(queryParams)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+      .join('&');
+    return `${path}${query ? `?${query}` : ''}${fragment ? `#${fragment}` : ''}`;
   }
 }

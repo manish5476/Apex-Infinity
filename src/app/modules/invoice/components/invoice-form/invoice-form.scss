@@ -153,19 +153,42 @@
   gap: var(--spacing-xl);
 }
 
-.span-2 { grid-column: span 2; }
-.span-3 { grid-column: span 3; }
-.span-4 { grid-column: span 4; }
-.span-12 { grid-column: span 12; }
+.span-2 {
+  grid-column: span 2;
+}
+
+.span-3 {
+  grid-column: span 3;
+}
+
+.span-4 {
+  grid-column: span 4;
+}
+
+.span-12 {
+  grid-column: span 12;
+}
 
 @media (max-width: 1024px) {
-  .span-2, .span-3, .span-4 { grid-column: span 6; }
-}
-@media (max-width: 640px) {
-  .span-2, .span-3, .span-4 { grid-column: span 12; }
+
+  .span-2,
+  .span-3,
+  .span-4 {
+    grid-column: span 6;
+  }
 }
 
-.form-group label, .section-label {
+@media (max-width: 640px) {
+
+  .span-2,
+  .span-3,
+  .span-4 {
+    grid-column: span 12;
+  }
+}
+
+.form-group label,
+.section-label {
   display: block;
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
@@ -244,7 +267,7 @@
   padding: var(--spacing-xs) var(--spacing-md);
   border-radius: var(--ui-border-radius);
   transition: var(--transition-base);
-  
+
   &.stock-checking {
     opacity: 0.4;
     filter: grayscale(100%);
@@ -269,7 +292,9 @@
 }
 
 @media (max-width: 1024px) {
-  .footer-grid { grid-template-columns: 1fr; }
+  .footer-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .quick-pay-card {
@@ -321,8 +346,13 @@
     color: var(--text-primary);
   }
 
-  .text-danger { color: var(--color-error); }
-  .text-success { color: var(--color-success); }
+  .text-danger {
+    color: var(--color-error);
+  }
+
+  .text-success {
+    color: var(--color-success);
+  }
 }
 
 .summary-divider {
@@ -376,7 +406,7 @@
   justify-content: space-between;
   align-items: center;
   z-index: var(--z-fixed);
-  box-shadow: 0 -4px 12px rgba(0,0,0,0.02);
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.02);
 }
 
 .footer-info {
@@ -395,7 +425,7 @@
 .theme-btn-secondary {
   color: var(--text-secondary);
   border-color: var(--border-secondary);
-  
+
   &:hover {
     background: var(--bg-hover);
     color: var(--text-primary);
@@ -425,13 +455,18 @@
   width: 6px;
   height: 6px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-track {
   background: var(--scroll-track);
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: var(--scroll-thumb);
   border-radius: var(--ui-border-radius-pill);
-}// /* ==============================================
+}
+
+
+// /* ==============================================
 //    INVOICE FORM (Layout & Structure Only)
 //    ============================================== */
 

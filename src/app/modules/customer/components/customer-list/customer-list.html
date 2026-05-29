@@ -17,15 +17,13 @@
 
     <div class="header-actions">
       @if (selectedRows && selectedRows.length === 1) {
-        <p-button *hasPermission="PERMISSIONS.CUSTOMER.UPDATE" 
-          label="Upload Photo" icon="pi pi-camera" 
-          styleClass="p-button-outlined p-button-info mr-2" 
-          (onClick)="openPhotoUpload()">
-        </p-button>
+      <p-button *hasPermission="PERMISSIONS.CUSTOMER.UPDATE" label="Upload Photo" icon="pi pi-camera"
+        styleClass="p-button-outlined p-button-info mr-2" (onClick)="openPhotoUpload()">
+      </p-button>
       }
 
-      <p-button label="Bulk Import" icon="pi pi-upload" 
-        styleClass="p-button-outlined p-button-secondary mr-2" (onClick)="openBulkImport()">
+      <p-button label="Bulk Import" icon="pi pi-upload" styleClass="p-button-outlined p-button-secondary mr-2"
+        (onClick)="openBulkImport()">
       </p-button>
       <p-button *hasPermission="PERMISSIONS.CUSTOMER.CREATE" label="New Customer" icon="pi pi-plus" routerLink="create"
         styleClass="p-button-primary">
@@ -39,10 +37,7 @@
 
       <div class="filter-field">
         <label for="customer">Customer</label>
-        <app-master-dropdown 
-          endpoint="customers" 
-          [(ngModel)]="customerFilter._id" 
-          (onSelect)="applyFilters()" 
+        <app-master-dropdown endpoint="customers" [(ngModel)]="customerFilter._id" (onSelect)="applyFilters()"
           placeholder="Select Customer">
         </app-master-dropdown>
       </div>
@@ -63,7 +58,7 @@
 
       <div class="filter-field">
         <label for="search">Smart Search</label>
-        <input (keydown.enter)="applyFilters()" (blur)="applyFilters()" id="search" type="text" pInputText
+        <input (keydown.enter)="applyFilters()" (blur)="applyFilters()" type="text" pInputText
           [(ngModel)]="customerFilter.search" placeholder="Name, contact, GST, PAN..." class="w-full" />
       </div>
 

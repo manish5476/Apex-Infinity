@@ -192,7 +192,7 @@ export class PlatformLoginComponent {
     
     this.platformService.login(this.credentials.phone, this.credentials.password).subscribe({
       next: (res) => {
-        localStorage.setItem('platform_delivery_token', res.token);
+        this.platformService.setToken(res.token);
         this.router.navigate(['/apex-delivery/dashboard']);
       },
       error: (err) => {

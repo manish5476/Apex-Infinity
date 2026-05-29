@@ -778,7 +778,7 @@ body {
   @include input-reset;
   display: block;
   width: 100%;
-  height: 2.5rem;
+  height: 2.25rem;
   /* Matches your 2.5rem PrimeNG geometry override */
   padding: 0 var(--spacing-md);
   font-family: var(--font-body);
@@ -926,7 +926,7 @@ body {
 }
 
 .p-button {
-  min-height: 2.5rem !important;
+  min-height: 2.25rem !important;
   line-height: var(--line-height-relaxed) !important;
   border-radius: var(--ui-border-radius) !important;
   white-space: nowrap !important;
@@ -947,7 +947,7 @@ body {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  height: 2.5rem !important;
+  height: 2.25rem !important;
   padding: 0 var(--spacing-lg) !important;
   font-family: var(--font-body) !important;
   font-size: var(--font-size-sm) !important;
@@ -1143,7 +1143,7 @@ body {
 .p-multiselect,
 .p-datepicker-input,
 .p-inputnumber-input {
-  height: 2.5rem !important;
+  height: 2.25rem !important;
   font-family: var(--font-body) !important;
   font-size: var(--font-size-sm) !important;
   border-radius: var(--ui-border-radius) !important;
@@ -1211,7 +1211,7 @@ body {
   /* Dropdown Icon Centering */
   .p-select-dropdown,
   .p-multiselect-dropdown {
-    width: 2.5rem !important;
+    width: 2.25rem !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -1250,7 +1250,7 @@ body {
     align-items: center !important;
     /* Changed from flex-end to center */
     gap: var(--spacing-md) !important;
-    height: 2.5rem !important;
+    height: 2.25rem !important;
     /* Match input height */
   }
 }
@@ -1325,4 +1325,151 @@ app-ag-share-grid {
     -webkit-backdrop-filter: none !important;
     border-radius: 0 !important;
   }
+}
+
+/* ============================================================================
+   ENTERPRISE COMPACT LIST DENSITY
+   Keeps list headers and filter regions subordinate to the data grid.
+   ============================================================================ */
+
+.app-container {
+  .container-header {
+    padding: var(--spacing-md) var(--spacing-lg) !important;
+    gap: var(--spacing-sm) !important;
+    min-height: 56px;
+
+    .container-title {
+      font-size: var(--font-size-lg) !important;
+      line-height: 1.2 !important;
+    }
+
+    .container-subtitle {
+      font-size: var(--font-size-xs) !important;
+      margin-top: 2px !important;
+      line-height: 1.25 !important;
+    }
+  }
+
+  .container-body {
+    padding: var(--spacing-md) !important;
+    gap: var(--spacing-sm) !important;
+    min-height: 0;
+  }
+}
+
+.list-page-container {
+  padding: var(--spacing-md) !important;
+  gap: var(--spacing-sm) !important;
+  min-height: 0;
+}
+
+.list-header,
+.page-header,
+.dashboard-header {
+  margin-bottom: var(--spacing-sm) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  min-height: 44px;
+}
+
+.list-title,
+.page-header h1,
+.page-header h2,
+.dashboard-header h1,
+.dashboard-header h2 {
+  font-size: var(--font-size-xl) !important;
+  line-height: 1.2 !important;
+}
+
+.themed-card,
+.list-content-area {
+  padding: var(--spacing-md) !important;
+  gap: var(--spacing-sm) !important;
+  min-height: 0 !important;
+}
+
+.app-filter-panel,
+.se-filter-bar,
+.filters {
+  gap: var(--spacing-sm) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  margin-bottom: var(--spacing-sm) !important;
+  align-items: center !important;
+  min-height: 44px;
+}
+
+.app-filter-panel {
+  border-radius: var(--ui-border-radius) !important;
+
+  &.single-row {
+    padding-bottom: var(--spacing-sm) !important;
+  }
+}
+
+.app-filter-panel .filter-field,
+.se-filter-bar .se-filter-field {
+  gap: 3px !important;
+  min-width: 150px !important;
+  max-width: 240px !important;
+  flex: 1 1 170px !important;
+
+  label {
+    font-size: 10px !important;
+    line-height: 1.1 !important;
+    letter-spacing: 0.04em !important;
+  }
+}
+
+.app-filter-panel .filter-actions,
+.app-filter-panel .filter-actions-right,
+.se-filter-actions,
+.header-actions {
+  gap: var(--spacing-xs) !important;
+  min-height: 2rem !important;
+}
+
+.app-filter-panel .p-inputtext,
+.app-filter-panel .p-select,
+.app-filter-panel .p-multiselect,
+.app-filter-panel .p-datepicker,
+.se-filter-bar .p-inputtext,
+.se-filter-bar .p-select,
+.se-filter-bar .p-multiselect,
+.se-filter-bar .p-datepicker,
+.filters input,
+.filters select {
+  min-height: 2rem !important;
+  height: 2rem !important;
+  font-size: var(--font-size-xs) !important;
+}
+
+.app-filter-panel .p-button,
+.se-filter-bar .p-button,
+.filters .p-button,
+.header-actions .p-button {
+  min-height: 2rem !important;
+  padding: 0.35rem 0.65rem !important;
+  font-size: var(--font-size-xs) !important;
+}
+
+.stats-strip {
+  gap: var(--spacing-xs) !important;
+
+  .stat-card {
+    padding: var(--spacing-sm) var(--spacing-md) !important;
+    gap: 2px !important;
+    min-height: 48px !important;
+  }
+
+  .stat-val {
+    font-size: var(--font-size-md) !important;
+    line-height: 1.15 !important;
+  }
+}
+
+.list-grid-wrapper,
+.list-grid-area,
+.grid-container,
+.classic-grid-wrapper {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
 }

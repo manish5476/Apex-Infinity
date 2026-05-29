@@ -1,6 +1,7 @@
 import {
   OnInit,
   AfterViewInit,
+  OnDestroy,
   Renderer2,
   ViewChild,
   computed,
@@ -30,7 +31,7 @@ import { TabId, TabMeta } from '../tab.types';
   styleUrls: ['./tab-strip.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TabStripComponent implements OnInit, AfterViewInit {
+export class TabStripComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly tabService = inject(TabService);
   private readonly keyboardService = inject(TabKeyboardService);
 
@@ -75,11 +76,18 @@ export class TabStripComponent implements OnInit, AfterViewInit {
         icon: 'pi pi-ban',
         command: () => this.tabService.closeAllTabs(),
       },
+      {
+        label: 'Reopen closed tab',
+        icon: 'pi pi-history',
+        disabled: this.tabService.recentlyClosed().length === 0,
+        command: () => this.tabService.reopenClosedTab(),
+      },
     ];
   });
 
   // ── Drag state ────────────────────────────────────────────────────────────
   private _dragFromIndex: number | null = null;
+  private wheelHandler?: (event: WheelEvent) => void;
 
   constructor() {
     // 🔥 THE FIX: Automatically react to ANY active tab change
@@ -99,9 +107,14 @@ export class TabStripComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     // We add the wheel listener manually with passive: false to allow preventDefault()
     if (this.scrollContainer) {
-      this.scrollContainer.nativeElement.addEventListener('wheel', (e: WheelEvent) => {
-        this.onWheelScroll(e);
-      }, { passive: false });
+      this.wheelHandler = (event: WheelEvent) => this.onWheelScroll(event);
+      this.scrollContainer.nativeElement.addEventListener('wheel', this.wheelHandler, { passive: false });
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.scrollContainer?.nativeElement && this.wheelHandler) {
+      this.scrollContainer.nativeElement.removeEventListener('wheel', this.wheelHandler);
     }
   }
 

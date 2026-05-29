@@ -89,9 +89,7 @@ export class ActionButtonsRenderer {
     DatePickerModule,
     HasPermissionDirective,
     DynamicDialogModule,
-    MasterDropdownComponent,
-    ActionButtonsRenderer
-  ],
+    MasterDropdownComponent],
   providers: [DialogService],
   template: `
     <p-toast position="bottom-right" appendTo="body"></p-toast>
@@ -553,7 +551,7 @@ export class SalesReturnListComponent implements OnInit, OnDestroy {
 
     this.searchControl.valueChanges.pipe(
       debounceTime(400),
-      distinctUntilChanged(), 
+      distinctUntilChanged(),
       takeUntil(this.destroy$)
     ).subscribe(() => {
       this.applyFilters();
@@ -857,14 +855,14 @@ export class SalesReturnListComponent implements OnInit, OnDestroy {
 //   template: `
 //     @if (params?.data?.status?.toLowerCase() === 'pending') {
 //       <div class="flex gap-1 items-center h-full">
-//         <button class="p-button-sm p-button-success p-button-text p-button-rounded action-btn approve-btn" 
-//                 style="padding: 0; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: rgba(16, 185, 129, 0.1); border: none; color: #10b981; cursor: pointer; border-radius: 50%; transition: all 0.2s;" 
+//         <button class="p-button-sm p-button-success p-button-text p-button-rounded action-btn approve-btn"
+//                 style="padding: 0; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: rgba(16, 185, 129, 0.1); border: none; color: #10b981; cursor: pointer; border-radius: 50%; transition: all 0.2s;"
 //                 title="Approve"
 //                 (click)="onClick('approve', $event)">
 //           <i class="pi pi-check" style="font-size: 0.8rem;"></i>
 //         </button>
-//         <button class="p-button-sm p-button-danger p-button-text p-button-rounded action-btn reject-btn" 
-//                 style="padding: 0; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: rgba(239, 68, 68, 0.1); border: none; color: #ef4444; cursor: pointer; border-radius: 50%; transition: all 0.2s;" 
+//         <button class="p-button-sm p-button-danger p-button-text p-button-rounded action-btn reject-btn"
+//                 style="padding: 0; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: rgba(239, 68, 68, 0.1); border: none; color: #ef4444; cursor: pointer; border-radius: 50%; transition: all 0.2s;"
 //                 title="Reject"
 //                 (click)="onClick('reject', $event)">
 //           <i class="pi pi-ban" style="font-size: 0.8rem;"></i>
