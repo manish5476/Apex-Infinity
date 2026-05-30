@@ -28,30 +28,3 @@ export class FooterSimpleComponent {
 
   currentYear = new Date().getFullYear();
 }
-// import { Component, Input, inject, OnInit } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-// import { RouterModule, Router } from '@angular/router';
-
-// @Component({
-//   selector: 'app-footer-simple',
-//   standalone: true,
-//   imports: [CommonModule, RouterModule],
-//   templateUrl: './footer-simple.component.html',
-//   styleUrls: ['./footer-simple.component.scss']
-// })
-// export class FooterSimpleComponent implements OnInit {
-//   @Input() config: any;
-//   @Input() organization: any;
-
-//   // We need the slug for the links to work
-//   orgSlug: string = '';
-//   private router = inject(Router);
-
-//   ngOnInit() {
-//     // Basic extraction of slug so links like "Shop" work
-//     const match = this.router.url.match(/\/store\/([^\/]+)/);
-//     if (match && match[1]) {
-//       this.orgSlug = match[1];
-//     }
-//   }
-// }

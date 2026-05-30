@@ -3,7 +3,8 @@ import { Component, Input, Type, signal } from '@angular/core';
 import {
   LAYOUT_SECTION_COMPONENT_REGISTRY,
   LayoutRenderContext,
-  LayoutSectionRenderEntry
+  LayoutSectionRenderEntry,
+  resolveLayoutSectionInputs
 } from './layout-section.registry';
 
 @Component({
@@ -96,6 +97,6 @@ export class LayoutSectionRendererComponent {
 
   private refreshInputs(): void {
     if (!this._entry || !this._section) return;
-    this.componentInputs.set(this._entry.inputs(this._section, this._context));
+    this.componentInputs.set(resolveLayoutSectionInputs(this._entry, this._section, this._context));
   }
 }

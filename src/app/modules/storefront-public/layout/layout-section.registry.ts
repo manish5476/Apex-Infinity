@@ -1,4 +1,5 @@
 import { Type } from '@angular/core';
+import { asRecord } from '../dynamic-page/section-config.utils';
 
 export interface LayoutSectionRenderEntry {
   load: () => Promise<Type<unknown>>;
@@ -10,17 +11,31 @@ export interface LayoutRenderContext {
   orgSlug: string;
 }
 
+const safeConfig = (section: any): Record<string, unknown> => asRecord(section?.config);
+
 const navInputs = (section: any, context: LayoutRenderContext) => ({
-  config: section.config,
+  config: safeConfig(section),
   organization: context.organization,
   logo: context.organization?.logo ?? undefined,
   orgSlug: context.orgSlug
 });
 
 const footerInputs = (section: any, context: LayoutRenderContext) => ({
-  config: section.config,
+  config: safeConfig(section),
   organization: context.organization
 });
+
+export function resolveLayoutSectionInputs(
+  entry: LayoutSectionRenderEntry,
+  section: any,
+  context: LayoutRenderContext
+): Record<string, unknown> {
+  try {
+    return entry.inputs(section ?? {}, context);
+  } catch {
+    return { config: safeConfig(section), organization: context.organization };
+  }
+}
 
 export const LAYOUT_SECTION_COMPONENT_REGISTRY: Record<string, LayoutSectionRenderEntry> = {
   navbar_simple: {

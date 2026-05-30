@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, Type, signal } from '@angular/core';
-import { SECTION_COMPONENT_REGISTRY, SectionRenderEntry } from './section-component.registry';
+import { SECTION_COMPONENT_REGISTRY, SectionRenderEntry, resolveSectionInputs } from './section-component.registry';
 
 @Component({
   selector: 'app-storefront-section-renderer',
@@ -68,6 +68,6 @@ export class StorefrontSectionRendererComponent {
 
   private refreshInputs(): void {
     if (!this._entry || !this._section) return;
-    this.componentInputs.set(this._entry.inputs(this._section, this._orgSlug));
+    this.componentInputs.set(resolveSectionInputs(this._entry, this._section, this._orgSlug));
   }
 }

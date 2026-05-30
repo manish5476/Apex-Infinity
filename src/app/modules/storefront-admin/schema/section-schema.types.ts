@@ -7,6 +7,7 @@ export type SectionFieldType =
   | 'boolean'
   | 'number'
   | 'color'
+  | 'font'
   | 'image'
   | 'array'
   | 'object'
@@ -25,6 +26,7 @@ export interface SectionFieldSchema {
   enum?: unknown[];
   min?: number;
   max?: number;
+  step?: number;
   maxLength?: number;
   maxItems?: number;
   ref?: string;
