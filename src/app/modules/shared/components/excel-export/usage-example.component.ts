@@ -4,25 +4,25 @@
 
 import { Component } from '@angular/core';
 
-import { ColumnConfig, ExcelExportComponent, ExcelExportConfig } from './excel-export';
+import { ColumnConfig, ExcelExportDialogComponent, ExcelExportConfig } from './excel-export';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [ExcelExportComponent],
+  imports: [ExcelExportDialogComponent],
   template: `
     <div style="padding: 2rem; font-family: Segoe UI, sans-serif;">
       <h2>Invoice Register</h2>
 
       <!-- ── Example 1: Basic usage ── -->
-      <app-excel-export
+      <app-excel-export-dialog
         [data]="invoices"
         [columns]="invoiceColumns"
         [config]="exportConfig"
       />
 
       <!-- ── Example 2: Hide IDs + some keys ── -->
-      <app-excel-export
+      <app-excel-export-dialog
         style="margin-left: 12px"
         [data]="invoices"
         [columns]="invoiceColumns"
