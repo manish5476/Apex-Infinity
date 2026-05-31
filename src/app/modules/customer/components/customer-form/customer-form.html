@@ -394,6 +394,7 @@
                     endpoint="customers"
                     placeholder="Search customer by name or phone..."
                     [(ngModel)]="pendingGuarantorId"
+                    [ngModelOptions]="{standalone: true}"
                     [showClear]="true">
                   </app-master-dropdown>
                   <small class="text-[var(--text-tertiary)] text-[11px]">Only customers from this organisation can be guarantors.</small>
@@ -405,8 +406,10 @@
                     type="text"
                     pInputText
                     [(ngModel)]="pendingGuarantorNotes"
+                    [ngModelOptions]="{standalone: true}"
                     placeholder="e.g. Family relation, Business partner..."
                     class="w-full" />
+
                 </div>
 
                 <div class="flex gap-3 justify-end">

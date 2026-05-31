@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, DestroyRef } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup, FormsModule } from '@angular/forms';
@@ -44,6 +44,9 @@ export class CustomerForm implements OnInit {
   private route = inject(ActivatedRoute);
   public common = inject(CommonMethodService);
   private messageService = inject(AppMessageService);
+  // Fix NG0203: inject DestroyRef as a field so takeUntilDestroyed() can be
+  // called from any method, not just the constructor / injection context.
+  private readonly destroyRef = inject(DestroyRef);
 
   // Signals
   isSubmitting = signal(false);
@@ -130,7 +133,8 @@ export class CustomerForm implements OnInit {
         prev.email === curr.email &&
         prev.phone === curr.phone
       ),
-      takeUntilDestroyed()
+      // Pass destroyRef so this works when called outside the constructor
+      takeUntilDestroyed(this.destroyRef)
     ).subscribe(values => {
       this.performDuplicateCheck(values);
     });
@@ -174,7 +178,9 @@ export class CustomerForm implements OnInit {
 
     if (id) {
       this.customerId.set(id);
-      this.editMode.set(true); // Ensure we set this true
+      // Fix NG0100: defer the signal write past the current CD cycle so
+      // Angular does not see a value change after it has already checked.
+      setTimeout(() => this.editMode.set(true));
       this.loadCustomerData(id);
     }
   }
