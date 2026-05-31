@@ -49,6 +49,18 @@ export interface UpdateCreditLimitPayload {
   creditLimit: number;
 }
 
+export interface GuarantorEntry {
+  customerId: string;
+  notes?: string | null;
+  addedAt?: string;
+  addedBy?: string;
+}
+
+export interface AddGuarantorPayload {
+  guarantorId: string;
+  notes?: string;
+}
+
 // =============================================================================
 // Customer Service
 // =============================================================================
@@ -107,6 +119,40 @@ export class CustomerService extends BaseApiService {
 
   updateCreditLimit(customerId: string, data: UpdateCreditLimitPayload): Observable<any> {
     return this.patch(`${this.endpoint}/${customerId}/credit-limit`, data, 'updateCreditLimit');
+  }
+
+  // ============================================================
+  // ── Guarantor APIs ───────────────────────────────────────
+  // ============================================================
+
+  /** GET /customers/:id/with-guarantors — single customer with populated guarantor details */
+  getCustomerWithGuarantors(customerId: string): Observable<any> {
+    return this.get(`${this.endpoint}/${customerId}/with-guarantors`, {}, 'getCustomerWithGuarantors');
+  }
+
+  /**
+   * GET /customers/:id/guaranteed-customers
+   * Returns all customers for whom this customer is acting as guarantor,
+   * with their purchase stats, outstanding balance, etc.
+   */
+  getGuaranteedCustomers(guarantorCustomerId: string): Observable<any> {
+    return this.get(`${this.endpoint}/${guarantorCustomerId}/guaranteed-customers`, {}, 'getGuaranteedCustomers');
+  }
+
+  /**
+   * POST /customers/:id/guarantors
+   * Add a guarantor to a customer. The guarantorId must be a different customer in the same org.
+   */
+  addGuarantor(customerId: string, payload: AddGuarantorPayload): Observable<any> {
+    return this.post(`${this.endpoint}/${customerId}/guarantors`, payload, 'addGuarantor');
+  }
+
+  /**
+   * DELETE /customers/:id/guarantors/:guarantorId
+   * Remove a specific guarantor from a customer.
+   */
+  removeGuarantor(customerId: string, guarantorId: string): Observable<any> {
+    return this.delete(`${this.endpoint}/${customerId}/guarantors/${guarantorId}`, null, 'removeGuarantor');
   }
 
   // ============================================================

@@ -1,14 +1,18 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { DatePipe } from '@angular/common';
 
-import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, Validators, FormGroup, FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
-import { switchMap, of, debounceTime, distinctUntilChanged } from 'rxjs'; // <--- NEW: Required for chaining requests
+import { switchMap, of, debounceTime, distinctUntilChanged } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 // Services
 import { CustomerService } from '../../services/customer-service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
+
+// Shared
+import { MasterDropdownComponent } from '../../../shared/components/masterFilterDropdown/master-dropdown.component';
 
 // PrimeNG Modules
 import { InputTextModule } from 'primeng/inputtext';
@@ -27,7 +31,7 @@ import { AvatarModule } from 'primeng/avatar';
 @Component({
   selector: 'app-customer-form',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterModule, InputTextModule, FileUploadModule, ButtonModule, CheckboxModule, CardModule, InputNumberModule, DividerModule, ToastModule, SelectModule, TextareaModule, SkeletonModule, AvatarModule],
+  imports: [ReactiveFormsModule, FormsModule, RouterModule, DatePipe, InputTextModule, FileUploadModule, ButtonModule, CheckboxModule, CardModule, InputNumberModule, DividerModule, ToastModule, SelectModule, TextareaModule, SkeletonModule, AvatarModule, MasterDropdownComponent],
   providers: [CustomerService],
   templateUrl: './customer-form.html',
   styleUrls: ['./customer-form.scss']
@@ -46,7 +50,19 @@ export class CustomerForm implements OnInit {
   loadingData = signal(false);
   editMode = signal(false);
   customerId = signal<string | null>(null);
-  duplicateCustomer = signal<any>(null); // NEW: Stores found duplicate
+  duplicateCustomer = signal<any>(null);
+
+  // Guarantors signals
+  guarantors = signal<any[]>([]);           // populated list from server
+  addingGuarantor = signal(false);          // is the add-form visible
+  savingGuarantor = signal(false);          // API call in progress
+  removingGuarantorId = signal<string | null>(null); // which row is being removed
+  pendingGuarantorId: string | null = null; // selected from dropdown
+  pendingGuarantorNotes = '';               // notes input
+
+  // Guaranteed Customers
+  guaranteedCustomers = signal<any[]>([]);
+  loadingGuaranteed = signal(false);
 
   // Computed
   pageTitle = computed(() => this.editMode() ? 'Edit Customer' : 'Create New Customer');
@@ -109,9 +125,9 @@ export class CustomerForm implements OnInit {
   private setupDuplicateCheck(): void {
     this.customerForm.valueChanges.pipe(
       debounceTime(600),
-      distinctUntilChanged((prev, curr) => 
-        prev.name === curr.name && 
-        prev.email === curr.email && 
+      distinctUntilChanged((prev, curr) =>
+        prev.name === curr.name &&
+        prev.email === curr.email &&
         prev.phone === curr.phone
       ),
       takeUntilDestroyed()
@@ -165,11 +181,10 @@ export class CustomerForm implements OnInit {
 
   private loadCustomerData(id: string): void {
     this.loadingData.set(true);
-
     this.common.apiCall(
-      this.customerService.getCustomerDataWithId(id),
+      this.customerService.getCustomerWithGuarantors(id),
       (response: any) => {
-        const data = response.data?.data || response.data || response;
+        const data = response.data?.customer || response.data?.data || response.data || response;
         if (data) {
           this.customerForm.patchValue(data);
           if (data.avatar) this.currentAvatarUrl = data.avatar;
@@ -177,12 +192,29 @@ export class CustomerForm implements OnInit {
           // Patch nested addresses safely
           if (data.billingAddress) this.customerForm.get('billingAddress')?.patchValue(data.billingAddress);
           if (data.shippingAddress) this.customerForm.get('shippingAddress')?.patchValue(data.shippingAddress);
+
+          // Hydrate guarantors list — each entry has customerId populated with name/phone/isActive
+          if (data.guarantors) this.guarantors.set(data.guarantors);
         }
         this.loadingData.set(false);
       }
-      // Removed the redundant 'Fetch Customer Data' parameter assuming your common service
-      // is now using the new handleHttpError signature!
     );
+
+    // Also fetch guaranteed customers
+    this.loadingGuaranteed.set(true);
+    this.customerService.getGuaranteedCustomers(id).subscribe({
+      next: (response: any) => {
+        const data = response.data || response;
+        if (Array.isArray(data)) {
+          this.guaranteedCustomers.set(data);
+        }
+        this.loadingGuaranteed.set(false);
+      },
+      error: (error) => {
+        console.error('Failed to load guaranteed customers:', error);
+        this.loadingGuaranteed.set(false);
+      }
+    });
   }
 
   onFileUpload(event: any): void {
@@ -270,7 +302,7 @@ export class CustomerForm implements OnInit {
   private handleError(err: any) {
     this.isSubmitting.set(false);
     console.error('Error:', err);
-    
+
     // Completely replaced the manual extraction with your robust global handler
     this.messageService.handleHttpError(err);
   }
@@ -285,8 +317,95 @@ export class CustomerForm implements OnInit {
       });
     }
   }
+
   isFieldInvalid(field: string): boolean {
     const control = this.customerForm.get(field);
     return !!(control && control.invalid && (control.dirty || control.touched));
+  }
+
+  // ─── Guarantors UI Helpers ─────────────────────────────────────────────────
+
+  /** Show the guarantor add-form */
+  showAddGuarantorForm(): void {
+    this.pendingGuarantorId = null;
+    this.pendingGuarantorNotes = '';
+    this.addingGuarantor.set(true);
+  }
+
+  cancelAddGuarantor(): void {
+    this.addingGuarantor.set(false);
+    this.pendingGuarantorId = null;
+    this.pendingGuarantorNotes = '';
+  }
+
+  /** Called when the operator confirms adding a guarantor */
+  confirmAddGuarantor(): void {
+    const id = this.customerId();
+    if (!id || !this.pendingGuarantorId) {
+      this.messageService.showWarn('Please select a guarantor customer first.');
+      return;
+    }
+
+    this.savingGuarantor.set(true);
+    this.customerService.addGuarantor(id, {
+      guarantorId: this.pendingGuarantorId,
+      notes: this.pendingGuarantorNotes || undefined,
+    }).subscribe({
+      next: (res: any) => {
+        this.messageService.showSuccess(res.message || 'Guarantor added.');
+        // Reload guarantors from the enriched endpoint
+        this.reloadGuarantors(id);
+        this.cancelAddGuarantor();
+        this.savingGuarantor.set(false);
+      },
+      error: (err: any) => {
+        this.messageService.handleHttpError(err);
+        this.savingGuarantor.set(false);
+      },
+    });
+  }
+
+  /** Remove a guarantor entry */
+  removeGuarantor(guarantorCustomerId: string): void {
+    const id = this.customerId();
+    if (!id) return;
+
+    this.removingGuarantorId.set(guarantorCustomerId);
+    this.customerService.removeGuarantor(id, guarantorCustomerId).subscribe({
+      next: () => {
+        this.messageService.showSuccess('Guarantor removed.');
+        this.guarantors.update(list =>
+          list.filter(g => (g.customerId?._id || g.customerId) !== guarantorCustomerId)
+        );
+        this.removingGuarantorId.set(null);
+      },
+      error: (err: any) => {
+        this.messageService.handleHttpError(err);
+        this.removingGuarantorId.set(null);
+      },
+    });
+  }
+
+  private reloadGuarantors(customerId: string): void {
+    this.customerService.getCustomerWithGuarantors(customerId).subscribe({
+      next: (res: any) => {
+        const data = res.data?.customer || res.data;
+        if (data?.guarantors) this.guarantors.set(data.guarantors);
+      },
+      error: () => { },
+    });
+  }
+
+  /** Resolve display name from a populated or raw guarantor entry */
+  getGuarantorName(entry: any): string {
+    return entry.customerId?.name ?? 'Unknown';
+  }
+
+  getGuarantorPhone(entry: any): string {
+    return entry.customerId?.phone ?? '';
+  }
+
+  isGuarantorInactive(entry: any): boolean {
+    return entry.customerId?.isActive === false;
   }
 }
