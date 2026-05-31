@@ -253,7 +253,9 @@ export class NavbarSimpleComponent implements OnInit, OnDestroy {
       { label: 'New Arrivals', url: 'new-arrivals' },
       { label: 'Best Sellers', url: 'best-sellers' },
       { label: 'About', url: 'about' },
-      { label: 'Contact', url: 'contact' }
+      { label: 'Contact', url: 'contact' },
+      { label: 'Track Order', url: 'track-order' },
+      { label: 'FAQ', url: 'faq' }
     ];
   });
 

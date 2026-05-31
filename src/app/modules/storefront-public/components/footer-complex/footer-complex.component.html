@@ -26,6 +26,10 @@
                   <a [href]="link.url" class="footer-complex__link" target="_blank" rel="noopener">
                     {{ link.label }}
                   </a>
+                } @else if (link.absolute) {
+                  <a [routerLink]="[link.url]" class="footer-complex__link">
+                    {{ link.label }}
+                  </a>
                 } @else {
                   <a [routerLink]="linkFor(link.url)" class="footer-complex__link">
                     {{ link.label }}

@@ -1,19 +1,12 @@
 /* ==========================================================================
    MAIN SCREEN LAYOUT ENGINE — TOKEN-DRIVEN
-   Zero hardcoded colors. All values reference the canonical token system.
-
-   Z-INDEX STACK:
-     content            → 1 (natural flow)
-     header             → var(--z-fixed)           = 300
-     sidebar (desktop)  → var(--z-sticky)          = 200
-     backdrop           → var(--z-modal-backdrop)  = 400
-     sidebar (mobile)   → var(--z-modal)           = 500
+   Enhanced for "Raised Canvas" visual depth and contrast.
    ========================================================================== */
 
 // ── Structural constants ─────────────────────────────────────────────────────
-$sidebar-width : 260px;
-$header-height : 60px;
-$sidebar-peek : 6px;
+$sidebar-width: 260px;
+$header-height: 64px; // Slightly taller for modern breathing room
+$sidebar-peek: 6px;
 
 // ── 1. Host ──────────────────────────────────────────────────────────────────
 :host {
@@ -29,7 +22,8 @@ $sidebar-peek : 6px;
   flex-direction: column;
   overflow: hidden;
   position: relative;
-  background: transparent;
+  /* Shell background: creates contrast against the main canvas */
+  background: var(--bg-secondary);
 }
 
 // ── 3. Header ────────────────────────────────────────────────────────────────
@@ -37,7 +31,11 @@ app-mainscreen-header {
   height: $header-height;
   flex-shrink: 0;
   position: relative;
-  z-index: var(--z-fixed); // 300
+  z-index: var(--z-fixed);
+
+  /* Visual distinction */
+  background: var(--bg-secondary);
+  border-bottom: var(--ui-border-width) solid var(--border-primary);
 }
 
 // ── 4. Body row (sidebar + content column) ───────────────────────────────────
@@ -53,7 +51,10 @@ app-mainscreen-header {
 // ── 5. Sidebar ───────────────────────────────────────────────────────────────
 app-mainscreen-sidebar {
   flex-shrink: 0;
-  z-index: var(--z-sticky); // 200
+  z-index: var(--z-sticky);
+  background: var(--bg-secondary);
+  /* Subtle separator from the canvas */
+  border-right: var(--ui-border-width) solid var(--border-tertiary, var(--border-primary));
 }
 
 // ── 6. Content Column (Tab shell + Main scroll) ──────────────────────────────
@@ -63,46 +64,57 @@ app-mainscreen-sidebar {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: transparent;
   transition: margin-left var(--transition-slow);
 
-  // When sidebar is pinned, push the whole column
+  /* THE CANVAS: 
+     By setting this to primary while the shell is secondary, 
+     we create a distinct working area. 
+  */
+  background: var(--bg-primary);
+
+  // Optional: Add a top-left radius to make the canvas look like a "card" 
+  // sitting on top of the background (popular in modern SaaS apps).
+  border-top-left-radius: var(--ui-border-radius-lg);
+  box-shadow: -4px 4px 12px rgba(0, 0, 0, 0.02); // Extremely subtle depth inset
+
   .is-pinned:not(.is-mobile) & {
     margin-left: $sidebar-width;
   }
 }
 
-// ── 7. Tab Strip Fixed Shell ──────────────────────────────────────────────────
+// ── 7. Tab Strip Fixed Shell ─────────────────────────────────────────────────
 .tab-strip-shell {
   flex-shrink: 0;
   background: var(--bg-primary);
-  border-bottom: 1px solid var(--border-primary);
+  border-bottom: var(--ui-border-width) solid var(--border-primary);
   padding: var(--spacing-sm) var(--spacing-xl) 0;
   z-index: 100;
-  box-shadow: var(--shadow-sm);
+
+  /* Maintain the top-left radius logic if implemented */
+  border-top-left-radius: var(--ui-border-radius-lg);
 }
 
-// ── 8. Main Scrollable Content ────────────────────────────────────────────────
+// ── 8. Main Scrollable Content ───────────────────────────────────────────────
 .main-content {
   flex: 1;
-  min-height: 0; // critical for flex scroll
-  overflow: hidden; // ✅ CRITICAL: Force children (outlet wrapper) to handle scroll
+  min-height: 0;
+  overflow: hidden;
   width: 100%;
   display: flex;
   flex-direction: column;
-  padding: 0; // Removing global padding to allow full-screen grids
+  padding: 0;
   background: transparent;
 
-  // Themed scrollbar
   scrollbar-width: thin;
   scrollbar-color: var(--scroll-thumb) var(--scroll-track);
 
   &::-webkit-scrollbar {
-    width: 5px;
+    width: 6px;
   }
 
   &::-webkit-scrollbar-track {
     background: var(--scroll-track);
+    margin-top: var(--spacing-sm); // Pushes scrollbar slightly away from top edge
   }
 
   &::-webkit-scrollbar-thumb {
@@ -111,23 +123,24 @@ app-mainscreen-sidebar {
   }
 }
 
-// ── 9. Mobile overrides ───────────────────────────────────────────────────────
+// ── 9. Mobile overrides ──────────────────────────────────────────────────────
 .layout-root.is-mobile {
   .content-column {
     margin-left: 0 !important;
+    border-radius: 0; // Remove rounded canvas edge on mobile
   }
 }
 
-// ── 10. Mobile backdrop ────────────────────────────────────────────────────────
+// ── 10. Mobile backdrop ──────────────────────────────────────────────────────
 .mobile-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   z-index: var(--z-modal-backdrop);
   cursor: pointer;
-  animation: backdrop-in 0.2s ease-out;
+  animation: backdrop-in 0.25s ease-out forwards;
 }
 
 @keyframes backdrop-in {
@@ -140,7 +153,7 @@ app-mainscreen-sidebar {
   }
 }
 
-// ── 11. Tab Content Area & Empty State ────────────────────────────────────────
+// ── 11. Tab Content Area & Empty State ───────────────────────────────────────
 .tab-outlet-wrapper {
   flex: 1;
   min-height: 0;
@@ -148,27 +161,21 @@ app-mainscreen-sidebar {
   flex-direction: column;
   position: relative;
   width: 100%;
-  overflow-y: auto !important; // ✅ FIX: Parent wrapper MUST be the scrollable container
+  overflow-y: auto !important;
   scrollbar-gutter: stable;
 
-  // Direct page component injected into outlet
   ::ng-deep router-outlet+* {
     display: flex;
     flex-direction: column;
     width: 100%;
-
-    // ✅ CRITICAL UNFREEZE: 
-    // Allow the component to grow beyond its height but stay at least full-viewport
     height: auto !important;
     min-height: 100% !important;
-
-    // Let the parent (tab-outlet-wrapper) handle the scrollbar
     overflow: visible !important;
-
-    animation: tabFadeIn 0.2s ease-out;
+    animation: tabFadeIn 0.3s cubic-bezier(0.2, 0.9, 0.2, 1); // Smoother, non-linear fade
   }
 }
 
+/* Enhanced Empty State - More premium feel */
 .tab-empty-state {
   position: absolute;
   inset: 0;
@@ -176,38 +183,254 @@ app-mainscreen-sidebar {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1.5rem;
-  color: var(--text-tertiary);
+  gap: var(--spacing-xl);
+  color: var(--text-secondary);
   pointer-events: none;
-  background: var(--bg-primary);
+  background: transparent;
 
   i {
-    font-size: 4rem;
-    opacity: 0.15;
-    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    font-size: var(--font-size-5xl);
+    padding: var(--spacing-2xl);
+    border-radius: var(--ui-border-radius-pill);
+    /* Soft glowing background behind the icon */
+    background: var(--color-primary-bg);
+    color: var(--accent-primary);
+    box-shadow: 0 0 40px var(--color-primary-bg);
   }
 
   p {
-    font-size: 1.1rem;
-    font-weight: 500;
+    font-size: var(--font-size-lg);
+    font-family: var(--font-heading);
+    font-weight: var(--font-weight-medium);
     margin: 0;
-    max-width: 300px;
+    max-width: 320px;
     text-align: center;
-    line-height: 1.5;
+    line-height: var(--line-height-relaxed);
   }
 }
 
 @keyframes tabFadeIn {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(12px) scale(0.99); // Adds a slight scale for a "pop" effect
   }
 
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
+
+// /* ==========================================================================
+//    MAIN SCREEN LAYOUT ENGINE — TOKEN-DRIVEN
+//    Zero hardcoded colors. All values reference the canonical token system.
+
+//    Z-INDEX STACK:
+//      content            → 1 (natural flow)
+//      header             → var(--z-fixed)           = 300
+//      sidebar (desktop)  → var(--z-sticky)          = 200
+//      backdrop           → var(--z-modal-backdrop)  = 400
+//      sidebar (mobile)   → var(--z-modal)           = 500
+//    ========================================================================== */
+
+// // ── Structural constants ─────────────────────────────────────────────────────
+// $sidebar-width : 260px;
+// $header-height : 60px;
+// $sidebar-peek : 6px;
+
+// // ── 1. Host ──────────────────────────────────────────────────────────────────
+// :host {
+//   display: block;
+//   height: 100%;
+// }
+
+// // ── 2. Root shell ────────────────────────────────────────────────────────────
+// .layout-root {
+//   height: 100vh;
+//   width: 100vw;
+//   display: flex;
+//   flex-direction: column;
+//   overflow: hidden;
+//   position: relative;
+//   background: transparent;
+// }
+
+// // ── 3. Header ────────────────────────────────────────────────────────────────
+// app-mainscreen-header {
+//   height: $header-height;
+//   flex-shrink: 0;
+//   position: relative;
+//   z-index: var(--z-fixed); // 300
+// }
+
+// // ── 4. Body row (sidebar + content column) ───────────────────────────────────
+// .layout-body {
+//   flex: 1;
+//   min-height: 0;
+//   display: flex;
+//   flex-direction: row;
+//   position: relative;
+//   overflow: hidden;
+// }
+
+// // ── 5. Sidebar ───────────────────────────────────────────────────────────────
+// app-mainscreen-sidebar {
+//   flex-shrink: 0;
+//   z-index: var(--z-sticky); // 200
+// }
+
+// // ── 6. Content Column (Tab shell + Main scroll) ──────────────────────────────
+// .content-column {
+//   flex: 1;
+//   min-width: 0;
+//   display: flex;
+//   flex-direction: column;
+//   height: 100%;
+//   background: transparent;
+//   transition: margin-left var(--transition-slow);
+
+//   // When sidebar is pinned, push the whole column
+//   .is-pinned:not(.is-mobile) & {
+//     margin-left: $sidebar-width;
+//   }
+// }
+
+// // ── 7. Tab Strip Fixed Shell ──────────────────────────────────────────────────
+// .tab-strip-shell {
+//   flex-shrink: 0;
+//   background: var(--bg-primary);
+//   border-bottom: 1px solid var(--border-primary);
+//   padding: var(--spacing-sm) var(--spacing-xl) 0;
+//   z-index: 100;
+//   box-shadow: var(--shadow-sm);
+// }
+
+// // ── 8. Main Scrollable Content ────────────────────────────────────────────────
+// .main-content {
+//   flex: 1;
+//   min-height: 0; // critical for flex scroll
+//   overflow: hidden; // ✅ CRITICAL: Force children (outlet wrapper) to handle scroll
+//   width: 100%;
+//   display: flex;
+//   flex-direction: column;
+//   padding: 0; // Removing global padding to allow full-screen grids
+//   background: transparent;
+
+//   // Themed scrollbar
+//   scrollbar-width: thin;
+//   scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+
+//   &::-webkit-scrollbar {
+//     width: 5px;
+//   }
+
+//   &::-webkit-scrollbar-track {
+//     background: var(--scroll-track);
+//   }
+
+//   &::-webkit-scrollbar-thumb {
+//     background: var(--scroll-thumb);
+//     border-radius: var(--ui-border-radius-pill);
+//   }
+// }
+
+// // ── 9. Mobile overrides ───────────────────────────────────────────────────────
+// .layout-root.is-mobile {
+//   .content-column {
+//     margin-left: 0 !important;
+//   }
+// }
+
+// // ── 10. Mobile backdrop ────────────────────────────────────────────────────────
+// .mobile-backdrop {
+//   position: fixed;
+//   inset: 0;
+//   background: rgba(0, 0, 0, 0.45);
+//   backdrop-filter: blur(3px);
+//   -webkit-backdrop-filter: blur(3px);
+//   z-index: var(--z-modal-backdrop);
+//   cursor: pointer;
+//   animation: backdrop-in 0.2s ease-out;
+// }
+
+// @keyframes backdrop-in {
+//   from {
+//     opacity: 0;
+//   }
+
+//   to {
+//     opacity: 1;
+//   }
+// }
+
+// // ── 11. Tab Content Area & Empty State ────────────────────────────────────────
+// .tab-outlet-wrapper {
+//   flex: 1;
+//   min-height: 0;
+//   display: flex;
+//   flex-direction: column;
+//   position: relative;
+//   width: 100%;
+//   overflow-y: auto !important; // ✅ FIX: Parent wrapper MUST be the scrollable container
+//   scrollbar-gutter: stable;
+
+//   // Direct page component injected into outlet
+//   ::ng-deep router-outlet+* {
+//     display: flex;
+//     flex-direction: column;
+//     width: 100%;
+
+//     // ✅ CRITICAL UNFREEZE: 
+//     // Allow the component to grow beyond its height but stay at least full-viewport
+//     height: auto !important;
+//     min-height: 100% !important;
+
+//     // Let the parent (tab-outlet-wrapper) handle the scrollbar
+//     overflow: visible !important;
+
+//     animation: tabFadeIn 0.2s ease-out;
+//   }
+// }
+
+// .tab-empty-state {
+//   position: absolute;
+//   inset: 0;
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   justify-content: center;
+//   gap: 1.5rem;
+//   color: var(--text-tertiary);
+//   pointer-events: none;
+//   background: var(--bg-primary);
+
+//   i {
+//     font-size: 4rem;
+//     opacity: 0.15;
+//     background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+//     background-clip: text;
+//     -webkit-background-clip: text;
+//     -webkit-text-fill-color: transparent;
+//   }
+
+//   p {
+//     font-size: 1.1rem;
+//     font-weight: 500;
+//     margin: 0;
+//     max-width: 300px;
+//     text-align: center;
+//     line-height: 1.5;
+//   }
+// }
+
+// @keyframes tabFadeIn {
+//   from {
+//     opacity: 0;
+//     transform: translateY(8px);
+//   }
+
+//   to {
+//     opacity: 1;
+//     transform: translateY(0);
+//   }
+// }

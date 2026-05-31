@@ -491,13 +491,13 @@
                 <span class="tl-field"> · {{ fieldLabel($any(log).changes.field) }}</span>
                 }
               </p>
-              @if ($any(log).changes?.oldValue !== undefined) {
+              @if ($any(log).changes && $any(log).changes.oldValue !== undefined) {
               <p class="tl-change">
-                <span class="tl-old">{{ formatChangeValue($any(log).changes.oldValue) }}</span>
+                <span class="tl-old">{{ formatChangeValue($any(log).changes?.oldValue) }}</span>
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
-                <span class="tl-new">{{ formatChangeValue($any(log).changes.newValue) }}</span>
+                <span class="tl-new">{{ formatChangeValue($any(log).changes?.newValue) }}</span>
               </p>
               }
               <span class="tl-time">{{ log.createdAt | date:'MMM d · h:mm a' }}</span>

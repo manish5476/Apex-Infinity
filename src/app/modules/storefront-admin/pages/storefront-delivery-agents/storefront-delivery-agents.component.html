@@ -17,89 +17,94 @@
 
     <div class="grid-container">
       @if (error()) {
-        <div class="error-state">
-          <i class="pi pi-exclamation-triangle"></i>
-          <p>{{ error() }}</p>
-          <button class="premium-btn ghost-btn" (click)="load()">Try Again</button>
-        </div>
+      <div class="error-state">
+        <i class="pi pi-exclamation-triangle"></i>
+        <p>{{ error() }}</p>
+        <button class="premium-btn ghost-btn" (click)="load()">Try Again</button>
+      </div>
       } @else {
-        <div class="classic-grid-wrapper">
-          <p-table 
-            [value]="agents()" 
-            [columns]="cols" 
-            [loading]="loading()" 
-            [paginator]="true" 
-            [rows]="20"
-            styleClass="premium-p-table"
-            [rowHover]="true">
-            
-            <ng-template pTemplate="header" let-columns>
-              <tr>
-                <th *ngFor="let col of columns">{{ col.header }}</th>
-                <th style="width: 120px; text-align: center;">Actions</th>
-              </tr>
-            </ng-template>
+      <div class="classic-grid-wrapper">
+        <p-table [value]="agents()" [columns]="cols" [loading]="loading()" [paginator]="true" [rows]="20"
+          styleClass="premium-p-table" [rowHover]="true">
 
-            <ng-template pTemplate="body" let-agent let-columns="columns">
-              <tr>
-                <td>
-                  <div class="agent-name-cell">
-                    <div class="avatar-circle">
-                      {{ agent.name.charAt(0).toUpperCase() }}
-                    </div>
-                    <div class="agent-info">
-                      <span class="name">{{ agent.name }}</span>
-                      <span class="email" *ngIf="agent.email">{{ agent.email }}</span>
-                    </div>
-                  </div>
-                </td>
-                <td><span class="cell-text">{{ agent.phone }}</span></td>
-                <td>
-                  <span class="vehicle-badge">
-                    <i class="pi" 
-                       [class.pi-car]="agent.vehicleType === 'car'"
-                       [class.pi-truck]="agent.vehicleType === 'truck' || agent.vehicleType === 'van'"
-                       [class.pi-compass]="agent.vehicleType === 'bike' || agent.vehicleType === 'motorcycle'">
-                    </i>
-                    {{ agent.vehicleType || 'N/A' }}
-                  </span>
-                </td>
-                <td>
-                  <span class="mono-badge" *ngIf="agent.vehicleRegistrationNumber">{{ agent.vehicleRegistrationNumber }}</span>
-                  <span class="empty-text" *ngIf="!agent.vehicleRegistrationNumber">—</span>
-                </td>
-                <td>
-                  <p-tag [value]="agent.isActive ? 'Active' : 'Inactive'" [severity]="getStatusSeverity(agent.isActive)"></p-tag>
-                </td>
-                <td>
-                  <div class="action-buttons">
-                    <button class="icon-btn edit-btn" pTooltip="Edit Agent" tooltipPosition="left" (click)="openEdit(agent)">
-                      <i class="pi pi-pencil"></i>
-                    </button>
-                    <button class="icon-btn delete-btn" pTooltip="Delete Agent" tooltipPosition="left" (click)="deleteAgent(agent, $event)">
-                      <i class="pi pi-trash"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </ng-template>
+          <ng-template pTemplate="header" let-columns>
+            <tr>
+              <th *ngFor="let col of columns">{{ col.header }}</th>
+              <th style="width: 120px; text-align: center;">Actions</th>
+            </tr>
+          </ng-template>
 
-            <ng-template pTemplate="empty">
-              <tr>
-                <td colspan="6">
-                  <div class="empty-state-block">
-                    <div class="empty-icon-wrapper"><i class="pi pi-car"></i></div>
-                    <h3>No Delivery Agents Found</h3>
-                    <p>Add an internal delivery agent to assign them to orders.</p>
-                    <button class="premium-btn primary-btn" (click)="openNew()" style="margin-top: 12px;">
-                      <i class="pi pi-plus"></i> Add Your First Agent
-                    </button>
+          <ng-template pTemplate="body" let-agent let-columns="columns">
+            <tr>
+              <td>
+                <div class="agent-name-cell">
+                  <div class="avatar-circle">
+                    {{ agent.name.charAt(0).toUpperCase() }}
                   </div>
-                </td>
-              </tr>
-            </ng-template>
-          </p-table>
-        </div>
+                  <div class="agent-info">
+                    <span class="name">{{ agent.name }}</span>
+                    <span class="email" *ngIf="agent.email">{{ agent.email }}</span>
+                  </div>
+                </div>
+              </td>
+              <td><span class="cell-text">{{ agent.phone }}</span></td>
+              <td>
+                <span class="vehicle-badge">
+                  <i class="pi" [class.pi-car]="agent.vehicleType === 'car'"
+                    [class.pi-truck]="agent.vehicleType === 'truck' || agent.vehicleType === 'van'"
+                    [class.pi-compass]="agent.vehicleType === 'bike' || agent.vehicleType === 'motorcycle'">
+                  </i>
+                  {{ agent.vehicleType || 'N/A' }}
+                </span>
+              </td>
+              <td>
+                <span class="mono-badge" *ngIf="agent.vehicleRegistrationNumber">{{ agent.vehicleRegistrationNumber
+                  }}</span>
+                <span class="empty-text" *ngIf="!agent.vehicleRegistrationNumber">—</span>
+              </td>
+              <td>
+                <p-tag [value]="agent.isActive ? 'Active' : 'Inactive'"
+                  [severity]="getStatusSeverity(agent.isActive)"></p-tag>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button class="icon-btn email-btn" pTooltip="Send Email Invite" tooltipPosition="left"
+                    (click)="sendInvite(agent, $event)" *ngIf="agent.email">
+                    <i class="pi pi-envelope"></i>
+                  </button>
+                  <button class="icon-btn share-btn" pTooltip="Share Login Link" tooltipPosition="left"
+                    (click)="shareLoginLink(agent, $event)">
+                    <i class="pi pi-share-alt"></i>
+                  </button>
+                  <button class="icon-btn edit-btn" pTooltip="Edit Agent" tooltipPosition="left"
+                    (click)="openEdit(agent)">
+                    <i class="pi pi-pencil"></i>
+                  </button>
+                  <button class="icon-btn delete-btn" pTooltip="Delete Agent" tooltipPosition="left"
+                    (click)="deleteAgent(agent, $event)">
+                    <i class="pi pi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="empty">
+            <tr>
+              <td colspan="6">
+                <div class="empty-state-block">
+                  <div class="empty-icon-wrapper"><i class="pi pi-car"></i></div>
+                  <h3>No Delivery Agents Found</h3>
+                  <p>Add an internal delivery agent to assign them to orders.</p>
+                  <button class="premium-btn primary-btn" (click)="openNew()" style="margin-top: 12px;">
+                    <i class="pi pi-plus"></i> Add Your First Agent
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
       }
     </div>
   </section>
@@ -117,10 +122,10 @@
 
     <div class="panel-scroll panel-form-scroll">
       <div class="agent-form-grid">
-        
+
         <div class="bento-block form-block">
           <div class="block-header-mini">Basic Information</div>
-          
+
           <label class="form-label">
             Full Name <span class="required">*</span>
             <input type="text" [(ngModel)]="formAgent.name" class="premium-input" placeholder="e.g. John Doe" />
@@ -140,7 +145,8 @@
 
           <label class="form-label">
             Password <span class="required" *ngIf="!selectedAgent()">*</span>
-            <input type="password" [(ngModel)]="formAgent.password" class="premium-input" placeholder="Enter secure password..." />
+            <input type="password" [(ngModel)]="formAgent.password" class="premium-input"
+              placeholder="Enter secure password..." />
             <small class="hint-text" *ngIf="selectedAgent()">Leave blank to keep current password.</small>
           </label>
         </div>
@@ -162,7 +168,8 @@
 
             <label class="form-label">
               Registration Plate
-              <input type="text" [(ngModel)]="formAgent.vehicleRegistrationNumber" class="premium-input uppercase-input" placeholder="e.g. GJ-05-XX-1234" />
+              <input type="text" [(ngModel)]="formAgent.vehicleRegistrationNumber" class="premium-input uppercase-input"
+                placeholder="e.g. GJ-05-XX-1234" />
             </label>
           </div>
         </div>

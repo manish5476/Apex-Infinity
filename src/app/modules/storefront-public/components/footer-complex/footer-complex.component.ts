@@ -47,6 +47,13 @@ export class FooterComplexComponent {
           { label: 'Terms', url: 'terms-and-conditions' },
           { label: 'Refunds', url: 'refund-policy' }
         ]
+      },
+      {
+        title: 'Logistics',
+        links: [
+          { label: 'In-house Delivery Login', url: 'delivery/login' },
+          { label: 'Apex Network Login', url: '/apex-delivery/login', absolute: true }
+        ]
       }
     ];
   });

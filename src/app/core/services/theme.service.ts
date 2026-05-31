@@ -123,11 +123,25 @@ export class ThemeService implements OnDestroy {
     }
     effect(() => {
       const user = this.authService.currentUser();
-      if (user?.preferences?.theme) {
-        const isDark = user.preferences.theme === 'dark';
+      if (user) {
+        const userThemeId = user.themeId;
+        const isDark = user.preferences?.theme === 'dark';
         const current = this.settingsSubject.value;
+        let newSettings = { ...current };
+        let changed = false;
+
+        if (userThemeId && userThemeId !== 'theme-dark' && current.lightThemeClass !== userThemeId) {
+          newSettings.lightThemeClass = userThemeId;
+          changed = true;
+        }
+
         if (current.isDarkMode !== isDark) {
-          this.updateSettings({ ...current, isDarkMode: isDark }, false);
+          newSettings.isDarkMode = isDark;
+          changed = true;
+        }
+
+        if (changed) {
+          this.updateSettings(newSettings, false);
         }
       }
     });
