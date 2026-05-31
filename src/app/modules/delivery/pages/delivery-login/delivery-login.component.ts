@@ -73,6 +73,15 @@ import { DeliveryService } from '../../services/delivery.service';
               </span>
               <i class="pi pi-spin pi-spinner loader" *ngIf="loading"></i>
             </button>
+            
+            <div class="divider">
+              <span>or</span>
+            </div>
+
+            <button type="button" class="premium-btn secondary-btn" (click)="goToForgotPassword()">
+              <i class="pi pi-key"></i>
+              Forgot Password?
+            </button>
           </form>
         </div>
       </div>
@@ -524,6 +533,14 @@ export class DeliveryLoginComponent implements OnInit {
         this.error = err?.error?.message || 'Login failed. Please check your credentials and try again.';
       }
     });
+  }
+
+  goToForgotPassword() {
+    if (this.orgSlug) {
+      this.router.navigate(['/store', this.orgSlug, 'delivery', 'forgot-password']);
+    } else {
+      this.error = 'Organization slug missing.';
+    }
   }
 }
 // import { Component, inject, OnInit } from '@angular/core';

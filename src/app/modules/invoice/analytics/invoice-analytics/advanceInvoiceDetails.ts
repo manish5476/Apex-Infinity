@@ -236,6 +236,27 @@ export class AdvancedProfitAnalysisComponent implements OnInit, OnDestroy {
       ],
       defaultValue: 'all',
     },
+    {
+      key: 'branchId',
+      label: 'Branch',
+      type: 'select',
+      dataSourceKey: 'branches',
+      placeholder: 'All Branches',
+    },
+    {
+      key: 'customerId',
+      label: 'Customer',
+      type: 'select',
+      dataSourceKey: 'customers',
+      placeholder: 'All Customers',
+    },
+    {
+      key: 'productId',
+      label: 'Product',
+      type: 'select',
+      dataSourceKey: 'products',
+      placeholder: 'All Products',
+    },
   ];
 
   ngOnInit(): void {

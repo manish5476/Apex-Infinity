@@ -363,7 +363,7 @@ export class ThemeService implements OnDestroy {
       this.socketService.updateTheme(themeId);
       this.authService.updateUserPreferences({
         theme: settings.isDarkMode ? 'dark' : 'light'
-      });
+      }, themeId);
     }
   }
 

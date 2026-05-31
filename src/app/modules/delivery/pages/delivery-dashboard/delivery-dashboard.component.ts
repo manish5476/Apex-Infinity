@@ -17,8 +17,8 @@ import { Html5QrcodeScanner, Html5QrcodeScanType } from 'html5-qrcode';
           <h1>My Deliveries</h1>
         </div>
         <div class="header-actions" style="display: flex; gap: 10px;">
-          <button class="icon-btn" (click)="showPasswordModal = true" title="Change Password">
-            <i class="pi pi-key"></i>
+          <button class="icon-btn" (click)="openSettings()" title="Settings">
+            <i class="pi pi-cog"></i>
           </button>
           <button class="icon-btn logout-btn" (click)="logout()" title="Logout">
             <i class="pi pi-power-off"></i>
@@ -135,37 +135,88 @@ import { Html5QrcodeScanner, Html5QrcodeScanType } from 'html5-qrcode';
         </div>
       </div>
 
-      <!-- Change Password Modal -->
-      <div class="modal-overlay" *ngIf="showPasswordModal" style="z-index: 1000;">
-        <div class="modal-card">
+      <!-- Settings Modal -->
+      <div class="modal-overlay" *ngIf="showSettingsModal" style="z-index: 1000;">
+        <div class="modal-card settings-modal">
           <div class="modal-header">
-            <h3>Change Password</h3>
-            <button class="close-btn" (click)="showPasswordModal = false"><i class="pi pi-times"></i></button>
+            <h3>Settings</h3>
+            <button class="close-btn" (click)="showSettingsModal = false"><i class="pi pi-times"></i></button>
           </div>
           
-          <div class="form-group" style="margin-bottom: 15px;">
-            <label style="display: block; margin-bottom: 8px; color: #64748b; font-size: 0.9rem;">Current Password</label>
-            <input type="password" [(ngModel)]="passwordForm.oldPassword" class="premium-input" placeholder="Enter current password">
+          <div class="scan-tabs">
+            <button [class.active]="settingsTab === 'profile'" (click)="settingsTab = 'profile'">Profile</button>
+            <button [class.active]="settingsTab === 'security'" (click)="settingsTab = 'security'">Security</button>
           </div>
           
-          <div class="form-group" style="margin-bottom: 15px;">
-            <label style="display: block; margin-bottom: 8px; color: #64748b; font-size: 0.9rem;">New Password</label>
-            <input type="password" [(ngModel)]="passwordForm.newPassword" class="premium-input" placeholder="Enter new password">
+          <!-- Profile Tab -->
+          <div class="tab-content" *ngIf="settingsTab === 'profile'">
+            <div *ngIf="loadingProfile" style="text-align: center; padding: 20px;">
+              <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: #38bdf8;"></i>
+            </div>
+            
+            <form *ngIf="!loadingProfile" (ngSubmit)="updateProfile()" #profileForm="ngForm">
+              <div class="form-group" style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 8px; color: #64748b; font-size: 0.9rem;">Email Address</label>
+                <input type="email" name="email" [(ngModel)]="profileData.email" class="premium-input" placeholder="agent@example.com">
+              </div>
+              
+              <div class="form-group" style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 8px; color: #64748b; font-size: 0.9rem;">Alternate Phone (Optional)</label>
+                <input type="tel" name="alternatePhone" [(ngModel)]="profileData.alternatePhone" class="premium-input" placeholder="Secondary contact number">
+              </div>
+              
+              <div class="form-group" style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 8px; color: #64748b; font-size: 0.9rem;">Vehicle Type</label>
+                <select name="vehicleType" [(ngModel)]="profileData.vehicleType" class="premium-input">
+                  <option value="Bike">Bike</option>
+                  <option value="Scooter">Scooter</option>
+                  <option value="Van">Van</option>
+                  <option value="Car">Car</option>
+                  <option value="Truck">Truck</option>
+                </select>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 8px; color: #64748b; font-size: 0.9rem;">Vehicle Registration Number</label>
+                <input type="text" name="vehicleReg" [(ngModel)]="profileData.vehicleRegistrationNumber" class="premium-input" placeholder="e.g. MH12 AB 1234">
+              </div>
+              
+              <div class="error-message" *ngIf="profileError" style="color: #ef4444; margin-bottom: 15px; font-size: 0.9rem;">{{ profileError }}</div>
+              <div class="success-message" *ngIf="profileSuccess" style="color: #16a34a; margin-bottom: 15px; font-size: 0.9rem;">{{ profileSuccess }}</div>
+              
+              <button type="submit" class="premium-btn primary-btn full-width" [disabled]="updatingProfile">
+                <i class="pi pi-spin pi-spinner" *ngIf="updatingProfile"></i>
+                {{ updatingProfile ? 'Saving...' : 'Save Profile' }}
+              </button>
+            </form>
           </div>
-          
-          <div class="error-message" *ngIf="passwordError" style="color: #ef4444; margin-bottom: 15px; font-size: 0.9rem;">{{ passwordError }}</div>
-          <div class="success-message" *ngIf="passwordSuccess" style="color: #16a34a; margin-bottom: 15px; font-size: 0.9rem;">{{ passwordSuccess }}</div>
-          
-          <button class="premium-btn primary-btn full-width" (click)="updatePassword()" [disabled]="updatingPassword || !passwordForm.oldPassword || !passwordForm.newPassword">
-            <i class="pi pi-spin pi-spinner" *ngIf="updatingPassword"></i>
-            {{ updatingPassword ? 'Updating...' : 'Update Password' }}
-          </button>
+
+          <!-- Security Tab -->
+          <div class="tab-content" *ngIf="settingsTab === 'security'">
+            <div class="form-group" style="margin-bottom: 15px;">
+              <label style="display: block; margin-bottom: 8px; color: #64748b; font-size: 0.9rem;">Current Password</label>
+              <input type="password" [(ngModel)]="passwordForm.oldPassword" class="premium-input" placeholder="Enter current password">
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 15px;">
+              <label style="display: block; margin-bottom: 8px; color: #64748b; font-size: 0.9rem;">New Password</label>
+              <input type="password" [(ngModel)]="passwordForm.newPassword" class="premium-input" placeholder="Enter new password">
+            </div>
+            
+            <div class="error-message" *ngIf="passwordError" style="color: #ef4444; margin-bottom: 15px; font-size: 0.9rem;">{{ passwordError }}</div>
+            <div class="success-message" *ngIf="passwordSuccess" style="color: #16a34a; margin-bottom: 15px; font-size: 0.9rem;">{{ passwordSuccess }}</div>
+            
+            <button class="premium-btn primary-btn full-width" (click)="updatePassword()" [disabled]="updatingPassword || !passwordForm.oldPassword || !passwordForm.newPassword">
+              <i class="pi pi-spin pi-spinner" *ngIf="updatingPassword"></i>
+              {{ updatingPassword ? 'Updating...' : 'Update Password' }}
+            </button>
+          </div>
         </div>
       </div>
 
       <!-- Slide Up Detail View -->
-      <div class="detail-overlay" *ngIf="selectedOrder && !showScanner && !showPaymentModal && !showPasswordModal" (click)="closeDetails()"></div>
-      <div class="detail-sheet" [class.open]="selectedOrder && !showScanner && !showPaymentModal && !showPasswordModal">
+      <div class="detail-overlay" *ngIf="selectedOrder && !showScanner && !showPaymentModal && !showSettingsModal" (click)="closeDetails()"></div>
+      <div class="detail-sheet" [class.open]="selectedOrder && !showScanner && !showPaymentModal && !showSettingsModal">
         <div class="drag-handle" (click)="closeDetails()"></div>
         <div class="sheet-content" *ngIf="selectedOrder as order">
           <div class="sheet-header">
@@ -451,8 +502,15 @@ export class DeliveryDashboardComponent implements OnInit, OnDestroy {
   // Payment Collection state
   showPaymentModal = false;
 
-  // Password Update State
-  showPasswordModal = false;
+  // Settings Update State
+  showSettingsModal = false;
+  settingsTab: 'profile' | 'security' = 'profile';
+
+  profileData = { email: '', alternatePhone: '', vehicleType: 'Bike', vehicleRegistrationNumber: '' };
+  loadingProfile = false;
+  updatingProfile = false;
+  profileError = '';
+  profileSuccess = '';
   passwordForm = { oldPassword: '', newPassword: '' };
   updatingPassword = false;
   passwordError = '';
@@ -632,6 +690,58 @@ export class DeliveryDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  openSettings() {
+    this.showSettingsModal = true;
+    this.settingsTab = 'profile';
+    this.passwordError = '';
+    this.passwordSuccess = '';
+    this.profileError = '';
+    this.profileSuccess = '';
+    this.passwordForm = { oldPassword: '', newPassword: '' };
+    this.loadProfile();
+  }
+
+  loadProfile() {
+    this.loadingProfile = true;
+    this.deliveryService.getProfile(this.orgSlug).subscribe({
+      next: (res) => {
+        this.loadingProfile = false;
+        if (res.data) {
+          this.profileData = {
+            email: res.data.email || '',
+            alternatePhone: res.data.alternatePhone || '',
+            vehicleType: res.data.vehicleType || 'Bike',
+            vehicleRegistrationNumber: res.data.vehicleRegistrationNumber || ''
+          };
+        }
+      },
+      error: (err) => {
+        this.loadingProfile = false;
+        this.profileError = 'Failed to load profile details.';
+      }
+    });
+  }
+
+  updateProfile() {
+    this.profileError = '';
+    this.profileSuccess = '';
+    this.updatingProfile = true;
+
+    this.deliveryService.updateProfile(this.orgSlug, this.profileData).subscribe({
+      next: (res) => {
+        this.updatingProfile = false;
+        this.profileSuccess = 'Profile updated successfully!';
+        setTimeout(() => {
+          this.profileSuccess = '';
+        }, 3000);
+      },
+      error: (err) => {
+        this.updatingProfile = false;
+        this.profileError = err?.error?.message || 'Failed to update profile';
+      }
+    });
+  }
+
   updatePassword() {
     this.passwordError = '';
     this.passwordSuccess = '';
@@ -642,7 +752,6 @@ export class DeliveryDashboardComponent implements OnInit, OnDestroy {
         this.updatingPassword = false;
         this.passwordSuccess = 'Password updated successfully!';
         setTimeout(() => {
-          this.showPasswordModal = false;
           this.passwordForm = { oldPassword: '', newPassword: '' };
           this.passwordSuccess = '';
         }, 1500);

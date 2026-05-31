@@ -33,6 +33,7 @@ export class StorefrontDeliveryAgentsComponent implements OnInit {
     password: '',
     vehicleType: 'van',
     vehicleRegistrationNumber: '',
+    alternatePhone: '',
     isActive: true
   };
 
@@ -71,6 +72,7 @@ export class StorefrontDeliveryAgentsComponent implements OnInit {
       password: '',
       vehicleType: 'van',
       vehicleRegistrationNumber: '',
+      alternatePhone: '',
       isActive: true
     };
     this.drawerVisible.set(true);
@@ -85,6 +87,7 @@ export class StorefrontDeliveryAgentsComponent implements OnInit {
       password: '', // blank intentionally for edit
       vehicleType: agent.vehicleType || 'van',
       vehicleRegistrationNumber: agent.vehicleRegistrationNumber || '',
+      alternatePhone: agent.alternatePhone || '',
       isActive: agent.isActive !== false // default true
     };
     this.drawerVisible.set(true);
@@ -96,8 +99,8 @@ export class StorefrontDeliveryAgentsComponent implements OnInit {
   }
 
   saveAgent(): void {
-    if (!this.formAgent.name || !this.formAgent.phone) {
-      this.error.set('Name and Phone are required.');
+    if (!this.formAgent.name || !this.formAgent.phone || !this.formAgent.email) {
+      this.error.set('Name, Phone, and Email are required.');
       return;
     }
 

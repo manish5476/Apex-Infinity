@@ -36,4 +36,22 @@ export class DeliveryService {
   updatePassword(orgSlug: string, oldPassword: string, newPassword: string): Observable<any> {
     return this.http.patch(`${this.base}/update-password`, { oldPassword, newPassword }, this.getHeaders(orgSlug));
   }
+
+  forgotPassword(orgSlug: string, phoneOrEmail: string): Observable<any> {
+    const isEmail = phoneOrEmail.includes('@');
+    const payload = isEmail ? { orgSlug, email: phoneOrEmail } : { orgSlug, phone: phoneOrEmail };
+    return this.http.post(`${this.base}/forgot-password`, payload);
+  }
+
+  resetPassword(token: string, password: string): Observable<any> {
+    return this.http.patch(`${this.base}/reset-password/${token}`, { password });
+  }
+
+  getProfile(orgSlug: string): Observable<any> {
+    return this.http.get(`${this.base}/profile`, this.getHeaders(orgSlug));
+  }
+
+  updateProfile(orgSlug: string, data: any): Observable<any> {
+    return this.http.patch(`${this.base}/profile`, data, this.getHeaders(orgSlug));
+  }
 }

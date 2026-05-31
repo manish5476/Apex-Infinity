@@ -138,10 +138,15 @@
             </label>
 
             <label class="form-label">
-              Email Address
+              Email Address <span class="required">*</span>
               <input type="email" [(ngModel)]="formAgent.email" class="premium-input" placeholder="agent@store.com" />
             </label>
           </div>
+
+          <label class="form-label">
+            Alternate Phone Number <span class="optional-text">(Optional)</span>
+            <input type="text" [(ngModel)]="formAgent.alternatePhone" class="premium-input" placeholder="+91 12345 67890" />
+          </label>
 
           <label class="form-label">
             Password <span class="required" *ngIf="!selectedAgent()">*</span>
