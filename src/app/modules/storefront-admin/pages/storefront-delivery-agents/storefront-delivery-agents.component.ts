@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { StorefrontAdminService } from '@core/services/storefront-admin.service';
 import { catchError, of } from 'rxjs';
@@ -13,7 +13,7 @@ import { AppMessageService } from '@core/services/message.service';
 @Component({
   selector: 'app-storefront-delivery-agents',
   standalone: true,
-  imports: [CommonModule, FormsModule, TableModule, TagModule, TooltipModule, DrawerModule],
+  imports: [FormsModule, TableModule, TagModule, TooltipModule, DrawerModule],
   templateUrl: './storefront-delivery-agents.component.html',
   styleUrls: ['./storefront-delivery-agents.component.scss']
 })

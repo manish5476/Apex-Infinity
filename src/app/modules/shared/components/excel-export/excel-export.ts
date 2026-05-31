@@ -5,7 +5,7 @@ import {
   computed,
   signal,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import * as ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 
@@ -414,7 +414,7 @@ function extractNestedData(data: Record<string, unknown>[], configs: NestedSheet
 @Component({
   selector: 'app-excel-export-dialog',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <button 

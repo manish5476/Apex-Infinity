@@ -46,7 +46,7 @@ import {
   signal,
   OnInit,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import type { ICellRendererAngularComp } from 'ag-grid-angular';
 import type { ICellRendererParams } from 'ag-grid-community';
 
@@ -102,7 +102,7 @@ const STATUS_COLOUR: Record<string, string> = {
 @Component({
   selector: 'app-avatar-name-renderer',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `

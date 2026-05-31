@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation, inject, signal, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { Subject } from 'rxjs';
@@ -27,7 +27,6 @@ import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
   selector: 'app-invoice-list',
   standalone: true,
   imports: [
-    CommonModule,
     SelectModule,
     FormsModule,
     ButtonModule,
@@ -38,7 +37,7 @@ import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
     AgShareGrid,
     HasPermissionDirective,
     MasterDropdownComponent
-  ],
+],
   template: `
     <p-toast position="bottom-right"></p-toast>
 

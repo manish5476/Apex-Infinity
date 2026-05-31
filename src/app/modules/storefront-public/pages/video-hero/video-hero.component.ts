@@ -34,44 +34,52 @@ export interface VideoHeroConfig extends SectionBaseConfig {
   encapsulation: ViewEncapsulation.None,
   template: `
     <section class="video-hero" [ngStyle]="hostStyles()">
-      
+    
       @if (cfg().videoUrl) {
         <video class="video-hero__video"
-               [src]="cfg().videoUrl"
-               [poster]="cfg().posterImage"
-               autoplay muted loop playsinline
-               disablePictureInPicture
-               aria-hidden="true">
+          [src]="cfg().videoUrl"
+          [poster]="cfg().posterImage"
+          autoplay muted loop playsinline
+          disablePictureInPicture
+          aria-hidden="true">
         </video>
       }
-      
+    
       <div class="video-hero__overlay" [style.opacity]="cfg().overlayOpacity / 100"></div>
       <div class="video-hero__gradient-lock"></div>
-      
+    
       <div class="video-hero__inner" [ngClass]="'video-hero__inner--' + cfg().contentPosition">
         <div class="video-hero__content" [ngClass]="'video-hero__content--' + cfg().alignment">
-          
+    
           @if (cfg().title) {
-            <ng-container [ngSwitch]="cfg().titleTag">
-              <h1 *ngSwitchCase="'h1'" class="video-hero__title" [ngStyle]="headingStyle()">{{ cfg().title }}</h1>
-              <h2 *ngSwitchCase="'h2'" class="video-hero__title" [ngStyle]="headingStyle()">{{ cfg().title }}</h2>
-              <h3 *ngSwitchCase="'h3'" class="video-hero__title" [ngStyle]="headingStyle()">{{ cfg().title }}</h3>
-              <h1 *ngSwitchDefault class="video-hero__title" [ngStyle]="headingStyle()">{{ cfg().title }}</h1>
-            </ng-container>
+            @switch (cfg().titleTag) {
+              @case ('h1') {
+                <h1 class="video-hero__title" [ngStyle]="headingStyle()">{{ cfg().title }}</h1>
+              }
+              @case ('h2') {
+                <h2 class="video-hero__title" [ngStyle]="headingStyle()">{{ cfg().title }}</h2>
+              }
+              @case ('h3') {
+                <h3 class="video-hero__title" [ngStyle]="headingStyle()">{{ cfg().title }}</h3>
+              }
+              @default {
+                <h1 class="video-hero__title" [ngStyle]="headingStyle()">{{ cfg().title }}</h1>
+              }
+            }
           }
-
+    
           @if (cfg().subtitle) {
             <p class="video-hero__subtitle" [ngStyle]="bodyStyle()">{{ cfg().subtitle }}</p>
           }
-
+    
           @if (cfg().ctaButtons?.length) {
             <div class="video-hero__actions">
               @for (btn of cfg().ctaButtons; track btn.text) {
                 @if (btn.text) {
-                  <a [href]="btn.link || '#'" 
-                     class="vhero-btn" 
-                     [ngClass]="'vhero-btn--' + (btn.variant ?? 'primary')"
-                     [ngStyle]="buttonStyle(btn)">
+                  <a [href]="btn.link || '#'"
+                    class="vhero-btn"
+                    [ngClass]="'vhero-btn--' + (btn.variant ?? 'primary')"
+                    [ngStyle]="buttonStyle(btn)">
                     @if (btn.icon) { <i [class]="btn.icon" aria-hidden="true"></i> }
                     <span [ngStyle]="{'font-family': cfg().typography?.headingFont || 'var(--font-heading)'}">{{ btn.text }}</span>
                   </a>
@@ -82,7 +90,7 @@ export interface VideoHeroConfig extends SectionBaseConfig {
         </div>
       </div>
     </section>
-  `,
+    `,
   styles: [`
     :host { display: block; width: 100%; }
     .video-hero { position: relative; display: flex; flex-direction: column; overflow: hidden; font-family: 'Google Sans', Roboto, sans-serif; background-color: #202124; }

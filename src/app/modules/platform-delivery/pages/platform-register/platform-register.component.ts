@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { PlatformDeliveryService } from '../../services/platform-delivery.service';
@@ -7,124 +7,130 @@ import { PlatformDeliveryService } from '../../services/platform-delivery.servic
 @Component({
   selector: 'app-platform-register',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [FormsModule, RouterModule],
   template: `
     <div class="auth-wrapper">
       <div class="auth-card">
-        
+    
         <div class="illustration-panel">
           <div class="illustration-content">
             <h2>Join Apex Global</h2>
             <p>Become a partner and scale your logistics network across the globe.</p>
           </div>
         </div>
-
+    
         <div class="form-panel scrollable-panel">
           <div class="form-header">
             <h1>Sign up</h1>
             <p>Small step for your knowledge, giant leap for your network.</p>
           </div>
-          
+    
           <form (ngSubmit)="onSubmit()" #regForm="ngForm" class="auth-form">
             <div class="form-group">
               <label>Full Name</label>
-              <input 
-                type="text" 
-                name="name" 
-                [(ngModel)]="form.name" 
-                required 
-                class="premium-input" 
+              <input
+                type="text"
+                name="name"
+                [(ngModel)]="form.name"
+                required
+                class="premium-input"
                 placeholder="e.g. John Doe">
-            </div>
-
-            <div class="form-group">
-              <label>Phone Number</label>
-              <input 
-                type="text" 
-                name="phone" 
-                [(ngModel)]="form.phone" 
-                required 
-                class="premium-input" 
-                placeholder="e.g. 9876543210">
-            </div>
-            
-            <div class="form-group">
-              <label>Password</label>
-              <input 
-                type="password" 
-                name="password" 
-                [(ngModel)]="form.password" 
-                required 
-                class="premium-input" 
-                placeholder="Create a strong password">
-            </div>
-
-            <div class="form-row">
-              <div class="form-group half-width">
-                <label>City</label>
-                <input 
-                  type="text" 
-                  name="city" 
-                  [(ngModel)]="form.city" 
-                  required 
-                  class="premium-input" 
-                  placeholder="City">
               </div>
-              <div class="form-group half-width">
-                <label>State</label>
-                <input 
-                  type="text" 
-                  name="state" 
-                  [(ngModel)]="form.state" 
-                  required 
-                  class="premium-input" 
-                  placeholder="State">
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label>Zip/Postal Code</label>
-              <input 
-                type="text" 
-                name="zipCode" 
-                [(ngModel)]="form.zipCode" 
-                required 
-                class="premium-input" 
-                placeholder="e.g. 110001">
-            </div>
-            
-            <div class="error-message" *ngIf="error">
-              <i class="pi pi-exclamation-circle"></i> {{ error }}
-            </div>
-            
-            <button type="submit" class="premium-btn primary-btn full-width" [disabled]="regForm.invalid || loading">
-              <i class="pi pi-spin pi-spinner" *ngIf="loading"></i>
-              <span *ngIf="!loading">Sign up</span>
-            </button>
-
-            <div class="divider">
-              <span>Or sign up with</span>
-            </div>
-
-            <div class="social-auth">
-              <button type="button" class="social-btn">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google">
-              </button>
-              <button type="button" class="social-btn">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft">
-              </button>
-            </div>
-
-            <div class="links">
-              <span>Already a partner?</span>
-              <a routerLink="/apex-delivery/login">Log in</a>
-            </div>
-          </form>
-        </div>
-
-      </div>
-    </div>
-  `,
+    
+              <div class="form-group">
+                <label>Phone Number</label>
+                <input
+                  type="text"
+                  name="phone"
+                  [(ngModel)]="form.phone"
+                  required
+                  class="premium-input"
+                  placeholder="e.g. 9876543210">
+                </div>
+    
+                <div class="form-group">
+                  <label>Password</label>
+                  <input
+                    type="password"
+                    name="password"
+                    [(ngModel)]="form.password"
+                    required
+                    class="premium-input"
+                    placeholder="Create a strong password">
+                  </div>
+    
+                  <div class="form-row">
+                    <div class="form-group half-width">
+                      <label>City</label>
+                      <input
+                        type="text"
+                        name="city"
+                        [(ngModel)]="form.city"
+                        required
+                        class="premium-input"
+                        placeholder="City">
+                      </div>
+                      <div class="form-group half-width">
+                        <label>State</label>
+                        <input
+                          type="text"
+                          name="state"
+                          [(ngModel)]="form.state"
+                          required
+                          class="premium-input"
+                          placeholder="State">
+                        </div>
+                      </div>
+    
+                      <div class="form-group">
+                        <label>Zip/Postal Code</label>
+                        <input
+                          type="text"
+                          name="zipCode"
+                          [(ngModel)]="form.zipCode"
+                          required
+                          class="premium-input"
+                          placeholder="e.g. 110001">
+                        </div>
+    
+                        @if (error) {
+                          <div class="error-message">
+                            <i class="pi pi-exclamation-circle"></i> {{ error }}
+                          </div>
+                        }
+    
+                        <button type="submit" class="premium-btn primary-btn full-width" [disabled]="regForm.invalid || loading">
+                          @if (loading) {
+                            <i class="pi pi-spin pi-spinner"></i>
+                          }
+                          @if (!loading) {
+                            <span>Sign up</span>
+                          }
+                        </button>
+    
+                        <div class="divider">
+                          <span>Or sign up with</span>
+                        </div>
+    
+                        <div class="social-auth">
+                          <button type="button" class="social-btn">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google">
+                          </button>
+                          <button type="button" class="social-btn">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft">
+                          </button>
+                        </div>
+    
+                        <div class="links">
+                          <span>Already a partner?</span>
+                          <a routerLink="/apex-delivery/login">Log in</a>
+                        </div>
+                      </form>
+                    </div>
+    
+                  </div>
+                </div>
+    `,
   styles: [`
     .auth-wrapper {
       min-height: 100vh;

@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, ViewEncapsulation, inject, signal, computed, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
 // ---------------------------------------------------------------------------
@@ -51,7 +51,7 @@ const PAGE_LIBRARY: Record<string, ExperiencePage> = {
 @Component({
   selector: 'app-storefront-experience',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [RouterModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
   template: `

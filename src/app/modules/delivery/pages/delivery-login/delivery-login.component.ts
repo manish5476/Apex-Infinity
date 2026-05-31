@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { DeliveryService } from '../../services/delivery.service';
@@ -7,16 +7,16 @@ import { DeliveryService } from '../../services/delivery.service';
 @Component({
   selector: 'app-delivery-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   template: `
     <div class="split-layout">
-      
+    
       <!-- ── Left: Form Section ────────────────────────────────────────── -->
       <div class="form-section">
-        
+    
         <!-- Subtle background glow powered by theme accent -->
         <div class="glow-orb"></div>
-
+    
         <div class="form-wrapper">
           <div class="brand">
             <div class="icon-wrapper">
@@ -25,97 +25,101 @@ import { DeliveryService } from '../../services/delivery.service';
             <h1>APEX Delivery</h1>
             <p>Login to manage your assigned orders for <span class="org-highlight">{{ orgSlug || 'your store' }}</span>.</p>
           </div>
-          
+    
           <form (ngSubmit)="onSubmit()" #loginForm="ngForm" class="login-form">
             <!-- Phone Number Input -->
             <div class="form-group">
               <label for="phone">Phone Number</label>
               <div class="input-container">
                 <i class="pi pi-phone input-icon"></i>
-                <input 
-                  type="tel" 
+                <input
+                  type="tel"
                   id="phone"
-                  name="phone" 
-                  [(ngModel)]="credentials.phone" 
-                  required 
-                  class="premium-input" 
+                  name="phone"
+                  [(ngModel)]="credentials.phone"
+                  required
+                  class="premium-input"
                   placeholder="e.g. 9876543210"
                   autocomplete="tel">
+                </div>
               </div>
+    
+              <!-- Password Input -->
+              <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-container">
+                  <i class="pi pi-lock input-icon"></i>
+                  <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    [(ngModel)]="credentials.password"
+                    required
+                    class="premium-input"
+                    placeholder="Enter password">
+                  </div>
+                </div>
+    
+                <!-- Error Message using semantic status tokens -->
+                @if (error) {
+                  <div class="error-message">
+                    <i class="pi pi-exclamation-circle"></i>
+                    <span>{{ error }}</span>
+                  </div>
+                }
+    
+                <button type="submit" class="premium-btn primary-btn" [disabled]="loginForm.invalid || loading">
+                  <span class="btn-content" [class.is-hidden]="loading">
+                    Secure Login
+                    <i class="pi pi-arrow-right"></i>
+                  </span>
+                  @if (loading) {
+                    <i class="pi pi-spin pi-spinner loader"></i>
+                  }
+                </button>
+    
+                <div class="divider">
+                  <span>or</span>
+                </div>
+    
+                <button type="button" class="premium-btn secondary-btn" (click)="goToForgotPassword()">
+                  <i class="pi pi-key"></i>
+                  Forgot Password?
+                </button>
+              </form>
             </div>
-
-            <!-- Password Input -->
-            <div class="form-group">
-              <label for="password">Password</label>
-              <div class="input-container">
-                <i class="pi pi-lock input-icon"></i>
-                <input 
-                  type="password" 
-                  id="password"
-                  name="password" 
-                  [(ngModel)]="credentials.password" 
-                  required 
-                  class="premium-input" 
-                  placeholder="Enter password">
-              </div>
-            </div>
-            
-            <!-- Error Message using semantic status tokens -->
-            <div class="error-message" *ngIf="error">
-              <i class="pi pi-exclamation-circle"></i>
-              <span>{{ error }}</span>
-            </div>
-            
-            <button type="submit" class="premium-btn primary-btn" [disabled]="loginForm.invalid || loading">
-              <span class="btn-content" [class.is-hidden]="loading">
-                Secure Login
-                <i class="pi pi-arrow-right"></i>
-              </span>
-              <i class="pi pi-spin pi-spinner loader" *ngIf="loading"></i>
-            </button>
-            
-            <div class="divider">
-              <span>or</span>
-            </div>
-
-            <button type="button" class="premium-btn secondary-btn" (click)="goToForgotPassword()">
-              <i class="pi pi-key"></i>
-              Forgot Password?
-            </button>
-          </form>
-        </div>
-      </div>
-
-      <!-- ── Right: Image/Showcase Section ─────────────────────────────── -->
-      <div class="hero-section">
-        <div class="hero-overlay"></div>
-        
-        <!-- Floating Glass Card for Premium Feel -->
-        <div class="hero-content">
-          <div class="glass-feature-card">
-            <div class="feature-header">
-              <div class="status-dot"></div>
-              <span>APEX Fleet Management</span>
-            </div>
-            <h3>Your route, optimized.</h3>
-            <p>Access real-time order tracking, customer delivery details, and instant proof-of-delivery tools on the go.</p>
-            
-            <div class="stats-row">
-              <div class="stat">
-                <h4><i class="pi pi-map-marker"></i></h4>
-                <span>Smart Routing</span>
-              </div>
-              <div class="stat">
-                <h4><i class="pi pi-check-circle"></i></h4>
-                <span>Instant POD</span>
+          </div>
+    
+          <!-- ── Right: Image/Showcase Section ─────────────────────────────── -->
+          <div class="hero-section">
+            <div class="hero-overlay"></div>
+    
+            <!-- Floating Glass Card for Premium Feel -->
+            <div class="hero-content">
+              <div class="glass-feature-card">
+                <div class="feature-header">
+                  <div class="status-dot"></div>
+                  <span>APEX Fleet Management</span>
+                </div>
+                <h3>Your route, optimized.</h3>
+                <p>Access real-time order tracking, customer delivery details, and instant proof-of-delivery tools on the go.</p>
+    
+                <div class="stats-row">
+                  <div class="stat">
+                    <h4><i class="pi pi-map-marker"></i></h4>
+                    <span>Smart Routing</span>
+                  </div>
+                  <div class="stat">
+                    <h4><i class="pi pi-check-circle"></i></h4>
+                    <span>Instant POD</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
+    
         </div>
-      </div>
-
-    </div>
-  `,
+    `,
   styles: [`
     /* ── Base Layout ── */
     :host {

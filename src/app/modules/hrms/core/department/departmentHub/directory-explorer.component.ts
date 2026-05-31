@@ -1,4 +1,4 @@
-import { CommonModule } from "@angular/common";
+
 import { Component, Input } from "@angular/core";
 import { CustomDepartmentTreeComponent } from "./custom-dept-tree.component";
 
@@ -8,7 +8,7 @@ import { CustomDepartmentTreeComponent } from "./custom-dept-tree.component";
 @Component({
   selector: 'app-directory-explorer',
   standalone: true,
-  imports: [CommonModule, CustomDepartmentTreeComponent],
+  imports: [CustomDepartmentTreeComponent],
   template: `
     <div class="premium-card directory-card">
       

@@ -1,4 +1,4 @@
-    import { CommonModule } from '@angular/common';
+    
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { StorefrontAdminService } from '@core/services/storefront-admin.service';
 import { MessageService } from 'primeng/api';
@@ -6,7 +6,7 @@ import { MessageService } from 'primeng/api';
 @Component({
   selector: 'app-theme-marketplace',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   providers: [MessageService],
   template: `
     <main class="themes-layout">

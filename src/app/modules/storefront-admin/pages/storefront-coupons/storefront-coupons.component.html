@@ -22,7 +22,7 @@
           <span>{{ success() }}</span>
         </div>
       }
-      
+
       @if (error()) {
         <div class="error-state">
           <i class="pi pi-exclamation-triangle"></i>
@@ -31,9 +31,9 @@
         </div>
       } @else {
         <div class="classic-grid-wrapper">
-          <app-shared-grid 
-            [columns]="columns" 
-            [data]="coupons()" 
+          <app-shared-grid
+            [columns]="columns"
+            [data]="coupons()"
             selectionMode="single"
             [showActions]="false"
             (gridEvent)="onGridEvent($event)">
@@ -43,182 +43,173 @@
     </div>
   </section>
 
-  <aside class="detail-panel" *ngIf="selectedCoupon() as coupon">
-    <header class="panel-header">
-      <div class="title-group">
-        <span class="eyebrow">Coupon Detail</span>
-        <h2>{{ coupon.code }}</h2>
-      </div>
-      <button class="close-btn" (click)="closePanel()">
-        <i class="pi pi-times"></i>
-      </button>
-    </header>
-
-    <div class="panel-scroll">
-      
-      <div class="bento-top-row">
-        <section class="bento-block status-card">
-          <div class="status-icon" [class.active-icon]="coupon.isActive === 'true' || coupon.isActive === true">
-            <i class="pi pi-ticket"></i>
-          </div>
-          <div class="status-info">
-            <h3>{{ coupon.discountType === '%' ? 'Percentage Discount' : 'Fixed Amount' }}</h3>
-            <span class="amount-badge">
-              {{ coupon.amount }}{{ coupon.discountType === '%' ? '%' : ' INR' }}
-            </span>
-          </div>
-        </section>
-      </div>
-
-      <div class="bento-metrics-row">
-        <div class="bento-block stat-box">
-          <span class="label">Total Claims</span>
-          <span class="value">{{ coupon.usedCount }}</span>
+  @if (selectedCoupon(); as coupon) {
+    <aside class="detail-panel">
+      <header class="panel-header">
+        <div class="title-group">
+          <span class="eyebrow">Coupon Detail</span>
+          <h2>{{ coupon.code }}</h2>
         </div>
-        <div class="bento-block stat-box">
-          <span class="label">Usage Limit</span>
-          <span class="value">{{ coupon.usageLimit !== null ? coupon.usageLimit : '∞' }}</span>
+        <button class="close-btn" (click)="closePanel()">
+          <i class="pi pi-times"></i>
+        </button>
+      </header>
+      <div class="panel-scroll">
+        <div class="bento-top-row">
+          <section class="bento-block status-card">
+            <div class="status-icon" [class.active-icon]="coupon.isActive === 'true' || coupon.isActive === true">
+              <i class="pi pi-ticket"></i>
+            </div>
+            <div class="status-info">
+              <h3>{{ coupon.discountType === '%' ? 'Percentage Discount' : 'Fixed Amount' }}</h3>
+              <span class="amount-badge">
+                {{ coupon.amount }}{{ coupon.discountType === '%' ? '%' : ' INR' }}
+              </span>
+            </div>
+          </section>
+        </div>
+        <div class="bento-metrics-row">
+          <div class="bento-block stat-box">
+            <span class="label">Total Claims</span>
+            <span class="value">{{ coupon.usedCount }}</span>
+          </div>
+          <div class="bento-block stat-box">
+            <span class="label">Usage Limit</span>
+            <span class="value">{{ coupon.usageLimit !== null ? coupon.usageLimit : '∞' }}</span>
+          </div>
+        </div>
+        <div class="bento-dashboard-grid one-col">
+          <section class="bento-block functional-list-block">
+            <div class="block-header">
+              <h3><i class="pi pi-shield"></i> Eligibility Rules</h3>
+            </div>
+            <div class="item-list">
+              <div class="rule-item">
+                <div class="item-icon"><i class="pi pi-shopping-cart"></i></div>
+                <div class="item-details">
+                  <strong>Minimum Purchase</strong>
+                  <span>Requires at least {{ coupon.minPurchaseAmount | currency:'INR':'symbol':'1.0-0' }} spend</span>
+                </div>
+              </div>
+              @if (coupon.maxDiscount) {
+                <div class="rule-item">
+                  <div class="item-icon"><i class="pi pi-percentage"></i></div>
+                  <div class="item-details">
+                    <strong>Maximum Discount Limit</strong>
+                    <span>Cap discount savings at {{ coupon.maxDiscount | currency:'INR':'symbol':'1.0-0' }}</span>
+                  </div>
+                </div>
+              }
+              @if (coupon.startDate) {
+                <div class="rule-item">
+                  <div class="item-icon"><i class="pi pi-calendar"></i></div>
+                  <div class="item-details">
+                    <strong>Active Range</strong>
+                    <span>From {{ coupon.startDate | date:'mediumDate' }} to {{ coupon.endDate ? (coupon.endDate | date:'mediumDate') : 'Indefinite' }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          </section>
+          <section class="bento-block action-block">
+            <div class="block-header">
+              <h3><i class="pi pi-cog"></i> Actions</h3>
+            </div>
+            <div class="action-grid">
+              <button class="premium-btn full-width-action" (click)="toggleStatus(coupon)">
+                <i class="pi" [class.pi-eye-slash]="coupon.isActive === 'true' || coupon.isActive === true" [class.pi-eye]="!(coupon.isActive === 'true' || coupon.isActive === true)"></i>
+                {{ coupon.isActive === 'true' || coupon.isActive === true ? 'Deactivate Coupon' : 'Activate Coupon' }}
+              </button>
+              <button class="premium-btn danger-btn full-width-action" (click)="deleteCoupon(coupon)">
+                <i class="pi pi-trash"></i> Delete
+              </button>
+            </div>
+          </section>
         </div>
       </div>
+    </aside>
+  }
 
-      <div class="bento-dashboard-grid one-col">
-        <section class="bento-block functional-list-block">
-          <div class="block-header">
-            <h3><i class="pi pi-shield"></i> Eligibility Rules</h3>
-          </div>
-          <div class="item-list">
-            <div class="rule-item">
-              <div class="item-icon"><i class="pi pi-shopping-cart"></i></div>
-              <div class="item-details">
-                <strong>Minimum Purchase</strong>
-                <span>Requires at least {{ coupon.minPurchaseAmount | currency:'INR':'symbol':'1.0-0' }} spend</span>
-              </div>
+  @if (isCreateMode()) {
+    <aside class="detail-panel create-panel">
+      <header class="panel-header">
+        <div class="title-group">
+          <span class="eyebrow">Storefront Operations</span>
+          <h2>New Discount Coupon</h2>
+        </div>
+        <button class="close-btn" (click)="closePanel()">
+          <i class="pi pi-times"></i>
+        </button>
+      </header>
+      <div class="panel-scroll panel-form-scroll">
+        <form (ngSubmit)="saveCoupon()" class="coupon-form-grid">
+          <div class="bento-block form-block">
+            <label class="form-label">
+              Coupon Code <span class="required">*</span>
+              <input type="text" name="code" [(ngModel)]="couponForm.code" required placeholder="e.g. WELCOME100" class="premium-input uppercase-input" />
+            </label>
+            <div class="form-row">
+              <label class="form-label">
+                Discount Type
+                <select name="discountType" [(ngModel)]="couponForm.discountType" class="premium-select">
+                  <option value="fixed">Fixed Amount</option>
+                  <option value="percentage">Percentage Discount</option>
+                </select>
+              </label>
+              <label class="form-label">
+                Discount Amount <span class="required">*</span>
+                <input type="number" name="amount" [(ngModel)]="couponForm.amount" required min="0" class="premium-input" />
+              </label>
             </div>
-            
-            <div class="rule-item" *ngIf="coupon.maxDiscount">
-              <div class="item-icon"><i class="pi pi-percentage"></i></div>
-              <div class="item-details">
-                <strong>Maximum Discount Limit</strong>
-                <span>Cap discount savings at {{ coupon.maxDiscount | currency:'INR':'symbol':'1.0-0' }}</span>
-              </div>
-            </div>
-
-            <div class="rule-item" *ngIf="coupon.startDate">
-              <div class="item-icon"><i class="pi pi-calendar"></i></div>
-              <div class="item-details">
-                <strong>Active Range</strong>
-                <span>From {{ coupon.startDate | date:'mediumDate' }} to {{ coupon.endDate ? (coupon.endDate | date:'mediumDate') : 'Indefinite' }}</span>
-              </div>
-            </div>
           </div>
-        </section>
-
-        <section class="bento-block action-block">
-          <div class="block-header">
-            <h3><i class="pi pi-cog"></i> Actions</h3>
+          <div class="bento-block form-block">
+            <div class="form-row">
+              <label class="form-label">
+                Min Spend (INR)
+                <input type="number" name="minPurchaseAmount" [(ngModel)]="couponForm.minPurchaseAmount" min="0" class="premium-input" placeholder="0" />
+              </label>
+              @if (couponForm.discountType === 'percentage') {
+                <label class="form-label">
+                  Max Discount (INR)
+                  <input type="number" name="maxDiscount" [(ngModel)]="couponForm.maxDiscount" min="0" class="premium-input" placeholder="No limit" />
+                </label>
+              }
+            </div>
+            <div class="form-row">
+              <label class="form-label">
+                Start Date
+                <input type="date" name="startDate" [(ngModel)]="couponForm.startDate" class="premium-input" />
+              </label>
+              <label class="form-label">
+                End Date
+                <input type="date" name="endDate" [(ngModel)]="couponForm.endDate" class="premium-input" />
+              </label>
+            </div>
+            <label class="form-label">
+              Usage Limit (Total times usable)
+              <input type="number" name="usageLimit" [(ngModel)]="couponForm.usageLimit" min="0" class="premium-input" placeholder="Leave empty for unlimited" />
+            </label>
           </div>
-          <div class="action-grid">
-            <button class="premium-btn full-width-action" (click)="toggleStatus(coupon)">
-              <i class="pi" [class.pi-eye-slash]="coupon.isActive === 'true' || coupon.isActive === true" [class.pi-eye]="!(coupon.isActive === 'true' || coupon.isActive === true)"></i>
-              {{ coupon.isActive === 'true' || coupon.isActive === true ? 'Deactivate Coupon' : 'Activate Coupon' }}
+          <div class="bento-block form-block toggle-block">
+            <label class="check-label">
+              <div class="check-text">
+                <strong>Activate Immediately</strong>
+                <span>Make this coupon code live on the storefront</span>
+              </div>
+              <div class="toggle-switch">
+                <input type="checkbox" name="isActive" [(ngModel)]="couponForm.isActive" />
+                <span class="slider"></span>
+              </div>
+            </label>
+          </div>
+          <div class="form-actions sticky-actions">
+            <button type="button" class="premium-btn ghost-btn" (click)="closePanel()">Cancel</button>
+            <button type="submit" class="premium-btn primary-btn" [disabled]="loading()">
+              <i class="pi pi-check"></i> Create Coupon
             </button>
-            <button class="premium-btn danger-btn full-width-action" (click)="deleteCoupon(coupon)">
-              <i class="pi pi-trash"></i> Delete
-            </button>
           </div>
-        </section>
+        </form>
       </div>
-
-    </div>
-  </aside>
-
-  <aside class="detail-panel create-panel" *ngIf="isCreateMode()">
-    <header class="panel-header">
-      <div class="title-group">
-        <span class="eyebrow">Storefront Operations</span>
-        <h2>New Discount Coupon</h2>
-      </div>
-      <button class="close-btn" (click)="closePanel()">
-        <i class="pi pi-times"></i>
-      </button>
-    </header>
-
-    <div class="panel-scroll panel-form-scroll">
-      <form (ngSubmit)="saveCoupon()" class="coupon-form-grid">
-        
-        <div class="bento-block form-block">
-          <label class="form-label">
-            Coupon Code <span class="required">*</span>
-            <input type="text" name="code" [(ngModel)]="couponForm.code" required placeholder="e.g. WELCOME100" class="premium-input uppercase-input" />
-          </label>
-
-          <div class="form-row">
-            <label class="form-label">
-              Discount Type
-              <select name="discountType" [(ngModel)]="couponForm.discountType" class="premium-select">
-                <option value="fixed">Fixed Amount</option>
-                <option value="percentage">Percentage Discount</option>
-              </select>
-            </label>
-
-            <label class="form-label">
-              Discount Amount <span class="required">*</span>
-              <input type="number" name="amount" [(ngModel)]="couponForm.amount" required min="0" class="premium-input" />
-            </label>
-          </div>
-        </div>
-
-        <div class="bento-block form-block">
-          <div class="form-row">
-            <label class="form-label">
-              Min Spend (INR)
-              <input type="number" name="minPurchaseAmount" [(ngModel)]="couponForm.minPurchaseAmount" min="0" class="premium-input" placeholder="0" />
-            </label>
-
-            <label class="form-label" *ngIf="couponForm.discountType === 'percentage'">
-              Max Discount (INR)
-              <input type="number" name="maxDiscount" [(ngModel)]="couponForm.maxDiscount" min="0" class="premium-input" placeholder="No limit" />
-            </label>
-          </div>
-
-          <div class="form-row">
-            <label class="form-label">
-              Start Date
-              <input type="date" name="startDate" [(ngModel)]="couponForm.startDate" class="premium-input" />
-            </label>
-
-            <label class="form-label">
-              End Date
-              <input type="date" name="endDate" [(ngModel)]="couponForm.endDate" class="premium-input" />
-            </label>
-          </div>
-
-          <label class="form-label">
-            Usage Limit (Total times usable)
-            <input type="number" name="usageLimit" [(ngModel)]="couponForm.usageLimit" min="0" class="premium-input" placeholder="Leave empty for unlimited" />
-          </label>
-        </div>
-
-        <div class="bento-block form-block toggle-block">
-          <label class="check-label">
-            <div class="check-text">
-              <strong>Activate Immediately</strong>
-              <span>Make this coupon code live on the storefront</span>
-            </div>
-            <div class="toggle-switch">
-              <input type="checkbox" name="isActive" [(ngModel)]="couponForm.isActive" />
-              <span class="slider"></span>
-            </div>
-          </label>
-        </div>
-
-        <div class="form-actions sticky-actions">
-          <button type="button" class="premium-btn ghost-btn" (click)="closePanel()">Cancel</button>
-          <button type="submit" class="premium-btn primary-btn" [disabled]="loading()">
-            <i class="pi pi-check"></i> Create Coupon
-          </button>
-        </div>
-      </form>
-    </div>
-  </aside>
+    </aside>
+  }
 </main>

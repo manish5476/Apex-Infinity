@@ -1,21 +1,21 @@
 import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-global-delivery-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   template: `
     <div class="split-layout">
-      
+    
       <!-- ── Left: Form Section ────────────────────────────────────────── -->
       <div class="form-section">
-        
+    
         <!-- Subtle background glow powered by theme accent -->
         <div class="glow-orb"></div>
-
+    
         <div class="form-wrapper">
           <div class="brand">
             <div class="icon-wrapper">
@@ -24,81 +24,85 @@ import { Router } from '@angular/router';
             <h1>Store Delivery Portal</h1>
             <p>Enter your assigned Store ID to manage dispatch, tracking, and local logistics.</p>
           </div>
-          
+    
           <form (ngSubmit)="onSubmit()" #loginForm="ngForm" class="login-form">
             <div class="form-group">
               <label for="storeId">Organization ID</label>
               <div class="input-container">
                 <i class="pi pi-building input-icon"></i>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   id="storeId"
-                  name="storeId" 
-                  [(ngModel)]="storeId" 
-                  required 
-                  class="premium-input" 
+                  name="storeId"
+                  [(ngModel)]="storeId"
+                  required
+                  class="premium-input"
                   placeholder="e.g. apex-store-1"
                   autocomplete="off"
                   spellcheck="false">
+                </div>
               </div>
-            </div>
-            
-            <!-- Error Message using semantic status tokens -->
-            <div class="error-message" *ngIf="error">
-              <i class="pi pi-exclamation-circle"></i>
-              <span>{{ error }}</span>
-            </div>
-            
-            <button type="submit" class="premium-btn primary-btn" [disabled]="loginForm.invalid || loading">
-              <span class="btn-content" [class.is-hidden]="loading">
-                Continue to Login
-                <i class="pi pi-arrow-right"></i>
-              </span>
-              <i class="pi pi-spin pi-spinner loader" *ngIf="loading"></i>
-            </button>
-            
-            <div class="divider">
-              <span>or</span>
-            </div>
-
-            <button type="button" class="premium-btn secondary-btn" (click)="goBack()">
-              <i class="pi pi-arrow-left"></i>
-              Return to Main ERP
-            </button>
-          </form>
+    
+              <!-- Error Message using semantic status tokens -->
+              @if (error) {
+                <div class="error-message">
+                  <i class="pi pi-exclamation-circle"></i>
+                  <span>{{ error }}</span>
+                </div>
+              }
+    
+              <button type="submit" class="premium-btn primary-btn" [disabled]="loginForm.invalid || loading">
+                <span class="btn-content" [class.is-hidden]="loading">
+                  Continue to Login
+                  <i class="pi pi-arrow-right"></i>
+                </span>
+                @if (loading) {
+                  <i class="pi pi-spin pi-spinner loader"></i>
+                }
+              </button>
+    
+              <div class="divider">
+                <span>or</span>
+              </div>
+    
+              <button type="button" class="premium-btn secondary-btn" (click)="goBack()">
+                <i class="pi pi-arrow-left"></i>
+                Return to Main ERP
+              </button>
+            </form>
+          </div>
         </div>
-      </div>
-
-      <!-- ── Right: Image/Showcase Section ─────────────────────────────── -->
-      <div class="hero-section">
-        <div class="hero-overlay"></div>
-        
-        <!-- Floating Glass Card for Premium Feel -->
-        <div class="hero-content">
-          <div class="glass-feature-card">
-            <div class="feature-header">
-              <div class="status-dot"></div>
-              <span>Global Logistics Network</span>
-            </div>
-            <h3>Real-time fleet & dispatch management.</h3>
-            <p>Seamlessly connect your local store operations with the global Apex delivery infrastructure.</p>
-            
-            <div class="stats-row">
-              <div class="stat">
-                <h4>99.9%</h4>
-                <span>Uptime</span>
+    
+        <!-- ── Right: Image/Showcase Section ─────────────────────────────── -->
+        <div class="hero-section">
+          <div class="hero-overlay"></div>
+    
+          <!-- Floating Glass Card for Premium Feel -->
+          <div class="hero-content">
+            <div class="glass-feature-card">
+              <div class="feature-header">
+                <div class="status-dot"></div>
+                <span>Global Logistics Network</span>
               </div>
-              <div class="stat">
-                <h4><i class="pi pi-bolt"></i></h4>
-                <span>Live Sync</span>
+              <h3>Real-time fleet & dispatch management.</h3>
+              <p>Seamlessly connect your local store operations with the global Apex delivery infrastructure.</p>
+    
+              <div class="stats-row">
+                <div class="stat">
+                  <h4>99.9%</h4>
+                  <span>Uptime</span>
+                </div>
+                <div class="stat">
+                  <h4><i class="pi pi-bolt"></i></h4>
+                  <span>Live Sync</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
+    
       </div>
-
-    </div>
-  `,
+    `,
   styles: [`
     /* ── Base Layout ── */
     :host {

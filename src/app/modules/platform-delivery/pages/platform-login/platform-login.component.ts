@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { PlatformDeliveryService } from '../../services/platform-delivery.service';
@@ -7,87 +7,93 @@ import { PlatformDeliveryService } from '../../services/platform-delivery.servic
 @Component({
   selector: 'app-platform-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [FormsModule, RouterModule],
   template: `
     <div class="login-wrapper">
       <div class="login-card">
-        
+    
         <div class="illustration-panel">
           <div class="illustration-content">
             <h2>Apex Global</h2>
             <p>Empowering seamless global deliveries through our connected platform.</p>
           </div>
         </div>
-
+    
         <div class="form-panel">
           <div class="form-header">
             <h1>Log in</h1>
             <p>Welcome back! Please enter your details.</p>
           </div>
-          
+    
           <form (ngSubmit)="onSubmit()" #loginForm="ngForm" class="login-form">
             <div class="form-group">
               <label>Phone Number</label>
-              <input 
-                type="text" 
-                name="phone" 
-                [(ngModel)]="credentials.phone" 
-                required 
-                class="premium-input" 
+              <input
+                type="text"
+                name="phone"
+                [(ngModel)]="credentials.phone"
+                required
+                class="premium-input"
                 placeholder="e.g. 9876543210">
+              </div>
+    
+              <div class="form-group">
+                <label>Password</label>
+                <input
+                  type="password"
+                  name="password"
+                  [(ngModel)]="credentials.password"
+                  required
+                  class="premium-input"
+                  placeholder="Enter your password">
+                </div>
+    
+                <div class="form-actions-row">
+                  <label class="remember-me">
+                    <input type="checkbox">
+                    <span>Remember me</span>
+                  </label>
+                  <a href="#" class="forgot-link">Forgot password?</a>
+                </div>
+    
+                @if (error) {
+                  <div class="error-message">
+                    <i class="pi pi-exclamation-circle"></i> {{ error }}
+                  </div>
+                }
+    
+                <button type="submit" class="premium-btn primary-btn full-width" [disabled]="loginForm.invalid || loading">
+                  @if (loading) {
+                    <i class="pi pi-spin pi-spinner"></i>
+                  }
+                  @if (!loading) {
+                    <span>Log in</span>
+                  }
+                </button>
+    
+                <div class="divider">
+                  <span>Or log in with</span>
+                </div>
+    
+                <div class="social-login">
+                  <button type="button" class="social-btn">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google">
+                  </button>
+                  <button type="button" class="social-btn">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft">
+                  </button>
+                </div>
+    
+                <div class="links">
+                  <span>Don't have an account?</span>
+                  <a routerLink="/apex-delivery/register">Sign up</a>
+                </div>
+              </form>
             </div>
-            
-            <div class="form-group">
-              <label>Password</label>
-              <input 
-                type="password" 
-                name="password" 
-                [(ngModel)]="credentials.password" 
-                required 
-                class="premium-input" 
-                placeholder="Enter your password">
-            </div>
-
-            <div class="form-actions-row">
-              <label class="remember-me">
-                <input type="checkbox"> 
-                <span>Remember me</span>
-              </label>
-              <a href="#" class="forgot-link">Forgot password?</a>
-            </div>
-            
-            <div class="error-message" *ngIf="error">
-              <i class="pi pi-exclamation-circle"></i> {{ error }}
-            </div>
-            
-            <button type="submit" class="premium-btn primary-btn full-width" [disabled]="loginForm.invalid || loading">
-              <i class="pi pi-spin pi-spinner" *ngIf="loading"></i>
-              <span *ngIf="!loading">Log in</span>
-            </button>
-
-            <div class="divider">
-              <span>Or log in with</span>
-            </div>
-
-            <div class="social-login">
-              <button type="button" class="social-btn">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google">
-              </button>
-              <button type="button" class="social-btn">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft">
-              </button>
-            </div>
-
-            <div class="links">
-              <span>Don't have an account?</span>
-              <a routerLink="/apex-delivery/register">Sign up</a>
-            </div>
-          </form>
+    
+          </div>
         </div>
-
-      </div>
-    </div>
-  `,
+    `,
   styles: [`
     /* Utilizing the provided Theme Tokens 
       Assuming variables like --bg-secondary, --accent-primary, etc. are globally mapped 

@@ -3,7 +3,7 @@
 
 
 import { Component, ChangeDetectionStrategy, ViewEncapsulation, inject, signal, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule, NgForm } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { StorefrontAuthFacade } from '../../../../storefront/core/facades/storefront-auth.facade';
@@ -11,7 +11,7 @@ import { StorefrontAuthFacade } from '../../../../storefront/core/facades/storef
 @Component({
   selector: 'app-reset-password',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [FormsModule, RouterModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
   template: `

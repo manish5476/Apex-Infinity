@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { DeliveryService } from '../../services/delivery.service';
@@ -7,15 +7,15 @@ import { DeliveryService } from '../../services/delivery.service';
 @Component({
   selector: 'app-delivery-reset-password',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   template: `
     <div class="split-layout">
-      
+    
       <!-- ── Left: Form Section ────────────────────────────────────────── -->
       <div class="form-section">
-        
+    
         <div class="glow-orb"></div>
-
+    
         <div class="form-wrapper">
           <div class="brand">
             <div class="icon-wrapper">
@@ -24,64 +24,69 @@ import { DeliveryService } from '../../services/delivery.service';
             <h1>Set New Password</h1>
             <p>Enter your new password to regain access to your delivery dashboard.</p>
           </div>
-          
-          <form (ngSubmit)="onSubmit()" #resetForm="ngForm" class="login-form" *ngIf="!successMessage">
-            <div class="form-group">
-              <label for="password">New Password</label>
-              <div class="input-container">
-                <i class="pi pi-lock input-icon"></i>
-                <input 
-                  type="password" 
-                  id="password"
-                  name="password" 
-                  [(ngModel)]="password" 
-                  required 
-                  minlength="8"
-                  class="premium-input" 
-                  placeholder="At least 8 characters">
+    
+          @if (!successMessage) {
+            <form (ngSubmit)="onSubmit()" #resetForm="ngForm" class="login-form">
+              <div class="form-group">
+                <label for="password">New Password</label>
+                <div class="input-container">
+                  <i class="pi pi-lock input-icon"></i>
+                  <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    [(ngModel)]="password"
+                    required
+                    minlength="8"
+                    class="premium-input"
+                    placeholder="At least 8 characters">
+                </div>
               </div>
-            </div>
-
-            <div class="form-group">
-              <label for="confirmPassword">Confirm Password</label>
-              <div class="input-container">
-                <i class="pi pi-lock input-icon"></i>
-                <input 
-                  type="password" 
-                  id="confirmPassword"
-                  name="confirmPassword" 
-                  [(ngModel)]="confirmPassword" 
-                  required 
-                  class="premium-input" 
-                  placeholder="Confirm new password">
+              <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <div class="input-container">
+                  <i class="pi pi-lock input-icon"></i>
+                  <input
+                    type="password"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    [(ngModel)]="confirmPassword"
+                    required
+                    class="premium-input"
+                    placeholder="Confirm new password">
+                </div>
               </div>
+              @if (error) {
+                <div class="error-message">
+                  <i class="pi pi-exclamation-circle"></i>
+                  <span>{{ error }}</span>
+                </div>
+              }
+              <button type="submit" class="premium-btn primary-btn" [disabled]="resetForm.invalid || loading">
+                <span class="btn-content" [class.is-hidden]="loading">
+                  Reset Password
+                  <i class="pi pi-check"></i>
+                </span>
+                @if (loading) {
+                  <i class="pi pi-spin pi-spinner loader"></i>
+                }
+              </button>
+            </form>
+          }
+    
+          @if (successMessage) {
+            <div class="success-message-box">
+              <i class="pi pi-check-circle" style="font-size: 3rem; color: var(--accent-primary); margin-bottom: 1rem;"></i>
+              <h3>Password Reset!</h3>
+              <p>{{ successMessage }}</p>
+              <button type="button" class="premium-btn primary-btn" style="margin-top: 1rem;" (click)="goToLogin()">
+                Continue to Login
+              </button>
             </div>
-            
-            <div class="error-message" *ngIf="error">
-              <i class="pi pi-exclamation-circle"></i>
-              <span>{{ error }}</span>
-            </div>
-            
-            <button type="submit" class="premium-btn primary-btn" [disabled]="resetForm.invalid || loading">
-              <span class="btn-content" [class.is-hidden]="loading">
-                Reset Password
-                <i class="pi pi-check"></i>
-              </span>
-              <i class="pi pi-spin pi-spinner loader" *ngIf="loading"></i>
-            </button>
-          </form>
-
-          <div class="success-message-box" *ngIf="successMessage">
-            <i class="pi pi-check-circle" style="font-size: 3rem; color: var(--accent-primary); margin-bottom: 1rem;"></i>
-            <h3>Password Reset!</h3>
-            <p>{{ successMessage }}</p>
-            <button type="button" class="premium-btn primary-btn" style="margin-top: 1rem;" (click)="goToLogin()">
-              Continue to Login
-            </button>
-          </div>
+          }
         </div>
       </div>
-
+    
       <!-- ── Right: Image/Showcase Section ─────────────────────────────── -->
       <div class="hero-section">
         <div class="hero-overlay"></div>
@@ -97,7 +102,7 @@ import { DeliveryService } from '../../services/delivery.service';
         </div>
       </div>
     </div>
-  `,
+    `,
   styles: [`
     /* Copying the same styles as delivery-login for consistency */
     :host {

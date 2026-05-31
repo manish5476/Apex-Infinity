@@ -6,7 +6,7 @@ import {
   output,
   signal
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule, NgForm } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
 import { RouterModule } from '@angular/router';
@@ -36,7 +36,7 @@ const slideRight = [
 @Component({
   selector: 'app-storefront-auth-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule, DialogModule, RouterModule],
+  imports: [FormsModule, DialogModule, RouterModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
     trigger('tabSlide', [

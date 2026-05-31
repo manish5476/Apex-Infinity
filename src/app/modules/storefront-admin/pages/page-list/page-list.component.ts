@@ -36,7 +36,7 @@ function getOrgSlug(): string {
   imports: [CommonModule, RouterModule, ReactiveFormsModule, DatePipe],
   template: `
     <main class="storefront-pages-layout" [class.panel-open]="showCreateModal()">
-      
+    
       <section class="grid-section">
         <header class="page-header">
           <div class="header-content">
@@ -52,7 +52,7 @@ function getOrgSlug(): string {
             </button>
           </div>
         </header>
-
+    
         <div class="grid-container">
           @if (error()) {
             <div class="error-state">
@@ -61,14 +61,14 @@ function getOrgSlug(): string {
               <button class="premium-btn ghost-btn" (click)="error.set(null)">Dismiss</button>
             </div>
           }
-
+    
           @if (isLoading()) {
             <div class="loader-container">
               <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: var(--text-secondary);"></i>
               <span class="loading-text">Assembling workspaces...</span>
             </div>
           } @else {
-            
+    
             @if (pages().length > 0) {
               <div class="bento-metrics-row">
                 <div class="bento-block stat-box">
@@ -101,10 +101,10 @@ function getOrgSlug(): string {
                 </div>
               </div>
             }
-
+    
             <div class="card-grid-wrapper">
               <div class="card-grid">
-                
+    
                 <button (click)="openCreateModal()" class="create-card" type="button">
                   <div class="create-icon-ring">
                     <i class="pi pi-plus"></i>
@@ -112,18 +112,18 @@ function getOrgSlug(): string {
                   <span class="create-label">Blank Slate Workspace</span>
                   <span class="create-hint">Start a new layout structure</span>
                 </button>
-
+    
                 @for (page of pages(); track page._id) {
                   <div class="page-card">
-                    
+    
                     <div class="card-cover-segment" [attr.data-type]="page.pageType">
                       <div class="cover-overlay"></div>
-                      
+    
                       <div class="status-badge" [class.published]="page.isPublished">
                         <span class="status-dot"></span>
                         {{ page.status === 'published' || page.isPublished ? 'Live' : 'Draft' }}
                       </div>
-
+    
                       @if (page.isHomepage) {
                         <div class="homepage-badge" title="Primary Store Homepage">
                           <i class="pi pi-home"></i>
@@ -134,7 +134,7 @@ function getOrgSlug(): string {
                         </div>
                       }
                     </div>
-
+    
                     <div class="card-content-segment">
                       <div class="card-header-row">
                         <h3 class="card-title" [title]="page.name">{{ page.name }}</h3>
@@ -142,9 +142,9 @@ function getOrgSlug(): string {
                           <i class="pi pi-external-link"></i>
                         </button>
                       </div>
-
+    
                       <code class="slug-pill">/{{ page.slug }}</code>
-
+    
                       <div class="meta-metrics-grid">
                         <div class="metric-item">
                           <i class="pi pi-eye"></i>
@@ -159,12 +159,12 @@ function getOrgSlug(): string {
                           <span style="text-transform: capitalize;">{{ page.pageType }}</span>
                         </div>
                       </div>
-
+    
                       <div class="card-actions-wrapper">
                         <a [routerLink]="[page._id, 'builder']" class="premium-btn primary-btn full-width">
                           <i class="pi pi-pencil"></i> Design
                         </a>
-                        
+    
                         <div class="icon-actions-group">
                           <button (click)="togglePublish(page)" class="icon-btn toggle-btn" [class.active]="page.isPublished" [title]="page.isPublished ? 'Unpublish' : 'Publish'">
                             <i class="pi" [class]="page.isPublished ? 'pi-eye' : 'pi-eye-slash'"></i>
@@ -172,16 +172,16 @@ function getOrgSlug(): string {
                           <button (click)="duplicatePage(page)" class="icon-btn" title="Duplicate Profile">
                             <i class="pi pi-copy"></i>
                           </button>
-                          <button 
-                            (click)="deletePage(page)" 
-                            class="icon-btn danger-btn" 
+                          <button
+                            (click)="deletePage(page)"
+                            class="icon-btn danger-btn"
                             title="Delete Segment"
                             [disabled]="page.isHomepage || page.pageType === 'home' || page.pageType === 'products'">
                             <i class="pi pi-trash"></i>
                           </button>
                         </div>
                       </div>
-
+    
                       <div class="meta-timestamp">
                         Updated: {{ page.updatedAt | date:'MMM d, y, h:mm a' }}
                       </div>
@@ -190,7 +190,7 @@ function getOrgSlug(): string {
                 }
               </div>
             </div>
-
+    
             @if (pages().length === 0 && !isLoading()) {
               <div class="empty-state-block">
                 <div class="empty-icon-wrapper"><i class="pi pi-folder-open"></i></div>
@@ -204,70 +204,65 @@ function getOrgSlug(): string {
           }
         </div>
       </section>
-
-      <aside class="detail-panel create-panel" *ngIf="showCreateModal()">
-        <header class="panel-header">
-          <div class="title-group">
-            <span class="eyebrow">CMS Operations</span>
-            <h2>New Workspace Node</h2>
-          </div>
-          <button class="close-btn" (click)="closeCreateModal()">
-            <i class="pi pi-times"></i>
-          </button>
-        </header>
-
-        <div class="panel-scroll panel-form-scroll">
-          <form [formGroup]="createForm" (ngSubmit)="createPage()" class="agent-form-grid">
-            
-            <div class="bento-block form-block">
-              <div class="block-header-mini">Page Configuration</div>
-              
-              <label class="form-label">
-                Workspace Descriptor / Title <span class="required">*</span>
-                <input formControlName="name" class="premium-input" placeholder="e.g. Winter Catalog Launch" autocomplete="off" />
-                @if (createForm.get('name')?.invalid && createForm.get('name')?.touched) {
-                  <span class="field-error">A unique descriptive name string is required.</span>
-                }
-              </label>
-
-              <label class="form-label">
-                Routing Uniform URL Slug <span class="required">*</span>
-                <div class="slug-input-wrapper">
-                  <span class="slug-prefix">/</span>
-                  <input formControlName="slug" class="premium-input slug-input" placeholder="winter-catalog-launch" autocomplete="off" />
-                </div>
-                @if (createForm.get('slug')?.invalid && createForm.get('slug')?.touched) {
-                  <span class="field-error">Slugs are constrained to lowercase alphanumeric vectors and uniform hyphens.</span>
-                }
-              </label>
-
-              <label class="form-label">
-                Functional Page Type Module
-                <select formControlName="pageType" class="premium-select">
-                  <option value="custom">Custom Framework Layer</option>
-                  <option value="home">Primary System Home Dashboard</option>
-                  <option value="landing">Marketing Conversion Landing Target</option>
-                  <option value="about">Corporate About Matrix Profile</option>
-                  <option value="contact">Support Touchpoint Pipeline Gateway</option>
-                  <option value="products">Product Directory Module Mesh</option>
-                </select>
-              </label>
+    
+      @if (showCreateModal()) {
+        <aside class="detail-panel create-panel">
+          <header class="panel-header">
+            <div class="title-group">
+              <span class="eyebrow">CMS Operations</span>
+              <h2>New Workspace Node</h2>
             </div>
-
-          </form>
-        </div>
-
-        <div class="sticky-actions">
-          <button type="button" (click)="closeCreateModal()" class="premium-btn ghost-btn">Dismiss</button>
-          <button type="submit" (click)="createPage()" [disabled]="createForm.invalid || isSubmitting()" class="premium-btn primary-btn">
-            <i class="pi" [class.pi-spin]="isSubmitting()" [class.pi-spinner]="isSubmitting()" [class.pi-plus]="!isSubmitting()"></i>
-            Initialize Matrix Node
-          </button>
-        </div>
-      </aside>
-
+            <button class="close-btn" (click)="closeCreateModal()">
+              <i class="pi pi-times"></i>
+            </button>
+          </header>
+          <div class="panel-scroll panel-form-scroll">
+            <form [formGroup]="createForm" (ngSubmit)="createPage()" class="agent-form-grid">
+              <div class="bento-block form-block">
+                <div class="block-header-mini">Page Configuration</div>
+                <label class="form-label">
+                  Workspace Descriptor / Title <span class="required">*</span>
+                  <input formControlName="name" class="premium-input" placeholder="e.g. Winter Catalog Launch" autocomplete="off" />
+                  @if (createForm.get('name')?.invalid && createForm.get('name')?.touched) {
+                    <span class="field-error">A unique descriptive name string is required.</span>
+                  }
+                </label>
+                <label class="form-label">
+                  Routing Uniform URL Slug <span class="required">*</span>
+                  <div class="slug-input-wrapper">
+                    <span class="slug-prefix">/</span>
+                    <input formControlName="slug" class="premium-input slug-input" placeholder="winter-catalog-launch" autocomplete="off" />
+                  </div>
+                  @if (createForm.get('slug')?.invalid && createForm.get('slug')?.touched) {
+                    <span class="field-error">Slugs are constrained to lowercase alphanumeric vectors and uniform hyphens.</span>
+                  }
+                </label>
+                <label class="form-label">
+                  Functional Page Type Module
+                  <select formControlName="pageType" class="premium-select">
+                    <option value="custom">Custom Framework Layer</option>
+                    <option value="home">Primary System Home Dashboard</option>
+                    <option value="landing">Marketing Conversion Landing Target</option>
+                    <option value="about">Corporate About Matrix Profile</option>
+                    <option value="contact">Support Touchpoint Pipeline Gateway</option>
+                    <option value="products">Product Directory Module Mesh</option>
+                  </select>
+                </label>
+              </div>
+            </form>
+          </div>
+          <div class="sticky-actions">
+            <button type="button" (click)="closeCreateModal()" class="premium-btn ghost-btn">Dismiss</button>
+            <button type="submit" (click)="createPage()" [disabled]="createForm.invalid || isSubmitting()" class="premium-btn primary-btn">
+              <i class="pi" [class.pi-spin]="isSubmitting()" [class.pi-spinner]="isSubmitting()" [class.pi-plus]="!isSubmitting()"></i>
+              Initialize Matrix Node
+            </button>
+          </div>
+        </aside>
+      }
+    
     </main>
-  `,
+    `,
   styles: [`
     .storefront-pages-layout {
       display: flex;

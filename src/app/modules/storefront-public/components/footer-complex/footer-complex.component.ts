@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, Input, computed, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { StorefrontStateService } from '@core/services/storefront-state.service';
@@ -6,7 +6,7 @@ import { StorefrontStateService } from '@core/services/storefront-state.service'
 @Component({
   selector: 'app-footer-complex',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [RouterModule],
   templateUrl: './footer-complex.component.html',
   styleUrls: ['./footer-complex.component.scss']
 })

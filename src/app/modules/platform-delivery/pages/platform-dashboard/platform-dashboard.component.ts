@@ -11,7 +11,7 @@ import { Html5QrcodeScanner, Html5QrcodeScanType } from 'html5-qrcode';
   imports: [CommonModule, FormsModule],
   template: `
     <div class="app-layout">
-      
+    
       <aside class="sidebar">
         <div class="brand-logo">
           <i class="pi pi-box"></i>
@@ -25,9 +25,9 @@ import { Html5QrcodeScanner, Html5QrcodeScanType } from 'html5-qrcode';
           <button class="nav-item user-profile" (click)="logout()" title="Logout"><i class="pi pi-sign-out"></i></button>
         </div>
       </aside>
-
+    
       <main class="main-content">
-        
+    
         <header class="page-header">
           <div class="header-title">
             <h1>Shipments</h1>
@@ -37,102 +37,111 @@ import { Html5QrcodeScanner, Html5QrcodeScanType } from 'html5-qrcode';
             </div>
           </div>
           <div class="header-actions">
-             <button class="btn-primary" (click)="openScanner()">
-               <i class="pi pi-plus"></i> Scan Parcel
-             </button>
+            <button class="btn-primary" (click)="openScanner()">
+              <i class="pi pi-plus"></i> Scan Parcel
+            </button>
           </div>
         </header>
-
-        <div *ngIf="loading()" class="state-container">
-          <i class="pi pi-spin pi-spinner text-muted" style="font-size: 2rem;"></i>
-        </div>
-
-        <div *ngIf="!loading() && filteredOrders().length === 0" class="state-container">
-          <div class="empty-icon"><i class="pi pi-check"></i></div>
-          <h3>Queue Empty</h3>
-          <p class="text-muted">No {{ filter() }} shipments assigned to you.</p>
-        </div>
-
-        <div class="shipment-grid" *ngIf="!loading() && filteredOrders().length > 0">
-          <div class="shipment-card" *ngFor="let order of filteredOrders()" (click)="selectedOrder.set(order)">
-            
-            <div class="card-head">
-              <span class="cargo-id">Cargo ID: <strong>{{ order.orderNumber }}</strong></span>
-              <span class="status-badge" [attr.data-status]="order.fulfillmentStatus">
-                {{ order.fulfillmentStatus === 'delivered' ? 'Delivered' : (order.fulfillmentStatus === 'shipped' ? 'In Transit' : 'Pick-Up') }}
-              </span>
-            </div>
-
-            <div class="route-overview">
-              <div class="route-point">
-                <div class="point-marker origin"></div>
-                <div class="point-details">
-                  <span class="date">{{ order.createdAt | date:'dd.MM.yyyy' }}</span>
-                  <div class="location">
-                    <span class="city">{{ order.organizationId?.name || 'Origin' }}</span>
-                    <span class="address">Merchant Hub</span>
-                  </div>
-                </div>
-              </div>
-              <div class="route-connector"></div>
-              <div class="route-point">
-                <div class="point-marker dest"></div>
-                <div class="point-details">
-                  <span class="date">{{ order.estimatedDeliveryDate ? (order.estimatedDeliveryDate | date:'dd.MM.yyyy') : 'Pending' }}</span>
-                  <div class="location">
-                    <span class="city">{{ order.shippingAddress?.city || 'Destination' }}</span>
-                    <span class="address text-truncate" style="max-width: 150px;">{{ order.shippingAddress?.addressLine1 }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="card-foot">
-              <div class="client-info">
-                <div class="avatar"><i class="pi pi-user"></i></div>
-                <div class="client-details">
-                  <span class="name">{{ order.shippingAddress?.fullName || 'Client' }}</span>
-                  <span class="role" *ngIf="order.paymentMethod === 'COD'">COD: {{ order.totalAmount | currency:'INR' }}</span>
-                  <span class="role" *ngIf="order.paymentMethod !== 'COD'">Prepaid</span>
-                </div>
-              </div>
-              <button class="icon-btn"><i class="pi pi-phone"></i></button>
-            </div>
-            
+    
+        @if (loading()) {
+          <div class="state-container">
+            <i class="pi pi-spin pi-spinner text-muted" style="font-size: 2rem;"></i>
           </div>
-        </div>
+        }
+    
+        @if (!loading() && filteredOrders().length === 0) {
+          <div class="state-container">
+            <div class="empty-icon"><i class="pi pi-check"></i></div>
+            <h3>Queue Empty</h3>
+            <p class="text-muted">No {{ filter() }} shipments assigned to you.</p>
+          </div>
+        }
+    
+        @if (!loading() && filteredOrders().length > 0) {
+          <div class="shipment-grid">
+            @for (order of filteredOrders(); track order) {
+              <div class="shipment-card" (click)="selectedOrder.set(order)">
+                <div class="card-head">
+                  <span class="cargo-id">Cargo ID: <strong>{{ order.orderNumber }}</strong></span>
+                  <span class="status-badge" [attr.data-status]="order.fulfillmentStatus">
+                    {{ order.fulfillmentStatus === 'delivered' ? 'Delivered' : (order.fulfillmentStatus === 'shipped' ? 'In Transit' : 'Pick-Up') }}
+                  </span>
+                </div>
+                <div class="route-overview">
+                  <div class="route-point">
+                    <div class="point-marker origin"></div>
+                    <div class="point-details">
+                      <span class="date">{{ order.createdAt | date:'dd.MM.yyyy' }}</span>
+                      <div class="location">
+                        <span class="city">{{ order.organizationId?.name || 'Origin' }}</span>
+                        <span class="address">Merchant Hub</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="route-connector"></div>
+                  <div class="route-point">
+                    <div class="point-marker dest"></div>
+                    <div class="point-details">
+                      <span class="date">{{ order.estimatedDeliveryDate ? (order.estimatedDeliveryDate | date:'dd.MM.yyyy') : 'Pending' }}</span>
+                      <div class="location">
+                        <span class="city">{{ order.shippingAddress?.city || 'Destination' }}</span>
+                        <span class="address text-truncate" style="max-width: 150px;">{{ order.shippingAddress?.addressLine1 }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-foot">
+                  <div class="client-info">
+                    <div class="avatar"><i class="pi pi-user"></i></div>
+                    <div class="client-details">
+                      <span class="name">{{ order.shippingAddress?.fullName || 'Client' }}</span>
+                      @if (order.paymentMethod === 'COD') {
+                        <span class="role">COD: {{ order.totalAmount | currency:'INR' }}</span>
+                      }
+                      @if (order.paymentMethod !== 'COD') {
+                        <span class="role">Prepaid</span>
+                      }
+                    </div>
+                  </div>
+                  <button class="icon-btn"><i class="pi pi-phone"></i></button>
+                </div>
+              </div>
+            }
+          </div>
+        }
       </main>
-
-      <div class="drawer-backdrop" *ngIf="selectedOrder()" (click)="selectedOrder.set(null)"></div>
+    
+      @if (selectedOrder()) {
+        <div class="drawer-backdrop" (click)="selectedOrder.set(null)"></div>
+      }
       <div class="details-drawer" [class.open]="selectedOrder()">
-        <ng-container *ngIf="selectedOrder() as order">
-          
+        @if (selectedOrder(); as order) {
           <div class="drawer-header">
             <button class="back-btn" (click)="selectedOrder.set(null)">
               <i class="pi pi-angle-left"></i> Shipment Details
             </button>
-            <button class="btn-primary btn-sm" 
-                    *ngIf="order.fulfillmentStatus !== 'delivered'"
-                    (click)="handleDeliverClick(order)" [disabled]="updating()">
-              {{ updating() ? 'Saving...' : 'Submit Delivery' }}
-            </button>
+            @if (order.fulfillmentStatus !== 'delivered') {
+              <button class="btn-primary btn-sm"
+                (click)="handleDeliverClick(order)" [disabled]="updating()">
+                {{ updating() ? 'Saving...' : 'Submit Delivery' }}
+              </button>
+            }
           </div>
-
           <div class="drawer-scroll-area">
-            
             <div class="panel-section">
               <div class="panel-title">Route Details</div>
               <div class="timeline-list">
-                <div class="tl-row" *ngFor="let event of selectedOrderTimeline(); let i = index">
-                  <div class="tl-number">{{ selectedOrderTimeline().length - i }}</div>
-                  <div class="tl-data">
-                    <span class="tl-city">{{ event.message }}</span>
-                    <span class="tl-address">{{ event.at | date:'dd MMM yyyy, hh:mm a' }}</span>
+                @for (event of selectedOrderTimeline(); track event; let i = $index) {
+                  <div class="tl-row">
+                    <div class="tl-number">{{ selectedOrderTimeline().length - i }}</div>
+                    <div class="tl-data">
+                      <span class="tl-city">{{ event.message }}</span>
+                      <span class="tl-address">{{ event.at | date:'dd MMM yyyy, hh:mm a' }}</span>
+                    </div>
                   </div>
-                </div>
+                }
               </div>
             </div>
-
             <div class="split-panels">
               <div class="panel-card flex-1">
                 <span class="card-label">Payment Type</span>
@@ -155,79 +164,84 @@ import { Html5QrcodeScanner, Html5QrcodeScanType } from 'html5-qrcode';
                 </div>
               </div>
             </div>
-
             <div class="panel-section">
               <div class="panel-title">Package Contents</div>
               <div class="cart-items">
-                <div class="cart-item" *ngFor="let item of order.items">
-                  <div class="item-img-box">
-                    <img *ngIf="item.snapshot?.image" [src]="item.snapshot?.image" alt="product">
-                    <i *ngIf="!item.snapshot?.image" class="pi pi-box"></i>
+                @for (item of order.items; track item) {
+                  <div class="cart-item">
+                    <div class="item-img-box">
+                      @if (item.snapshot?.image) {
+                        <img [src]="item.snapshot?.image" alt="product">
+                      }
+                      @if (!item.snapshot?.image) {
+                        <i class="pi pi-box"></i>
+                      }
+                    </div>
+                    <div class="item-info">
+                      <span class="item-name">{{ item.snapshot?.name || item.name }}</span>
+                      <span class="item-sku">Qty: {{ item.quantity }}</span>
+                    </div>
+                    <div class="item-price">{{ item.unitPrice | currency:'INR' }}</div>
                   </div>
-                  <div class="item-info">
-                    <span class="item-name">{{ item.snapshot?.name || item.name }}</span>
-                    <span class="item-sku">Qty: {{ item.quantity }}</span>
-                  </div>
-                  <div class="item-price">{{ item.unitPrice | currency:'INR' }}</div>
-                </div>
+                }
               </div>
             </div>
-
             <div class="panel-section bg-muted">
               <span class="card-label">NOTE FOR DRIVER:</span>
               <p class="note-text">{{ order.deliveryNotes || 'No specific instructions provided. Inspect cargo for visible damage before delivery.' }}</p>
             </div>
-
           </div>
-        </ng-container>
+        }
       </div>
-
-      <div class="modal-overlay" *ngIf="showScanner()">
-        <div class="ui-modal">
-          <div class="modal-head">
-            <h3>Scan Shipment</h3>
-            <button class="icon-btn" (click)="closeScanner()"><i class="pi pi-times"></i></button>
-          </div>
-          
-          <div class="segment-control w-100 mb-md">
-            <button class="w-50" [class.active]="scanMode() === 'camera'" (click)="scanMode.set('camera')">Camera</button>
-            <button class="w-50" [class.active]="scanMode() === 'manual'" (click)="scanMode.set('manual')">Manual Entry</button>
-          </div>
-          
-          <div [hidden]="scanMode() !== 'camera'" class="scanner-frame">
-            <div id="qr-reader"></div>
-          </div>
-          
-          <div *ngIf="scanMode() === 'manual'" class="manual-box">
-            <input type="text" [ngModel]="manualIdentifier()" (ngModelChange)="manualIdentifier.set($event)" class="ui-input" placeholder="Enter Tracking or Cargo ID">
-            <button class="btn-primary w-100 mt-md" (click)="searchManual()" [disabled]="searchingScan()">
-              {{ searchingScan() ? 'Searching...' : 'Submit' }}
-            </button>
-          </div>
-          
-          <div class="error-msg mt-md" *ngIf="scanError()">{{ scanError() }}</div>
-        </div>
-      </div>
-
-      <div class="modal-overlay" *ngIf="showPaymentModal()" style="z-index: 1000;">
-        <div class="ui-modal text-center">
-          <div class="modal-icon"><i class="pi pi-wallet"></i></div>
-          <h3 class="mt-md">Collect Payment</h3>
-          <p class="text-muted text-sm mt-sm">This is a Cash on Delivery order. Collect exact amount.</p>
-          
-          <div class="amount-display mt-md">
-             {{ selectedOrder()?.totalAmount | currency:'INR' }}
-          </div>
-          
-          <div class="d-flex gap-md mt-lg">
-             <button class="btn-secondary flex-1" (click)="showPaymentModal.set(false)">Cancel</button>
-             <button class="btn-primary flex-1" (click)="confirmDeliverWithPayment()">Confirm</button>
+    
+      @if (showScanner()) {
+        <div class="modal-overlay">
+          <div class="ui-modal">
+            <div class="modal-head">
+              <h3>Scan Shipment</h3>
+              <button class="icon-btn" (click)="closeScanner()"><i class="pi pi-times"></i></button>
+            </div>
+            <div class="segment-control w-100 mb-md">
+              <button class="w-50" [class.active]="scanMode() === 'camera'" (click)="scanMode.set('camera')">Camera</button>
+              <button class="w-50" [class.active]="scanMode() === 'manual'" (click)="scanMode.set('manual')">Manual Entry</button>
+            </div>
+            <div [hidden]="scanMode() !== 'camera'" class="scanner-frame">
+              <div id="qr-reader"></div>
+            </div>
+            @if (scanMode() === 'manual') {
+              <div class="manual-box">
+                <input type="text" [ngModel]="manualIdentifier()" (ngModelChange)="manualIdentifier.set($event)" class="ui-input" placeholder="Enter Tracking or Cargo ID">
+                <button class="btn-primary w-100 mt-md" (click)="searchManual()" [disabled]="searchingScan()">
+                  {{ searchingScan() ? 'Searching...' : 'Submit' }}
+                </button>
+              </div>
+            }
+            @if (scanError()) {
+              <div class="error-msg mt-md">{{ scanError() }}</div>
+            }
           </div>
         </div>
-      </div>
-
+      }
+    
+      @if (showPaymentModal()) {
+        <div class="modal-overlay" style="z-index: 1000;">
+          <div class="ui-modal text-center">
+            <div class="modal-icon"><i class="pi pi-wallet"></i></div>
+            <h3 class="mt-md">Collect Payment</h3>
+            <p class="text-muted text-sm mt-sm">This is a Cash on Delivery order. Collect exact amount.</p>
+            <div class="amount-display mt-md">
+              {{ selectedOrder()?.totalAmount | currency:'INR' }}
+            </div>
+            <div class="d-flex gap-md mt-lg">
+              <button class="btn-secondary flex-1" (click)="showPaymentModal.set(false)">Cancel</button>
+              <button class="btn-primary flex-1" (click)="confirmDeliverWithPayment()">Confirm</button>
+            </div>
+          </div>
+        </div>
+      }
+    
     </div>
-  `,
+    `,
   styles: [`
     /* ==========================================================================
        THEME ALIGNMENT (Using provided tokens + safe fallbacks)

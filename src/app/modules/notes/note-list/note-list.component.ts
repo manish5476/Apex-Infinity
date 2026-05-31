@@ -1,5 +1,5 @@
 import { Component, inject, signal, effect, computed, ViewEncapsulation, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterModule, Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
@@ -29,7 +29,6 @@ type FilterType = 'all' | 'favorites' | 'shared' | 'shared-by-me' | 'recent' | '
   selector: 'app-note-list',
   standalone: true,
   imports: [
-    CommonModule,
     RouterModule,
     ReactiveFormsModule,
     NoteCardComponent,
@@ -41,7 +40,7 @@ type FilterType = 'all' | 'favorites' | 'shared' | 'shared-by-me' | 'recent' | '
     InputTextModule,
     TooltipModule,
     ProgressSpinnerModule
-  ],
+],
   encapsulation: ViewEncapsulation.None,
   template: `
     <div class="dashboard-container">

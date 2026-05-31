@@ -37,33 +37,41 @@ export interface HeroBannerConfig extends SectionBaseConfig {
       } @else {
         <div class="hero-bg hero-bg--fallback" [ngStyle]="fallbackBgStyle()"></div>
       }
-
+    
       <div class="hero-overlay" [style.opacity]="cfg().overlayOpacity / 100" [ngStyle]="{'background-color': cfg().overlayColor}"></div>
-
+    
       <div class="hero-inner" [ngClass]="'hero-inner--' + cfg().contentPosition">
         <div class="hero-content" [ngClass]="'hero-content--' + cfg().alignment">
-
+    
           @if (cfg().title) {
-            <ng-container [ngSwitch]="cfg().titleTag">
-              <h1 *ngSwitchCase="'h1'" class="hero-title" [ngStyle]="headingStyle()">{{ cfg().title }}</h1>
-              <h2 *ngSwitchCase="'h2'" class="hero-title" [ngStyle]="headingStyle()">{{ cfg().title }}</h2>
-              <h3 *ngSwitchCase="'h3'" class="hero-title" [ngStyle]="headingStyle()">{{ cfg().title }}</h3>
-              <h1 *ngSwitchDefault class="hero-title" [ngStyle]="headingStyle()">{{ cfg().title }}</h1>
-            </ng-container>
+            @switch (cfg().titleTag) {
+              @case ('h1') {
+                <h1 class="hero-title" [ngStyle]="headingStyle()">{{ cfg().title }}</h1>
+              }
+              @case ('h2') {
+                <h2 class="hero-title" [ngStyle]="headingStyle()">{{ cfg().title }}</h2>
+              }
+              @case ('h3') {
+                <h3 class="hero-title" [ngStyle]="headingStyle()">{{ cfg().title }}</h3>
+              }
+              @default {
+                <h1 class="hero-title" [ngStyle]="headingStyle()">{{ cfg().title }}</h1>
+              }
+            }
           }
-
+    
           @if (cfg().subtitle) {
             <p class="hero-subtitle" [ngStyle]="bodyStyle()">{{ cfg().subtitle }}</p>
           }
-
+    
           @if (cfg().ctaButtons?.length) {
             <div class="hero-actions">
               @for (btn of cfg().ctaButtons; track btn.text) {
                 @if (btn.text) {
                   <a [href]="btn.link || '#'"
-                     class="hero-btn"
-                     [ngClass]="'hero-btn--' + (btn.variant ?? 'primary')"
-                     [ngStyle]="buttonStyle(btn)">
+                    class="hero-btn"
+                    [ngClass]="'hero-btn--' + (btn.variant ?? 'primary')"
+                    [ngStyle]="buttonStyle(btn)">
                     @if (btn.icon) { <i [class]="btn.icon" aria-hidden="true"></i> }
                     <span [ngStyle]="{'font-family': cfg().typography.headingFont}">{{ btn.text }}</span>
                   </a>
@@ -71,11 +79,11 @@ export interface HeroBannerConfig extends SectionBaseConfig {
               }
             </div>
           }
-
+    
         </div>
       </div>
     </section>
-  `,
+    `,
   styles: [`
     app-hero-banner { display: block; width: 100%; }
 

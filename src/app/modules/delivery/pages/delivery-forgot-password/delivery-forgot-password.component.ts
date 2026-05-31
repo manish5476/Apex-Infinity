@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { DeliveryService } from '../../services/delivery.service';
@@ -7,15 +7,15 @@ import { DeliveryService } from '../../services/delivery.service';
 @Component({
   selector: 'app-delivery-forgot-password',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   template: `
     <div class="split-layout">
-      
+    
       <!-- ── Left: Form Section ────────────────────────────────────────── -->
       <div class="form-section">
-        
+    
         <div class="glow-orb"></div>
-
+    
         <div class="form-wrapper">
           <div class="brand">
             <div class="icon-wrapper">
@@ -24,59 +24,63 @@ import { DeliveryService } from '../../services/delivery.service';
             <h1>Forgot Password</h1>
             <p>Enter your phone or email to receive a password reset link for <span class="org-highlight">{{ orgSlug || 'your store' }}</span>.</p>
           </div>
-          
-          <form (ngSubmit)="onSubmit()" #forgotForm="ngForm" class="login-form" *ngIf="!successMessage">
-            <div class="form-group">
-              <label for="phoneOrEmail">Phone Number or Email</label>
-              <div class="input-container">
-                <i class="pi pi-user input-icon"></i>
-                <input 
-                  type="text" 
-                  id="phoneOrEmail"
-                  name="phoneOrEmail" 
-                  [(ngModel)]="phoneOrEmail" 
-                  required 
-                  class="premium-input" 
-                  placeholder="e.g. agent@example.com or 9876543210"
-                  autocomplete="off">
+    
+          @if (!successMessage) {
+            <form (ngSubmit)="onSubmit()" #forgotForm="ngForm" class="login-form">
+              <div class="form-group">
+                <label for="phoneOrEmail">Phone Number or Email</label>
+                <div class="input-container">
+                  <i class="pi pi-user input-icon"></i>
+                  <input
+                    type="text"
+                    id="phoneOrEmail"
+                    name="phoneOrEmail"
+                    [(ngModel)]="phoneOrEmail"
+                    required
+                    class="premium-input"
+                    placeholder="e.g. agent@example.com or 9876543210"
+                    autocomplete="off">
+                </div>
               </div>
+              @if (error) {
+                <div class="error-message">
+                  <i class="pi pi-exclamation-circle"></i>
+                  <span>{{ error }}</span>
+                </div>
+              }
+              <button type="submit" class="premium-btn primary-btn" [disabled]="forgotForm.invalid || loading">
+                <span class="btn-content" [class.is-hidden]="loading">
+                  Send Reset Link
+                  <i class="pi pi-arrow-right"></i>
+                </span>
+                @if (loading) {
+                  <i class="pi pi-spin pi-spinner loader"></i>
+                }
+              </button>
+              <div class="divider">
+                <span>or</span>
+              </div>
+              <button type="button" class="premium-btn secondary-btn" (click)="goToLogin()">
+                <i class="pi pi-arrow-left"></i>
+                Back to Login
+              </button>
+            </form>
+          }
+    
+          @if (successMessage) {
+            <div class="success-message-box">
+              <i class="pi pi-check-circle" style="font-size: 3rem; color: var(--accent-primary); margin-bottom: 1rem;"></i>
+              <h3>Link Sent!</h3>
+              <p>{{ successMessage }}</p>
+              <button type="button" class="premium-btn secondary-btn" style="margin-top: 1rem;" (click)="goToLogin()">
+                <i class="pi pi-arrow-left"></i>
+                Back to Login
+              </button>
             </div>
-            
-            <div class="error-message" *ngIf="error">
-              <i class="pi pi-exclamation-circle"></i>
-              <span>{{ error }}</span>
-            </div>
-            
-            <button type="submit" class="premium-btn primary-btn" [disabled]="forgotForm.invalid || loading">
-              <span class="btn-content" [class.is-hidden]="loading">
-                Send Reset Link
-                <i class="pi pi-arrow-right"></i>
-              </span>
-              <i class="pi pi-spin pi-spinner loader" *ngIf="loading"></i>
-            </button>
-
-            <div class="divider">
-              <span>or</span>
-            </div>
-
-            <button type="button" class="premium-btn secondary-btn" (click)="goToLogin()">
-              <i class="pi pi-arrow-left"></i>
-              Back to Login
-            </button>
-          </form>
-
-          <div class="success-message-box" *ngIf="successMessage">
-            <i class="pi pi-check-circle" style="font-size: 3rem; color: var(--accent-primary); margin-bottom: 1rem;"></i>
-            <h3>Link Sent!</h3>
-            <p>{{ successMessage }}</p>
-            <button type="button" class="premium-btn secondary-btn" style="margin-top: 1rem;" (click)="goToLogin()">
-              <i class="pi pi-arrow-left"></i>
-              Back to Login
-            </button>
-          </div>
+          }
         </div>
       </div>
-
+    
       <!-- ── Right: Image/Showcase Section ─────────────────────────────── -->
       <div class="hero-section">
         <div class="hero-overlay"></div>
@@ -92,7 +96,7 @@ import { DeliveryService } from '../../services/delivery.service';
         </div>
       </div>
     </div>
-  `,
+    `,
   styles: [`
     /* Copying the same styles as delivery-login for consistency */
     :host {
