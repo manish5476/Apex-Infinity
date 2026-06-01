@@ -1,12 +1,11 @@
 import { Component, inject, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
-import { PlatformDeliveryService } from '../../services/platform-delivery.service';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
-  selector: 'app-platform-login',
+  selector: 'app-global-delivery-login',
   standalone: true,
-  imports: [FormsModule, RouterModule],
+  imports: [FormsModule, RouterLink],
   encapsulation: ViewEncapsulation.None,
   template: `
 <div class="auth-root">
@@ -27,14 +26,14 @@ import { PlatformDeliveryService } from '../../services/platform-delivery.servic
       </div>
 
       <div class="hero-copy">
-        <p class="overline-text">Apex Network</p>
+        <p class="overline-text">Global Logistics</p>
         <h1 class="hero-headline">
-          Hit the<br>
-          road with<br>
+          Route<br>
+          with<br>
           <em>impact.</em>
         </h1>
         <p class="hero-body">
-          Empowering seamless global deliveries through our connected platform.
+          Seamlessly connect your local store operations with the global Apex delivery infrastructure.
         </p>
       </div>
 
@@ -47,8 +46,8 @@ import { PlatformDeliveryService } from '../../services/platform-delivery.servic
   <main class="form-panel" id="main-content">
     <div class="form-inner">
       <div class="form-header">
-        <h2 class="form-title">Network Login</h2>
-        <p class="form-subtitle">Welcome back! Please enter your details.</p>
+        <h2 class="form-title">Store Delivery Portal</h2>
+        <p class="form-subtitle">Enter your assigned Store ID to manage dispatch, tracking, and local logistics.</p>
       </div>
 
       @if (error) {
@@ -62,61 +61,56 @@ import { PlatformDeliveryService } from '../../services/platform-delivery.servic
 
       <form (ngSubmit)="onSubmit()" #loginForm="ngForm" class="auth-form" novalidate>
         <div class="field-group">
-          <label class="field-label" for="phone">Phone Number</label>
-          <input type="tel" id="phone" name="phone" [(ngModel)]="credentials.phone" required class="apex-input" placeholder="e.g. 9876543210" autocomplete="tel">
-        </div>
-
-        <div class="field-group">
-          <div class="field-label-row">
-            <label class="field-label" for="password">Password</label>
-            <a href="#" class="forgot-link">Forgot?</a>
-          </div>
-          <input type="password" id="password" name="password" [(ngModel)]="credentials.password" required class="apex-input" placeholder="Enter password">
+          <label class="field-label" for="storeId">Organization ID</label>
+          <input type="text" id="storeId" name="storeId" [(ngModel)]="storeId" required class="apex-input" placeholder="e.g. apex-store-1" autocomplete="off" spellcheck="false">
         </div>
 
         <button type="submit" class="submit-btn" [class.loading]="loading" [disabled]="loginForm.invalid || loading">
           @if (loading) {
             <span class="spinner" aria-hidden="true"></span>
-            <span>Logging in…</span>
+            <span>Locating…</span>
           } @else {
-            <span>Secure Login</span>
+            <span>Continue to Login</span>
             <svg class="btn-arrow" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
               <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
             </svg>
           }
         </button>
-      </form>
 
-      <p class="signup-nudge">
-        Don't have an account? <a routerLink="/apex-delivery/register" class="signup-link">Sign up</a>
-      </p>
+        <button type="button" class="submit-btn" (click)="goBack()" style="margin-top: 1rem; background: transparent; color: var(--text-primary); border: 1px solid var(--border);">
+          Return to Main ERP
+        </button>
+      </form>
     </div>
   </main>
 </div>
-  `,
+`,
   styleUrl: '../../../../modules/auth/_auth.shared.scss'
 })
-export class PlatformLoginComponent {
-  private platformService = inject(PlatformDeliveryService);
+export class GlobalDeliveryLoginComponent {
   private router = inject(Router);
 
-  credentials = { phone: '', password: '' };
+  storeId = '';
   loading = false;
   error = '';
 
   onSubmit() {
+    if (!this.storeId) {
+      this.error = 'Please enter a valid organization ID';
+      return;
+    }
+
     this.loading = true;
     this.error = '';
-    
-    this.platformService.login(this.credentials.phone, this.credentials.password).subscribe({
-      next: (res) => {
-        this.platformService.setToken(res.token);
-        this.router.navigate(['/apex-delivery/dashboard']);
-      },
-      error: (err) => {
-        this.loading = false;
-        this.error = err?.error?.message || 'Login failed. Please try again.';
-      }
-    });
+
+    // In a real app, this would verify the org exists via API
+    // For now, assume it's valid and route to the store's delivery login
+    setTimeout(() => {
+      this.router.navigate(['/store', this.storeId, 'delivery', 'login']);
+    }, 600);
+  }
+
+  goBack() {
+    this.router.navigate(['/auth/login']);
   }
 }

@@ -46,20 +46,20 @@ import { TooltipModule } from 'primeng/tooltip';
           <p>Record your daily attendance and track your working hours.</p>
         </div>
       </header>
-
+    
       <!-- Main Content Grid (Bento Layout) -->
       <div class="bento-grid">
-        
+    
         <!-- Left Column (Actions & Stats) -->
         <div class="left-column">
-          
+    
           <!-- Clock & Actions Card -->
           <div class="bento-card main-action-card">
             <div class="clock-section">
               <div class="time-display">{{ currentTime() | date:'HH:mm:ss' }}</div>
               <div class="date-display">{{ currentTime() | date:'EEEE, dd MMM yyyy' }}</div>
             </div>
-
+    
             <div class="status-section">
               @if (currentStatus() === 'in') {
                 <div class="status-ring ring-in">
@@ -81,123 +81,137 @@ import { TooltipModule } from 'primeng/tooltip';
                 <div class="status-text text-out">Currently Clocked Out</div>
               }
             </div>
-
+    
             <div class="action-buttons">
               @if (currentStatus() === 'out') {
                 <button class="btn-primary btn-in" [class.loading]="isPunching()" (click)="performPunch('in')">
-                  <i class="pi pi-sign-in" *ngIf="!isPunching()"></i>
-                  <i class="pi pi-spinner pi-spin" *ngIf="isPunching()"></i>
+                  @if (!isPunching()) {
+                    <i class="pi pi-sign-in"></i>
+                  }
+                  @if (isPunching()) {
+                    <i class="pi pi-spinner pi-spin"></i>
+                  }
                   Punch In
                 </button>
               } @else {
                 <button class="btn-primary btn-out" [class.loading]="isPunching()" (click)="performPunch('out')">
-                  <i class="pi pi-sign-out" *ngIf="!isPunching()"></i>
-                  <i class="pi pi-spinner pi-spin" *ngIf="isPunching()"></i>
+                  @if (!isPunching()) {
+                    <i class="pi pi-sign-out"></i>
+                  }
+                  @if (isPunching()) {
+                    <i class="pi pi-spinner pi-spin"></i>
+                  }
                   Punch Out
                 </button>
               }
-              
+    
               <div class="secondary-actions">
                 @if (currentStatus() === 'in') {
                   <button class="btn-secondary btn-break" [class.loading]="isPunching()" (click)="performPunch('break_start')">
-                    <i class="pi pi-coffee" *ngIf="!isPunching()"></i> Start Break
-                  </button>
-                } @else if (currentStatus() === 'break') {
-                  <button class="btn-secondary btn-break" [class.loading]="isPunching()" (click)="performPunch('break_end')">
-                    <i class="pi pi-play" *ngIf="!isPunching()"></i> End Break
-                  </button>
-                } @else {
-                  <button class="btn-secondary btn-remote" [class.loading]="isPunching()" (click)="performPunch('remote_in')">
-                    <i class="pi pi-globe" *ngIf="!isPunching()"></i> Remote In
-                  </button>
-                }
-              </div>
-            </div>
-
-            <div class="location-badge" [class.acquired]="hasLocation()">
-              <i class="pi" [ngClass]="hasLocation() ? 'pi-map-marker' : 'pi-compass pi-spin'"></i>
-              <span>{{ hasLocation() ? 'Location Acquired' : 'Acquiring Location...' }}</span>
-            </div>
-          </div>
-
-          <!-- Stats Card -->
-          <div class="bento-card stats-card">
-            <div class="stat-box border-right">
-              <span class="stat-label">Total Hours</span>
-              <div class="stat-value text-primary">
-                {{ summaryStats()?.totalHours || '0.0' }}<span class="stat-unit">h</span>
-              </div>
-            </div>
-            <div class="stat-box">
-              <span class="stat-label">Break Time</span>
-              <div class="stat-value text-warning">
-                {{ summaryStats()?.breakHours || '0.0' }}<span class="stat-unit">h</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Right Column (Timeline) -->
-        <div class="right-column">
-          <div class="bento-card timeline-card">
-            <div class="card-header">
-              <div class="header-title">
-                <div class="icon-wrapper"><i class="pi pi-list"></i></div>
-                <h3>Today's Activity</h3>
-              </div>
-            </div>
-            
-            <div class="timeline-container">
-              @if (isLoadingLogs()) {
-                <div class="skeleton-wrapper">
-                  <p-skeleton height="80px" borderRadius="12px" styleClass="mb-3"></p-skeleton>
-                  <p-skeleton height="80px" borderRadius="12px" styleClass="mb-3"></p-skeleton>
-                  <p-skeleton height="80px" borderRadius="12px"></p-skeleton>
-                </div>
-              } @else {
-                <p-timeline [value]="myLogs()" styleClass="modern-timeline">
-                  <ng-template pTemplate="marker" let-log>
-                    <div class="timeline-marker" [ngClass]="getMarkerClass(log.type)">
-                      <i [ngClass]="getLogIcon(log.type)"></i>
+                    @if (!isPunching()) {
+                      <i class="pi pi-coffee"></i>
+                      } Start Break
+                    </button>
+                  } @else if (currentStatus() === 'break') {
+                    <button class="btn-secondary btn-break" [class.loading]="isPunching()" (click)="performPunch('break_end')">
+                      @if (!isPunching()) {
+                        <i class="pi pi-play"></i>
+                        } End Break
+                      </button>
+                    } @else {
+                      <button class="btn-secondary btn-remote" [class.loading]="isPunching()" (click)="performPunch('remote_in')">
+                        @if (!isPunching()) {
+                          <i class="pi pi-globe"></i>
+                          } Remote In
+                        </button>
+                      }
                     </div>
-                  </ng-template>
-                  
-                  <ng-template pTemplate="content" let-log>
-                    <div class="timeline-content-box">
-                      <div class="content-header">
-                        <span class="log-type">{{ formatType(log.type) }}</span>
-                        <span class="log-time">{{ log.timestamp | date:'HH:mm:ss' }}</span>
-                      </div>
-                      <div class="content-details">
-                        <span class="detail-item source"><i class="pi pi-desktop"></i> {{ log.source }}</span>
-                        @if (log.location?.address) {
-                          <span class="detail-item location" [pTooltip]="log.location.address" tooltipPosition="top">
-                            <i class="pi pi-map-marker"></i> {{ log.location.address }}
-                          </span>
-                        }
-                        @if (log.processingStatus === 'flagged') {
-                          <span class="detail-item flagged">FLAGGED</span>
-                        }
-                      </div>
-                    </div>
-                  </ng-template>
-                </p-timeline>
-                
-                @if (myLogs().length === 0) {
-                  <div class="empty-state">
-                    <div class="empty-icon"><i class="pi pi-inbox"></i></div>
-                    <h4>No Activity Yet</h4>
-                    <p>Your punches for today will appear here.</p>
                   </div>
-                }
-              }
+    
+                  <div class="location-badge" [class.acquired]="hasLocation()">
+                    <i class="pi" [ngClass]="hasLocation() ? 'pi-map-marker' : 'pi-compass pi-spin'"></i>
+                    <span>{{ hasLocation() ? 'Location Acquired' : 'Acquiring Location...' }}</span>
+                  </div>
+                </div>
+    
+                <!-- Stats Card -->
+                <div class="bento-card stats-card">
+                  <div class="stat-box border-right">
+                    <span class="stat-label">Total Hours</span>
+                    <div class="stat-value text-primary">
+                      {{ summaryStats()?.totalHours || '0.0' }}<span class="stat-unit">h</span>
+                    </div>
+                  </div>
+                  <div class="stat-box">
+                    <span class="stat-label">Break Time</span>
+                    <div class="stat-value text-warning">
+                      {{ summaryStats()?.breakHours || '0.0' }}<span class="stat-unit">h</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+    
+              <!-- Right Column (Timeline) -->
+              <div class="right-column">
+                <div class="bento-card timeline-card">
+                  <div class="card-header">
+                    <div class="header-title">
+                      <div class="icon-wrapper"><i class="pi pi-list"></i></div>
+                      <h3>Today's Activity</h3>
+                    </div>
+                  </div>
+    
+                  <div class="timeline-container">
+                    @if (isLoadingLogs()) {
+                      <div class="skeleton-wrapper">
+                        <p-skeleton height="80px" borderRadius="12px" styleClass="mb-3"></p-skeleton>
+                        <p-skeleton height="80px" borderRadius="12px" styleClass="mb-3"></p-skeleton>
+                        <p-skeleton height="80px" borderRadius="12px"></p-skeleton>
+                      </div>
+                    } @else {
+                      <p-timeline [value]="myLogs()" styleClass="modern-timeline">
+                        <ng-template pTemplate="marker" let-log>
+                          <div class="timeline-marker" [ngClass]="getMarkerClass(log.type)">
+                            <i [ngClass]="getLogIcon(log.type)"></i>
+                          </div>
+                        </ng-template>
+    
+                        <ng-template pTemplate="content" let-log>
+                          <div class="timeline-content-box">
+                            <div class="content-header">
+                              <span class="log-type">{{ formatType(log.type) }}</span>
+                              <span class="log-time">{{ log.timestamp | date:'HH:mm:ss' }}</span>
+                            </div>
+                            <div class="content-details">
+                              <span class="detail-item source"><i class="pi pi-desktop"></i> {{ log.source }}</span>
+                              @if (log.location?.address) {
+                                <span class="detail-item location" [pTooltip]="log.location.address" tooltipPosition="top">
+                                  <i class="pi pi-map-marker"></i> {{ log.location.address }}
+                                </span>
+                              }
+                              @if (log.processingStatus === 'flagged') {
+                                <span class="detail-item flagged">FLAGGED</span>
+                              }
+                            </div>
+                          </div>
+                        </ng-template>
+                      </p-timeline>
+    
+                      @if (myLogs().length === 0) {
+                        <div class="empty-state">
+                          <div class="empty-icon"><i class="pi pi-inbox"></i></div>
+                          <h4>No Activity Yet</h4>
+                          <p>Your punches for today will appear here.</p>
+                        </div>
+                      }
+                    }
+                  </div>
+                </div>
+              </div>
+    
             </div>
           </div>
-        </div>
-
-      </div>
-    </div>
-  `,
+    `,
   styles: [`
     /* Master Container */
     .attendance-dashboard {

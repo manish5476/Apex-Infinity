@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation, inject, signal, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { Subject } from "rxjs";
@@ -76,7 +76,6 @@ export class ActionButtonsRenderer {
   selector: 'app-sales-return-list',
   standalone: true,
   imports: [
-    CommonModule,
     SelectModule,
     FormsModule,
     ReactiveFormsModule,
@@ -89,7 +88,8 @@ export class ActionButtonsRenderer {
     DatePickerModule,
     HasPermissionDirective,
     DynamicDialogModule,
-    MasterDropdownComponent],
+    MasterDropdownComponent
+],
   providers: [DialogService],
   template: `
     <p-toast position="bottom-right" appendTo="body"></p-toast>

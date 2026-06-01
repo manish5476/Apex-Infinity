@@ -24,18 +24,14 @@
         </div>
       } @else {
         <div class="classic-grid-wrapper">
-          <p-table 
-            [value]="agents()" 
-            [columns]="cols" 
-            [loading]="loading()" 
-            [paginator]="true" 
-            [rows]="20"
-            styleClass="premium-p-table"
-            [rowHover]="true">
-            
+          <p-table [value]="agents()" [columns]="cols" [loading]="loading()" [paginator]="true" [rows]="20"
+            styleClass="premium-p-table" [rowHover]="true">
+
             <ng-template pTemplate="header" let-columns>
               <tr>
-                <th *ngFor="let col of columns">{{ col.header }}</th>
+                @for (col of columns; track col) {
+                  <th>{{ col.header }}</th>
+                }
                 <th style="width: 120px; text-align: center;">Actions</th>
               </tr>
             </ng-template>
@@ -49,34 +45,53 @@
                     </div>
                     <div class="agent-info">
                       <span class="name">{{ agent.name }}</span>
-                      <span class="email" *ngIf="agent.email">{{ agent.email }}</span>
+                      @if (agent.email) {
+                        <span class="email">{{ agent.email }}</span>
+                      }
                     </div>
                   </div>
                 </td>
                 <td><span class="cell-text">{{ agent.phone }}</span></td>
                 <td>
                   <span class="vehicle-badge">
-                    <i class="pi" 
-                       [class.pi-car]="agent.vehicleType === 'car'"
-                       [class.pi-truck]="agent.vehicleType === 'truck' || agent.vehicleType === 'van'"
-                       [class.pi-compass]="agent.vehicleType === 'bike' || agent.vehicleType === 'motorcycle'">
+                    <i class="pi" [class.pi-car]="agent.vehicleType === 'car'"
+                      [class.pi-truck]="agent.vehicleType === 'truck' || agent.vehicleType === 'van'"
+                      [class.pi-compass]="agent.vehicleType === 'bike' || agent.vehicleType === 'motorcycle'">
                     </i>
                     {{ agent.vehicleType || 'N/A' }}
                   </span>
                 </td>
                 <td>
-                  <span class="mono-badge" *ngIf="agent.vehicleRegistrationNumber">{{ agent.vehicleRegistrationNumber }}</span>
-                  <span class="empty-text" *ngIf="!agent.vehicleRegistrationNumber">—</span>
+                  @if (agent.vehicleRegistrationNumber) {
+                    <span class="mono-badge">{{ agent.vehicleRegistrationNumber
+                    }}</span>
+                  }
+                  @if (!agent.vehicleRegistrationNumber) {
+                    <span class="empty-text">—</span>
+                  }
                 </td>
                 <td>
-                  <p-tag [value]="agent.isActive ? 'Active' : 'Inactive'" [severity]="getStatusSeverity(agent.isActive)"></p-tag>
+                  <p-tag [value]="agent.isActive ? 'Active' : 'Inactive'"
+                  [severity]="getStatusSeverity(agent.isActive)"></p-tag>
                 </td>
                 <td>
                   <div class="action-buttons">
-                    <button class="icon-btn edit-btn" pTooltip="Edit Agent" tooltipPosition="left" (click)="openEdit(agent)">
+                    @if (agent.email) {
+                      <button class="icon-btn email-btn" pTooltip="Send Email Invite" tooltipPosition="left"
+                        (click)="sendInvite(agent, $event)">
+                        <i class="pi pi-envelope"></i>
+                      </button>
+                    }
+                    <button class="icon-btn share-btn" pTooltip="Share Login Link" tooltipPosition="left"
+                      (click)="shareLoginLink(agent, $event)">
+                      <i class="pi pi-share-alt"></i>
+                    </button>
+                    <button class="icon-btn edit-btn" pTooltip="Edit Agent" tooltipPosition="left"
+                      (click)="openEdit(agent)">
                       <i class="pi pi-pencil"></i>
                     </button>
-                    <button class="icon-btn delete-btn" pTooltip="Delete Agent" tooltipPosition="left" (click)="deleteAgent(agent, $event)">
+                    <button class="icon-btn delete-btn" pTooltip="Delete Agent" tooltipPosition="left"
+                      (click)="deleteAgent(agent, $event)">
                       <i class="pi pi-trash"></i>
                     </button>
                   </div>
@@ -104,91 +119,91 @@
     </div>
   </section>
 
-  <aside class="detail-panel" *ngIf="drawerVisible()">
-    <header class="panel-header">
-      <div class="title-group">
-        <span class="eyebrow">Fleet Management</span>
-        <h2>{{ selectedAgent() ? 'Edit Delivery Agent' : 'Add Delivery Agent' }}</h2>
-      </div>
-      <button class="close-btn" (click)="closeDrawer()">
-        <i class="pi pi-times"></i>
-      </button>
-    </header>
-
-    <div class="panel-scroll panel-form-scroll">
-      <div class="agent-form-grid">
-        
-        <div class="bento-block form-block">
-          <div class="block-header-mini">Basic Information</div>
-          
-          <label class="form-label">
-            Full Name <span class="required">*</span>
-            <input type="text" [(ngModel)]="formAgent.name" class="premium-input" placeholder="e.g. John Doe" />
-          </label>
-
-          <div class="form-row">
+  @if (drawerVisible()) {
+    <aside class="detail-panel">
+      <header class="panel-header">
+        <div class="title-group">
+          <span class="eyebrow">Fleet Management</span>
+          <h2>{{ selectedAgent() ? 'Edit Delivery Agent' : 'Add Delivery Agent' }}</h2>
+        </div>
+        <button class="close-btn" (click)="closeDrawer()">
+          <i class="pi pi-times"></i>
+        </button>
+      </header>
+      <div class="panel-scroll panel-form-scroll">
+        <div class="agent-form-grid">
+          <div class="bento-block form-block">
+            <div class="block-header-mini">Basic Information</div>
             <label class="form-label">
-              Phone Number <span class="required">*</span>
-              <input type="text" [(ngModel)]="formAgent.phone" class="premium-input" placeholder="+91 98765 43210" />
+              Full Name <span class="required">*</span>
+              <input type="text" [(ngModel)]="formAgent.name" class="premium-input" placeholder="e.g. John Doe" />
             </label>
-
+            <div class="form-row">
+              <label class="form-label">
+                Phone Number <span class="required">*</span>
+                <input type="text" [(ngModel)]="formAgent.phone" class="premium-input" placeholder="+91 98765 43210" />
+              </label>
+              <label class="form-label">
+                Email Address <span class="required">*</span>
+                <input type="email" [(ngModel)]="formAgent.email" class="premium-input" placeholder="agent@store.com" />
+              </label>
+            </div>
             <label class="form-label">
-              Email Address
-              <input type="email" [(ngModel)]="formAgent.email" class="premium-input" placeholder="agent@store.com" />
+              Alternate Phone Number <span class="optional-text">(Optional)</span>
+              <input type="text" [(ngModel)]="formAgent.alternatePhone" class="premium-input" placeholder="+91 12345 67890" />
+            </label>
+            <label class="form-label">
+              Password @if (!selectedAgent()) {
+              <span class="required">*</span>
+            }
+            <input type="password" [(ngModel)]="formAgent.password" class="premium-input"
+              placeholder="Enter secure password..." />
+              @if (selectedAgent()) {
+                <small class="hint-text">Leave blank to keep current password.</small>
+              }
             </label>
           </div>
-
-          <label class="form-label">
-            Password <span class="required" *ngIf="!selectedAgent()">*</span>
-            <input type="password" [(ngModel)]="formAgent.password" class="premium-input" placeholder="Enter secure password..." />
-            <small class="hint-text" *ngIf="selectedAgent()">Leave blank to keep current password.</small>
-          </label>
-        </div>
-
-        <div class="bento-block form-block">
-          <div class="block-header-mini">Vehicle Assignments</div>
-
-          <div class="form-row">
-            <label class="form-label">
-              Vehicle Type
-              <select [(ngModel)]="formAgent.vehicleType" class="premium-select">
-                <option value="bike">Bicycle</option>
-                <option value="motorcycle">Motorcycle</option>
-                <option value="van">Delivery Van</option>
-                <option value="truck">Truck</option>
-                <option value="car">Car</option>
-              </select>
-            </label>
-
-            <label class="form-label">
-              Registration Plate
-              <input type="text" [(ngModel)]="formAgent.vehicleRegistrationNumber" class="premium-input uppercase-input" placeholder="e.g. GJ-05-XX-1234" />
-            </label>
+          <div class="bento-block form-block">
+            <div class="block-header-mini">Vehicle Assignments</div>
+            <div class="form-row">
+              <label class="form-label">
+                Vehicle Type
+                <select [(ngModel)]="formAgent.vehicleType" class="premium-select">
+                  <option value="bike">Bicycle</option>
+                  <option value="motorcycle">Motorcycle</option>
+                  <option value="van">Delivery Van</option>
+                  <option value="truck">Truck</option>
+                  <option value="car">Car</option>
+                </select>
+              </label>
+              <label class="form-label">
+                Registration Plate
+                <input type="text" [(ngModel)]="formAgent.vehicleRegistrationNumber" class="premium-input uppercase-input"
+                  placeholder="e.g. GJ-05-XX-1234" />
+                </label>
+              </div>
+            </div>
+            <div class="bento-block form-block toggle-block">
+              <label class="check-label">
+                <div class="check-text">
+                  <strong>Active Status</strong>
+                  <span>Agent is available and can be assigned to new orders</span>
+                </div>
+                <div class="toggle-switch">
+                  <input type="checkbox" [(ngModel)]="formAgent.isActive">
+                  <span class="slider"></span>
+                </div>
+              </label>
+            </div>
           </div>
         </div>
-
-        <div class="bento-block form-block toggle-block">
-          <label class="check-label">
-            <div class="check-text">
-              <strong>Active Status</strong>
-              <span>Agent is available and can be assigned to new orders</span>
-            </div>
-            <div class="toggle-switch">
-              <input type="checkbox" [(ngModel)]="formAgent.isActive">
-              <span class="slider"></span>
-            </div>
-          </label>
+        <div class="sticky-actions">
+          <button class="premium-btn ghost-btn" (click)="closeDrawer()">Cancel</button>
+          <button class="premium-btn primary-btn" (click)="saveAgent()" [disabled]="loading()">
+            <i class="pi" [class.pi-spin]="loading()" [class.pi-spinner]="loading()" [class.pi-check]="!loading()"></i>
+            {{ loading() ? 'Saving...' : 'Save Agent' }}
+          </button>
         </div>
-
-      </div>
-    </div>
-
-    <div class="sticky-actions">
-      <button class="premium-btn ghost-btn" (click)="closeDrawer()">Cancel</button>
-      <button class="premium-btn primary-btn" (click)="saveAgent()" [disabled]="loading()">
-        <i class="pi" [class.pi-spin]="loading()" [class.pi-spinner]="loading()" [class.pi-check]="!loading()"></i>
-        {{ loading() ? 'Saving...' : 'Save Agent' }}
-      </button>
-    </div>
-  </aside>
-</main>
+      </aside>
+    }
+  </main>

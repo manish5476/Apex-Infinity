@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, OnInit, inject, signal, computed, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { StorefrontAdminService } from '@core/services/storefront-admin.service';
@@ -25,7 +25,7 @@ interface StorefrontTheme {
 @Component({
   selector: 'app-storefront-layout',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   template: `
     <main class="layout-settings">
       <header class="page-header">
@@ -40,7 +40,7 @@ interface StorefrontTheme {
           </button>
         </div>
       </header>
-
+    
       @if (loading()) {
         <div class="loading-state">
           <i class="pi pi-spin pi-spinner"></i>
@@ -53,9 +53,9 @@ interface StorefrontTheme {
           <button class="premium-btn ghost-btn" (click)="fetchCoreData()">Retry</button>
         </div>
       } @else {
-        
+    
         <div class="settings-grid">
-            
+    
           <section class="config-card bento-block span-4">
             <div class="card-header">
               <h2><i class="pi pi-palette"></i> Brand Settings</h2>
@@ -69,15 +69,15 @@ interface StorefrontTheme {
                 </div>
                 <p class="hint" style="margin-top: 8px;">Used for primary buttons, active links, and accents.</p>
               </div>
-              
+    
               <hr class="divider" style="margin: 20px 0;" />
               <div class="form-group">
                 <label>Storefront Currency</label>
                 <input type="text" [(ngModel)]="commerce.currency" class="premium-input uppercase-input" placeholder="e.g. INR" />
               </div>
-
+    
               <hr class="divider" style="margin: 20px 0;" />
-              
+    
               <div class="form-group">
                 <label>Fulfillment Strategy</label>
                 <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
@@ -91,7 +91,7 @@ interface StorefrontTheme {
               </div>
             </div>
           </section>
-
+    
           <section class="config-card bento-block span-8">
             <div class="card-header">
               <h2><i class="pi pi-sparkles"></i> Theme Marketplace</h2>
@@ -99,15 +99,15 @@ interface StorefrontTheme {
             </div>
             <div class="card-body marketplace-body">
               <p class="hint" style="margin-bottom: 20px;">Select a curated template to instantly update your global branding palette.</p>
-              
+    
               @if (themes().length === 0) {
                 <div class="empty-hint">No premium themes available from the registry.</div>
               } @else {
                 <div class="themes-grid">
                   @for (theme of themes(); track theme.id) {
-                    <div class="theme-card" 
-                         [class.active]="colors.primary === theme.color" 
-                         (click)="applyThemeLocally(theme)">
+                    <div class="theme-card"
+                      [class.active]="colors.primary === theme.color"
+                      (click)="applyThemeLocally(theme)">
                       <div class="theme-preview" [style.background]="theme.gradient || theme.color">
                         @if (colors.primary === theme.color) {
                           <div class="active-indicator"><i class="pi pi-check-circle"></i></div>
@@ -122,144 +122,140 @@ interface StorefrontTheme {
               }
             </div>
           </section>
-
+    
           <section class="config-card bento-block span-8">
             <div class="card-header">
               <h2><i class="pi pi-compass"></i> Header Navigation Bar</h2>
             </div>
             <div class="card-body">
               <p class="hint" style="margin-bottom: 20px;">Map external URLs or search to link existing storefront pages.</p>
-              
+    
               <div class="link-builder">
-                <div class="link-row" *ngFor="let link of headerLinks; let i = index">
-                  <i class="pi pi-bars drag-handle"></i>
-                  
-                  <div class="input-group">
-                    <input type="text" [(ngModel)]="link.label" placeholder="Display Label (e.g. Shop All)" class="premium-input" />
-                  </div>
-                  
-                  <div class="input-group suggestion-container">
-                    <input 
-                      type="text" 
-                      [(ngModel)]="link.url" 
-                      (focus)="activeSuggestionIndex.set('header-' + i)"
-                      (input)="filterPages(link.url)"
-                      placeholder="URL Routing (e.g. /products)" 
-                      class="premium-input mono-input" />
-                    
-                    @if (activeSuggestionIndex() === 'header-' + i && filteredPages().length > 0) {
-                      <div class="suggestions-dropdown">
-                        <div class="suggestion-header">Storefront Pages</div>
-                        @for (p of filteredPages(); track p._id) {
-                          <div class="suggestion-item" (click)="selectSuggestion(p, link)">
-                            <div class="s-main"><i class="pi pi-file"></i> {{ p.name }}</div>
-                            <span class="s-slug">/{{ p.slug }}</span>
+                @for (link of headerLinks; track link; let i = $index) {
+                  <div class="link-row">
+                    <i class="pi pi-bars drag-handle"></i>
+                    <div class="input-group">
+                      <input type="text" [(ngModel)]="link.label" placeholder="Display Label (e.g. Shop All)" class="premium-input" />
+                    </div>
+                    <div class="input-group suggestion-container">
+                      <input
+                        type="text"
+                        [(ngModel)]="link.url"
+                        (focus)="activeSuggestionIndex.set('header-' + i)"
+                        (input)="filterPages(link.url)"
+                        placeholder="URL Routing (e.g. /products)"
+                        class="premium-input mono-input" />
+                        @if (activeSuggestionIndex() === 'header-' + i && filteredPages().length > 0) {
+                          <div class="suggestions-dropdown">
+                            <div class="suggestion-header">Storefront Pages</div>
+                            @for (p of filteredPages(); track p._id) {
+                              <div class="suggestion-item" (click)="selectSuggestion(p, link)">
+                                <div class="s-main"><i class="pi pi-file"></i> {{ p.name }}</div>
+                                <span class="s-slug">/{{ p.slug }}</span>
+                              </div>
+                            }
                           </div>
                         }
                       </div>
-                    }
-                  </div>
-                  
-                  <button class="icon-btn danger" (click)="removeHeaderLink(i)"><i class="pi pi-trash"></i></button>
-                </div>
-                
-                <button class="premium-btn ghost-btn dashed-btn" (click)="addHeaderLink()">
-                  <i class="pi pi-plus"></i> Add Nav Link
-                </button>
-              </div>
-            </div>
-          </section>
-
-          <section class="config-card bento-block span-4 page-manager-block">
-            <div class="card-header">
-              <h2><i class="pi pi-sitemap"></i> Live Pages</h2>
-              <span class="badge">{{ pages().length }} Nodes</span>
-            </div>
-            <div class="card-body scrollable-body">
-              @if (pages().length === 0) {
-                <p class="empty-hint" style="text-align: center; margin: 24px 0;">No pages initialized in CMS.</p>
-              } @else {
-                <div class="page-list-compact">
-                  @for (page of pages(); track page._id) {
-                    <div class="compact-page-row">
-                      <div class="page-ident">
-                        <span class="p-name">{{ page.name }}</span>
-                        <span class="p-slug">/{{ page.slug }}</span>
-                      </div>
-                      <button 
-                        class="icon-action-btn" 
-                        [class.active]="page.isPublished"
-                        (click)="togglePagePublishState(page)"
-                        [title]="page.isPublished ? 'Unpublish Node' : 'Publish Node'">
-                        <i class="pi" [class]="page.isPublished ? 'pi-eye' : 'pi-eye-slash'"></i>
-                      </button>
+                      <button class="icon-btn danger" (click)="removeHeaderLink(i)"><i class="pi pi-trash"></i></button>
                     </div>
                   }
-                </div>
-              }
-            </div>
-          </section>
-
-          <section class="config-card bento-block span-12">
-            <div class="card-header">
-              <h2><i class="pi pi-align-bottom"></i> Footer Configuration</h2>
-            </div>
-            <div class="card-body footer-grid-layout">
-              
-              <div class="form-group footer-left-col">
-                <label>Copyright Declaration</label>
-                <input type="text" [(ngModel)]="footerCopyright" placeholder="© 2026 Your Store Name" class="premium-input" />
-                <p class="hint" style="margin-top: 8px;">Displayed at the absolute bottom of the storefront.</p>
-              </div>
-              
-              <div class="form-group footer-right-col">
-                <label>Footer Matrix (Quick Links)</label>
-                <div class="link-builder">
-                  <div class="link-row" *ngFor="let link of footerLinks; let i = index">
-                    <i class="pi pi-bars drag-handle"></i>
-                    
-                    <div class="input-group">
-                      <input type="text" [(ngModel)]="link.label" placeholder="Display Label" class="premium-input" />
-                    </div>
-
-                    <div class="input-group suggestion-container">
-                      <input 
-                        type="text" 
-                        [(ngModel)]="link.url" 
-                        (focus)="activeSuggestionIndex.set('footer-' + i)"
-                        (input)="filterPages(link.url)"
-                        placeholder="URL Routing" 
-                        class="premium-input mono-input" />
-                      
-                      @if (activeSuggestionIndex() === 'footer-' + i && filteredPages().length > 0) {
-                        <div class="suggestions-dropdown">
-                          <div class="suggestion-header">Storefront Pages</div>
-                          @for (p of filteredPages(); track p._id) {
-                            <div class="suggestion-item" (click)="selectSuggestion(p, link)">
-                              <div class="s-main"><i class="pi pi-file"></i> {{ p.name }}</div>
-                              <span class="s-slug">/{{ p.slug }}</span>
-                            </div>
-                          }
-                        </div>
-                      }
-                    </div>
-
-                    <button class="icon-btn danger" (click)="removeFooterLink(i)"><i class="pi pi-trash"></i></button>
-                  </div>
-                  
-                  <button class="premium-btn ghost-btn dashed-btn" (click)="addFooterLink()">
-                    <i class="pi pi-plus"></i> Add Footer Link
+    
+                  <button class="premium-btn ghost-btn dashed-btn" (click)="addHeaderLink()">
+                    <i class="pi pi-plus"></i> Add Nav Link
                   </button>
                 </div>
               </div>
-              
+            </section>
+    
+            <section class="config-card bento-block span-4 page-manager-block">
+              <div class="card-header">
+                <h2><i class="pi pi-sitemap"></i> Live Pages</h2>
+                <span class="badge">{{ pages().length }} Nodes</span>
+              </div>
+              <div class="card-body scrollable-body">
+                @if (pages().length === 0) {
+                  <p class="empty-hint" style="text-align: center; margin: 24px 0;">No pages initialized in CMS.</p>
+                } @else {
+                  <div class="page-list-compact">
+                    @for (page of pages(); track page._id) {
+                      <div class="compact-page-row">
+                        <div class="page-ident">
+                          <span class="p-name">{{ page.name }}</span>
+                          <span class="p-slug">/{{ page.slug }}</span>
+                        </div>
+                        <button
+                          class="icon-action-btn"
+                          [class.active]="page.isPublished"
+                          (click)="togglePagePublishState(page)"
+                          [title]="page.isPublished ? 'Unpublish Node' : 'Publish Node'">
+                          <i class="pi" [class]="page.isPublished ? 'pi-eye' : 'pi-eye-slash'"></i>
+                        </button>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </section>
+    
+            <section class="config-card bento-block span-12">
+              <div class="card-header">
+                <h2><i class="pi pi-align-bottom"></i> Footer Configuration</h2>
+              </div>
+              <div class="card-body footer-grid-layout">
+    
+                <div class="form-group footer-left-col">
+                  <label>Copyright Declaration</label>
+                  <input type="text" [(ngModel)]="footerCopyright" placeholder="© 2026 Your Store Name" class="premium-input" />
+                  <p class="hint" style="margin-top: 8px;">Displayed at the absolute bottom of the storefront.</p>
+                </div>
+    
+                <div class="form-group footer-right-col">
+                  <label>Footer Matrix (Quick Links)</label>
+                  <div class="link-builder">
+                    @for (link of footerLinks; track link; let i = $index) {
+                      <div class="link-row">
+                        <i class="pi pi-bars drag-handle"></i>
+                        <div class="input-group">
+                          <input type="text" [(ngModel)]="link.label" placeholder="Display Label" class="premium-input" />
+                        </div>
+                        <div class="input-group suggestion-container">
+                          <input
+                            type="text"
+                            [(ngModel)]="link.url"
+                            (focus)="activeSuggestionIndex.set('footer-' + i)"
+                            (input)="filterPages(link.url)"
+                            placeholder="URL Routing"
+                            class="premium-input mono-input" />
+                            @if (activeSuggestionIndex() === 'footer-' + i && filteredPages().length > 0) {
+                              <div class="suggestions-dropdown">
+                                <div class="suggestion-header">Storefront Pages</div>
+                                @for (p of filteredPages(); track p._id) {
+                                  <div class="suggestion-item" (click)="selectSuggestion(p, link)">
+                                    <div class="s-main"><i class="pi pi-file"></i> {{ p.name }}</div>
+                                    <span class="s-slug">/{{ p.slug }}</span>
+                                  </div>
+                                }
+                              </div>
+                            }
+                          </div>
+                          <button class="icon-btn danger" (click)="removeFooterLink(i)"><i class="pi pi-trash"></i></button>
+                        </div>
+                      }
+    
+                      <button class="premium-btn ghost-btn dashed-btn" (click)="addFooterLink()">
+                        <i class="pi pi-plus"></i> Add Footer Link
+                      </button>
+                    </div>
+                  </div>
+    
+                </div>
+              </section>
+    
             </div>
-          </section>
-
-        </div>
-      }
-    </main>
-  `,
+          }
+        </main>
+    `,
   styles: [`
     .layout-settings {
       padding: 32px; 

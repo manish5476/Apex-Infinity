@@ -10,7 +10,7 @@ import {
   ViewEncapsulation,
   inject
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { AbstractControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { TabsModule } from 'primeng/tabs';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
@@ -22,11 +22,10 @@ import { DynamicFieldDefinition, DynamicFormTabs, SectionFieldSchema } from '../
   selector: 'app-config-form',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     TabsModule,
     DynamicFieldRendererComponent
-  ],
+],
   templateUrl: './config-form.component.html',
   styleUrls: ['./config-form.component.scss'],
   encapsulation: ViewEncapsulation.None

@@ -69,6 +69,16 @@ export const routes: Routes = [
   },
 
   // ============================================================
+  // 3.6 GLOBAL INLINE DELIVERY LOGIN
+  // ============================================================
+  {
+    path: 'delivery-agent/login',
+    loadComponent: () =>
+      import('./modules/delivery/pages/global-delivery-login/global-delivery-login.component').then(m => m.GlobalDeliveryLoginComponent),
+    title: 'Store Delivery Login'
+  },
+
+  // ============================================================
   // 4. SECURE ERP APP  (authGuard required)
   // ============================================================
   {

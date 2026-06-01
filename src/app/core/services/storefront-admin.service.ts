@@ -167,10 +167,13 @@ export class StorefrontAdminService extends BaseApiService {
     return this.delete(`${this.base}/delivery-agents/${agentId}`);
   }
 
+  sendDeliveryAgentInvite(agentId: string): Observable<any> {
+    return this.post(`${this.base}/delivery-agents/${agentId}/send-invite`, {});
+  }
+
   assignDeliveryAgent(orderId: string, data: any): Observable<any> {
     return this.patch(`${this.base}/orders/${orderId}/assign-agent`, data);
   }
-
   getStorefrontCustomers(params?: {
     status?: string;
     converted?: boolean;

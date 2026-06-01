@@ -305,6 +305,202 @@
           </div>
         </section>
 
+        <!-- ═══════════════════════════════════════════════════════════
+             GUARANTORS SECTION (Edit mode only — customer must exist)
+             ═══════════════════════════════════════════════════════════ -->
+        @if (editMode()) {
+          <section class="form-section">
+            <div class="flex items-center justify-between">
+              <h4 class="section-title">Guarantors</h4>
+              @if (!addingGuarantor()) {
+                <p-button
+                  icon="pi pi-plus"
+                  label="Add Guarantor"
+                  styleClass="p-button-sm p-button-outlined"
+                  (onClick)="showAddGuarantorForm()">
+                </p-button>
+              }
+            </div>
+
+            <!-- ── Existing Guarantors List ──────────────────────────── -->
+            @if (guarantors().length > 0) {
+              <div class="flex flex-col gap-3">
+                @for (entry of guarantors(); track $index) {
+                  <div class="flex items-center gap-4 p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-ternary)]">
+
+                    <!-- Avatar -->
+                    <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
+                         [style.background]="isGuarantorInactive(entry) ? '#9ca3af' : 'var(--accent-primary)'">
+                      {{ getGuarantorName(entry).charAt(0).toUpperCase() }}
+                    </div>
+
+                    <!-- Info -->
+                    <div class="flex-grow min-w-0">
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <span class="font-semibold text-[var(--text-primary)] text-sm">{{ getGuarantorName(entry) }}</span>
+                        @if (isGuarantorInactive(entry)) {
+                          <span class="text-[10px] uppercase font-bold tracking-wider bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full border border-gray-200">Deactivated</span>
+                        } @else {
+                          <span class="text-[10px] uppercase font-bold tracking-wider bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full border border-emerald-200">Active</span>
+                        }
+                      </div>
+                      @if (getGuarantorPhone(entry)) {
+                        <div class="text-xs text-[var(--text-tertiary)] mt-0.5 flex items-center gap-1">
+                          <i class="pi pi-phone" style="font-size: 0.65rem"></i>
+                          {{ getGuarantorPhone(entry) }}
+                        </div>
+                      }
+                      @if (entry.notes) {
+                        <div class="text-xs text-[var(--text-secondary)] mt-1 italic">
+                          <i class="pi pi-comment" style="font-size: 0.65rem"></i>
+                          {{ entry.notes }}
+                        </div>
+                      }
+                      @if (entry.addedAt) {
+                        <div class="text-[10px] text-[var(--text-tertiary)] mt-0.5">
+                          Added {{ entry.addedAt | date:'mediumDate' }}
+                        </div>
+                      }
+                    </div>
+
+                    <!-- Remove -->
+                    <p-button
+                      icon="pi pi-trash"
+                      styleClass="p-button-text p-button-danger p-button-sm"
+                      [loading]="removingGuarantorId() === (entry.customerId?._id || entry.customerId)"
+                      [title]="'Remove ' + getGuarantorName(entry)"
+                      (onClick)="removeGuarantor(entry.customerId?._id || entry.customerId)">
+                    </p-button>
+
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="text-center py-8 text-[var(--text-secondary)] text-sm">
+                <i class="pi pi-users text-3xl opacity-30 block mb-2"></i>
+                No guarantors added yet.
+              </div>
+            }
+
+            <!-- ── Add Guarantor Inline Form ────────────────────────── -->
+            @if (addingGuarantor()) {
+              <div class="mt-2 p-4 rounded-xl border border-blue-200 bg-blue-50/40 flex flex-col gap-4 animate-fadeIn">
+                <h5 class="font-semibold text-[var(--text-primary)] text-sm mb-0">Add a Guarantor</h5>
+
+                <div class="form-field">
+                  <label>Select Customer as Guarantor <span class="text-red-500">*</span></label>
+                  <app-master-dropdown
+                    id="guarantorSelect"
+                    endpoint="customers"
+                    placeholder="Search customer by name or phone..."
+                    [(ngModel)]="pendingGuarantorId"
+                    [ngModelOptions]="{standalone: true}"
+                    [showClear]="true">
+                  </app-master-dropdown>
+                  <small class="text-[var(--text-tertiary)] text-[11px]">Only customers from this organisation can be guarantors.</small>
+                </div>
+
+                <div class="form-field">
+                  <label>Notes (Optional)</label>
+                  <input
+                    type="text"
+                    pInputText
+                    [(ngModel)]="pendingGuarantorNotes"
+                    [ngModelOptions]="{standalone: true}"
+                    placeholder="e.g. Family relation, Business partner..."
+                    class="w-full" />
+
+                </div>
+
+                <div class="flex gap-3 justify-end">
+                  <p-button
+                    label="Cancel"
+                    styleClass="p-button-text p-button-secondary p-button-sm"
+                    (onClick)="cancelAddGuarantor()">
+                  </p-button>
+                  <p-button
+                    label="Confirm & Add"
+                    icon="pi pi-check"
+                    styleClass="p-button-sm"
+                    [loading]="savingGuarantor()"
+                    [disabled]="!pendingGuarantorId || savingGuarantor()"
+                    (onClick)="confirmAddGuarantor()">
+                  </p-button>
+                </div>
+              </div>
+            }
+
+          </section>
+        }
+        <!-- ── End Guarantors Section ──────────────────────────────── -->
+
+        <!-- ═══════════════════════════════════════════════════════════
+             GUARANTEED CUSTOMERS SECTION (Who is this customer guaranteeing?)
+             ═══════════════════════════════════════════════════════════ -->
+        @if (editMode()) {
+          <section class="form-section mt-8">
+            <div class="flex items-center justify-between mb-4">
+              <h4 class="section-title m-0">Acts as Guarantor For</h4>
+            </div>
+
+            @if (loadingGuaranteed()) {
+              <div class="flex flex-col gap-3">
+                <p-skeleton height="4rem" borderRadius="12px"></p-skeleton>
+                <p-skeleton height="4rem" borderRadius="12px"></p-skeleton>
+              </div>
+            } @else if (guaranteedCustomers().length > 0) {
+              <div class="flex flex-col gap-3">
+                @for (gc of guaranteedCustomers(); track $index) {
+                  <div class="flex items-center gap-4 p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-ternary)] hover:border-[var(--accent-primary)] hover:bg-[var(--bg-secondary)] transition-all cursor-pointer" [routerLink]="['/customer/edit', gc._id]">
+                    
+                    <!-- Avatar -->
+                    <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-[var(--accent-primary)] bg-blue-50 border border-blue-100 font-bold text-sm">
+                      {{ (gc.name || 'U').charAt(0).toUpperCase() }}
+                    </div>
+
+                    <!-- Info -->
+                    <div class="flex-grow min-w-0">
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <span class="font-semibold text-[var(--text-primary)] text-sm">{{ gc.name }}</span>
+                        @if (gc.isActive === false) {
+                          <span class="text-[10px] uppercase font-bold tracking-wider bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full border border-gray-200">Deactivated</span>
+                        } @else {
+                          <span class="text-[10px] uppercase font-bold tracking-wider bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full border border-emerald-200">Active</span>
+                        }
+                      </div>
+                      
+                      <div class="flex items-center gap-4 mt-1.5">
+                        @if (gc.phone) {
+                          <div class="text-xs text-[var(--text-secondary)] flex items-center gap-1.5">
+                            <i class="pi pi-phone text-[var(--text-tertiary)]" style="font-size: 0.65rem"></i>
+                            {{ gc.phone }}
+                          </div>
+                        }
+                        @if (gc.email) {
+                          <div class="text-xs text-[var(--text-secondary)] flex items-center gap-1.5">
+                            <i class="pi pi-envelope text-[var(--text-tertiary)]" style="font-size: 0.65rem"></i>
+                            <span class="truncate max-w-[150px]">{{ gc.email }}</span>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                    
+                    <div class="flex-shrink-0">
+                      <p-button icon="pi pi-external-link" styleClass="p-button-text p-button-secondary p-button-rounded" [routerLink]="['/customer/edit', gc._id]"></p-button>
+                    </div>
+
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="text-center py-8 text-[var(--text-secondary)] text-sm border border-dashed border-[var(--border-primary)] rounded-xl bg-[var(--bg-ternary)]">
+                <i class="pi pi-shield text-3xl opacity-30 block mb-2"></i>
+                This customer is not a guarantor for anyone.
+              </div>
+            }
+          </section>
+        }
+
         <footer class="form-footer flex justify-end gap-3 mt-8 pt-4 border-t border-gray-100">
           <p-button label="Cancel" type="button" styleClass="p-button-text p-button-secondary" routerLink="/customer"></p-button>
           <p-button 

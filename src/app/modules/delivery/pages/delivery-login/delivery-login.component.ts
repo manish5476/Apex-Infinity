@@ -1,178 +1,116 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { DeliveryService } from '../../services/delivery.service';
 
 @Component({
   selector: 'app-delivery-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule, RouterLink],
+  encapsulation: ViewEncapsulation.None,
   template: `
-    <div class="login-container">
-      <div class="login-card glass-panel">
-        <div class="brand">
-          <i class="pi pi-box brand-icon"></i>
-          <h1>Delivery Portal</h1>
-          <p>Login to manage your assigned orders.</p>
+<div class="auth-root">
+  <aside class="brand-panel">
+    <div class="grid-lines" aria-hidden="true"></div>
+    <div class="orb orb-1" aria-hidden="true"></div>
+    <div class="orb orb-2" aria-hidden="true"></div>
+
+    <div class="brand-inner">
+      <div class="wordmark">
+        <div class="logo-glyph">
+          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M4 28 L16 4 L28 28" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M8.5 20 L23.5 20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
+          </svg>
         </div>
-        
-        <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
-          <div class="form-group">
-            <label>Phone Number</label>
-            <input type="text" name="phone" [(ngModel)]="credentials.phone" required class="premium-input" placeholder="e.g. 9876543210">
-          </div>
-          
-          <div class="form-group">
-            <label>Password</label>
-            <input type="password" name="password" [(ngModel)]="credentials.password" required class="premium-input" placeholder="Enter password">
-          </div>
-          
-          <div class="error-message" *ngIf="error">{{ error }}</div>
-          
-          <button type="submit" class="premium-btn primary-btn full-width" [disabled]="loginForm.invalid || loading">
-            <i class="pi pi-spin pi-spinner" *ngIf="loading"></i>
-            <span *ngIf="!loading">Login</span>
-          </button>
-        </form>
+        <span class="wordmark-text">Apex</span>
       </div>
+
+      <div class="hero-copy">
+        <p class="overline-text">Store Fleet</p>
+        <h1 class="hero-headline">
+          Deliver<br>
+          with<br>
+          <em>precision.</em>
+        </h1>
+        <p class="hero-body">
+          Access real-time order tracking, customer delivery details, and instant proof-of-delivery tools on the go.
+        </p>
+      </div>
+
+      <footer class="brand-footer">
+        <span>© 2026 Apex Inc.</span>
+      </footer>
     </div>
-  `,
-  styles: [`
-    .login-container {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-      padding: 20px;
-    }
-    
-    .login-card {
-      width: 100%;
-      max-width: 400px;
-      padding: 40px 30px;
-      border-radius: 20px;
-    }
-    
-    .glass-panel {
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    }
-    
-    .brand {
-      text-align: center;
-      margin-bottom: 30px;
-      color: white;
-    }
-    
-    .brand-icon {
-      font-size: 3rem;
-      color: #38bdf8;
-      margin-bottom: 15px;
-      display: inline-block;
-    }
-    
-    h1 {
-      margin: 0 0 10px 0;
-      font-size: 1.8rem;
-      font-weight: 600;
-    }
-    
-    p {
-      margin: 0;
-      color: #94a3b8;
-      font-size: 0.95rem;
-    }
-    
-    .form-group {
-      margin-bottom: 20px;
-    }
-    
-    label {
-      display: block;
-      margin-bottom: 8px;
-      color: #cbd5e1;
-      font-size: 0.9rem;
-      font-weight: 500;
-    }
-    
-    .premium-input {
-      width: 100%;
-      padding: 12px 16px;
-      border-radius: 10px;
-      background: rgba(15, 23, 42, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: white;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-    }
-    
-    .premium-input:focus {
-      outline: none;
-      border-color: #38bdf8;
-      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
-    }
-    
-    .premium-btn {
-      padding: 14px;
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-    
-    .primary-btn {
-      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
-      color: white;
-      border: none;
-    }
-    
-    .primary-btn:hover:not([disabled]) {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 20px -10px rgba(37, 99, 235, 0.6);
-    }
-    
-    .primary-btn[disabled] {
-      opacity: 0.7;
-      cursor: not-allowed;
-    }
-    
-    .full-width {
-      width: 100%;
-    }
-    
-    .error-message {
-      color: #ef4444;
-      font-size: 0.85rem;
-      margin-bottom: 15px;
-      text-align: center;
-      background: rgba(239, 68, 68, 0.1);
-      padding: 10px;
-      border-radius: 8px;
-    }
-  `]
+  </aside>
+
+  <main class="form-panel" id="main-content">
+    <div class="form-inner">
+      <div class="form-header">
+        <h2 class="form-title">Agent Login</h2>
+        <p class="form-subtitle">Login to manage assigned orders for <span style="font-weight: 600; color: var(--text-primary);">{{ orgSlug || 'your store' }}</span></p>
+      </div>
+
+      @if (error) {
+        <div class="error-banner" role="alert">
+          <svg class="error-icon" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+          </svg>
+          <span>{{ error }}</span>
+        </div>
+      }
+
+      <form (ngSubmit)="onSubmit()" #loginForm="ngForm" class="auth-form" novalidate>
+        <div class="field-group">
+          <label class="field-label" for="phone">Phone Number</label>
+          <input type="tel" id="phone" name="phone" [(ngModel)]="credentials.phone" required class="apex-input" placeholder="e.g. 9876543210" autocomplete="tel">
+        </div>
+
+        <div class="field-group">
+          <div class="field-label-row">
+            <label class="field-label" for="password">Password</label>
+            <a (click)="goToForgotPassword()" style="cursor:pointer" class="forgot-link">Forgot?</a>
+          </div>
+          <input type="password" id="password" name="password" [(ngModel)]="credentials.password" required class="apex-input" placeholder="Enter password">
+        </div>
+
+        <button type="submit" class="submit-btn" [class.loading]="loading" [disabled]="loginForm.invalid || loading">
+          @if (loading) {
+            <span class="spinner" aria-hidden="true"></span>
+            <span>Signing in…</span>
+          } @else {
+            <span>Secure Login</span>
+            <svg class="btn-arrow" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          }
+        </button>
+      </form>
+
+      <p class="signup-nudge">
+        Not an agent? <a routerLink="/" class="signup-link">Back to Home</a>
+      </p>
+    </div>
+  </main>
+</div>
+`,
+  styleUrl: '../../../../modules/auth/_auth.shared.scss'
 })
 export class DeliveryLoginComponent implements OnInit {
   private deliveryService = inject(DeliveryService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
-  credentials = { phone: '', password: '' };
+  credentials = {
+    phone: '',
+    password: ''
+  };
+
+  orgSlug = '';
   loading = false;
   error = '';
-  orgSlug = '';
 
   ngOnInit() {
-    // Traverse up the route tree to find orgSlug because we are inside a lazily loaded module
     let currentRoute: import('@angular/router').ActivatedRouteSnapshot | null = this.route.snapshot;
     while (currentRoute) {
       if (currentRoute.paramMap.has('orgSlug')) {
@@ -185,23 +123,36 @@ export class DeliveryLoginComponent implements OnInit {
 
   onSubmit() {
     if (!this.orgSlug) {
-      this.error = 'Invalid organization scope.';
+      this.error = 'Invalid organization scope. Please use your specific store login link.';
+      return;
+    }
+
+    if (!this.credentials.phone || !this.credentials.password) {
+      this.error = 'Please fill all required fields';
       return;
     }
 
     this.loading = true;
     this.error = '';
-    
-    this.deliveryService.login(this.orgSlug, this.credentials.phone, this.credentials.password).subscribe({
-      next: (res) => {
-        // Store token scoped to this org
-        localStorage.setItem(`delivery_token_${this.orgSlug}`, res.token);
-        this.router.navigate(['/store', this.orgSlug, 'delivery', 'dashboard']);
-      },
-      error: (err) => {
-        this.loading = false;
-        this.error = err?.error?.message || 'Login failed. Please try again.';
-      }
-    });
+
+    this.deliveryService.login(this.orgSlug, this.credentials.phone, this.credentials.password)
+      .subscribe({
+        next: (res) => {
+          localStorage.setItem(`delivery_token_${this.orgSlug}`, res.token);
+          this.router.navigate(['/store', this.orgSlug, 'delivery', 'dashboard']);
+        },
+        error: (err) => {
+          this.loading = false;
+          this.error = err.error?.message || 'Invalid credentials';
+        }
+      });
+  }
+
+  goToForgotPassword() {
+    if (this.orgSlug) {
+      this.router.navigate(['/store', this.orgSlug, 'delivery', 'forgot-password']);
+    } else {
+      this.router.navigate(['/delivery-agent/forgot-password']);
+    }
   }
 }

@@ -17,232 +17,323 @@ import { Html5QrcodeScanner, Html5QrcodeScanType } from 'html5-qrcode';
           <h1>My Deliveries</h1>
         </div>
         <div class="header-actions" style="display: flex; gap: 10px;">
-          <button class="icon-btn" (click)="showPasswordModal = true" title="Change Password">
-            <i class="pi pi-key"></i>
+          <button class="icon-btn" (click)="openSettings()" title="Settings">
+            <i class="pi pi-cog"></i>
           </button>
           <button class="icon-btn logout-btn" (click)="logout()" title="Logout">
             <i class="pi pi-power-off"></i>
           </button>
         </div>
       </header>
-
+    
       <main class="content">
         <div class="status-tabs">
           <button [class.active]="filter === 'active'" (click)="filter = 'active'">Active</button>
           <button [class.active]="filter === 'delivered'" (click)="filter = 'delivered'">Delivered</button>
         </div>
-
-        <div *ngIf="loading" class="loading-state">
-          <i class="pi pi-spin pi-spinner"></i>
-          <p>Loading orders...</p>
-        </div>
-
-        <div *ngIf="!loading && filteredOrders.length === 0" class="empty-state">
-          <div class="empty-icon"><i class="pi pi-check-circle"></i></div>
-          <h3>All Caught Up!</h3>
-          <p>You have no {{ filter }} deliveries at the moment.</p>
-        </div>
-
-        <div class="orders-list" *ngIf="!loading && filteredOrders.length > 0">
-          <div class="order-card" *ngFor="let order of filteredOrders" (click)="openDetails(order)">
-            <div class="order-header">
-              <span class="order-number">{{ order.orderNumber }}</span>
-              <span class="status-badge" [attr.data-status]="order.fulfillmentStatus">{{ order.fulfillmentStatus | titlecase }}</span>
-            </div>
-            
-            <div class="order-body">
-              <div class="info-row">
-                <i class="pi pi-map-marker"></i>
-                <div class="address-details" *ngIf="order.shippingAddress">
-                  <strong>{{ order.shippingAddress.fullName || order.customerId?.firstName || 'Customer' }}</strong>
-                  <p>{{ order.shippingAddress.addressLine1 }}, {{ order.shippingAddress.city }}</p>
+    
+        @if (loading) {
+          <div class="loading-state">
+            <i class="pi pi-spin pi-spinner"></i>
+            <p>Loading orders...</p>
+          </div>
+        }
+    
+        @if (!loading && filteredOrders.length === 0) {
+          <div class="empty-state">
+            <div class="empty-icon"><i class="pi pi-check-circle"></i></div>
+            <h3>All Caught Up!</h3>
+            <p>You have no {{ filter }} deliveries at the moment.</p>
+          </div>
+        }
+    
+        @if (!loading && filteredOrders.length > 0) {
+          <div class="orders-list">
+            @for (order of filteredOrders; track order) {
+              <div class="order-card" (click)="openDetails(order)">
+                <div class="order-header">
+                  <span class="order-number">{{ order.orderNumber }}</span>
+                  <span class="status-badge" [attr.data-status]="order.fulfillmentStatus">{{ order.fulfillmentStatus | titlecase }}</span>
+                </div>
+                <div class="order-body">
+                  <div class="info-row">
+                    <i class="pi pi-map-marker"></i>
+                    @if (order.shippingAddress) {
+                      <div class="address-details">
+                        <strong>{{ order.shippingAddress.fullName || order.customerId?.firstName || 'Customer' }}</strong>
+                        <p>{{ order.shippingAddress.addressLine1 }}, {{ order.shippingAddress.city }}</p>
+                      </div>
+                    }
+                  </div>
+                  <div class="info-row">
+                    <i class="pi pi-phone"></i>
+                    <p>{{ order.shippingAddress?.phone || 'No phone provided' }}</p>
+                  </div>
+                  <!-- Payment Info on Card -->
+                  @if (order.paymentMethod === 'COD') {
+                    <div class="info-row">
+                      <i class="pi pi-money-bill" style="color: #16a34a;"></i>
+                      <strong style="color: #16a34a;">Collect: {{ order.totalAmount | currency:'INR' }}</strong>
+                    </div>
+                  }
+                </div>
+                <div class="order-footer">
+                  <div class="items-count">{{ order.items?.length || 0 }} items</div>
+                  <button class="action-btn">
+                    <span>View Details</span>
+                    <i class="pi pi-angle-right"></i>
+                  </button>
                 </div>
               </div>
-              
-              <div class="info-row">
-                <i class="pi pi-phone"></i>
-                <p>{{ order.shippingAddress?.phone || 'No phone provided' }}</p>
-              </div>
-              
-              <!-- Payment Info on Card -->
-              <div class="info-row" *ngIf="order.paymentMethod === 'COD'">
-                <i class="pi pi-money-bill" style="color: #16a34a;"></i>
-                <strong style="color: #16a34a;">Collect: {{ order.totalAmount | currency:'INR' }}</strong>
-              </div>
-            </div>
-            
-            <div class="order-footer">
-              <div class="items-count">{{ order.items?.length || 0 }} items</div>
-              <button class="action-btn">
-                <span>View Details</span>
-                <i class="pi pi-angle-right"></i>
-              </button>
-            </div>
+            }
           </div>
-        </div>
+        }
       </main>
-      
+    
       <!-- Floating Action Button for Scanner -->
       <button class="fab-scan" (click)="openScanner()">
         <i class="pi pi-camera"></i>
       </button>
-      
+    
       <!-- Scanner Modal -->
-      <div class="modal-overlay" *ngIf="showScanner">
-        <div class="modal-card scanner-modal">
-          <div class="modal-header">
-            <h3>Scan Parcel</h3>
-            <button class="close-btn" (click)="closeScanner()"><i class="pi pi-times"></i></button>
-          </div>
-          <div class="scan-tabs">
-            <button [class.active]="scanMode === 'camera'" (click)="scanMode = 'camera'">Camera</button>
-            <button [class.active]="scanMode === 'manual'" (click)="scanMode = 'manual'">Manual</button>
-          </div>
-          
-          <div class="scanner-container" [hidden]="scanMode !== 'camera'">
-            <div id="qr-reader"></div>
-          </div>
-          
-          <div class="manual-input-container" *ngIf="scanMode === 'manual'">
-            <input type="text" [(ngModel)]="manualIdentifier" class="premium-input" placeholder="Tracking ID or Order #">
-            <button class="premium-btn primary-btn full-width" style="margin-top: 15px;" (click)="searchManual()" [disabled]="searchingScan">
-              <i class="pi pi-spin pi-spinner" *ngIf="searchingScan"></i>
-              {{ searchingScan ? 'Searching...' : 'Search' }}
-            </button>
-          </div>
-          
-          <div class="scan-error" *ngIf="scanError">{{ scanError }}</div>
-        </div>
-      </div>
-      
-      <!-- COD Payment Collection Modal -->
-      <div class="modal-overlay" *ngIf="showPaymentModal" style="z-index: 1000;">
-        <div class="modal-card payment-modal">
-          <div class="payment-icon"><i class="pi pi-wallet"></i></div>
-          <h3>Collect Cash on Delivery</h3>
-          <p>This is a COD order. Please collect the exact amount below from the customer before completing the delivery.</p>
-          
-          <div class="amount-box">
-             {{ selectedOrder?.totalAmount | currency:'INR' }}
-          </div>
-          
-          <div class="payment-actions">
-             <button class="premium-btn secondary-btn" (click)="showPaymentModal = false">Cancel</button>
-             <button class="premium-btn success-btn" (click)="confirmDeliverWithPayment()">
-               <i class="pi pi-check"></i> Cash Collected
-             </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Change Password Modal -->
-      <div class="modal-overlay" *ngIf="showPasswordModal" style="z-index: 1000;">
-        <div class="modal-card">
-          <div class="modal-header">
-            <h3>Change Password</h3>
-            <button class="close-btn" (click)="showPasswordModal = false"><i class="pi pi-times"></i></button>
-          </div>
-          
-          <div class="form-group" style="margin-bottom: 15px;">
-            <label style="display: block; margin-bottom: 8px; color: #64748b; font-size: 0.9rem;">Current Password</label>
-            <input type="password" [(ngModel)]="passwordForm.oldPassword" class="premium-input" placeholder="Enter current password">
-          </div>
-          
-          <div class="form-group" style="margin-bottom: 15px;">
-            <label style="display: block; margin-bottom: 8px; color: #64748b; font-size: 0.9rem;">New Password</label>
-            <input type="password" [(ngModel)]="passwordForm.newPassword" class="premium-input" placeholder="Enter new password">
-          </div>
-          
-          <div class="error-message" *ngIf="passwordError" style="color: #ef4444; margin-bottom: 15px; font-size: 0.9rem;">{{ passwordError }}</div>
-          <div class="success-message" *ngIf="passwordSuccess" style="color: #16a34a; margin-bottom: 15px; font-size: 0.9rem;">{{ passwordSuccess }}</div>
-          
-          <button class="premium-btn primary-btn full-width" (click)="updatePassword()" [disabled]="updatingPassword || !passwordForm.oldPassword || !passwordForm.newPassword">
-            <i class="pi pi-spin pi-spinner" *ngIf="updatingPassword"></i>
-            {{ updatingPassword ? 'Updating...' : 'Update Password' }}
-          </button>
-        </div>
-      </div>
-
-      <!-- Slide Up Detail View -->
-      <div class="detail-overlay" *ngIf="selectedOrder && !showScanner && !showPaymentModal && !showPasswordModal" (click)="closeDetails()"></div>
-      <div class="detail-sheet" [class.open]="selectedOrder && !showScanner && !showPaymentModal && !showPasswordModal">
-        <div class="drag-handle" (click)="closeDetails()"></div>
-        <div class="sheet-content" *ngIf="selectedOrder as order">
-          <div class="sheet-header">
-            <h2>{{ order.orderNumber }}</h2>
-            <span class="status-badge" [attr.data-status]="order.fulfillmentStatus">{{ order.fulfillmentStatus | titlecase }}</span>
-          </div>
-          
-          <div class="customer-info">
-            <h3>Delivery Details</h3>
-            <div class="info-group">
-              <i class="pi pi-user"></i>
-              <span>{{ order.shippingAddress?.fullName || 'Customer' }}</span>
+      @if (showScanner) {
+        <div class="modal-overlay">
+          <div class="modal-card scanner-modal">
+            <div class="modal-header">
+              <h3>Scan Parcel</h3>
+              <button class="close-btn" (click)="closeScanner()"><i class="pi pi-times"></i></button>
             </div>
-            <div class="info-group">
-              <i class="pi pi-phone"></i>
-              <a [href]="'tel:' + order.shippingAddress?.phone">{{ order.shippingAddress?.phone || 'No phone' }}</a>
+            <div class="scan-tabs">
+              <button [class.active]="scanMode === 'camera'" (click)="scanMode = 'camera'">Camera</button>
+              <button [class.active]="scanMode === 'manual'" (click)="scanMode = 'manual'">Manual</button>
             </div>
-            <div class="info-group address">
-              <i class="pi pi-map-marker"></i>
-              <div>
-                <p>{{ order.shippingAddress?.addressLine1 }}</p>
-                <p *ngIf="order.shippingAddress?.addressLine2">{{ order.shippingAddress?.addressLine2 }}</p>
-                <p>{{ order.shippingAddress?.city }}, {{ order.shippingAddress?.state }} {{ order.shippingAddress?.pincode }}</p>
+            <div class="scanner-container" [hidden]="scanMode !== 'camera'">
+              <div id="qr-reader"></div>
+            </div>
+            @if (scanMode === 'manual') {
+              <div class="manual-input-container">
+                <input type="text" [(ngModel)]="manualIdentifier" class="premium-input" placeholder="Tracking ID or Order #">
+                <button class="premium-btn primary-btn full-width" style="margin-top: 15px;" (click)="searchManual()" [disabled]="searchingScan">
+                  @if (searchingScan) {
+                    <i class="pi pi-spin pi-spinner"></i>
+                  }
+                  {{ searchingScan ? 'Searching...' : 'Search' }}
+                </button>
               </div>
-            </div>
-            
-            <div class="info-group">
-               <i class="pi pi-credit-card"></i>
-               <span>
-                  {{ order.paymentMethod === 'COD' ? 'Cash on Delivery' : 'Prepaid' }}
-                  <strong *ngIf="order.paymentMethod === 'COD'" style="color: #16a34a; margin-left: 5px;">
-                    ({{ order.totalAmount | currency:'INR' }})
-                  </strong>
-               </span>
-            </div>
-            
-            <div class="info-group" *ngIf="order.deliveryFee">
-               <i class="pi pi-truck"></i>
-               <span>Delivery Fee: {{ order.deliveryFee | currency:'INR' }}</span>
-            </div>
-          </div>
-          
-          <div class="notes" *ngIf="order.deliveryNotes">
-            <h3>Notes</h3>
-            <p>{{ order.deliveryNotes }}</p>
-          </div>
-          
-          <div class="items-summary">
-            <h3>Items ({{ order.items?.length }})</h3>
-            <ul>
-              <li *ngFor="let item of order.items">
-                {{ item.quantity }}x {{ item.snapshot?.name || item.name || 'Product' }}
-              </li>
-            </ul>
-          </div>
-          
-          <div class="action-buttons">
-            <button class="action-btn out-for-delivery" 
-                    *ngIf="order.fulfillmentStatus !== 'shipped' && order.fulfillmentStatus !== 'delivered'"
-                    (click)="updateStatus(order._id, 'shipped')" [disabled]="updating">
-              <i class="pi pi-truck" *ngIf="!updating"></i>
-              <i class="pi pi-spin pi-spinner" *ngIf="updating"></i>
-              Mark Out for Delivery
-            </button>
-            
-            <button class="action-btn delivered" 
-                    *ngIf="order.fulfillmentStatus !== 'delivered'"
-                    (click)="handleDeliverClick(order)" [disabled]="updating">
-              <i class="pi pi-check-circle" *ngIf="!updating"></i>
-              <i class="pi pi-spin pi-spinner" *ngIf="updating"></i>
-              {{ order.paymentMethod === 'COD' ? 'Collect & Deliver' : 'Mark Delivered' }}
-            </button>
+            }
+            @if (scanError) {
+              <div class="scan-error">{{ scanError }}</div>
+            }
           </div>
         </div>
+      }
+    
+      <!-- COD Payment Collection Modal -->
+      @if (showPaymentModal) {
+        <div class="modal-overlay" style="z-index: 1000;">
+          <div class="modal-card payment-modal">
+            <div class="payment-icon"><i class="pi pi-wallet"></i></div>
+            <h3>Collect Cash on Delivery</h3>
+            <p>This is a COD order. Please collect the exact amount below from the customer before completing the delivery.</p>
+            <div class="amount-box">
+              {{ selectedOrder?.totalAmount | currency:'INR' }}
+            </div>
+            <div class="payment-actions">
+              <button class="premium-btn secondary-btn" (click)="showPaymentModal = false">Cancel</button>
+              <button class="premium-btn success-btn" (click)="confirmDeliverWithPayment()">
+                <i class="pi pi-check"></i> Cash Collected
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    
+      <!-- Settings Modal -->
+      @if (showSettingsModal) {
+        <div class="modal-overlay" style="z-index: 1000;">
+          <div class="modal-card settings-modal">
+            <div class="modal-header">
+              <h3>Settings</h3>
+              <button class="close-btn" (click)="showSettingsModal = false"><i class="pi pi-times"></i></button>
+            </div>
+            <div class="scan-tabs">
+              <button [class.active]="settingsTab === 'profile'" (click)="settingsTab = 'profile'">Profile</button>
+              <button [class.active]="settingsTab === 'security'" (click)="settingsTab = 'security'">Security</button>
+            </div>
+            <!-- Profile Tab -->
+            @if (settingsTab === 'profile') {
+              <div class="tab-content">
+                @if (loadingProfile) {
+                  <div style="text-align: center; padding: 20px;">
+                    <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: #38bdf8;"></i>
+                  </div>
+                }
+                @if (!loadingProfile) {
+                  <form (ngSubmit)="updateProfile()" #profileForm="ngForm">
+                    <div class="form-group" style="margin-bottom: 15px;">
+                      <label style="display: block; margin-bottom: 8px; color: #64748b; font-size: 0.9rem;">Email Address</label>
+                      <input type="email" name="email" [(ngModel)]="profileData.email" class="premium-input" placeholder="agent@example.com">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                      <label style="display: block; margin-bottom: 8px; color: #64748b; font-size: 0.9rem;">Alternate Phone (Optional)</label>
+                      <input type="tel" name="alternatePhone" [(ngModel)]="profileData.alternatePhone" class="premium-input" placeholder="Secondary contact number">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                      <label style="display: block; margin-bottom: 8px; color: #64748b; font-size: 0.9rem;">Vehicle Type</label>
+                      <select name="vehicleType" [(ngModel)]="profileData.vehicleType" class="premium-input">
+                        <option value="Bike">Bike</option>
+                        <option value="Scooter">Scooter</option>
+                        <option value="Van">Van</option>
+                        <option value="Car">Car</option>
+                        <option value="Truck">Truck</option>
+                      </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                      <label style="display: block; margin-bottom: 8px; color: #64748b; font-size: 0.9rem;">Vehicle Registration Number</label>
+                      <input type="text" name="vehicleReg" [(ngModel)]="profileData.vehicleRegistrationNumber" class="premium-input" placeholder="e.g. MH12 AB 1234">
+                    </div>
+                    @if (profileError) {
+                      <div class="error-message" style="color: #ef4444; margin-bottom: 15px; font-size: 0.9rem;">{{ profileError }}</div>
+                    }
+                    @if (profileSuccess) {
+                      <div class="success-message" style="color: #16a34a; margin-bottom: 15px; font-size: 0.9rem;">{{ profileSuccess }}</div>
+                    }
+                    <button type="submit" class="premium-btn primary-btn full-width" [disabled]="updatingProfile">
+                      @if (updatingProfile) {
+                        <i class="pi pi-spin pi-spinner"></i>
+                      }
+                      {{ updatingProfile ? 'Saving...' : 'Save Profile' }}
+                    </button>
+                  </form>
+                }
+              </div>
+            }
+            <!-- Security Tab -->
+            @if (settingsTab === 'security') {
+              <div class="tab-content">
+                <div class="form-group" style="margin-bottom: 15px;">
+                  <label style="display: block; margin-bottom: 8px; color: #64748b; font-size: 0.9rem;">Current Password</label>
+                  <input type="password" [(ngModel)]="passwordForm.oldPassword" class="premium-input" placeholder="Enter current password">
+                </div>
+                <div class="form-group" style="margin-bottom: 15px;">
+                  <label style="display: block; margin-bottom: 8px; color: #64748b; font-size: 0.9rem;">New Password</label>
+                  <input type="password" [(ngModel)]="passwordForm.newPassword" class="premium-input" placeholder="Enter new password">
+                </div>
+                @if (passwordError) {
+                  <div class="error-message" style="color: #ef4444; margin-bottom: 15px; font-size: 0.9rem;">{{ passwordError }}</div>
+                }
+                @if (passwordSuccess) {
+                  <div class="success-message" style="color: #16a34a; margin-bottom: 15px; font-size: 0.9rem;">{{ passwordSuccess }}</div>
+                }
+                <button class="premium-btn primary-btn full-width" (click)="updatePassword()" [disabled]="updatingPassword || !passwordForm.oldPassword || !passwordForm.newPassword">
+                  @if (updatingPassword) {
+                    <i class="pi pi-spin pi-spinner"></i>
+                  }
+                  {{ updatingPassword ? 'Updating...' : 'Update Password' }}
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    
+      <!-- Slide Up Detail View -->
+      @if (selectedOrder && !showScanner && !showPaymentModal && !showSettingsModal) {
+        <div class="detail-overlay" (click)="closeDetails()"></div>
+      }
+      <div class="detail-sheet" [class.open]="selectedOrder && !showScanner && !showPaymentModal && !showSettingsModal">
+        <div class="drag-handle" (click)="closeDetails()"></div>
+        @if (selectedOrder; as order) {
+          <div class="sheet-content">
+            <div class="sheet-header">
+              <h2>{{ order.orderNumber }}</h2>
+              <span class="status-badge" [attr.data-status]="order.fulfillmentStatus">{{ order.fulfillmentStatus | titlecase }}</span>
+            </div>
+            <div class="customer-info">
+              <h3>Delivery Details</h3>
+              <div class="info-group">
+                <i class="pi pi-user"></i>
+                <span>{{ order.shippingAddress?.fullName || 'Customer' }}</span>
+              </div>
+              <div class="info-group">
+                <i class="pi pi-phone"></i>
+                <a [href]="'tel:' + order.shippingAddress?.phone">{{ order.shippingAddress?.phone || 'No phone' }}</a>
+              </div>
+              <div class="info-group address">
+                <i class="pi pi-map-marker"></i>
+                <div>
+                  <p>{{ order.shippingAddress?.addressLine1 }}</p>
+                  @if (order.shippingAddress?.addressLine2) {
+                    <p>{{ order.shippingAddress?.addressLine2 }}</p>
+                  }
+                  <p>{{ order.shippingAddress?.city }}, {{ order.shippingAddress?.state }} {{ order.shippingAddress?.pincode }}</p>
+                </div>
+              </div>
+              <div class="info-group">
+                <i class="pi pi-credit-card"></i>
+                <span>
+                  {{ order.paymentMethod === 'COD' ? 'Cash on Delivery' : 'Prepaid' }}
+                  @if (order.paymentMethod === 'COD') {
+                    <strong style="color: #16a34a; margin-left: 5px;">
+                      ({{ order.totalAmount | currency:'INR' }})
+                    </strong>
+                  }
+                </span>
+              </div>
+              @if (order.deliveryFee) {
+                <div class="info-group">
+                  <i class="pi pi-truck"></i>
+                  <span>Delivery Fee: {{ order.deliveryFee | currency:'INR' }}</span>
+                </div>
+              }
+            </div>
+            @if (order.deliveryNotes) {
+              <div class="notes">
+                <h3>Notes</h3>
+                <p>{{ order.deliveryNotes }}</p>
+              </div>
+            }
+            <div class="items-summary">
+              <h3>Items ({{ order.items?.length }})</h3>
+              <ul>
+                @for (item of order.items; track item) {
+                  <li>
+                    {{ item.quantity }}x {{ item.snapshot?.name || item.name || 'Product' }}
+                  </li>
+                }
+              </ul>
+            </div>
+            <div class="action-buttons">
+              @if (order.fulfillmentStatus !== 'shipped' && order.fulfillmentStatus !== 'delivered') {
+                <button class="action-btn out-for-delivery"
+                  (click)="updateStatus(order._id, 'shipped')" [disabled]="updating">
+                  @if (!updating) {
+                    <i class="pi pi-truck"></i>
+                  }
+                  @if (updating) {
+                    <i class="pi pi-spin pi-spinner"></i>
+                  }
+                  Mark Out for Delivery
+                </button>
+              }
+              @if (order.fulfillmentStatus !== 'delivered') {
+                <button class="action-btn delivered"
+                  (click)="handleDeliverClick(order)" [disabled]="updating">
+                  @if (!updating) {
+                    <i class="pi pi-check-circle"></i>
+                  }
+                  @if (updating) {
+                    <i class="pi pi-spin pi-spinner"></i>
+                  }
+                  {{ order.paymentMethod === 'COD' ? 'Collect & Deliver' : 'Mark Delivered' }}
+                </button>
+              }
+            </div>
+          </div>
+        }
       </div>
     </div>
-  `,
+    `,
   styles: [`
     .dashboard-container {
       background: #f8fafc;
@@ -451,8 +542,15 @@ export class DeliveryDashboardComponent implements OnInit, OnDestroy {
   // Payment Collection state
   showPaymentModal = false;
 
-  // Password Update State
-  showPasswordModal = false;
+  // Settings Update State
+  showSettingsModal = false;
+  settingsTab: 'profile' | 'security' = 'profile';
+
+  profileData = { email: '', alternatePhone: '', vehicleType: 'Bike', vehicleRegistrationNumber: '' };
+  loadingProfile = false;
+  updatingProfile = false;
+  profileError = '';
+  profileSuccess = '';
   passwordForm = { oldPassword: '', newPassword: '' };
   updatingPassword = false;
   passwordError = '';
@@ -632,6 +730,58 @@ export class DeliveryDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  openSettings() {
+    this.showSettingsModal = true;
+    this.settingsTab = 'profile';
+    this.passwordError = '';
+    this.passwordSuccess = '';
+    this.profileError = '';
+    this.profileSuccess = '';
+    this.passwordForm = { oldPassword: '', newPassword: '' };
+    this.loadProfile();
+  }
+
+  loadProfile() {
+    this.loadingProfile = true;
+    this.deliveryService.getProfile(this.orgSlug).subscribe({
+      next: (res) => {
+        this.loadingProfile = false;
+        if (res.data) {
+          this.profileData = {
+            email: res.data.email || '',
+            alternatePhone: res.data.alternatePhone || '',
+            vehicleType: res.data.vehicleType || 'Bike',
+            vehicleRegistrationNumber: res.data.vehicleRegistrationNumber || ''
+          };
+        }
+      },
+      error: (err) => {
+        this.loadingProfile = false;
+        this.profileError = 'Failed to load profile details.';
+      }
+    });
+  }
+
+  updateProfile() {
+    this.profileError = '';
+    this.profileSuccess = '';
+    this.updatingProfile = true;
+
+    this.deliveryService.updateProfile(this.orgSlug, this.profileData).subscribe({
+      next: (res) => {
+        this.updatingProfile = false;
+        this.profileSuccess = 'Profile updated successfully!';
+        setTimeout(() => {
+          this.profileSuccess = '';
+        }, 3000);
+      },
+      error: (err) => {
+        this.updatingProfile = false;
+        this.profileError = err?.error?.message || 'Failed to update profile';
+      }
+    });
+  }
+
   updatePassword() {
     this.passwordError = '';
     this.passwordSuccess = '';
@@ -642,7 +792,6 @@ export class DeliveryDashboardComponent implements OnInit, OnDestroy {
         this.updatingPassword = false;
         this.passwordSuccess = 'Password updated successfully!';
         setTimeout(() => {
-          this.showPasswordModal = false;
           this.passwordForm = { oldPassword: '', newPassword: '' };
           this.passwordSuccess = '';
         }, 1500);

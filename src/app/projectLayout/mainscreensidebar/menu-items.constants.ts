@@ -288,11 +288,19 @@ export const SIDEBAR_MENU: MenuItem[] = [
     permissions: [PERMISSIONS.ORG.MANAGE, PERMISSIONS.STOREFRONT.READ],
     items: [
       { label: 'Command Center', icon: 'pi pi-home', routerLink: ['/storefront/overview'], permissions: [PERMISSIONS.STOREFRONT.READ] },
+      { label: 'Analytics Overview', icon: 'pi pi-chart-line', routerLink: ['/storefront/analytics'], permissions: [PERMISSIONS.STOREFRONT.READ] },
+      { label: 'Sales Reports', icon: 'pi pi-file-excel', routerLink: ['/storefront/reports/sales'], permissions: [PERMISSIONS.STOREFRONT.READ] },
       { label: 'Page Builder', icon: 'pi pi-sitemap', routerLink: ['/storefront/pages'], permissions: [PERMISSIONS.STOREFRONT.READ] },
+      { label: 'Templates Library', icon: 'pi pi-clone', routerLink: ['/storefront/templates'], permissions: [PERMISSIONS.STOREFRONT.READ] },
+      { label: 'Media Manager', icon: 'pi pi-image', routerLink: ['/storefront/media'], permissions: [PERMISSIONS.STOREFRONT.READ] },
       { label: 'Orders', icon: 'pi pi-receipt', routerLink: ['/storefront/orders'], permissions: [PERMISSIONS.STOREFRONT.READ] },
+      { label: 'Abandoned Carts', icon: 'pi pi-shopping-cart', routerLink: ['/storefront/abandoned-carts'], permissions: [PERMISSIONS.STOREFRONT.READ] },
       { label: 'Delivery Agents', icon: 'pi pi-truck', routerLink: ['/storefront/delivery-agents'], permissions: [PERMISSIONS.STOREFRONT.READ] },
       { label: 'Customers', icon: 'pi pi-users', routerLink: ['/storefront/customers'], permissions: [PERMISSIONS.STOREFRONT.READ] },
+      { label: 'Customer Segments', icon: 'pi pi-users', routerLink: ['/storefront/segments'], permissions: [PERMISSIONS.STOREFRONT.READ] },
       { label: 'Coupons', icon: 'pi pi-ticket', routerLink: ['/storefront/coupons'], permissions: [PERMISSIONS.STOREFRONT.READ] },
+      { label: 'Discount Manager', icon: 'pi pi-percentage', routerLink: ['/storefront/discounts'], permissions: [PERMISSIONS.STOREFRONT.READ] },
+      { label: 'SEO Dashboard', icon: 'pi pi-search', routerLink: ['/storefront/seo'], permissions: [PERMISSIONS.STOREFRONT.READ] },
       {
         label: 'Design & Layout',
         icon: 'pi pi-palette',
@@ -300,6 +308,30 @@ export const SIDEBAR_MENU: MenuItem[] = [
         items: [
           { label: 'Themes', icon: 'pi pi-images', routerLink: ['/storefront/themes'], permissions: [PERMISSIONS.STOREFRONT.THEME_MANAGE] },
           { label: 'Master Layout', icon: 'pi pi-desktop', routerLink: ['/storefront/settings/layout'], permissions: [PERMISSIONS.STOREFRONT.LAYOUT_MANAGE] }
+        ]
+      },
+      {
+        label: 'Administration',
+        icon: 'pi pi-cog',
+        permissions: [PERMISSIONS.STOREFRONT.READ],
+        items: [
+          { label: 'Storefront Settings', icon: 'pi pi-cog', routerLink: ['/storefront/settings'], permissions: [PERMISSIONS.STOREFRONT.READ] },
+          { label: 'Domain Settings', icon: 'pi pi-globe', routerLink: ['/storefront/domains'], permissions: [PERMISSIONS.STOREFRONT.READ] },
+          { label: 'Integrations', icon: 'pi pi-link', routerLink: ['/storefront/integrations'], permissions: [PERMISSIONS.STOREFRONT.READ] },
+          { label: 'Role Management', icon: 'pi pi-users', routerLink: ['/storefront/roles'], permissions: [PERMISSIONS.STOREFRONT.READ] },
+          { label: 'Billing', icon: 'pi pi-credit-card', routerLink: ['/storefront/billing'], permissions: [PERMISSIONS.STOREFRONT.READ] }
+        ]
+      },
+      {
+        label: 'System Logs',
+        icon: 'pi pi-list',
+        permissions: [PERMISSIONS.STOREFRONT.READ],
+        items: [
+          { label: 'Activity Logs', icon: 'pi pi-history', routerLink: ['/storefront/activity'], permissions: [PERMISSIONS.STOREFRONT.READ] },
+          { label: 'Audit History', icon: 'pi pi-history', routerLink: ['/storefront/audit-history'], permissions: [PERMISSIONS.STOREFRONT.READ] },
+          { label: 'Notifications Center', icon: 'pi pi-bell', routerLink: ['/storefront/notifications'], permissions: [PERMISSIONS.STOREFRONT.READ] },
+          { label: 'Publish History', icon: 'pi pi-cloud-upload', routerLink: ['/storefront/publish-history'], permissions: [PERMISSIONS.STOREFRONT.READ] },
+          { label: 'Page Revisions', icon: 'pi pi-file-edit', routerLink: ['/storefront/revisions'], permissions: [PERMISSIONS.STOREFRONT.READ] }
         ]
       }
     ]

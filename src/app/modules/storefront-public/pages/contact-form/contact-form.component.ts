@@ -1,6 +1,7 @@
 import { Component, Input, OnInit, signal, computed, inject, ChangeDetectionStrategy, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { StorefrontStateService } from '@core/services/storefront-state.service';
 
 // ---------------------------------------------------------------------------
@@ -45,7 +46,7 @@ const DEFAULT_FIELDS: ContactFieldConfig[] = [
 @Component({
   selector: 'app-contact-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
   template: `
@@ -108,6 +109,15 @@ const DEFAULT_FIELDS: ContactFieldConfig[] = [
               @if (!orgContact()?.email && !orgContact()?.phone) {
                 <p class="cf-no-contact">Contact information not configured.</p>
               }
+
+              <div class="cf-delivery-partners">
+                <span class="cf-detail-label" [ngStyle]="{'color': cfg().backgroundImage ? 'rgba(255,255,255,0.7)' : 'var(--text-tertiary)'}">Delivery Partners</span>
+                <div class="cf-delivery-links">
+                  <a [routerLink]="['/store', orgSlug(), 'delivery', 'login']" class="cf-delivery-link">In-house Portal</a>
+                  <span class="cf-divider">•</span>
+                  <a routerLink="/apex-delivery/login" class="cf-delivery-link">Apex Network</a>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -208,6 +218,12 @@ const DEFAULT_FIELDS: ContactFieldConfig[] = [
     .cf-detail-value:hover { color: var(--accent-primary) !important; }
     .cf-no-contact { font-size: var(--font-size-sm); color: var(--text-tertiary); font-style: italic; margin: 0; }
 
+    .cf-delivery-partners { margin-top: var(--spacing-lg); padding-top: var(--spacing-md); border-top: 1px solid var(--border-secondary); }
+    .cf-delivery-links { display: flex; align-items: center; gap: var(--spacing-sm); margin-top: 4px; }
+    .cf-delivery-link { font-size: var(--font-size-sm); font-weight: 600; color: var(--accent-primary); text-decoration: none; transition: opacity 0.2s ease; }
+    .cf-delivery-link:hover { opacity: 0.8; text-decoration: underline; }
+    .cf-divider { color: var(--text-tertiary); font-size: 10px; }
+
     .cf-card { background: var(--bg-secondary); border: 1px solid var(--border-secondary); padding: var(--spacing-3xl); position: relative; overflow: hidden; }
     @media (min-width: 768px) { .cf-card { padding: var(--spacing-4xl); } }
     .cf-card-accent { position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary, var(--accent-primary))); }
@@ -283,6 +299,7 @@ export class ContactFormComponent implements OnInit {
   });
 
   readonly orgContact = computed(() => this.stateService.organization()?.contact);
+  readonly orgSlug = computed(() => this.stateService.organization()?.slug || '');
 
   readonly sectionStyle = computed(() => ({
     'padding-top': PADDING[this.cfg().paddingTop] ?? '10rem',

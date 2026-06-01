@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, Input, computed, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { StorefrontStateService } from '@core/services/storefront-state.service';
@@ -6,7 +6,7 @@ import { StorefrontStateService } from '@core/services/storefront-state.service'
 @Component({
   selector: 'app-footer-minimal',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [RouterModule],
   template: `
     <footer class="footer-minimal">
       <div class="footer-minimal__inner">

@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, Input, computed, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { StorefrontStateService } from '@core/services/storefront-state.service';
@@ -6,7 +6,7 @@ import { StorefrontStateService } from '@core/services/storefront-state.service'
 @Component({
   selector: 'app-footer-complex',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [RouterModule],
   templateUrl: './footer-complex.component.html',
   styleUrls: ['./footer-complex.component.scss']
 })
@@ -46,6 +46,13 @@ export class FooterComplexComponent {
           { label: 'Privacy', url: 'privacy-policy' },
           { label: 'Terms', url: 'terms-and-conditions' },
           { label: 'Refunds', url: 'refund-policy' }
+        ]
+      },
+      {
+        title: 'Logistics',
+        links: [
+          { label: 'In-house Delivery Login', url: 'delivery/login' },
+          { label: 'Apex Network Login', url: '/apex-delivery/login', absolute: true }
         ]
       }
     ];

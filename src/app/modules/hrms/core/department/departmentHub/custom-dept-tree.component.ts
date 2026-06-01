@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 /* ══════════════════════════════════════════════════════
    INLINED CUSTOM DEPT TREE COMPONENT (To resolve missing import)
@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-custom-dept-tree',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   template: `
     <div class="dept-tree-container">
       @for (node of nodes; track node.id || $index) {

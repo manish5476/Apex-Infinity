@@ -1,11 +1,11 @@
-import { CommonModule } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, Input, computed } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-layout-announcement-bar',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [RouterModule],
   template: `
     <aside class="announcement" [class.promo]="tone() === 'promo'">
       <div class="announcement__inner">

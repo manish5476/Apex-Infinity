@@ -408,7 +408,7 @@ export class GeofenceFormComponent implements OnInit, AfterViewInit, OnDestroy {
     this.map = L.map(this.mapContainer.nativeElement).setView([this.defaultLat, this.defaultLng], 5);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
+      attribution: 'ï¿½ OpenStreetMap contributors'
     }).addTo(this.map);
 
     this.map.on('click', (e: L.LeafletMouseEvent) => {
@@ -813,7 +813,7 @@ export class GeofenceFormComponent implements OnInit, AfterViewInit, OnDestroy {
 //     this.map = L.map(this.mapContainer.nativeElement).setView([this.defaultLat, this.defaultLng], 5);
 
 //     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-//       attribution: '© OpenStreetMap contributors'
+//       attribution: 'ï¿½ OpenStreetMap contributors'
 //     }).addTo(this.map);
 
 //     // Handle Clicks
@@ -1119,7 +1119,7 @@ export class GeofenceFormComponent implements OnInit, AfterViewInit, OnDestroy {
 
 //     this.map = L.map('geofenceMap').setView([defaultLat, defaultLng], 12);
 //     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-//       attribution: '© OpenStreetMap contributors'
+//       attribution: 'ï¿½ OpenStreetMap contributors'
 //     }).addTo(this.map);
 
 //     this.map.on('click', (e: L.LeafletMouseEvent) => {

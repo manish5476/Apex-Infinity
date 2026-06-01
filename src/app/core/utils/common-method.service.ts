@@ -1960,7 +1960,14 @@ export class CommonMethodService {
       gradient: "linear-gradient(135deg, #6820c0 0%, #9040e8 48%, #c8a030 100%)",
       category: "glass",
       description: "Twilight purple sky fading to indigo night with warm gold dust shimmer."
-    },
+    }, {
+      name: "Luxury Minimal",
+      id: "theme-luxury-minimal",
+      color: "#C89B6D",
+      gradient: "linear-gradient(135deg, #B38658 0%, #C89B6D 50%, #E3C19F 100%)",
+      category: "glass",
+      description: "Soft warm beige and frosted white glass with premium champagne gold accents and a luxury enterprise aesthetic."
+    }
   ];
 
 }

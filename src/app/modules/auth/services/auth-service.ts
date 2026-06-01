@@ -465,13 +465,16 @@ export class AuthService implements OnDestroy {
   //   });
   // }
 
-  updateUserPreferences(preferences: Partial<User['preferences']>): void {
+  updateUserPreferences(preferences: Partial<User['preferences']>, themeId?: string): void {
     const user = this.currentUserValue;
     if (user) {
       user.preferences = {
         ...(user.preferences || { theme: 'light' }),
         ...preferences
       } as any;
+      if (themeId) {
+        user.themeId = themeId;
+      }
       this.setItem(this.USER_KEY, user);
       this._currentUser.set({ ...user });
     }

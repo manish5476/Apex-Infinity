@@ -16,7 +16,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { InputTextModule } from 'primeng/inputtext';
 import { TabsModule } from 'primeng/tabs';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { ExcelExportComponent, ColumnConfig, ExcelExportConfig } from '../../../components/excel-export/excel-export';
+import { ExcelExportDialogComponent, ColumnConfig, ExcelExportConfig } from '../../../components/excel-export/excel-export';
 
 /* --------------------------------------------------
    PROP TYPES
@@ -63,7 +63,7 @@ interface ArraySection {
     TooltipModule,
     InputTextModule,
     TabsModule,
-    ExcelExportComponent,
+    ExcelExportDialogComponent,
   ],
   encapsulation: ViewEncapsulation.None, // Required for PrimeNG inner styling without ::ng-deep
   template: `
@@ -113,11 +113,11 @@ interface ArraySection {
           </div>
 
           <!-- Export Excel -->
-          <app-excel-export
+          <app-excel-export-dialog
             [data]="excelData()"
             [columns]="excelColumns()"
             [config]="excelConfig()"
-          ></app-excel-export>
+          ></app-excel-export-dialog>
 
           <!-- Copy JSON -->
           <button

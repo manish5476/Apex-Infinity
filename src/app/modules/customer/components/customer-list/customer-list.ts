@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit, inject, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { Subject, of } from 'rxjs';
@@ -29,7 +29,6 @@ import { CommonMethodService } from '@core/utils/common-method.service';
   selector: 'app-customer-list',
   standalone: true,
   imports: [
-    CommonModule,
     SelectModule,
     AutoCompleteModule,
     FormsModule,
@@ -41,7 +40,7 @@ import { CommonMethodService } from '@core/utils/common-method.service';
     AgShareGrid,
     HasPermissionDirective,
     MasterDropdownComponent
-  ],
+],
   providers: [CustomerService, ConfirmationService],
   template: `
     <p-toast position="bottom-right"></p-toast>
