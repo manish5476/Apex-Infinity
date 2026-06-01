@@ -142,6 +142,16 @@
                                       }
 
                                       @if (mode() === 'checkout') {
+                                        @if (catalogMode()) {
+                                          <section class="sf-container">
+                                            <div class="empty-state panel" style="min-height: 14rem; padding: 2rem;">
+                                              <div class="empty-icon"><i class="pi pi-store"></i></div>
+                                              <h2>Online checkout is disabled</h2>
+                                              <p>Please visit our store or contact us to purchase these items.</p>
+                                              <a class="apx-button-primitive primary" [routerLink]="['/store', orgSlug(), 'cart']">Back to cart</a>
+                                            </div>
+                                          </section>
+                                        } @else {
                                         <section class="checkout-grid sf-container">
                                           <div class="checkout-steps">
                                             <button type="button" [class.active]="checkoutStep() === 'contact'" (click)="checkoutStep.set('contact')"><i
@@ -162,7 +172,11 @@
                                                     <a class="apx-button-primitive secondary" [routerLink]="['/store', orgSlug(), 'register']">Create account</a>
                                                   </div>
                                                   <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--surface-border);">
-                                                    <strong>Or continue as a guest below.</strong>
+                                                    @if (allowGuestCheckout()) {
+                                                      <strong>Or continue as a guest below.</strong>
+                                                    } @else {
+                                                      <strong>Please sign in or create an account to continue.</strong>
+                                                    }
                                                   </div>
                                                 </div>
                                               }
@@ -258,7 +272,9 @@
                                                   <div style="display: flex; gap: 1rem; margin-top: 1rem;">
                                                     <button class="secondary-action" type="button" (click)="checkoutStep.set('delivery')"
                                                     style="flex: 1;">Back</button>
-                                                    <button class="checkout-button" type="submit" [disabled]="submitting() || !items().length" style="flex: 2;">
+                                                    <button class="checkout-button" type="submit"
+                                                      [disabled]="submitting() || !items().length || (!allowGuestCheckout() && !customer()) || (minOrderAmount() > 0 && subtotal() < minOrderAmount())"
+                                                      style="flex: 2;">
                                                       @if(submitting()) { <i class="pi pi-spin pi-spinner"></i> } @else { <i class="pi pi-lock"></i> } Pay {{
                                                       total() | currency: currency() }}
                                                     </button>
@@ -277,6 +293,7 @@
                                             <p class="muted">Orders are linked to storefront customers only. CRM conversion is manual from admin.</p>
                                           </aside>
                                         </section>
+                                        }
                                       }
 
                                       @if (mode() === 'login' || mode() === 'register' || mode() === 'forgot') {

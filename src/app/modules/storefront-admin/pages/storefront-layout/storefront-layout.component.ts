@@ -78,6 +78,26 @@ interface StorefrontTheme {
 
               <hr class="divider" style="margin: 20px 0;" />
               <div class="form-group">
+                <label>Guest Checkout</label>
+                <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+                  <label class="switch">
+                    <input type="checkbox" [(ngModel)]="commerce.allowGuestCheckout">
+                    <span class="slider round"></span>
+                  </label>
+                  <span>Allow customers to place orders without an account</span>
+                </div>
+                <p class="hint" style="margin-top: 8px;">When disabled, customers must sign in before checkout.</p>
+              </div>
+
+              <hr class="divider" style="margin: 20px 0;" />
+              <div class="form-group">
+                <label>Minimum Online Order Amount</label>
+                <input type="number" min="0" [(ngModel)]="commerce.minOrderAmount" class="premium-input" placeholder="0" />
+                <p class="hint" style="margin-top: 8px;">Set 0 to allow checkout at any cart value.</p>
+              </div>
+
+              <hr class="divider" style="margin: 20px 0;" />
+              <div class="form-group">
                 <label>Shop Name</label>
                 <input type="text" [(ngModel)]="shopName" class="premium-input" placeholder="e.g. My Awesome Store" />
                 <p class="hint" style="margin-top: 8px;">Displayed in the storefront header and meta titles.</p>
@@ -510,7 +530,7 @@ export class StorefrontLayoutComponent implements OnInit {
   footerLinks: Array<{ label: string, url: string }> = [];
   footerCopyright = '';
   colors = { primary: 'var(--accent-primary)', secondary: 'var(--text-secondary)', accent: 'var(--color-warning)' };
-  commerce: any = { currency: 'INR', catalogMode: false };
+  commerce: any = { currency: 'INR', allowGuestCheckout: true, minOrderAmount: 0, catalogMode: false };
   shopName = 'My Store';
 
   ngOnInit() {
@@ -687,7 +707,11 @@ export class StorefrontLayoutComponent implements OnInit {
     // Compile Globals (Themes & Commerce)
     if (!payload.globalSettings) payload.globalSettings = {};
     payload.globalSettings.colors = { ...(payload.globalSettings.colors || {}), ...this.colors };
-    payload.globalSettings.commerce = { ...(payload.globalSettings.commerce || {}), ...this.commerce };
+    payload.globalSettings.commerce = {
+      ...(payload.globalSettings.commerce || {}),
+      ...this.commerce,
+      minOrderAmount: Math.max(0, Number(this.commerce.minOrderAmount || 0))
+    };
     payload.globalSettings.shopName = this.shopName;
 
     forkJoin([

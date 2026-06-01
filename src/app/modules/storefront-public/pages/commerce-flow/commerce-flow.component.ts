@@ -76,6 +76,8 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
   readonly editAddressId = signal<string | null>(null);
 
   readonly catalogMode = computed(() => this.stateService.globalSettings()?.commerce?.catalogMode ?? false);
+  readonly allowGuestCheckout = computed(() => this.stateService.globalSettings()?.commerce?.allowGuestCheckout !== false);
+  readonly minOrderAmount = computed(() => Number(this.stateService.globalSettings()?.commerce?.minOrderAmount ?? 0));
 
   readonly cart = this.cartFacade.cart;
   readonly dashboard = this.storefrontAuth.dashboard;
@@ -339,6 +341,20 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
   }
 
   placeOrder(): void {
+    if (this.catalogMode()) {
+      this.error.set('Online checkout is disabled for this store. Please contact the store or visit in person to purchase.');
+      return;
+    }
+    if (!this.allowGuestCheckout() && !this.customer()) {
+      this.error.set('Please sign in or create an account before checkout.');
+      this.router.navigate(['/store', this.orgSlug(), 'login']);
+      return;
+    }
+    if (this.minOrderAmount() > 0 && this.subtotal() < this.minOrderAmount()) {
+      this.error.set(`Minimum order amount is ${this.minOrderAmount()}.`);
+      return;
+    }
+
     const addresses = this.addresses();
     const selectedId = this.selectedAddressId();
     let finalAddress = this.addressForm;
@@ -464,13 +480,27 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
   }
 
   validateAndCheckout(): void {
+    if (this.catalogMode()) {
+      this.error.set('Online checkout is disabled for this store. Please contact the store or visit in person to purchase.');
+      return;
+    }
+    if (!this.allowGuestCheckout() && !this.customer()) {
+      this.error.set('Please sign in or create an account before checkout.');
+      this.router.navigate(['/store', this.orgSlug(), 'login']);
+      return;
+    }
+    if (this.minOrderAmount() > 0 && this.subtotal() < this.minOrderAmount()) {
+      this.error.set(`Minimum order amount is ${this.minOrderAmount()}.`);
+      return;
+    }
+
     this.validating.set(true);
     this.cartFacade.validate(this.orgSlug()).pipe(
       catchError((err) => of(err?.error ?? { valid: false }))
     ).subscribe(result => {
       this.validating.set(false);
       if (result?.valid !== false) this.router.navigate(['/store', this.orgSlug(), 'checkout']);
-      else this.error.set('Some cart items need attention before checkout.');
+      else this.error.set(result?.message || result?.data?.issues?.[0]?.message || 'Some cart items need attention before checkout.');
     });
   }
 
