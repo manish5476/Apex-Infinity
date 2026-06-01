@@ -1,6 +1,7 @@
 // src/app/modules/storefront-public/storefront-public.routes.ts
 import { Routes } from '@angular/router';
 import { storefrontCustomerGuard } from '@core/services/storefront-customer.guard';
+import { portalCustomerGuard } from '@core/services/portal-customer.guard';
 import { storefrontCartResolver } from '../../storefront/core/resolvers/storefront-cart.resolver';
 import { storefrontCustomerResolver } from '../../storefront/core/resolvers/storefront-customer.resolver';
 
@@ -24,6 +25,17 @@ const commerceFlowRoute = (path: string, mode: string, title: string, customerOn
     : customerOnly
       ? { customer: storefrontCustomerResolver }
       : undefined,
+  data: { mode },
+  title
+});
+
+/** Helper for portal routes (all use CustomerPortalComponent) */
+const portalRoute = (path: string, mode: string, title: string, guarded = false): Routes[number] => ({
+  path,
+  loadComponent: () =>
+    import('./pages/customer-portal/customer-portal.component')
+      .then(m => m.CustomerPortalComponent),
+  canActivate: guarded ? [portalCustomerGuard] : undefined,
   data: { mode },
   title
 });
@@ -66,7 +78,7 @@ export const STOREFRONT_PUBLIC_ROUTES: Routes = [
   },
   commerceFlowRoute('wishlist', 'wishlist', 'Wishlist', true),
   commerceFlowRoute('track-order', 'track-order', 'Track Order'),
-  ...[
+  ...([
     ['search', 'search', 'Search'],
     ['compare', 'compare', 'Compare Products'],
     ['recently-viewed', 'recently-viewed', 'Recently Viewed'],
@@ -76,7 +88,23 @@ export const STOREFRONT_PUBLIC_ROUTES: Routes = [
     ['orders/success', 'order-success', 'Order Success'],
     ['orders/failure', 'order-failure', 'Order Failure'],
     ['gift-card', 'gift-card', 'Gift Card']
-  ].map(([path, pageKey, title]) => storefrontExperienceRoute(path, pageKey, title)),
+  ] as [string, string, string][]).map(([path, pageKey, title]) => storefrontExperienceRoute(path, pageKey, title)),
+
+  // ── Customer Self-Service Portal (/portal/*) ─────────────────────────────
+  // Auth routes — no guard
+  portalRoute('portal/login',          'login',          'Sign In — My Account'),
+  portalRoute('portal/register',       'register',       'Create Account — My Account'),
+  portalRoute('portal/forgot-password','forgot-password','Forgot Password — My Account'),
+  portalRoute('portal/reset-password', 'reset-password', 'Reset Password — My Account'),
+  // Protected routes — require portal JWT
+  portalRoute('portal/dashboard',       'dashboard',    'Dashboard — My Account',      true),
+  portalRoute('portal/orders',          'orders',       'My Orders — My Account',       true),
+  portalRoute('portal/orders/:saleId',  'order-detail', 'Order Detail — My Account',    true),
+  portalRoute('portal/returns',         'returns',      'My Returns — My Account',      true),
+  portalRoute('portal/returns/:returnId','return-detail','Return Detail — My Account',  true),
+  portalRoute('portal/return-form',     'return-form',  'Request Return — My Account',  true),
+  portalRoute('portal/profile',         'profile',      'My Profile — My Account',      true),
+
   {
     path: 'products/:productSlug',
     loadComponent: () =>
