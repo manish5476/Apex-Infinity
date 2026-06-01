@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ChangeDetectorRef } from '@angular/core';
@@ -12,6 +12,7 @@ import {
   StorefrontWishlistItem
 } from '@apx/storefront-contracts';
 import { StorefrontSessionService } from '@core/services/storefront-session.service';
+import { StorefrontStateService } from '@core/services/storefront-state.service';
 import { StorefrontCartFacade } from '../../../../storefront/core/facades/storefront-cart.facade';
 import { StorefrontAuthFacade } from '../../../../storefront/core/facades/storefront-auth.facade';
 import { StorefrontCustomerFacade } from '../../../../storefront/core/facades/storefront-customer.facade';
@@ -48,6 +49,7 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
   private readonly checkoutFacade = inject(StorefrontCheckoutFacade);
   private readonly orderFacade = inject(StorefrontOrderFacade);
   private readonly storefrontSession = inject(StorefrontSessionService);
+  private readonly stateService = inject(StorefrontStateService);
   private readonly publicService = inject(StorefrontPublicService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly search$ = new Subject<string>();
@@ -72,6 +74,8 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
   readonly selectedAddressId = signal<string | null | undefined>(null);
   readonly showAddressForm = signal(false);
   readonly editAddressId = signal<string | null>(null);
+
+  readonly catalogMode = computed(() => this.stateService.globalSettings()?.commerce?.catalogMode ?? false);
 
   readonly cart = this.cartFacade.cart;
   readonly dashboard = this.storefrontAuth.dashboard;

@@ -75,6 +75,27 @@ interface StorefrontTheme {
                 <label>Storefront Currency</label>
                 <input type="text" [(ngModel)]="commerce.currency" class="premium-input uppercase-input" placeholder="e.g. INR" />
               </div>
+
+              <hr class="divider" style="margin: 20px 0;" />
+              <div class="form-group">
+                <label>Shop Name</label>
+                <input type="text" [(ngModel)]="shopName" class="premium-input" placeholder="e.g. My Awesome Store" />
+                <p class="hint" style="margin-top: 8px;">Displayed in the storefront header and meta titles.</p>
+              </div>
+
+              <hr class="divider" style="margin: 20px 0;" />
+
+              <div class="form-group">
+                <label>Catalog Mode (Disable Online Orders)</label>
+                <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+                  <label class="switch">
+                    <input type="checkbox" [(ngModel)]="commerce.catalogMode">
+                    <span class="slider round"></span>
+                  </label>
+                  <span>Hide checkout and turn store into an inquiry catalog</span>
+                </div>
+                <p class="hint" style="margin-top: 8px;">Customers can add items to cart, but cannot checkout online.</p>
+              </div>
     
               <hr class="divider" style="margin: 20px 0;" />
     
@@ -489,7 +510,8 @@ export class StorefrontLayoutComponent implements OnInit {
   footerLinks: Array<{ label: string, url: string }> = [];
   footerCopyright = '';
   colors = { primary: 'var(--accent-primary)', secondary: 'var(--text-secondary)', accent: 'var(--color-warning)' };
-  commerce = { currency: 'INR' };
+  commerce: any = { currency: 'INR', catalogMode: false };
+  shopName = 'My Store';
 
   ngOnInit() {
     this.fetchCoreData();
@@ -557,6 +579,9 @@ export class StorefrontLayoutComponent implements OnInit {
           }
           if (layout.globalSettings?.commerce) {
             this.commerce = { ...this.commerce, ...layout.globalSettings.commerce };
+          }
+          if (layout.globalSettings?.shopName) {
+            this.shopName = layout.globalSettings.shopName;
           }
         } catch (e) { }
 
@@ -663,6 +688,7 @@ export class StorefrontLayoutComponent implements OnInit {
     if (!payload.globalSettings) payload.globalSettings = {};
     payload.globalSettings.colors = { ...(payload.globalSettings.colors || {}), ...this.colors };
     payload.globalSettings.commerce = { ...(payload.globalSettings.commerce || {}), ...this.commerce };
+    payload.globalSettings.shopName = this.shopName;
 
     forkJoin([
       this.adminService.updateLayout(payload),

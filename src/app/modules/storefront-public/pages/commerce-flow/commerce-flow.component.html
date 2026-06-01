@@ -126,11 +126,17 @@
                                               <i class="pi pi-truck"></i> Estimate shipping &amp; tax
                                             </button>
                                             <div class="summary-total"><span>Total</span><strong>{{ total() | currency: currency() }}</strong></div>
-                                            <button class="checkout-button" type="button" (click)="validateAndCheckout()"
-                                              [disabled]="!items().length || validating()">
-                                              @if (validating()) { <i class="pi pi-spin pi-spinner"></i> } @else { <i class="pi pi-lock"></i> }
-                                              Continue checkout
-                                            </button>
+                                            @if (catalogMode()) {
+                                              <div class="commerce-alert warning" style="margin-top: 1rem;">
+                                                Online checkout is disabled. Please visit our store or contact us to purchase.
+                                              </div>
+                                            } @else {
+                                              <button class="checkout-button" type="button" (click)="validateAndCheckout()"
+                                                [disabled]="!items().length || validating()">
+                                                @if (validating()) { <i class="pi pi-spin pi-spinner"></i> } @else { <i class="pi pi-lock"></i> }
+                                                Continue checkout
+                                              </button>
+                                            }
                                           </aside>
                                         </section>
                                       }

@@ -28,9 +28,9 @@ import { Subject, catchError, debounceTime, distinctUntilChanged, filter, of, sw
         <!-- Brand -->
         <a class="sf-nav__brand" [routerLink]="['/store', slug(), 'home']">
           @if (logo) {
-            <img [src]="logo" [alt]="organization?.name || 'Store'" />
+            <img [src]="logo" [alt]="shopName()" />
           } @else {
-            <span>{{ organization?.name || 'Store' }}</span>
+            <span>{{ shopName() }}</span>
           }
         </a>
 
@@ -161,9 +161,13 @@ import { Subject, catchError, debounceTime, distinctUntilChanged, filter, of, sw
             <strong>{{ grandTotal() | currency: currency() }}</strong>
           </div>
           <a [routerLink]="['/store', slug(), 'cart']" (click)="cartOpen.set(false)">View cart</a>
-          <a class="primary" [routerLink]="['/store', slug(), 'checkout']" (click)="cartOpen.set(false)">
-            Checkout
-          </a>
+          @if (catalogMode()) {
+            <div class="catalog-mode-alert">Online checkout is disabled. Visit store to buy.</div>
+          } @else {
+            <a class="primary" [routerLink]="['/store', slug(), 'checkout']" (click)="cartOpen.set(false)">
+              Checkout
+            </a>
+          }
         </div>
       </aside>
       <button class="drawer-backdrop" type="button" (click)="cartOpen.set(false)" aria-label="Close cart drawer"></button>
@@ -175,7 +179,7 @@ import { Subject, catchError, debounceTime, distinctUntilChanged, filter, of, sw
         <div class="drawer-head">
           <div>
             <span>Menu</span>
-            <strong>{{ organization?.name || 'Store' }}</strong>
+            <strong>{{ shopName() }}</strong>
           </div>
           <button type="button" (click)="mobileOpen.set(false)" aria-label="Close menu">
             <i class="pi pi-times"></i>
@@ -244,6 +248,15 @@ export class NavbarSimpleComponent implements OnInit, OnDestroy {
     this._inputSlug() ||
     this.parseSlugFromUrl(this.router.url)
   );
+
+  readonly globalSettings = computed(() => this.stateService.globalSettings());
+  readonly shopName = computed(() => 
+    this.globalSettings()?.shopName || 
+    this.globalSettings()?.defaultSeo?.siteName || 
+    this.organization?.name || 
+    'Store'
+  );
+  readonly catalogMode = computed(() => this.globalSettings()?.commerce?.catalogMode ?? false);
 
   readonly menuItems = computed(() => {
     const items = this.config?.menuItems || this.config?.links;
