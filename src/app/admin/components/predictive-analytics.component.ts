@@ -756,9 +756,10 @@ export class PredictiveAnalyticsComponent implements OnInit, OnDestroy {
 
   filterConfig: FilterField[] = [
     { key: 'branchId', label: 'Branch Context', type: 'select', dataSourceKey: 'branches', optionLabel: 'name', optionValue: '_id', placeholder: 'Global Forecast' },
-    { key: 'periods', label: 'Forecast Horizon', type: 'select', staticOptions: [{ label: 'Next Month', value: 1 }, { label: '3 Months', value: 3 }, { label: '6 Months', value: 6 }], defaultValue: 3 },
-    { key: 'confidence', label: 'Model Confidence', type: 'select', staticOptions: [{ label: '80%', value: 0.8 }, { label: '95%', value: 0.95 }], defaultValue: 0.95 }
+    { key: 'periods', label: 'Forecast Horizon', type: 'select', optionLabel: 'label', optionValue: 'value', staticOptions: [{ label: 'Next Month', value: 1 }, { label: '3 Months', value: 3 }, { label: '6 Months', value: 6 }], defaultValue: 3 },
+    { key: 'confidence', label: 'Model Confidence', type: 'select', optionLabel: 'label', optionValue: 'value', staticOptions: [{ label: '80%', value: 0.8 }, { label: '95%', value: 0.95 }], defaultValue: 0.95 }
   ];
+
 
   ngOnInit() {
     this.setupColumns();

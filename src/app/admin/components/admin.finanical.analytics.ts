@@ -853,9 +853,10 @@ export class FinancialDashboardComponent implements OnInit, OnDestroy {
 
   loadData(): void {
     this.loading.set(true);
+    const [startDate, endDate] = this.resolveDateRange();
     this.analyticsService.getFinancialDashboard(
-      this.currentFilters['date']?.[0]?.toISOString(),
-      this.currentFilters['date']?.[1]?.toISOString(),
+      startDate,
+      endDate,
       this.currentFilters['branchId']
     ).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
@@ -894,8 +895,21 @@ export class FinancialDashboardComponent implements OnInit, OnDestroy {
     ];
   }
 
+  private resolveDateRange(): [string | undefined, string | undefined] {
+    const start = this.currentFilters['startDate'] ?? this.currentFilters['date']?.[0];
+    const end   = this.currentFilters['endDate']   ?? this.currentFilters['date']?.[1];
+    return [this.toIsoDate(start), this.toIsoDate(end)];
+  }
+
+  private toIsoDate(value: any): string | undefined {
+    if (!value) return undefined;
+    const date = value instanceof Date ? value : new Date(value);
+    return Number.isNaN(date.getTime()) ? undefined : date.toISOString();
+  }
+
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
+
 }

@@ -14,6 +14,7 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
 import { CommonMethodService } from '../../core/utils/common-method.service';
 import { MasterListService } from '../../core/services/master-list.service';
 import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
+import { MasterDropdownComponent } from '../../modules/shared/components/masterFilterDropdown/master-dropdown.component';
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 
@@ -25,7 +26,7 @@ import { takeUntil } from "rxjs/operators";
     CommonModule, FormsModule,
     TagModule, TooltipModule, ProgressSpinnerModule,
     SelectModule, DatePicker,
-    AgShareGrid
+    AgShareGrid, MasterDropdownComponent
   ],
   template: `
 <div class="dash-root">
@@ -49,16 +50,12 @@ import { takeUntil } from "rxjs/operators";
     <div class="header-controls">
       <div class="ctrl-group">
         <label class="ctrl-label">Branch</label>
-        <p-select
-          appendTo="body"
-          [options]="masterList.branches()"
-          optionLabel="name"
-          optionValue="_id"
+        <app-master-dropdown
+          endpoint="branches"
           [(ngModel)]="selectedBranch"
           (onChange)="onFilterChange()"
-          styleClass="dash-select"
           placeholder="All branches">
-        </p-select>
+        </app-master-dropdown>
       </div>
 
       <div class="ctrl-divider"></div>

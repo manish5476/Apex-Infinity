@@ -204,6 +204,8 @@ export class SalesForecastComponent implements OnInit, OnDestroy {
       key: 'periods',
       label: 'Forecast Horizon',
       type: 'select',
+      optionLabel: 'label',
+      optionValue: 'value',
       staticOptions: [
         { label: 'Next Quarter (3mo)', value: 3 },
         { label: 'Half Year (6mo)', value: 6 },
@@ -215,6 +217,8 @@ export class SalesForecastComponent implements OnInit, OnDestroy {
       key: 'confidence',
       label: 'Confidence Interval',
       type: 'select',
+      optionLabel: 'label',
+      optionValue: 'value',
       staticOptions: [
         { label: '80% (Aggressive)', value: 0.8 },
         { label: '90% (Balanced)', value: 0.9 },
@@ -223,6 +227,7 @@ export class SalesForecastComponent implements OnInit, OnDestroy {
       ],
       defaultValue: 0.95
     }
+
   ];
 
   constructor(private analyticsService: AdminAnalyticsService) {}

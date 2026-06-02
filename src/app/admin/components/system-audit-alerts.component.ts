@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject, ChangeDetectorRef, OnDestroy } from '@angular/core';
-
+import { CommonModule } from '@angular/common';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -15,12 +15,14 @@ import { takeUntil } from "rxjs/operators";
   selector: 'app-system-audit-alerts',
   standalone: true,
   imports: [
+    CommonModule,
     TagModule,
     TooltipModule,
     ProgressSpinnerModule,
     AgShareGrid,
     UniversalFilterComponent
   ],
+
   template: `
 <div class="audit-root">
 
@@ -401,11 +403,14 @@ export class SystemAuditAlertsComponent implements OnInit, OnDestroy {
       label: 'Action Type',
       type: 'select',
       placeholder: 'All Actions',
+      optionLabel: 'label',
+      optionValue: 'value',
       staticOptions: [
         { label: 'Reads', value: 'read' },
         { label: 'Writes', value: 'write' }
       ]
     },
+
     { key: 'date', label: 'Audit Period', type: 'date-range' }
   ];
 
@@ -424,9 +429,10 @@ export class SystemAuditAlertsComponent implements OnInit, OnDestroy {
 
   refreshAll(): void {
     this.loading.set(true);
+    const [startDate, endDate] = this.resolveDateRange();
     this.analyticsService.getSecurityAuditLog(
-      this.currentFilters['date']?.[0]?.toISOString(),
-      this.currentFilters['date']?.[1]?.toISOString(),
+      startDate,
+      endDate,
       this.currentFilters['branchId']
     ).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
@@ -438,6 +444,18 @@ export class SystemAuditAlertsComponent implements OnInit, OnDestroy {
       },
       error: () => this.loading.set(false)
     });
+  }
+
+  private resolveDateRange(): [string | undefined, string | undefined] {
+    const start = this.currentFilters['startDate'] ?? this.currentFilters['date']?.[0];
+    const end   = this.currentFilters['endDate']   ?? this.currentFilters['date']?.[1];
+    return [this.toIsoDate(start), this.toIsoDate(end)];
+  }
+
+  private toIsoDate(value: any): string | undefined {
+    if (!value) return undefined;
+    const date = value instanceof Date ? value : new Date(value);
+    return Number.isNaN(date.getTime()) ? undefined : date.toISOString();
   }
 
   setupColumns(): void {
