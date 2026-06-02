@@ -64,7 +64,7 @@ import { AppMessageService } from '@core/services/message.service';
                 
                 <div class="input-group mb-4">
                   <label class="info-label">Leave Type <span class="text-error">*</span></label>
-                  <p-select formControlName="leaveType" [options]="leaveTypes" placeholder="Select Leave Type" styleClass="w-full premium-dropdown" [filter]="true" filterBy="label"></p-select>
+                  <p-select formControlName="leaveType" [options]="leaveTypes" optionLabel="label" optionValue="value" placeholder="Select Leave Type" styleClass="w-full premium-dropdown" [filter]="true" filterBy="label"></p-select>
 
                 </div>
 
@@ -82,12 +82,12 @@ import { AppMessageService } from '@core/services/message.service';
                 <div class="grid-2 gap-4 mb-4">
                   <div class="input-group">
                     <label class="info-label">Start Session</label>
-                    <p-select formControlName="startSession" [options]="sessions" styleClass="w-full premium-dropdown" (onChange)="calculateDays()" [filter]="true" filterBy="label"></p-select>
+                    <p-select formControlName="startSession" [options]="sessions" optionLabel="label" optionValue="value" styleClass="w-full premium-dropdown" (onChange)="calculateDays()" [filter]="true" filterBy="label"></p-select>
 
                   </div>
                   <div class="input-group">
                     <label class="info-label">End Session</label>
-                    <p-select formControlName="endSession" [options]="sessions" styleClass="w-full premium-dropdown" (onChange)="calculateDays()" [filter]="true" filterBy="label"></p-select>
+                    <p-select formControlName="endSession" [options]="sessions" optionLabel="label" optionValue="value" styleClass="w-full premium-dropdown" (onChange)="calculateDays()" [filter]="true" filterBy="label"></p-select>
 
                   </div>
                 </div>

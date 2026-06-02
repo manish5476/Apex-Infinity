@@ -50,7 +50,7 @@ import { AppMessageService } from '@core/services/message.service';
           </div>
         </div>
         <div class="header-right flex-align gap-3">
-          <p-select [options]="years" [(ngModel)]="selectedYear" (onChange)="loadYearData()" styleClass="premium-select font-bold" [filter]="true" filterBy="label"></p-select>
+          <p-select [options]="years" optionLabel="label" optionValue="value" [(ngModel)]="selectedYear" (onChange)="loadYearData()" styleClass="premium-select font-bold" [filter]="true" filterBy="label"></p-select>
     
           <p-button icon="pi pi-copy" label="Copy Previous Year" severity="secondary" [outlined]="true" (onClick)="displayCopyDialog = true"></p-button>
           <p-button icon="pi pi-plus" label="Add Holiday" styleClass="p-button-primary" (onClick)="onAdd()"></p-button>
@@ -190,12 +190,12 @@ import { AppMessageService } from '@core/services/message.service';
       <div class="flex-col gap-4">
         <div class="input-group">
           <label class="info-label">Source Year (Copy From)</label>
-          <p-select [(ngModel)]="copyFromYear" [options]="years" appendTo="body" styleClass="w-full premium-select" [filter]="true" filterBy="label"></p-select>
+          <p-select [(ngModel)]="copyFromYear" [options]="years" optionLabel="label" optionValue="value" appendTo="body" styleClass="w-full premium-select" [filter]="true" filterBy="label"></p-select>
     
         </div>
         <div class="input-group">
           <label class="info-label">Target Year (Copy To)</label>
-          <p-select [(ngModel)]="copyToYear" [options]="years" appendTo="body" styleClass="w-full premium-select" [filter]="true" filterBy="label"></p-select>
+          <p-select [(ngModel)]="copyToYear" [options]="years" optionLabel="label" optionValue="value" appendTo="body" styleClass="w-full premium-select" [filter]="true" filterBy="label"></p-select>
     
         </div>
         <div class="flex-align justify-end gap-3 mt-4 pt-4 border-top">

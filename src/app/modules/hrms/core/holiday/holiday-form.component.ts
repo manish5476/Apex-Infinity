@@ -72,7 +72,7 @@ import { AppMessageService } from '@core/services/message.service';
                     </div>
                     <div class="input-group">
                       <label class="info-label">Holiday Category <span class="text-error">*</span></label>
-                      <p-select formControlName="holidayType" [options]="holidayTypes" appendTo="body" styleClass="w-full premium-select" [filter]="true" filterBy="label"></p-select>
+                      <p-select formControlName="holidayType" [options]="holidayTypes" optionLabel="label" optionValue="value" appendTo="body" styleClass="w-full premium-select" [filter]="true" filterBy="label"></p-select>
 
                     </div>
                   </div>
