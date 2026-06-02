@@ -287,6 +287,12 @@ export class PageBuilderComponent implements OnInit, OnDestroy {
         config['targetDate'] = (config['targetDate'] as Date).toISOString();
       }
 
+      const productIds = this.extractManualProductIds(s.type, config, s.manualData?.productIds);
+      const manualData = {
+        ...(s.manualData ?? {}),
+        ...(productIds.length ? { productIds } : {})
+      };
+
       return {
         id: s.id,
         type: s.type,
@@ -296,7 +302,7 @@ export class PageBuilderComponent implements OnInit, OnDestroy {
         isHiddenOnMobile: s.isHiddenOnMobile ?? false,
         isHiddenOnDesktop: s.isHiddenOnDesktop ?? false,
         smartRuleId: s.smartRuleId ?? null,
-        manualData: s.manualData ?? undefined
+        manualData: Object.keys(manualData).length ? manualData : undefined
       };
     });
 
@@ -336,6 +342,30 @@ export class PageBuilderComponent implements OnInit, OnDestroy {
 
   hasRuntimeSupport(type: string): boolean {
     return SECTION_RUNTIME_TYPES.includes(type) || !!SECTION_COMPONENT_REGISTRY[type];
+  }
+
+  private extractManualProductIds(type: string, config: Record<string, any>, existing: string[] = []): string[] {
+    const ids = new Set<string>();
+    const add = (value: unknown): void => {
+      if (Array.isArray(value)) {
+        value.forEach(add);
+        return;
+      }
+
+      const id = String(value ?? '').trim();
+      if (id) ids.add(id);
+    };
+
+    if (type === 'featured_product') {
+      add(config['productId']);
+    }
+
+    if (config['ruleType'] === 'manual_selection') {
+      add(config['manualProductIds']);
+    }
+
+    existing.forEach(add);
+    return Array.from(ids);
   }
   deletePage(): void {
     const page = this.page();

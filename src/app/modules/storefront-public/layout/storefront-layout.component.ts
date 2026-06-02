@@ -102,11 +102,11 @@ export class StorefrontLayoutComponent implements OnInit, OnDestroy {
         
         // Expose standard variables to all child pages (commerce-flow, product-listing, etc)
         '--color-primary': selectedTheme.color,
-        '--bg-primary': dark ? 'var(--text-primary)' : 'var(--bg-primary)',
-        '--bg-secondary': dark ? 'var(--text-primary)' : 'var(--bg-secondary)',
+        '--bg-primary': dark ? '#1e293b' : '#ffffff',
+        '--bg-secondary': dark ? '#0f172a' : '#f8fafc',
         '--border-secondary': dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
-        '--text-primary': dark ? 'var(--bg-secondary)' : 'var(--text-primary)',
-        '--text-secondary': dark ? 'var(--text-secondary)' : 'var(--text-secondary)'
+        '--text-primary': dark ? '#f8fafc' : '#0f172a',
+        '--text-secondary': dark ? '#94a3b8' : '#64748b'
       };
     }
 
@@ -139,11 +139,11 @@ export class StorefrontLayoutComponent implements OnInit, OnDestroy {
 
       // Expose standard variables to all child pages
       '--color-primary': primary,
-      '--bg-primary': dark ? 'var(--text-primary)' : 'var(--bg-primary)',
-      '--bg-secondary': dark ? 'var(--text-primary)' : 'var(--bg-secondary)',
+      '--bg-primary': dark ? '#1e293b' : '#ffffff',
+      '--bg-secondary': dark ? '#0f172a' : '#f8fafc',
       '--border-secondary': dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
-      '--text-primary': dark ? 'var(--bg-secondary)' : 'var(--text-primary)',
-      '--text-secondary': dark ? 'var(--text-secondary)' : 'var(--text-secondary)'
+      '--text-primary': dark ? '#f8fafc' : '#0f172a',
+      '--text-secondary': dark ? '#94a3b8' : '#64748b'
     };
   });
 

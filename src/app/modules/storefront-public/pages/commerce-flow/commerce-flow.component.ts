@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ChangeDetectorRef } from '@angular/core';
@@ -12,6 +12,7 @@ import {
   StorefrontWishlistItem
 } from '@apx/storefront-contracts';
 import { StorefrontSessionService } from '@core/services/storefront-session.service';
+import { StorefrontStateService } from '@core/services/storefront-state.service';
 import { StorefrontCartFacade } from '../../../../storefront/core/facades/storefront-cart.facade';
 import { StorefrontAuthFacade } from '../../../../storefront/core/facades/storefront-auth.facade';
 import { StorefrontCustomerFacade } from '../../../../storefront/core/facades/storefront-customer.facade';
@@ -48,6 +49,7 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
   private readonly checkoutFacade = inject(StorefrontCheckoutFacade);
   private readonly orderFacade = inject(StorefrontOrderFacade);
   private readonly storefrontSession = inject(StorefrontSessionService);
+  private readonly stateService = inject(StorefrontStateService);
   private readonly publicService = inject(StorefrontPublicService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly search$ = new Subject<string>();
@@ -72,6 +74,10 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
   readonly selectedAddressId = signal<string | null | undefined>(null);
   readonly showAddressForm = signal(false);
   readonly editAddressId = signal<string | null>(null);
+
+  readonly catalogMode = computed(() => this.stateService.globalSettings()?.commerce?.catalogMode ?? false);
+  readonly allowGuestCheckout = computed(() => this.stateService.globalSettings()?.commerce?.allowGuestCheckout !== false);
+  readonly minOrderAmount = computed(() => Number(this.stateService.globalSettings()?.commerce?.minOrderAmount ?? 0));
 
   readonly cart = this.cartFacade.cart;
   readonly dashboard = this.storefrontAuth.dashboard;
@@ -335,6 +341,20 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
   }
 
   placeOrder(): void {
+    if (this.catalogMode()) {
+      this.error.set('Online checkout is disabled for this store. Please contact the store or visit in person to purchase.');
+      return;
+    }
+    if (!this.allowGuestCheckout() && !this.customer()) {
+      this.error.set('Please sign in or create an account before checkout.');
+      this.router.navigate(['/store', this.orgSlug(), 'login']);
+      return;
+    }
+    if (this.minOrderAmount() > 0 && this.subtotal() < this.minOrderAmount()) {
+      this.error.set(`Minimum order amount is ${this.minOrderAmount()}.`);
+      return;
+    }
+
     const addresses = this.addresses();
     const selectedId = this.selectedAddressId();
     let finalAddress = this.addressForm;
@@ -460,13 +480,27 @@ export class CommerceFlowComponent implements OnInit, OnDestroy {
   }
 
   validateAndCheckout(): void {
+    if (this.catalogMode()) {
+      this.error.set('Online checkout is disabled for this store. Please contact the store or visit in person to purchase.');
+      return;
+    }
+    if (!this.allowGuestCheckout() && !this.customer()) {
+      this.error.set('Please sign in or create an account before checkout.');
+      this.router.navigate(['/store', this.orgSlug(), 'login']);
+      return;
+    }
+    if (this.minOrderAmount() > 0 && this.subtotal() < this.minOrderAmount()) {
+      this.error.set(`Minimum order amount is ${this.minOrderAmount()}.`);
+      return;
+    }
+
     this.validating.set(true);
     this.cartFacade.validate(this.orgSlug()).pipe(
       catchError((err) => of(err?.error ?? { valid: false }))
     ).subscribe(result => {
       this.validating.set(false);
       if (result?.valid !== false) this.router.navigate(['/store', this.orgSlug(), 'checkout']);
-      else this.error.set('Some cart items need attention before checkout.');
+      else this.error.set(result?.message || result?.data?.issues?.[0]?.message || 'Some cart items need attention before checkout.');
     });
   }
 

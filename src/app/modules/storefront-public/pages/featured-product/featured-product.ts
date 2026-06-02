@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { SectionBaseConfig, PADDING_MAP } from '../../dynamic-page/section.types';
 import { PublicProduct } from '@core/models/storefront.model';
 import { StorefrontStateService } from '@core/services/storefront-state.service';
+import { StorefrontCartFacade } from '../../../../storefront/core/facades/storefront-cart.facade';
 
 // ---------------------------------------------------------------------------
 // Interfaces
@@ -93,11 +94,15 @@ export interface FeaturedProductConfig extends SectionBaseConfig {
               }
 
               <div class="prem-actions">
-                <button class="prem-btn prem-btn--primary" type="button" 
-                        [ngStyle]="{'background-color': cfg().typography?.headingColor || 'var(--accent-primary)'}">
-                  <span>Add to Cart</span>
-                  <i class="pi pi-arrow-right"></i>
-                </button>
+                @if (!catalogMode()) {
+                  <button class="prem-btn prem-btn--primary" type="button"
+                          [disabled]="!mappedProduct.stock.available"
+                          (click)="addToCart()"
+                          [ngStyle]="{'background-color': cfg().typography?.headingColor || 'var(--accent-primary)'}">
+                    <span>{{ mappedProduct.stock.available ? 'Add to Cart' : 'Out of Stock' }}</span>
+                    <i class="pi pi-arrow-right"></i>
+                  </button>
+                }
                 <a [routerLink]="['/store', orgSlug(), 'products', mappedProduct.slug]" 
                    class="prem-btn prem-btn--secondary"
                    [ngStyle]="{'color': cfg().backgroundImage ? '#ffffff' : 'var(--text-primary)', 'border-color': cfg().backgroundImage ? 'rgba(255,255,255,0.3)' : 'var(--border-primary)'}">
@@ -230,6 +235,7 @@ export interface FeaturedProductConfig extends SectionBaseConfig {
       height: 3.5rem; padding: 0 2.5rem; border-radius: 100px; font-size: 1rem; font-weight: 600;
       text-decoration: none; cursor: pointer; transition: all 0.3s var(--ease-spring);
     }
+    .prem-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; filter: none; }
     
     .prem-btn--primary {
       color: var(--bg-primary); border: 1px solid transparent;
@@ -274,9 +280,13 @@ export class FeaturedProductComponent implements OnChanges {
 
   mappedProduct: (PublicProduct & { description?: string | null }) | null = null;
 
-  constructor(private state: StorefrontStateService) { }
+  constructor(
+    private state: StorefrontStateService,
+    private cartFacade: StorefrontCartFacade
+  ) { }
 
-  orgSlug = computed(() => this.state.organization().slug || '');
+  orgSlug = computed(() => this.state.organization()?.slug || '');
+  catalogMode = computed(() => this.state.globalSettings()?.commerce?.catalogMode ?? false);
 
   readonly cfg = computed(() => ({
     layout: this.config?.layout || 'image_left',
@@ -345,6 +355,15 @@ export class FeaturedProductComponent implements OnChanges {
     const { original, current } = this.mappedProduct.price;
     if (!original || !current || current >= original) return 0;
     return Math.round(((original - current) / original) * 100);
+  }
+
+  addToCart(): void {
+    if (!this.mappedProduct || this.catalogMode()) return;
+    const productId = this.mappedProduct.id || (this.mappedProduct as any)._id;
+    const orgSlug = this.orgSlug();
+    if (!productId || !orgSlug || !this.mappedProduct.stock?.available) return;
+
+    this.cartFacade.add(orgSlug, { productId, quantity: 1 }).subscribe();
   }
 
   private toPublicProduct(p: any): PublicProduct & { description?: string | null } {
