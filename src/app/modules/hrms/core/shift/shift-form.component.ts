@@ -33,26 +33,26 @@ import { takeUntil } from "rxjs/operators";
 ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="app-fullscreen-wrapper fade-in">
+    <div class="apex-page fade-in">
       
-      <header class="dashboard-header glass-header">
-        <div class="header-left">
-          <button class="icon-btn back-btn" type="button" (click)="goBack()" title="Go Back">
+      <header class="apex-page-header">
+        <div class="apex-page-header__title-block">
+          <button class="apex-btn apex-btn--icon mr-3" type="button" (click)="goBack()" title="Go Back">
             <i class="pi pi-arrow-left"></i>
           </button>
           <div>
-            <h1 class="page-title">{{ isEditMode() ? 'Edit Shift' : 'Create Shift' }}</h1>
-            <p class="page-subtitle">Configure working hours, rules, and overtime policies.</p>
+            <h1 class="apex-page-header__title">{{ isEditMode() ? 'Edit Shift' : 'Create Shift' }}</h1>
+            <p class="apex-page-header__subtitle">Configure working hours, rules, and overtime policies.</p>
           </div>
         </div>
         
-        <div class="header-right">
-          <div class="header-status" [class.valid]="shiftForm.valid">
+        <div class="apex-page-header__actions">
+          <div class="header-status mr-3" [class.valid]="shiftForm.valid">
             <div class="status-dot"></div>
             <span>{{ shiftForm.valid ? 'Ready' : 'Draft' }}</span>
           </div>
-          <button type="button" class="btn btn-outline" (click)="goBack()" [disabled]="isSubmitting() || isLoading()">Cancel</button>
-          <button type="button" class="btn btn-primary" [disabled]="isSubmitting() || isLoading() || shiftForm.invalid" (click)="onSubmit()">
+          <button type="button" class="apex-btn apex-btn--secondary" (click)="goBack()" [disabled]="isSubmitting() || isLoading()">Cancel</button>
+          <button type="button" class="apex-btn apex-btn--primary" [disabled]="isSubmitting() || isLoading() || shiftForm.invalid" (click)="onSubmit()">
             @if (!isSubmitting()) {
               <i class="pi pi-save"></i>
               <span>{{ isEditMode() ? 'Update' : 'Save' }}</span>
@@ -64,8 +64,8 @@ import { takeUntil } from "rxjs/operators";
         </div>
       </header>
 
-      <main class="dashboard-content" [class.loading-opacity]="isLoading()">
-        <form [formGroup]="shiftForm" class="bento-grid">
+      <div class="apex-content" [class.loading-opacity]="isLoading()">
+        <form [formGroup]="shiftForm" class="bento-grid pb-6">
           
           <p-card styleClass="grid-card span-2 card-anim-1">
             <ng-template pTemplate="header">
@@ -76,71 +76,69 @@ import { takeUntil } from "rxjs/operators";
             </ng-template>
             
             <div class="inner-grid-2">
-              <div class="form-field">
-                <label for="name">Shift Name <span class="required">*</span></label>
+              <div class="apex-filter-group">
+                <label class="apex-input-label">Shift Name <span class="required">*</span></label>
                 <div class="p-input-icon-left w-full">
                   <i class="pi pi-tag text-tertiary"></i>
-                  <input pInputText id="name" type="text" formControlName="name" class="w-full" placeholder="e.g. Morning Shift">
+                  <input pInputText id="name" type="text" formControlName="name" class="apex-input w-full" placeholder="e.g. Morning Shift">
                 </div>
               </div>
 
-              <div class="form-field">
-                <label for="code">Shift Code <span class="required">*</span></label>
+              <div class="apex-filter-group">
+                <label class="apex-input-label">Shift Code <span class="required">*</span></label>
                 <div class="p-input-icon-left w-full">
                   <i class="pi pi-barcode text-tertiary"></i>
-                  <input pInputText id="code" type="text" formControlName="code" class="w-full uppercase-input" placeholder="e.g. MOR-01">
+                  <input pInputText id="code" type="text" formControlName="code" class="apex-input w-full uppercase-input" placeholder="e.g. MOR-01">
                 </div>
               </div>
 
-              <div class="form-field">
-                <label for="shiftType">Shift Type</label>
+              <div class="apex-filter-group">
+                <label class="apex-input-label">Shift Type</label>
                 <p-select 
                   id="shiftType" 
                   formControlName="shiftType" 
                   [options]="shiftTypeOptions" 
                   optionLabel="label"
                   optionValue="value"
-                  styleClass="w-full" 
+                  styleClass="w-full prime-override" 
                   appendTo="body"
                   [filter]="true"
                   filterBy="label">
                 </p-select>
-
-
               </div>
 
-              <div class="form-field">
-                <label for="breakDurationMins">Break Duration (Mins)</label>
+              <div class="apex-filter-group">
+                <label class="apex-input-label">Break Duration (Mins)</label>
                 <p-inputNumber 
                   id="breakDurationMins" 
                   formControlName="breakDurationMins" 
-                  styleClass="w-full" 
+                  styleClass="w-full prime-override-num" 
                   [min]="0" 
                   placeholder="60">
                 </p-inputNumber>
               </div>
 
-              <div class="form-field">
+              <div class="apex-filter-group">
+                <label class="apex-input-label">Start Time</label>
                 <p-datepicker id="startTime" formControlName="startTime" [timeOnly]="true" 
-                  hourFormat="12" styleClass="w-full prime-override-input" appendTo="body"></p-datepicker>
-
+                  hourFormat="12" styleClass="w-full prime-override" appendTo="body"></p-datepicker>
               </div>
 
-              <div class="form-field">
+              <div class="apex-filter-group">
+                <label class="apex-input-label">End Time</label>
                 <p-datepicker id="endTime" formControlName="endTime" [timeOnly]="true" 
-                  hourFormat="12" styleClass="w-full prime-override-input" appendTo="body"></p-datepicker>
-
+                  hourFormat="12" styleClass="w-full prime-override" appendTo="body"></p-datepicker>
               </div>
 
-              <div class="form-field span-2-inner mt-1">
-                <label for="description">Description</label>
+              <div class="apex-filter-group span-2-inner mt-1">
+                <label class="apex-input-label">Description</label>
                 <textarea 
                   pTextarea 
                   id="description" 
                   formControlName="description" 
                   rows="2" 
                   [autoResize]="true" 
-                  class="w-full" 
+                  class="apex-input w-full" 
                   placeholder="Brief details about this shift...">
                 </textarea>
               </div>
@@ -157,57 +155,57 @@ import { takeUntil } from "rxjs/operators";
             
             <div class="flex-col gap-4">
               <div class="inner-grid-2">
-                <div class="form-field">
-                  <label for="gracePeriodMins">Grace Period (Mins)</label>
+                <div class="apex-filter-group">
+                  <label class="apex-input-label">Grace Period (Mins)</label>
                   <p-inputNumber 
                     id="gracePeriodMins" 
                     formControlName="gracePeriodMins" 
-                    styleClass="w-full" 
+                    styleClass="w-full prime-override-num" 
                     [min]="0" 
                     placeholder="15">
                   </p-inputNumber>
                 </div>
-                <div class="form-field">
-                  <label for="lateThresholdMins">Late Mark After (Mins)</label>
+                <div class="apex-filter-group">
+                  <label class="apex-input-label">Late Mark After (Mins)</label>
                   <p-inputNumber 
                     id="lateThresholdMins" 
                     formControlName="lateThresholdMins" 
-                    styleClass="w-full" 
+                    styleClass="w-full prime-override-num" 
                     [min]="0" 
                     placeholder="30">
                   </p-inputNumber>
                 </div>
               </div>
 
-              <div class="form-field">
-                <label for="earlyDepartureThresholdMins">Early Departure Penalty After (Mins)</label>
+              <div class="apex-filter-group">
+                <label class="apex-input-label">Early Departure Penalty After (Mins)</label>
                 <p-inputNumber 
                   id="earlyDepartureThresholdMins" 
                   formControlName="earlyDepartureThresholdMins" 
-                  styleClass="w-full" 
+                  styleClass="w-full prime-override-num" 
                   [min]="0" 
                   placeholder="15">
                 </p-inputNumber>
               </div>
 
               <div class="inner-grid-2">
-                <div class="form-field">
-                  <label for="halfDayThresholdHrs">Half Day (Hrs)</label>
+                <div class="apex-filter-group">
+                  <label class="apex-input-label">Half Day (Hrs)</label>
                   <p-inputNumber 
                     id="halfDayThresholdHrs" 
                     formControlName="halfDayThresholdHrs" 
-                    styleClass="w-full" 
+                    styleClass="w-full prime-override-num" 
                     [min]="0" [step]="0.5" 
                     [minFractionDigits]="1"
                     placeholder="4">
                   </p-inputNumber>
                 </div>
-                <div class="form-field">
-                  <label for="minFullDayHrs">Full Day (Hrs)</label>
+                <div class="apex-filter-group">
+                  <label class="apex-input-label">Full Day (Hrs)</label>
                   <p-inputNumber 
                     id="minFullDayHrs" 
                     formControlName="minFullDayHrs" 
-                    styleClass="w-full" 
+                    styleClass="w-full prime-override-num" 
                     [min]="0" [step]="0.5" 
                     [minFractionDigits]="1"
                     placeholder="8">
@@ -226,8 +224,8 @@ import { takeUntil } from "rxjs/operators";
             </ng-template>
             
             <div class="flex-col gap-4">
-              <div class="form-field">
-                <label for="weeklyOffs">Weekly Off Days</label>
+              <div class="apex-filter-group">
+                <label class="apex-input-label">Weekly Off Days</label>
                 <p-multiSelect 
                   id="weeklyOffs" 
                   formControlName="weeklyOffs" 
@@ -243,8 +241,8 @@ import { takeUntil } from "rxjs/operators";
                 <span class="detail-text" style="font-size: 11px; color: var(--text-tertiary); margin-top: 4px;">Defaults to Sunday.</span>
               </div>
 
-              <div class="form-field">
-                <label for="applicableDays">Applicable Days</label>
+              <div class="apex-filter-group">
+                <label class="apex-input-label">Applicable Days</label>
                 <p-multiSelect 
                   id="applicableDays" 
                   formControlName="applicableDays" 
@@ -277,22 +275,22 @@ import { takeUntil } from "rxjs/operators";
               </label>
 
               <div class="inner-grid-2">
-                <div class="form-field">
-                  <label for="multiplier">Standard OT Multiplier</label>
+                <div class="apex-filter-group">
+                  <label class="apex-input-label">Standard OT Multiplier</label>
                   <p-inputNumber 
                     id="multiplier" 
                     formControlName="multiplier" 
-                    styleClass="w-full" 
+                    styleClass="w-full prime-override-num" 
                     [step]="0.1" [minFractionDigits]="1" 
                     placeholder="1.5">
                   </p-inputNumber>
                 </div>
-                <div class="form-field">
-                  <label for="holidayMultiplier">Holiday OT Multiplier</label>
+                <div class="apex-filter-group">
+                  <label class="apex-input-label">Holiday OT Multiplier</label>
                   <p-inputNumber 
                     id="holidayMultiplier" 
                     formControlName="holidayMultiplier" 
-                    styleClass="w-full" 
+                    styleClass="w-full prime-override-num" 
                     [step]="0.1" [minFractionDigits]="1" 
                     placeholder="2.0">
                   </p-inputNumber>
@@ -300,21 +298,21 @@ import { takeUntil } from "rxjs/operators";
               </div>
 
               <div class="inner-grid-2">
-                <div class="form-field">
-                  <label for="afterHours">OT After (Hrs)</label>
+                <div class="apex-filter-group">
+                  <label class="apex-input-label">OT After (Hrs)</label>
                   <p-inputNumber 
                     id="afterHours" 
                     formControlName="afterHours" 
-                    styleClass="w-full" 
+                    styleClass="w-full prime-override-num" 
                     placeholder="8">
                   </p-inputNumber>
                 </div>
-                <div class="form-field">
-                  <label for="doubleAfterHours">Double OT After (Hrs)</label>
+                <div class="apex-filter-group">
+                  <label class="apex-input-label">Double OT After (Hrs)</label>
                   <p-inputNumber 
                     id="doubleAfterHours" 
                     formControlName="doubleAfterHours" 
-                    styleClass="w-full" 
+                    styleClass="w-full prime-override-num" 
                     placeholder="12">
                   </p-inputNumber>
                 </div>
@@ -334,37 +332,37 @@ import { takeUntil } from "rxjs/operators";
               <span class="detail-text" style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 4px;">Only applies if Shift Type is set to "Flexible".</span>
               
               <div class="inner-grid-2">
-                <div class="form-field">
-                  <label for="coreStartTime">Core Start Time</label>
+                <div class="apex-filter-group">
+                  <label class="apex-input-label">Core Start Time</label>
                   <p-datepicker id="coreStartTime" formControlName="coreStartTime" [timeOnly]="true" 
-                    hourFormat="12" styleClass="w-full prime-override-input" appendTo="body"></p-datepicker>
+                    hourFormat="12" styleClass="w-full prime-override" appendTo="body"></p-datepicker>
                 </div>
-                <div class="form-field">
-                  <label for="coreEndTime">Core End Time</label>
+                <div class="apex-filter-group">
+                  <label class="apex-input-label">Core End Time</label>
                   <p-datepicker id="coreEndTime" formControlName="coreEndTime" [timeOnly]="true" 
-                    hourFormat="12" styleClass="w-full prime-override-input" appendTo="body"></p-datepicker>
+                    hourFormat="12" styleClass="w-full prime-override" appendTo="body"></p-datepicker>
                 </div>
               </div>
 
               <div class="inner-grid-2">
-                <div class="form-field">
-                  <label for="flexibleBandStart">Flexi Band Start</label>
+                <div class="apex-filter-group">
+                  <label class="apex-input-label">Flexi Band Start</label>
                   <p-datepicker id="flexibleBandStart" formControlName="flexibleBandStart" [timeOnly]="true" 
-                    hourFormat="12" styleClass="w-full prime-override-input" appendTo="body"></p-datepicker>
+                    hourFormat="12" styleClass="w-full prime-override" appendTo="body"></p-datepicker>
                 </div>
-                <div class="form-field">
-                  <label for="flexibleBandEnd">Flexi Band End</label>
+                <div class="apex-filter-group">
+                  <label class="apex-input-label">Flexi Band End</label>
                   <p-datepicker id="flexibleBandEnd" formControlName="flexibleBandEnd" [timeOnly]="true" 
-                    hourFormat="12" styleClass="w-full prime-override-input" appendTo="body"></p-datepicker>
+                    hourFormat="12" styleClass="w-full prime-override" appendTo="body"></p-datepicker>
                 </div>
               </div>
 
-              <div class="form-field mt-1">
-                <label for="minHoursPerDay">Minimum Hours Per Day</label>
+              <div class="apex-filter-group mt-1">
+                <label class="apex-input-label">Minimum Hours Per Day</label>
                 <p-inputNumber 
                   id="minHoursPerDay" 
                   formControlName="minHoursPerDay" 
-                  styleClass="w-full" 
+                  styleClass="w-full prime-override-num" 
                   placeholder="4">
                 </p-inputNumber>
               </div>
@@ -375,8 +373,8 @@ import { takeUntil } from "rxjs/operators";
             <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--spacing-md);">
               
               <div style="display: flex; gap: var(--spacing-xl);">
-                <div class="form-field">
-                  <label for="effectiveFrom">Effective From</label>
+                <div class="apex-filter-group">
+                  <label class="apex-input-label">Effective From</label>
                   <p-datepicker 
                     id="effectiveFrom" 
                     formControlName="effectiveFrom" 
@@ -384,12 +382,12 @@ import { takeUntil } from "rxjs/operators";
                     iconDisplay="input" 
                     placeholder="Select Date" 
                     dateFormat="yy-mm-dd"
-                    styleClass="w-full prime-override-date" 
+                    styleClass="w-full prime-override" 
                     appendTo="body">
                   </p-datepicker>
                 </div>
-                <div class="form-field">
-                  <label for="effectiveTo">Effective To</label>
+                <div class="apex-filter-group">
+                  <label class="apex-input-label">Effective To</label>
                   <p-datepicker 
                     id="effectiveTo" 
                     formControlName="effectiveTo" 
@@ -397,7 +395,7 @@ import { takeUntil } from "rxjs/operators";
                     iconDisplay="input" 
                     placeholder="Select Date" 
                     dateFormat="yy-mm-dd"
-                    styleClass="w-full prime-override-date" 
+                    styleClass="w-full prime-override" 
                     appendTo="body">
                   </p-datepicker>
                 </div>
@@ -412,101 +410,62 @@ import { takeUntil } from "rxjs/operators";
           </p-card>
 
         </form>
-      </main>
+      </div>
     </div>
   `,
   styles: [`
-    /* ==========================================================================
-       BASE THEME & LAYOUT (Stripped of global inputs)
-       ========================================================================== */
-    :host { display: block; width: 100%; height: 100vh; background-color: var(--bg-secondary); font-family: var(--font-body); color: var(--text-primary); overflow: hidden; }
-    .app-fullscreen-wrapper { display: flex; flex-direction: column; height: 100%; width: 100%; }
+    :host { display: block; width: 100%; height: 100%; background-color: var(--bg-secondary); }
     .w-full { width: 100%; }
     .flex-col { display: flex; flex-direction: column; }
     .flex-align { display: flex; align-items: center; }
+    .flex-between { display: flex; justify-content: space-between; align-items: center; }
     .gap-2 { gap: var(--spacing-sm); }
     .gap-4 { gap: var(--spacing-lg); }
     .mt-1 { margin-top: 4px; }
     .mt-auto { margin-top: auto; }
+    .mr-3 { margin-right: var(--spacing-lg); }
     .font-bold { font-weight: 700; }
     .text-primary { color: var(--color-primary); }
-
-    /* Header */
-    .dashboard-header { display: flex; justify-content: space-between; align-items: center; padding: var(--spacing-lg) var(--spacing-2xl); background: var(--bg-primary); border-bottom: 1px solid var(--border-secondary); z-index: 50; flex-shrink: 0; box-shadow: var(--shadow-xs); }
-    .header-left, .header-right { display: flex; align-items: center; gap: var(--spacing-xl); }
-    .icon-btn { background: var(--bg-secondary); border: 1px solid var(--border-secondary); color: var(--text-secondary); border-radius: var(--ui-border-radius-lg); width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; font-size: 18px; }
-    .icon-btn:hover { background: var(--bg-primary); color: var(--text-primary); border-color: var(--color-primary); }
-    .page-title { font-family: var(--font-heading); font-size: 24px; font-weight: 800; margin: 0 0 2px 0; line-height: 1.2; letter-spacing: -0.5px; }
-    .page-subtitle { font-size: 13px; color: var(--text-secondary); margin: 0; }
+    .pb-6 { padding-bottom: var(--spacing-3xl); }
     
     /* Header Status */
-    .header-status { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: var(--text-secondary); padding: 6px 14px; background: var(--bg-secondary); border-radius: 20px; border: 1px solid var(--border-secondary); margin-right: var(--spacing-md); text-transform: uppercase; letter-spacing: 0.5px; }
+    .header-status { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: var(--text-secondary); padding: 6px 14px; background: var(--bg-secondary); border-radius: 20px; border: 1px solid var(--border-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
     .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-tertiary); }
     .header-status.valid { color: var(--color-success); border-color: var(--color-success-border); background: var(--color-success-bg); }
     .header-status.valid .status-dot { background: var(--color-success); }
     
-    /* Buttons */
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 20px; font-size: 14px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; border: none; }
-    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-    .btn-outline { background: var(--bg-primary); border: 1px solid var(--border-secondary); color: var(--text-primary); }
-    .btn-outline:not(:disabled):hover { background: var(--bg-secondary); border-color: var(--text-tertiary); }
-    .btn-primary { background: var(--color-primary); color: var(--color-on-primary); }
-    .btn-primary:not(:disabled):hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
-
     /* Layout */
-    .dashboard-content { flex: 1; overflow-y: auto; padding: var(--spacing-2xl) var(--spacing-3xl); background: var(--bg-secondary); transition: opacity 0.3s; }
     .bento-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-2xl); align-items: start; max-width: 1600px; margin: 0 auto; }
     .span-2 { grid-column: span 2; } .span-2-inner { grid-column: span 2; } .span-3 { grid-column: span 3; }
     .inner-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-xl); }
     .loading-opacity { opacity: 0.5; pointer-events: none; filter: grayscale(50%); }
 
     /* Form Fields */
-    .form-field { display: flex; flex-direction: column; gap: 6px; }
-    .form-field label { font-size: 11px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.5px; }
     .required { color: var(--color-error); font-weight: bold; margin-left: 2px; }
     .uppercase-input { text-transform: uppercase; font-family: var(--font-mono); font-weight: 600; letter-spacing: 0.5px; }
 
-    /* For native inputs that need to match PrimeNG styling visually */
-    .prime-override-input {
-      width: 100%; height: 42px; background: var(--bg-primary);
-      border: 1px solid var(--border-secondary); border-radius: 8px;
-      padding: 0 16px; font-size: 14px; font-family: var(--font-body);
-      color: var(--text-primary); font-weight: 500; transition: all 0.2s ease; outline: none; box-sizing: border-box;
+    ::ng-deep .prime-override, 
+    ::ng-deep .prime-override-multi,
+    ::ng-deep .prime-override-num {
+      width: 100%;
     }
-    .prime-override-input:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px var(--accent-focus); }
-
-    // /* PrimeNG Overrides (Select, MultiSelect, DatePicker, InputNumber, Textarea) */
-    // ::ng-deep .p-inputtext, 
-    // ::ng-deep .prime-override-date .p-inputtext,
-    // ::ng-deep .prime-override-multi.p-multiselect {
-    //   width: 100%; height: 42px; background: var(--bg-primary);
-    //   border: 1px solid var(--border-secondary); border-radius: 8px;
-    //   font-family: var(--font-body); font-size: 14px; font-weight: 500;
-    //   color: var(--text-primary); display: flex; align-items: center;
-    //   transition: all 0.2s ease; box-shadow: none;
-    // }
+    ::ng-deep .prime-override .p-inputtext,
+    ::ng-deep .prime-override-num .p-inputtext {
+      width: 100%;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--ui-border-radius);
+    }
     
-    // ::ng-deep p-textarea.p-inputtext,
-    // ::ng-deep textarea.p-inputtext { height: auto; min-height: 80px; padding: 12px 16px; line-height: 1.5; }
-    
-    // ::ng-deep .p-inputtext:not(:disabled):hover,
-    // ::ng-deep .prime-override-multi.p-multiselect:not(.p-disabled):hover { border-color: var(--text-tertiary); }
-    
-    // ::ng-deep .p-inputtext:focus,
-    // ::ng-deep .p-inputwrapper-focus .p-inputtext,
-    // ::ng-deep .prime-override-multi.p-multiselect.p-focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
-    
-    // ::ng-deep .prime-override-multi .p-multiselect-label { padding: 4px 12px; }
-    // ::ng-deep .prime-override-date .p-datepicker-input-icon-container { color: var(--text-tertiary); }
+    ::ng-deep .p-select, ::ng-deep .p-multiselect {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--ui-border-radius);
+    }
 
     /* Premium Toggle Switch */
     .status-toggle-wrapper { padding: var(--spacing-lg); background: var(--bg-secondary); border: 1px solid var(--border-secondary); border-radius: 12px; }
     .toggle-container { display: flex; align-items: center; cursor: pointer; gap: 14px; }
-    .toggle-input { display: none; }
-    .toggle-slider { position: relative; width: 44px; height: 24px; background-color: var(--border-secondary); border-radius: 24px; transition: all 0.3s ease; flex-shrink: 0; }
-    .toggle-slider::before { content: ""; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: var(--bg-primary); border-radius: 50%; transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1); box-shadow: var(--shadow-sm); }
-    .toggle-input:checked + .toggle-slider { background-color: var(--color-success); }
-    .toggle-input:checked + .toggle-slider::before { transform: translateX(20px); }
     .toggle-label { font-size: 14px; color: var(--text-primary); font-weight: 500; }
     ::ng-deep .compact-card .p-card-body { padding: var(--spacing-md) var(--spacing-lg); }
 
@@ -534,7 +493,7 @@ import { takeUntil } from "rxjs/operators";
     .card-anim-6 { animation: popIn 0.4s cubic-bezier(0.2, 0.9, 0.2, 1) 0.3s both; }
 
     @media (max-width: 1200px) { .bento-grid { grid-template-columns: repeat(2, 1fr); } .span-2, .span-3 { grid-column: span 2; } }
-    @media (max-width: 768px) { .dashboard-content { padding: var(--spacing-lg); } .dashboard-header { flex-direction: column; align-items: flex-start; gap: var(--spacing-lg); } .header-right { width: 100%; justify-content: flex-end; } .bento-grid { grid-template-columns: 1fr; } .span-2, .span-2-inner, .span-3 { grid-column: span 1; } .inner-grid-2 { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { .bento-grid { grid-template-columns: 1fr; } .span-2, .span-2-inner, .span-3 { grid-column: span 1; } .inner-grid-2 { grid-template-columns: 1fr; } }
   `]
 })
 export class ShiftFormComponent implements OnInit, OnDestroy {

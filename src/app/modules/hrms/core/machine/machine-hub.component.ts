@@ -34,148 +34,150 @@ import { takeUntil } from "rxjs/operators";
   providers: [MessageService, ConfirmationService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="page-wrapper fade-in">
+    <div class="apex-page fade-in flex-col h-screen">
     
-      <header class="dashboard-header slide-down mb-4">
-        <div class="header-left">
-          <div class="icon-brand bg-primary text-white shadow-md"><i class="pi pi-server"></i></div>
-          <div class="header-titles">
-            <h1 class="page-title m-0">Device Fleet Management</h1>
-            <p class="page-subtitle mt-1">Monitor, configure, and manage biometric and RFID attendance machines.</p>
+      <header class="apex-header apex-header--elevated flex-shrink-0">
+        <div class="flex-align gap-4">
+          <div class="apex-card__icon" style="width: 48px; height: 48px; font-size: 20px;"><i class="pi pi-server"></i></div>
+          <div class="flex-col">
+            <h1 class="apex-page-header__title m-0" style="font-size: var(--font-size-2xl);">Device Fleet Management</h1>
+            <p class="apex-page-header__subtitle m-0 text-sm text-tertiary">Monitor, configure, and manage biometric and RFID attendance machines.</p>
           </div>
         </div>
-        <div class="header-right flex-align gap-3">
+        <div class="header-right flex-align gap-3 ml-auto">
           <p-button icon="pi pi-refresh" [text]="true" [rounded]="true" severity="secondary" pTooltip="Refresh Fleet" (onClick)="loadData()"></p-button>
-          <p-button label="Register Device" icon="pi pi-plus" styleClass="p-button-primary" (onClick)="onAddMachine()"></p-button>
+          <p-button label="Register Device" icon="pi pi-plus" styleClass="apex-btn apex-btn--primary" (onClick)="onAddMachine()"></p-button>
         </div>
       </header>
     
-      @if (isLoading()) {
-        <div class="grid-4 mb-4">
-          <p-skeleton height="100px" borderRadius="12px"></p-skeleton>
-          <p-skeleton height="100px" borderRadius="12px"></p-skeleton>
-          <p-skeleton height="100px" borderRadius="12px"></p-skeleton>
-          <p-skeleton height="100px" borderRadius="12px"></p-skeleton>
-        </div>
-        <p-skeleton height="400px" borderRadius="12px"></p-skeleton>
-      } @else {
-    
-        @if (analytics(); as a) {
-          <div class="grid-4 mb-4 slide-down" styleClass="animation-delay: 0.1s">
-            <p-card styleClass="stat-card border-left-primary">
-              <span class="stat-label">Total Devices</span>
-              <div class="stat-val text-primary mt-2">{{ a.totalMachines || 0 }}</div>
-            </p-card>
-            <p-card styleClass="stat-card border-left-success">
-              <span class="stat-label">Online & Active</span>
-              <div class="flex-align gap-2 mt-2">
-                <div class="pulse-dot bg-success"></div>
-                <span class="stat-val text-success">{{ a.onlineMachines || 0 }}</span>
+      <main class="apex-content flex-1 overflow-auto flex-col p-4 sm:p-5">
+        @if (isLoading()) {
+          <div class="apex-grid apex-grid--4 mb-4">
+            <p-skeleton height="100px" borderRadius="var(--ui-border-radius-lg)"></p-skeleton>
+            <p-skeleton height="100px" borderRadius="var(--ui-border-radius-lg)"></p-skeleton>
+            <p-skeleton height="100px" borderRadius="var(--ui-border-radius-lg)"></p-skeleton>
+            <p-skeleton height="100px" borderRadius="var(--ui-border-radius-lg)"></p-skeleton>
+          </div>
+          <p-skeleton height="400px" borderRadius="var(--ui-border-radius-lg)"></p-skeleton>
+        } @else {
+      
+          @if (analytics(); as a) {
+            <div class="apex-grid apex-grid--4 mb-4 slide-down" style="animation-delay: 0.1s">
+              <div class="apex-card p-4 border-left-primary">
+                <span class="stat-label">Total Devices</span>
+                <div class="stat-val text-primary mt-2">{{ a.totalMachines || 0 }}</div>
               </div>
-            </p-card>
-            <p-card styleClass="stat-card border-left-error">
-              <span class="stat-label">Offline / Errors</span>
-              <div class="flex-align gap-2 mt-2">
-                <i class="pi pi-exclamation-triangle text-error text-xl"></i>
-                <span class="stat-val text-error">{{ a.offlineMachines || 0 }}</span>
+              <div class="apex-card p-4 border-left-success">
+                <span class="stat-label">Online & Active</span>
+                <div class="flex-align gap-2 mt-2">
+                  <div class="pulse-dot bg-success"></div>
+                  <span class="stat-val text-success">{{ a.onlineMachines || 0 }}</span>
+                </div>
               </div>
-            </p-card>
-            <p-card styleClass="stat-card border-left-info">
-              <span class="stat-label">Transactions (24h)</span>
-              <div class="stat-val text-info mt-2">{{ a.transactions24h || 0 }}</div>
-            </p-card>
+              <div class="apex-card p-4 border-left-error">
+                <span class="stat-label">Offline / Errors</span>
+                <div class="flex-align gap-2 mt-2">
+                  <i class="pi pi-exclamation-triangle text-error text-xl"></i>
+                  <span class="stat-val text-error">{{ a.offlineMachines || 0 }}</span>
+                </div>
+              </div>
+              <div class="apex-card p-4 border-left-info">
+                <span class="stat-label">Transactions (24h)</span>
+                <div class="stat-val text-info mt-2">{{ a.transactions24h || 0 }}</div>
+              </div>
+            </div>
+          }
+      
+          <div class="apex-card apex-card--surface p-0 border-0 shadow-none slide-down" style="animation-delay: 0.2s">
+            <p-table
+              #dt
+              [value]="machines()"
+              [(selection)]="selectedMachines"
+              dataKey="_id"
+              [paginator]="true"
+              [rows]="10"
+              [globalFilterFields]="['name', 'serialNumber', 'ipAddress', 'model']"
+              responsiveLayout="scroll"
+              styleClass="premium-table border-round-lg border border-primary surface-border">
+      
+              <ng-template pTemplate="caption">
+                <div class="table-toolbar flex-between p-3 bg-surface border-bottom">
+                  <div class="flex-align gap-3">
+                    <h3 class="m-0 font-heading text-primary-color flex-align gap-2"><i class="pi pi-list"></i> Registered Devices</h3>
+                    @if (selectedMachines.length > 0) {
+                      <p-button label="Bulk Action" icon="pi pi-cog" styleClass="apex-btn apex-btn--sm bg-warning text-white border-0" (onClick)="displayBulkDialog = true"></p-button>
+                    }
+                  </div>
+                  <p-iconField iconPosition="left">
+                    <p-inputIcon styleClass="pi pi-search"></p-inputIcon>
+                    <input type="text" pInputText placeholder="Search IP, Serial..." (input)="dt.filterGlobal($any($event.target).value, 'contains')" class="premium-search-input" />
+                  </p-iconField>
+                </div>
+              </ng-template>
+      
+              <ng-template pTemplate="header">
+                <tr>
+                  <th styleClass="width: 3rem"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+                  <th>Device Info</th>
+                  <th>Network & Protocol</th>
+                  <th class="text-center">Connection</th>
+                  <th>Last Sync</th>
+                  <th class="text-right">Manage</th>
+                </tr>
+              </ng-template>
+      
+              <ng-template pTemplate="body" let-machine>
+                <tr class="table-row-hover">
+                  <td><p-tableCheckbox [value]="machine"></p-tableCheckbox></td>
+                  <td>
+                    <div class="flex-col gap-1">
+                      <span class="font-bold text-primary-color flex-align gap-2">
+                        <i class="pi" [ngClass]="getProviderIcon(machine.providerType)"></i> {{ machine.name }}
+                      </span>
+                      <span class="badge-mono-sm w-max">SN: {{ machine.serialNumber }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="flex-col gap-1">
+                      <span class="font-mono text-sm text-secondary">{{ machine.ipAddress || 'DHCP' }}@if (machine.port) {
+                        <span>:{{ machine.port }}</span>
+                      }</span>
+                      <span class="text-xs text-tertiary uppercase font-bold">{{ machine.connectionProtocol }}</span>
+                    </div>
+                  </td>
+                  <td class="text-center">
+                    <p-tag [severity]="getConnectionSeverity(machine.connectionStatus)" styleClass="status-tag">
+                      <div class="flex-align gap-1">
+                        <div class="status-dot" [ngClass]="machine.connectionStatus"></div>
+                        {{ machine.connectionStatus | uppercase }}
+                      </div>
+                    </p-tag>
+                  </td>
+                  <td>
+                    <div class="flex-col gap-1 text-sm text-secondary font-medium">
+                      @if (machine.lastSyncAt) {
+                        <span><i class="pi pi-clock text-xs text-tertiary mr-1"></i> {{ machine.lastSyncAt | date:'dd MMM, HH:mm' }}</span>
+                      }
+                      @if (!machine.lastSyncAt) {
+                        <span class="text-tertiary italic">Never synced</span>
+                      }
+                      @if (machine.lastPingAt) {
+                        <span class="text-xs text-tertiary">Ping: {{ machine.lastPingAt | date:'HH:mm:ss' }}</span>
+                      }
+                    </div>
+                  </td>
+                  <td class="text-right">
+                    <p-button icon="pi pi-cog" [text]="true" [rounded]="true" severity="secondary" pTooltip="Inspect & Map" (onClick)="onInspect(machine._id)"></p-button>
+                  </td>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="emptymessage">
+                <tr><td colspan="6" class="text-center py-6 text-secondary">No devices registered. Click 'Register Device' to begin.</td></tr>
+              </ng-template>
+            </p-table>
           </div>
         }
-    
-        <p-card styleClass="premium-card glass-card slide-down" styleClass="animation-delay: 0.2s">
-          <p-table
-            #dt
-            [value]="machines()"
-            [(selection)]="selectedMachines"
-            dataKey="_id"
-            [paginator]="true"
-            [rows]="10"
-            [globalFilterFields]="['name', 'serialNumber', 'ipAddress', 'model']"
-            responsiveLayout="scroll"
-            styleClass="premium-table border-round-xl manish-border-1 surface-border">
-    
-            <ng-template pTemplate="caption">
-              <div class="table-toolbar flex-between p-3 bg-surface border-bottom">
-                <div class="flex-align gap-3">
-                  <h3 class="m-0 font-heading text-primary-color flex-align gap-2"><i class="pi pi-list"></i> Registered Devices</h3>
-                  @if (selectedMachines.length > 0) {
-                    <p-button label="Bulk Action" icon="pi pi-cog" severity="warn" size="small" (onClick)="displayBulkDialog = true"></p-button>
-                  }
-                </div>
-                <p-iconField iconPosition="left">
-                  <p-inputIcon styleClass="pi pi-search"></p-inputIcon>
-                  <input type="text" pInputText placeholder="Search IP, Serial..." (input)="dt.filterGlobal($any($event.target).value, 'contains')" class="premium-search-input" />
-                </p-iconField>
-              </div>
-            </ng-template>
-    
-            <ng-template pTemplate="header">
-              <tr>
-                <th styleClass="width: 3rem"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
-                <th>Device Info</th>
-                <th>Network & Protocol</th>
-                <th class="text-center">Connection</th>
-                <th>Last Sync</th>
-                <th class="text-right">Manage</th>
-              </tr>
-            </ng-template>
-    
-            <ng-template pTemplate="body" let-machine>
-              <tr class="table-row-hover">
-                <td><p-tableCheckbox [value]="machine"></p-tableCheckbox></td>
-                <td>
-                  <div class="flex-col gap-1">
-                    <span class="font-bold text-primary-color flex-align gap-2">
-                      <i class="pi" [ngClass]="getProviderIcon(machine.providerType)"></i> {{ machine.name }}
-                    </span>
-                    <span class="badge-mono-sm w-max">SN: {{ machine.serialNumber }}</span>
-                  </div>
-                </td>
-                <td>
-                  <div class="flex-col gap-1">
-                    <span class="font-mono text-sm text-secondary">{{ machine.ipAddress || 'DHCP' }}@if (machine.port) {
-                      <span>:{{ machine.port }}</span>
-                    }</span>
-                    <span class="text-xs text-tertiary uppercase font-bold">{{ machine.connectionProtocol }}</span>
-                  </div>
-                </td>
-                <td class="text-center">
-                  <p-tag [severity]="getConnectionSeverity(machine.connectionStatus)" styleClass="status-tag">
-                    <div class="flex-align gap-1">
-                      <div class="status-dot" [ngClass]="machine.connectionStatus"></div>
-                      {{ machine.connectionStatus | uppercase }}
-                    </div>
-                  </p-tag>
-                </td>
-                <td>
-                  <div class="flex-col gap-1 text-sm text-secondary font-medium">
-                    @if (machine.lastSyncAt) {
-                      <span><i class="pi pi-clock text-xs text-tertiary mr-1"></i> {{ machine.lastSyncAt | date:'dd MMM, HH:mm' }}</span>
-                    }
-                    @if (!machine.lastSyncAt) {
-                      <span class="text-tertiary italic">Never synced</span>
-                    }
-                    @if (machine.lastPingAt) {
-                      <span class="text-xs text-tertiary">Ping: {{ machine.lastPingAt | date:'HH:mm:ss' }}</span>
-                    }
-                  </div>
-                </td>
-                <td class="text-right">
-                  <p-button icon="pi pi-cog" [text]="true" [rounded]="true" severity="secondary" pTooltip="Inspect & Map" (onClick)="onInspect(machine._id)"></p-button>
-                </td>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="emptymessage">
-              <tr><td colspan="6" class="text-center py-6 text-secondary">No devices registered. Click 'Register Device' to begin.</td></tr>
-            </ng-template>
-          </p-table>
-        </p-card>
-      }
+      </main>
     </div>
     
     <p-dialog header="Bulk Device Status Update" [(visible)]="displayBulkDialog" [modal]="true" [style]="{width: '400px'}" styleClass="premium-dialog">
@@ -188,23 +190,33 @@ import { takeUntil } from "rxjs/operators";
         </div>
         <div class="flex-align justify-end gap-3 pt-4 border-top mt-2">
           <p-button label="Cancel" [text]="true" severity="secondary" (onClick)="displayBulkDialog = false"></p-button>
-          <p-button label="Apply Update" icon="pi pi-check" severity="warn" [loading]="isProcessing()" [disabled]="!bulkStatus" (onClick)="submitBulkUpdate()"></p-button>
+          <p-button label="Apply Update" icon="pi pi-check" styleClass="apex-btn apex-btn--primary" [loading]="isProcessing()" [disabled]="!bulkStatus" (onClick)="submitBulkUpdate()"></p-button>
         </div>
       </div>
     </p-dialog>
     `,
   styles: [`
-    :host { display: block; width: 100%; min-height: 100vh; background-color: var(--bg-primary); color: var(--text-primary); font-family: var(--font-body); }
-    .page-wrapper { padding: var(--spacing-2xl) var(--spacing-3xl); max-width: 1500px; margin: 0 auto; }
-    
-    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--spacing-xl); }
+    :host {
+      display: block; 
+      width: 100%; 
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Utility Helpers */
     .flex-col { display: flex; flex-direction: column; }
     .flex-between { display: flex; justify-content: space-between; align-items: center; }
     .flex-align { display: flex; align-items: center; }
     .justify-end { justify-content: flex-end; }
+    .flex-shrink-0 { flex-shrink: 0; }
+    .flex-1 { flex: 1; }
+    .ml-auto { margin-left: auto; }
     
     .w-full { width: 100%; }
     .w-max { width: max-content; }
+    .h-screen { height: 100vh; }
+    .h-full { height: 100%; }
+    
     .gap-1 { gap: var(--spacing-xs); }
     .gap-2 { gap: var(--spacing-sm); }
     .gap-3 { gap: var(--spacing-md); }
@@ -218,18 +230,28 @@ import { takeUntil } from "rxjs/operators";
     
     .p-0 { padding: 0 !important; }
     .p-3 { padding: var(--spacing-lg); }
+    .p-4 { padding: var(--spacing-xl); }
     .pt-4 { padding-top: var(--spacing-xl); }
     .py-6 { padding-top: var(--spacing-4xl); padding-bottom: var(--spacing-4xl); }
     
     .bg-surface { background: var(--bg-secondary); }
     .bg-primary { background: var(--color-primary); color: white; }
     .bg-success { background: var(--color-success); }
+    .bg-warning { background: var(--color-warning) !important; color: #fff !important; }
     
+    .border { border: 1px solid var(--border-primary); }
+    .border-0 { border: none !important; }
     .border-top { border-top: 1px solid var(--border-primary); }
     .border-bottom { border-bottom: 1px solid var(--border-primary); }
-    .manish-border-1 { border: 1px solid; }
     .surface-border { border-color: var(--border-primary); }
-    .border-round-xl { border-radius: var(--radius-2xl); }
+    .border-left-primary { border-left: 4px solid var(--color-primary) !important; }
+    .border-left-success { border-left: 4px solid var(--color-success) !important; }
+    .border-left-warning { border-left: 4px solid var(--color-warning) !important; }
+    .border-left-error { border-left: 4px solid var(--color-error) !important; }
+    .border-left-info { border-left: 4px solid #0ea5e9 !important; }
+    .shadow-none { box-shadow: none !important; }
+    .overflow-hidden { overflow: hidden; }
+    .overflow-auto { overflow-y: auto; overflow-x: hidden; }
     
     .text-center { text-align: center; }
     .text-right { text-align: right; }
@@ -253,26 +275,11 @@ import { takeUntil } from "rxjs/operators";
     .uppercase { text-transform: uppercase; }
     .italic { font-style: italic; }
 
-    /* Header */
-    .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--radius-2xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
-    .header-left { display: flex; align-items: center; gap: var(--spacing-xl); }
-    .icon-brand { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: var(--font-size-2xl); }
-    .page-title { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); font-family: var(--font-heading); letter-spacing: -0.02em; }
-    .page-subtitle { font-size: var(--font-size-sm); color: var(--text-secondary); }
-
     /* KPIs */
-    ::ng-deep .stat-card.p-card { border-radius: var(--ui-border-radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-primary); }
-    ::ng-deep .stat-card .p-card-body { padding: var(--spacing-xl); }
-    .border-left-primary { border-left: 4px solid var(--color-primary) !important; }
-    .border-left-success { border-left: 4px solid var(--color-success) !important; }
-    .border-left-warning { border-left: 4px solid var(--color-warning) !important; }
-    .border-left-error { border-left: 4px solid var(--color-error) !important; }
-    .border-left-info { border-left: 4px solid #0ea5e9 !important; }
     .stat-label { font-size: var(--font-size-xs); color: var(--text-tertiary); font-weight: var(--font-weight-bold); text-transform: uppercase; letter-spacing: 0.05em; }
     .stat-val { font-size: 2.2rem; font-weight: var(--font-weight-bold); line-height: 1; }
 
     /* Table */
-    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--radius-2xl); box-shadow: var(--shadow-md); overflow: hidden; }
     ::ng-deep .premium-table .p-datatable-header { padding: 0; border: none; background: transparent; }
     ::ng-deep .premium-table .p-datatable-thead > tr > th { background: var(--bg-secondary) !important; border-bottom: 2px solid var(--border-primary) !important; color: var(--text-tertiary); font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); text-transform: uppercase; letter-spacing: 0.05em; padding: var(--spacing-lg) var(--spacing-xl); }
     ::ng-deep .premium-table .p-datatable-tbody > tr > td { border-bottom: 1px solid var(--border-primary); padding: var(--spacing-md) var(--spacing-xl); color: var(--text-secondary); transition: background-color 0.2s; }
@@ -302,6 +309,10 @@ import { takeUntil } from "rxjs/operators";
     @keyframes slideDown { from { transform: translateY(-15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     .fade-in { animation: fadeIn 0.4s cubic-bezier(0.2, 0.9, 0.2, 1); }
     .slide-down { animation: slideDown 0.4s cubic-bezier(0.2, 0.9, 0.2, 1); animation-fill-mode: both; }
+
+    @media (min-width: 640px) {
+      .sm\\:p-5 { padding: var(--spacing-2xl); }
+    }
   `]
 })
 export class MachineHubComponent implements OnInit, OnDestroy {

@@ -433,7 +433,8 @@ export class SystemAuditAlertsComponent implements OnInit, OnDestroy {
     this.analyticsService.getSecurityAuditLog(
       startDate,
       endDate,
-      this.currentFilters['branchId']
+      this.currentFilters['branchId'],
+      this.currentFilters['actionType']
     ).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         if (res.status === 'success') {

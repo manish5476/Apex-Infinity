@@ -36,249 +36,255 @@ import { AppMessageService } from '@core/services/message.service';
   providers: [MessageService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="page-wrapper fade-in">
+    <div class="apex-page fade-in flex-col h-screen">
       
-      <header class="dashboard-header slide-down mb-5">
-        <div class="header-left">
-          <div class="icon-brand bg-primary text-white shadow-md"><i class="pi pi-shield"></i></div>
-          <div class="header-titles">
-            <h1 class="page-title">Leave Administration</h1>
-            <p class="page-subtitle">Monitor organizational time-off, view team calendars, and analyze absence trends.</p>
+      <header class="apex-header apex-header--elevated flex-shrink-0">
+        <div class="flex-align gap-4">
+          <div class="apex-card__icon" style="width: 48px; height: 48px; font-size: 20px;"><i class="pi pi-shield"></i></div>
+          <div class="flex-col">
+            <h1 class="apex-page-header__title m-0" style="font-size: var(--font-size-2xl);">Leave Administration</h1>
+            <p class="apex-page-header__subtitle m-0 text-sm text-tertiary">Monitor organizational time-off, view team calendars, and analyze absence trends.</p>
           </div>
         </div>
-        <div class="header-right flex-align gap-3">
+        <div class="header-right flex-align gap-3 ml-auto">
           <p-select [options]="departments" optionLabel="label" optionValue="value" [filter]="true" filterBy="label" placeholder="Filter by Department" styleClass="premium-dropdown"></p-select>
-          <p-button icon="pi pi-download" [outlined]="true" label="Export Report" severity="secondary"></p-button>
+          <p-button icon="pi pi-download" [outlined]="true" label="Export Report" styleClass="apex-btn apex-btn--secondary"></p-button>
         </div>
-        <div class="flex-between mb-4">
-  <h3 class="font-heading m-0 text-primary-color">Requires Your Attention</h3>
-  
-  <p-button 
-    label="Approve Selected ({{ selectedApprovals().length }})" 
-    icon="pi pi-check-circle" 
-    severity="success" 
-    [disabled]="selectedApprovals().length === 0"
-    [loading]="isBulkApproving()"
-    (onClick)="bulkApprove()">
-  </p-button>
-</div>
       </header>
 
-      @if (isLoading()) {
-        <div class="flex-col gap-4">
-          <p-skeleton height="60px" borderRadius="12px"></p-skeleton>
-          <p-skeleton height="500px" borderRadius="12px"></p-skeleton>
+      <main class="apex-content flex-1 overflow-auto flex-col p-4 sm:p-5">
+        <div class="flex-between mb-4">
+          <h3 class="font-heading m-0 text-primary-color">Requires Your Attention</h3>
+          
+          <p-button 
+            label="Approve Selected ({{ selectedApprovals().length }})" 
+            icon="pi pi-check-circle" 
+            styleClass="apex-btn apex-btn--primary bg-success border-success" 
+            [disabled]="selectedApprovals().length === 0"
+            [loading]="isBulkApproving()"
+            (onClick)="bulkApprove()">
+          </p-button>
         </div>
-      } @else {
-        
-        <p-card styleClass="premium-card glass-card workspace-card slide-down" styleClass="animation-delay: 0.1s">
-          <p-tabs value="0">
-            
-            <p-tablist styleClass="hub-tablist">
-              <p-tab value="0"><div class="tab-label"><i class="pi pi-list"></i> All Requests</div></p-tab>
-              <p-tab value="1"><div class="tab-label"><i class="pi pi-calendar"></i> Team Calendar</div></p-tab>
-              <p-tab value="2"><div class="tab-label"><i class="pi pi-chart-bar"></i> Leave Analytics</div></p-tab>
-            </p-tablist>
 
-            <p-tabpanels styleClass="hub-tabpanels p-0">
+        @if (isLoading()) {
+          <div class="flex-col gap-4">
+            <p-skeleton height="60px" borderRadius="var(--ui-border-radius-lg)"></p-skeleton>
+            <p-skeleton height="500px" borderRadius="var(--ui-border-radius-lg)"></p-skeleton>
+          </div>
+        } @else {
+          
+          <div class="apex-card apex-card--surface p-0 slide-down border-0" style="animation-delay: 0.1s">
+            <p-tabs value="0">
               
-              <p-tabpanel value="0">
-                <div class="panel-inner p-4">
-                  <p-table 
-                    #dt
-                    [value]="allRequests()" 
-                    [paginator]="true" 
-                    [rows]="10" 
-                    [globalFilterFields]="['leaveRequestId', 'user.name', 'leaveType', 'status']"
-                    responsiveLayout="scroll"
-                    styleClass="premium-table border-round-xl overflow-hidden manish-border-1 surface-border">
-                    
-                    <ng-template pTemplate="caption">
-                      <div class="table-toolbar flex-between">
-                        <h3 class="m-0 font-heading text-primary-color">Organizational Leaves</h3>
-                        <p-iconField iconPosition="left">
-                          <p-inputIcon styleClass="pi pi-search"></p-inputIcon>
-                          <input type="text" pInputText placeholder="Search requests..." (input)="dt.filterGlobal($any($event.target).value, 'contains')" class="premium-search-input" />
-                        </p-iconField>
-                      </div>
-                    </ng-template>
+              <p-tablist styleClass="hub-tablist">
+                <p-tab value="0"><div class="tab-label"><i class="pi pi-list"></i> All Requests</div></p-tab>
+                <p-tab value="1"><div class="tab-label"><i class="pi pi-calendar"></i> Team Calendar</div></p-tab>
+                <p-tab value="2"><div class="tab-label"><i class="pi pi-chart-bar"></i> Leave Analytics</div></p-tab>
+              </p-tablist>
 
-                    <ng-template pTemplate="header">
-                      <tr>
-                        <th>Employee</th>
-                        <th>Request Details</th>
-                        <th>Duration</th>
-                        <th>Status</th>
-                        <th class="text-right">Actions</th>
-                      </tr>
-                    </ng-template>
+              <p-tabpanels styleClass="hub-tabpanels p-0">
+                
+                <p-tabpanel value="0">
+                  <div class="panel-inner p-4">
+                    <p-table 
+                      #dt
+                      [value]="allRequests()" 
+                      [paginator]="true" 
+                      [rows]="10" 
+                      [globalFilterFields]="['leaveRequestId', 'user.name', 'leaveType', 'status']"
+                      responsiveLayout="scroll"
+                      styleClass="premium-table border-round-lg overflow-hidden border border-primary surface-border">
+                      
+                      <ng-template pTemplate="caption">
+                        <div class="table-toolbar flex-between pb-3">
+                          <h3 class="m-0 font-heading text-primary-color">Organizational Leaves</h3>
+                          <p-iconField iconPosition="left">
+                            <p-inputIcon styleClass="pi pi-search"></p-inputIcon>
+                            <input type="text" pInputText placeholder="Search requests..." (input)="dt.filterGlobal($any($event.target).value, 'contains')" class="premium-search-input" />
+                          </p-iconField>
+                        </div>
+                      </ng-template>
 
-                    <ng-template pTemplate="body" let-req>
-                      <tr class="table-row-hover">
-                        <td>
-                          <div class="flex-align gap-3">
-                            <p-avatar [label]="getInitials(req.user?.name)" shape="circle" size="large" [style]="{'background-color': 'var(--color-primary-bg)', 'color': 'var(--color-primary)'}"></p-avatar>
-                            <div class="flex-col gap-1">
-                              <span class="font-bold text-primary-color">{{ req.user?.name || 'Unknown' }}</span>
-                              <span class="text-xs text-secondary">{{ req.departmentId?.name || 'Dept N/A' }}</span>
+                      <ng-template pTemplate="header">
+                        <tr>
+                          <th>Employee</th>
+                          <th>Request Details</th>
+                          <th>Duration</th>
+                          <th>Status</th>
+                          <th class="text-right">Actions</th>
+                        </tr>
+                      </ng-template>
+
+                      <ng-template pTemplate="body" let-req>
+                        <tr class="table-row-hover">
+                          <td>
+                            <div class="flex-align gap-3">
+                              <p-avatar [label]="getInitials(req.user?.name)" shape="circle" size="large" [style]="{'background-color': 'var(--color-primary-bg)', 'color': 'var(--color-primary)'}"></p-avatar>
+                              <div class="flex-col gap-1">
+                                <span class="font-bold text-primary-color">{{ req.user?.name || 'Unknown' }}</span>
+                                <span class="text-xs text-secondary">{{ req.departmentId?.name || 'Dept N/A' }}</span>
+                              </div>
                             </div>
-                          </div>
-                        </td>
-                        <td>
-                          <div class="flex-col gap-1">
-                            <span class="font-bold capitalize flex-align gap-2">
-                              <div class="type-dot" [ngClass]="req.leaveType"></div>
-                              {{ req.leaveType }} Leave
-                            </span>
-                            <span class="badge-mono-sm w-max">{{ req.leaveRequestId }}</span>
-                          </div>
-                        </td>
-                        <td>
-                          <div class="flex-align gap-2 text-sm text-secondary font-medium">
-                            <span>{{ req.startDate | date:'dd MMM' }}</span>
-                            <i class="pi pi-arrow-right text-xs text-tertiary"></i>
-                            <span>{{ req.endDate | date:'dd MMM' }}</span>
-                          </div>
-                          <div class="text-xs text-primary font-bold mt-1">{{ req.daysCount }} Days</div>
-                        </td>
-                        <td>
-                          <p-tag [severity]="getStatusSeverity(req.status)" [value]="req.status | titlecase"></p-tag>
-                        </td>
-                        <td class="text-right">
-                          <p-button icon="pi pi-eye" [text]="true" [rounded]="true" severity="secondary" pTooltip="View Details"></p-button>
-                        </td>
-                      </tr>
-                    </ng-template>
-                    <ng-template pTemplate="emptymessage">
-                      <tr><td colspan="5" class="text-center py-6 text-secondary">No leave requests found.</td></tr>
-                    </ng-template>
-                  </p-table>
-                </div>
-              </p-tabpanel>
+                          </td>
+                          <td>
+                            <div class="flex-col gap-1">
+                              <span class="font-bold capitalize flex-align gap-2">
+                                <div class="type-dot" [ngClass]="req.leaveType"></div>
+                                {{ req.leaveType }} Leave
+                              </span>
+                              <span class="badge-mono-sm w-max">{{ req.leaveRequestId }}</span>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="flex-align gap-2 text-sm text-secondary font-medium">
+                              <span>{{ req.startDate | date:'dd MMM' }}</span>
+                              <i class="pi pi-arrow-right text-xs text-tertiary"></i>
+                              <span>{{ req.endDate | date:'dd MMM' }}</span>
+                            </div>
+                            <div class="text-xs text-primary font-bold mt-1">{{ req.daysCount }} Days</div>
+                          </td>
+                          <td>
+                            <p-tag [severity]="getStatusSeverity(req.status)" [value]="req.status | titlecase"></p-tag>
+                          </td>
+                          <td class="text-right">
+                            <p-button icon="pi pi-eye" [text]="true" [rounded]="true" severity="secondary" pTooltip="View Details"></p-button>
+                          </td>
+                        </tr>
+                      </ng-template>
+                      <ng-template pTemplate="emptymessage">
+                        <tr><td colspan="5" class="text-center py-6 text-secondary">No leave requests found.</td></tr>
+                      </ng-template>
+                    </p-table>
+                  </div>
+                </p-tabpanel>
 
-              <p-tabpanel value="1">
-                <div class="panel-inner p-4 bg-surface h-full">
-                  <div class="flex-between mb-4">
-                    <h3 class="font-heading m-0 text-primary-color">Team Availability</h3>
-                    <div class="flex-align gap-2">
-                      <p-button icon="pi pi-chevron-left" [text]="true" [rounded]="true" severity="secondary"></p-button>
-                      <span class="font-bold text-lg mx-2">{{ currentMonthText }}</span>
-                      <p-button icon="pi pi-chevron-right" [text]="true" [rounded]="true" severity="secondary"></p-button>
+                <p-tabpanel value="1">
+                  <div class="panel-inner p-4 bg-surface h-full">
+                    <div class="flex-between mb-4">
+                      <h3 class="font-heading m-0 text-primary-color">Team Availability</h3>
+                      <div class="flex-align gap-2">
+                        <p-button icon="pi pi-chevron-left" [text]="true" [rounded]="true" severity="secondary"></p-button>
+                        <span class="font-bold text-lg mx-2">{{ currentMonthText }}</span>
+                        <p-button icon="pi pi-chevron-right" [text]="true" [rounded]="true" severity="secondary"></p-button>
+                      </div>
+                    </div>
+
+                    <div class="timeline-container">
+                      @for (item of calendarData(); track $index) {
+                        <div class="timeline-row apex-card p-3 mb-3 flex-align gap-4">
+                          <div class="date-badge flex-col text-center">
+                            <span class="text-sm text-secondary uppercase-text">{{ item.date | date:'EEE' }}</span>
+                            <span class="text-2xl font-bold text-primary">{{ item.date | date:'dd' }}</span>
+                          </div>
+                          <div class="flex-1">
+                            @if (item.leaves.length > 0) {
+                              <div class="flex-align gap-3 flex-wrap">
+                                @for (leave of item.leaves; track leave.id) {
+                                  <div class="leave-chip flex-align gap-2" [ngClass]="leave.type">
+                                    <p-avatar [label]="getInitials(leave.userName)" shape="circle" size="normal" styleClass="mini-avatar"></p-avatar>
+                                    <span class="text-sm font-semibold">{{ leave.userName }}</span>
+                                    <span class="text-xs opacity-80 border-left pl-2 ml-1">{{ leave.type | titlecase }}</span>
+                                  </div>
+                                }
+                              </div>
+                            } @else {
+                              <span class="text-tertiary text-sm italic">Full team is available today.</span>
+                            }
+                          </div>
+                        </div>
+                      }
                     </div>
                   </div>
+                </p-tabpanel>
 
-                  <div class="timeline-container">
-                    @for (item of calendarData(); track $index) {
-                      <div class="timeline-row glass-card p-3 mb-3 flex-align gap-4">
-                        <div class="date-badge flex-col text-center">
-                          <span class="text-sm text-secondary uppercase-text">{{ item.date | date:'EEE' }}</span>
-                          <span class="text-2xl font-bold text-primary">{{ item.date | date:'dd' }}</span>
+                <p-tabpanel value="2">
+                  <div class="panel-inner p-4">
+                    
+                    @if (analyticsData(); as stats) {
+                      <div class="apex-grid apex-grid--3 mb-5">
+                        <div class="apex-card p-4 border-top-primary">
+                          <span class="kpi-label">Total Leaves Taken</span>
+                          <div class="kpi-val">{{ stats.totalLeavesTaken || 0 }} <span class="text-sm text-secondary font-normal">days</span></div>
+                          <span class="text-xs text-success flex-align gap-1 mt-2"><i class="pi pi-arrow-down"></i> 12% vs last month</span>
                         </div>
-                        <div class="flex-1">
-                          @if (item.leaves.length > 0) {
-                            <div class="flex-align gap-3 flex-wrap">
-                              @for (leave of item.leaves; track leave.id) {
-                                <div class="leave-chip flex-align gap-2" [ngClass]="leave.type">
-                                  <p-avatar [label]="getInitials(leave.userName)" shape="circle" size="normal" styleClass="mini-avatar"></p-avatar>
-                                  <span class="text-sm font-semibold">{{ leave.userName }}</span>
-                                  <span class="text-xs opacity-80 border-left pl-2 ml-1">{{ leave.type | titlecase }}</span>
-                                </div>
-                              }
-                            </div>
-                          } @else {
-                            <span class="text-tertiary text-sm italic">Full team is available today.</span>
-                          }
+                        <div class="apex-card p-4 border-top-warning">
+                          <span class="kpi-label">Pending Requests</span>
+                          <div class="kpi-val">{{ stats.pendingRequests || 0 }}</div>
+                          <span class="text-xs text-tertiary mt-2">Awaiting manager action</span>
+                        </div>
+                        <div class="apex-card p-4 border-top-info">
+                          <span class="kpi-label">Most Used Leave Type</span>
+                          <div class="kpi-val text-xl capitalize mt-2">{{ stats.mostUsedType || 'N/A' }}</div>
                         </div>
                       </div>
                     }
+
+                    <div class="apex-grid apex-grid--2">
+                      <div class="apex-card p-4">
+                        <h4 class="font-heading m-0 mb-4 text-primary-color">Monthly Leave Trends</h4>
+                        <p-chart type="bar" [data]="trendChartData" [options]="chartOptions" height="250px"></p-chart>
+                      </div>
+
+                      <div class="apex-card p-4">
+                        <h4 class="font-heading m-0 mb-4 text-primary-color">High Leave Utilization</h4>
+                        <ul class="absentee-list">
+                          <li class="flex-between py-2 border-bottom">
+                            <div class="flex-align gap-2">
+                              <p-avatar label="JD" shape="circle" [style]="{'background-color': '#fef2f2', 'color': '#ef4444'}"></p-avatar>
+                              <span class="font-semibold text-secondary">John Doe</span>
+                            </div>
+                            <span class="font-bold text-error">18 Days</span>
+                          </li>
+                          <li class="flex-between py-2 border-bottom">
+                            <div class="flex-align gap-2">
+                              <p-avatar label="SJ" shape="circle" [style]="{'background-color': '#fff7ed', 'color': '#f97316'}"></p-avatar>
+                              <span class="font-semibold text-secondary">Sarah Jenkins</span>
+                            </div>
+                            <span class="font-bold text-warning">14 Days</span>
+                          </li>
+                          <li class="flex-between py-2">
+                            <div class="flex-align gap-2">
+                              <p-avatar label="MS" shape="circle" [style]="{'background-color': '#eff6ff', 'color': '#3b82f6'}"></p-avatar>
+                              <span class="font-semibold text-secondary">Mukesh Singh</span>
+                            </div>
+                            <span class="font-bold text-primary">10 Days</span>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+
                   </div>
-                </div>
-              </p-tabpanel>
+                </p-tabpanel>
 
-              <p-tabpanel value="2">
-                <div class="panel-inner p-4">
-                  
-                  @if (analyticsData(); as stats) {
-                    <div class="kpi-grid mb-5">
-                      <div class="kpi-card border-top-primary">
-                        <span class="kpi-label">Total Leaves Taken</span>
-                        <div class="kpi-val">{{ stats.totalLeavesTaken || 0 }} <span class="text-sm text-secondary font-normal">days</span></div>
-                        <span class="text-xs text-success flex-align gap-1 mt-2"><i class="pi pi-arrow-down"></i> 12% vs last month</span>
-                      </div>
-                      <div class="kpi-card border-top-warning">
-                        <span class="kpi-label">Pending Requests</span>
-                        <div class="kpi-val">{{ stats.pendingRequests || 0 }}</div>
-                        <span class="text-xs text-tertiary mt-2">Awaiting manager action</span>
-                      </div>
-                      <div class="kpi-card border-top-info">
-                        <span class="kpi-label">Most Used Leave Type</span>
-                        <div class="kpi-val text-xl capitalize mt-2">{{ stats.mostUsedType || 'N/A' }}</div>
-                      </div>
-                    </div>
-                  }
-
-                  <div class="grid-2">
-                    <div class="chart-container glass-card p-4">
-                      <h4 class="font-heading m-0 mb-4 text-primary-color">Monthly Leave Trends</h4>
-                      <p-chart type="bar" [data]="trendChartData" [options]="chartOptions" height="250px"></p-chart>
-                    </div>
-
-                    <div class="chart-container glass-card p-4">
-                      <h4 class="font-heading m-0 mb-4 text-primary-color">High Leave Utilization</h4>
-                      <ul class="absentee-list">
-                        <li class="flex-between py-2 border-bottom">
-                          <div class="flex-align gap-2">
-                            <p-avatar label="JD" shape="circle" [style]="{'background-color': '#fef2f2', 'color': '#ef4444'}"></p-avatar>
-                            <span class="font-semibold text-secondary">John Doe</span>
-                          </div>
-                          <span class="font-bold text-error">18 Days</span>
-                        </li>
-                        <li class="flex-between py-2 border-bottom">
-                          <div class="flex-align gap-2">
-                            <p-avatar label="SJ" shape="circle" [style]="{'background-color': '#fff7ed', 'color': '#f97316'}"></p-avatar>
-                            <span class="font-semibold text-secondary">Sarah Jenkins</span>
-                          </div>
-                          <span class="font-bold text-warning">14 Days</span>
-                        </li>
-                        <li class="flex-between py-2">
-                          <div class="flex-align gap-2">
-                            <p-avatar label="MS" shape="circle" [style]="{'background-color': '#eff6ff', 'color': '#3b82f6'}"></p-avatar>
-                            <span class="font-semibold text-secondary">Mukesh Singh</span>
-                          </div>
-                          <span class="font-bold text-primary">10 Days</span>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-
-                </div>
-              </p-tabpanel>
-
-            </p-tabpanels>
-          </p-tabs>
-        </p-card>
-      }
+              </p-tabpanels>
+            </p-tabs>
+          </div>
+        }
+      </main>
     </div>
   `,
   styles: [`
-    /* --------------------------------------------------------------------------
-       GLOBAL & VARIABLES
-       -------------------------------------------------------------------------- */
-    :host { display: block; width: 100%; min-height: 100vh; background-color: var(--bg-primary); color: var(--text-primary); font-family: var(--font-body); }
-    .page-wrapper { padding: var(--spacing-2xl) var(--spacing-3xl); max-width: 1400px; margin: 0 auto; }
+    :host {
+      display: block; 
+      width: 100%; 
+      height: 100vh;
+      overflow: hidden;
+    }
 
-    /* Utility */
+    /* Utility Helpers */
     .flex-col { display: flex; flex-direction: column; }
     .flex-between { display: flex; justify-content: space-between; align-items: center; }
     .flex-align { display: flex; align-items: center; }
+    .justify-end { justify-content: flex-end; }
+    .flex-shrink-0 { flex-shrink: 0; }
     .flex-1 { flex: 1; }
     .flex-wrap { flex-wrap: wrap; }
+    .ml-auto { margin-left: auto; }
     
     .w-full { width: 100%; }
     .w-max { width: max-content; }
+    .h-screen { height: 100vh; }
     .h-full { height: 100%; }
-    
-    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-xl); }
     
     .gap-1 { gap: var(--spacing-xs); }
     .gap-2 { gap: var(--spacing-sm); }
@@ -296,6 +302,7 @@ import { AppMessageService } from '@core/services/message.service';
     .p-0 { padding: 0 !important; }
     .p-3 { padding: var(--spacing-lg); }
     .p-4 { padding: var(--spacing-xl); }
+    .pb-3 { padding-bottom: var(--spacing-lg); }
     .py-2 { padding-top: var(--spacing-sm); padding-bottom: var(--spacing-sm); }
     .py-6 { padding-top: var(--spacing-4xl); padding-bottom: var(--spacing-4xl); }
     .pl-2 { padding-left: var(--spacing-sm); }
@@ -304,9 +311,12 @@ import { AppMessageService } from '@core/services/message.service';
     .bg-surface { background: var(--bg-secondary); }
     .bg-primary { background: var(--color-primary); color: white; }
     
+    .border { border: 1px solid var(--border-primary); }
+    .border-0 { border: none !important; }
     .border-top { border-top: 1px solid var(--border-primary); }
     .border-bottom { border-bottom: 1px solid var(--border-primary); }
     .border-left { border-left: 1px solid rgba(255,255,255,0.3); }
+    .surface-border { border-color: var(--border-primary); }
     
     .text-center { text-align: center; }
     .text-right { text-align: right; }
@@ -334,33 +344,21 @@ import { AppMessageService } from '@core/services/message.service';
     .uppercase-text { text-transform: uppercase; letter-spacing: 0.05em; }
     .italic { font-style: italic; }
     .opacity-80 { opacity: 0.8; }
+    .overflow-hidden { overflow: hidden; }
+    .overflow-auto { overflow-y: auto; overflow-x: hidden; }
 
-    /* --------------------------------------------------------------------------
-       HEADER & TABS
-       -------------------------------------------------------------------------- */
-    .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--radius-2xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
-    .header-left { display: flex; align-items: center; gap: var(--spacing-xl); }
-    .icon-brand { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: var(--font-size-2xl); }
-    .header-titles { display: flex; flex-direction: column; gap: 4px; }
-    .page-title { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); font-family: var(--font-heading); margin: 0; letter-spacing: -0.02em; }
-    .page-subtitle { font-size: var(--font-size-sm); color: var(--text-secondary); margin: 0; }
-
+    /* Dropdown */
     ::ng-deep .premium-dropdown .p-select { background: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: var(--ui-border-radius-md); transition: var(--transition-base); }
-    
-    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--radius-2xl); box-shadow: var(--shadow-md); overflow: hidden; }
-    ::ng-deep .workspace-card .p-card-body, ::ng-deep .workspace-card .p-card-content { padding: 0; }
 
-    ::ng-deep .hub-tablist .p-tablist-nav { background: var(--bg-secondary) !important; border-bottom: 1px solid var(--border-primary) !important; padding: 0 var(--spacing-xl) !important; }
+    /* Tabs Override */
+    ::ng-deep .hub-tablist .p-tablist-nav { background: transparent !important; border-bottom: 1px solid var(--border-primary) !important; padding: 0 var(--spacing-xl) !important; }
     ::ng-deep .hub-tablist .p-tablist-nav .p-tab { padding: var(--spacing-lg) var(--spacing-xl) !important; border: none !important; border-bottom: 2px solid transparent !important; color: var(--text-secondary) !important; font-weight: var(--font-weight-medium) !important; transition: var(--transition-base); }
     ::ng-deep .hub-tablist .p-tablist-nav .p-tab.p-highlight { border-bottom-color: var(--color-primary) !important; color: var(--color-primary) !important; }
+    ::ng-deep .hub-tabpanels { background: transparent !important; }
     .tab-label { display: flex; align-items: center; gap: var(--spacing-sm); font-size: var(--font-size-md); }
 
-    /* --------------------------------------------------------------------------
-       TABLE
-       -------------------------------------------------------------------------- */
-    .table-toolbar { padding: 0 0 var(--spacing-lg) 0; }
+    /* Table */
     ::ng-deep .premium-search-input { background: var(--bg-secondary) !important; border: 1px solid var(--border-primary) !important; border-radius: var(--ui-border-radius-lg) !important; width: 250px; }
-
     ::ng-deep .premium-table .p-datatable-header { padding: 0; border: none; background: transparent; }
     ::ng-deep .premium-table .p-datatable-thead > tr > th { background: var(--bg-secondary) !important; border-bottom: 2px solid var(--border-primary) !important; color: var(--text-tertiary); font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); text-transform: uppercase; letter-spacing: 0.05em; padding: var(--spacing-lg) var(--spacing-xl); }
     ::ng-deep .premium-table .p-datatable-tbody > tr > td { border-bottom: 1px solid var(--border-primary); padding: var(--spacing-md) var(--spacing-xl); color: var(--text-secondary); transition: background-color 0.2s; }
@@ -374,12 +372,10 @@ import { AppMessageService } from '@core/services/message.service';
     .type-dot.earned { background: #f59e0b; }
     .type-dot.unpaid { background: #64748b; }
 
-    /* --------------------------------------------------------------------------
-       CALENDAR TIMELINE
-       -------------------------------------------------------------------------- */
+    /* Calendar Timeline */
     .timeline-container { display: flex; flex-direction: column; max-width: 1000px; }
-    .timeline-row { border: 1px solid var(--border-primary); transition: transform 0.2s; }
-    .timeline-row:hover { border-color: var(--color-primary-border); transform: translateX(4px); }
+    .timeline-row { transition: transform 0.2s; }
+    .timeline-row:hover { border-color: var(--color-primary); transform: translateX(4px); }
     .date-badge { width: 60px; padding-right: var(--spacing-lg); border-right: 1px dashed var(--border-secondary); }
     
     .leave-chip { padding: 4px 12px 4px 4px; border-radius: 20px; color: white; box-shadow: var(--shadow-sm); }
@@ -388,18 +384,12 @@ import { AppMessageService } from '@core/services/message.service';
     .leave-chip.earned { background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); }
     ::ng-deep .mini-avatar .p-avatar { width: 24px; height: 24px; font-size: 10px; background: rgba(255,255,255,0.2) !important; color: white !important; }
 
-    /* --------------------------------------------------------------------------
-       ANALYTICS
-       -------------------------------------------------------------------------- */
-    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-xl); }
-    .kpi-card { background: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: var(--ui-border-radius-lg); padding: var(--spacing-xl); display: flex; flex-direction: column; box-shadow: var(--shadow-sm); }
-    .border-top-primary { border-top: 4px solid var(--color-primary); }
-    .border-top-warning { border-top: 4px solid var(--color-warning); }
-    .border-top-info { border-top: 4px solid var(--color-info); }
+    /* Analytics */
+    .border-top-primary { border-top: 4px solid var(--color-primary) !important; }
+    .border-top-warning { border-top: 4px solid var(--color-warning) !important; }
+    .border-top-info { border-top: 4px solid #0ea5e9 !important; }
     .kpi-label { font-size: var(--font-size-sm); color: var(--text-tertiary); font-weight: var(--font-weight-bold); text-transform: uppercase; letter-spacing: 0.05em; }
     .kpi-val { font-size: var(--font-size-4xl); font-weight: var(--font-weight-bold); color: var(--text-primary); margin-top: var(--spacing-sm); line-height: 1; }
-    
-    .chart-container { border: 1px solid var(--border-primary); }
     .absentee-list { list-style: none; padding: 0; margin: 0; }
 
     /* Animations */
@@ -408,11 +398,8 @@ import { AppMessageService } from '@core/services/message.service';
     .fade-in { animation: fadeIn 0.4s cubic-bezier(0.2, 0.9, 0.2, 1); }
     .slide-down { animation: slideDown 0.4s cubic-bezier(0.2, 0.9, 0.2, 1); animation-fill-mode: both; }
 
-    @media (max-width: 768px) {
-      .dashboard-header { flex-direction: column; align-items: stretch; gap: var(--spacing-xl); }
-      .header-right { flex-direction: column; }
-      .grid-2 { grid-template-columns: 1fr; }
-      .table-toolbar { flex-direction: column; align-items: stretch; gap: var(--spacing-md); }
+    @media (min-width: 640px) {
+      .sm\\:p-5 { padding: var(--spacing-2xl); }
     }
   `]
 })

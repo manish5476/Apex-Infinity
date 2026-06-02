@@ -335,6 +335,11 @@ export class TimeAnalyticsComponent implements OnInit, OnDestroy {
       optionLabel: 'name',
       optionValue: '_id',
       placeholder: 'Global Chronology'
+    },
+    {
+      key: 'date',
+      label: 'Date Range',
+      type: 'date-range'
     }
   ];
 
@@ -373,10 +378,15 @@ export class TimeAnalyticsComponent implements OnInit, OnDestroy {
   loadData() {
     this.loading.set(true);
 
-    // Pass branch context
+    // Pass branch context and date range
     const branchId = this.currentFilters.branchId;
+    const start = this.currentFilters['startDate'] ?? this.currentFilters['date']?.[0];
+    const end = this.currentFilters['endDate'] ?? this.currentFilters['date']?.[1];
 
-    this.analyticsService.getTimeBasedAnalytics(branchId).pipe(takeUntil(this.destroy$)).subscribe({
+    const startDate = start ? new Date(start).toISOString() : undefined;
+    const endDate = end ? new Date(end).toISOString() : undefined;
+
+    this.analyticsService.getTimeBasedAnalytics(startDate, endDate, branchId).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         if (res.status === 'success') {
           this.timeData.set(res.data);
