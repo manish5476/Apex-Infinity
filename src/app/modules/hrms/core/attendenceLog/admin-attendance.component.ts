@@ -619,25 +619,28 @@ export class AdminAttendanceComponent implements OnInit, OnDestroy {
       }
     ];
   }
-
-  loadData() {
+loadData() {
     this.isLoading.set(true);
 
     forkJoin({
       logsData: this.hrmsService.getAttendanceLogs().pipe(
-        catchError(() => of({ data: { data: [] } })) // Maps to standard list paginated response
+        // Cast the fallback to 'any' to satisfy the TypeScript compiler
+        catchError(() => of({ data: [] } as any)) 
       ),
       statsData: this.hrmsService.getLogStats().pipe(
-        catchError(() => of({ data: { total: [], byStatus: [], byType: [] } }))
+        catchError(() => of({ data: { total: [], byStatus: [], byType: [] } } as any))
       )
     }).pipe(
       finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
     ).subscribe(({ logsData, statsData }) => {
-      // 1. Assign logs
-      this.logs.set(logsData?.data?.data || logsData?.data || []);
+      
+      // 1. Safely parse logs using 'any' to bypass strict type definition conflicts
+      const resLogs = logsData as any;
+      const extractedLogs = resLogs?.data?.data || resLogs?.data?.logs || resLogs?.logs || resLogs?.data || [];
+      this.logs.set(Array.isArray(extractedLogs) ? extractedLogs : []);
       
       // 2. Parse accurate stats from provided JSON format
-      const st = statsData?.data || {};
+      const st = (statsData as any)?.data || {};
       const presentCount = st.total?.[0]?.uniqueUsers || 0;
       const flaggedCount = st.byStatus?.find((s: any) => s._id === 'flagged')?.count || 0;
       const remoteCount = st.byType?.find((s: any) => s._id === 'remote_in')?.count || 0;
@@ -645,7 +648,6 @@ export class AdminAttendanceComponent implements OnInit, OnDestroy {
       this.stats.set({ presentCount, flaggedCount, remoteCount });
     });
   }
-
   onSearch(event: Event) {
     const val = (event.target as HTMLInputElement).value;
     if (this.gridApi) this.gridApi.setGridOption('quickFilterText', val);
