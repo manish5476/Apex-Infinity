@@ -1218,15 +1218,14 @@
 //  PRIMENG POPOVER SHELL OVERRIDES
 // ══════════════════════════════════════════════════════════════════════════════
 
-::ng-deep .apex-profile-popover {
-  .p-popover-content {
-    padding: 0 !important;
-    overflow: hidden;
-    border-radius: var(--ui-border-radius-lg);
-  }
-}
-
+::ng-deep .apex-profile-popover,
 ::ng-deep .apex-notification-popover {
+  margin-top: var(--spacing-sm) !important;
+  border: var(--ui-border-width) solid var(--border-primary) !important;
+  border-radius: var(--ui-border-radius-lg) !important;
+  box-shadow: var(--shadow-xl) !important;
+  overflow: hidden !important;
+
   .p-popover-content {
     padding: 0 !important;
     overflow: hidden;

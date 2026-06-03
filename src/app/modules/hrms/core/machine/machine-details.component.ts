@@ -141,7 +141,7 @@ import { takeUntil } from "rxjs/operators";
                     <ng-template pTemplate="body" let-user>
                       <tr class="table-row-hover">
                         <td class="font-bold text-primary-color">{{ user.name }}</td>
-                        <td class="text-sm text-secondary">{{ user.employeeProfile?.designation || 'N/A' }}</td>
+                        <td class="text-sm text-secondary">{{ user.employee?.designation || 'N/A' }}</td>
                         <td class="text-sm text-secondary">{{ user.email }}</td>
                         <td>
                           <input pInputText type="text" [(ngModel)]="user.machineUserId" placeholder="Enter ID from Machine" class="w-full premium-input font-mono" />

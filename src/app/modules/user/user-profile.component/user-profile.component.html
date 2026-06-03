@@ -57,14 +57,14 @@
               <div class="detail-icon bg-primary-light text-primary"><i class="pi pi-briefcase"></i></div>
               <div class="detail-text">
                 <label>Designation</label>
-                <span>{{ user.employeeProfile?.designationId?.title || 'Not Assigned' | titlecase }}</span>
+                <span>{{ user.employee?.designationId?.title || 'Not Assigned' | titlecase }}</span>
               </div>
             </div>
             <div class="detail-row">
               <div class="detail-icon bg-info-light text-info"><i class="pi pi-sitemap"></i></div>
               <div class="detail-text">
                 <label>Department</label>
-                <span>{{ user.employeeProfile?.departmentId?.name || 'Not Assigned' }}</span>
+                <span>{{ user.employee?.departmentId?.name || 'Not Assigned' }}</span>
               </div>
             </div>
           </div>
@@ -109,7 +109,7 @@
 
       <div class="bento-split-grid">
 
-        @if (user.attendanceConfig; as att) {
+        @if (user.employee?.attendanceConfig; as att) {
         <div class="glass-card flex-col h-full">
           <div class="card-header border-b flex justify-between align-center">
             <h3 class="card-title"><i class="pi pi-calendar-times text-primary"></i> Attendance Rules</h3>
@@ -225,7 +225,7 @@
         </div>
       </div>
 
-      <div class="form-section" formGroupName="employeeProfile">
+      <div class="form-section" formGroupName="employee">
         <h4 class="section-title">Contact & Location</h4>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="field"><label>Secondary Phone</label><input pInputText formControlName="secondaryPhone"
@@ -633,9 +633,9 @@
             </div>
             <div class="detail-row">
               <div class="detail-icon bg-warning-light text-warning"><i class="pi pi-user-plus"></i></div>
-              <div class="detail-text">
-                <label>Reporting Manager</label>
-                <span>{{ user.employeeProfile?.reportingManagerId?.name || 'Self' }}</span>
+              <div class="meta-item" [title]="user.employee?.reportingManagerId?.name || 'Self'">
+                <i class="pi pi-sitemap"></i>
+                <span>{{ user.employee?.reportingManagerId?.name || 'Self' }}</span>
               </div>
             </div>
           </div>

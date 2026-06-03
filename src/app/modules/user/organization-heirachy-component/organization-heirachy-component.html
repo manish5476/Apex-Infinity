@@ -52,23 +52,23 @@
                       <div class="avatar-initials">{{ getInitials(node.data.name) }}</div>
                     }
                     
-                    @if (node.data.employeeProfile?.designationId?.level) {
+                    @if (node.data.employee?.designationId?.level) {
                       <div class="level-badge" pTooltip="Clearance Level" tooltipPosition="top">
-                        L{{ node.data.employeeProfile.designationId.level }}
+                        L{{ node.data.employee.designationId.level }}
                       </div>
                     }
                   </div>
 
                   <div class="info-section">
                     <h3 class="employee-name" [title]="node.data.name">{{ node.data.name }}</h3>
-                    <span class="employee-role" [title]="node.data.employeeProfile?.designationId?.title">
-                      {{ node.data.employeeProfile?.designationId?.title || 'No Title' }}
+                    <span class="employee-role" [title]="node.data.employee?.designationId?.title">
+                      {{ node.data.employee?.designationId?.title || 'No Title' }}
                     </span>
                     
                     <div class="employee-meta">
-                      <div class="meta-item" [title]="node.data.employeeProfile?.departmentId?.name">
+                      <div class="meta-item" [title]="node.data.employee?.departmentId?.name">
                         <i class="pi pi-briefcase"></i>
-                        <span>{{ node.data.employeeProfile?.departmentId?.name || 'Unassigned' }}</span>
+                        <span>{{ node.data.employee?.departmentId?.name || 'Unassigned' }}</span>
                       </div>
                     </div>
                   </div>

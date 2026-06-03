@@ -16,7 +16,7 @@ interface OrgUser {
   name: string;
   email: string;
   avatar?: string | null;
-  employeeProfile: {
+  employee: {
     departmentId?: { _id: string; name: string };
     designationId?: { _id: string; title: string; level: number };
     reportingManagerId?: string | null;

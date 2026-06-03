@@ -20,8 +20,7 @@ interface User {
   _id: string; name: string; email: string; phone: string; avatar?: string; isActive: boolean; status: string;
   createdAt: string; updatedAt: string; lastLoginAt: string;
   upiId?: string; language?: string; themeId?: string;
-  employeeProfile?: { designationId?: { title: string }; departmentId?: { name: string }; reportingManagerId?: { name: string }; secondaryPhone?: string; workLocation?: string; guarantorDetails?: { name: string; relationship: string; phone: string }; };
-  attendanceConfig?: { isAttendanceEnabled: boolean; allowWebPunch: boolean; allowMobilePunch: boolean; shiftId?: { name: string; duration: string; startTime: string; endTime: string }; };
+  employee?: { designationId?: { title: string }; departmentId?: { name: string }; reportingManagerId?: { name: string }; workLocation?: string; personal?: { secondaryPhone?: string }; guarantorDetails?: { name: string; relationship: string; phone: string }; attendanceConfig?: { isAttendanceEnabled: boolean; allowWebPunch: boolean; allowMobilePunch: boolean; shiftId?: { name: string; duration: string; startTime: string; endTime: string }; }; };
   preferences: { theme: string; notifications: { email: boolean; push: boolean; sms: boolean } };
   branchId?: { name: string; address: { street: string; city: string; state: string; zipCode: string; country: string } };
   role: string; permissions?: string[];
@@ -70,9 +69,10 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   initForm() {
     this.profileForm = this.fb.group({
       name: ['', Validators.required],
-      upiId: [''], language: ['en'], themeId: ['theme-glass'],
-      employeeProfile: this.fb.group({
-        secondaryPhone: [''], workLocation: [''],
+      upiId: [''], language: ['en'], themeId: ['theme-light'],
+      employee: this.fb.group({
+        workLocation: [''],
+        personal: this.fb.group({ secondaryPhone: [''] }),
         guarantorDetails: this.fb.group({ name: [''], relationship: [''], phone: [''] })
       }),
       preferences: this.fb.group({
@@ -85,13 +85,14 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     const user = this.currentUser();
     if (user) {
       this.profileForm.patchValue({
-        name: user.name || '', upiId: user.upiId || '', language: user.language || 'en', themeId: user.themeId || 'theme-glass',
-        employeeProfile: {
-          secondaryPhone: user.employeeProfile?.secondaryPhone || '', workLocation: user.employeeProfile?.workLocation || '',
+        name: user.name || '', upiId: user.upiId || '', language: user.language || 'en', themeId: user.themeId || 'theme-light',
+        employee: {
+          workLocation: user.employee?.workLocation || '',
+          personal: { secondaryPhone: user.employee?.personal?.secondaryPhone || '' },
           guarantorDetails: {
-            name: user.employeeProfile?.guarantorDetails?.name || '',
-            relationship: user.employeeProfile?.guarantorDetails?.relationship || '',
-            phone: user.employeeProfile?.guarantorDetails?.phone || ''
+            name: user.employee?.guarantorDetails?.name || '',
+            relationship: user.employee?.guarantorDetails?.relationship || '',
+            phone: user.employee?.guarantorDetails?.phone || ''
           }
         },
         preferences: {
@@ -114,10 +115,12 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
     const payload = {
       name: val.name, upiId: val.upiId, language: val.language, themeId: val.themeId,
-      'preferences.theme': val.preferences.theme, 'preferences.notifications': val.preferences.notifications,
-      'employeeProfile.secondaryPhone': val.employeeProfile.secondaryPhone,
-      'employeeProfile.workLocation': val.employeeProfile.workLocation,
-      'employeeProfile.guarantorDetails': val.employeeProfile.guarantorDetails
+      preferences: val.preferences,
+      employee: {
+        personal: val.employee.personal,
+        workLocation: val.employee.workLocation,
+        guarantorDetails: val.employee.guarantorDetails
+      }
     };
 
     this.userService.updateMyProfile(payload).pipe(takeUntil(this.destroy$)).subscribe({

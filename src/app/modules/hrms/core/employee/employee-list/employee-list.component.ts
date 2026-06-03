@@ -13,20 +13,20 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 
-// import { MasterListService } from '../../../core/services/master-list.service';
-import { AppMessageService } from '../../../core/services/message.service';
-import { ImageCellRendererComponent } from '../../shared/AgGrid/AgGridcomponents/image-cell-renderer/image-cell-renderer.component';
-import { AgShareGrid, ActionColumnConfig } from '../../shared/components/ag-shared-grid';
-import { UserManagementService } from '../user-management.service';
+// import { MasterListService } from '../../../../../core/services/master-list.service';
+import { AppMessageService } from '../../../../../core/services/message.service';
+import { ImageCellRendererComponent } from '../../../../shared/AgGrid/AgGridcomponents/image-cell-renderer/image-cell-renderer.component';
+import { AgShareGrid, ActionColumnConfig } from '../../../../shared/components/ag-shared-grid';
+import { UserManagementService } from '../../../../user/user-management.service';
 import { finalize, Subject } from 'rxjs';
 import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '@core/auth/permissions.constants';
-import { DynamicDialogServices } from '../../../core/services/dynamic-dialog-services';
+import { DynamicDialogServices } from '../../../../../core/services/dynamic-dialog-services';
 import { takeUntil } from "rxjs/operators";
-import { MasterDropdownComponent } from '../../shared/components/masterFilterDropdown/master-dropdown.component';
+import { MasterDropdownComponent } from '../../../../shared/components/masterFilterDropdown/master-dropdown.component';
 
 @Component({
-  selector: 'app-user-list',
+  selector: 'app-employee-list',
   standalone: true,
   imports: [
     FormsModule,
@@ -41,10 +41,10 @@ import { MasterDropdownComponent } from '../../shared/components/masterFilterDro
     MasterDropdownComponent
   ],
   providers: [UserManagementService, ConfirmationService],
-  templateUrl: './user-list.html',
-  styleUrl: './user-list.scss'
+  templateUrl: './employee-list.component.html',
+  styleUrl: './employee-list.component.scss'
 })
-export class UserListComponent implements OnInit, OnDestroy {
+export class EmployeeListComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
   readonly PERMISSIONS = PERMISSIONS;
 
@@ -100,7 +100,7 @@ export class UserListComponent implements OnInit, OnDestroy {
   }
 
   createNew() {
-    this.router.navigate(['/user/create']);
+    this.router.navigate(['/hrms/employees/new']);
   }
 
   openExportDialog() {
@@ -120,7 +120,7 @@ export class UserListComponent implements OnInit, OnDestroy {
 
       // Handle direct dialog triggers on specific columns
       if (event.field === 'security') {
-        this.dynamicDialog.openUserStatus(event.row)?.onClose.pipe(takeUntil(this.destroy$)).subscribe(result => {
+        this.dynamicDialog.openUserStatus(event.row)?.onClose.pipe(takeUntil(this.destroy$)).subscribe((result: any) => {
           if (result) this.getData(false); // Refresh row data
         });
         return;
@@ -128,18 +128,18 @@ export class UserListComponent implements OnInit, OnDestroy {
 
       // Navigate to details if clicking the name column
       if (event.field === 'name') {
-        this.router.navigate(['/user/details', userId]);
+        this.router.navigate(['/hrms/employees/details', userId]);
       }
     }
 
     if (event.type === 'view') {
       const userId = event.row._id;
-      this.router.navigate(['/user/details', userId]);
+      this.router.navigate(['/hrms/employees/details', userId]);
     }
 
     if (event.type === 'editStart') {
       const userId = event.row._id;
-      this.router.navigate(['/user/edit', userId]);
+      this.router.navigate(['/hrms/employees/edit', userId]);
     }
 
     if (event.type === 'delete') {

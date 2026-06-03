@@ -9,28 +9,41 @@ export interface Branch {
   isMainBranch: boolean;
 }
 
-export interface EmployeeProfile {
-  employeeId?: string;
-  departmentId?: string;
-  designationId?: string;
-  dateOfJoining?: Date;
-  dateOfBirth?: Date;
-  reportingManagerId?: string;
-  employmentType?: 'permanent' | 'contract' | 'intern' | 'probation' | 'consultant';
-  workLocation?: string;
-  secondaryPhone?: string;
-}
-
 export interface AttendanceConfig {
   machineUserId?: string;
-  shiftId?: string;
-  shiftGroupId?: string;
+  shiftId?: string | any;
+  shiftGroupId?: string | any;
   isAttendanceEnabled: boolean;
   allowWebPunch: boolean;
   allowMobilePunch: boolean;
   enforceGeoFence: boolean;
-  geoFenceId?: string;
+  geoFenceId?: string | any;
   biometricVerified: boolean;
+}
+
+export interface Employee {
+  _id?: string;
+  employeeId?: string;
+  departmentId?: string | any;
+  designationId?: string | any;
+  reportingManagerId?: string | any;
+  employmentType?: 'permanent' | 'contract' | 'intern' | 'probation' | 'consultant';
+  workMode?: 'office' | 'remote' | 'hybrid' | 'field';
+  status?: string;
+  dateOfJoining?: Date;
+  personal?: {
+    dateOfBirth?: Date;
+    gender?: string;
+    maritalStatus?: string;
+    bloodGroup?: string;
+    secondaryPhone?: string;
+  };
+  guarantorDetails?: {
+    name?: string;
+    relationship?: string;
+    phone?: string;
+  };
+  attendanceConfig?: AttendanceConfig;
 }
 
 export interface Device {
@@ -57,8 +70,7 @@ export interface User {
   isActive: boolean;
   isLoginBlocked: boolean;
   emailVerified: boolean;
-  employeeProfile?: EmployeeProfile;
-  attendanceConfig?: AttendanceConfig;
+  employee?: Employee;
   devices?: Device[];
   preferences?: {
     theme: 'light' | 'dark';

@@ -196,7 +196,7 @@ import { AppMessageService } from '@core/services/message.service';
                                   <p-avatar [label]="getInitials(approval.user?.name)" shape="circle" size="large" [style]="{'background-color': 'var(--accent-focus)', 'color': 'var(--accent-primary)'}"></p-avatar>
                                   <div class="flex-col">
                                     <span class="font-bold text-primary-color">{{ approval.user?.name || 'Employee' }}</span>
-                                    <span class="text-xs text-secondary">{{ approval.user?.employeeProfile?.employeeId || 'ID N/A' }}</span>
+                                    <span class="text-xs text-secondary">{{ approval.user?.employee?.employeeId || 'ID N/A' }}</span>
                                   </div>
                                 </div>
                                 <span class="badge-mono-sm">{{ approval.leaveRequestId }}</span>

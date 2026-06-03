@@ -91,7 +91,7 @@ import { takeUntil } from "rxjs/operators";
                       [value]="balances()" 
                       [paginator]="true" 
                       [rows]="10" 
-                      [globalFilterFields]="['user.name', 'user.employeeProfile.employeeId']"
+                      [globalFilterFields]="['user.name', 'user.employee.employeeId']"
                       responsiveLayout="scroll"
                       styleClass="premium-table border-round-lg border border-primary overflow-hidden">
                       

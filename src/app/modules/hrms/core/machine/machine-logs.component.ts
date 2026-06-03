@@ -115,7 +115,7 @@ export class MachineLogsComponent implements OnInit, OnDestroy {
         headerName: 'User Details', field: 'user.name', width: 220,
         cellRenderer: (p: any) => {
           const name = p.data?.user?.name || 'Unmapped User';
-          const hardwareId = p.data?.user?.employeeProfile?.employeeId || '-';
+          const hardwareId = p.data?.user?.employee?.employeeId || '-';
           return `<div style="line-height:1.2; padding-top:6px;">
                     <div style="font-weight:600; color:var(--text-primary);">${name}</div>
                     <div style="font-size:11px; color:var(--text-tertiary); font-family:monospace;">EMP ID: ${hardwareId}</div>

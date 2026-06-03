@@ -19,14 +19,14 @@ import { TabsModule } from 'primeng/tabs';
 import { CardModule } from 'primeng/card';
 
 // Custom Services & Components
-import { UserManagementService } from '../user-management.service';
-import { AppMessageService } from '../../../core/services/message.service';
-import { LoadingService } from '../../../core/services/loading.service';
-import { MasterDropdownComponent } from '../../shared/components/masterFilterDropdown/master-dropdown.component';
+import { UserManagementService } from '../../../../user/user-management.service';
+import { AppMessageService } from '../../../../../core/services/message.service';
+import { LoadingService } from '../../../../../core/services/loading.service';
+import { MasterDropdownComponent } from '../../../../shared/components/masterFilterDropdown/master-dropdown.component';
 import { takeUntil } from "rxjs/operators";
 
 @Component({
-  selector: 'app-user-form',
+  selector: 'app-employee-form',
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule, FormsModule, RouterModule,
@@ -34,10 +34,10 @@ import { takeUntil } from "rxjs/operators";
     ToastModule, ToggleButtonModule, InputNumberModule, DatePickerModule,
     PanelModule, DividerModule, TabsModule, CardModule, MasterDropdownComponent
   ],
-  templateUrl: './user-form.html',
-  styleUrl: './user-form.scss'
+  templateUrl: './employee-form.component.html',
+  styleUrl: './employee-form.component.scss'
 })
-export class UserFormComponent implements OnInit, OnDestroy {
+export class EmployeeFormComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
   private fb = inject(FormBuilder);
   private userService = inject(UserManagementService);
@@ -269,7 +269,7 @@ export class UserFormComponent implements OnInit, OnDestroy {
   }
 
   onCancel() {
-    this.router.navigate(['/user/list']);
+    this.router.navigate(['/hrms/employees/list']);
   }
 
   ngOnDestroy(): void {

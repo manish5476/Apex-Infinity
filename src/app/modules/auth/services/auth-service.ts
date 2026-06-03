@@ -72,7 +72,7 @@ export class AuthService implements OnDestroy {
   }
 
   public handleLoginSuccess(response: any, rememberMe: boolean = false, returnUrl: string = '/create-dashboard'): void {
-    const user = response.data?.user;
+    const user = response.data?.user || response.data?.owner;
     const token = response.token;
     if (!token || !user) return;
     this._token = token;

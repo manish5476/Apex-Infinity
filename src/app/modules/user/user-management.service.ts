@@ -18,32 +18,28 @@ export interface User {
   isLoginBlocked: boolean;
   emailVerified: boolean;
   maxConcurrentSessions?: number;
-  employeeProfile?: {
+  employee?: {
+    _id?: string;
     employeeId?: string;
     departmentId?: any;
     designationId?: any;
-    dateOfJoining?: Date;
-    dateOfBirth?: Date;
     reportingManagerId?: string;
     employmentType?: string;
-    workLocation?: string;
-    secondaryPhone?: string;
-    guarantorDetails?: {
-      name: string;
-      relationship: string;
-      phone: string;
+    workMode?: string;
+    status?: string;
+    dateOfJoining?: Date;
+    personal?: {
+      dateOfBirth?: Date;
+      gender?: string;
+      maritalStatus?: string;
+      bloodGroup?: string;
+      secondaryPhone?: string;
     };
-  };
-  attendanceConfig?: {
-    machineUserId?: string;
-    shiftId?: any;
-    shiftGroupId?: string;
-    isAttendanceEnabled: boolean;
-    allowWebPunch: boolean;
-    allowMobilePunch: boolean;
-    enforceGeoFence: boolean;
-    geoFenceId?: string;
-    biometricVerified: boolean;
+    guarantorDetails?: {
+      name?: string;
+      relationship?: string;
+      phone?: string;
+    };
   };
   devices?: any[];
   preferences?: any;

@@ -570,7 +570,7 @@ export class AttendanceReportsComponent implements OnInit, OnDestroy {
         cellRenderer: (params: any) => {
           const user = params.data?.user || {};
           const name = user.name || 'Unknown';
-          const code = user.employeeProfile?.employeeId || user._id?.substring(0, 8) || 'N/A';
+          const code = user.employee?.employeeId || user._id?.substring(0, 8) || 'N/A';
           const initials = this.getInitials(name);
           
           return `
@@ -999,7 +999,7 @@ export class AttendanceReportsComponent implements OnInit, OnDestroy {
 //                         <td class="px-lg py-md border-bottom-subtle">
 //                           <div class="flex-col gap-xs">
 //                             <span class="font-bold text-primary">{{ record.user?.name || 'Unknown' }}</span>
-//                             <span class="text-xs font-mono text-secondary">{{ record.user?.employeeProfile?.employeeId || record.user?._id | slice:0:8 }}</span>
+//                             <span class="text-xs font-mono text-secondary">{{ record.user?.employee?.employeeId || record.user?._id | slice:0:8 }}</span>
 //                           </div>
 //                         </td>
 //                         <td class="px-lg py-md border-bottom-subtle font-mono text-sm text-secondary">
@@ -1632,7 +1632,7 @@ export class AttendanceReportsComponent implements OnInit, OnDestroy {
 // //                       <td>
 // //                         <div class="flex-col gap-1">
 // //                           <span class="font-bold text-primary-color">{{ record.user?.name || 'Unknown' }}</span>
-// //                           <span class="text-xs text-secondary">{{ record.user?.employeeProfile?.employeeId || record.user?._id | slice:0:8 }}</span>
+// //                           <span class="text-xs text-secondary">{{ record.user?.employee?.employeeId || record.user?._id | slice:0:8 }}</span>
 // //                         </div>
 // //                       </td>
 // //                       <td class="font-mono text-sm">

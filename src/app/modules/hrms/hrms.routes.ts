@@ -68,9 +68,9 @@ import { ShiftGroupListComponent } from './core/shift/shift-group-list.component
 import { ShiftListComponent } from './core/shift/shift-list.component';
 import { ShiftValidatorComponent } from './core/shift/shift-validator.component';
 
-import { UserDetailsComponent } from '../user/user-details/user-details';
-import { UserFormComponent } from '../user/user-form/user-form';
-import { UserListComponent } from '../user/user-list/user-list';
+import { EmployeeDetailsComponent } from './core/employee/employee-details/employee-details.component';
+import { EmployeeFormComponent } from './core/employee/employee-form/employee-form.component';
+import { EmployeeListComponent } from './core/employee/employee-list/employee-list.component';
 import { OrgHierarchyComponent } from '../user/organization-heirachy-component/organization-heirachy-component';
 import { RoleManagementComponent } from '../organization/components/role-management/role-management';
 
@@ -83,10 +83,10 @@ export const HRMS_ROUTES: Routes = [
     data: { permissions: [PERMISSIONS.USER.READ] },
     children: [
       { path: '', redirectTo: 'list', pathMatch: 'full' },
-      { path: 'list', component: UserListComponent, data: { tabLabel: 'Employees', tabIcon: 'pi pi-users', permissions: [PERMISSIONS.USER.READ] } },
-      { path: 'new', component: UserFormComponent, data: { tabLabel: 'Onboard Employee', tabIcon: 'pi pi-user-plus', permissions: [PERMISSIONS.USER.MANAGE] } },
-      { path: 'edit/:id', component: UserFormComponent, data: { tabLabel: 'Edit Employee', tabIcon: 'pi pi-user-edit', permissions: [PERMISSIONS.USER.MANAGE] } },
-      { path: 'details/:id', component: UserDetailsComponent, data: { tabLabel: 'Employee Details', tabIcon: 'pi pi-id-card', permissions: [PERMISSIONS.USER.READ] } },
+      { path: 'list', component: EmployeeListComponent, data: { tabLabel: 'Employees', tabIcon: 'pi pi-users', permissions: [PERMISSIONS.USER.READ] } },
+      { path: 'new', component: EmployeeFormComponent, data: { tabLabel: 'Onboard Employee', tabIcon: 'pi pi-user-plus', permissions: [PERMISSIONS.USER.MANAGE] } },
+      { path: 'edit/:id', component: EmployeeFormComponent, data: { tabLabel: 'Edit Employee', tabIcon: 'pi pi-user-edit', permissions: [PERMISSIONS.USER.MANAGE] } },
+      { path: 'details/:id', component: EmployeeDetailsComponent, data: { tabLabel: 'Employee Details', tabIcon: 'pi pi-id-card', permissions: [PERMISSIONS.USER.READ] } },
       { path: 'hierarchy', component: OrgHierarchyComponent, data: { tabLabel: 'Employee Hierarchy', tabIcon: 'pi pi-sitemap', permissions: [PERMISSIONS.USER.READ] } },
     ]
   },

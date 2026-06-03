@@ -188,38 +188,13 @@
       opacity: 0.85;
     }
 
-    /* 🔥 RGB BORDER */
+    /* ✨ Clean Active Border */
     &::after {
       content: '';
       position: absolute;
       inset: 0;
-
       border-radius: inherit;
-      padding: 1px;
-
-      background: linear-gradient(120deg,
-          #ff4d4d,
-          #ff9a00,
-          #ffd500,
-          #4dff88,
-          #00cfff,
-          #4d7dff,
-          #b84dff,
-          #ff4d4d);
-
-      background-size: 300% 300%;
-      animation: rgb-border-move 6s linear infinite;
-
-      /* mask → border only */
-      -webkit-mask:
-        linear-gradient(#000 0 0) content-box,
-        linear-gradient(#000 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-
-      filter: blur(0.6px) brightness(1.1) saturate(1.1);
-      opacity: 0.85;
-
+      border: 1.5px solid var(--accent-primary);
       pointer-events: none;
       z-index: 1;
     }

@@ -54,7 +54,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   private chatHttp = inject(ChatHttpService);
   private chatState = inject(ChatStateService);
 
-  activeThemeId: any = 'theme-glass';
+  activeThemeId: any = 'theme-light';
 
   // --- UI Signals & State ---
   channels = signal<Channel[]>([]);

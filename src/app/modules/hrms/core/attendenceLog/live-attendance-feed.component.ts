@@ -90,7 +90,7 @@ import { TooltipModule } from 'primeng/tooltip';
                   </p-avatar>
                   <div class="flex-col gap-xs">
                     <span class="font-bold text-lg text-primary line-height-none">{{ log.user?.name || 'Unknown User' }}</span>
-                    <span class="text-xs font-mono text-secondary">{{ log.user?.employeeProfile?.employeeId || log.user?._id | slice:0:8 }}</span>
+                    <span class="text-xs font-mono text-secondary">{{ log.user?.employee?.employeeId || log.user?._id | slice:0:8 }}</span>
                   </div>
                 </div>
 
@@ -391,7 +391,7 @@ export class LiveAttendanceFeedComponent implements OnInit {
 //                   <p-avatar [label]="getInitials(log.user?.name)" shape="circle" size="xlarge" [style]="{'background-color': 'var(--bg-secondary)', 'color': 'var(--text-primary)', 'border': '2px solid var(--border-primary)'}"></p-avatar>
 //                   <div class="flex-col">
 //                     <span class="font-bold text-lg text-primary-color m-0 leading-tight">{{ log.user?.name || 'Unknown User' }}</span>
-//                     <span class="text-sm text-secondary">{{ log.user?.employeeProfile?.designation || 'Employee' }}</span>
+//                     <span class="text-sm text-secondary">{{ log.user?.employee?.designation || 'Employee' }}</span>
 //                   </div>
 //                 </div>
 
@@ -662,7 +662,7 @@ export class LiveAttendanceFeedComponent implements OnInit {
 //                       {{ log.user?.name || 'Unknown User' }}
 //                     </span>
 //                     <span class="text-xs font-medium text-tertiary truncate">
-//                       {{ log.user?.employeeProfile?.designation || 'Employee' }}
+//                       {{ log.user?.employee?.designation || 'Employee' }}
 //                     </span>
 //                   </div>
 //                 </div>

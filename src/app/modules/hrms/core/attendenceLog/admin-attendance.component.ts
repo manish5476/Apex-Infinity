@@ -425,7 +425,7 @@ export class AdminAttendanceComponent implements OnInit, OnDestroy {
         cellRenderer: (params: any) => {
           const user = params.data?.user || {};
           const name = user.name || 'Unknown';
-          const code = user.employeeProfile?.employeeId || user._id?.substring(0, 8) || 'N/A';
+          const code = user.employee?.employeeId || user._id?.substring(0, 8) || 'N/A';
           const initials = this.getInitials(name);
           
           return `
@@ -818,7 +818,7 @@ export class AdminAttendanceComponent implements OnInit, OnDestroy {
 //                     <p-avatar [label]="getInitials(log.user?.name)" shape="circle" size="normal" [style]="{'background-color': 'var(--bg-secondary)', 'color': 'var(--text-secondary)'}"></p-avatar>
 //                     <div class="flex-col gap-1">
 //                       <span class="font-bold text-primary-color">{{ log.user?.name || 'Unknown' }}</span>
-//                       <span class="text-xs text-secondary">{{ log.user?.employeeProfile?.employeeId || log.user?._id | slice:0:8 }}</span>
+//                       <span class="text-xs text-secondary">{{ log.user?.employee?.employeeId || log.user?._id | slice:0:8 }}</span>
 //                     </div>
 //                   </div>
 //                 </td>
