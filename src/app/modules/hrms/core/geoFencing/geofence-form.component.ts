@@ -111,7 +111,7 @@ import { InputIconModule } from 'primeng/inputicon';
                       </div>
                       <div class="input-group flex-col gap-xs">
                         <label class="info-label text-xs font-bold text-tertiary uppercase tracking-widest">Shape Type</label>
-                        <p-select formControlName="type" [options]="types" appendTo="body" styleClass="w-full" [filter]="true" filterBy="label"></p-select>
+                        <p-select formControlName="type" [options]="types" optionLabel="label" optionValue="value" appendTo="body" styleClass="w-full" [filter]="true" filterBy="label"></p-select>
 
                       </div>
                     </div>

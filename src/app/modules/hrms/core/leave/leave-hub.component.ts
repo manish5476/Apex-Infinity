@@ -31,244 +31,250 @@ import { AppMessageService } from '@core/services/message.service';
   providers: [MessageService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="page-wrapper fade-in">
+    <div class="apex-page fade-in flex-col h-screen">
       
-      <header class="dashboard-header slide-down mb-5">
-        <div class="header-left">
-          <div class="icon-brand bg-primary-light text-primary"><i class="pi pi-calendar-minus"></i></div>
-          <div class="header-titles">
-            <h1 class="page-title">Leave & Time Off</h1>
-            <p class="page-subtitle">Manage your time off requests, balances, and team approvals.</p>
+      <header class="apex-header apex-header--elevated flex-shrink-0">
+        <div class="flex-align gap-4">
+          <div class="apex-card__icon" style="width: 48px; height: 48px; font-size: 20px;"><i class="pi pi-calendar-minus"></i></div>
+          <div class="flex-col">
+            <h1 class="apex-page-header__title m-0" style="font-size: var(--font-size-2xl);">Leave & Time Off</h1>
+            <p class="apex-page-header__subtitle m-0 text-sm text-tertiary">Manage your time off requests, balances, and team approvals.</p>
           </div>
         </div>
-        <div class="header-right">
+        <div class="header-right ml-auto">
           <p-button 
             label="Apply for Leave" 
             icon="pi pi-plus" 
-            styleClass="p-button-primary shadow-md"
+            styleClass="apex-btn apex-btn--primary"
             (onClick)="onApplyLeave()">
           </p-button>
         </div>
       </header>
 
-      @if (isLoading()) {
-        <div class="flex-col gap-4">
-          <div class="grid-3">
-            <p-skeleton height="8rem" borderRadius="12px"></p-skeleton>
-            <p-skeleton height="8rem" borderRadius="12px"></p-skeleton>
-            <p-skeleton height="8rem" borderRadius="12px"></p-skeleton>
+      <main class="apex-content flex-1 overflow-auto flex-col p-4 sm:p-5">
+        @if (isLoading()) {
+          <div class="flex-col gap-4 h-full">
+            <div class="apex-grid apex-grid--3">
+              <p-skeleton height="8rem" borderRadius="var(--ui-border-radius-lg)"></p-skeleton>
+              <p-skeleton height="8rem" borderRadius="var(--ui-border-radius-lg)"></p-skeleton>
+              <p-skeleton height="8rem" borderRadius="var(--ui-border-radius-lg)"></p-skeleton>
+            </div>
+            <p-skeleton height="400px" borderRadius="var(--ui-border-radius-lg)"></p-skeleton>
           </div>
-          <p-skeleton height="400px" borderRadius="12px"></p-skeleton>
-        </div>
-      } @else {
-        
-        <p-card styleClass="premium-card glass-card workspace-card slide-down" styleClass="animation-delay: 0.1s">
-          <p-tabs value="0">
-            <p-tablist styleClass="hub-tablist">
-              <p-tab value="0"><div class="tab-label"><i class="pi pi-user"></i> My Leave Requests</div></p-tab>
-              <p-tab value="1">
-                <div class="tab-label flex-align gap-2">
-                  <i class="pi pi-inbox"></i> Pending Approvals
-                  @if (pendingApprovals().length > 0) {
-                    <p-tag severity="danger" [value]="pendingApprovals().length.toString()" [rounded]="true"></p-tag>
-                  }
-                </div>
-              </p-tab>
-            </p-tablist>
+        } @else {
+          
+          <div class="apex-card apex-card--surface h-full flex-col p-0 border-0 shadow-none overflow-hidden slide-down">
+            <p-tabs value="0" styleClass="h-full flex-col w-full">
+              <p-tablist styleClass="hub-tablist px-4 border-bottom bg-surface">
+                <p-tab value="0"><div class="tab-label flex-align gap-2"><i class="pi pi-user"></i> My Leave Requests</div></p-tab>
+                <p-tab value="1">
+                  <div class="tab-label flex-align gap-2">
+                    <i class="pi pi-inbox"></i> Pending Approvals
+                    @if (pendingApprovals().length > 0) {
+                      <p-tag severity="danger" [value]="pendingApprovals().length.toString()" [rounded]="true"></p-tag>
+                    }
+                  </div>
+                </p-tab>
+              </p-tablist>
 
-            <p-tabpanels styleClass="hub-tabpanels p-0">
-              
-              <p-tabpanel value="0">
-                <div class="panel-inner p-4">
-                  
-                  @if (balances(); as bal) {
-                    <div class="balance-grid mb-5">
-                      <div class="balance-card casual-card">
-                        <div class="b-header">
-                          <span class="b-title">Casual Leave (CL)</span>
-                          <i class="pi pi-sun b-icon"></i>
+              <p-tabpanels styleClass="flex-1 relative overflow-hidden bg-surface p-0">
+                
+                <p-tabpanel value="0">
+                  <div class="panel-inner p-4 sm:p-6 h-full overflow-auto">
+                    
+                    @if (balances(); as bal) {
+                      <div class="apex-grid apex-grid--3 mb-5">
+                        <div class="apex-card casual-card p-4">
+                          <div class="flex-between">
+                            <span class="text-sm font-bold uppercase tracking-wider text-slate-600">Casual Leave (CL)</span>
+                            <i class="pi pi-sun text-xl text-slate-500"></i>
+                          </div>
+                          <div class="mt-4">
+                            <div class="text-3xl font-bold text-slate-700 m-0">{{ bal.casual?.available || 0 }} <span class="text-lg text-slate-500 font-medium">/ {{ bal.casual?.total || 0 }}</span></div>
+                            <p-progressBar [value]="getPercentage(bal.casual?.available, bal.casual?.total)" [showValue]="false" styleClass="mt-2 h-2"></p-progressBar>
+                          </div>
                         </div>
-                        <div class="b-body">
-                          <div class="b-value">{{ bal.casual?.available || 0 }} <span class="b-total">/ {{ bal.casual?.total || 0 }}</span></div>
-                          <p-progressBar [value]="getPercentage(bal.casual?.available, bal.casual?.total)" [showValue]="false" styleClass="mt-2 h-2"></p-progressBar>
+
+                        <div class="apex-card sick-card p-4">
+                          <div class="flex-between">
+                            <span class="text-sm font-bold uppercase tracking-wider text-sky-700">Sick Leave (SL)</span>
+                            <i class="pi pi-heart-fill text-xl text-sky-600"></i>
+                          </div>
+                          <div class="mt-4">
+                            <div class="text-3xl font-bold text-sky-800 m-0">{{ bal.sick?.available || 0 }} <span class="text-lg text-sky-600 font-medium">/ {{ bal.sick?.total || 0 }}</span></div>
+                            <p-progressBar [value]="getPercentage(bal.sick?.available, bal.sick?.total)" [showValue]="false" styleClass="mt-2 h-2"></p-progressBar>
+                          </div>
+                        </div>
+
+                        <div class="apex-card earned-card p-4">
+                          <div class="flex-between">
+                            <span class="text-sm font-bold uppercase tracking-wider text-orange-700">Earned Leave (EL)</span>
+                            <i class="pi pi-star-fill text-xl text-orange-600"></i>
+                          </div>
+                          <div class="mt-4">
+                            <div class="text-3xl font-bold text-orange-800 m-0">{{ bal.earned?.available || 0 }} <span class="text-lg text-orange-600 font-medium">/ {{ bal.earned?.total || 0 }}</span></div>
+                            <p-progressBar [value]="getPercentage(bal.earned?.available, bal.earned?.total)" [showValue]="false" styleClass="mt-2 h-2"></p-progressBar>
+                          </div>
                         </div>
                       </div>
+                    }
 
-                      <div class="balance-card sick-card">
-                        <div class="b-header">
-                          <span class="b-title">Sick Leave (SL)</span>
-                          <i class="pi pi-heart-fill b-icon"></i>
-                        </div>
-                        <div class="b-body">
-                          <div class="b-value">{{ bal.sick?.available || 0 }} <span class="b-total">/ {{ bal.sick?.total || 0 }}</span></div>
-                          <p-progressBar [value]="getPercentage(bal.sick?.available, bal.sick?.total)" [showValue]="false" styleClass="mt-2 h-2"></p-progressBar>
-                        </div>
-                      </div>
+                    <h3 class="apex-section__title mb-4 mt-0">
+                      <i class="pi pi-history text-tertiary"></i> Request History
+                    </h3>
+                    
+                    <p-table 
+                      [value]="myRequests()" 
+                      [paginator]="true" 
+                      [rows]="10" 
+                      responsiveLayout="scroll"
+                      styleClass="premium-table border-round-lg overflow-hidden border border-primary surface-border">
+                      <ng-template pTemplate="header">
+                        <tr>
+                          <th>Request ID & Type</th>
+                          <th>Duration</th>
+                          <th>Days</th>
+                          <th>Status</th>
+                          <th class="text-right">Applied On</th>
+                        </tr>
+                      </ng-template>
+                      <ng-template pTemplate="body" let-req>
+                        <tr class="table-row-hover cursor-pointer" (click)="viewDetails(req.leaveRequestId)">
+                          <td>
+                            <div class="flex-col gap-1">
+                              <span class="font-bold text-primary-color capitalize">{{ req.leaveType }} Leave</span>
+                              <span class="badge-mono-sm w-max">{{ req.leaveRequestId }}</span>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="flex-align gap-2 text-sm text-secondary font-medium">
+                              <i class="pi pi-calendar text-tertiary"></i>
+                              <span>{{ req.startDate | date:'dd MMM yyyy' }}</span>
+                              <i class="pi pi-arrow-right text-xs text-tertiary mx-1"></i>
+                              <span>{{ req.endDate | date:'dd MMM yyyy' }}</span>
+                            </div>
+                            @if (req.daysCount === 0.5) {
+                              <div class="text-xs text-tertiary mt-1">Half Day ({{ req.startSession | titlecase }})</div>
+                            }
+                          </td>
+                          <td>
+                            <span class="font-bold text-lg">{{ req.daysCount }}</span> <span class="text-secondary text-sm">day(s)</span>
+                          </td>
+                          <td>
+                            <p-tag [severity]="getStatusSeverity(req.status)" [value]="req.status | titlecase"></p-tag>
+                          </td>
+                          <td class="text-right text-sm text-tertiary font-medium">
+                            {{ req.appliedAt | date:'mediumDate' }}
+                          </td>
+                        </tr>
+                      </ng-template>
+                      <ng-template pTemplate="emptymessage">
+                        <tr>
+                          <td colspan="5" class="text-center py-6">
+                            <div class="empty-glass-state">
+                              <i class="pi pi-file-o text-4xl text-tertiary mb-3"></i>
+                              <h4 class="m-0 mb-1 text-primary-color">No Leave Requests</h4>
+                              <p class="m-0 text-secondary">You haven't applied for any leaves yet.</p>
+                            </div>
+                          </td>
+                        </tr>
+                      </ng-template>
+                    </p-table>
+                  </div>
+                </p-tabpanel>
 
-                      <div class="balance-card earned-card">
-                        <div class="b-header">
-                          <span class="b-title">Earned Leave (EL)</span>
-                          <i class="pi pi-star-fill b-icon"></i>
-                        </div>
-                        <div class="b-body">
-                          <div class="b-value">{{ bal.earned?.available || 0 }} <span class="b-total">/ {{ bal.earned?.total || 0 }}</span></div>
-                          <p-progressBar [value]="getPercentage(bal.earned?.available, bal.earned?.total)" [showValue]="false" styleClass="mt-2 h-2"></p-progressBar>
-                        </div>
-                      </div>
-                    </div>
-                  }
+                <p-tabpanel value="1">
+                  <div class="panel-inner p-4 sm:p-6 bg-surface h-full overflow-auto">
+                    @if (pendingApprovals().length > 0) {
+                      <div class="apex-grid apex-grid--auto">
+                        @for (approval of pendingApprovals(); track approval._id) {
+                          <div class="apex-card apex-card--interactive flex-col h-full p-4">
+                            <div class="flex-col gap-4 h-full">
+                              
+                              <div class="flex-between border-bottom pb-3">
+                                <div class="flex-align gap-3">
+                                  <p-avatar [label]="getInitials(approval.user?.name)" shape="circle" size="large" [style]="{'background-color': 'var(--accent-focus)', 'color': 'var(--accent-primary)'}"></p-avatar>
+                                  <div class="flex-col">
+                                    <span class="font-bold text-primary-color">{{ approval.user?.name || 'Employee' }}</span>
+                                    <span class="text-xs text-secondary">{{ approval.user?.employeeProfile?.employeeId || 'ID N/A' }}</span>
+                                  </div>
+                                </div>
+                                <span class="badge-mono-sm">{{ approval.leaveRequestId }}</span>
+                              </div>
 
-                  <h3 class="font-heading mb-3 mt-0 text-primary-color flex-align gap-2">
-                    <i class="pi pi-history text-tertiary"></i> Request History
-                  </h3>
-                  
-                  <p-table 
-                    [value]="myRequests()" 
-                    [paginator]="true" 
-                    [rows]="10" 
-                    responsiveLayout="scroll"
-                    styleClass="premium-table border-round-xl overflow-hidden manish-border-1 surface-border">
-                    <ng-template pTemplate="header">
-                      <tr>
-                        <th>Request ID & Type</th>
-                        <th>Duration</th>
-                        <th>Days</th>
-                        <th>Status</th>
-                        <th class="text-right">Applied On</th>
-                      </tr>
-                    </ng-template>
-                    <ng-template pTemplate="body" let-req>
-                      <tr class="table-row-hover cursor-pointer" (click)="viewDetails(req.leaveRequestId)">
-                        <td>
-                          <div class="flex-col gap-1">
-                            <span class="font-bold text-primary-color capitalize">{{ req.leaveType }} Leave</span>
-                            <span class="badge-mono-sm w-max">{{ req.leaveRequestId }}</span>
-                          </div>
-                        </td>
-                        <td>
-                          <div class="flex-align gap-2 text-sm text-secondary font-medium">
-                            <i class="pi pi-calendar text-tertiary"></i>
-                            <span>{{ req.startDate | date:'dd MMM yyyy' }}</span>
-                            <i class="pi pi-arrow-right text-xs text-tertiary mx-1"></i>
-                            <span>{{ req.endDate | date:'dd MMM yyyy' }}</span>
-                          </div>
-                          @if (req.daysCount === 0.5) {
-                            <div class="text-xs text-tertiary mt-1">Half Day ({{ req.startSession | titlecase }})</div>
-                          }
-                        </td>
-                        <td>
-                          <span class="font-bold text-lg">{{ req.daysCount }}</span> <span class="text-secondary text-sm">day(s)</span>
-                        </td>
-                        <td>
-                          <p-tag [severity]="getStatusSeverity(req.status)" [value]="req.status | titlecase"></p-tag>
-                        </td>
-                        <td class="text-right text-sm text-tertiary font-medium">
-                          {{ req.appliedAt | date:'mediumDate' }}
-                        </td>
-                      </tr>
-                    </ng-template>
-                    <ng-template pTemplate="emptymessage">
-                      <tr>
-                        <td colspan="5" class="text-center py-6">
-                          <div class="empty-glass-state">
-                            <i class="pi pi-file-o text-4xl text-tertiary mb-3"></i>
-                            <h4 class="m-0 mb-1 text-primary-color">No Leave Requests</h4>
-                            <p class="m-0 text-secondary">You haven't applied for any leaves yet.</p>
-                          </div>
-                        </td>
-                      </tr>
-                    </ng-template>
-                  </p-table>
-                </div>
-              </p-tabpanel>
-
-              <p-tabpanel value="1">
-                <div class="panel-inner p-4 bg-surface h-full">
-                  @if (pendingApprovals().length > 0) {
-                    <div class="approvals-grid">
-                      @for (approval of pendingApprovals(); track approval._id) {
-                        <p-card styleClass="approval-card">
-                          <div class="flex-col gap-3">
-                            
-                            <div class="flex-between border-bottom pb-3">
-                              <div class="flex-align gap-3">
-                                <p-avatar [label]="getInitials(approval.user?.name)" shape="circle" size="large" [style]="{'background-color': 'var(--color-primary-bg)', 'color': 'var(--color-primary)'}"></p-avatar>
-                                <div class="flex-col">
-                                  <span class="font-bold text-primary-color">{{ approval.user?.name || 'Employee' }}</span>
-                                  <span class="text-xs text-secondary">{{ approval.user?.employeeProfile?.employeeId || 'ID N/A' }}</span>
+                              <div class="grid-2 gap-3 flex-1">
+                                <div class="info-group">
+                                  <span class="info-label text-tertiary">Leave Type</span>
+                                  <div class="flex-align gap-2 mt-1">
+                                    <div class="type-dot" [ngClass]="approval.leaveType"></div>
+                                    <span class="font-bold capitalize text-sm">{{ approval.leaveType }} Leave</span>
+                                  </div>
+                                </div>
+                                <div class="info-group">
+                                  <span class="info-label text-tertiary">Duration</span>
+                                  <span class="font-medium mt-1 text-sm">{{ approval.daysCount }} Day(s)</span>
+                                </div>
+                                <div class="info-group span-2 bg-primary-light p-2 border-radius-sm">
+                                  <span class="text-sm font-medium text-primary-color flex-align gap-2">
+                                    <i class="pi pi-calendar"></i>
+                                    {{ approval.startDate | date:'dd MMM yyyy' }} - {{ approval.endDate | date:'dd MMM yyyy' }}
+                                  </span>
+                                </div>
+                                <div class="info-group span-2">
+                                  <span class="info-label text-tertiary">Reason</span>
+                                  <p class="m-0 text-sm text-secondary mt-1 line-clamp-2" [pTooltip]="approval.reason">{{ approval.reason }}</p>
                                 </div>
                               </div>
-                              <span class="badge-mono-sm">{{ approval.leaveRequestId }}</span>
-                            </div>
 
-                            <div class="grid-2 gap-3">
-                              <div class="info-group">
-                                <span class="info-label text-tertiary">Leave Type</span>
-                                <div class="flex-align gap-2 mt-1">
-                                  <div class="type-dot" [ngClass]="approval.leaveType"></div>
-                                  <span class="font-bold capitalize">{{ approval.leaveType }} Leave</span>
-                                </div>
+                              <div class="flex-align gap-2 pt-3 border-top mt-auto">
+                                <p-button label="Approve" icon="pi pi-check" styleClass="apex-btn apex-btn--sm bg-success text-white border-0 w-full" (onClick)="actionRequest(approval._id, 'approve')"></p-button>
+                                <p-button label="Reject" icon="pi pi-times" styleClass="apex-btn apex-btn--sm apex-btn--secondary w-full" (onClick)="actionRequest(approval._id, 'reject')"></p-button>
                               </div>
-                              <div class="info-group">
-                                <span class="info-label text-tertiary">Duration</span>
-                                <span class="font-medium mt-1">{{ approval.daysCount }} Day(s)</span>
-                              </div>
-                              <div class="info-group span-2 bg-primary-light p-2 border-radius-md">
-                                <span class="text-sm font-medium text-primary-color flex-align gap-2">
-                                  <i class="pi pi-calendar"></i>
-                                  {{ approval.startDate | date:'dd MMM yyyy' }} - {{ approval.endDate | date:'dd MMM yyyy' }}
-                                </span>
-                              </div>
-                              <div class="info-group span-2">
-                                <span class="info-label text-tertiary">Reason</span>
-                                <p class="m-0 text-sm text-secondary mt-1 line-clamp-2" [pTooltip]="approval.reason">{{ approval.reason }}</p>
-                              </div>
-                            </div>
-
-                            <div class="flex-align gap-2 pt-3 border-top mt-auto">
-                              <p-button label="Approve" icon="pi pi-check" styleClass="p-button-success w-full" size="small" (onClick)="actionRequest(approval._id, 'approve')"></p-button>
-                              <p-button label="Reject" icon="pi pi-times" styleClass="p-button-danger p-button-outlined w-full" size="small" (onClick)="actionRequest(approval._id, 'reject')"></p-button>
                             </div>
                           </div>
-                        </p-card>
-                      }
-                    </div>
-                  } @else {
-                    <div class="empty-glass-state h-full flex-center py-6">
-                      <div class="icon-circle-large mb-3 bg-success-light text-success"><i class="pi pi-check-circle"></i></div>
-                      <h3 class="m-0 mb-1 text-primary-color font-heading">All Caught Up!</h3>
-                      <p class="m-0 text-secondary">There are no pending leave requests requiring your approval.</p>
-                    </div>
-                  }
-                </div>
-              </p-tabpanel>
+                        }
+                      </div>
+                    } @else {
+                      <div class="empty-glass-state h-full flex-center py-6">
+                        <div class="icon-circle-large mb-3 bg-success-light text-success"><i class="pi pi-check-circle"></i></div>
+                        <h3 class="m-0 mb-1 text-primary-color font-heading">All Caught Up!</h3>
+                        <p class="m-0 text-secondary">There are no pending leave requests requiring your approval.</p>
+                      </div>
+                    }
+                  </div>
+                </p-tabpanel>
 
-            </p-tabpanels>
-          </p-tabs>
-        </p-card>
-      }
+              </p-tabpanels>
+            </p-tabs>
+          </div>
+        }
+      </main>
     </div>
   `,
   styles: [`
-    /* --------------------------------------------------------------------------
-       GLOBAL & VARIABLES
-       -------------------------------------------------------------------------- */
-    :host { display: block; width: 100%; min-height: 100vh; background-color: var(--bg-primary); color: var(--text-primary); font-family: var(--font-body); }
-    .page-wrapper { padding: var(--spacing-2xl) var(--spacing-3xl); max-width: 1400px; margin: 0 auto; }
+    :host {
+      display: block; 
+      width: 100%; 
+      height: 100vh;
+      overflow: hidden;
+    }
 
-    /* Utility */
+    /* Utility Helpers */
     .flex-col { display: flex; flex-direction: column; }
     .flex-between { display: flex; justify-content: space-between; align-items: center; }
     .flex-align { display: flex; align-items: center; }
     .flex-center { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .flex-shrink-0 { flex-shrink: 0; }
+    .flex-1 { flex: 1; }
+    .ml-auto { margin-left: auto; }
     
     .w-full { width: 100%; }
     .w-max { width: max-content; }
+    .h-screen { height: 100vh; }
     .h-full { height: 100%; }
     .h-2 { height: 0.5rem; }
     
     .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); }
-    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--spacing-xl); }
     .span-2 { grid-column: span 2; }
     
     .gap-1 { gap: var(--spacing-xs); }
@@ -280,9 +286,11 @@ import { AppMessageService } from '@core/services/message.service';
     .mt-0 { margin-top: 0; }
     .mt-1 { margin-top: var(--spacing-xs); }
     .mt-2 { margin-top: var(--spacing-sm); }
+    .mt-4 { margin-top: var(--spacing-xl); }
     .mt-auto { margin-top: auto; }
     .mb-1 { margin-bottom: var(--spacing-xs); }
     .mb-3 { margin-bottom: var(--spacing-md); }
+    .mb-4 { margin-bottom: var(--spacing-lg); }
     .mb-5 { margin-bottom: var(--spacing-2xl); }
     .mx-1 { margin-left: var(--spacing-xs); margin-right: var(--spacing-xs); }
     
@@ -296,62 +304,50 @@ import { AppMessageService } from '@core/services/message.service';
     .bg-surface { background: var(--bg-secondary); }
     .bg-primary-light { background: var(--color-primary-bg, #eff6ff); }
     .bg-success-light { background: var(--color-success-bg, #ecfdf5); }
+    .bg-success { background: var(--color-success) !important; color: #fff !important; }
     
+    .border { border: 1px solid var(--border-primary); }
+    .border-0 { border: none !important; }
     .border-top { border-top: 1px solid var(--border-primary); }
     .border-bottom { border-bottom: 1px solid var(--border-primary); }
-    .border-radius-md { border-radius: var(--ui-border-radius-md); }
+    .border-radius-sm { border-radius: var(--ui-border-radius-sm); }
+    .shadow-none { box-shadow: none !important; }
+    .overflow-hidden { overflow: hidden; }
+    .overflow-auto { overflow-y: auto; overflow-x: hidden; }
+    .relative { position: relative; }
     
     .text-center { text-align: center; }
     .text-right { text-align: right; }
     .text-sm { font-size: var(--font-size-sm); }
     .text-xs { font-size: var(--font-size-xs); }
     .text-lg { font-size: var(--font-size-lg); }
+    .text-xl { font-size: var(--font-size-xl); }
+    .text-2xl { font-size: var(--font-size-2xl); }
+    .text-3xl { font-size: var(--font-size-3xl); }
+    
     .text-secondary { color: var(--text-secondary); }
     .text-tertiary { color: var(--text-tertiary); }
     .text-primary-color { color: var(--text-primary); }
-    .text-primary { color: var(--color-primary); }
-    .text-success { color: var(--color-success); }
     
     .font-medium { font-weight: var(--font-weight-medium); }
     .font-bold { font-weight: var(--font-weight-bold); }
-    .font-heading { font-family: var(--font-heading); }
+    .uppercase { text-transform: uppercase; }
     .capitalize { text-transform: capitalize; }
+    .tracking-wider { letter-spacing: 0.05em; }
     .cursor-pointer { cursor: pointer; }
     .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
-    /* --------------------------------------------------------------------------
-       HEADER & TABS
-       -------------------------------------------------------------------------- */
-    .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--radius-2xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
-    .header-left { display: flex; align-items: center; gap: var(--spacing-xl); }
-    .icon-brand { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: var(--font-size-2xl); border: 1px solid var(--color-primary-border); }
-    .header-titles { display: flex; flex-direction: column; }
-    .page-title { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); font-family: var(--font-heading); margin: 0 0 4px 0; letter-spacing: -0.02em; }
-    .page-subtitle { font-size: var(--font-size-sm); color: var(--text-secondary); margin: 0; }
+    /* Theme colors */
+    .text-slate-500 { color: #64748b; }
+    .text-slate-600 { color: #475569; }
+    .text-slate-700 { color: #334155; }
+    .text-sky-600 { color: #0284c7; }
+    .text-sky-700 { color: #0369a1; }
+    .text-sky-800 { color: #075985; }
+    .text-orange-600 { color: #ea580c; }
+    .text-orange-700 { color: #c2410c; }
+    .text-orange-800 { color: #9a3412; }
 
-    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--radius-2xl); box-shadow: var(--shadow-md); overflow: hidden; }
-    ::ng-deep .workspace-card .p-card-body, ::ng-deep .workspace-card .p-card-content { padding: 0; }
-
-    ::ng-deep .hub-tablist .p-tablist-nav { background: var(--bg-secondary) !important; border-bottom: 1px solid var(--border-primary) !important; padding: 0 var(--spacing-xl) !important; }
-    ::ng-deep .hub-tablist .p-tablist-nav .p-tab { padding: var(--spacing-lg) var(--spacing-xl) !important; border: none !important; border-bottom: 2px solid transparent !important; color: var(--text-secondary) !important; font-weight: var(--font-weight-medium) !important; transition: var(--transition-base); }
-    ::ng-deep .hub-tablist .p-tablist-nav .p-tab.p-highlight { border-bottom-color: var(--color-primary) !important; color: var(--color-primary) !important; }
-    .tab-label { display: flex; align-items: center; gap: var(--spacing-sm); font-size: var(--font-size-md); }
-
-    /* --------------------------------------------------------------------------
-       BALANCE CARDS
-       -------------------------------------------------------------------------- */
-    .balance-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--spacing-xl); }
-    .balance-card { padding: var(--spacing-xl); border-radius: var(--ui-border-radius-lg); border: 1px solid rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between; gap: var(--spacing-lg); box-shadow: var(--shadow-sm); transition: transform 0.2s ease; }
-    .balance-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
-    
-    .b-header { display: flex; justify-content: space-between; align-items: flex-start; }
-    .b-title { font-weight: var(--font-weight-bold); font-size: var(--font-size-sm); text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.9; }
-    .b-icon { font-size: 1.5rem; opacity: 0.8; }
-    
-    .b-value { font-size: var(--font-size-4xl); font-weight: var(--font-weight-bold); line-height: 1; margin-bottom: var(--spacing-xs); }
-    .b-total { font-size: var(--font-size-lg); opacity: 0.7; font-weight: var(--font-weight-medium); }
-
-    /* Theming the cards */
     .casual-card { background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%); color: #475569; border-color: #cbd5e1; }
     .casual-card ::ng-deep .p-progressbar-value { background: #64748b; }
     
@@ -363,9 +359,12 @@ import { AppMessageService } from '@core/services/message.service';
 
     ::ng-deep .p-progressbar { background: rgba(0,0,0,0.1) !important; }
 
-    /* --------------------------------------------------------------------------
-       TABLE
-       -------------------------------------------------------------------------- */
+    /* PrimeNG Tabs overrides for Hub */
+    ::ng-deep .hub-tablist .p-tablist-nav { background: transparent !important; border: none !important; }
+    ::ng-deep .hub-tablist .p-tablist-nav .p-tab { padding: var(--spacing-lg) var(--spacing-xl) !important; border: none !important; border-bottom: 3px solid transparent !important; color: var(--text-secondary) !important; font-weight: var(--font-weight-medium) !important; transition: var(--transition-base); background: transparent !important; }
+    ::ng-deep .hub-tablist .p-tablist-nav .p-tab.p-highlight { border-bottom-color: var(--color-primary) !important; color: var(--color-primary) !important; }
+
+    /* Table */
     ::ng-deep .premium-table .p-datatable-header { padding: 0; border: none; background: transparent; }
     ::ng-deep .premium-table .p-datatable-thead > tr > th { background: var(--bg-secondary) !important; border-bottom: 2px solid var(--border-primary) !important; color: var(--text-tertiary); font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); text-transform: uppercase; letter-spacing: 0.05em; padding: var(--spacing-lg) var(--spacing-xl); }
     ::ng-deep .premium-table .p-datatable-tbody > tr > td { border-bottom: 1px solid var(--border-primary); padding: var(--spacing-md) var(--spacing-xl); color: var(--text-secondary); transition: background-color 0.2s; }
@@ -373,15 +372,7 @@ import { AppMessageService } from '@core/services/message.service';
 
     .badge-mono-sm { font-family: var(--font-mono); font-size: 11px; background: var(--bg-secondary); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border-primary); color: var(--text-secondary); }
 
-    /* --------------------------------------------------------------------------
-       APPROVALS GRID
-       -------------------------------------------------------------------------- */
-    .approvals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: var(--spacing-xl); }
-    ::ng-deep .approval-card.p-card { height: 100%; border-radius: var(--ui-border-radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-primary); transition: var(--transition-base); }
-    ::ng-deep .approval-card.p-card:hover { box-shadow: var(--shadow-lg); border-color: var(--color-primary-border); transform: translateY(-2px); }
-    ::ng-deep .approval-card .p-card-body { padding: var(--spacing-lg); height: 100%; display: flex; flex-direction: column; }
-    ::ng-deep .approval-card .p-card-content { padding: 0; flex: 1; display: flex; flex-direction: column; }
-
+    /* Approvals Grid */
     .info-group { display: flex; flex-direction: column; }
     .info-label { font-size: 10px; font-weight: var(--font-weight-bold); text-transform: uppercase; letter-spacing: 0.05em; }
 
@@ -390,9 +381,7 @@ import { AppMessageService } from '@core/services/message.service';
     .type-dot.casual { background: #3b82f6; }
     .type-dot.earned { background: #f59e0b; }
 
-    /* --------------------------------------------------------------------------
-       EMPTY STATES
-       -------------------------------------------------------------------------- */
+    /* Empty States */
     .empty-glass-state { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
     .icon-circle-large { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; }
 
@@ -402,15 +391,14 @@ import { AppMessageService } from '@core/services/message.service';
     .fade-in { animation: fadeIn 0.4s cubic-bezier(0.2, 0.9, 0.2, 1); }
     .slide-down { animation: slideDown 0.4s cubic-bezier(0.2, 0.9, 0.2, 1); animation-fill-mode: both; }
 
-    @media (max-width: 768px) {
-      .dashboard-header { flex-direction: column; align-items: stretch; gap: var(--spacing-xl); }
-      .header-right { margin-top: var(--spacing-xs); }
-      .balance-grid { grid-template-columns: 1fr; }
+    @media (min-width: 640px) {
+      .sm\\:p-5 { padding: var(--spacing-2xl); }
+      .sm\\:p-6 { padding: var(--spacing-3xl); }
     }
   `]
 })
 export class LeaveHubComponent implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
   private router = inject(Router);
@@ -491,8 +479,8 @@ export class LeaveHubComponent implements OnInit, OnDestroy {
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

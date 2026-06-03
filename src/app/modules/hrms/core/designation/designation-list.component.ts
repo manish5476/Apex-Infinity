@@ -14,84 +14,86 @@ import { catchError, finalize } from 'rxjs/operators';
   imports: [FormsModule, RouterModule, AgShareGrid],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="list-page-container fade-in">
+    <div class="apex-page">
       
-      <div class="list-header">
-        <div class="title-section">
-          <div class="icon-box"><i class="pi pi-id-card"></i></div>
-          <div class="text-content">
-            <h2 class="page-title">Designations</h2>
-            <p class="page-subtitle">Manage job titles, levels, and organizational grades.</p>
+      <header class="apex-page-header">
+        <div class="apex-page-header__title-block">
+          <div class="apex-page-header__icon"><i class="pi pi-id-card"></i></div>
+          <div>
+            <h1 class="apex-page-header__title">Designations</h1>
+            <p class="apex-page-header__subtitle">Manage job titles, levels, and organizational grades.</p>
           </div>
         </div>
-        <div class="stats-badge">
-          <span class="count">{{ totalCount() }}</span>
-          <span class="label">Total Records</span>
+        <div class="apex-page-header__actions">
+          <div class="apex-stat-badge">
+            <span class="apex-stat-badge__value">{{ totalCount() }}</span>
+            <span class="apex-stat-badge__label">Total Records</span>
+          </div>
         </div>
-      </div>
+      </header>
 
-      <div class="themed-card list-content-area">
+      <div class="apex-content">
+        <div class="apex-card apex-card--surface h-full d-flex flex-column p-0">
+          
+          <div class="apex-filter-bar p-3 border-bottom">
+            <div class="apex-flex flex-wrap gap-3 align-items-end w-full">
+              
+              <div class="apex-filter-group flex-1 min-w-15rem">
+                <label class="apex-input-label">Search</label>
+                <div class="p-input-icon-left w-full">
+                  <i class="pi pi-search"></i>
+                  <input type="text" 
+                    [ngModel]="filters().search" 
+                    (ngModelChange)="updateSearch($event)"
+                    placeholder="Title or Code..." class="apex-input w-full" />
+                </div>
+              </div>
 
-        <div class="se-filter-bar">
-          <div class="se-filter-field search-field">
-            <label for="search">Search</label>
-            <div class="input-icon-wrapper w-full">
-              <i class="pi pi-search input-icon"></i>
-              <input id="search" type="text" 
-                [ngModel]="filters().search" 
-                (ngModelChange)="updateSearch($event)"
-                placeholder="Title or Code..." class="se-input w-full with-icon" />
+              <div class="apex-filter-group min-w-10rem">
+                <label class="apex-input-label">Grade</label>
+                <select [ngModel]="filters().grade" (change)="updateGrade($event)" class="apex-input w-full">
+                  <option value="">All Grades</option>
+                  <option value="A">Grade A</option>
+                  <option value="B">Grade B</option>
+                  <option value="C">Grade C</option>
+                  <option value="D">Grade D</option>
+                  <option value="E">Grade E</option>
+                  <option value="F">Grade F</option>
+                </select>
+              </div>
+
+              <div class="apex-filter-group min-w-10rem">
+                <label class="apex-input-label">Status</label>
+                <select [ngModel]="filters().isActive" (change)="updateStatus($event)" class="apex-input w-full">
+                  <option value="">All Statuses</option>
+                  <option value="true">Active</option>
+                  <option value="false">Inactive</option>
+                </select>
+              </div>
+
+              <div class="apex-flex gap-2 ml-auto">
+                <button class="apex-btn apex-btn--secondary" (click)="resetFilters()">
+                  <i class="pi pi-refresh"></i> Reset
+                </button>
+                <button class="apex-btn apex-btn--primary" (click)="createNew()">
+                  <i class="pi pi-plus"></i> Add Designation
+                </button>
+              </div>
+
             </div>
           </div>
 
-          <div class="se-filter-field">
-            <label for="grade">Grade</label>
-            <div class="select-wrapper w-full">
-              <select id="grade" [ngModel]="filters().grade" (change)="updateGrade($event)" class="se-input w-full">
-                <option value="">All Grades</option>
-                <option value="A">Grade A</option>
-                <option value="B">Grade B</option>
-                <option value="C">Grade C</option>
-                <option value="D">Grade D</option>
-                <option value="E">Grade E</option>
-                <option value="F">Grade F</option>
-              </select>
-            </div>
+          <div class="flex-1 position-relative p-3">
+            <app-ag-share-grid 
+              [columns]="column()" 
+              [data]="data()" 
+              [actionColumn]="designationActionColumn"
+              selectionMode="single"
+              class="fill-grid"
+              (gridEvent)="eventFromGrid($event)">
+            </app-ag-share-grid>
           </div>
 
-          <div class="se-filter-field">
-            <label for="status">Status</label>
-            <div class="select-wrapper w-full">
-              <select id="status" [ngModel]="filters().isActive" (change)="updateStatus($event)" class="se-input w-full">
-                <option value="">All Statuses</option>
-                <option value="true">Active</option>
-                <option value="false">Inactive</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="se-filter-actions">
-            <button class="btn btn-outline" (click)="resetFilters()">
-              <i class="pi pi-refresh"></i> Reset
-            </button>
-          </div>
-
-          <div class="se-filter-right">
-            <button class="btn btn-primary" (click)="createNew()">
-              <i class="pi pi-plus"></i> Add Designation
-            </button>
-          </div>
-        </div>
-
-        <div class="list-grid-wrapper">
-          <app-ag-share-grid 
-            [columns]="column()" 
-            [data]="data()" 
-            [actionColumn]="designationActionColumn"
-           
-            selectionMode="single"
-            (gridEvent)="eventFromGrid($event)">
-          </app-ag-share-grid>
         </div>
       </div>
     </div>
@@ -99,74 +101,52 @@ import { catchError, finalize } from 'rxjs/operators';
   styles: [`
     :host {
       display: block;
-      height: 100vh;
-      background-color: var(--bg-secondary);
-      font-family: var(--font-body);
-      color: var(--text-primary);
-    }
-
-    .list-page-container {
-      padding: var(--spacing-lg) var(--spacing-xl);
-      max-width: 100%; /* Changed from 1600px for full width */
       height: 100%;
+      background-color: var(--bg-secondary);
+    }
+    
+    .h-full { height: 100%; }
+    .d-flex { display: flex; }
+    .flex-column { flex-direction: column; }
+    .p-0 { padding: 0 !important; }
+    .p-3 { padding: var(--spacing-lg) !important; }
+    .border-bottom { border-bottom: 1px solid var(--border-primary); }
+    .flex-1 { flex: 1; min-height: 0; }
+    .w-full { width: 100%; }
+    .min-w-15rem { min-width: 15rem; }
+    .min-w-10rem { min-width: 10rem; }
+    .ml-auto { margin-left: auto; }
+    .position-relative { position: relative; }
+    
+    .fill-grid {
+      position: absolute;
+      inset: 1rem;
+      display: block;
+    }
+    
+    .apex-stat-badge {
       display: flex;
       flex-direction: column;
-      gap: var(--spacing-lg);
-    }
-
-    .list-header {
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center;
-      padding: 0 var(--spacing-xs);
-    }
-
-    .themed-card {
-      flex: 1;
+      align-items: flex-end;
+      padding: var(--spacing-sm) var(--spacing-md);
       background: var(--bg-primary);
-      border: 1px solid var(--border-secondary);
-      border-radius: var(--ui-border-radius);
-      box-shadow: var(--elevation-2);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      padding: var(--spacing-lg);
-      gap: var(--spacing-md);
-    }
-
-    .list-grid-wrapper {
-      flex: 1;
-      min-height: 0;
-      width: 100%;
-      border: 1px solid var(--border-secondary);
-      border-radius: var(--ui-border-radius-sm);
-      overflow: hidden;
-      background: var(--bg-primary);
-    }
-
-    /* Input & UI refinements using your theme */
-    .se-input {
-      background: var(--bg-secondary);
       border: 1px solid var(--border-primary);
-      transition: var(--transition-base);
+      border-radius: var(--ui-border-radius);
+    }
+    .apex-stat-badge__value {
+      font-size: var(--font-size-xl);
+      font-weight: 800;
+      color: var(--accent-primary);
+      line-height: 1;
+    }
+    .apex-stat-badge__label {
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 2px;
     }
 
-    .se-input:focus {
-      border-color: var(--accent-primary);
-      box-shadow: 0 0 0 3px var(--accent-focus);
-    }
-
-    .btn-primary {
-      background: var(--accent-gradient);
-      border: none;
-      color: var(--color-on-primary);
-      box-shadow: var(--shadow-md);
-    }
-
-    .btn-primary:hover {
-      filter: brightness(1.1);
-      box-shadow: var(--elevation-1);
-    }
   `]
 })
 export class DesignationListComponent implements OnInit {

@@ -53,147 +53,150 @@ import { takeUntil } from "rxjs/operators";
   providers: [MessageService, ConfirmationService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="page-wrapper fade-in">
+    <div class="apex-page fade-in flex-col h-screen">
       
-      <header class="dashboard-header slide-down mb-5">
-        <div class="header-left">
-          <div class="icon-brand bg-primary text-white"><i class="pi pi-wallet"></i></div>
-          <div class="header-titles">
-            <h1 class="page-title">Leave Balances & Audits</h1>
-            <p class="page-subtitle">Manage allocations, track transactions, and execute financial year rollovers.</p>
+      <header class="apex-header apex-header--elevated flex-shrink-0 flex-wrap gap-4">
+        <div class="flex-align gap-4">
+          <div class="apex-card__icon bg-primary text-white" style="width: 48px; height: 48px; font-size: 20px;">
+            <i class="pi pi-wallet"></i>
+          </div>
+          <div class="flex-col">
+            <h1 class="apex-page-header__title m-0" style="font-size: var(--font-size-2xl);">Leave Balances & Audits</h1>
+            <p class="apex-page-header__subtitle m-0 text-sm text-tertiary">Manage allocations, track transactions, and execute financial year rollovers.</p>
           </div>
         </div>
-        <div class="header-right flex-align gap-3">
-          <p-select [options]="financialYears" [(ngModel)]="selectedFy" (onChange)="loadData()" [filter]="true" filterBy="label" styleClass="premium-select w-10rem"></p-select>
-          <p-button label="Bulk Initialize Year" icon="pi pi-sync" styleClass="p-button-primary shadow-sm" (onClick)="showBulkInitDialog()"></p-button>
+        <div class="header-right flex-align gap-3 ml-auto">
+          <p-select [options]="financialYears" optionLabel="label" optionValue="value" [(ngModel)]="selectedFy" (onChange)="loadData()" [filter]="true" filterBy="label" styleClass="premium-select w-10rem"></p-select>
+          <p-button label="Bulk Initialize Year" icon="pi pi-sync" styleClass="apex-btn apex-btn--primary" (onClick)="showBulkInitDialog()"></p-button>
         </div>
       </header>
 
-      @if (isLoading()) {
-        <p-card styleClass="premium-card glass-card"><p-skeleton width="100%" height="500px" borderRadius="12px"></p-skeleton></p-card>
-      } @else {
-        
-        <p-card styleClass="premium-card glass-card workspace-card slide-down" styleClass="animation-delay: 0.1s">
-          <p-tabs value="0">
-            <p-tablist styleClass="hub-tablist">
-              <p-tab value="0"><div class="tab-label"><i class="pi pi-users"></i> Employee Directory</div></p-tab>
-              <p-tab value="1"><div class="tab-label"><i class="pi pi-chart-line"></i> Utilization Trends</div></p-tab>
-            </p-tablist>
+      <main class="apex-content flex-1 overflow-auto flex-col p-4 sm:p-5">
+        @if (isLoading()) {
+          <p-skeleton width="100%" height="500px" borderRadius="var(--ui-border-radius-lg)"></p-skeleton>
+        } @else {
+          <div class="apex-card apex-card--surface p-0 slide-down border-0" style="animation-delay: 0.1s">
+            <p-tabs value="0">
+              <p-tablist styleClass="hub-tablist">
+                <p-tab value="0"><div class="tab-label"><i class="pi pi-users"></i> Employee Directory</div></p-tab>
+                <p-tab value="1"><div class="tab-label"><i class="pi pi-chart-line"></i> Utilization Trends</div></p-tab>
+              </p-tablist>
 
-            <p-tabpanels styleClass="hub-tabpanels p-0">
-              
-              <p-tabpanel value="0">
-                <div class="panel-inner p-4">
-                  <p-table 
-                    #dt
-                    [value]="balances()" 
-                    [paginator]="true" 
-                    [rows]="10" 
-                    [globalFilterFields]="['user.name', 'user.employeeProfile.employeeId']"
-                    responsiveLayout="scroll"
-                    styleClass="premium-table border-round-xl manish-border-1 surface-border">
-                    
-                    <ng-template pTemplate="header">
-                      <tr>
-                        <th>Employee Information</th>
-                        <th class="text-center">Casual Leave (CL)</th>
-                        <th class="text-center">Sick Leave (SL)</th>
-                        <th class="text-center">Earned Leave (EL)</th>
-                        <th class="text-right">Actions</th>
-                      </tr>
-                    </ng-template>
+              <p-tabpanels styleClass="hub-tabpanels p-0">
+                
+                <p-tabpanel value="0">
+                  <div class="panel-inner p-4">
+                    <p-table 
+                      #dt
+                      [value]="balances()" 
+                      [paginator]="true" 
+                      [rows]="10" 
+                      [globalFilterFields]="['user.name', 'user.employeeProfile.employeeId']"
+                      responsiveLayout="scroll"
+                      styleClass="premium-table border-round-lg border border-primary overflow-hidden">
+                      
+                      <ng-template pTemplate="header">
+                        <tr>
+                          <th>Employee Information</th>
+                          <th class="text-center">Casual Leave (CL)</th>
+                          <th class="text-center">Sick Leave (SL)</th>
+                          <th class="text-center">Earned Leave (EL)</th>
+                          <th class="text-right">Actions</th>
+                        </tr>
+                      </ng-template>
 
-                    <ng-template pTemplate="body" let-bal>
-                      <tr class="table-row-hover">
-                        <td>
-                          <div class="flex-align gap-3">
-                            <p-avatar [label]="getInitials(bal.user?.name)" shape="circle" size="large" [style]="{'background-color': 'var(--color-primary-bg)', 'color': 'var(--color-primary)'}"></p-avatar>
-                            <div class="flex-col gap-1">
-                              <span class="font-bold text-primary-color">{{ bal.user?.name || 'Unknown' }}</span>
-                              <span class="badge-mono-sm w-max">{{ bal.financialYear }}</span>
+                      <ng-template pTemplate="body" let-bal>
+                        <tr class="table-row-hover">
+                          <td>
+                            <div class="flex-align gap-3">
+                              <p-avatar [label]="getInitials(bal.user?.name)" shape="circle" size="large" [style]="{'background-color': 'var(--color-primary-bg)', 'color': 'var(--color-primary)'}"></p-avatar>
+                              <div class="flex-col gap-1">
+                                <span class="font-bold text-primary-color">{{ bal.user?.name || 'Unknown' }}</span>
+                                <span class="badge-mono-sm w-max">{{ bal.financialYear }}</span>
+                              </div>
                             </div>
-                          </div>
-                        </td>
-                        
-                        <td>
-                          <div class="flex-col align-center w-full px-3">
-                            <div class="flex-between w-full text-sm mb-1">
-                              <span class="font-bold">{{ (bal.casualLeave?.total || 0) - (bal.casualLeave?.used || 0) }} left</span>
-                              <span class="text-secondary">{{ bal.casualLeave?.total || 0 }} total</span>
+                          </td>
+                          
+                          <td>
+                            <div class="flex-col align-center w-full px-3">
+                              <div class="flex-between w-full text-sm mb-1">
+                                <span class="font-bold">{{ (bal.casualLeave?.total || 0) - (bal.casualLeave?.used || 0) }} left</span>
+                                <span class="text-secondary">{{ bal.casualLeave?.total || 0 }} total</span>
+                              </div>
+                              <p-progressBar [value]="getPercentage(bal.casualLeave?.used, bal.casualLeave?.total)" [showValue]="false" styleClass="h-2 w-full"></p-progressBar>
                             </div>
-                            <p-progressBar [value]="getPercentage(bal.casualLeave?.used, bal.casualLeave?.total)" [showValue]="false" styleClass="h-2 w-full"></p-progressBar>
-                          </div>
-                        </td>
+                          </td>
 
-                        <td>
-                          <div class="flex-col align-center w-full px-3">
-                            <div class="flex-between w-full text-sm mb-1">
-                              <span class="font-bold">{{ (bal.sickLeave?.total || 0) - (bal.sickLeave?.used || 0) }} left</span>
-                              <span class="text-secondary">{{ bal.sickLeave?.total || 0 }} total</span>
+                          <td>
+                            <div class="flex-col align-center w-full px-3">
+                              <div class="flex-between w-full text-sm mb-1">
+                                <span class="font-bold">{{ (bal.sickLeave?.total || 0) - (bal.sickLeave?.used || 0) }} left</span>
+                                <span class="text-secondary">{{ bal.sickLeave?.total || 0 }} total</span>
+                              </div>
+                              <p-progressBar [value]="getPercentage(bal.sickLeave?.used, bal.sickLeave?.total)" [showValue]="false" styleClass="h-2 w-full bg-error-light" [color]="'var(--color-error)'"></p-progressBar>
                             </div>
-                            <p-progressBar [value]="getPercentage(bal.sickLeave?.used, bal.sickLeave?.total)" [showValue]="false" styleClass="h-2 w-full bg-error-light" [color]="'var(--color-error)'"></p-progressBar>
-                          </div>
-                        </td>
+                          </td>
 
-                        <td>
-                          <div class="flex-col align-center w-full px-3">
-                            <div class="flex-between w-full text-sm mb-1">
-                              <span class="font-bold">{{ (bal.earnedLeave?.total || 0) - (bal.earnedLeave?.used || 0) }} left</span>
-                              <span class="text-secondary">{{ bal.earnedLeave?.total || 0 }} total</span>
+                          <td>
+                            <div class="flex-col align-center w-full px-3">
+                              <div class="flex-between w-full text-sm mb-1">
+                                <span class="font-bold">{{ (bal.earnedLeave?.total || 0) - (bal.earnedLeave?.used || 0) }} left</span>
+                                <span class="text-secondary">{{ bal.earnedLeave?.total || 0 }} total</span>
+                              </div>
+                              <p-progressBar [value]="getPercentage(bal.earnedLeave?.used, bal.earnedLeave?.total)" [showValue]="false" styleClass="h-2 w-full bg-warning-light" [color]="'var(--color-warning)'"></p-progressBar>
                             </div>
-                            <p-progressBar [value]="getPercentage(bal.earnedLeave?.used, bal.earnedLeave?.total)" [showValue]="false" styleClass="h-2 w-full bg-warning-light" [color]="'var(--color-warning)'"></p-progressBar>
-                          </div>
-                        </td>
+                          </td>
 
-                        <td class="text-right">
-                          <p-button icon="pi pi-sliders-h" [text]="true" [rounded]="true" severity="secondary" pTooltip="Adjust Balance" (onClick)="showAdjustDialog(bal)"></p-button>
-                          <p-button icon="pi pi-history" [text]="true" [rounded]="true" severity="secondary" pTooltip="Transaction Log"></p-button>
-                        </td>
-                      </tr>
-                    </ng-template>
+                          <td class="text-right">
+                            <p-button icon="pi pi-sliders-h" [text]="true" [rounded]="true" severity="secondary" pTooltip="Adjust Balance" (onClick)="showAdjustDialog(bal)"></p-button>
+                            <p-button icon="pi pi-history" [text]="true" [rounded]="true" severity="secondary" pTooltip="Transaction Log"></p-button>
+                          </td>
+                        </tr>
+                      </ng-template>
 
-                    <ng-template pTemplate="emptymessage">
-                      <tr><td colspan="5" class="text-center py-6 text-secondary">No leave balances found for the selected financial year.</td></tr>
-                    </ng-template>
-                  </p-table>
-                </div>
-              </p-tabpanel>
-
-              <p-tabpanel value="1">
-                <div class="panel-inner p-4 bg-surface h-full">
-                  <div class="grid-2">
-                    <p-card styleClass="h-full manish-border-1 surface-border shadow-none">
-                      <h4 class="font-heading m-0 mb-4 text-primary-color">Year-over-Year Utilization Trends</h4>
-                      <p-chart type="bar" [data]="trendsChartData" [options]="chartOptions" height="300px"></p-chart>
-                    </p-card>
-
-                    <p-card styleClass="h-full manish-border-1 surface-border shadow-none">
-                       <h4 class="font-heading m-0 mb-4 text-primary-color">Department Liability Report</h4>
-                       <p class="text-sm text-secondary mb-4">Current unutilized leave balances across departments representing financial liability.</p>
-                       
-                       <ul class="liability-list">
-                         <li class="flex-between py-3 border-bottom">
-                           <span class="font-bold text-secondary">Engineering</span>
-                           <span class="font-bold text-error">1,240 Days</span>
-                         </li>
-                         <li class="flex-between py-3 border-bottom">
-                           <span class="font-bold text-secondary">Sales</span>
-                           <span class="font-bold text-warning">850 Days</span>
-                         </li>
-                         <li class="flex-between py-3">
-                           <span class="font-bold text-secondary">Human Resources</span>
-                           <span class="font-bold text-primary">320 Days</span>
-                         </li>
-                       </ul>
-                    </p-card>
+                      <ng-template pTemplate="emptymessage">
+                        <tr><td colspan="5" class="text-center py-6 text-secondary">No leave balances found for the selected financial year.</td></tr>
+                      </ng-template>
+                    </p-table>
                   </div>
-                </div>
-              </p-tabpanel>
+                </p-tabpanel>
 
-            </p-tabpanels>
-          </p-tabs>
-        </p-card>
-      }
+                <p-tabpanel value="1">
+                  <div class="panel-inner p-4 bg-surface h-full">
+                    <div class="apex-grid apex-grid--2">
+                      <div class="apex-card h-full p-4 border border-primary">
+                        <h4 class="font-heading m-0 mb-4 text-primary-color">Year-over-Year Utilization Trends</h4>
+                        <p-chart type="bar" [data]="trendsChartData" [options]="chartOptions" height="300px"></p-chart>
+                      </div>
+
+                      <div class="apex-card h-full p-4 border border-primary">
+                         <h4 class="font-heading m-0 mb-4 text-primary-color">Department Liability Report</h4>
+                         <p class="text-sm text-secondary mb-4">Current unutilized leave balances across departments representing financial liability.</p>
+                         
+                         <ul class="liability-list">
+                           <li class="flex-between py-3 border-bottom">
+                             <span class="font-bold text-secondary">Engineering</span>
+                             <span class="font-bold text-error">1,240 Days</span>
+                           </li>
+                           <li class="flex-between py-3 border-bottom">
+                             <span class="font-bold text-secondary">Sales</span>
+                             <span class="font-bold text-warning">850 Days</span>
+                           </li>
+                           <li class="flex-between py-3">
+                             <span class="font-bold text-secondary">Human Resources</span>
+                             <span class="font-bold text-primary">320 Days</span>
+                           </li>
+                         </ul>
+                      </div>
+                    </div>
+                  </div>
+                </p-tabpanel>
+
+              </p-tabpanels>
+            </p-tabs>
+          </div>
+        }
+      </main>
     </div>
 
     <p-dialog header="Bulk Initialize Financial Year" [(visible)]="displayBulkDialog" [modal]="true" [style]="{width: '450px'}" styleClass="premium-dialog">
@@ -213,7 +216,7 @@ import { takeUntil } from "rxjs/operators";
 
         <div class="flex-align justify-end gap-3 mt-4 pt-4 border-top">
           <p-button label="Cancel" [text]="true" severity="secondary" (onClick)="displayBulkDialog = false"></p-button>
-          <p-button label="Initialize Balances" icon="pi pi-sync" type="submit" [loading]="isProcessing()" [disabled]="bulkInitForm.invalid" styleClass="p-button-primary" (onClick)="submitBulkInit()"></p-button>
+          <p-button label="Initialize Balances" icon="pi pi-sync" type="submit" [loading]="isProcessing()" [disabled]="bulkInitForm.invalid" styleClass="apex-btn apex-btn--primary" (onClick)="submitBulkInit()"></p-button>
         </div>
       </form>
     </p-dialog>
@@ -222,20 +225,20 @@ import { takeUntil } from "rxjs/operators";
       <div class="mb-4 bg-surface p-3 border-radius-md flex-align gap-3">
         <p-avatar [label]="getInitials(selectedBalance?.user?.name)" shape="circle" styleClass="bg-primary text-white"></p-avatar>
         <div class="flex-col">
-          <span class="font-bold">{{ selectedBalance?.user?.name }}</span>
+          <span class="font-bold text-primary-color">{{ selectedBalance?.user?.name }}</span>
           <span class="text-xs text-secondary">FY: {{ selectedBalance?.financialYear }}</span>
         </div>
       </div>
 
       <form [formGroup]="adjustForm" class="flex-col gap-4">
-        <div class="grid-2 gap-4">
+        <div class="apex-grid apex-grid--2 gap-4">
           <div class="input-group">
             <label class="info-label">Leave Type <span class="text-error">*</span></label>
-            <p-select formControlName="leaveType" [options]="leaveTypes" [filter]="true" filterBy="label" placeholder="Select" styleClass="w-full premium-select" appendTo="body"></p-select>
+            <p-select formControlName="leaveType" [options]="leaveTypes" optionLabel="label" optionValue="value" [filter]="true" filterBy="label" placeholder="Select" styleClass="w-full premium-select" appendTo="body"></p-select>
           </div>
           <div class="input-group">
             <label class="info-label">Action <span class="text-error">*</span></label>
-            <p-select formControlName="actionType" [options]="actionTypes" [filter]="true" filterBy="label" placeholder="Select" styleClass="w-full premium-select" appendTo="body"></p-select>
+            <p-select formControlName="actionType" [options]="actionTypes" optionLabel="label" optionValue="value" [filter]="true" filterBy="label" placeholder="Select" styleClass="w-full premium-select" appendTo="body"></p-select>
           </div>
         </div>
 
@@ -251,32 +254,36 @@ import { takeUntil } from "rxjs/operators";
 
         <div class="flex-align justify-end gap-3 mt-4 pt-4 border-top">
           <p-button label="Cancel" [text]="true" severity="secondary" (onClick)="displayAdjustDialog = false"></p-button>
-          <p-button label="Confirm Adjustment" icon="pi pi-check" type="submit" [loading]="isProcessing()" [disabled]="adjustForm.invalid" styleClass="p-button-primary" (onClick)="submitAdjustment()"></p-button>
+          <p-button label="Confirm Adjustment" icon="pi pi-check" type="submit" [loading]="isProcessing()" [disabled]="adjustForm.invalid" styleClass="apex-btn apex-btn--primary" (onClick)="submitAdjustment()"></p-button>
         </div>
       </form>
     </p-dialog>
   `,
   styles: [`
-    /* --------------------------------------------------------------------------
-       GLOBAL & VARIABLES
-       -------------------------------------------------------------------------- */
-    :host { display: block; width: 100%; min-height: 100vh; background-color: var(--bg-primary); color: var(--text-primary); font-family: var(--font-body); }
-    .page-wrapper { padding: var(--spacing-2xl) var(--spacing-3xl); max-width: 1400px; margin: 0 auto; }
+    :host {
+      display: block; 
+      width: 100%; 
+      height: 100vh;
+      overflow: hidden;
+    }
 
-    /* Utility */
+    /* Utility Helpers */
     .flex-col { display: flex; flex-direction: column; }
     .flex-between { display: flex; justify-content: space-between; align-items: center; }
     .flex-align { display: flex; align-items: center; }
     .justify-end { justify-content: flex-end; }
     .align-center { align-items: center; }
+    .flex-shrink-0 { flex-shrink: 0; }
+    .flex-1 { flex: 1; }
+    .flex-wrap { flex-wrap: wrap; }
+    .ml-auto { margin-left: auto; }
     
     .w-full { width: 100%; }
     .w-max { width: max-content; }
     .w-10rem { width: 10rem; }
+    .h-screen { height: 100vh; }
     .h-full { height: 100%; }
     .h-2 { height: 0.5rem; }
-    
-    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-xl); }
     
     .gap-1 { gap: var(--spacing-xs); }
     .gap-2 { gap: var(--spacing-sm); }
@@ -303,14 +310,14 @@ import { takeUntil } from "rxjs/operators";
     .bg-primary { background: var(--color-primary); color: white; }
     .bg-primary-light { background: var(--color-primary-bg, #eff6ff); }
     
+    .border { border: 1px solid var(--border-primary); }
+    .border-0 { border: none !important; }
     .border-top { border-top: 1px solid var(--border-primary); }
     .border-bottom { border-bottom: 1px solid var(--border-primary); }
     .border-radius-md { border-radius: var(--ui-border-radius-md); }
-    .manish-border-1 { border: 1px solid; }
-    .surface-border { border-color: var(--border-primary); }
-    .border-round-xl { border-radius: var(--radius-2xl); }
+    .border-round-lg { border-radius: var(--ui-border-radius-lg); }
     .overflow-hidden { overflow: hidden; }
-    .shadow-none { box-shadow: none !important; }
+    .overflow-auto { overflow-y: auto; overflow-x: hidden; }
     
     .text-center { text-align: center; }
     .text-right { text-align: right; }
@@ -330,27 +337,14 @@ import { takeUntil } from "rxjs/operators";
     .font-heading { font-family: var(--font-heading); }
     .cursor-pointer { cursor: pointer; }
 
-    /* --------------------------------------------------------------------------
-       HEADER & TABS
-       -------------------------------------------------------------------------- */
-    .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--radius-2xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
-    .header-left { display: flex; align-items: center; gap: var(--spacing-xl); }
-    .icon-brand { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: var(--font-size-2xl); }
-    .header-titles { display: flex; flex-direction: column; gap: 4px; }
-    .page-title { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); font-family: var(--font-heading); margin: 0; letter-spacing: -0.02em; }
-    .page-subtitle { font-size: var(--font-size-sm); color: var(--text-secondary); margin: 0; }
-
-    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--radius-2xl); box-shadow: var(--shadow-md); overflow: hidden; }
-    ::ng-deep .workspace-card .p-card-body, ::ng-deep .workspace-card .p-card-content { padding: 0; }
-
-    ::ng-deep .hub-tablist .p-tablist-nav { background: var(--bg-secondary) !important; border-bottom: 1px solid var(--border-primary) !important; padding: 0 var(--spacing-xl) !important; }
+    /* Tabs Override */
+    ::ng-deep .hub-tablist .p-tablist-nav { background: transparent !important; border-bottom: 1px solid var(--border-primary) !important; padding: 0 var(--spacing-xl) !important; }
     ::ng-deep .hub-tablist .p-tablist-nav .p-tab { padding: var(--spacing-lg) var(--spacing-xl) !important; border: none !important; border-bottom: 2px solid transparent !important; color: var(--text-secondary) !important; font-weight: var(--font-weight-medium) !important; transition: var(--transition-base); }
     ::ng-deep .hub-tablist .p-tablist-nav .p-tab.p-highlight { border-bottom-color: var(--color-primary) !important; color: var(--color-primary) !important; }
+    ::ng-deep .hub-tabpanels { background: transparent !important; }
     .tab-label { display: flex; align-items: center; gap: var(--spacing-sm); font-size: var(--font-size-md); }
 
-    /* --------------------------------------------------------------------------
-       TABLE & PROGRESS BARS
-       -------------------------------------------------------------------------- */
+    /* Table */
     ::ng-deep .premium-table .p-datatable-header { padding: 0; border: none; background: transparent; }
     ::ng-deep .premium-table .p-datatable-thead > tr > th { background: var(--bg-secondary) !important; border-bottom: 2px solid var(--border-primary) !important; color: var(--text-tertiary); font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); text-transform: uppercase; letter-spacing: 0.05em; padding: var(--spacing-lg) var(--spacing-xl); }
     ::ng-deep .premium-table .p-datatable-tbody > tr > td { border-bottom: 1px solid var(--border-primary); padding: var(--spacing-md) var(--spacing-xl); color: var(--text-secondary); transition: background-color 0.2s; }
@@ -365,9 +359,7 @@ import { takeUntil } from "rxjs/operators";
     ::ng-deep .bg-error-light .p-progressbar-value { background: var(--color-error) !important; }
     ::ng-deep .bg-warning-light .p-progressbar-value { background: var(--color-warning) !important; }
 
-    /* --------------------------------------------------------------------------
-       FORMS & DIALOGS
-       -------------------------------------------------------------------------- */
+    /* Forms & Dialogs */
     .input-group { display: flex; flex-direction: column; gap: var(--spacing-xs); }
     .info-label { font-size: 10px; font-weight: var(--font-weight-bold); color: var(--text-label); text-transform: uppercase; letter-spacing: 0.05em; }
 
@@ -385,10 +377,8 @@ import { takeUntil } from "rxjs/operators";
     .fade-in { animation: fadeIn 0.4s cubic-bezier(0.2, 0.9, 0.2, 1); }
     .slide-down { animation: slideDown 0.4s cubic-bezier(0.2, 0.9, 0.2, 1); animation-fill-mode: both; }
 
-    @media (max-width: 768px) {
-      .grid-2 { grid-template-columns: 1fr; }
-      .header-right { margin-top: var(--spacing-md); }
-      .dashboard-header { flex-direction: column; align-items: stretch; gap: var(--spacing-xl); }
+    @media (min-width: 640px) {
+      .sm\\:p-5 { padding: var(--spacing-2xl); }
     }
   `]
 })

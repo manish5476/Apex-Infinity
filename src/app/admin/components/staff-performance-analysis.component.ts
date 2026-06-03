@@ -372,6 +372,8 @@ export class StaffPerformanceAnalysisComponent implements OnInit, OnDestroy {
       key: 'minSales',
       label: 'Min Revenue',
       type: 'select',
+      optionLabel: 'label',
+      optionValue: 'value',
       staticOptions: [
         { label: 'All Staff', value: 0 },
         { label: '> ₹10,000', value: 10000 },
@@ -380,6 +382,7 @@ export class StaffPerformanceAnalysisComponent implements OnInit, OnDestroy {
       ],
       defaultValue: 0
     }
+
   ];
 
   // Computed Totals

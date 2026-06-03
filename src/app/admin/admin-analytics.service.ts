@@ -73,8 +73,9 @@ export class AdminAnalyticsService extends BaseApiService {
   }
 
   /** RFM customer segmentation */
-  getCustomerSegmentation(): Observable<any> {
-    return this.get<any>('/v1/analytics/customer-segmentation', {}, 'getCustomerSegmentation');
+  getCustomerSegmentation(startDate?: string, endDate?: string, branchId?: string): Observable<any> {
+    const params = this.buildParams(startDate, endDate, branchId);
+    return this.get<any>('/v1/analytics/customer-segmentation', params, 'getCustomerSegmentation');
   }
 
   /** Customer lifetime value analysis */
@@ -196,8 +197,8 @@ export class AdminAnalyticsService extends BaseApiService {
   }
 
   /** Security audit logs */
-  getSecurityAuditLog(startDate?: string, endDate?: string, branchId?: string): Observable<any> {
-    const params = this.buildParams(startDate, endDate, branchId);
+  getSecurityAuditLog(startDate?: string, endDate?: string, branchId?: string, actionType?: string): Observable<any> {
+    const params = this.buildParams(startDate, endDate, branchId, { actionType });
     return this.get<any>('/v1/analytics/security-audit', params, 'getSecurityAuditLog');
   }
 

@@ -716,6 +716,8 @@ export class RealTimeMonitoringComponent implements OnInit, OnDestroy {
       label: 'Threat Level',
       type: 'select',
       placeholder: 'All Levels',
+      optionLabel: 'label',
+      optionValue: 'value',
       staticOptions: [
         { label: 'Critical Only', value: 'critical' },
         { label: 'Active Alerts', value: 'warning' }

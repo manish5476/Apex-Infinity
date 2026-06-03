@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ChangeDetectionStrategy, signal, DestroyRef } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy, signal, DestroyRef, TemplateRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { FormsModule } from '@angular/forms';
@@ -29,153 +29,149 @@ import { SelectModule } from 'primeng/select';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="list-page-container fade-in">
-      
-      <header class="page-header flex-between flex-wrap gap-md mb-xl md:mb-2xl">
-        <div class="header-titles flex-col gap-xs">
-          <h1 class="title font-heading text-3xl font-bold text-primary m-0">Shift Management</h1>
-          <p class="subtitle text-secondary m-0">View, filter, and manage organizational shift configurations.</p>
+    <div class="apex-page">
+      <header class="apex-page-header">
+        <div class="apex-page-header__title-block">
+          <div class="apex-page-header__icon"><i class="pi pi-calendar-clock"></i></div>
+          <div>
+            <h1 class="apex-page-header__title">Shift Management</h1>
+            <p class="apex-page-header__subtitle">View, filter, and manage organizational shift configurations.</p>
+          </div>
         </div>
-        <p-button label="Add Shift" icon="pi pi-plus" (onClick)="createNew()" size="small"></p-button>
+        <div class="apex-page-header__actions">
+          <div class="apex-stat-badge mr-3">
+            <span class="apex-stat-badge__value">{{ totalCount() }}</span>
+            <span class="apex-stat-badge__label">Total Shifts</span>
+          </div>
+          <button class="apex-btn apex-btn--primary" (click)="createNew()">
+            <i class="pi pi-plus"></i> Add Shift
+          </button>
+        </div>
       </header>
 
-      <div class="themed-card glass-panel list-content-area">
-        
-        <div class="se-filter-bar flex-wrap align-items-end gap-md pb-lg border-bottom-subtle">
+      <div class="apex-content">
+        <div class="apex-card apex-card--surface h-full d-flex flex-column p-0">
           
-          <div class="se-filter-field flex-grow-1 md:flex-grow-0">
-            <span class="p-input-icon-left w-full">
-              <i class="pi pi-search"></i>
-              <input pInputText type="text" 
-                [ngModel]="shiftFilter().search" 
-                (ngModelChange)="onSearchChange($event)" 
-                placeholder="Search Shift Name or Code..." 
-                class="w-full md:w-20rem" />
-            </span>
+          <div class="apex-filter-bar p-3 border-bottom">
+            <div class="apex-flex flex-wrap gap-3 align-items-end w-full">
+              
+              <div class="apex-filter-group flex-1 min-w-15rem">
+                <label class="apex-input-label">Search</label>
+                <div class="p-input-icon-left w-full">
+                  <i class="pi pi-search"></i>
+                  <input type="text" pInputText
+                    [ngModel]="shiftFilter().search" 
+                    (ngModelChange)="onSearchChange($event)"
+                    placeholder="Search Shift Name or Code..." class="apex-input w-full" />
+                </div>
+              </div>
+
+              <div class="apex-filter-group min-w-14rem">
+                <label class="apex-input-label">Shift Type</label>
+                <p-select 
+                  [options]="typeOptions" 
+                  [ngModel]="shiftFilter().shiftType" 
+                  (ngModelChange)="updateFilter('shiftType', $event)" 
+                  placeholder="All Types"
+                  styleClass="w-full"
+                  [showClear]="true"
+                  [filter]="true"
+                  filterBy="label">
+                </p-select>
+              </div>
+
+              <div class="apex-filter-group min-w-14rem">
+                <label class="apex-input-label">Status</label>
+                <p-select 
+                  [options]="statusOptions" 
+                  [ngModel]="shiftFilter().isActive" 
+                  (ngModelChange)="updateFilter('isActive', $event)" 
+                  placeholder="All Statuses"
+                  styleClass="w-full"
+                  [showClear]="true"
+                  [filter]="true"
+                  filterBy="label">
+                </p-select>
+              </div>
+
+              <div class="apex-flex ml-auto">
+                <button class="apex-btn apex-btn--secondary" (click)="resetFilters()">
+                  <i class="pi pi-filter-slash"></i> Reset
+                </button>
+              </div>
+
+            </div>
           </div>
 
-          <div class="se-filter-field">
-            <p-select 
-              [options]="typeOptions" 
-              [ngModel]="shiftFilter().shiftType" 
-              (ngModelChange)="updateFilter('shiftType', $event)" 
-              placeholder="All Types"
-              styleClass="w-full md:w-14rem"
-              [showClear]="true"
-              [filter]="true"
-              filterBy="label">
-            </p-select>
-
+          <div class="flex-1 position-relative p-3">
+            <app-ag-share-grid 
+              [columns]="column()" 
+              [data]="data()" 
+              [actionColumn]="shiftActionColumn"
+              selectionMode="single"
+              class="fill-grid"
+              (gridEvent)="eventFromGrid($event)">
+            </app-ag-share-grid>
           </div>
 
-          <div class="se-filter-field">
-            <p-select 
-              [options]="statusOptions" 
-              [ngModel]="shiftFilter().isActive" 
-              (ngModelChange)="updateFilter('isActive', $event)" 
-              placeholder="All Statuses"
-              styleClass="w-full md:w-12rem"
-              [showClear]="true"
-              [filter]="true"
-              filterBy="label">
-            </p-select>
-
-          </div>
-
-          <div class="se-filter-actions ml-auto flex gap-sm">
-            <p-button icon="pi pi-filter-slash" label="Reset" severity="secondary" [outlined]="true" (onClick)="resetFilters()"></p-button>
-          </div>
         </div>
-
-        <div class="list-grid-wrapper mt-lg">
-          <app-ag-share-grid 
-            [columns]="column()" 
-            [data]="data()" 
-            [actionColumn]="shiftActionColumn"
-            selectionMode="single"
-            (gridEvent)="eventFromGrid($event)">
-          </app-ag-share-grid>
-        </div>
-
       </div>
     </div>
   `,
   styles: [`
     :host {
       display: block;
-      min-height: 100vh;
+      height: 100%;
       background-color: var(--bg-secondary);
-      font-family: var(--font-body);
-      color: var(--text-primary);
     }
-
-    .list-page-container {
-      padding: var(--spacing-2xl) var(--spacing-xl);
-      max-width: 1400px;
-      margin: 0 auto;
-      height: calc(100vh - 80px);
+    
+    .h-full { height: 100%; }
+    .d-flex { display: flex; }
+    .flex-column { flex-direction: column; }
+    .p-0 { padding: 0 !important; }
+    .p-3 { padding: var(--spacing-lg) !important; }
+    .border-bottom { border-bottom: 1px solid var(--border-primary); }
+    .flex-1 { flex: 1; min-height: 0; }
+    .w-full { width: 100%; }
+    .min-w-15rem { min-width: 15rem; }
+    .min-w-14rem { min-width: 14rem; }
+    .ml-auto { margin-left: auto; }
+    .mr-3 { margin-right: var(--spacing-lg); }
+    .position-relative { position: relative; }
+    
+    ::ng-deep .p-select {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--ui-border-radius);
+    }
+    
+    .fill-grid {
+      position: absolute;
+      inset: 1rem;
+      display: block;
+    }
+    
+    .apex-stat-badge {
       display: flex;
       flex-direction: column;
-    }
-
-    .themed-card {
+      align-items: flex-end;
+      padding: var(--spacing-sm) var(--spacing-md);
       background: var(--bg-primary);
       border: 1px solid var(--border-primary);
-      border-radius: var(--radius-2xl);
-      box-shadow: var(--shadow-xl);
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      overflow: hidden;
-      padding: var(--spacing-xl);
+      border-radius: var(--ui-border-radius);
     }
-
-    /* Glassmorphism token support */
-    .glass-panel {
-      background: var(--glass-bg-c, var(--bg-primary));
-      backdrop-filter: blur(var(--glass-blur-c, 10px));
-      -webkit-backdrop-filter: blur(var(--glass-blur-c, 10px));
+    .apex-stat-badge__value {
+      font-size: var(--font-size-xl);
+      font-weight: 800;
+      color: var(--accent-primary);
+      line-height: 1;
     }
-
-    /* Utility Classes */
-    .flex-between { display: flex; justify-content: space-between; align-items: center; }
-    .flex-col { display: flex; flex-direction: column; }
-    .flex-wrap { display: flex; flex-wrap: wrap; }
-    .flex-grow-1 { flex-grow: 1; }
-    .align-items-end { align-items: flex-end; }
-    .gap-xs { gap: var(--spacing-xs); }
-    .gap-sm { gap: var(--spacing-sm); }
-    .gap-md { gap: var(--spacing-md); }
-    .w-full { width: 100%; }
-    .m-0 { margin: 0; }
-    .mb-xl { margin-bottom: var(--spacing-xl); }
-    .pb-lg { padding-bottom: var(--spacing-lg); }
-    .mt-lg { margin-top: var(--spacing-lg); }
-    .ml-auto { margin-left: auto; }
-    
-    .border-bottom-subtle { border-bottom: 1px solid var(--border-secondary); }
-    
-    .font-heading { font-family: var(--font-heading); }
-    .font-bold { font-weight: var(--font-weight-bold); }
-    .text-primary { color: var(--text-primary); }
-    .text-secondary { color: var(--text-secondary); }
-
-    .se-filter-bar { display: flex; }
-    .list-grid-wrapper { flex: 1; min-height: 0; position: relative; }
-
-    /* Animations */
-    .fade-in { animation: fadeIn var(--transition-base); }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-    @media (max-width: 768px) {
-      .list-page-container { padding: var(--spacing-xl) var(--spacing-md); }
-      .md\\:mb-2xl { margin-bottom: var(--spacing-2xl); }
-      .md\\:w-20rem { width: 20rem; }
-      .md\\:w-14rem { width: 14rem; }
-      .md\\:w-12rem { width: 12rem; }
-      .md\\:flex-grow-0 { flex-grow: 0; }
-      .se-filter-bar { flex-direction: column; align-items: stretch; }
-      .se-filter-actions { margin-left: 0; justify-content: flex-start; }
+    .apex-stat-badge__label {
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 2px;
     }
   `]
 })

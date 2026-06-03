@@ -56,24 +56,24 @@ import { takeUntil } from "rxjs/operators";
   template: `
     <p-toast position="top-right"></p-toast>
     <p-confirmDialog 
-      styleClass="glass-panel border-radius-xl shadow-xl" 
-      acceptButtonStyleClass="p-button-primary" 
+      styleClass="premium-dialog" 
+      acceptButtonStyleClass="apex-btn apex-btn--primary" 
       rejectButtonStyleClass="p-button-secondary p-button-text">
     </p-confirmDialog>
 
-    <div class="page-container fade-in">
+    <div class="apex-page fade-in flex-col h-screen">
       
-      <header class="page-header flex-between flex-wrap gap-md mb-4xl slide-down">
-        <div class="flex align-items-center gap-xl">
-          <div class="icon-brand flex-center bg-primary text-white border-radius-lg shadow-md flex-shrink-0" style="width: 56px; height: 56px;">
-            <i class="pi pi-shield text-3xl"></i>
+      <header class="apex-header apex-header--elevated flex-shrink-0 flex-wrap gap-4">
+        <div class="flex-align gap-4">
+          <div class="apex-card__icon bg-primary text-white" style="width: 48px; height: 48px; font-size: 20px;">
+            <i class="pi pi-shield"></i>
           </div>
-          <div class="header-titles flex-col gap-xs">
-            <h1 class="title font-heading text-3xl font-bold text-primary m-0 line-height-tight">Attendance Audit Console</h1>
-            <p class="subtitle text-secondary text-md m-0 max-w-prose">Monitor live punches, manage anomalies, and execute log corrections.</p>
+          <div class="flex-col">
+            <h1 class="apex-page-header__title m-0" style="font-size: var(--font-size-2xl);">Attendance Audit Console</h1>
+            <p class="apex-page-header__subtitle m-0 text-sm text-tertiary">Monitor live punches, manage anomalies, and execute log corrections.</p>
           </div>
         </div>
-        <div class="header-actions">
+        <div class="header-actions ml-auto">
           <p-button 
             icon="pi pi-refresh" 
             label="Refresh Feed"
@@ -84,70 +84,71 @@ import { takeUntil } from "rxjs/operators";
         </div>
       </header>
 
-      @if (isLoading()) {
-        <div class="grid-3 mb-4xl">
-          <p-skeleton height="120px" borderRadius="16px"></p-skeleton>
-          <p-skeleton height="120px" borderRadius="16px"></p-skeleton>
-          <p-skeleton height="120px" borderRadius="16px"></p-skeleton>
-        </div>
-        <p-skeleton height="500px" borderRadius="16px"></p-skeleton>
-      } @else {
-        
-        @if (stats(); as s) {
-          <div class="grid-3 mb-4xl slide-down">
-            <div class="kpi-card glass-inset p-xl border-radius-lg manish-border-1 border-solid border-secondary border-left-success">
-              <span class="text-xs text-tertiary uppercase font-bold tracking-widest">Present Today</span>
-              <div class="flex align-items-baseline gap-sm mt-md">
-                <span class="text-4xl font-heading font-bold text-success line-height-none">{{ s.presentCount || 0 }}</span>
-                <span class="text-sm font-medium text-secondary">employees</span>
+      <main class="apex-content flex-1 overflow-auto flex-col p-4 sm:p-5">
+        @if (isLoading()) {
+          <div class="apex-grid apex-grid--3 mb-4">
+            <p-skeleton height="120px" borderRadius="var(--ui-border-radius-lg)"></p-skeleton>
+            <p-skeleton height="120px" borderRadius="var(--ui-border-radius-lg)"></p-skeleton>
+            <p-skeleton height="120px" borderRadius="var(--ui-border-radius-lg)"></p-skeleton>
+          </div>
+          <p-skeleton height="500px" borderRadius="var(--ui-border-radius-lg)"></p-skeleton>
+        } @else {
+          
+          @if (stats(); as s) {
+            <div class="apex-grid apex-grid--3 mb-4 slide-down">
+              <div class="apex-card p-4 border border-primary border-left-success" style="border-left-width: 4px;">
+                <span class="text-xs text-tertiary uppercase font-bold tracking-widest">Present Today</span>
+                <div class="flex align-items-baseline gap-2 mt-3">
+                  <span class="text-4xl font-heading font-bold text-success line-height-none">{{ s.presentCount || 0 }}</span>
+                  <span class="text-sm font-medium text-secondary">employees</span>
+                </div>
+              </div>
+              
+              <div class="apex-card p-4 border border-primary border-left-warning" style="border-left-width: 4px;">
+                <span class="text-xs text-tertiary uppercase font-bold tracking-widest">Anomalies / Flagged</span>
+                <div class="flex align-items-baseline gap-2 mt-3">
+                  <span class="text-4xl font-heading font-bold color-warning line-height-none">{{ s.flaggedCount || 0 }}</span>
+                  <span class="text-sm font-medium text-secondary">require review</span>
+                </div>
+              </div>
+              
+              <div class="apex-card p-4 border border-primary border-left-primary" style="border-left-width: 4px;">
+                <span class="text-xs text-tertiary uppercase font-bold tracking-widest">Remote / Web Punches</span>
+                <div class="flex align-items-baseline gap-2 mt-3">
+                  <span class="text-4xl font-heading font-bold text-primary line-height-none">{{ s.remoteCount || 0 }}</span>
+                  <span class="text-sm font-medium text-secondary">logs recorded</span>
+                </div>
               </div>
             </div>
-            
-            <div class="kpi-card glass-inset p-xl border-radius-lg manish-border-1 border-solid border-secondary border-left-warning">
-              <span class="text-xs text-tertiary uppercase font-bold tracking-widest">Anomalies / Flagged</span>
-              <div class="flex align-items-baseline gap-sm mt-md">
-                <span class="text-4xl font-heading font-bold color-warning line-height-none">{{ s.flaggedCount || 0 }}</span>
-                <span class="text-sm font-medium text-secondary">require review</span>
-              </div>
+          }
+
+          <div class="apex-card apex-card--surface p-0 flex-col flex-1 slide-down border-0 overflow-hidden" style="animation-delay: 0.1s; min-height: 550px;">
+            <div class="flex-between flex-wrap gap-3 px-4 py-3 bg-secondary border-bottom">
+              <h3 class="m-0 font-heading text-lg font-bold text-primary flex align-items-center gap-2">
+                <i class="pi pi-list text-primary"></i> Raw Punch Ledger
+              </h3>
+              
+              <p-iconField iconPosition="left">
+                <p-inputIcon styleClass="pi pi-search text-tertiary"></p-inputIcon>
+                <input 
+                  type="text" 
+                  pInputText 
+                  placeholder="Search by name, status..." 
+                  (input)="onSearch($event)" 
+                  class="w-full sm:w-20rem premium-input" />
+              </p-iconField>
             </div>
-            
-            <div class="kpi-card glass-inset p-xl border-radius-lg manish-border-1 border-solid border-secondary border-left-primary">
-              <span class="text-xs text-tertiary uppercase font-bold tracking-widest">Remote / Web Punches</span>
-              <div class="flex align-items-baseline gap-sm mt-md">
-                <span class="text-4xl font-heading font-bold text-primary line-height-none">{{ s.remoteCount || 0 }}</span>
-                <span class="text-sm font-medium text-secondary">logs recorded</span>
-              </div>
+
+            <div class="grid-wrapper w-full flex-grow-1 h-full">
+              <app-ag-share-grid 
+                [columns]="columns" 
+                [data]="logs()"
+                (gridEvent)="onGridEvent($event)">
+              </app-ag-share-grid>
             </div>
           </div>
         }
-
-        <p-card styleClass="glass-panel border-radius-xl shadow-xl overflow-hidden p-0 flex-col h-full slide-down">
-          
-          <div class="flex-between flex-wrap gap-md px-xl py-lg bg-secondary border-bottom-subtle">
-            <h3 class="m-0 font-heading text-lg font-bold text-primary flex align-items-center gap-sm">
-              <i class="pi pi-list text-primary"></i> Raw Punch Ledger
-            </h3>
-            
-            <p-iconField iconPosition="left">
-              <p-inputIcon styleClass="pi pi-search text-tertiary"></p-inputIcon>
-              <input 
-                type="text" 
-                pInputText 
-                placeholder="Search by name, status..." 
-                (input)="onSearch($event)" 
-                class="w-full sm:w-20rem premium-input" />
-            </p-iconField>
-          </div>
-
-          <div class="grid-wrapper w-full flex-grow-1" style="min-height: 550px;">
-            <app-ag-share-grid 
-              [columns]="columns" 
-              [data]="logs()"
-              (gridEvent)="onGridEvent($event)">
-            </app-ag-share-grid>
-          </div>
-        </p-card>
-      }
+      </main>
     </div>
 
     <p-dialog 
@@ -156,22 +157,22 @@ import { takeUntil } from "rxjs/operators";
       [modal]="true" 
       [style]="{width: '450px'}" 
       [draggable]="false"
-      styleClass="glass-panel border-radius-xl shadow-xl">
+      styleClass="premium-dialog">
       
-      <p class="text-sm text-secondary mb-xl mt-0 line-height-relaxed">Marking this log as flagged will suspend it from payroll processing until manually reviewed.</p>
+      <p class="text-sm text-secondary mb-4 mt-0 line-height-relaxed">Marking this log as flagged will suspend it from payroll processing until manually reviewed.</p>
       
-      <div class="input-group flex-col gap-xs">
+      <div class="input-group flex-col gap-1">
         <label class="info-label text-xs font-bold text-tertiary uppercase tracking-widest">Reason for Flagging <span class="text-error">*</span></label>
         <textarea 
           pInputTextarea 
           [(ngModel)]="flagReason" 
           rows="3" 
-          class="w-full" 
+          class="w-full premium-input" 
           placeholder="e.g. Geolocation outside allowed radius">
         </textarea>
       </div>
       
-      <div class="flex justify-content-end gap-md mt-xl pt-xl border-top-subtle">
+      <div class="flex justify-content-end gap-3 mt-4 pt-4 border-top">
         <p-button label="Cancel" [text]="true" severity="secondary" (onClick)="displayFlagDialog = false"></p-button>
         <p-button label="Flag Log" icon="pi pi-flag" severity="warn" [disabled]="!flagReason" [loading]="isProcessing()" (onClick)="submitFlag()"></p-button>
       </div>
@@ -183,169 +184,162 @@ import { takeUntil } from "rxjs/operators";
       [modal]="true" 
       [style]="{width: '450px'}" 
       [draggable]="false"
-      styleClass="glass-panel border-radius-xl shadow-xl">
+      styleClass="premium-dialog">
       
-      <p class="text-sm text-secondary mb-xl mt-0 line-height-relaxed">Create a verified correction entry. The original raw log will be preserved for auditing purposes.</p>
+      <p class="text-sm text-secondary mb-4 mt-0 line-height-relaxed">Create a verified correction entry. The original raw log will be preserved for auditing purposes.</p>
       
-      <form [formGroup]="correctForm" class="flex-col gap-xl">
-        <div class="input-group flex-col gap-xs">
+      <form [formGroup]="correctForm" class="flex-col gap-4">
+        <div class="input-group flex-col gap-1">
           <label class="info-label text-xs font-bold text-tertiary uppercase tracking-widest">Corrected Timestamp <span class="text-error">*</span></label>
           <p-datepicker 
             formControlName="timestamp" 
             [showTime]="true" 
             [showSeconds]="true" 
             appendTo="body" 
-            styleClass="w-full">
+            styleClass="w-full premium-input">
           </p-datepicker>
         </div>
         
-        <div class="input-group flex-col gap-xs">
+        <div class="input-group flex-col gap-1">
           <label class="info-label text-xs font-bold text-tertiary uppercase tracking-widest">Corrected Type <span class="text-error">*</span></label>
           <p-select 
             formControlName="type" 
             [options]="punchTypes" 
             appendTo="body" 
-            styleClass="w-full"
+            styleClass="w-full premium-input"
             [filter]="true"
             filterBy="label">
           </p-select>
 
         </div>
 
-        <div class="input-group flex-col gap-xs">
+        <div class="input-group flex-col gap-1">
           <label class="info-label text-xs font-bold text-tertiary uppercase tracking-widest">Correction Reason <span class="text-error">*</span></label>
           <textarea 
             pInputTextarea 
             formControlName="reason" 
             rows="2" 
-            class="w-full" 
+            class="w-full premium-input" 
             placeholder="e.g. Employee forgot to punch out">
           </textarea>
         </div>
 
-        <div class="flex justify-content-end gap-md mt-xl pt-xl border-top-subtle">
+        <div class="flex justify-content-end gap-3 mt-4 pt-4 border-top">
           <p-button label="Cancel" [text]="true" severity="secondary" (onClick)="displayCorrectDialog = false"></p-button>
-          <p-button label="Apply Correction" icon="pi pi-save" type="submit" [disabled]="correctForm.invalid" [loading]="isProcessing()" styleClass="p-button-primary" (onClick)="submitCorrection()"></p-button>
+          <p-button label="Apply Correction" icon="pi pi-save" type="submit" [disabled]="correctForm.invalid" [loading]="isProcessing()" styleClass="apex-btn apex-btn--primary" (onClick)="submitCorrection()"></p-button>
         </div>
       </form>
     </p-dialog>
   `,
   styles: [`
-    /* ==========================================================================
-       BASE & LAYOUT UTILITIES
-       ========================================================================== */
-    :host { display: block; font-family: var(--font-body); color: var(--text-primary); min-height: 100vh; background-color: var(--bg-secondary); }
-    
-    .page-container { max-width: 1500px; margin: 0 auto; padding: var(--spacing-2xl) var(--spacing-xl); }
-    
-    .flex { display: flex; }
+    :host {
+      display: block; 
+      width: 100%; 
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Utility Helpers */
     .flex-col { display: flex; flex-direction: column; }
     .flex-between { display: flex; justify-content: space-between; align-items: center; }
+    .flex-align { display: flex; align-items: center; }
+    .justify-end { justify-content: flex-end; }
     .flex-center { display: flex; align-items: center; justify-content: center; }
-    .flex-wrap { display: flex; flex-wrap: wrap; }
-    .align-items-center { align-items: center; }
-    .align-items-baseline { align-items: baseline; }
-    .justify-content-end { justify-content: flex-end; }
     .flex-shrink-0 { flex-shrink: 0; }
     .flex-grow-1 { flex-grow: 1; }
+    .flex-1 { flex: 1; }
+    .flex-wrap { flex-wrap: wrap; }
+    .ml-auto { margin-left: auto; }
     
     .w-full { width: 100%; }
+    .w-max { width: max-content; }
+    .w-max-content { width: max-content; }
+    .h-screen { height: 100vh; }
     .h-full { height: 100%; }
+    .min-h-screen { min-height: 60vh; }
     
-    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--spacing-xl); }
-
-    /* Spacing */
-    .m-0 { margin: 0 !important; }
+    .gap-1 { gap: var(--spacing-xs); }
+    .gap-2 { gap: var(--spacing-sm); }
+    .gap-3 { gap: var(--spacing-md); }
+    .gap-4 { gap: var(--spacing-lg); }
+    
+    .m-0 { margin: 0; }
+    .mb-1 { margin-bottom: var(--spacing-xs); }
+    .mb-3 { margin-bottom: var(--spacing-md); }
+    .mb-4 { margin-bottom: var(--spacing-xl); }
+    .mt-1 { margin-top: 4px; }
+    .mt-3 { margin-top: var(--spacing-md); }
+    .mt-4 { margin-top: var(--spacing-xl); }
+    
     .p-0 { padding: 0 !important; }
-    .mb-xs { margin-bottom: var(--spacing-xs); }
-    .mb-md { margin-bottom: var(--spacing-md); }
-    .mb-xl { margin-bottom: var(--spacing-xl); }
-    .mb-4xl { margin-bottom: var(--spacing-4xl); }
-    .mt-0 { margin-top: 0; }
-    .mt-md { margin-top: var(--spacing-md); }
-    .mt-xl { margin-top: var(--spacing-xl); }
+    .p-3 { padding: var(--spacing-lg); }
+    .p-4 { padding: var(--spacing-xl); }
+    .px-1 { padding-left: var(--spacing-xs); padding-right: var(--spacing-xs); }
+    .px-2 { padding-left: var(--spacing-sm); padding-right: var(--spacing-sm); }
+    .px-3 { padding-left: var(--spacing-lg); padding-right: var(--spacing-lg); }
+    .px-4 { padding-left: var(--spacing-xl); padding-right: var(--spacing-xl); }
+    .py-1 { padding-top: var(--spacing-xs); padding-bottom: var(--spacing-xs); }
+    .py-3 { padding-top: var(--spacing-md); padding-bottom: var(--spacing-md); }
+    .py-6 { padding-top: var(--spacing-4xl); padding-bottom: var(--spacing-4xl); }
+    .pt-4 { padding-top: var(--spacing-xl); }
     
-    .p-md { padding: var(--spacing-md); }
-    .p-xl { padding: var(--spacing-xl); }
-    .px-xl { padding-left: var(--spacing-xl); padding-right: var(--spacing-xl); }
-    .py-lg { padding-top: var(--spacing-lg); padding-bottom: var(--spacing-lg); }
-    .pt-xl { padding-top: var(--spacing-xl); }
+    .bg-surface { background: var(--bg-secondary); }
+    .bg-primary { background: var(--color-primary); color: white; }
+    .bg-primary-light { background: var(--color-primary-bg, #eff6ff); }
+    .bg-secondary { background: var(--bg-secondary); }
     
-    .gap-xs { gap: var(--spacing-xs); }
-    .gap-sm { gap: var(--spacing-sm); }
-    .gap-md { gap: var(--spacing-md); }
-    .gap-xl { gap: var(--spacing-xl); }
-
-    /* Typography & Colors */
-    .font-heading { font-family: var(--font-heading); }
-    .font-mono { font-family: var(--font-mono); }
-    .font-medium { font-weight: var(--font-weight-medium); }
-    .font-bold { font-weight: var(--font-weight-bold); }
+    .border { border: 1px solid var(--border-primary); }
+    .border-0 { border: none !important; }
+    .border-top { border-top: 1px solid var(--border-primary); }
+    .border-bottom { border-bottom: 1px solid var(--border-primary); }
+    .border-radius-sm { border-radius: var(--ui-border-radius-sm); }
+    .border-radius-md { border-radius: var(--ui-border-radius-md); }
+    .border-radius-lg { border-radius: var(--ui-border-radius-lg); }
+    .overflow-hidden { overflow: hidden; }
+    .overflow-auto { overflow-y: auto; overflow-x: hidden; }
     
-    .text-xs { font-size: var(--font-size-xs); }
+    .border-left-success { border-left-color: var(--color-success); border-left-style: solid; }
+    .border-left-warning { border-left-color: var(--color-warning); border-left-style: solid; }
+    .border-left-primary { border-left-color: var(--color-primary); border-left-style: solid; }
+    
+    .shadow-sm { box-shadow: var(--shadow-sm); }
+    
+    .text-center { text-align: center; }
+    .text-right { text-align: right; }
     .text-sm { font-size: var(--font-size-sm); }
-    .text-md { font-size: var(--font-size-md); }
-    .text-lg { font-size: var(--font-size-lg); }
-    .text-3xl { font-size: var(--font-size-3xl); }
+    .text-xs { font-size: var(--font-size-xs); }
+    .text-xl { font-size: var(--font-size-xl); }
+    .text-2xl { font-size: var(--font-size-2xl); }
     .text-4xl { font-size: 2.5rem; }
     
     .uppercase { text-transform: uppercase; }
-    .capitalize { text-transform: capitalize; }
     .tracking-widest { letter-spacing: 0.05em; }
-    .line-height-none { line-height: 1; }
     .line-height-tight { line-height: var(--line-height-tight); }
+    .line-height-none { line-height: 1; }
     .line-height-relaxed { line-height: var(--line-height-relaxed); }
-    .max-w-prose { max-width: 65ch; }
-
-    .text-primary { color: var(--text-primary); }
+    
     .text-secondary { color: var(--text-secondary); }
     .text-tertiary { color: var(--text-tertiary); }
-    .text-success { color: var(--color-success, #16a34a); }
+    .text-primary-color { color: var(--text-primary); }
+    .text-primary { color: var(--color-primary); }
     .text-error { color: var(--color-error, #dc2626); }
+    .text-warning { color: var(--color-warning, #d97706); }
     .color-warning { color: var(--color-warning, #d97706); }
-    .text-white { color: #ffffff; }
+    .text-success { color: var(--color-success, #16a34a); }
+    .text-info { color: #0ea5e9; }
+    .text-white { color: white; }
     
-    .bg-primary { background: var(--bg-primary); }
-    .bg-secondary { background: var(--bg-secondary); }
+    .font-bold { font-weight: var(--font-weight-bold); }
+    .font-medium { font-weight: var(--font-weight-medium); }
+    .font-heading { font-family: var(--font-heading); }
+    .font-mono { font-family: var(--font-mono); }
+    .cursor-pointer { cursor: pointer; }
 
-    /* Borders & Glassmorphism */
-    .glass-panel { background: var(--glass-bg-c); backdrop-filter: blur(var(--glass-blur-c)); border: 1px solid var(--border-primary); }
-    .glass-inset { background: color-mix(in srgb, var(--bg-primary) 40%, transparent); box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
-    
-    .border-radius-lg { border-radius: var(--ui-border-radius-lg); }
-    .border-radius-xl { border-radius: var(--radius-2xl); }
-    
-    .border-top-subtle { border-top: 1px solid var(--border-secondary); }
-    .border-bottom-subtle { border-bottom: 1px solid var(--border-secondary); }
-    .manish-border-1 { border-width: 1px; }
-    .border-solid { border-style: solid; }
-    .border-secondary { border-color: var(--border-secondary); }
-    
-    .border-left-success { border-left-width: 4px; border-left-color: var(--color-success); border-left-style: solid; }
-    .border-left-warning { border-left-width: 4px; border-left-color: var(--color-warning); border-left-style: solid; }
-    .border-left-primary { border-left-width: 4px; border-left-color: var(--color-primary); border-left-style: solid; }
-    
-    .shadow-md { box-shadow: var(--shadow-md); }
-    .shadow-xl { box-shadow: var(--shadow-xl); }
-    .overflow-hidden { overflow: hidden; }
-    
-    /* Premium Input Override for Grid Search */
-    ::ng-deep .premium-input {
-      background: var(--bg-primary) !important;
-      border: 1px solid var(--border-primary) !important;
-      border-radius: var(--ui-border-radius-md) !important;
-      transition: var(--transition-base);
-    }
-    ::ng-deep .premium-input:focus {
-      border-color: var(--color-primary) !important;
-      box-shadow: 0 0 0 2px var(--color-primary-bg) !important;
-    }
+    ::ng-deep .premium-input, ::ng-deep .premium-select .p-select, ::ng-deep .premium-input .p-inputtext, ::ng-deep textarea.premium-input { background: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: var(--ui-border-radius-md); transition: var(--transition-base); font-family: var(--font-body); }
+    ::ng-deep .premium-input:focus, ::ng-deep .premium-select .p-select.p-focus, ::ng-deep .premium-input .p-inputtext:focus, ::ng-deep textarea.premium-input:focus { border-color: var(--color-primary); box-shadow: 0 0 0 2px var(--color-primary-bg) !important; }
 
-    /* Animations */
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes slideDown { from { transform: translateY(-15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-    .fade-in { animation: fadeIn 0.4s cubic-bezier(0.2, 0.9, 0.2, 1); }
-    .slide-down { animation: slideDown 0.4s cubic-bezier(0.2, 0.9, 0.2, 1); animation-fill-mode: both; }
+    ::ng-deep .premium-dialog .p-dialog-header { background: var(--bg-secondary); border-bottom: 1px solid var(--border-primary); padding: var(--spacing-xl); }
+    ::ng-deep .premium-dialog .p-dialog-content { padding: var(--spacing-xl); }
 
     /* Custom CSS for Native HTML Buttons inside AG Grid */
     ::ng-deep .ag-action-btn {
@@ -361,13 +355,15 @@ import { takeUntil } from "rxjs/operators";
     ::ng-deep .ag-action-btn.flag-btn:hover { background: var(--color-warning); color: #fff; border-color: var(--color-warning); }
     ::ng-deep .ag-action-btn.edit-btn:hover { background: var(--color-primary); color: #fff; border-color: var(--color-primary); }
 
-    /* Responsive */
+    /* Animations */
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideDown { from { transform: translateY(-15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .fade-in { animation: fadeIn 0.4s cubic-bezier(0.2, 0.9, 0.2, 1); }
+    .slide-down { animation: slideDown 0.4s cubic-bezier(0.2, 0.9, 0.2, 1); animation-fill-mode: both; }
+
     @media (min-width: 640px) {
+      .sm\\:p-5 { padding: var(--spacing-2xl); }
       .sm\\:w-20rem { width: 20rem; }
-    }
-    @media (max-width: 768px) {
-      .page-container { padding: var(--spacing-xl) var(--spacing-md); }
-      .header-actions { margin-top: var(--spacing-md); width: 100%; }
     }
   `]
 })

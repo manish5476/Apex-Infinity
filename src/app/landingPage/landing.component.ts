@@ -1,9 +1,9 @@
 import {
   Component, OnInit, AfterViewInit, OnDestroy,
   HostListener, signal, ViewEncapsulation, ChangeDetectionStrategy,
-  Injectable
+  Injectable, PLATFORM_ID, Inject
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
 export interface FeatureDetail {
@@ -1111,11 +1111,17 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   // ── Private ─────────────────────────────────────────────────────────────────
   private scrollObserver: IntersectionObserver | null = null;
   private featureTimer: ReturnType<typeof setInterval> | null = null;
+  private readonly isBrowser: boolean;
+
+  constructor(@Inject(PLATFORM_ID) platformId: object) {
+    this.isBrowser = isPlatformBrowser(platformId);
+  }
 
   // ── Lifecycle ────────────────────────────────────────────────────────────────
   ngOnInit(): void { }
 
   ngAfterViewInit(): void {
+    if (!this.isBrowser) return;  // SSR guard — browser APIs not available on server
     this.initScrollObserver();
     this.startFeatureTimer();
   }
@@ -1128,6 +1134,7 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   // ── Host listeners ───────────────────────────────────────────────────────────
   @HostListener('window:scroll')
   onScroll(): void {
+    if (!this.isBrowser) return;  // SSR guard
     this.scrollY.set(window.scrollY);
   }
 

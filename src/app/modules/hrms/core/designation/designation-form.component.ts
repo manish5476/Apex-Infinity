@@ -31,26 +31,26 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="app-fullscreen-wrapper fade-in">
+    <div class="apex-page fade-in">
       
-      <header class="dashboard-header glass-header">
-        <div class="header-left">
-          <button class="icon-btn back-btn" type="button" (click)="goBack()" title="Go Back">
+      <header class="apex-page-header">
+        <div class="apex-page-header__title-block">
+          <button class="apex-btn apex-btn--icon mr-3" type="button" (click)="goBack()" title="Go Back">
             <i class="pi pi-arrow-left"></i>
           </button>
           <div>
-            <h1 class="page-title">{{ isEditMode() ? 'Edit Designation' : 'Create Designation' }}</h1>
-            <p class="page-subtitle">Define job roles, hierarchy, and compensation bands.</p>
+            <h1 class="apex-page-header__title">{{ isEditMode() ? 'Edit Designation' : 'Create Designation' }}</h1>
+            <p class="apex-page-header__subtitle">Define job roles, hierarchy, and compensation bands.</p>
           </div>
         </div>
         
-        <div class="header-right">
-          <div class="header-status" [class.valid]="desigForm.valid">
+        <div class="apex-page-header__actions">
+          <div class="header-status mr-3" [class.valid]="desigForm.valid">
             <div class="status-dot"></div>
             <span>{{ desigForm.valid ? 'Ready' : 'Draft' }}</span>
           </div>
-          <button type="button" class="btn btn-outline" (click)="goBack()" [disabled]="isSubmitting() || isLoading()">Cancel</button>
-          <button type="button" class="btn btn-primary" [disabled]="isSubmitting() || isLoading() || desigForm.invalid" (click)="onSubmit()">
+          <button type="button" class="apex-btn apex-btn--secondary" (click)="goBack()" [disabled]="isSubmitting() || isLoading()">Cancel</button>
+          <button type="button" class="apex-btn apex-btn--primary" [disabled]="isSubmitting() || isLoading() || desigForm.invalid" (click)="onSubmit()">
             @if (!isSubmitting()) {
               <i class="pi pi-save"></i>
               <span>{{ isEditMode() ? 'Update' : 'Save' }}</span>
@@ -62,8 +62,8 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
         </div>
       </header>
 
-      <main class="dashboard-content" [class.loading-opacity]="isLoading()">
-        <form [formGroup]="desigForm" class="bento-grid">
+      <div class="apex-content" [class.loading-opacity]="isLoading()">
+        <form [formGroup]="desigForm" class="bento-grid pb-6">
           
           <p-card styleClass="grid-card span-2 card-anim-1">
             <ng-template pTemplate="header">
@@ -74,50 +74,50 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
             </ng-template>
             
             <div class="inner-grid-2">
-              <div class="form-field">
-                <label for="title">Designation Title <span class="required">*</span></label>
+              <div class="apex-filter-group">
+                <label class="apex-input-label">Designation Title <span class="required">*</span></label>
                 <div class="p-input-icon-left flex gap-sm w-full">
                   <i class="pi pi-briefcase text-tertiary"></i>
-                  <input pInputText id="title" type="text" formControlName="title" class="w-full se-input" placeholder="e.g. Senior Developer">
+                  <input pInputText id="title" type="text" formControlName="title" class="w-full se-input apex-input" placeholder="e.g. Senior Developer">
                 </div>
               </div>
 
-              <div class="form-field">
-                <label for="code">Job Code <span class="required">*</span></label>
+              <div class="apex-filter-group">
+                <label class="apex-input-label">Job Code <span class="required">*</span></label>
                 <div class="p-input-icon-left flex gap-sm w-full">
                   <i class="pi pi-tag text-tertiary"></i>
-                  <input pInputText id="code" type="text" formControlName="code" class="w-full uppercase-input se-input" placeholder="e.g. DEV-002">
+                  <input pInputText id="code" type="text" formControlName="code" class="w-full uppercase-input se-input apex-input" placeholder="e.g. DEV-002">
                 </div>
               </div>
 
-              <div class="form-field">
-                <label for="jobFamily">Job Family</label>
+              <div class="apex-filter-group">
+                <label class="apex-input-label">Job Family</label>
                 <div class="p-input-icon-left flex gap-sm w-full">
                   <i class="pi pi-users text-tertiary"></i>
-                  <input pInputText id="jobFamily" type="text" formControlName="jobFamily" class="w-full se-input" placeholder="e.g. Technical, Managerial">
+                  <input pInputText id="jobFamily" type="text" formControlName="jobFamily" class="w-full se-input apex-input" placeholder="e.g. Technical, Managerial">
                 </div>
               </div>
 
-              <div class="form-field">
-                <label for="experienceRequired">Experience Required (Years)</label>
+              <div class="apex-filter-group">
+                <label class="apex-input-label">Experience Required (Years)</label>
                 <p-inputNumber 
                   id="experienceRequired" 
                   formControlName="experienceRequired" 
-                  styleClass="w-full" 
+                  styleClass="w-full prime-override-num" 
                   [min]="0" 
                   placeholder="e.g. 5">
                 </p-inputNumber>
               </div>
 
-              <div class="form-field span-2-inner">
-                <label for="description">Role Description</label>
+              <div class="apex-filter-group span-2-inner">
+                <label class="apex-input-label">Role Description</label>
                 <textarea 
                   pTextarea 
                   id="description" 
                   formControlName="description" 
                   rows="3" 
                   [autoResize]="true" 
-                  class="w-full se-input" 
+                  class="w-full se-input apex-input" 
                   placeholder="Brief overview of the role...">
                 </textarea>
               </div>
@@ -134,25 +134,25 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
             
             <div class="flex-col gap-4 h-full">
               <div class="inner-grid-2">
-                <div class="form-field">
-                  <label for="level">Level <span class="required">*</span></label>
+                <div class="apex-filter-group">
+                  <label class="apex-input-label">Level <span class="required">*</span></label>
                   <p-inputNumber 
                     id="level" 
                     formControlName="level" 
-                    styleClass="w-full" 
+                    styleClass="w-full prime-override-num" 
                     [min]="1" 
                     placeholder="1">
                   </p-inputNumber>
                 </div>
                 
-                <div class="form-field">
-                  <label for="grade">Grade</label>
+                <div class="apex-filter-group">
+                  <label class="apex-input-label">Grade</label>
                   <p-select 
                     id="grade" 
                     formControlName="grade" 
                     [options]="gradeOptions" 
                     placeholder="Select Grade" 
-                    styleClass="w-full" 
+                    styleClass="w-full prime-override" 
                     appendTo="body"
                     [filter]="true"
                     filterBy="label">
@@ -160,8 +160,8 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
                 </div>
               </div>
 
-              <div class="form-field">
-                <label for="nextDesignation">Career Path (Next Role)</label>
+              <div class="apex-filter-group">
+                <label class="apex-input-label">Career Path (Next Role)</label>
                 <p-select 
                   id="nextDesignation" 
                   formControlName="nextDesignation" 
@@ -172,17 +172,17 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
                   [showClear]="true" 
                   [filter]="true"
                   filterPlaceholder="Search roles..."
-                  styleClass="w-full" 
+                  styleClass="w-full prime-override" 
                   appendTo="body">
                 </p-select>
               </div>
 
-              <div class="form-field mt-auto">
-                <label for="promotionAfterYears">Promotion Eligibility (Years)</label>
+              <div class="apex-filter-group mt-auto">
+                <label class="apex-input-label">Promotion Eligibility (Years)</label>
                 <p-inputNumber 
                   id="promotionAfterYears" 
                   formControlName="promotionAfterYears" 
-                  styleClass="w-full" 
+                  styleClass="w-full prime-override-num" 
                   [min]="0" 
                   placeholder="e.g. 2">
                 </p-inputNumber>
@@ -199,28 +199,28 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
             </ng-template>
             
             <div class="inner-grid-2">
-              <div class="form-field">
-                <label for="responsibilitiesText">Key Responsibilities</label>
+              <div class="apex-filter-group">
+                <label class="apex-input-label">Key Responsibilities</label>
                 <textarea 
                   pTextarea 
                   id="responsibilitiesText" 
                   formControlName="responsibilitiesText" 
                   rows="5" 
                   [autoResize]="true" 
-                  class="w-full se-input" 
+                  class="w-full se-input apex-input" 
                   placeholder="Enter responsibilities, separated by new lines...">
                 </textarea>
               </div>
 
-              <div class="form-field">
-                <label for="qualificationsText">Qualifications</label>
+              <div class="apex-filter-group">
+                <label class="apex-input-label">Qualifications</label>
                 <textarea 
                   pTextarea 
                   id="qualificationsText" 
                   formControlName="qualificationsText" 
                   rows="5" 
                   [autoResize]="true" 
-                  class="w-full se-input" 
+                  class="w-full se-input apex-input" 
                   placeholder="Enter qualifications, separated by new lines...">
                 </textarea>
               </div>
@@ -236,35 +236,35 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
             </ng-template>
             
             <div class="flex-col gap-4">
-              <div class="form-field">
-                <label for="minSalary">Minimum Range</label>
+              <div class="apex-filter-group">
+                <label class="apex-input-label">Minimum Range</label>
                 <p-inputNumber 
                   id="minSalary" 
                   formControlName="min" 
-                  styleClass="w-full" 
+                  styleClass="w-full prime-override-num" 
                   placeholder="0">
                 </p-inputNumber>
               </div>
 
-              <div class="form-field">
-                <label for="maxSalary">Maximum Range</label>
+              <div class="apex-filter-group">
+                <label class="apex-input-label">Maximum Range</label>
                 <p-inputNumber 
                   id="maxSalary" 
                   formControlName="max" 
-                  styleClass="w-full" 
+                  styleClass="w-full prime-override-num" 
                   placeholder="0">
                 </p-inputNumber>
               </div>
 
-              <div class="form-field">
-                <label for="currency">Currency</label>
+              <div class="apex-filter-group">
+                <label class="apex-input-label">Currency</label>
                 <p-select 
                   id="currency" 
                   formControlName="currency" 
                   [options]="currencyOptions" 
                   optionLabel="label"
                   optionValue="value"
-                  styleClass="w-full" 
+                  styleClass="w-full prime-override" 
                   appendTo="body"
                   [filter]="true"
                   filterBy="label">
@@ -283,8 +283,8 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
             
             <div class="bento-grid" style="grid-template-columns: 1fr 1fr; gap: var(--spacing-xl); padding: 0;">
               
-              <div class="form-field">
-                <label for="reportsTo">Reports To</label>
+              <div class="apex-filter-group">
+                <label class="apex-input-label">Reports To</label>
                 <p-multiSelect 
                   id="reportsTo" 
                   formControlName="reportsTo" 
@@ -294,7 +294,7 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
                   placeholder="Select reporting lines..." 
                   [filter]="true"
                   filterPlaceholder="Search roles..."
-                  styleClass="w-full" 
+                  styleClass="w-full prime-override-multi" 
                   appendTo="body">
                 </p-multiSelect>
               </div>
@@ -319,7 +319,7 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
 
                 </div>
 
-                <label class="status-toggle-wrapper active-toggle flex-between cursor-pointer">
+                <label class="status-toggle-wrapper active-toggle flex-between cursor-pointer" style="border-color: var(--color-primary); margin: 0;">
                   <div class="toggle-text"><span class="toggle-label font-bold text-sm text-primary">Designation is Active</span></div>
                   <p-toggleswitch formControlName="isActive"></p-toggleswitch>
                 </label>
@@ -329,21 +329,17 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
           </p-card>
 
         </form>
-      </main>
+      </div>
     </div>
   `,
   styles: [`
     :host { 
       display: block; 
       width: 100%; 
-      height: 100vh; 
+      height: 100%; 
       background-color: var(--bg-secondary); 
-      font-family: var(--font-body); 
-      color: var(--text-primary); 
-      overflow: hidden; 
     }
     
-    .app-fullscreen-wrapper { display: flex; flex-direction: column; height: 100%; width: 100%; }
     .w-full { width: 100%; }
     .flex-col { display: flex; flex-direction: column; }
     .flex-align { display: flex; align-items: center; }
@@ -351,24 +347,8 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
     .gap-sm { gap: var(--spacing-sm); }
     .gap-4 { gap: var(--spacing-lg); }
     .mt-auto { margin-top: auto; }
-    
-    /* Header */
-    .dashboard-header { 
-      display: flex; justify-content: space-between; align-items: center; 
-      padding: var(--spacing-lg) var(--spacing-2xl); 
-      background: var(--bg-primary); 
-      border-bottom: 1px solid var(--border-secondary); 
-      z-index: 50; flex-shrink: 0; box-shadow: var(--shadow-xs); 
-    }
-    .header-left, .header-right { display: flex; align-items: center; gap: var(--spacing-xl); }
-    .icon-btn { 
-      background: var(--bg-secondary); border: 1px solid var(--border-secondary); 
-      color: var(--text-secondary); border-radius: var(--ui-border-radius-lg); 
-      width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; 
-      cursor: pointer; transition: all 0.2s ease; font-size: 18px; 
-    }
-    .page-title { font-family: var(--font-heading); font-size: 24px; font-weight: 800; margin: 0 0 2px 0; line-height: 1.2; letter-spacing: -0.5px; }
-    .page-subtitle { font-size: 13px; color: var(--text-secondary); margin: 0; }
+    .mr-3 { margin-right: var(--spacing-lg); }
+    .pb-6 { padding-bottom: var(--spacing-3xl); }
     
     /* Header Status */
     .header-status { 
@@ -382,11 +362,6 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
     .header-status.valid .status-dot { background: var(--color-success); }
     
     /* Full-Width Grid Layout */
-    .dashboard-content { 
-      flex: 1; overflow-y: auto; 
-      padding: var(--spacing-2xl) var(--spacing-3xl); 
-      background: var(--bg-secondary); transition: opacity 0.3s; 
-    }
     .bento-grid { 
       display: grid; 
       grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); 
@@ -400,20 +375,27 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
     .inner-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-xl); }
     .loading-opacity { opacity: 0.5; pointer-events: none; filter: grayscale(50%); }
 
-    /* Form Inputs with Clear Visible Borders */
-    .form-field { display: flex; flex-direction: column; gap: 6px; }
-    .form-field label { font-size: 11px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.5px; }
+    /* Form Inputs */
     .required { color: var(--color-error); font-weight: bold; margin-left: 2px; }
     .uppercase-input { text-transform: uppercase; font-family: var(--font-mono); font-weight: 600; letter-spacing: 0.5px; }
     
-    .se-input {
-      background: var(--bg-primary);
-      border: 1px solid var(--border-primary) !important;
-      border-radius: var(--ui-border-radius-sm);
+    ::ng-deep .prime-override, 
+    ::ng-deep .prime-override-multi,
+    ::ng-deep .prime-override-num {
+      width: 100%;
     }
-    .se-input:focus, .se-input:focus-within {
-      border-color: var(--accent-primary) !important;
-      box-shadow: 0 0 0 3px var(--accent-focus);
+    ::ng-deep .prime-override .p-inputtext,
+    ::ng-deep .prime-override-num .p-inputtext {
+      width: 100%;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--ui-border-radius);
+    }
+    
+    ::ng-deep .p-select, ::ng-deep .p-multiselect {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--ui-border-radius);
     }
 
     /* Toggles & Structural Chrome */
@@ -450,21 +432,6 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
     .card-header-custom h2 { margin: 0; font-size: 16px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.3px; }
     .card-header-custom i { font-size: 18px; }
 
-    /* Button Styling */
-    .btn {
-      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-      height: 40px; padding: 0 20px; font-size: 13px; font-weight: 600;
-      border-radius: 8px; cursor: pointer; transition: all 0.2s ease; border: none;
-    }
-    .btn-outline {
-      background: var(--bg-primary); border: 1px solid var(--border-secondary);
-      color: var(--text-primary);
-    }
-    .btn-outline:hover:not(:disabled) { background: var(--bg-secondary); border-color: var(--text-tertiary); }
-    .btn-primary { background: var(--color-primary); color: #ffffff; }
-    .btn-primary:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
-    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-
     /* Animations */
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes popIn { from { opacity: 0; transform: scale(0.98) translateY(15px); } to { opacity: 1; transform: scale(1) translateY(0); } }
@@ -484,9 +451,6 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
       .span-2 { grid-column: span 2; }
     }
     @media (max-width: 1023px) { 
-      .dashboard-content { padding: var(--spacing-lg); } 
-      .dashboard-header { flex-direction: column; align-items: flex-start; gap: var(--spacing-lg); } 
-      .header-right { width: 100%; justify-content: flex-end; } 
       .bento-grid { grid-template-columns: 1fr; } 
       .span-2, .span-2-inner { grid-column: span 1; } 
       .inner-grid-2 { grid-template-columns: 1fr; } 
