@@ -15,7 +15,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { DatePickerModule } from 'primeng/datepicker';
 import { CheckboxModule } from 'primeng/checkbox';
 
-// Services (Mocked paths based on your original code)
+// Services
 import { HRMSService } from '../../hrms.service';
 import { AppMessageService } from '@core/services/message.service';
 
@@ -32,16 +32,18 @@ import { AppMessageService } from '@core/services/message.service';
   template: `
     <div class="crextio-theme-wrapper fade-in">
       
-      <header class="crextio-header mb-5">
-        <h1 class="page-title">My Attendance</h1>
-        
-        <div class="header-controls">
+      <header class="crextio-header mb-5 slide-down">
+        <div class="flex-align gap-4">
+          <h1 class="page-title">My Attendance</h1>
+          
           <div class="nav-pills hidden-mobile">
             <span class="nav-pill active">Timesheet</span>
             <span class="nav-pill">Requests</span>
             <span class="nav-pill">Overtime</span>
           </div>
-          
+        </div>
+        
+        <div class="header-controls">
           <p-datepicker
             [(ngModel)]="selectedMonth"
             view="month"
@@ -62,25 +64,24 @@ import { AppMessageService } from '@core/services/message.service';
         
         @if (summary(); as s) {
           <div class="summary-bar mb-5 slide-down" style="animation-delay: 0.1s">
-            <div class="stat-item">
-              <span class="stat-label">Present</span>
-              <div class="stat-progress-container">
-                <span class="stat-pill bg-yellow text-dark">{{ s.present || 0 }}</span>
-                <div class="progress-track"><div class="progress-fill bg-yellow" [style.width.%]="(s.present / s.total) * 100"></div></div>
+            <div class="stat-group">
+              <div class="stat-item text-center">
+                <span class="stat-label">Present</span>
+                <div class="stat-circle active">{{ s.present || 0 }}</div>
               </div>
-            </div>
-            
-            <div class="stat-item">
-              <span class="stat-label">Absent</span>
-              <div class="stat-progress-container">
-                <span class="stat-pill bg-light border-dashed">{{ s.absent || 0 }}</span>
+              
+              <div class="stat-divider"></div>
+              
+              <div class="stat-item text-center">
+                <span class="stat-label">Absent</span>
+                <div class="stat-circle">{{ s.absent || 0 }}</div>
               </div>
             </div>
 
-            <div class="stat-item">
-              <span class="stat-label">Work Hours</span>
-              <div class="stat-progress-container">
-                <span class="stat-pill bg-light border-dashed">{{ s.totalWorkHours || 0 }}h</span>
+            <div class="stat-group ml-6">
+              <div class="stat-item text-center">
+                <span class="stat-label">Work Hours</span>
+                <div class="stat-pill-wide">{{ s.totalWorkHours || 0 }}h</div>
               </div>
             </div>
           </div>
@@ -95,21 +96,20 @@ import { AppMessageService } from '@core/services/message.service';
     
             <ng-template pTemplate="header">
               <tr>
-                <th style="width: 3rem">
-                   </th>
-                <th>Date</th>
-                <th>Schedule</th>
-                <th>First In</th>
-                <th>Last Out</th>
-                <th>Net Hours</th>
-                <th>Status</th>
-                <th class="text-right">Action</th>
+                <th style="width: 4rem"></th>
+                <th>DATE</th>
+                <th>SCHEDULE</th>
+                <th>FIRST IN</th>
+                <th>LAST OUT</th>
+                <th>NET HOURS</th>
+                <th>STATUS</th>
+                <th class="text-center">ACTION</th>
               </tr>
             </ng-template>
     
             <ng-template pTemplate="body" let-record let-rowIndex="rowIndex">
               <tr class="table-row-hover" [class.row-highlight]="record.status === 'absent'">
-                <td>
+                <td class="text-center">
                   <p-checkbox [binary]="true" [ngModel]="record.status === 'absent'" [readonly]="true"></p-checkbox>
                 </td>
                 
@@ -125,14 +125,14 @@ import { AppMessageService } from '@core/services/message.service';
                   }
                 </td>
     
-                <td [ngClass]="{'text-error font-bold': record.isLate}">
+                <td [ngClass]="{'text-error font-bold': record.isLate, 'font-bold': record.firstIn}">
                   {{ record.firstIn ? (record.firstIn | date:'HH:mm') : '--:--' }}
                   @if (record.isLate) {
                     <i class="pi pi-exclamation-circle text-xs ml-1 text-error" pTooltip="Late Arrival"></i>
                   }
                 </td>
     
-                <td [ngClass]="{'text-warning font-bold': record.isEarlyDeparture}">
+                <td [ngClass]="{'text-warning font-bold': record.isEarlyDeparture, 'font-bold': record.lastOut}">
                   {{ record.lastOut ? (record.lastOut | date:'HH:mm') : '--:--' }}
                 </td>
     
@@ -147,7 +147,7 @@ import { AppMessageService } from '@core/services/message.service';
                   </div>
                 </td>
     
-                <td class="text-right">
+                <td class="text-center">
                   @if (canRegularize(record)) {
                     <button class="action-btn" (click)="openRegularizeDialog(record)" pTooltip="Regularize">
                       <i class="pi pi-sliders-h"></i>
@@ -202,34 +202,22 @@ import { AppMessageService } from '@core/services/message.service';
       display: block;
       width: 100%;
       min-height: 100vh;
-      background-color: #9AA3AD; /* Backdrop color outside the app */
+      background-color: #9AA3AD; 
       padding: 2rem;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       
-      /* Colors */
       --c-bg-app: #F5F6F8;
       --c-bg-card: #FFFFFF;
       --c-text-main: #1A1A1A;
       --c-text-muted: #8E8E93;
       --c-text-light: #BDBDBD;
       --c-accent-yellow: #FCDA68;
-      --c-accent-yellow-dark: #D4B447;
       --c-border: #E5E5EA;
       
-      /* Status Colors */
-      --c-status-green-bg: #E8F5E9;
-      --c-status-green-dot: #4CAF50;
-      --c-status-green-text: #2E7D32;
-      
-      --c-status-gray-bg: #F0F0F0;
-      --c-status-gray-dot: #9E9E9E;
       --c-status-gray-text: #616161;
-      
-      --c-status-red-bg: #FFEBEE;
+      --c-status-gray-dot: #9E9E9E;
       --c-status-red-dot: #F44336;
-      --c-status-red-text: #C62828;
-
-      /* Radii & Spacing */
+      
       --radius-app: 32px;
       --radius-card: 24px;
       --radius-pill: 50px;
@@ -246,23 +234,23 @@ import { AppMessageService } from '@core/services/message.service';
     .crextio-theme-wrapper {
       background: var(--c-bg-app);
       border-radius: var(--radius-app);
-      padding: var(--spacing-xl);
-      max-width: 1400px;
-      margin: 0 auto;
+      padding: 3rem;
+      width: 100%; /* Fully spans the host container */
       box-shadow: 0 20px 40px rgba(0,0,0,0.1);
       position: relative;
       overflow: hidden;
+      min-height: 80vh;
     }
 
-    /* Soft top-right gradient mimicking the image */
+    /* Radial background gradient mimicking the image */
     .crextio-theme-wrapper::before {
       content: '';
       position: absolute;
-      top: -100px;
-      right: -100px;
-      width: 500px;
-      height: 500px;
-      background: radial-gradient(circle, rgba(252,218,104,0.3) 0%, rgba(245,246,248,0) 70%);
+      top: -20%;
+      right: -10%;
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(circle, rgba(252,218,104,0.2) 0%, rgba(245,246,248,0) 60%);
       z-index: 0;
       pointer-events: none;
     }
@@ -272,6 +260,7 @@ import { AppMessageService } from '@core/services/message.service';
     .justify-end { justify-content: flex-end; }
     .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-lg); }
     .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); }
+    
     .w-full { width: 100%; }
     .w-15rem { width: 15rem; }
     .gap-3 { gap: 12px; }
@@ -280,11 +269,11 @@ import { AppMessageService } from '@core/services/message.service';
     .mb-5 { margin-bottom: var(--spacing-xl); }
     .mt-2 { margin-top: var(--spacing-sm); }
     .mt-4 { margin-top: var(--spacing-md); }
+    .ml-6 { margin-left: 3rem; }
     .pt-4 { padding-top: var(--spacing-md); }
     .text-center { text-align: center; }
     .text-right { text-align: right; }
     .text-error { color: var(--c-status-red-dot); }
-    .text-warning { color: var(--c-accent-yellow-dark); }
     .text-secondary { color: var(--c-text-muted); }
     .font-bold { font-weight: 600; }
     .border-top-dashed { border-top: 1px dashed var(--c-border); }
@@ -301,27 +290,18 @@ import { AppMessageService } from '@core/services/message.service';
     }
     
     .page-title {
-      font-size: 28px;
-      font-weight: 400;
+      font-size: 32px;
+      font-weight: 500;
       color: var(--c-text-main);
       margin: 0;
       letter-spacing: -0.02em;
     }
 
-    .header-controls {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-md);
-    }
-
-    .nav-pills {
-      display: flex;
-      background: transparent;
-      gap: var(--spacing-md);
-    }
+    .header-controls { display: flex; align-items: center; gap: var(--spacing-md); }
+    .nav-pills { display: flex; background: transparent; gap: 8px; margin-left: 1rem; }
 
     .nav-pill {
-      padding: 8px 16px;
+      padding: 10px 20px;
       border-radius: var(--radius-pill);
       color: var(--c-text-muted);
       font-size: 14px;
@@ -332,25 +312,31 @@ import { AppMessageService } from '@core/services/message.service';
     .nav-pill.active {
       background: var(--c-text-main);
       color: #FFF;
+      font-weight: 500;
     }
 
     /* =========================================================
-       SUMMARY BARS
+       SUMMARY BARS (Matched exactly to image)
        ========================================================= */
     .summary-bar {
       position: relative;
       z-index: 1;
       display: flex;
-      gap: var(--spacing-xl);
-      align-items: center;
+      align-items: flex-end;
       padding: 0 10px;
+    }
+
+    .stat-group {
+      display: flex;
+      align-items: center;
+      gap: 16px;
     }
 
     .stat-item {
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      min-width: 150px;
+      align-items: center;
+      gap: 12px;
     }
 
     .stat-label {
@@ -358,48 +344,62 @@ import { AppMessageService } from '@core/services/message.service';
       color: var(--c-text-muted);
     }
 
-    .stat-progress-container {
+    .stat-circle {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
       display: flex;
       align-items: center;
-      gap: 12px;
-    }
-
-    .stat-pill {
-      padding: 6px 16px;
-      border-radius: var(--radius-pill);
-      font-size: 12px;
+      justify-content: center;
       font-weight: 600;
+      font-size: 14px;
+      border: 1px dashed var(--c-border);
+      background: var(--c-bg-app); /* Transparent-like */
+      color: var(--c-text-muted);
     }
 
-    .bg-yellow { background: var(--c-accent-yellow); color: var(--c-text-main); }
-    .bg-light { background: transparent; color: var(--c-text-muted); }
-    .border-dashed { border: 1px dashed var(--c-border); }
+    .stat-circle.active {
+      background: var(--c-accent-yellow);
+      border-color: var(--c-accent-yellow);
+      color: var(--c-text-main);
+    }
 
-    .progress-track {
-      flex-grow: 1;
-      height: 6px;
+    .stat-divider {
+      width: 60px;
+      height: 4px;
       background: var(--c-border);
       border-radius: 4px;
-      overflow: hidden;
+      margin-bottom: 20px; /* Align with circle centers */
     }
-    .progress-fill {
-      height: 100%;
-      border-radius: 4px;
+
+    .stat-pill-wide {
+      padding: 0 24px;
+      height: 44px;
+      border-radius: var(--radius-pill);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 14px;
+      border: 1px dashed var(--c-border);
+      background: var(--c-bg-app);
+      color: var(--c-text-muted);
     }
 
     /* =========================================================
-       DATA TABLE 
+       FLOATING DATA TABLE 
        ========================================================= */
     .table-container {
       background: var(--c-bg-card);
       border-radius: var(--radius-card);
-      padding: var(--spacing-lg);
+      padding: 10px 30px 30px 30px;
       position: relative;
       z-index: 1;
     }
 
-    ::ng-deep .crextio-table .p-datatable-wrapper {
-      border-radius: var(--radius-card);
+    ::ng-deep .crextio-table table {
+      border-collapse: separate !important;
+      border-spacing: 0 12px !important; /* Creates the isolated floating rows */
     }
     
     ::ng-deep .crextio-table .p-datatable-thead > tr > th {
@@ -407,41 +407,51 @@ import { AppMessageService } from '@core/services/message.service';
       border: none !important;
       border-bottom: 1px dashed var(--c-border) !important;
       color: var(--c-text-light);
-      font-size: 12px;
-      font-weight: 400;
-      padding: 16px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 16px 8px 12px 8px;
+    }
+
+    ::ng-deep .crextio-table .p-datatable-tbody > tr {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
     ::ng-deep .crextio-table .p-datatable-tbody > tr > td {
       border: none !important;
-      border-bottom: 1px dashed var(--c-border) !important;
       padding: 16px 8px;
       color: var(--c-text-main);
       font-size: 14px;
-      transition: background-color 0.2s ease, border-radius 0.2s ease;
+      background: transparent;
     }
 
-    ::ng-deep .crextio-table .p-datatable-tbody > tr:last-child > td {
-      border-bottom: none !important;
+    ::ng-deep .crextio-table .p-datatable-tbody > tr > td:first-child { border-top-left-radius: 12px; border-bottom-left-radius: 12px; padding-left: 20px;}
+    ::ng-deep .crextio-table .p-datatable-tbody > tr > td:last-child { border-top-right-radius: 12px; border-bottom-right-radius: 12px; padding-right: 20px;}
+
+    /* Highlighted Row (Yellow matching image) */
+    ::ng-deep .crextio-table .p-datatable-tbody > tr.row-highlight > td {
+      background: var(--c-accent-yellow) !important;
+    }
+    
+    ::ng-deep .crextio-table .p-datatable-tbody > tr.row-highlight {
+      box-shadow: 0 4px 15px rgba(252, 218, 104, 0.3);
     }
 
-    /* Highlighted Row (Yellow background mimicking the image selection) */
-    .row-highlight > td {
-      background-color: var(--c-accent-yellow) !important;
-      border-bottom-color: transparent !important;
-    }
-    .row-highlight > td:first-child { border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
-    .row-highlight > td:last-child { border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
-
-    /* Custom Checkbox */
+    /* Black Checkbox for selected states */
     ::ng-deep .crextio-table p-checkbox .p-checkbox-box {
       border-radius: 4px;
-      border-color: var(--c-border);
-      width: 18px;
-      height: 18px;
+      border: 1px solid var(--c-text-muted);
+      width: 20px;
+      height: 20px;
+      transition: 0.2s;
+    }
+    ::ng-deep .crextio-table p-checkbox .p-checkbox-box.p-highlight {
+      background: var(--c-text-main) !important;
+      border-color: var(--c-text-main) !important;
+      color: #FFF !important;
     }
     ::ng-deep .crextio-table .row-highlight p-checkbox .p-checkbox-box {
-      background: var(--c-text-main);
       border-color: var(--c-text-main);
     }
 
@@ -450,7 +460,7 @@ import { AppMessageService } from '@core/services/message.service';
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 4px 12px;
+      padding: 6px 16px;
       border-radius: var(--radius-pill);
       font-size: 12px;
       font-weight: 500;
@@ -459,38 +469,33 @@ import { AppMessageService } from '@core/services/message.service';
       width: 6px;
       height: 6px;
       border-radius: 50%;
+      background: var(--c-status-gray-dot);
     }
     
-    .status-green { background: var(--c-status-green-bg); color: var(--c-status-green-text); }
-    .status-green .status-dot { background: var(--c-status-green-dot); }
+    .status-gray { background: var(--c-bg-app); color: var(--c-status-gray-text); border: 1px solid var(--c-border); }
     
-    .status-gray { background: var(--c-bg-card); color: var(--c-status-gray-text); border: 1px solid var(--c-border); }
-    .status-gray .status-dot { background: var(--c-status-gray-dot); }
-    
-    .status-red { background: var(--c-status-red-bg); color: var(--c-status-red-text); }
-    .status-red .status-dot { background: var(--c-status-red-dot); }
-
+    /* When inside a yellow row, make it white with no border */
     .row-highlight .status-pill {
-      background: rgba(255, 255, 255, 0.5);
+      background: #FFFFFF;
       border-color: transparent;
+      color: var(--c-status-gray-text);
     }
 
-    /* Action Button */
+    /* Action Slider Button */
     .action-btn {
       background: transparent;
-      border: 1px solid var(--c-border);
+      border: 1px solid rgba(0,0,0,0.15);
       border-radius: 8px;
-      width: 32px;
-      height: 32px;
+      width: 42px;
+      height: 42px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      color: var(--c-text-muted);
+      color: var(--c-text-main);
       cursor: pointer;
       transition: 0.2s;
     }
-    .row-highlight .action-btn { border-color: rgba(0,0,0,0.1); color: var(--c-text-main); }
-    .action-btn:hover { background: var(--c-border); }
+    .action-btn:hover { background: rgba(0,0,0,0.05); }
 
     /* =========================================================
        INPUTS & DIALOG 
@@ -499,10 +504,11 @@ import { AppMessageService } from '@core/services/message.service';
       background: var(--c-bg-card);
       border: 1px solid var(--c-border);
       border-radius: var(--radius-pill);
-      padding: 10px 16px;
+      padding: 12px 20px;
       color: var(--c-text-main);
       font-family: inherit;
       transition: all 0.2s;
+      min-width: 200px;
     }
     .pill-input { border-radius: 16px; resize: none; }
     ::ng-deep .pill-datepicker .p-inputtext:focus, .pill-input:focus {
@@ -524,11 +530,7 @@ import { AppMessageService } from '@core/services/message.service';
       padding-top: var(--spacing-md);
     }
 
-    .info-label {
-      font-size: 12px;
-      color: var(--c-text-muted);
-      margin-left: 12px;
-    }
+    .info-label { font-size: 12px; color: var(--c-text-muted); margin-left: 12px; }
 
     .btn-text {
       background: transparent;
@@ -553,6 +555,12 @@ import { AppMessageService } from '@core/services/message.service';
     @keyframes slideDown { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     .fade-in { animation: fadeIn 0.4s ease; }
     .slide-down { animation: slideDown 0.4s ease forwards; opacity: 0; }
+    
+    @media (max-width: 768px) {
+      .hidden-mobile { display: none !important; }
+      :host { padding: 1rem; }
+      .crextio-theme-wrapper { padding: 1.5rem; }
+    }
   `]
 })
 export class MyDailyAttendanceComponent implements OnInit, OnDestroy {
@@ -562,7 +570,7 @@ export class MyDailyAttendanceComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
 
   isLoading = signal(true);
-  selectedMonth: Date = new Date('2026-06-01'); // Adjusted based on your API response context
+  selectedMonth: Date = new Date('2026-06-01'); // Adjusted based on context
   records = signal<any[]>([]);
   summary = signal<any>(null);
 
@@ -643,7 +651,7 @@ export class MyDailyAttendanceComponent implements OnInit, OnDestroy {
   getStatusClass(status: string): string {
     switch (status?.toLowerCase()) {
       case 'present': return 'green';
-      case 'absent': return 'gray'; // In the reference, 'absent' has a gray dot
+      case 'absent': return 'gray'; // Handled via specific styling inside row-highlight
       case 'late': case 'half_day': return 'red';
       default: return 'gray';
     }
