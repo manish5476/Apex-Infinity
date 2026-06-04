@@ -131,7 +131,6 @@ export class LoginComponent implements OnInit, OnDestroy {
 
         const msg = err.error?.message || 'Invalid credentials. Please try again.';
         this.errorMessage.set(msg);
-        this.messageService.showError(msg);
       }
     });
   }

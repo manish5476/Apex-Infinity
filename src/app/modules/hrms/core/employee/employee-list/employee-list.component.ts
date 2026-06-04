@@ -18,6 +18,7 @@ import { AppMessageService } from '../../../../../core/services/message.service'
 import { ImageCellRendererComponent } from '../../../../shared/AgGrid/AgGridcomponents/image-cell-renderer/image-cell-renderer.component';
 import { AgShareGrid, ActionColumnConfig } from '../../../../shared/components/ag-shared-grid';
 import { UserManagementService } from '../../../../user/user-management.service';
+import { HRMSService } from '../../../../hrms/hrms.service';
 import { finalize, Subject } from 'rxjs';
 import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '@core/auth/permissions.constants';
@@ -40,7 +41,7 @@ import { MasterDropdownComponent } from '../../../../shared/components/masterFil
     HasPermissionDirective,
     MasterDropdownComponent
   ],
-  providers: [UserManagementService, ConfirmationService],
+  providers: [UserManagementService, HRMSService, ConfirmationService],
   templateUrl: './employee-list.component.html',
   styleUrl: './employee-list.component.scss'
 })
@@ -59,6 +60,7 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
 
   private cdr = inject(ChangeDetectorRef);
   private userService = inject(UserManagementService);
+  private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
   private confirmationService = inject(ConfirmationService);
   // public masterList = inject(MasterListService);
@@ -116,35 +118,35 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
 
   eventFromGrid(event: any) {
     if (event.type === 'cellClicked') {
-      const userId = event.row._id;
+      const userId = event.row.user?._id;
 
       // Handle direct dialog triggers on specific columns
       if (event.field === 'security') {
-        this.dynamicDialog.openUserStatus(event.row)?.onClose.pipe(takeUntil(this.destroy$)).subscribe((result: any) => {
+        this.dynamicDialog.openUserStatus(event.row.user)?.onClose.pipe(takeUntil(this.destroy$)).subscribe((result: any) => {
           if (result) this.getData(false); // Refresh row data
         });
         return;
       }
 
       // Navigate to details if clicking the name column
-      if (event.field === 'name') {
+      if (event.field === 'user.name') {
         this.router.navigate(['/hrms/employees/details', userId]);
       }
     }
 
     if (event.type === 'view') {
-      const userId = event.row._id;
+      const userId = event.row.user?._id;
       this.router.navigate(['/hrms/employees/details', userId]);
     }
 
     if (event.type === 'editStart') {
-      const userId = event.row._id;
+      const userId = event.row.user?._id;
       this.router.navigate(['/hrms/employees/edit', userId]);
     }
 
     if (event.type === 'delete') {
-      const userId = event.row._id;
-      const userName = event.row.name;
+      const userId = event.row.user?._id; // Get the User ID to delete both user and employee
+      const userName = event.row.user?.name || event.row.employeeId;
 
 
       this.confirmationService.confirm({
@@ -180,7 +182,7 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
       limit: this.pageSize
     };
 
-    this.userService.getAllUsers(params)
+    this.hrmsService.getEmployees(params)
       .pipe(
         finalize(() => {
           this.isLoading = false;
@@ -189,11 +191,11 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (res: any) => {
-          const newData = res.data?.data || [];
-          const pagination = res.data?.pagination;
+          const newData = res.data?.employees || res.data?.data || [];
+          const pagination = res.pagination || res.data?.pagination;
 
           if (pagination) {
-            this.totalCount = pagination.totalResults;
+            this.totalCount = pagination.total || pagination.totalResults;
           } else {
             this.totalCount = res.results || this.totalCount;
           }
@@ -227,7 +229,7 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
     this.column = [
 
       {
-        field: 'avatar',
+        field: 'user.avatar',
         headerName: '',
         cellRenderer: ImageCellRendererComponent,
         width: 60,
@@ -240,7 +242,7 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
 
 
       {
-        field: 'name',
+        field: 'user.name',
         headerName: 'Employee Name',
         width: 180,
         pinned: 'left',
@@ -258,7 +260,7 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
 
       {
         headerName: 'Role',
-        field: 'role.name',
+        field: 'user.role.name',
         width: 140,
         filter: true,
         cellRenderer: (params: any) => {
@@ -290,13 +292,13 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
         headerName: 'Contact Info',
         width: 220,
         cellRenderer: (params: any) => {
-          const email = params.data.email;
-          const phone = params.data.phone ? `<span style="color:var(--text-tertiary);"> • ${params.data.phone}</span>` : '';
+          const email = params.data.user?.email || '';
+          const phone = params.data.user?.phone ? `<span style="color:var(--text-tertiary);"> • ${params.data.user.phone}</span>` : '';
 
           return `
             <div style="display:flex; flex-direction:column; justify-content:center; height:100%; line-height:1.2;">
               <span style="color:var(--text-secondary); font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${email}</span>
-              <span style="font-size:10px; color:var(--text-tertiary);">${params.data.phone || ''}</span>
+              <span style="font-size:10px; color:var(--text-tertiary);">${phone}</span>
             </div>
           `;
         }
@@ -307,7 +309,7 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
         headerName: 'Shift Name',
         width: 160,
         cellRenderer: (params: any) => {
-          const config = params.data.employee?.attendanceConfig;
+          const config = params.data.attendanceConfig;
 
           if (!config?.isAttendanceEnabled) {
             return `<div style="display:flex; align-items:center; height:100%; color:#94a3b8; font-style:italic; font-size:12px;">Disabled</div>`;
@@ -330,7 +332,7 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
         headerName: 'Timing',
         width: 140,
         cellRenderer: (params: any) => {
-          const shift = params.data.employee?.attendanceConfig?.shiftId;
+          const shift = params.data.attendanceConfig?.shiftId;
 
           if (shift && shift.startTime && shift.endTime) {
             return `
@@ -348,7 +350,7 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
         headerName: 'Config',
         width: 150,
         cellRenderer: (params: any) => {
-          const config = params.data.employee?.attendanceConfig || {};
+          const config = params.data.attendanceConfig || {};
           const machineId = config.machineUserId;
 
           if (machineId) {
@@ -396,7 +398,7 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
         sortable: false,
         filter: false,
         cellRenderer: (params: any) => {
-          const isBlocked = params.data.isLoginBlocked;
+          const isBlocked = params.data.user?.isLoginBlocked;
           const icon = isBlocked ? 'pi-lock text-error' : 'pi-shield text-primary';
           const tooltip = isBlocked ? 'Login Blocked' : 'Account Secure';
 

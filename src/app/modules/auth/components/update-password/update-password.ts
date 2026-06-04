@@ -60,7 +60,6 @@ export class UpdatePasswordComponent implements OnDestroy {
         this.isLoading.set(false);
         const msg = err.error?.message || 'Something went wrong. Please try again.';
         this.errorMessage.set(msg);
-        this.messageService.handleHttpError(err);
       }
     });
   }

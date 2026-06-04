@@ -6,12 +6,14 @@ import { BehaviorSubject, Subject, timer, Subscription } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../modules/auth/services/auth-service';
 import { AppMessageService } from './../message.service';
+import { NotificationService } from '../notification.service';
 
 @Injectable({ providedIn: 'root' })
 export class SocketConnectionService implements OnDestroy {
   private zone = inject(NgZone);
   private authService = inject(AuthService);
   private messageService = inject(AppMessageService);
+  private notificationService = inject(NotificationService);
   private platformId = inject(PLATFORM_ID);
 
   private socket: Socket | null = null;
@@ -211,6 +213,15 @@ export class SocketConnectionService implements OnDestroy {
 
     this.socket.on('themeChanged', (data: { themeId: string }) => {
       this.zone.run(() => this.themeChanged$.next(data));
+    });
+
+    // Real-time Notification Listeners
+    this.socket.on('newNotification', (notification: any) => {
+      this.zone.run(() => this.notificationService.handleLiveNotification(notification));
+    });
+
+    this.socket.on('notificationRead', (data: { notificationId: string }) => {
+      this.zone.run(() => this.notificationService.markAsReadLocal(data.notificationId));
     });
 
     this.socket.on('permissions:updated', (payload: any) => {

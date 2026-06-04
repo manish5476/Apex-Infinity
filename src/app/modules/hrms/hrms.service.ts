@@ -432,6 +432,52 @@ export class HRMSService extends BaseApiService {
   }
 
   // ======================================================
+  // EMPLOYEE ENDPOINTS
+  // ======================================================
+
+  /**
+   * Get all employees (HRMS view)
+   */
+  getEmployees(params?: any): Observable<{ status: string; results: number; pagination: any; data: { employees: any[] } }> {
+    return this.get<{ status: string; results: number; pagination: any; data: { employees: any[] } }>('/v1/hrms/employees', params);
+  }
+
+  /**
+   * Get single employee by Employee ID
+   */
+  getEmployee(id: string): Observable<{ status: string; data: { employee: any } }> {
+    return this.get<{ status: string; data: { employee: any } }>(`/v1/hrms/employees/${id}`);
+  }
+
+  /**
+   * Get employee by User ID
+   */
+  getEmployeeByUser(userId: string): Observable<{ status: string; data: { employee: any } }> {
+    return this.get<{ status: string; data: { employee: any } }>(`/v1/hrms/employees/by-user/${userId}`);
+  }
+
+  /**
+   * Create employee (requires existing User ID)
+   */
+  createEmployee(data: any): Observable<{ status: string; data: { employee: any } }> {
+    return this.post<{ status: string; data: { employee: any } }>('/v1/hrms/employees', data);
+  }
+
+  /**
+   * Update employee
+   */
+  updateEmployee(id: string, data: any): Observable<{ status: string; data: { employee: any } }> {
+    return this.patch<{ status: string; data: { employee: any } }>(`/v1/hrms/employees/${id}`, data);
+  }
+
+  /**
+   * Deactivate employee
+   */
+  deactivateEmployee(id: string, data?: any): Observable<{ status: string; data: { employee: any } }> {
+    return this.patch<{ status: string; data: { employee: any } }>(`/v1/hrms/employees/${id}/deactivate`, data || {});
+  }
+
+  // ======================================================
   // DEPARTMENT ENDPOINTS
   // ======================================================
 

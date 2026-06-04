@@ -7,6 +7,7 @@ import { catchError, finalize, map, of, Subject } from 'rxjs'; // 👈 Import Rx
 
 // Services
 import { UserManagementService } from '../../../../user/user-management.service';
+import { HRMSService } from '../../../../hrms/hrms.service';
 
 // PrimeNG
 import { CardModule } from 'primeng/card';
@@ -37,7 +38,7 @@ import { takeUntil } from "rxjs/operators";
     ConfirmDialogModule, ToastModule, SkeletonModule, TooltipModule,
     HasPermissionDirective
   ],
-  providers: [MessageService, ConfirmationService],
+  providers: [MessageService, ConfirmationService, HRMSService],
   templateUrl: './employee-details.component.html',
   styleUrl: './employee-details.component.scss'
 })
@@ -48,6 +49,7 @@ export class EmployeeDetailsComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   public userService = inject(UserManagementService);
+  public hrmsService = inject(HRMSService);
   private permissionService = inject(PermissionService);
   private messageService = inject(AppMessageService); // Updated injection
   private confirmationService = inject(ConfirmationService);
@@ -94,11 +96,17 @@ export class EmployeeDetailsComponent implements OnInit, OnDestroy {
 
   // --- Data Loading ---
   loadUserDetails() {
-    this.userService.getUser(this.userId).pipe(takeUntil(this.destroy$)).subscribe({
+    this.hrmsService.getEmployeeByUser(this.userId).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
-        const userData = res.data?.data || res.data?.user;
-        if (userData) {
-          this.user.set(userData);
+        const employeeData = res.data?.employee;
+        if (employeeData && employeeData.user) {
+          // Map the employee structure to match what the template expects for the user
+          const mappedUser = {
+            ...employeeData.user,
+            employee: employeeData,
+            branchId: employeeData.branchId // Use employee branch if populated
+          };
+          this.user.set(mappedUser);
         }
       },
       error: (err) => {

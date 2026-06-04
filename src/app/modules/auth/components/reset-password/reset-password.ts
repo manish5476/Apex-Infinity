@@ -58,13 +58,11 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
         this.resetForm.reset();
         const msg = 'Password reset successfully! You can now log in.';
         this.successMessage.set(msg);
-        this.messageService.showSuccess(msg);
       },
       error: (err) => {
         this.isLoading.set(false);
         const msg = err.error?.message || 'Something went wrong. Please try again.';
         this.errorMessage.set(msg);
-        this.messageService.handleHttpError(err);
       }
     });
   }

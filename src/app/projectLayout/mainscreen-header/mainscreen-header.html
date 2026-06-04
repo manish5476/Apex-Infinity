@@ -49,14 +49,8 @@
     </p-dialog>
 
     <!-- Notifications -->
-    <p-popover #notificationPopover styleClass="apex-notification-popover" appendTo="body">
-      <div class="notification-panel">
-        <app-notification-bell (close)="notificationPopover.hide()"></app-notification-bell>
-      </div>
-    </p-popover>
-
     <button *hasPermission="PERMISSIONS.NOTIFICATION.READ" class="icon-btn notification-btn"
-      [class.has-badge]="recentNotifications.length > 0" (click)="notificationPopover.toggle($event)"
+      [class.has-badge]="recentNotifications.length > 0" (click)="toggleNotificationPopover($event)"
       pTooltip="Notifications" tooltipPosition="bottom" aria-label="Notifications">
       <i class="pi pi-bell"></i>
       @if (recentNotifications.length > 0) {
@@ -64,6 +58,11 @@
       }
     </button>
 
+    <p-popover #notificationPopover styleClass="apex-notification-popover" appendTo="body">
+      <div class="notification-panel">
+        <app-notification-bell (close)="notificationPopover.hide()"></app-notification-bell>
+      </div>
+    </p-popover>
     <!-- Profile pill -->
     @if (currentUser()) {
     <p-popover #profilePopover styleClass="apex-profile-popover" appendTo="body">

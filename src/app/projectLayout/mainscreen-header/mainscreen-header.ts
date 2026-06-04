@@ -286,4 +286,21 @@ export class MainscreenHeader implements OnInit, OnDestroy {
     if (this.profileViewMode === 'dialog') this.profileDialogVisible = true;
     else popover.toggle(event);
   }
+
+  toggleNotificationPopover(event: Event) {
+    console.log('[DEBUG] Notification bell clicked. Event:', event);
+    console.log('[DEBUG] notificationPopover reference:', this.notificationPopover);
+    
+    if (this.notificationPopover) {
+      try {
+        this.notificationPopover.toggle(event);
+        console.log('[DEBUG] Toggle method called on popover');
+      } catch (err) {
+        console.error('[DEBUG] Error while toggling popover:', err);
+      }
+    } else {
+      console.error('[DEBUG] notificationPopover ViewChild is undefined!');
+    }
+  }
 }
+

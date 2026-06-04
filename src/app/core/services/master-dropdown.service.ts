@@ -55,6 +55,7 @@ export type DropdownEndpoint =
   | 'departments'
   | 'designations'
   | 'shifts'
+  | 'shift-groups'
   | 'shift-assignments'
   | 'holidays'
   | 'geofencing'

@@ -48,9 +48,6 @@ export class ForgotPasswordComponent implements OnDestroy {
       },
       error: (err) => {
         this.isLoading.set(false);
-
-        // Let the global error handler do the heavy lifting for you!
-        this.messageService.handleHttpError(err);
       }
     });
   }

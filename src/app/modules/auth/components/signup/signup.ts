@@ -111,16 +111,11 @@ export class Signup implements OnInit, OnDestroy {
     this.authService.employeeSignup(payload).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.isLoading.set(false);
-        const msg = 'Account created! Welcome to Apex.';
-        this.successMessage.set(msg);
-        this.messageService.showSuccess(msg);
-        this.router.navigateByUrl('/create-dashboard');
       },
       error: (err) => {
         this.isLoading.set(false);
         const msg = err.error?.message || 'Failed to create account. Please try again.';
         this.errorMessage.set(msg);
-        this.messageService.handleHttpError(err);
       }
     });
   }
