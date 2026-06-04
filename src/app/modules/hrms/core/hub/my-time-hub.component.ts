@@ -1,34 +1,40 @@
 import { Component, computed, signal, inject } from '@angular/core';
-
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { EntityCardComponent } from './entity-card/entity-card';
+import { Router } from '@angular/router';
+import { EntityCardComponent } from '../../../../projectLayout/create-dashboard/entity-card/entity-card';
 import { PermissionService } from '@core/auth/services/permission.service';
 import { PERMISSIONS } from '@core/auth/permissions.constants';
+import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 
-interface CreateEntity {
+interface HubAction {
   title: string;
   icon: string;
   description: string;
-  createRoute: string[];
+  createRoute?: string[];
+  openDialog?: boolean;
+  dialogComponent?: any;
   category: string;
   permissions?: string[];
 }
 
 @Component({
-  selector: 'app-create-dashboard',
+  selector: 'app-my-time-hub',
   standalone: true,
-  imports: [FormsModule, EntityCardComponent],
-  template: `<div class="create-dashboard-container">
+  imports: [CommonModule, FormsModule, EntityCardComponent],
+  providers: [DialogService],
+  template: `
+<div class="create-dashboard-container">
   <div class="dashboard-header">
     <div class="header-content">
-      <h1>What would you like to create?</h1>
-      <p>Select a form below to add new entities to the system.</p>
+      <h1>My Time Hub</h1>
+      <p>Manage your attendance, timesheet, leaves, and requests all in one place.</p>
     </div>
 
     <div class="search-bar">
       <i class="pi pi-search"></i>
       <input type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
-        placeholder="Search for forms (e.g., 'Invoice', 'Product')..." />
+        placeholder="Search for 'Clock', 'Leave', etc..." />
     </div>
   </div>
 
@@ -42,22 +48,24 @@ interface CreateEntity {
   </div>
 
   <div class="grid-container">
-    @for (entity of filteredEntities(); track entity) {
-      <app-entity-card [title]="entity.title" [icon]="entity.icon"
-        [description]="entity.description" [createRoute]="entity.createRoute">
+    @for (action of filteredActions(); track action) {
+      <app-entity-card [title]="action.title" [icon]="action.icon"
+        [description]="action.description" [createRoute]="action.createRoute!"
+        (click)="handleActionClick($event, action)">
       </app-entity-card>
     }
 
-    @if (filteredEntities().length === 0) {
+    @if (filteredActions().length === 0) {
       <div class="empty-state">
         <i class="pi pi-inbox"></i>
-        <p>No forms found matching your criteria.</p>
+        <p>No actions found matching your criteria.</p>
       </div>
     }
   </div>
-</div>`,
-  styles: `.create-dashboard-container {
-
+</div>
+  `,
+  styles: [`
+.create-dashboard-container {
   padding: var(--spacing-3xl) var(--spacing-xl);
   max-width: 1400px;
   margin: 0 auto;
@@ -138,7 +146,7 @@ interface CreateEntity {
     }
   }
 
-  /* --- Category Tabs (The Modern Way) --- */
+  /* --- Category Tabs --- */
   .category-tabs {
     display: flex;
     gap: var(--spacing-sm);
@@ -166,7 +174,7 @@ interface CreateEntity {
 
       &.active {
         background: var(--accent-primary);
-        color: white; // Or use a theme-text-on-accent token
+        color: white; 
         box-shadow: var(--shadow-md);
       }
     }
@@ -198,11 +206,8 @@ interface CreateEntity {
       }
     }
   }
-}
 
-/* --- Responsive Adjustments --- */
-@media (max-width: 768px) {
-  .create-dashboard-container {
+  @media (max-width: 768px) {
     .dashboard-header {
       flex-direction: column;
       align-items: flex-start;
@@ -218,110 +223,136 @@ interface CreateEntity {
       border-radius: var(--ui-border-radius);
     }
   }
-}`
-  // styleUrl: './create-dashboard.scss'
+}
+  `]
 })
-export class CreateDashboardComponent {
+export class MyTimeHubComponent {
   private permService = inject(PermissionService);
+  private dialogService = inject(DialogService);
+  private router = inject(Router);
 
   searchQuery = signal('');
   activeCategory = signal('All');
 
-  categories = ['All', 'Sales & Billing', 'Inventory & Purchase', 'HRMS', 'Workspace', 'Administration'];
+  categories = ['All', 'Attendance', 'Leave & Time Off', 'Manager Approvals'];
 
-  private allEntities: CreateEntity[] = [
+  private allActions: HubAction[] = [
     {
-      title: 'Scan Invoice (POS)',
-      icon: 'pi pi-shopping-cart',
-      description: 'Quickly scan items and generate a Point of Sale invoice.',
-      createRoute: ['/invoices/PosInvoiceComponent'],
-      category: 'Sales & Billing',
-      permissions: [PERMISSIONS.INVOICE.CREATE]
+      title: 'Web Clock',
+      icon: 'pi pi-clock',
+      description: 'Check in or out for the day using the web clock.',
+      createRoute: ['/hrms/attendance/my-clock'],
+      category: 'Attendance'
     },
     {
-      title: 'Standard Invoice',
-      icon: 'pi pi-file-edit',
-      description: 'Create a detailed standard invoice for a customer.',
-      createRoute: ['/invoices/create'],
-      category: 'Sales & Billing',
-      permissions: [PERMISSIONS.INVOICE.CREATE]
+      title: 'My Timesheet',
+      icon: 'pi pi-file',
+      description: 'View your daily attendance and total working hours.',
+      createRoute: ['/hrms/daily-attendance/my-timesheet'],
+      category: 'Attendance'
     },
     {
-      title: 'New Product',
-      icon: 'pi pi-box',
-      description: 'Add a new product to your inventory system.',
-      createRoute: ['/product/create'],
-      category: 'Inventory & Purchase',
-      permissions: [PERMISSIONS.PRODUCT.CREATE]
+      title: 'Request Regularization',
+      icon: 'pi pi-calendar-plus',
+      description: 'Apply for missed punches or attendance correction.',
+      openDialog: true,
+      category: 'Attendance'
     },
     {
-      title: 'Purchase Order',
-      icon: 'pi pi-truck',
-      description: 'Create a new purchase order for your suppliers.',
-      createRoute: ['/purchase/create'],
-      category: 'Inventory & Purchase',
-      permissions: [PERMISSIONS.PURCHASE.CREATE]
+      title: 'My Requests History',
+      icon: 'pi pi-history',
+      description: 'View the status of your past regularization requests.',
+      createRoute: ['/hrms/attendance-requests/my-requests'],
+      category: 'Attendance'
     },
     {
-      title: 'New Department',
-      icon: 'pi pi-building',
-      description: 'Configure a new organizational department.',
-      createRoute: ['/hrms/department/new'],
-      category: 'HRMS',
-      permissions: [PERMISSIONS.DEPARTMENT.MANAGE]
+      title: 'Leave Center',
+      icon: 'pi pi-calendar-minus',
+      description: 'View your leave balances and request history.',
+      createRoute: ['/hrms/leave/hub'],
+      category: 'Leave & Time Off'
     },
     {
-      title: 'New Designation',
-      icon: 'pi pi-id-card',
-      description: 'Create a new job role or designation.',
-      createRoute: ['/hrms/designation/new'],
-      category: 'HRMS',
-      permissions: [PERMISSIONS.DESIGNATION.MANAGE]
+      title: 'Apply for Leave',
+      icon: 'pi pi-plane',
+      description: 'Submit a new leave request (Sick, Casual, Earned).',
+      openDialog: true,
+      category: 'Leave & Time Off'
     },
     {
-      title: 'Onboard User',
-      icon: 'pi pi-user-plus',
-      description: 'Add a new employee or user to the system.',
-      createRoute: ['/user/create'],
-      category: 'Administration',
-      permissions: [PERMISSIONS.USER.MANAGE]
+      title: 'Pending Regularizations',
+      icon: 'pi pi-check-square',
+      description: 'Review and approve team attendance regularization requests.',
+      createRoute: ['/hrms/attendance-requests/approvals'],
+      category: 'Manager Approvals',
+      permissions: [PERMISSIONS.USER.READ] // Any minimal manager permission, or we can filter conditionally later
     },
     {
-      title: 'New Note',
-      icon: 'pi pi-pen-to-square',
-      description: 'Jot down a new note or memo.',
-      createRoute: ['/notes/create'],
-      category: 'Workspace',
-      permissions: [PERMISSIONS.NOTE.WRITE]
+      title: 'Pending Leaves',
+      icon: 'pi pi-inbox',
+      description: 'Review and approve team leave requests.',
+      createRoute: ['/hrms/leave/hub'],
+      category: 'Manager Approvals',
+      permissions: [PERMISSIONS.USER.READ]
     }
   ];
 
-  filteredEntities = computed(() => {
+  filteredActions = computed(() => {
     // 1. Filter by permissions
-    let entities = this.allEntities.filter(entity => {
-      if (!entity.permissions) return true;
-      return this.permService.check(entity.permissions);
+    let actions = this.allActions.filter(action => {
+      if (!action.permissions) return true;
+      return this.permService.check(action.permissions);
     });
 
     // 2. Filter by category
     const cat = this.activeCategory();
     if (cat !== 'All') {
-      entities = entities.filter(e => e.category === cat);
+      actions = actions.filter(a => a.category === cat);
     }
 
     // 3. Filter by search query
     const q = this.searchQuery().toLowerCase().trim();
     if (q) {
-      entities = entities.filter(e =>
-        e.title.toLowerCase().includes(q) ||
-        e.description.toLowerCase().includes(q)
+      actions = actions.filter(a =>
+        a.title.toLowerCase().includes(q) ||
+        a.description.toLowerCase().includes(q)
       );
     }
 
-    return entities;
+    return actions;
   });
 
   setCategory(cat: string) {
     this.activeCategory.set(cat);
+  }
+
+  handleActionClick(event: Event, action: HubAction) {
+    if (action.openDialog) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (action.title === 'Apply for Leave') {
+        import('../leave/leave-form.component').then(m => {
+          this.dialogService.open(m.LeaveFormComponent, {
+            header: 'Apply for Leave',
+            width: '600px',
+            contentStyle: { overflow: 'auto' },
+            baseZIndex: 10000,
+            maximizable: true
+          });
+        });
+      } else if (action.title === 'Request Regularization') {
+        import('../attendence/requests/attendance-request-form.component').then(m => {
+          this.dialogService.open(m.AttendanceRequestFormComponent, {
+            header: 'New Regularization Request',
+            width: '600px',
+            contentStyle: { overflow: 'auto' },
+            baseZIndex: 10000,
+            maximizable: true
+          });
+        });
+      }
+    } else if (action.createRoute) {
+      this.router.navigate(action.createRoute);
+    }
   }
 }

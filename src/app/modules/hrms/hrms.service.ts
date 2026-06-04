@@ -1,6 +1,7 @@
 // services/hrms.service.ts
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
+import { HttpParams } from '@angular/common/http';
 import { BaseApiService } from '../../core/services/base-api.service';
 
 export interface Department {
@@ -1429,5 +1430,31 @@ export class HRMSService extends BaseApiService {
    */
   copyHolidaysFromYear(fromYear: number, toYear: number, branchId?: string): Observable<{ status: string; data: any }> {
     return this.post<{ status: string; data: any }>('/v1/hrms/attendance/holidays/copy-year', { fromYear, toYear, branchId });
+  }
+
+  // --- ATTENDANCE REQUESTS ---
+
+  createAttendanceRequest(data: any): Observable<any> {
+    return this.post<any>('/v1/hrms/attendance-requests', data);
+  }
+
+  getMyAttendanceRequests(): Observable<any> {
+    return this.get<any>('/v1/hrms/attendance-requests/my-requests');
+  }
+
+  getPendingAttendanceApprovals(): Observable<any> {
+    return this.get<any>('/v1/hrms/attendance-requests/pending-approvals');
+  }
+
+  approveAttendanceRequest(id: string, payload: any): Observable<any> {
+    return this.patch<any>(`/v1/hrms/attendance-requests/${id}/approve`, payload);
+  }
+
+  rejectAttendanceRequest(id: string, payload: any): Observable<any> {
+    return this.patch<any>(`/v1/hrms/attendance-requests/${id}/reject`, payload);
+  }
+
+  cancelAttendanceRequest(id: string, payload: any): Observable<any> {
+    return this.patch<any>(`/v1/hrms/attendance-requests/${id}/cancel`, payload);
   }
 }

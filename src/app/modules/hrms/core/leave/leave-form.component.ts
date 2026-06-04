@@ -1,9 +1,9 @@
 import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { of, Subject } from 'rxjs';
+import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
 
 // Services
 import { MessageService } from 'primeng/api';
@@ -20,6 +20,7 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { SelectModule } from 'primeng/select';
 import { HRMSService } from '../../hrms.service';
 import { AppMessageService } from '@core/services/message.service';
+import { UserManagementService } from '../../../user/user-management.service';
 
 @Component({
   selector: 'app-leave-form',
@@ -35,37 +36,33 @@ import { AppMessageService } from '@core/services/message.service';
     FileUploadModule,
     ToastModule,
     SkeletonModule
-],
+  ],
   providers: [MessageService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <p-toast position="top-right"></p-toast>
 
-    <div class="page-wrapper fade-in">
-      <header class="dashboard-header slide-down mb-5">
-        <div class="header-left">
-          <p-button icon="pi pi-arrow-left" [text]="true" [rounded]="true" size="large" styleClass="back-btn" (onClick)="onCancel()"></p-button>
-          <div class="header-titles">
-            <h1 class="page-title">{{ isEditMode() ? 'Edit Leave Request' : 'Apply for Leave' }}</h1>
-            <p class="page-subtitle">Fill in the details below to submit your time-off request.</p>
-          </div>
-        </div>
-      </header>
-
       @if (isLoading()) {
         <p-card styleClass="premium-card glass-card"><p-skeleton width="100%" height="400px"></p-skeleton></p-card>
       } @else {
-        <form [formGroup]="leaveForm" (ngSubmit)="onSubmit()" class="flex-col gap-5 pb-6">
+        <form [formGroup]="leaveForm" (ngSubmit)="onSubmit()" class="flex-col gap-5 pb-6 pt-2">
           
           <div class="grid-layout">
             <div class="flex-col gap-5">
-              <p-card styleClass="premium-card glass-card slide-down" styleClass="animation-delay: 0.1s">
+              <p-card styleClass="premium-card glass-card slide-down" [style]="{'animation-delay': '0.1s'}">
                 <h3 class="section-title mb-4"><i class="pi pi-calendar text-primary"></i> Leave Details</h3>
                 
                 <div class="input-group mb-4">
                   <label class="info-label">Leave Type <span class="text-error">*</span></label>
                   <p-select formControlName="leaveType" [options]="leaveTypes" optionLabel="label" optionValue="value" placeholder="Select Leave Type" styleClass="w-full premium-dropdown" [filter]="true" filterBy="label"></p-select>
 
+                </div>
+
+                <div class="grid-2 gap-4 mb-4">
+                  <div class="input-group">
+                    <label class="info-label">Assigned Approver <span class="text-error">*</span></label>
+                    <p-select formControlName="assignedApprover" [options]="approvers" optionLabel="name" optionValue="_id" placeholder="Select Approver" styleClass="w-full premium-dropdown" [filter]="true" filterBy="name"></p-select>
+                  </div>
                 </div>
 
                 <div class="grid-2 gap-4 mb-4">
@@ -98,7 +95,7 @@ import { AppMessageService } from '@core/services/message.service';
                 </div>
               </p-card>
 
-              <p-card styleClass="premium-card glass-card slide-down" styleClass="animation-delay: 0.2s">
+              <p-card styleClass="premium-card glass-card slide-down" [style]="{'animation-delay': '0.2s'}">
                 <h3 class="section-title mb-4"><i class="pi pi-align-left text-primary"></i> Reason & Notes</h3>
                 
                 <div class="input-group mb-4">
@@ -114,7 +111,7 @@ import { AppMessageService } from '@core/services/message.service';
             </div>
 
             <div class="flex-col gap-5">
-              <p-card styleClass="premium-card glass-card slide-down" styleClass="animation-delay: 0.15s">
+              <p-card styleClass="premium-card glass-card slide-down" [style]="{'animation-delay': '0.15s'}">
                 <h3 class="section-title mb-4"><i class="pi pi-users text-primary"></i> Work Handover</h3>
                 
                 <div class="input-group mb-4">
@@ -128,7 +125,7 @@ import { AppMessageService } from '@core/services/message.service';
                 </div>
               </p-card>
 
-              <p-card styleClass="premium-card glass-card slide-down" styleClass="animation-delay: 0.25s">
+              <p-card styleClass="premium-card glass-card slide-down" [style]="{'animation-delay': '0.25s'}">
                 <h3 class="section-title mb-4"><i class="pi pi-phone text-primary"></i> Emergency Contact</h3>
                 <div formGroupName="emergencyContact" class="flex-col gap-4">
                   <div class="input-group">
@@ -156,7 +153,7 @@ import { AppMessageService } from '@core/services/message.service';
           </div>
         </form>
       }
-    </div>
+    
   `,
   styles: [`
     :host { display: block; font-family: var(--font-body); color: var(--text-primary); }
@@ -216,12 +213,13 @@ import { AppMessageService } from '@core/services/message.service';
   `]
 })
 export class LeaveFormComponent implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   private fb = inject(FormBuilder);
   private hrmsService = inject(HRMSService);
+  private userService = inject(UserManagementService);
   private messageService = inject(AppMessageService);
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
+  private ref = inject(DynamicDialogRef, { optional: true });
+  private config = inject(DynamicDialogConfig, { optional: true });
   private readonly objectIdPattern = /^[a-f\d]{24}$/i;
 
   leaveForm!: FormGroup;
@@ -229,6 +227,7 @@ export class LeaveFormComponent implements OnInit, OnDestroy {
   isSaving = signal(false);
   isEditMode = signal(false);
   leaveId: string | null = null;
+  approvers: any[] = [];
 
   leaveTypes = [
     { label: 'Casual Leave (CL)', value: 'casual' },
@@ -248,7 +247,8 @@ export class LeaveFormComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.initForm();
-    this.leaveId = this.route.snapshot.paramMap.get('id');
+    this.fetchApprovers();
+    this.leaveId = this.config?.data?.id || null;
 
     if (this.leaveId) {
       this.isEditMode.set(true);
@@ -258,9 +258,19 @@ export class LeaveFormComponent implements OnInit, OnDestroy {
     }
   }
 
+  fetchApprovers() {
+    this.userService.getAllUsers({ limit: 1000 }).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (res: any) => {
+        this.approvers = res.data?.users || [];
+      },
+      error: () => this.messageService.showError('Failed to load approvers.')
+    });
+  }
+
   private initForm() {
     this.leaveForm = this.fb.group({
       leaveType: [null, Validators.required],
+      assignedApprover: [null, Validators.required],
       startDate: [null, Validators.required],
       endDate: [null, Validators.required],
       startSession: ['full'],
@@ -336,6 +346,7 @@ export class LeaveFormComponent implements OnInit, OnDestroy {
 
     const payload: any = {
       leaveType: raw.leaveType,
+      assignedApprover: raw.assignedApprover,
       startDate: raw.startDate,
       endDate: raw.endDate,
       startSession: raw.startSession,
@@ -356,21 +367,29 @@ export class LeaveFormComponent implements OnInit, OnDestroy {
         this.messageService.handleHttpError(err)
         return of(null);
       }),
-      finalize(() => this.isSaving.set(false)), takeUntil(this.destroy$)
-    ).subscribe(res => {
-      if (res) {
-        // this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Leave request submitted.' });
-        setTimeout(() => this.onCancel(), 1000);
-      }
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: res => {
+        if (res) {
+          if (this.ref) {
+            this.ref.close(res);
+          }
+        }
+      },
+      complete: () => this.isSaving.set(false)
     });
   }
 
   onCancel() {
-    this.router.navigate(['/hrms/leave/hub']);
+    if (this.ref) {
+      this.ref.close();
+    } else {
+      window.history.back();
+    }
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

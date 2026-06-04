@@ -1,14 +1,10 @@
 import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { forkJoin, of, Subject } from 'rxjs';
 import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
 
-// Services
 import { MessageService } from 'primeng/api';
-import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
-
-// PrimeNG Modules
 import { TabsModule } from 'primeng/tabs';
 import { TableModule } from 'primeng/table';
 import { CardModule } from 'primeng/card';
@@ -17,37 +13,40 @@ import { TagModule } from 'primeng/tag';
 import { SkeletonModule } from 'primeng/skeleton';
 import { AvatarModule } from 'primeng/avatar';
 import { TooltipModule } from 'primeng/tooltip';
-import { ProgressBarModule } from 'primeng/progressbar';
-import { HRMSService } from '../../hrms.service';
 import { AppMessageService } from '@core/services/message.service';
+import { DialogModule } from 'primeng/dialog';
+import { FormsModule } from '@angular/forms';
+import { InputTextModule } from 'primeng/inputtext';
+import { TextareaModule } from 'primeng/textarea';
+import { HRMSService } from '../../../hrms.service';
 
 @Component({
-  selector: 'app-leave-hub',
+  selector: 'app-attendance-requests',
   standalone: true,
   imports: [
     CommonModule, TabsModule, TableModule, CardModule,
     ButtonModule, TagModule, SkeletonModule, AvatarModule,
-    TooltipModule, ProgressBarModule
+    TooltipModule, DialogModule, InputTextModule, TextareaModule, FormsModule
   ],
-  providers: [MessageService, DialogService],
+  providers: [MessageService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="apex-page fade-in flex-col h-screen">
       
       <header class="apex-header apex-header--elevated flex-shrink-0">
         <div class="flex-align gap-4">
-          <div class="apex-card__icon" style="width: 48px; height: 48px; font-size: 20px;"><i class="pi pi-calendar-minus"></i></div>
+          <div class="apex-card__icon" style="width: 48px; height: 48px; font-size: 20px;"><i class="pi pi-calendar-plus"></i></div>
           <div class="flex-col">
-            <h1 class="apex-page-header__title m-0" style="font-size: var(--font-size-2xl);">Leave & Time Off</h1>
-            <p class="apex-page-header__subtitle m-0 text-sm text-tertiary">Manage your time off requests, balances, and team approvals.</p>
+            <h1 class="apex-page-header__title m-0" style="font-size: var(--font-size-2xl);">Attendance Regularization</h1>
+            <p class="apex-page-header__subtitle m-0 text-sm text-tertiary">Manage missed punches and attendance corrections.</p>
           </div>
         </div>
         <div class="header-right ml-auto">
           <p-button 
-            label="Apply for Leave" 
+            label="Apply for Regularization" 
             icon="pi pi-plus" 
             styleClass="apex-btn apex-btn--primary"
-            (onClick)="onApplyLeave()">
+            (onClick)="onApplyRequest()">
           </p-button>
         </div>
       </header>
@@ -55,19 +54,14 @@ import { AppMessageService } from '@core/services/message.service';
       <main class="apex-content flex-1 overflow-auto flex-col p-4 sm:p-5">
         @if (isLoading()) {
           <div class="flex-col gap-4 h-full">
-            <div class="apex-grid apex-grid--3">
-              <p-skeleton height="8rem" borderRadius="var(--ui-border-radius-lg)"></p-skeleton>
-              <p-skeleton height="8rem" borderRadius="var(--ui-border-radius-lg)"></p-skeleton>
-              <p-skeleton height="8rem" borderRadius="var(--ui-border-radius-lg)"></p-skeleton>
-            </div>
             <p-skeleton height="400px" borderRadius="var(--ui-border-radius-lg)"></p-skeleton>
           </div>
         } @else {
           
           <div class="apex-card apex-card--surface h-full flex-col p-0 border-0 shadow-none overflow-hidden slide-down">
-            <p-tabs value="0" styleClass="h-full flex-col w-full">
+            <p-tabs [value]="activeTab()" (valueChange)="activeTab.set($event)" styleClass="h-full flex-col w-full">
               <p-tablist styleClass="hub-tablist px-4 border-bottom bg-surface">
-                <p-tab value="0"><div class="tab-label flex-align gap-2"><i class="pi pi-user"></i> My Leave Requests</div></p-tab>
+                <p-tab value="0"><div class="tab-label flex-align gap-2"><i class="pi pi-user"></i> My Requests</div></p-tab>
                 <p-tab value="1">
                   <div class="tab-label flex-align gap-2">
                     <i class="pi pi-inbox"></i> Pending Approvals
@@ -83,43 +77,6 @@ import { AppMessageService } from '@core/services/message.service';
                 <p-tabpanel value="0">
                   <div class="panel-inner p-4 sm:p-6 h-full overflow-auto">
                     
-                    @if (balances(); as bal) {
-                      <div class="apex-grid apex-grid--3 mb-5">
-                        <div class="apex-card casual-card p-4">
-                          <div class="flex-between">
-                            <span class="text-sm font-bold uppercase tracking-wider text-slate-600">Casual Leave (CL)</span>
-                            <i class="pi pi-sun text-xl text-slate-500"></i>
-                          </div>
-                          <div class="mt-4">
-                            <div class="text-3xl font-bold text-slate-700 m-0">{{ bal.casual?.available || 0 }} <span class="text-lg text-slate-500 font-medium">/ {{ bal.casual?.total || 0 }}</span></div>
-                            <p-progressBar [value]="getPercentage(bal.casual?.available, bal.casual?.total)" [showValue]="false" styleClass="mt-2 h-2"></p-progressBar>
-                          </div>
-                        </div>
-
-                        <div class="apex-card sick-card p-4">
-                          <div class="flex-between">
-                            <span class="text-sm font-bold uppercase tracking-wider text-sky-700">Sick Leave (SL)</span>
-                            <i class="pi pi-heart-fill text-xl text-sky-600"></i>
-                          </div>
-                          <div class="mt-4">
-                            <div class="text-3xl font-bold text-sky-800 m-0">{{ bal.sick?.available || 0 }} <span class="text-lg text-sky-600 font-medium">/ {{ bal.sick?.total || 0 }}</span></div>
-                            <p-progressBar [value]="getPercentage(bal.sick?.available, bal.sick?.total)" [showValue]="false" styleClass="mt-2 h-2"></p-progressBar>
-                          </div>
-                        </div>
-
-                        <div class="apex-card earned-card p-4">
-                          <div class="flex-between">
-                            <span class="text-sm font-bold uppercase tracking-wider text-orange-700">Earned Leave (EL)</span>
-                            <i class="pi pi-star-fill text-xl text-orange-600"></i>
-                          </div>
-                          <div class="mt-4">
-                            <div class="text-3xl font-bold text-orange-800 m-0">{{ bal.earned?.available || 0 }} <span class="text-lg text-orange-600 font-medium">/ {{ bal.earned?.total || 0 }}</span></div>
-                            <p-progressBar [value]="getPercentage(bal.earned?.available, bal.earned?.total)" [showValue]="false" styleClass="mt-2 h-2"></p-progressBar>
-                          </div>
-                        </div>
-                      </div>
-                    }
-
                     <h3 class="apex-section__title mb-4 mt-0">
                       <i class="pi pi-history text-tertiary"></i> Request History
                     </h3>
@@ -132,40 +89,32 @@ import { AppMessageService } from '@core/services/message.service';
                       styleClass="premium-table border-round-lg overflow-hidden border border-primary surface-border">
                       <ng-template pTemplate="header">
                         <tr>
-                          <th>Request ID & Type</th>
-                          <th>Duration</th>
-                          <th>Days</th>
+                          <th>Target Date</th>
+                          <th>Request Type</th>
                           <th>Status</th>
+                          <th>Reason</th>
                           <th class="text-right">Applied On</th>
                         </tr>
                       </ng-template>
                       <ng-template pTemplate="body" let-req>
-                        <tr class="table-row-hover cursor-pointer" (click)="viewDetails(req.leaveRequestId)">
-                          <td>
-                            <div class="flex-col gap-1">
-                              <span class="font-bold text-primary-color capitalize">{{ req.leaveType }} Leave</span>
-                              <span class="badge-mono-sm w-max">{{ req.leaveRequestId }}</span>
-                            </div>
-                          </td>
+                        <tr class="table-row-hover">
                           <td>
                             <div class="flex-align gap-2 text-sm text-secondary font-medium">
                               <i class="pi pi-calendar text-tertiary"></i>
-                              <span>{{ req.startDate | date:'dd MMM yyyy' }}</span>
-                              <i class="pi pi-arrow-right text-xs text-tertiary mx-1"></i>
-                              <span>{{ req.endDate | date:'dd MMM yyyy' }}</span>
+                              <span>{{ req.targetDate | date:'dd MMM yyyy' }}</span>
                             </div>
-                            @if (req.daysCount === 0.5) {
-                              <div class="text-xs text-tertiary mt-1">Half Day ({{ req.startSession | titlecase }})</div>
-                            }
                           </td>
                           <td>
-                            <span class="font-bold text-lg">{{ req.daysCount }}</span> <span class="text-secondary text-sm">day(s)</span>
+                            <span class="font-bold text-primary-color capitalize">{{ req.type?.replace('_', ' ') }}</span>
                           </td>
                           <td>
                             <p-tag [severity]="getStatusSeverity(req.status)" [value]="req.status | titlecase"></p-tag>
                           </td>
+                          <td>
+                            <span class="text-secondary text-sm line-clamp-1" [pTooltip]="req.correction?.reason">{{ req.correction?.reason || 'N/A' }}</span>
+                          </td>
                           <td class="text-right text-sm text-tertiary font-medium">
-                            {{ req.appliedAt | date:'mediumDate' }}
+                            {{ req.createdAt | date:'mediumDate' }}
                           </td>
                         </tr>
                       </ng-template>
@@ -174,8 +123,8 @@ import { AppMessageService } from '@core/services/message.service';
                           <td colspan="5" class="text-center py-6">
                             <div class="empty-glass-state">
                               <i class="pi pi-file-o text-4xl text-tertiary mb-3"></i>
-                              <h4 class="m-0 mb-1 text-primary-color">No Leave Requests</h4>
-                              <p class="m-0 text-secondary">You haven't applied for any leaves yet.</p>
+                              <h4 class="m-0 mb-1 text-primary-color">No Requests Found</h4>
+                              <p class="m-0 text-secondary">You haven't submitted any regularization requests.</p>
                             </div>
                           </td>
                         </tr>
@@ -197,39 +146,34 @@ import { AppMessageService } from '@core/services/message.service';
                                   <p-avatar [label]="getInitials(approval.user?.name)" shape="circle" size="large" [style]="{'background-color': 'var(--accent-focus)', 'color': 'var(--accent-primary)'}"></p-avatar>
                                   <div class="flex-col">
                                     <span class="font-bold text-primary-color">{{ approval.user?.name || 'Employee' }}</span>
-                                    <span class="text-xs text-secondary">{{ approval.user?.employee?.employeeId || 'ID N/A' }}</span>
                                   </div>
                                 </div>
-                                <span class="badge-mono-sm">{{ approval.leaveRequestId }}</span>
+                                <span class="badge-mono-sm">{{ approval.type }}</span>
                               </div>
 
                               <div class="grid-2 gap-3 flex-1">
                                 <div class="info-group">
-                                  <span class="info-label text-tertiary">Leave Type</span>
-                                  <div class="flex-align gap-2 mt-1">
-                                    <div class="type-dot" [ngClass]="approval.leaveType"></div>
-                                    <span class="font-bold capitalize text-sm">{{ approval.leaveType }} Leave</span>
-                                  </div>
+                                  <span class="info-label text-tertiary">Target Date</span>
+                                  <span class="font-medium mt-1 text-sm"><i class="pi pi-calendar text-xs mr-1"></i> {{ approval.targetDate | date:'dd MMM yyyy' }}</span>
                                 </div>
                                 <div class="info-group">
-                                  <span class="info-label text-tertiary">Duration</span>
-                                  <span class="font-medium mt-1 text-sm">{{ approval.daysCount }} Day(s)</span>
-                                </div>
-                                <div class="info-group span-2 bg-primary-light p-2 border-radius-sm">
-                                  <span class="text-sm font-medium text-primary-color flex-align gap-2">
-                                    <i class="pi pi-calendar"></i>
-                                    {{ approval.startDate | date:'dd MMM yyyy' }} - {{ approval.endDate | date:'dd MMM yyyy' }}
-                                  </span>
-                                </div>
-                                <div class="info-group span-2">
                                   <span class="info-label text-tertiary">Reason</span>
-                                  <p class="m-0 text-sm text-secondary mt-1 line-clamp-2" [pTooltip]="approval.reason">{{ approval.reason }}</p>
+                                  <span class="font-medium mt-1 text-sm line-clamp-1" [pTooltip]="approval.correction?.reason">{{ approval.correction?.reason || 'N/A' }}</span>
                                 </div>
+                                
+                                @if(approval.type === 'missed_punch') {
+                                  <div class="info-group span-2 bg-primary-light p-2 border-radius-sm">
+                                    <span class="text-sm font-medium text-primary-color flex-align gap-2">
+                                      <i class="pi pi-clock"></i>
+                                      Proposed: IN {{ approval.correction?.inTime || '--:--' }} | OUT {{ approval.correction?.outTime || '--:--' }}
+                                    </span>
+                                  </div>
+                                }
                               </div>
 
                               <div class="flex-align gap-2 pt-3 border-top mt-auto">
-                                <p-button label="Approve" icon="pi pi-check" styleClass="apex-btn apex-btn--sm bg-success text-white border-0 w-full" (onClick)="actionRequest(approval._id, 'approve')"></p-button>
-                                <p-button label="Reject" icon="pi pi-times" styleClass="apex-btn apex-btn--sm apex-btn--secondary w-full" (onClick)="actionRequest(approval._id, 'reject')"></p-button>
+                                <p-button label="Approve" icon="pi pi-check" styleClass="apex-btn apex-btn--sm bg-success text-white border-0 w-full" (onClick)="openActionDialog(approval._id, 'approve')"></p-button>
+                                <p-button label="Reject" icon="pi pi-times" styleClass="apex-btn apex-btn--sm apex-btn--secondary w-full" (onClick)="openActionDialog(approval._id, 'reject')"></p-button>
                               </div>
                             </div>
                           </div>
@@ -239,7 +183,7 @@ import { AppMessageService } from '@core/services/message.service';
                       <div class="empty-glass-state h-full flex-center py-6">
                         <div class="icon-circle-large mb-3 bg-success-light text-success"><i class="pi pi-check-circle"></i></div>
                         <h3 class="m-0 mb-1 text-primary-color font-heading">All Caught Up!</h3>
-                        <p class="m-0 text-secondary">There are no pending leave requests requiring your approval.</p>
+                        <p class="m-0 text-secondary">There are no pending requests requiring your approval.</p>
                       </div>
                     }
                   </div>
@@ -250,17 +194,27 @@ import { AppMessageService } from '@core/services/message.service';
           </div>
         }
       </main>
+
+      <p-dialog [(visible)]="showActionDialog" [header]="dialogAction === 'approve' ? 'Approve Request' : 'Reject Request'" [modal]="true" [style]="{width: '450px'}" styleClass="apex-dialog">
+        <div class="flex-col gap-4 pt-2">
+          <p class="m-0 text-secondary">Please provide {{ dialogAction === 'approve' ? 'optional comments' : 'a mandatory reason' }} for this action.</p>
+          <div class="field">
+            <label class="apex-label block mb-2">{{ dialogAction === 'approve' ? 'Comments' : 'Reason *' }}</label>
+            <textarea pTextarea [(ngModel)]="actionComments" rows="3" class="w-full apex-input" placeholder="Type here..."></textarea>
+          </div>
+        </div>
+        <ng-template pTemplate="footer">
+          <p-button label="Cancel" icon="pi pi-times" (onClick)="showActionDialog = false" styleClass="p-button-text p-button-secondary"></p-button>
+          <p-button [label]="dialogAction === 'approve' ? 'Confirm Approval' : 'Confirm Rejection'" [icon]="dialogAction === 'approve' ? 'pi pi-check' : 'pi pi-times'" 
+            [styleClass]="dialogAction === 'approve' ? 'p-button-success' : 'p-button-danger'" 
+            (onClick)="confirmAction()" 
+            [disabled]="dialogAction === 'reject' && !actionComments.trim()"></p-button>
+        </ng-template>
+      </p-dialog>
     </div>
   `,
   styles: [`
-    :host {
-      display: block; 
-      width: 100%; 
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    /* Utility Helpers */
+    :host { display: block; width: 100%; height: 100vh; overflow: hidden; }
     .flex-col { display: flex; flex-direction: column; }
     .flex-between { display: flex; justify-content: space-between; align-items: center; }
     .flex-align { display: flex; align-items: center; }
@@ -268,46 +222,34 @@ import { AppMessageService } from '@core/services/message.service';
     .flex-shrink-0 { flex-shrink: 0; }
     .flex-1 { flex: 1; }
     .ml-auto { margin-left: auto; }
-    
     .w-full { width: 100%; }
-    .w-max { width: max-content; }
     .h-screen { height: 100vh; }
     .h-full { height: 100%; }
-    .h-2 { height: 0.5rem; }
-    
     .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); }
     .span-2 { grid-column: span 2; }
-    
-    .gap-1 { gap: var(--spacing-xs); }
     .gap-2 { gap: var(--spacing-sm); }
     .gap-3 { gap: var(--spacing-md); }
     .gap-4 { gap: var(--spacing-lg); }
-    
     .m-0 { margin: 0; }
     .mt-0 { margin-top: 0; }
     .mt-1 { margin-top: var(--spacing-xs); }
-    .mt-2 { margin-top: var(--spacing-sm); }
-    .mt-4 { margin-top: var(--spacing-xl); }
     .mt-auto { margin-top: auto; }
     .mb-1 { margin-bottom: var(--spacing-xs); }
+    .mb-2 { margin-bottom: var(--spacing-sm); }
     .mb-3 { margin-bottom: var(--spacing-md); }
     .mb-4 { margin-bottom: var(--spacing-lg); }
-    .mb-5 { margin-bottom: var(--spacing-2xl); }
-    .mx-1 { margin-left: var(--spacing-xs); margin-right: var(--spacing-xs); }
-    
+    .mr-1 { margin-right: var(--spacing-xs); }
     .p-0 { padding: 0 !important; }
     .p-2 { padding: var(--spacing-sm); }
     .p-4 { padding: var(--spacing-xl); }
+    .pt-2 { padding-top: var(--spacing-sm); }
     .pt-3 { padding-top: var(--spacing-md); }
     .pb-3 { padding-bottom: var(--spacing-md); }
     .py-6 { padding-top: var(--spacing-4xl); padding-bottom: var(--spacing-4xl); }
-    
     .bg-surface { background: var(--bg-secondary); }
     .bg-primary-light { background: var(--color-primary-bg, #eff6ff); }
     .bg-success-light { background: var(--color-success-bg, #ecfdf5); }
     .bg-success { background: var(--color-success) !important; color: #fff !important; }
-    
-    .border { border: 1px solid var(--border-primary); }
     .border-0 { border: none !important; }
     .border-top { border-top: 1px solid var(--border-primary); }
     .border-bottom { border-bottom: 1px solid var(--border-primary); }
@@ -316,170 +258,123 @@ import { AppMessageService } from '@core/services/message.service';
     .overflow-hidden { overflow: hidden; }
     .overflow-auto { overflow-y: auto; overflow-x: hidden; }
     .relative { position: relative; }
-    
     .text-center { text-align: center; }
     .text-right { text-align: right; }
     .text-sm { font-size: var(--font-size-sm); }
     .text-xs { font-size: var(--font-size-xs); }
-    .text-lg { font-size: var(--font-size-lg); }
-    .text-xl { font-size: var(--font-size-xl); }
-    .text-2xl { font-size: var(--font-size-2xl); }
-    .text-3xl { font-size: var(--font-size-3xl); }
-    
     .text-secondary { color: var(--text-secondary); }
     .text-tertiary { color: var(--text-tertiary); }
     .text-primary-color { color: var(--text-primary); }
-    
     .font-medium { font-weight: var(--font-weight-medium); }
     .font-bold { font-weight: var(--font-weight-bold); }
-    .uppercase { text-transform: uppercase; }
     .capitalize { text-transform: capitalize; }
-    .tracking-wider { letter-spacing: 0.05em; }
-    .cursor-pointer { cursor: pointer; }
-    .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-
-    /* Theme colors */
-    .text-slate-500 { color: #64748b; }
-    .text-slate-600 { color: #475569; }
-    .text-slate-700 { color: #334155; }
-    .text-sky-600 { color: #0284c7; }
-    .text-sky-700 { color: #0369a1; }
-    .text-sky-800 { color: #075985; }
-    .text-orange-600 { color: #ea580c; }
-    .text-orange-700 { color: #c2410c; }
-    .text-orange-800 { color: #9a3412; }
-
-    .casual-card { background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%); color: #475569; border-color: #cbd5e1; }
-    .casual-card ::ng-deep .p-progressbar-value { background: #64748b; }
+    .line-clamp-1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
     
-    .sick-card { background: linear-gradient(135deg, #fff1eb 0%, #ace0f9 100%); color: #0284c7; border-color: #bae6fd; }
-    .sick-card ::ng-deep .p-progressbar-value { background: #0ea5e9; }
-    
-    .earned-card { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); color: #c2410c; border-color: #fed7aa; }
-    .earned-card ::ng-deep .p-progressbar-value { background: #f97316; }
-
-    ::ng-deep .p-progressbar { background: rgba(0,0,0,0.1) !important; }
-
-    /* PrimeNG Tabs overrides for Hub */
     ::ng-deep .hub-tablist .p-tablist-nav { background: transparent !important; border: none !important; }
     ::ng-deep .hub-tablist .p-tablist-nav .p-tab { padding: var(--spacing-lg) var(--spacing-xl) !important; border: none !important; border-bottom: 3px solid transparent !important; color: var(--text-secondary) !important; font-weight: var(--font-weight-medium) !important; transition: var(--transition-base); background: transparent !important; }
     ::ng-deep .hub-tablist .p-tablist-nav .p-tab.p-highlight { border-bottom-color: var(--color-primary) !important; color: var(--color-primary) !important; }
-
-    /* Table */
+    
     ::ng-deep .premium-table .p-datatable-header { padding: 0; border: none; background: transparent; }
     ::ng-deep .premium-table .p-datatable-thead > tr > th { background: var(--bg-secondary) !important; border-bottom: 2px solid var(--border-primary) !important; color: var(--text-tertiary); font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); text-transform: uppercase; letter-spacing: 0.05em; padding: var(--spacing-lg) var(--spacing-xl); }
     ::ng-deep .premium-table .p-datatable-tbody > tr > td { border-bottom: 1px solid var(--border-primary); padding: var(--spacing-md) var(--spacing-xl); color: var(--text-secondary); transition: background-color 0.2s; }
     ::ng-deep .premium-table .p-datatable-tbody > tr.table-row-hover:hover > td { background: var(--color-primary-bg) !important; }
-
-    .badge-mono-sm { font-family: var(--font-mono); font-size: 11px; background: var(--bg-secondary); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border-primary); color: var(--text-secondary); }
-
-    /* Approvals Grid */
+    
+    .badge-mono-sm { font-family: var(--font-mono); font-size: 11px; background: var(--bg-secondary); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border-primary); color: var(--text-secondary); text-transform: uppercase; }
     .info-group { display: flex; flex-direction: column; }
     .info-label { font-size: 10px; font-weight: var(--font-weight-bold); text-transform: uppercase; letter-spacing: 0.05em; }
-
-    .type-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--text-tertiary); }
-    .type-dot.sick { background: #ef4444; }
-    .type-dot.casual { background: #3b82f6; }
-    .type-dot.earned { background: #f59e0b; }
-
-    /* Empty States */
     .empty-glass-state { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
     .icon-circle-large { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; }
-
-    /* Animations */
+    
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes slideDown { from { transform: translateY(-15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     .fade-in { animation: fadeIn 0.4s cubic-bezier(0.2, 0.9, 0.2, 1); }
     .slide-down { animation: slideDown 0.4s cubic-bezier(0.2, 0.9, 0.2, 1); animation-fill-mode: both; }
-
-    @media (min-width: 640px) {
-      .sm\\:p-5 { padding: var(--spacing-2xl); }
-      .sm\\:p-6 { padding: var(--spacing-3xl); }
-    }
   `]
 })
-export class LeaveHubComponent implements OnInit, OnDestroy {
+export class AttendanceRequestsComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
-  private dialogService = inject(DialogService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
-  // State
   isLoading = signal<boolean>(true);
   myRequests = signal<any[]>([]);
   pendingApprovals = signal<any[]>([]);
-  balances = signal<any>(null);
+  activeTab = signal<any>("0");
+
+  showActionDialog = false;
+  dialogAction: 'approve' | 'reject' = 'approve';
+  actionComments = '';
+  selectedRequestId = '';
 
   ngOnInit() {
-    this.loadDashboardData();
+    // If navigated from the hub as 'approvals', select the second tab
+    this.route.url.subscribe(url => {
+      if (url.length > 0 && url[url.length - 1].path === 'approvals') {
+        this.activeTab.set("1");
+      }
+    });
+
+    this.loadData();
   }
 
-  private loadDashboardData() {
+  private loadData() {
     this.isLoading.set(true);
 
     forkJoin({
-      balances: this.hrmsService.getLeaveBalanceSummary().pipe(
-        map(res => res?.data || {}),
-        catchError(() => of({}))
-      ),
-      myReqs: this.hrmsService.getMyLeaveRequests().pipe(
-        map(res => res?.data?.leaveRequests || []),
+      myReqs: this.hrmsService.getMyAttendanceRequests().pipe(
+        map((res: any) => res?.data?.requests || []),
         catchError(() => of([]))
       ),
-      approvals: this.hrmsService.getPendingApprovals().pipe(
-        map(res => res?.data || []),
+      approvals: this.hrmsService.getPendingAttendanceApprovals().pipe(
+        map((res: any) => res?.data?.requests || []),
         catchError(() => of([]))
       )
     }).pipe(
       finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
-    ).subscribe(({ balances, myReqs, approvals }) => {
-      this.balances.set(balances);
+    ).subscribe(({ myReqs, approvals }) => {
       this.myRequests.set(myReqs);
       this.pendingApprovals.set(approvals);
     });
   }
 
-  // --- Actions ---
-  onApplyLeave() {
-    import('./leave-form.component').then(m => {
-      const ref = this.dialogService.open(m.LeaveFormComponent, {
-        header: 'Apply for Leave',
-        width: '600px',
-        contentStyle: { overflow: 'auto' },
-        baseZIndex: 10000,
-        maximizable: true
+  onApplyRequest() {
+    this.router.navigate(['/hrms/attendance-requests/apply']);
+  }
+
+  openActionDialog(id: string, action: 'approve' | 'reject') {
+    this.selectedRequestId = id;
+    this.dialogAction = action;
+    this.actionComments = '';
+    this.showActionDialog = true;
+  }
+
+  confirmAction() {
+    if (!this.selectedRequestId) return;
+    this.showActionDialog = false;
+
+    if (this.dialogAction === 'approve') {
+      this.hrmsService.approveAttendanceRequest(this.selectedRequestId, { comments: this.actionComments }).subscribe({
+        next: (res: any) => {
+          this.messageService.showSuccess('Request approved successfully.');
+          this.loadData();
+        },
+        error: (err: any) => {
+          this.messageService.showError(err.error?.message || 'Failed to approve request.');
+        }
       });
-
-      if (ref) {
-        ref.onClose.subscribe((result) => {
-          if (result) {
-            this.messageService.showSuccess('Leave request submitted successfully.');
-            this.loadDashboardData();
-          }
-        });
-      }
-    });
-  }
-
-  viewDetails(id: string) {
-    this.router.navigate(['/leave/details', id]);
-  }
-
-  actionRequest(id: string, action: 'approve' | 'reject') {
-    // Stub for approval workflow endpoint integration
-    const summaryMsg = action === 'approve' ? 'Leave Approved' : 'Leave Rejected';
-    const severity = action === 'approve' ? 'success' : 'warn';
-
-    // Optimistic UI update
-    this.pendingApprovals.update(apps => apps.filter(a => a._id !== id));
-    // this.messageService.add({ severity, summary: summaryMsg, detail: `The request has been processed.` });
-  }
-
-  // --- Helpers ---
-  getPercentage(available: number = 0, total: number = 0): number {
-    if (total === 0) return 0;
-    return Math.round((available / total) * 100);
+    } else {
+      this.hrmsService.rejectAttendanceRequest(this.selectedRequestId, { reason: this.actionComments }).subscribe({
+        next: (res: any) => {
+          this.messageService.showSuccess('Request rejected successfully.');
+          this.loadData();
+        },
+        error: (err: any) => {
+          this.messageService.showError(err.error?.message || 'Failed to reject request.');
+        }
+      });
+    }
   }
 
   getStatusSeverity(status: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' {

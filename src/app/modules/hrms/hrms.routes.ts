@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { HrmsDashboardComponent } from './core/dashboard/hrms-dashboard.component';
 
 // --- Daily Attendance ---
 import { AdminDailyAttendanceComponent } from './core/attendence/admin-daily-attendance.component';
@@ -77,6 +78,14 @@ import { RoleManagementComponent } from '../organization/components/role-managem
 import { TabRouterGuard } from '../../Tabbing';
 
 export const HRMS_ROUTES: Routes = [
+  {
+    path: 'dashboard',
+    canActivateChild: [TabRouterGuard],
+    children: [
+      { path: '', redirectTo: 'hub', pathMatch: 'full' },
+      { path: 'hub', component: HrmsDashboardComponent, data: { tabLabel: 'HRMS Hub', tabIcon: 'pi pi-home' } }
+    ]
+  },
   {
     path: 'employees',
     canActivateChild: [TabRouterGuard, permissionGuard],
@@ -170,6 +179,24 @@ export const HRMS_ROUTES: Routes = [
       { path: '', redirectTo: 'admin', pathMatch: 'full' },
       { path: 'admin', component: LeaveBalanceAdminComponent, data: { tabLabel: 'Leave Balances', tabIcon: 'pi pi-wallet' } },
       { path: 'details/:id', component: LeaveBalanceDetailComponent, data: { tabLabel: 'Balance Detail', tabIcon: 'pi pi-info-circle' } },
+    ]
+  },
+  {
+    path: 'my-time',
+    canActivateChild: [TabRouterGuard],
+    children: [
+      { path: '', redirectTo: 'hub', pathMatch: 'full' },
+      { path: 'hub', loadComponent: () => import('./core/hub/my-time-hub.component').then(m => m.MyTimeHubComponent), data: { tabLabel: 'My Time Hub', tabIcon: 'pi pi-compass' } }
+    ]
+  },
+  {
+    path: 'attendance-requests',
+    canActivateChild: [TabRouterGuard],
+    children: [
+      { path: '', redirectTo: 'my-requests', pathMatch: 'full' },
+      { path: 'my-requests', loadComponent: () => import('./core/attendence/requests/attendance-requests.component').then(m => m.AttendanceRequestsComponent), data: { tabLabel: 'My Requests', tabIcon: 'pi pi-history' } },
+      { path: 'approvals', loadComponent: () => import('./core/attendence/requests/attendance-requests.component').then(m => m.AttendanceRequestsComponent), data: { tabLabel: 'Pending Approvals', tabIcon: 'pi pi-inbox' } },
+      { path: 'apply', loadComponent: () => import('./core/attendence/requests/attendance-request-form.component').then(m => m.AttendanceRequestFormComponent), data: { tabLabel: 'Apply Regularization', tabIcon: 'pi pi-plus' } }
     ]
   },
   {

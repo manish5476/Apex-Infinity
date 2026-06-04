@@ -245,9 +245,7 @@ export const SIDEBAR_MENU: MenuItem[] = [
         label: 'Self Service',
         icon: 'pi pi-user',
         items: [
-          { label: 'My Attendance', icon: 'pi pi-clock', routerLink: ['/hrms/attendance/my-clock'], permissions: [PERMISSIONS.ATTENDANCE.READ] },
-          { label: 'My Timesheet', icon: 'pi pi-calendar', routerLink: ['/hrms/daily-attendance/my-timesheet'], permissions: [PERMISSIONS.ATTENDANCE.READ] },
-          { label: 'Leave Center', icon: 'pi pi-calendar-minus', routerLink: ['/hrms/leave/hub'], permissions: [PERMISSIONS.LEAVE.READ] },
+          { label: 'My Time Hub', icon: 'pi pi-compass', routerLink: ['/hrms/my-time'], permissions: [PERMISSIONS.ATTENDANCE.READ] },
         ]
       },
       {

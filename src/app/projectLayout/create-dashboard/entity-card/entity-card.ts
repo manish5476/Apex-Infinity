@@ -13,6 +13,6 @@ export class EntityCardComponent {
   @Input() title!: string;
   @Input() icon!: string;
   @Input() description!: string;
-  @Input() createRoute!: string[];
+  @Input() createRoute?: string[];
   @Input() category?: string;
 }
