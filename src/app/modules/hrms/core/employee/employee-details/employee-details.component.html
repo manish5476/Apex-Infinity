@@ -1,231 +1,219 @@
 <p-toast></p-toast>
 <p-confirmDialog [style]="{width: '450px'}" styleClass="glass-confirm-dialog"></p-confirmDialog>
 
-<div class="page-container animate-fadeIn">
-
+<div class="employee-dashboard w-full animate-fadeIn">
   @if (!user()) {
-  <div class="flex-col gap-5 p-5">
-    <p-skeleton width="100%" height="200px" styleClass="rounded-xl"></p-skeleton>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-      <p-skeleton width="100%" height="400px" styleClass="rounded-xl"></p-skeleton>
-      <p-skeleton width="100%" height="400px" styleClass="rounded-xl col-span-2"></p-skeleton>
+  <div class="flex flex-col gap-6 p-8 w-full">
+    <p-skeleton width="100%" height="100px" styleClass="rounded-2xl"></p-skeleton>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <p-skeleton width="100%" height="400px" styleClass="rounded-2xl lg:col-span-3"></p-skeleton>
+      <p-skeleton width="100%" height="400px" styleClass="rounded-2xl lg:col-span-6"></p-skeleton>
+      <p-skeleton width="100%" height="400px" styleClass="rounded-2xl lg:col-span-3"></p-skeleton>
     </div>
   </div>
   }
-
   @else if (user(); as u) {
-  <header class="page-header flex justify-between align-center mb-5">
-    <div class="flex align-center gap-4">
-      <button pButton icon="pi pi-arrow-left" class="p-button-rounded p-button-text p-button-secondary glass-back-btn"
-        (click)="onBack()" pTooltip="Back to Users" tooltipPosition="bottom"></button>
-      <div class="header-titles">
-        <h1 class="page-title">User Details</h1>
-        <p class="page-subtitle text-muted">Manage identity, security access, and audit activity.</p>
-      </div>
+  <header class="dashboard-header flex justify-between items-center mb-6">
+    <div class="flex items-center gap-2 text-sm">
+      <a class="text-primary hover:underline cursor-pointer font-medium" (click)="onBack()">Employees</a>
+      <i class="pi pi-angle-right text-muted text-xs"></i>
+      <span class="text-text-secondary font-medium">{{ u.name | titlecase }}</span>
     </div>
 
-    <div class="header-actions flex gap-3">
-      <button *hasPermission="PERMISSIONS.USER.MANAGE" pButton label="Edit Profile" icon="pi pi-user-edit"
-        class="p-button-outlined p-button-rounded p-button-lg shadow-sm hover-shadow-md"
-        (click)="onEditUser()"></button>
+    <div class="flex gap-3">
+      <button pButton icon="pi pi-print"
+        class="p-button-rounded p-button-text p-button-secondary bg-component hover-bg-hover shadow-sm"
+        pTooltip="Print Details"></button>
+      <button *hasPermission="PERMISSIONS.USER.MANAGE" pButton label="Edit Employee" icon="pi pi-pencil"
+        class="p-button-outlined p-button-rounded bg-component hover-bg-hover shadow-sm text-text-primary border-tertiary"
+        (click)="onEditUser()">
+      </button>
     </div>
   </header>
 
-  <div class="master-grid">
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-    <aside class="sidebar-column flex-col gap-5">
+    <div class="dashboard-card profile-card lg:col-span-3 flex flex-col items-center text-center">
+      <div class="avatar-container mb-4 relative"
+        [class.cursor-pointer]="userService.checkPermission(PERMISSIONS.USER.MANAGE)"
+        (click)="userService.checkPermission(PERMISSIONS.USER.MANAGE) && !uploading() && fileInput.click()">
+        <input #fileInput type="file" accept="image/*" hidden (change)="onFileSelected($event)">
 
-      <div class="glass-card profile-card">
-        <div class="card-banner bg-accent-gradient"></div>
-
-        <div class="profile-content">
-          <div class="avatar-wrapper shadow-2xl"
-            [class.cursor-pointer]="userService.checkPermission(PERMISSIONS.USER.MANAGE)"
-            (click)="userService.checkPermission(PERMISSIONS.USER.MANAGE) && !uploading() && fileInput.click()"
-            pTooltip="Update Photo" tooltipPosition="right">
-            <input #fileInput type="file" accept="image/*" hidden (change)="onFileSelected($event)">
-            <div class="avatar-circle">
-              @if (u.avatar) {
-              <img [src]="u.avatar" class="profile-image">
-              } @else {
-              <span class="initials">{{ u.name[0] | uppercase }}</span>
-              }
-
-              @if (userService.checkPermission(PERMISSIONS.USER.MANAGE)) {
-              <div class="avatar-overlay"><i class="pi pi-camera"></i></div>
-              }
-              @if (uploading()) { <div class="avatar-loader"><i class="pi pi-spin pi-spinner"></i></div> }
-            </div>
-            <div class="status-indicator shadow-md" [class.active]="u.isActive"
-              [pTooltip]="u.isActive ? 'Active Account' : 'Deactivated'"></div>
+        <div class="avatar-circle w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-md mx-auto">
+          @if (u.avatar) {
+          <img [src]="u.avatar" class="w-full h-full object-cover">
+          } @else {
+          <div
+            class="w-full h-full bg-primary-light text-primary flex items-center justify-center text-3xl font-bold uppercase">
+            {{ u.name[0] }}
           </div>
+          }
+        </div>
+        @if (uploading()) { <div class="absolute inset-0 flex items-center justify-center bg-black/30 rounded-full"><i
+            class="pi pi-spin pi-spinner text-white"></i></div> }
+      </div>
 
-          <div class="user-identity text-center">
-            <h2 class="user-name">{{ u.name | titlecase }}</h2>
-            <div
-              class="role-badge mt-2 mx-auto inline-flex align-center gap-2 bg-primary-light text-primary px-4 py-1.5 rounded-pill font-bold text-xs uppercase tracking-wider">
-              <i class="pi" [ngClass]="u.role?.name === 'all access' ? 'pi-shield' : 'pi-user'"></i>
-              {{ u.role?.name || 'Standard User' }}
-            </div>
+      <h2 class="text-xl font-bold text-text-primary m-0">{{ u.name | titlecase }}</h2>
+      <span class="text-sm text-muted mt-1">{{ u.email }}</span>
 
-            <div class="contact-pills mt-4 flex flex-wrap justify-center gap-2">
-              <span class="contact-pill"><i class="pi pi-envelope text-primary"></i> {{ u.email }}</span>
-              @if(u.phone) { <span class="contact-pill"><i class="pi pi-phone text-primary"></i> {{ u.phone }}</span> }
-            </div>
-          </div>
-
-          <hr class="card-divider">
-
-          <div class="employment-details flex-col gap-4">
-            <div class="detail-row">
-              <div class="detail-icon bg-info-light text-info"><i class="pi pi-building"></i></div>
-              <div class="detail-text">
-                <label>Assigned Branch</label>
-                <span>{{ u.branchId?.name || 'Head Office' }}</span>
-              </div>
-            </div>
-            <div class="detail-row">
-              <div class="detail-icon bg-success-light text-success"><i class="pi pi-calendar-plus"></i></div>
-              <div class="detail-text">
-                <label>Date Joined</label>
-                <span>{{ u.createdAt | date:'mediumDate' }}</span>
-              </div>
-            </div>
-            <div class="detail-row">
-              <div class="detail-icon bg-secondary text-muted"><i class="pi pi-id-card"></i></div>
-              <div class="detail-text">
-                <label>System ID</label>
-                <span class="font-mono text-xs">{{ u._id }}</span>
-              </div>
-            </div>
-          </div>
+      <div class="w-full flex justify-center gap-8 my-6">
+        <div class="flex flex-col">
+          <span class="text-2xl font-bold text-text-primary">{{ u.employee?.employeeId || 'N/A' }}</span>
+          <span class="text-xs text-muted font-medium uppercase tracking-wide">Emp ID</span>
+        </div>
+        <div class="w-px bg-border-secondary"></div>
+        <div class="flex flex-col">
+          <span class="text-2xl font-bold text-text-primary">{{ u.role?.name || 'User' }}</span>
+          <span class="text-xs text-muted font-medium uppercase tracking-wide">System Role</span>
         </div>
       </div>
 
-      @if(userService.checkPermission(PERMISSIONS.USER.MANAGE)) {
-      <div class="glass-card">
-        <div class="card-header border-b p-5">
-          <h3 class="card-title text-xl"><i class="pi pi-lock text-primary"></i> Security & Access</h3>
+      <button *hasPermission="PERMISSIONS.USER.MANAGE" pButton label="Send Message"
+        class="p-button-primary w-full p-button-rounded shadow-md"
+        style="background: var(--accent-primary); border: none;"></button>
+    </div>
+
+    <div class="dashboard-card lg:col-span-6">
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-y-8 gap-x-4">
+        <div class="info-group">
+          <label>Work Mode</label>
+          <p class="capitalize">{{ u.employee?.workMode || 'N/A' }}</p>
         </div>
-        <div class="card-body p-4 flex-col gap-2">
+        <div class="info-group">
+          <label>Birthday</label>
+          <p>{{ (u.employee?.personal?.dateOfBirth | date:'mediumDate') || 'N/A' }}</p>
+        </div>
+        <div class="info-group">
+          <label>Phone Number</label>
+          <p>{{ u.phone || 'N/A' }}</p>
+        </div>
+        <div class="info-group col-span-2 sm:col-span-3">
+          <label>Branch Address</label>
+          <p>{{ u.employee?.branchId?.fullAddress || u.employee?.branchId?.name || 'N/A' }}</p>
+        </div>
+        <div class="info-group">
+          <label>Department</label>
+          <p>{{ u.employee?.departmentId?.name || 'N/A' }}</p>
+        </div>
+        <div class="info-group">
+          <label>Designation</label>
+          <p>{{ u.employee?.designationId?.title || 'N/A' }}</p>
+        </div>
+        <div class="info-group">
+          <label>Date of Joining</label>
+          <p>{{ u.employee?.dateOfJoining | date:'mediumDate' }}</p>
+        </div>
+        <div class="info-group">
+          <label>Employment Status</label>
+          <p>
+            <span class="px-3 py-1 rounded-full text-xs font-bold capitalize bg-success-light text-success-dark">
+              {{ u.employee?.status || 'Active' }}
+            </span>
+          </p>
+        </div>
+      </div>
+    </div>
 
-          <button
-            class="action-list-item flex align-center justify-between p-3 rounded-xl border border-tertiary bg-secondary transition-base hover-border-primary w-full text-left"
-            (click)="showPasswordDialog = true">
-            <div class="flex align-center gap-4">
-              <div class="w-12 h-12 rounded-lg bg-info-light text-info flex align-center justify-center text-xl"><i
-                  class="pi pi-key"></i></div>
-              <div class="flex-col">
-                <span class="font-bold text-text-primary text-md">Force Password Reset</span>
-                <span class="text-xs text-muted mt-1">Admin override mechanism</span>
-              </div>
-            </div>
-            <i class="pi pi-chevron-right text-muted"></i>
+    <div class="flex flex-col gap-6 lg:col-span-3">
+      @if(userService.checkPermission(PERMISSIONS.USER.MANAGE)) {
+      <div class="dashboard-card flex flex-col h-full">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-md font-bold text-text-primary m-0">Admin Actions</h3>
+        </div>
+
+        <div class="flex flex-col gap-3">
+          <button class="action-btn" (click)="showPasswordDialog = true">
+            <i class="pi pi-key text-info"></i>
+            <span class="flex-1 text-left text-sm font-medium">Force Password Reset</span>
+            <i class="pi pi-chevron-right text-muted text-xs"></i>
           </button>
 
-          <button
-            class="action-list-item flex align-center justify-between p-3 rounded-xl border border-tertiary bg-secondary transition-base hover-shadow-md w-full text-left"
-            [class.hover-border-error]="u.isActive" [class.hover-border-success]="!u.isActive" (click)="toggleStatus()">
-            <div class="flex align-center gap-4">
-              <div class="w-12 h-12 rounded-lg flex align-center justify-center text-xl"
-                [ngClass]="u.isActive ? 'bg-error-light text-error' : 'bg-success-light text-success'">
-                <i class="pi" [ngClass]="u.isActive ? 'pi-ban' : 'pi-check-circle'"></i>
-              </div>
-              <div class="flex-col">
-                <span class="font-bold text-text-primary text-md">{{ u.isActive ? 'Suspend Account' : 'Reactivate
-                  Account' }}</span>
-                <span class="text-xs text-muted mt-1">{{ u.isActive ? 'Block user login and API access' : 'Restore
-                  system access' }}</span>
-              </div>
-            </div>
-            <i class="pi pi-chevron-right text-muted"></i>
+          <button class="action-btn" (click)="toggleStatus()">
+            <i class="pi" [ngClass]="u.isActive ? 'pi-ban text-error' : 'pi-check-circle text-success'"></i>
+            <span class="flex-1 text-left text-sm font-medium">{{ u.isActive ? 'Suspend Account' : 'Reactivate Account'
+              }}</span>
+            <i class="pi pi-chevron-right text-muted text-xs"></i>
           </button>
 
-          <button
-            class="action-list-item flex align-center justify-between p-3 rounded-xl border border-tertiary bg-secondary transition-base hover-border-primary w-full text-left"
-            (click)="onManagePermissions()">
-            <div class="flex align-center gap-4">
-              <div class="w-12 h-12 rounded-lg bg-primary-light text-primary flex align-center justify-center text-xl">
-                <i class="pi pi-shield"></i>
-              </div>
-              <div class="flex-col">
-                <span class="font-bold text-text-primary text-md">Advanced Permissions</span>
-                <span class="text-xs text-muted mt-1">Manage manual overrides (Grant/Revoke)</span>
-              </div>
-            </div>
-            <i class="pi pi-chevron-right text-muted"></i>
+          <button class="action-btn" (click)="onManagePermissions()">
+            <i class="pi pi-shield text-primary"></i>
+            <span class="flex-1 text-left text-sm font-medium">Manage Permissions</span>
+            <i class="pi pi-chevron-right text-muted text-xs"></i>
           </button>
-
         </div>
       </div>
       }
-    </aside>
+    </div>
 
-    <main class="content-column">
-      <div class="glass-card h-full flex-col">
-        <div class="card-header border-b p-6 flex justify-between align-center">
-          <div class="flex align-center gap-3">
-            <div class="w-12 h-12 rounded-xl bg-primary-light text-primary flex align-center justify-center text-xl">
-              <i class="pi pi-history"></i>
-            </div>
-            <h3 class="card-title text-xl m-0">Audit & Activity Log</h3>
-          </div>
-          <span class="badge bg-primary text-white rounded-pill px-4 py-2 text-sm font-bold shadow-md">
-            {{ activities().length }} Events
-          </span>
-        </div>
+    <div class="dashboard-card lg:col-span-9">
+      <div class="flex gap-6 border-b border-tertiary mb-6 pb-2">
+        <button class="text-sm font-bold text-primary border-b-2 border-primary pb-2 px-1">Activity Log</button>
+        <button class="text-sm font-medium text-muted hover:text-text-primary pb-2 px-1 transition-colors">Access
+          History</button>
+      </div>
 
-        <div class="card-body p-0 flex-1 overflow-hidden">
-          <div class="timeline-scroll-area custom-scroll p-6 max-h-[750px] overflow-y-auto">
-
-            @if (activities().length > 0) {
-            <div class="custom-timeline">
-              @for (act of activities(); track act._id; let isFirst = $first) {
-              <div class="timeline-row flex gap-4 relative" [class.is-first]="isFirst">
-
-                <div class="time-col flex-col align-end w-24 pt-1 shrink-0">
-                  <span class="text-sm font-bold text-text-primary">{{ act.createdAt | date:'h:mm a' }}</span>
-                  <span class="text-xs font-semibold text-muted uppercase tracking-wider mt-1">{{ act.createdAt |
-                    date:'MMM d' }}</span>
-                </div>
-
-                <div class="marker-col relative flex flex-col align-center w-6 shrink-0">
-                  <div class="timeline-line absolute top-0 bottom-0 w-0.5 bg-border-secondary"></div>
-                  <div class="timeline-dot relative w-4 h-4 rounded-full border-2 bg-bg-primary z-10 mt-1.5"
-                    [ngClass]="isFirst ? 'border-primary shadow-glow' : 'border-muted'"></div>
-                </div>
-
-                <div class="content-col flex-1 pb-8">
-                  <div
-                    class="act-card bg-secondary border border-tertiary rounded-xl p-4 transition-base hover-border-primary hover-shadow-md">
-                    <div class="flex justify-between align-start mb-2">
-                      <span class="text-md font-bold text-primary capitalize">{{ act.action }}</span>
-                      @if(act.ipAddress) {
-                      <span
-                        class="text-xs font-mono text-muted bg-bg-primary px-2 py-1 rounded-md border border-tertiary">
-                        <i class="pi pi-globe text-xs"></i> {{ act.ipAddress }}
-                      </span>
-                      }
-                    </div>
-                    <p class="text-sm text-text-secondary m-0 leading-relaxed">{{ act.details }}</p>
-                  </div>
-                </div>
-
+      <div class="timeline-container max-h-[400px] overflow-y-auto pr-2 custom-scroll">
+        @if (activities().length > 0) {
+        <div class="w-full">
+          @for (act of activities(); track act._id) {
+          <div
+            class="flex items-center justify-between p-4 mb-3 rounded-xl border border-tertiary bg-bg-primary hover:border-primary transition-colors">
+            <div class="flex items-center gap-4 min-w-[200px]">
+              <div class="w-2 h-2 rounded-full bg-primary"></div>
+              <div class="flex flex-col">
+                <span class="text-sm font-bold text-text-primary">{{ act.createdAt | date:'dd MMM yyyy' }}</span>
+                <span class="text-xs text-muted">{{ act.createdAt | date:'hh:mm a' }}</span>
               </div>
+            </div>
+            <div class="flex-1 px-4">
+              <span class="text-sm font-semibold capitalize text-text-primary">{{ act.action }}</span>
+            </div>
+            <div class="flex-1 px-4 hidden sm:block">
+              <span class="text-sm text-text-secondary truncate block max-w-[300px]">{{ act.details }}</span>
+            </div>
+            <div class="min-w-[120px] text-right">
+              @if(act.ipAddress) {
+              <span class="text-xs font-mono bg-secondary px-2 py-1 rounded border border-tertiary text-muted">
+                <i class="pi pi-globe text-[10px]"></i> {{ act.ipAddress }}
+              </span>
               }
             </div>
-            } @else {
-            <div class="empty-state text-center py-10 flex-col align-center justify-center">
-              <i class="pi pi-inbox text-5xl text-muted mb-4"></i>
-              <h3 class="text-lg font-bold text-text-primary m-0">No Activity Recorded</h3>
-              <p class="text-muted mt-2">This user has not generated any system logs yet.</p>
-            </div>
-            }
+          </div>
+          }
+        </div>
+        } @else {
+        <div class="flex flex-col items-center justify-center py-12 text-center">
+          <i class="pi pi-inbox text-4xl text-muted mb-3"></i>
+          <p class="text-text-secondary">No activity recorded for this user.</p>
+        </div>
+        }
+      </div>
+    </div>
 
+    <div class="dashboard-card lg:col-span-3">
+      <h3 class="text-md font-bold text-text-primary m-0 mb-4">Active Devices</h3>
+      <div class="flex flex-col gap-4 max-h-[400px] overflow-y-auto custom-scroll pr-2">
+        @if(u.devices && u.devices.length > 0) {
+        @for (device of u.devices; track device.deviceId) {
+        <div class="flex items-center gap-3 pb-3 border-b border-tertiary last:border-0 last:pb-0">
+          <div
+            class="w-10 h-10 rounded-lg bg-bg-primary border border-tertiary flex items-center justify-center text-muted">
+            <i class="pi" [ngClass]="device.deviceType === 'web' ? 'pi-desktop' : 'pi-mobile'"></i>
+          </div>
+          <div class="flex flex-col flex-1 overflow-hidden">
+            <span class="text-sm font-semibold text-text-primary capitalize">{{ device.deviceType }} Session</span>
+            <span class="text-xs text-muted truncate">{{ device.userAgent?.split(' ')[0] || 'Unknown Browser' }}</span>
+          </div>
+          <div class="text-right">
+            <span class="text-xs font-medium text-success">Active</span>
           </div>
         </div>
+        }
+        } @else {
+        <p class="text-sm text-muted text-center py-4">No active devices found.</p>
+        }
       </div>
-    </main>
+    </div>
 
   </div>
   }
@@ -233,35 +221,32 @@
 
 <p-dialog appendTo="body" [(visible)]="showPasswordDialog" [modal]="true" styleClass="glass-dialog-spacious"
   header="Force Password Reset" [style]="{width: '500px', maxWidth: '95vw'}" [draggable]="false" [resizable]="false">
-
   <ng-template pTemplate="header">
-    <div class="flex align-center gap-3">
-      <div class="w-10 h-10 rounded-xl bg-error-light text-error flex align-center justify-center text-xl">
-        <i class="pi pi-key"></i>
-      </div>
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-error-light text-error flex items-center justify-center text-xl"><i
+          class="pi pi-key"></i></div>
       <h2 class="text-xl font-bold m-0 font-heading text-text-primary">Reset Password</h2>
     </div>
   </ng-template>
 
-  <form [formGroup]="passwordForm" class="flex-col gap-5 mt-4">
-    <div class="p-4 bg-warning-light border border-warning rounded-xl flex gap-3 align-start">
-      <i class="pi pi-exclamation-triangle text-warning text-lg mt-0.5"></i>
-      <div class="flex-col">
-        <span class="text-sm font-bold text-warning uppercase tracking-wider mb-1">Admin Override</span>
-        <span class="text-sm text-text-secondary">The new password will apply immediately. The user's current active
-          sessions will <strong>not</strong> be revoked automatically.</span>
+  <form [formGroup]="passwordForm" class="flex flex-col gap-5 mt-4">
+    <div class="p-4 bg-warning-light border border-warning-border rounded-xl flex gap-3 items-start">
+      <i class="pi pi-exclamation-triangle text-warning-dark text-lg mt-0.5"></i>
+      <div class="flex flex-col">
+        <span class="text-sm font-bold text-warning-dark uppercase tracking-wider mb-1">Admin Override</span>
+        <span class="text-sm text-text-secondary">The new password will apply immediately. Active sessions are not
+          revoked automatically.</span>
       </div>
     </div>
-
-    <div class="form-section">
-      <div class="field mb-4">
-        <label class="text-sm font-semibold text-muted mb-2 block">New Password</label>
-        <input pInputText type="password" formControlName="password" class="w-full glass-input p-inputtext-lg"
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-col gap-2">
+        <label class="text-sm font-semibold text-text-secondary">New Password</label>
+        <input pInputText type="password" formControlName="password" class="w-full p-inputtext-lg"
           placeholder="Minimum 6 characters" />
       </div>
-      <div class="field">
-        <label class="text-sm font-semibold text-muted mb-2 block">Confirm Password</label>
-        <input pInputText type="password" formControlName="passwordConfirm" class="w-full glass-input p-inputtext-lg"
+      <div class="flex flex-col gap-2">
+        <label class="text-sm font-semibold text-text-secondary">Confirm Password</label>
+        <input pInputText type="password" formControlName="passwordConfirm" class="w-full p-inputtext-lg"
           placeholder="Re-type new password" />
       </div>
     </div>
@@ -269,10 +254,10 @@
 
   <ng-template pTemplate="footer">
     <div class="flex justify-end gap-3 pt-4 border-t border-tertiary">
-      <button pButton label="Cancel" class="p-button-text p-button-secondary p-button-lg rounded-pill"
+      <button pButton label="Cancel" class="p-button-text p-button-secondary rounded-pill"
         (click)="showPasswordDialog = false"></button>
-      <button pButton label="Confirm Reset" icon="pi pi-check" class="p-button-danger p-button-lg rounded-pill"
-        (click)="resetPassword()" [loading]="isSubmitting" [disabled]="passwordForm.invalid"></button>
+      <button pButton label="Confirm Reset" class="p-button-danger rounded-pill" (click)="resetPassword()"
+        [loading]="isSubmitting" [disabled]="passwordForm.invalid"></button>
     </div>
   </ng-template>
 </p-dialog>

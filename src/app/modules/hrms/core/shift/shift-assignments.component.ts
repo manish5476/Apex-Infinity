@@ -187,7 +187,7 @@ import { InputIconModule } from 'primeng/inputicon';
 
               @if (filteredUsers().length === 0) {
                 <div class="empty-state">
-                  <i class="pi pi-search"></i>
+                  <!-- <i class="pi pi-search"></i> -->
                   <h4>No results found</h4>
                   <p>Try adjusting your search criteria.</p>
                 </div>

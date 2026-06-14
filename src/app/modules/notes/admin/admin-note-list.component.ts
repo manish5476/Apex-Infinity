@@ -4,7 +4,8 @@ import {
   OnInit,
   inject,
   signal,
-  ViewEncapsulation, OnDestroy } from '@angular/core';
+  ViewEncapsulation, OnDestroy
+} from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -34,7 +35,7 @@ import { takeUntil } from "rxjs/operators";
     ConfirmDialogModule,
     DatePicker,
     AgShareGrid
-],
+  ],
   providers: [ConfirmationService, DatePipe],
   encapsulation: ViewEncapsulation.None,
   template: `
@@ -115,7 +116,7 @@ import { takeUntil } from "rxjs/operators";
           <div class="se-filter-field" style="flex-grow: 1;">
             <label for="search">Search</label>
             <span class="p-input-icon-left w-full">
-              <i class="pi pi-search"></i>
+              <!-- <i class="pi pi-search"></i> -->
               <input
                 id="search"
                 type="text"
@@ -396,7 +397,7 @@ import { takeUntil } from "rxjs/operators";
   ],
 })
 export class AdminNoteListComponent implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   private cdr = inject(ChangeDetectorRef);
   private noteService = inject(NoteService);
   private messageService = inject(AppMessageService);
@@ -899,8 +900,8 @@ export class AdminNoteListComponent implements OnInit, OnDestroy {
   //     },
   //   ];
   // }
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

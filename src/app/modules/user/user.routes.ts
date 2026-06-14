@@ -26,7 +26,7 @@ export const USER_ROUTES: Routes = [
     path: 'details/:id',
     component: UserDetailsComponent,
     canActivate: [TabRouterGuard, permissionGuard],
-    data: { tabLabel: 'Employee Details', tabIcon: 'pi pi-id-card', permissions: [PERMISSIONS.USER.READ] }
+    data: { tabLabel: 'User Details', tabIcon: 'pi pi-id-card', permissions: [PERMISSIONS.USER.READ] }
   },
   {
     path: 'create',

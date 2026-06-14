@@ -89,7 +89,7 @@ export class ActionButtonsRenderer {
     HasPermissionDirective,
     DynamicDialogModule,
     MasterDropdownComponent
-],
+  ],
   providers: [DialogService],
   template: `
     <p-toast position="bottom-right" appendTo="body"></p-toast>
@@ -129,7 +129,7 @@ export class ActionButtonsRenderer {
           <div class="filter-field">
             <label>Search</label>
             <span class="p-input-icon-left w-full">
-              <i class="pi pi-search"></i>
+              <!-- <i class="pi pi-search"></i> -->
               <input type="text" pInputText 
                 [formControl]="searchControl" 
                 placeholder="Return #, Invoice #..."

@@ -44,7 +44,7 @@ import { takeUntil } from "rxjs/operators";
 })
 
 export class EmployeeDetailsComponent implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   readonly PERMISSIONS = PERMISSIONS;
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -87,11 +87,19 @@ export class EmployeeDetailsComponent implements OnInit, OnDestroy {
 
   // --- Navigation ---
   onEditUser() {
-    this.router.navigate(['/hrms/employees/edit', this.userId]);
+    if (this.router.url.includes('/user/')) {
+      this.router.navigate(['/user/edit', this.userId]);
+    } else {
+      this.router.navigate(['/hrms/employees/edit', this.userId]);
+    }
   }
 
   onBack() {
-    this.router.navigate(['/hrms/employees/list']);
+    if (this.router.url.includes('/user/')) {
+      this.router.navigate(['/user/list']);
+    } else {
+      this.router.navigate(['/hrms/employees/list']);
+    }
   }
 
   // --- Data Loading ---
@@ -239,8 +247,8 @@ export class EmployeeDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

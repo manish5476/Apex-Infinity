@@ -40,7 +40,7 @@ import { CommonMethodService } from '@core/utils/common-method.service';
     AgShareGrid,
     HasPermissionDirective,
     MasterDropdownComponent
-],
+  ],
   providers: [CustomerService, ConfirmationService],
   template: `
     <p-toast position="bottom-right"></p-toast>
@@ -120,7 +120,7 @@ import { CommonMethodService } from '@core/utils/common-method.service';
           <div class="filter-field">
             <label for="search">Smart Search</label>
             <span class="p-input-icon-left w-full">
-              <i class="pi pi-search"></i>
+              <!-- <i class="pi pi-search"></i> -->
               <input id="search" type="text" pInputText
                 [(ngModel)]="customerFilter.search" 
                 (keydown.enter)="applyFilters()" 
@@ -553,7 +553,7 @@ export class CustomerList implements OnInit, OnDestroy {
               const isIndiv = d.type === 'individual';
               const icon = isIndiv ? 'pi-user' : 'pi-building';
               const sub = d.contactPerson && d.contactPerson !== d.name ? d.contactPerson : this.common.toTitleCase(d.type || '');
-              
+
               return `<div style="display:flex; align-items:center; gap: 12px; width:100%; overflow:hidden;">
                         <span style="width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; background: ${avatar.background}; color: ${avatar.color}; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: var(--font-weight-bold); border: 1px solid rgba(0,0,0,0.05);">${initials}</span>
                         ${this.twoLine(d.name, `<i class="pi ${icon}" style="font-size: 9px; margin-right: 4px;"></i>${sub}`)}
@@ -567,8 +567,8 @@ export class CustomerList implements OnInit, OnDestroy {
             cellStyle: { display: 'flex', alignItems: 'center' },
             cellRenderer: (params: any) => {
               if (params.data.isDeleted) return this.badge('Deleted', '--color-error-bg', '--color-error-dark', '--color-error-border');
-              return params.value 
-                ? this.badge('Active', '--color-success-bg', '--color-success-dark', '--color-success-border') 
+              return params.value
+                ? this.badge('Active', '--color-success-bg', '--color-success-dark', '--color-success-border')
                 : this.badge('Inactive', '--bg-ternary', '--text-secondary', '--border-primary');
             }
           },
@@ -589,91 +589,91 @@ export class CustomerList implements OnInit, OnDestroy {
       {
         headerName: 'Contact Details',
         children: [
-          { 
-            headerName: 'Email', 
-            field: 'email', 
-            width: 220, 
-            cellStyle: { display: 'flex', alignItems: 'center' }, 
-            cellRenderer: (params: any) => params.value 
-              ? `<div style="display:flex; align-items:center; gap: 8px; overflow:hidden; width:100%;"><i class="pi pi-envelope" style="font-size: 11px; color: var(--text-tertiary); flex-shrink:0;"></i><span style="font-size: var(--font-size-sm); color: var(--text-secondary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${params.value}</span></div>` 
-              : `<span style="color:var(--text-tertiary); font-size: var(--font-size-xs);">—</span>` 
+          {
+            headerName: 'Email',
+            field: 'email',
+            width: 220,
+            cellStyle: { display: 'flex', alignItems: 'center' },
+            cellRenderer: (params: any) => params.value
+              ? `<div style="display:flex; align-items:center; gap: 8px; overflow:hidden; width:100%;"><i class="pi pi-envelope" style="font-size: 11px; color: var(--text-tertiary); flex-shrink:0;"></i><span style="font-size: var(--font-size-sm); color: var(--text-secondary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${params.value}</span></div>`
+              : `<span style="color:var(--text-tertiary); font-size: var(--font-size-xs);">—</span>`
           },
-          { 
-            headerName: 'Phone', 
-            field: 'phone', 
-            width: 160, 
-            cellStyle: { display: 'flex', alignItems: 'center' }, 
+          {
+            headerName: 'Phone',
+            field: 'phone',
+            width: 160,
+            cellStyle: { display: 'flex', alignItems: 'center' },
             cellRenderer: (params: any) => {
               const phone = params.value;
               const alt = params.data?.altPhone;
               if (!phone) return `<span style="color:var(--text-tertiary); font-size: var(--font-size-xs);">—</span>`;
               const top = `<i class="pi pi-phone" style="font-size: 10px; margin-right: 4px;"></i>${this.common.formatPhone(phone)}`;
               const bot = alt ? `Alt: ${this.common.formatPhone(alt)}` : '';
-              return bot 
-                ? this.twoLine(top, bot) 
+              return bot
+                ? this.twoLine(top, bot)
                 : `<div style="display:flex; align-items:center; gap: 6px;"><i class="pi pi-phone" style="font-size: 11px; color: var(--text-tertiary);"></i><span style="font-size: var(--font-size-sm); color: var(--text-secondary);">${this.common.formatPhone(phone)}</span></div>`;
             }
           },
-          { 
-            headerName: 'Location', 
-            field: 'billingAddress.city', 
-            width: 160, 
-            cellStyle: { display: 'flex', alignItems: 'center' }, 
-            valueGetter: (p: any) => { const a = p.data?.billingAddress; return a?.city ? `${a.city}, ${a.state}` : ''; }, 
-            tooltipValueGetter: (p: any) => { const a = p.data?.billingAddress; return a ? this.common.formatAddress(a) : ''; }, 
-            cellRenderer: (params: any) => params.value 
-              ? `<div style="display:flex; align-items:center; gap: 6px; overflow:hidden;"><i class="pi pi-map-marker" style="font-size: 11px; color: var(--text-tertiary); flex-shrink:0;"></i><span style="font-size: var(--font-size-sm); color: var(--text-secondary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${params.value}</span></div>` 
-              : `<span style="color:var(--text-tertiary); font-size: var(--font-size-xs);">—</span>` 
+          {
+            headerName: 'Location',
+            field: 'billingAddress.city',
+            width: 160,
+            cellStyle: { display: 'flex', alignItems: 'center' },
+            valueGetter: (p: any) => { const a = p.data?.billingAddress; return a?.city ? `${a.city}, ${a.state}` : ''; },
+            tooltipValueGetter: (p: any) => { const a = p.data?.billingAddress; return a ? this.common.formatAddress(a) : ''; },
+            cellRenderer: (params: any) => params.value
+              ? `<div style="display:flex; align-items:center; gap: 6px; overflow:hidden;"><i class="pi pi-map-marker" style="font-size: 11px; color: var(--text-tertiary); flex-shrink:0;"></i><span style="font-size: var(--font-size-sm); color: var(--text-secondary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${params.value}</span></div>`
+              : `<span style="color:var(--text-tertiary); font-size: var(--font-size-xs);">—</span>`
           }
         ]
       },
       {
         headerName: 'Financial Overview',
         children: [
-          { 
-            field: 'outstandingBalance', 
-            headerName: 'Outstanding', 
-            width: 140, 
-            type: 'rightAligned', 
-            cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: '16px' }, 
-            cellRenderer: (params: any) => { 
-              const val = params.value || 0; 
-              return val <= 0 
-                ? this.badge('✓ Clear', '--color-success-bg', '--color-success-dark', '--color-success-border') 
-                : `<span style="color: var(--color-error); font-weight: var(--font-weight-bold); font-family: var(--font-mono); font-size: var(--font-size-sm);">${this.common.formatCurrency(val)}</span>`; 
-            } 
+          {
+            field: 'outstandingBalance',
+            headerName: 'Outstanding',
+            width: 140,
+            type: 'rightAligned',
+            cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: '16px' },
+            cellRenderer: (params: any) => {
+              const val = params.value || 0;
+              return val <= 0
+                ? this.badge('✓ Clear', '--color-success-bg', '--color-success-dark', '--color-success-border')
+                : `<span style="color: var(--color-error); font-weight: var(--font-weight-bold); font-family: var(--font-mono); font-size: var(--font-size-sm);">${this.common.formatCurrency(val)}</span>`;
+            }
           },
-          { 
-            field: 'creditLimit', 
-            headerName: 'Credit Limit', 
-            width: 130, 
-            type: 'rightAligned', 
-            cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: '16px' }, 
-            cellRenderer: (params: any) => { 
-              const val = params.value || 0; 
-              return val 
-                ? `<span style="color: var(--text-secondary); font-family: var(--font-mono); font-size: var(--font-size-sm);">${this.common.formatCurrency(val)}</span>` 
-                : `<span style="color: var(--text-tertiary); font-size: var(--font-size-xs);">—</span>`; 
-            } 
+          {
+            field: 'creditLimit',
+            headerName: 'Credit Limit',
+            width: 130,
+            type: 'rightAligned',
+            cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: '16px' },
+            cellRenderer: (params: any) => {
+              const val = params.value || 0;
+              return val
+                ? `<span style="color: var(--text-secondary); font-family: var(--font-mono); font-size: var(--font-size-sm);">${this.common.formatCurrency(val)}</span>`
+                : `<span style="color: var(--text-tertiary); font-size: var(--font-size-xs);">—</span>`;
+            }
           },
-          { 
-            field: 'invoiceCount', 
-            headerName: 'Invoices', 
-            width: 100, 
-            type: 'rightAligned', 
-            cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: '16px' }, 
-            cellRenderer: (params: any) => `<span style="font-weight: var(--font-weight-bold); font-size: var(--font-size-md); font-family: var(--font-mono); color: ${(params.value || 0) > 0 ? 'var(--accent-primary)' : 'var(--text-tertiary)'};">${params.value || 0}</span>` 
+          {
+            field: 'invoiceCount',
+            headerName: 'Invoices',
+            width: 100,
+            type: 'rightAligned',
+            cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: '16px' },
+            cellRenderer: (params: any) => `<span style="font-weight: var(--font-weight-bold); font-size: var(--font-size-md); font-family: var(--font-mono); color: ${(params.value || 0) > 0 ? 'var(--accent-primary)' : 'var(--text-tertiary)'};">${params.value || 0}</span>`
           }
         ]
       },
       {
         headerName: 'Compliance',
         children: [
-          { 
-            field: 'gstNumber', 
-            headerName: 'GST / PAN', 
-            width: 170, 
-            cellStyle: { display: 'flex', alignItems: 'center', padding: '0 16px' }, 
+          {
+            field: 'gstNumber',
+            headerName: 'GST / PAN',
+            width: 170,
+            cellStyle: { display: 'flex', alignItems: 'center', padding: '0 16px' },
             cellRenderer: (params: any) => {
               const gst = params.value;
               const pan = params.data?.panNumber;
@@ -689,13 +689,13 @@ export class CustomerList implements OnInit, OnDestroy {
       {
         headerName: 'System',
         children: [
-          { 
-            field: 'createdAt', 
-            headerName: 'Since', 
-            width: 130, 
-            sortable: true, 
-            cellStyle: { display: 'flex', alignItems: 'center', padding: '0 16px' }, 
-            cellRenderer: (params: any) => params.value ? this.twoLine(this.common.formatDate(params.value), this.common.timeAgoText(params.value)) : '-' 
+          {
+            field: 'createdAt',
+            headerName: 'Since',
+            width: 130,
+            sortable: true,
+            cellStyle: { display: 'flex', alignItems: 'center', padding: '0 16px' },
+            cellRenderer: (params: any) => params.value ? this.twoLine(this.common.formatDate(params.value), this.common.timeAgoText(params.value)) : '-'
           }
         ]
       }

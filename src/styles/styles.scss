@@ -1,6 +1,6 @@
 /* ==========================================================================
-   APEX CRM — MAIN STYLESHEET (PERFECTED)
-   Aligned with Master Theme Tokens & PrimeNG Overrides
+   APEX CRM — MAIN STYLESHEET (PERFECTED & UNIFIED)
+   Aligned with Master Theme Tokens & PrimeNG Overrides (2.5rem Geometry)
    ========================================================================== */
 
 /* ==========================================================================
@@ -535,7 +535,6 @@ body {
     inset: -145%;
     rotate: -45deg;
     background: transparent;
-
     background-image:
       radial-gradient(2px 80px at 0px 235px, color-mix(in srgb, var(--accent-primary) 15%, transparent), transparent),
       radial-gradient(2px 80px at 300px 235px, color-mix(in srgb, var(--accent-primary) 15%, transparent), transparent),
@@ -778,8 +777,8 @@ body {
   @include input-reset;
   display: block;
   width: 100%;
-  height: 2.25rem;
-  /* Matches your 2.5rem PrimeNG geometry override */
+  min-height: 2.5rem;
+  /* UNIFIED 2.5rem GEOMETRY */
   padding: 0 var(--spacing-md);
   font-family: var(--font-body);
   font-size: var(--font-size-md);
@@ -926,7 +925,8 @@ body {
 }
 
 .p-button {
-  min-height: 2.25rem !important;
+  min-height: 2.5rem !important;
+  /* UNIFIED 2.5rem GEOMETRY */
   line-height: var(--line-height-relaxed) !important;
   border-radius: var(--ui-border-radius) !important;
   white-space: nowrap !important;
@@ -944,10 +944,12 @@ body {
 /* 1. Base Geometry & Shared Properties */
 .btn,
 .p-button {
+  box-sizing: border-box !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  height: 2.25rem !important;
+  min-height: 2.5rem !important;
+  /* UNIFIED 2.5rem GEOMETRY */
   padding: 0 var(--spacing-lg) !important;
   font-family: var(--font-body) !important;
   font-size: var(--font-size-sm) !important;
@@ -1109,14 +1111,16 @@ body {
 /* 5. Size Adjustments */
 .btn-sm,
 .p-button-sm {
-  height: 2rem !important;
+  min-height: 2rem !important;
+  /* Scaled proportionally */
   font-size: var(--font-size-xs) !important;
-  padding: 0 var(--spacing-md) !important;
+  padding: 0 var(--spacing-sm) !important;
 }
 
 .btn-lg,
 .p-button-lg {
-  height: 3rem !important;
+  min-height: 3rem !important;
+  /* Scaled proportionally */
   font-size: var(--font-size-base) !important;
   padding: 0 var(--spacing-xl) !important;
 }
@@ -1143,7 +1147,9 @@ body {
 .p-multiselect,
 .p-datepicker-input,
 .p-inputnumber-input {
-  height: 2.25rem !important;
+  box-sizing: border-box !important;
+  min-height: 2.5rem !important;
+  /* UNIFIED 2.5rem GEOMETRY */
   font-family: var(--font-body) !important;
   font-size: var(--font-size-sm) !important;
   border-radius: var(--ui-border-radius) !important;
@@ -1211,7 +1217,8 @@ body {
   /* Dropdown Icon Centering */
   .p-select-dropdown,
   .p-multiselect-dropdown {
-    width: 2.25rem !important;
+    width: 2.5rem !important;
+    /* Scaled to perfectly match 2.5rem height */
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -1248,9 +1255,8 @@ body {
   .filter-actions-right {
     display: flex !important;
     align-items: center !important;
-    /* Changed from flex-end to center */
     gap: var(--spacing-md) !important;
-    height: 2.25rem !important;
+    min-height: 2.5rem !important;
     /* Match input height */
   }
 }
@@ -1424,7 +1430,8 @@ app-ag-share-grid {
 .se-filter-actions,
 .header-actions {
   gap: var(--spacing-xs) !important;
-  min-height: 2rem !important;
+  min-height: 2.5rem !important;
+  /* Scaled to 2.5rem */
 }
 
 .app-filter-panel .p-inputtext,
@@ -1437,18 +1444,20 @@ app-ag-share-grid {
 .se-filter-bar .p-datepicker,
 .filters input,
 .filters select {
-  min-height: 2rem !important;
-  height: 2rem !important;
-  font-size: var(--font-size-xs) !important;
+  min-height: 2.5rem !important;
+  /* Scaled to 2.5rem */
+  height: 2.5rem !important;
+  font-size: var(--font-size-sm) !important;
 }
 
 .app-filter-panel .p-button,
 .se-filter-bar .p-button,
 .filters .p-button,
 .header-actions .p-button {
-  min-height: 2rem !important;
-  padding: 0.35rem 0.65rem !important;
-  font-size: var(--font-size-xs) !important;
+  min-height: 2.5rem !important;
+  /* Scaled to 2.5rem */
+  padding: 0 var(--spacing-lg) !important;
+  font-size: var(--font-size-sm) !important;
 }
 
 .stats-strip {
@@ -1474,1212 +1483,2750 @@ app-ag-share-grid {
   min-height: 0 !important;
 }
 
-// /* =============================================================================
-//    APEX CRM — AG Grid Cell Utility Classes
-//    Add this block to apex-ui-classes.scss (or import as a partial)
-//    These classes are used by the invoice-list.columns.ts cell renderers.
-//    All values reference theme tokens from apex-themes-v2.scss.
-//    ============================================================================= */
 
-// /* ── Layout helpers ─────────────────────────────────────────────────────────── */
-// .cell-flex-center {
-//   display: flex;
-//   align-items: center;
-//   height: 100%;
-//   overflow: hidden;
+
+
+
+// /* ==========================================================================
+//    APEX CRM — MAIN STYLESHEET (PERFECTED)
+//    Aligned with Master Theme Tokens & PrimeNG Overrides
+//    ========================================================================== */
+
+// /* ==========================================================================
+//    1. IMPORTS & DEPENDENCIES
+//    ========================================================================== */
+// @use 'tailwindcss';
+// // @import './themes';
+// @import 'primeicons/primeicons.css';
+// @import 'leaflet/dist/leaflet.css';
+
+// // /* AG GRID CORE & THEME */
+// // @import "ag-grid-community/styles/ag-grid.css";
+// // @import "ag-grid-community/styles/ag-theme-quartz.css";
+
+// /* ==========================================================================
+//    2. GLOBAL VARIABLES & OVERRIDES
+//    ========================================================================== */
+// :root {
+//   /* ==========================================================================
+//      1. TYPOGRAPHY (Fluid Compact Scale)
+//      ========================================================================== */
+//   --font-body: 'Inter', -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+//   --font-heading: 'Plus Jakarta Sans', -apple-system, system-ui, sans-serif;
+//   --font-mono: 'Fira Code', 'Courier New', monospace;
+
+//   --font-size-xs: clamp(0.55rem, 0.2vw + 0.5rem, 0.65rem);
+//   --font-size-sm: clamp(0.65rem, 0.2vw + 0.6rem, 0.75rem);
+//   --font-size-base: clamp(0.75rem, 0.2vw + 0.7rem, 0.8125rem);
+//   --font-size-md: clamp(0.8125rem, 0.2vw + 0.75rem, 0.875rem);
+//   --font-size-lg: clamp(0.875rem, 0.2vw + 0.8rem, 0.9375rem);
+//   --font-size-xl: clamp(0.9375rem, 0.3vw + 0.85rem, 1rem);
+//   --font-size-2xl: clamp(1rem, 0.4vw + 0.9rem, 1.125rem);
+//   --font-size-3xl: clamp(1.125rem, 0.8vw + 0.9rem, 1.375rem);
+//   --font-size-4xl: clamp(1.375rem, 1.2vw + 1rem, 1.75rem);
+//   --font-size-5xl: clamp(1.75rem, 1.5vw + 1.25rem, 2.25rem);
+
+//   --line-height-tight: 1.1;
+//   --line-height-normal: 1.3;
+//   --line-height-relaxed: 1.5;
+
+//   --font-weight-light: 300;
+//   --font-weight-normal: 400;
+//   --font-weight-medium: 500;
+//   --font-weight-semibold: 600;
+//   --font-weight-bold: 700;
+
+//   /* ==========================================================================
+//      2. SPACING (Fluid Compact Grid)
+//      ========================================================================== */
+//   --spacing-xs: clamp(0.125rem, 0.2vw + 0.1rem, 0.25rem);
+//   --spacing-sm: clamp(0.25rem, 0.3vw + 0.15rem, 0.375rem);
+//   --spacing-md: clamp(0.375rem, 0.4vw + 0.2rem, 0.5rem);
+//   --spacing-lg: clamp(0.5rem, 0.5vw + 0.3rem, 0.75rem);
+//   --spacing-xl: clamp(0.75rem, 0.8vw + 0.4rem, 1rem);
+//   --spacing-2xl: clamp(1rem, 1.2vw + 0.5rem, 1.5rem);
+//   --spacing-3xl: clamp(1.5rem, 1.5vw + 0.75rem, 2rem);
+//   --spacing-4xl: clamp(2rem, 2vw + 1rem, 2.75rem);
+//   --spacing-5xl: clamp(2.5rem, 3vw + 1.5rem, 3.5rem);
+
+//   /* ==========================================================================
+//      3. UI CONSTANTS & BASE SHADOWS
+//      ========================================================================== */
+//   --ui-border-radius-sm: 6px;
+//   --ui-border-radius: 10px;
+//   --ui-border-radius-lg: clamp(16px, 2vw, 20px);
+//   --ui-border-radius-xl: clamp(20px, 3vw, 28px);
+//   --ui-border-radius-pill: 9999px;
+
+//   --ui-border-width: 1px;
+//   --ui-border-width-lg: 2px;
+
+//   /* Base shadows (non-themed, use for structural chrome) */
+//   --shadow-xs: 0 0.5px 1px rgba(0, 0, 0, 0.04);
+//   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+//   --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.08);
+//   --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.1);
+//   --shadow-xl: 0 8px 24px rgba(0, 0, 0, 0.12);
+//   --shadow-2xl: 0 12px 32px rgba(0, 0, 0, 0.15);
+//   --shadow-3xl: 0 16px 40px rgba(0, 0, 0, 0.18);
+
+//   /* ==========================================================================
+//      4. ANIMATIONS & INTERACTION
+//      ========================================================================== */
+//   --transition-fast: all 0.12s cubic-bezier(0.23, 1, 0.32, 1);
+//   --transition-base: all 0.22s cubic-bezier(0.2, 0.9, 0.2, 1);
+//   --transition-slow: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+//   --p-mask-transition-duration: 0.2s;
+
+//   --focus-ring-width: 2px;
+//   --focus-ring-offset: 2px;
+//   --focus-outline-width: 3px;
+
+//   --z-dropdown: 100;
+//   --z-sticky: 200;
+//   --z-fixed: 300;
+//   --z-modal-backdrop: 400;
+//   --z-modal: 500;
+//   --z-toast: 600;
+//   --z-tooltip: 700;
+
+//   /* Global Card Tokens (Mapped to Master Theme) */
+//   --card-bg: var(--bg-secondary);
+//   --card-border: var(--ui-border-width) solid var(--border-primary);
+//   --card-shadow: var(--shadow-sm);
+//   --card-shadow-hover: var(--elevation-2);
+//   --card-radius: var(--ui-border-radius-xl);
+//   --card-padding: var(--spacing-xl);
 // }
 
-// .cell-flex-end {
-//   display: flex;
-//   align-items: center;
-//   justify-content: flex-end;
-//   height: 100%;
-//   overflow: hidden;
+// body {
+//   font-family: var(--font-body);
+//   background-color: var(--bg-primary);
+//   color: var(--text-primary);
+//   -webkit-font-smoothing: antialiased;
+//   line-height: var(--line-height-relaxed);
 // }
 
-// .cell-stack {
+// /* ==========================================================================
+//    3. LAYOUT CONTAINERS
+//    ========================================================================== */
+// .app-container {
+//   background: var(--bg-primary);
+//   border-radius: var(--ui-border-radius-lg);
+//   box-shadow: var(--shadow-sm);
 //   display: flex;
 //   flex-direction: column;
-//   justify-content: center;
-//   gap: 2px;
-//   height: 100%;
+//   width: 100%;
 //   overflow: hidden;
+//   transition: box-shadow var(--transition-base), border-color var(--transition-base);
+//   border: 1px solid transparent;
+
+//   &.interactive-container:hover {
+//     box-shadow: var(--elevation-1);
+//     border-color: var(--border-secondary);
+//   }
+
+//   .container-header {
+//     padding: var(--spacing-xl) var(--spacing-2xl);
+//     border-bottom: 1px solid var(--border-secondary);
+//     display: flex;
+//     justify-content: space-between;
+//     align-items: center;
+//     flex-wrap: wrap;
+//     gap: var(--spacing-md);
+
+//     .header-titles {
+//       display: flex;
+//       flex-direction: column;
+//       gap: var(--spacing-xs);
+//     }
+
+//     .container-title {
+//       margin: 0;
+//       font-family: var(--font-heading);
+//       font-size: var(--font-size-xl);
+//       font-weight: 600;
+//       color: var(--text-primary);
+//     }
+
+//     .container-subtitle {
+//       margin: 0;
+//       font-size: var(--font-size-sm);
+//       color: var(--text-secondary);
+//     }
+
+//     .header-actions {
+//       display: flex;
+//       align-items: center;
+//       gap: var(--spacing-md);
+//       flex-wrap: wrap;
+//     }
+//   }
+
+//   /* Body Section */
+//   .container-body {
+//     padding: var(--spacing-2xl);
+//     flex: 1;
+//     overflow-y: auto;
+
+//     &.no-padding {
+//       padding: 0;
+//     }
+//   }
+
+//   /* Footer Section */
+//   .container-footer {
+//     padding: var(--spacing-lg) var(--spacing-2xl);
+//     border-top: 1px solid var(--border-secondary);
+//     background: var(--bg-secondary);
+//     display: flex;
+//     justify-content: flex-end;
+//     align-items: center;
+//     gap: var(--spacing-md);
+//     flex-wrap: wrap;
+//   }
+
+//   /* Mobile Responsiveness for App Container */
+//   @media (max-width: 768px) {
+//     border-radius: 0;
+//     border-left: none;
+//     border-right: none;
+
+//     .container-header {
+//       padding: var(--spacing-lg) var(--spacing-xl);
+//     }
+
+//     .container-body {
+//       padding: var(--spacing-xl);
+//     }
+
+//     .container-footer {
+//       padding: var(--spacing-lg) var(--spacing-xl);
+//     }
+//   }
 // }
 
-// .cell-stack.align-end {
+// /* ==========================================================================
+//    4. UI COMPONENTS (Cards & Stats)
+//    ========================================================================== */
+
+// /* Premium Standard Card */
+// .premium-card {
+//   background: var(--card-bg);
+//   border: var(--card-border);
+//   border-radius: var(--card-radius);
+//   box-shadow: var(--card-shadow);
+//   transition: all var(--transition-base);
+//   overflow: hidden;
+//   height: 100%;
+//   display: flex;
+//   flex-direction: column;
+
+//   &:hover {
+//     box-shadow: var(--card-shadow-hover);
+//     border-color: var(--border-secondary);
+//   }
+
+//   .card-header {
+//     padding: var(--card-padding) var(--card-padding) calc(var(--card-padding) * 0.75);
+//     border-bottom: var(--ui-border-width) solid var(--border-primary);
+//     background: var(--bg-secondary);
+//     font-weight: 600;
+//     font-family: var(--font-heading);
+//     color: var(--text-primary);
+//     display: flex;
+//     align-items: center;
+//     justify-content: space-between;
+//   }
+
+//   .card-body {
+//     padding: var(--card-padding);
+//     flex: 1;
+//   }
+
+//   .card-footer {
+//     padding: calc(var(--card-padding) * 0.75) var(--card-padding);
+//     border-top: var(--ui-border-width) solid var(--border-primary);
+//     background: var(--bg-secondary);
+//     display: flex;
+//     align-items: center;
+//     gap: var(--spacing-md);
+//   }
+
+//   /* Variants */
+//   &.compact {
+//     --card-padding: var(--spacing-lg);
+//     --card-radius: var(--ui-border-radius-lg);
+//   }
+
+//   &.borderless {
+//     border: none;
+//     box-shadow: none;
+//     background: transparent;
+
+//     &:hover {
+//       box-shadow: none;
+//       border: none;
+//     }
+//   }
+
+//   &.interactive {
+//     cursor: pointer;
+
+//     &:hover {
+//       transform: translateY(-2px);
+//     }
+
+//     &:active {
+//       transform: translateY(0);
+//     }
+//   }
+// }
+
+// /* Dashboard Statistic Card */
+// .stat-card {
+//   background: var(--card-bg);
+//   border: var(--card-border);
+//   border-radius: var(--ui-border-radius-lg);
+//   padding: var(--spacing-xl);
+//   display: flex;
+//   align-items: center;
+//   gap: var(--spacing-lg);
+//   box-shadow: var(--shadow-sm);
+//   transition: all var(--transition-base);
+//   position: relative;
+//   overflow: hidden;
+
+//   &:hover {
+//     box-shadow: var(--elevation-2);
+//     transform: translateY(-2px);
+//     border-color: var(--border-secondary);
+//   }
+
+//   .stat-icon {
+//     width: 56px;
+//     height: 56px;
+//     border-radius: var(--ui-border-radius);
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+//     font-size: 24px;
+//     flex-shrink: 0;
+
+//     &.primary {
+//       background: var(--color-primary-bg);
+//       color: var(--color-primary);
+//     }
+
+//     &.success {
+//       background: var(--color-success-bg);
+//       color: var(--color-success);
+//     }
+
+//     &.info {
+//       background: var(--color-info-bg);
+//       color: var(--color-info);
+//     }
+
+//     &.warning {
+//       background: var(--color-warning-bg);
+//       color: var(--color-warning);
+//     }
+//   }
+
+//   .stat-content {
+//     display: flex;
+//     flex-direction: column;
+//     gap: var(--spacing-xs);
+//     min-width: 0;
+
+//     .stat-label {
+//       font-size: var(--font-size-xs);
+//       color: var(--text-tertiary);
+//       text-transform: uppercase;
+//       font-weight: 600;
+//       letter-spacing: 0.5px;
+//       white-space: nowrap;
+//       overflow: hidden;
+//       text-overflow: ellipsis;
+//     }
+
+//     .stat-value {
+//       font-size: var(--font-size-3xl);
+//       font-weight: 700;
+//       color: var(--text-primary);
+//       line-height: 1;
+//     }
+//   }
+
+//   /* Top Border Accents */
+//   &.border-top-primary {
+//     border-top: 4px solid var(--color-primary);
+//   }
+
+//   &.border-top-success {
+//     border-top: 4px solid var(--color-success);
+//   }
+
+//   &.border-top-info {
+//     border-top: 4px solid var(--color-info);
+//   }
+// }
+
+// /* ==========================================================================
+//    5. SHARED FILTER PANEL (Grid/Table Headers)
+//    ========================================================================== */
+// .app-filter-panel {
+//   display: flex;
 //   align-items: flex-end;
+//   gap: var(--spacing-xl);
+//   width: 100%;
+//   background: var(--bg-secondary);
+//   border: 1px solid var(--border-secondary);
+//   border-radius: var(--ui-border-radius-lg);
+//   padding: var(--spacing-xl);
+//   box-shadow: var(--shadow-xs);
+//   transition: box-shadow var(--transition-base);
+//   flex-wrap: wrap;
+
+//   &:hover {
+//     box-shadow: var(--shadow-sm);
+//   }
+
+//   /* === SINGLE ROW MODIFIER === */
+//   &.single-row {
+//     flex-wrap: nowrap;
+//     overflow-x: auto;
+//     padding-bottom: var(--spacing-xl);
+
+//     &::-webkit-scrollbar {
+//       height: 6px;
+//     }
+
+//     &::-webkit-scrollbar-track {
+//       background: transparent;
+//     }
+
+//     &::-webkit-scrollbar-thumb {
+//       background: var(--scroll-thumb);
+//       border-radius: var(--ui-border-radius-pill);
+//     }
+
+//     &::-webkit-scrollbar-thumb:hover {
+//       background: var(--accent-primary);
+//     }
+
+//     .filter-field {
+//       flex: 0 0 auto;
+//       width: 180px;
+//     }
+
+//     .filter-actions,
+//     .filter-actions-right {
+//       flex-shrink: 0;
+//     }
+//   }
+
+//   .filter-field {
+//     display: flex;
+//     flex-direction: column;
+//     gap: var(--spacing-xs);
+//     flex: 1 1 220px;
+//     min-width: 200px;
+//     max-width: 320px;
+
+//     label {
+//       font-size: var(--font-size-xs);
+//       font-weight: 600;
+//       color: var(--text-label);
+//       text-transform: uppercase;
+//       letter-spacing: 0.5px;
+//       white-space: nowrap;
+//     }
+//   }
+
+//   .filter-actions {
+//     display: flex;
+//     gap: var(--spacing-md);
+//     align-items: flex-end;
+//   }
+
+//   .filter-actions-right {
+//     margin-left: auto;
+//     display: flex;
+//     align-items: flex-end;
+//     gap: var(--spacing-md);
+//   }
 // }
 
-// .cell-customer {
+// @media (max-width: 768px) {
+//   .app-filter-panel {
+//     flex-wrap: nowrap;
+//     overflow-x: auto;
+//     -webkit-overflow-scrolling: touch;
+//     padding-bottom: var(--spacing-lg);
+//     gap: var(--spacing-lg);
+
+//     &::-webkit-scrollbar {
+//       height: 4px;
+//     }
+
+//     &::-webkit-scrollbar-track {
+//       background: transparent;
+//     }
+
+//     &::-webkit-scrollbar-thumb {
+//       background: var(--scroll-thumb);
+//       border-radius: var(--ui-border-radius-pill);
+//     }
+
+//     .filter-field {
+//       flex: 0 0 220px;
+//       max-width: none;
+//     }
+
+//     .filter-actions,
+//     .filter-actions-right {
+//       flex-shrink: 0;
+//       margin-left: 0;
+//     }
+
+//     .filter-actions-right::after {
+//       content: '';
+//       padding-right: var(--spacing-md);
+//     }
+//   }
+// }
+
+// /* ==========================================================================
+//    6. UTILITIES & BACKGROUND EFFECTS
+//    ========================================================================== */
+
+// .bg-theme-gradient {
+//   background-image: var(--accent-gradient);
+//   color: #ffffff;
+// }
+
+// .bg-theme-soft-gradient {
+//   background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-ternary) 100%);
+// }
+
+// /* Animated Meteor Background Effect */
+// .meteor {
+//   position: absolute;
+//   inset: 0;
+//   background: var(--bg-primary);
+//   overflow: hidden;
+
+//   &::before {
+//     content: "";
+//     position: absolute;
+//     inset: -145%;
+//     rotate: -45deg;
+//     background: transparent;
+
+//     background-image:
+//       radial-gradient(2px 80px at 0px 235px, color-mix(in srgb, var(--accent-primary) 15%, transparent), transparent),
+//       radial-gradient(2px 80px at 300px 235px, color-mix(in srgb, var(--accent-primary) 15%, transparent), transparent),
+//       radial-gradient(1px 1px at 150px 117.5px, color-mix(in srgb, var(--accent-primary) 30%, transparent) 100%, transparent 150%),
+//       radial-gradient(2px 80px at 0px 252px, color-mix(in srgb, var(--accent-secondary) 10%, transparent), transparent),
+//       radial-gradient(2px 80px at 300px 252px, color-mix(in srgb, var(--color-info) 10%, transparent), transparent),
+//       radial-gradient(1px 1px at 150px 126px, color-mix(in srgb, var(--accent-secondary) 20%, transparent) 100%, transparent 150%),
+//       radial-gradient(2px 80px at 0px 150px, color-mix(in srgb, var(--accent-primary) 15%, transparent), transparent),
+//       radial-gradient(2px 80px at 300px 150px, color-mix(in srgb, var(--accent-primary) 15%, transparent), transparent),
+//       radial-gradient(1px 1px at 150px 75px, color-mix(in srgb, var(--accent-primary) 30%, transparent) 100%, transparent 150%),
+//       radial-gradient(2px 80px at 0px 253px, color-mix(in srgb, var(--color-warning) 12%, transparent), transparent),
+//       radial-gradient(2px 80px at 300px 253px, color-mix(in srgb, var(--color-warning) 12%, transparent), transparent),
+//       radial-gradient(1px 1px at 150px 126.5px, color-mix(in srgb, var(--color-warning) 25%, transparent) 100%, transparent 150%),
+//       radial-gradient(2px 80px at 0px 204px, color-mix(in srgb, var(--accent-primary) 15%, transparent), transparent),
+//       radial-gradient(2px 80px at 300px 204px, color-mix(in srgb, var(--accent-primary) 15%, transparent), transparent),
+//       radial-gradient(1px 1px at 150px 102px, color-mix(in srgb, var(--accent-primary) 30%, transparent) 100%, transparent 150%),
+//       radial-gradient(2px 80px at 0px 134px, color-mix(in srgb, var(--accent-primary) 12%, transparent), transparent),
+//       radial-gradient(2px 80px at 300px 134px, color-mix(in srgb, var(--accent-primary) 12%, transparent), transparent),
+//       radial-gradient(1px 1px at 150px 67px, color-mix(in srgb, var(--accent-primary) 25%, transparent) 100%, transparent 150%),
+//       radial-gradient(2px 80px at 0px 179px, color-mix(in srgb, var(--color-warning) 15%, transparent), transparent),
+//       radial-gradient(2px 80px at 300px 179px, color-mix(in srgb, var(--color-warning) 15%, transparent), transparent),
+//       radial-gradient(1px 1px at 150px 89.5px, color-mix(in srgb, var(--color-warning) 30%, transparent) 100%, transparent 150%),
+//       radial-gradient(2px 80px at 0px 299px, color-mix(in srgb, var(--accent-primary) 10%, transparent), transparent),
+//       radial-gradient(2px 80px at 300px 299px, color-mix(in srgb, var(--accent-primary) 10%, transparent), transparent),
+//       radial-gradient(1px 1px at 150px 149.5px, color-mix(in srgb, var(--accent-primary) 20%, transparent) 100%, transparent 150%),
+//       radial-gradient(2px 80px at 0px 215px, color-mix(in srgb, var(--color-warning) 12%, transparent), transparent),
+//       radial-gradient(2px 80px at 300px 215px, color-mix(in srgb, var(--color-warning) 12%, transparent), transparent),
+//       radial-gradient(1px 1px at 150px 107.5px, color-mix(in srgb, var(--color-warning) 25%, transparent) 100%, transparent 150%),
+//       radial-gradient(2px 80px at 0px 281px, color-mix(in srgb, var(--color-error) 10%, transparent), transparent),
+//       radial-gradient(2px 80px at 300px 281px, color-mix(in srgb, var(--color-warning) 10%, transparent), transparent),
+//       radial-gradient(1px 1px at 150px 140.5px, color-mix(in srgb, var(--color-error) 20%, transparent) 100%, transparent 150%),
+//       radial-gradient(2px 80px at 0px 158px, color-mix(in srgb, var(--accent-tertiary) 12%, transparent), transparent),
+//       radial-gradient(2px 80px at 300px 158px, color-mix(in srgb, var(--accent-tertiary) 12%, transparent), transparent),
+//       radial-gradient(1px 1px at 150px 79px, color-mix(in srgb, var(--accent-tertiary) 25%, transparent) 100%, transparent 150%),
+//       radial-gradient(2px 80px at 0px 210px, color-mix(in srgb, var(--accent-primary) 12%, transparent), transparent),
+//       radial-gradient(2px 80px at 300px 210px, color-mix(in srgb, var(--accent-primary) 12%, transparent), transparent),
+//       radial-gradient(1px 1px at 150px 105px, color-mix(in srgb, var(--accent-primary) 25%, transparent) 100%, transparent 150%);
+
+//     background-size:
+//       300px 235px, 300px 235px, 300px 235px,
+//       300px 252px, 300px 252px, 300px 252px,
+//       300px 150px, 300px 150px, 300px 150px,
+//       300px 253px, 300px 253px, 300px 253px,
+//       300px 204px, 300px 204px, 300px 204px,
+//       300px 134px, 300px 134px, 300px 134px,
+//       300px 179px, 300px 179px, 300px 179px,
+//       300px 299px, 300px 299px, 300px 299px,
+//       300px 215px, 300px 215px, 300px 215px,
+//       300px 281px, 300px 281px, 300px 281px,
+//       300px 158px, 300px 158px, 300px 158px,
+//       300px 210px, 300px 210px, 300px 210px;
+
+//     animation: gentleFloat 180s linear infinite;
+//     opacity: 0.8;
+//   }
+
+//   /* Fade Overlay for Depth */
+//   &::after {
+//     content: "";
+//     position: absolute;
+//     inset: 0;
+//     background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--bg-secondary) 40%, transparent) 0%, transparent 80%);
+//     pointer-events: none;
+//   }
+// }
+
+// @keyframes gentleFloat {
+//   0% {
+//     background-position:
+//       0px 220px, 3px 220px, 151.5px 337.5px,
+//       25px 24px, 28px 24px, 176.5px 150px,
+//       50px 16px, 53px 16px, 201.5px 91px,
+//       75px 224px, 78px 224px, 226.5px 350.5px,
+//       100px 19px, 103px 19px, 251.5px 121px,
+//       125px 120px, 128px 120px, 276.5px 187px,
+//       150px 31px, 153px 31px, 301.5px 120.5px,
+//       175px 235px, 178px 235px, 326.5px 384.5px,
+//       200px 121px, 203px 121px, 351.5px 228.5px,
+//       225px 224px, 228px 224px, 376.5px 364.5px,
+//       250px 26px, 253px 26px, 401.5px 105px,
+//       275px 75px, 278px 75px, 426.5px 180px;
+//   }
+
+//   to {
+//     background-position:
+//       0px 6800px, 3px 6800px, 151.5px 6917.5px,
+//       25px 13632px, 28px 13632px, 176.5px 13758px,
+//       50px 5416px, 53px 5416px, 201.5px 5491px,
+//       75px 17175px, 78px 17175px, 226.5px 17301.5px,
+//       100px 5119px, 103px 5119px, 251.5px 5221px,
+//       125px 8428px, 128px 8428px, 276.5px 8495px,
+//       150px 9876px, 153px 9876px, 301.5px 9965.5px,
+//       175px 13391px, 178px 13391px, 326.5px 13540.5px,
+//       200px 14741px, 203px 14741px, 351.5px 14848.5px,
+//       225px 18770px, 228px 18770px, 376.5px 18910.5px,
+//       250px 5082px, 253px 5082px, 401.5px 5161px,
+//       275px 6375px, 278px 6375px, 426.5px 6480px;
+//   }
+// }
+
+// /* ==========================================================================
+//    7. PRIME-NG DYNAMIC DIALOG CUSTOMIZATION (Synced)
+//    ========================================================================== */
+
+// /* Backdrop Styling */
+// .app-dialog-mask {
+//   background-color: rgba(0, 0, 0, 0.56) !important;
+//   backdrop-filter: blur(8px);
+//   -webkit-backdrop-filter: blur(8px);
+//   animation: fadeInMask 0.2s ease-out;
+// }
+
+// @keyframes fadeInMask {
+//   from {
+//     opacity: 0;
+//     backdrop-filter: blur(0px);
+//   }
+
+//   to {
+//     opacity: 1;
+//     backdrop-filter: blur(4px);
+//   }
+// }
+
+// /* Main Dialog Window */
+// .app-dialog {
+//   background: var(--component-surface-raised) !important;
+//   border: 1px solid var(--border-primary) !important;
+//   border-radius: var(--ui-border-radius-xl) !important;
+//   box-shadow: var(--elevation-3) !important;
+//   transform: translateY(0);
+//   animation: slideUpFade 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+//   display: flex !important;
+//   flex-direction: column;
+
+//   .p-dialog-header {
+//     background: var(--component-surface-raised) !important;
+//     border-bottom: 1px solid var(--border-primary) !important;
+//     padding: var(--spacing-xl) var(--spacing-2xl) !important;
+//     border-top-left-radius: var(--ui-border-radius-xl) !important;
+//     border-top-right-radius: var(--ui-border-radius-xl) !important;
+
+//     .p-dialog-title {
+//       font-family: var(--font-heading);
+//       font-size: var(--font-size-xl);
+//       font-weight: 600;
+//       color: var(--text-primary);
+//     }
+
+//     .p-dialog-header-icons button {
+//       background: transparent;
+//       color: var(--text-tertiary);
+//       border: none;
+//       border-radius: var(--ui-border-radius);
+//       width: 32px;
+//       height: 32px;
+//       transition: all var(--transition-base);
+
+//       &:hover {
+//         background: var(--component-bg-hover);
+//         color: var(--text-primary);
+//       }
+
+//       &:focus {
+//         box-shadow: 0 0 0 2px var(--accent-focus);
+//       }
+//     }
+//   }
+
+//   .p-dialog-content {
+//     background: var(--component-surface-raised) !important;
+//     color: var(--text-primary) !important;
+//   }
+
+//   .p-dialog-footer {
+//     background: var(--bg-secondary) !important;
+//     border-top: 1px solid var(--border-primary) !important;
+//     padding: var(--spacing-lg) var(--spacing-2xl) !important;
+//     display: flex;
+//     justify-content: flex-end;
+//     gap: var(--spacing-md);
+//     border-bottom-left-radius: var(--ui-border-radius-xl) !important;
+//     border-bottom-right-radius: var(--ui-border-radius-xl) !important;
+//   }
+// }
+
+// .enterprise-dialog {
+//   border-radius: calc(var(--ui-border-radius-xl) * 1.5) !important;
+
+//   &.p-dialog-maximized {
+//     border-radius: 0 !important;
+//     border: none !important;
+//   }
+// }
+
+// @keyframes slideUpFade {
+//   from {
+//     opacity: 0;
+//     transform: translateY(20px) scale(0.98);
+//   }
+
+//   to {
+//     opacity: 1;
+//     transform: translateY(0) scale(1);
+//   }
+// }
+
+// /* ==========================================================================
+//    8. SHARED COMPONENT MIXINS (Fixed with Master Tokens)
+//    ========================================================================== */
+
+// // ── Icon Alignment ────────────────────────────────────────────────────────
+// @mixin icon-host {
+//   display: inline-flex;
+//   align-items: center;
+//   gap: var(--spacing-xs);
+//   line-height: 1;
+
+//   .p-icon,
+//   svg {
+//     display: block;
+//     flex-shrink: 0;
+//     width: 1.25rem;
+//     height: 1.25rem;
+//     fill: currentColor;
+//   }
+// }
+
+// // ── Base input reset ────────────────────────────────────────────────────────
+// @mixin input-reset {
+//   appearance: none;
+//   -webkit-appearance: none;
+//   box-sizing: border-box;
+//   margin: 0;
+//   outline: none;
+// }
+
+// // ── Input base ──────────────────────────────────────────────────────────────
+// @mixin input-base {
+//   @include input-reset;
+//   display: block;
+//   width: 100%;
+//   height: 2rem;
+//   /* Matches your 2rem PrimeNG geometry override */
+//   padding: 0 var(--spacing-md);
+//   font-family: var(--font-body);
+//   font-size: var(--font-size-md);
+//   font-weight: var(--font-weight-normal);
+//   color: var(--text-primary);
+//   background: var(--bg-secondary);
+//   border: 1px solid var(--border-primary);
+//   border-radius: var(--ui-border-radius);
+//   transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+
+//   &::placeholder {
+//     color: var(--text-label);
+//   }
+
+//   &:hover:not(:disabled):not(:focus) {
+//     border-color: var(--border-secondary);
+//     background: var(--component-bg-hover);
+//   }
+
+//   &:focus {
+//     border-color: var(--accent-primary);
+//     box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus);
+//     background: var(--bg-primary);
+//   }
+
+//   &:disabled {
+//     background: var(--color-disabled);
+//     color: var(--color-disabled-text);
+//     border-color: var(--border-primary);
+//     cursor: not-allowed;
+//     opacity: var(--p-disabled-opacity, 0.6);
+//   }
+// }
+
+// // ── Overlay/dropdown panel ─────────────────────────────────────────────────
+// @mixin overlay-panel {
+//   background: var(--component-surface-raised);
+//   border: 1px solid var(--border-primary);
+//   border-radius: var(--ui-border-radius-lg);
+//   box-shadow: var(--elevation-2);
+// }
+
+// // ── List item (dropdown options, menu items) ─────────────────────────────
+// @mixin list-item {
 //   display: flex;
 //   align-items: center;
 //   gap: var(--spacing-sm);
-//   height: 100%;
-//   overflow: hidden;
-
-//   .customer-info {
-//     display: flex;
-//     flex-direction: column;
-//     gap: 1px;
-//     min-width: 0;
-//   }
-
-//   .customer-name {
-//     font-size: var(--font-size-sm);
-//     font-weight: var(--font-weight-semibold);
-//     color: var(--theme-text-primary);
-//     white-space: nowrap;
-//     overflow: hidden;
-//     text-overflow: ellipsis;
-//   }
-
-//   .customer-contact {
-//     display: flex;
-//     align-items: center;
-//     gap: 3px;
-//     font-size: var(--font-size-xs);
-//     color: var(--theme-text-tertiary);
-//     white-space: nowrap;
-//     overflow: hidden;
-//     text-overflow: ellipsis;
-//   }
-// }
-
-// /* ── Gap utilities ──────────────────────────────────────────────────────────── */
-// .gap-xs {
-//   gap: var(--spacing-xs, 4px);
-// }
-
-// .gap-sm {
-//   gap: var(--spacing-sm, 6px);
-// }
-
-// /* ── Padding overrides ──────────────────────────────────────────────────────── */
-// .px-sm {
-//   padding-inline: var(--spacing-sm, 6px);
-// }
-
-// /* ── Width ──────────────────────────────────────────────────────────────────── */
-// .w-full {
-//   width: 100%;
-// }
-
-// /* ── Line height helpers ────────────────────────────────────────────────────── */
-// .line-tight {
-//   line-height: var(--line-height-tight, 1.1);
-// }
-
-// /* ── Ellipsis truncation ────────────────────────────────────────────────────── */
-// .ellipsis {
-//   white-space: nowrap;
-//   overflow: hidden;
-//   text-overflow: ellipsis;
-// }
-
-// /* ── Typography helpers ─────────────────────────────────────────────────────── */
-// .font-mono {
-//   font-family: var(--font-mono);
-// }
-
-// .font-bold {
-//   font-weight: var(--font-weight-bold);
-// }
-
-// .font-semibold {
-//   font-weight: var(--font-weight-semibold);
-// }
-
-// .text-xs {
-//   font-size: var(--font-size-xs);
-// }
-
-// .text-sm {
-//   font-size: var(--font-size-sm);
-// }
-
-// .text-primary {
-//   color: var(--theme-text-primary);
-// }
-
-// .text-secondary {
-//   color: var(--theme-text-secondary);
-// }
-
-// .text-tertiary {
-//   color: var(--theme-text-tertiary);
-// }
-
-// .text-accent {
-//   color: var(--theme-accent-primary);
-// }
-
-// .text-info {
-//   color: var(--theme-info);
-// }
-
-// .text-success {
-//   color: var(--theme-success);
-// }
-
-// .text-warning {
-//   color: var(--theme-warning);
-// }
-
-// .text-error {
-//   color: var(--theme-error);
-// }
-
-// .tracking-tight {
-//   letter-spacing: -0.02em;
-// }
-
-// /* ── Cursor / interaction ───────────────────────────────────────────────────── */
-// .cursor-pointer {
-//   cursor: pointer;
-// }
-
-// .hover-underline:hover {
-//   text-decoration: underline;
-// }
-
-// /* ── Avatar tokens ──────────────────────────────────────────────────────────── */
-// /* Used by inline renderers that still build avatars manually (legacy support) */
-// .avatar-xs {
-//   display: inline-flex;
-//   align-items: center;
-//   justify-content: center;
-//   width: 24px;
-//   height: 24px;
-//   border-radius: 50%;
-//   font-size: 9px;
-//   font-weight: var(--font-weight-bold);
-//   flex-shrink: 0;
-//   letter-spacing: 0.02em;
-// }
-
-// .avatar-sm {
-//   display: inline-flex;
-//   align-items: center;
-//   justify-content: center;
-//   width: 32px;
+//   padding: var(--spacing-sm) var(--spacing-md);
 //   height: 32px;
-//   border-radius: 50%;
-//   font-size: 11px;
-//   font-weight: var(--font-weight-bold);
-//   flex-shrink: 0;
-//   letter-spacing: 0.02em;
-// }
-
-// /* ── Icon size helpers ──────────────────────────────────────────────────────── */
-// /* Works for both Tabler (ti) and PrimeIcons (pi) */
-// .icon-xxs {
-//   font-size: 10px;
-// }
-
-// .icon-xs {
-//   font-size: 13px;
-// }
-
-// .icon-sm {
-//   font-size: 15px;
-// }
-
-// .icon-md {
-//   font-size: 18px;
-// }
-
-// .icon-accent-muted {
-//   color: color-mix(in srgb, var(--theme-accent-primary) 60%, transparent 40%);
-// }
-
-// /* ── Grid badge (pill) ─────────────────────────────────────────────────────── */
-// .grid-badge {
-//   display: inline-flex;
-//   align-items: center;
-//   padding: 3px 10px;
-//   border-radius: var(--ui-border-radius-pill);
-//   font-size: 11px;
-//   font-weight: var(--font-weight-semibold);
-//   letter-spacing: 0.02em;
+//   border-radius: var(--ui-border-radius-sm);
+//   font-size: var(--font-size-sm);
+//   color: var(--text-secondary);
+//   cursor: pointer;
+//   transition: background var(--transition-fast);
 //   white-space: nowrap;
-//   line-height: 1.4;
+//   user-select: none;
+
+//   .p-icon,
+//   svg {
+//     width: 1.25rem;
+//     height: 1.25rem;
+//     flex-shrink: 0;
+//     display: block;
+//   }
+
+//   &:hover:not(.p-disabled):not(.p-highlight) {
+//     background: var(--component-bg-hover);
+//     color: var(--text-primary);
+//   }
+
+//   &.p-highlight {
+//     background: var(--accent-focus);
+//     color: var(--accent-primary);
+//     font-weight: var(--font-weight-medium);
+//   }
+
+//   &.p-disabled {
+//     opacity: var(--p-disabled-opacity, 0.6);
+//     cursor: not-allowed;
+//     pointer-events: none;
+//   }
 // }
 
-// /* Semantic variants */
-// .badge-info-soft {
-//   background: var(--color-info-bg);
-//   color: var(--color-info-dark);
-// }
-
-// .badge-warning-soft {
-//   background: var(--color-warning-bg);
-//   color: var(--color-warning-dark);
-// }
-
-// .badge-success-soft {
-//   background: var(--color-success-bg);
-//   color: var(--color-success-dark);
-// }
-
-// .badge-error-soft {
-//   background: var(--color-error-bg);
-//   color: var(--color-error-dark);
-// }
-
-// .badge-neutral-soft {
-//   background: var(--theme-bg-secondary);
-//   color: var(--theme-text-secondary);
-// }
-
-// /* Dynamic badge — colour injected via style attribute from _resolveBadgeTheme() */
-// .badge-dynamic {
-//   /* base styles only; bg & color set inline */
-// }
-
-// /* Solid success (used for "✓ Paid") */
-// .badge-success-solid {
+// // ── Icon-only action button ───────────────────────────────────────────────
+// @mixin icon-button($size: 28px) {
 //   display: inline-flex;
 //   align-items: center;
-//   gap: 4px;
-//   padding: 3px 10px;
-//   border-radius: var(--ui-border-radius-pill);
-//   background: var(--theme-success);
-//   color: #fff;
-//   font-size: 11px;
-//   font-weight: var(--font-weight-bold);
+//   justify-content: center;
+//   flex-shrink: 0;
+//   width: $size;
+//   height: $size;
+//   padding: 0;
+//   border: none;
+//   border-radius: var(--ui-border-radius-sm);
+//   background: transparent;
+//   color: var(--text-tertiary);
+//   cursor: pointer;
+//   transition: background var(--transition-fast), color var(--transition-fast);
+//   outline: none;
+
+//   .p-icon,
+//   svg {
+//     width: 1.25rem;
+//     height: 1.25rem;
+//     display: block;
+//     flex-shrink: 0;
+//   }
+
+//   &:hover {
+//     background: var(--component-bg-hover);
+//     color: var(--text-primary);
+//   }
+
+//   &:active {
+//     background: var(--component-bg-active);
+//   }
+
+//   &:focus-visible {
+//     box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus);
+//   }
 // }
 
-// /* ── Alert tag (inline overdue / due-soon label) ───────────────────────────── */
-// .tag-alert {
-//   display: inline-flex;
-//   align-items: center;
-//   gap: 3px;
-//   font-size: 10px;
-//   font-weight: var(--font-weight-semibold);
-//   letter-spacing: 0.02em;
-//   line-height: 1;
+// // ── Invalid state modifier ───────────────────────────────────────────────
+// @mixin invalid-state {
+//   border-color: var(--color-error) !important;
+
+//   &:focus {
+//     box-shadow: 0 0 0 var(--focus-ring-width) var(--color-error-bg) !important;
+//   }
 // }
 
-// /* ── Progress bar (balance due cell) ──────────────────────────────────────── */
-// .progress-track {
-//   width: 100%;
-//   height: 3px;
-//   background: color-mix(in srgb, var(--theme-border-primary) 60%, transparent 40%);
-//   border-radius: 99px;
-//   overflow: hidden;
+// // ── Feedback severity ────────────────────────────────────────────────────
+// @mixin severity($bg, $border, $text) {
+//   background: $bg;
+//   border-color: $border;
+//   color: $text;
+
+//   .p-message-icon,
+//   .p-toast-message-icon {
+//     color: $text;
+//     width: 1.5rem;
+//     height: 1.5rem;
+//   }
 // }
 
-// .progress-fill {
-//   height: 100%;
-//   background: var(--theme-accent-primary);
-//   border-radius: 99px;
-//   transition: width 0.3s ease;
+// .p-button {
+//   min-height: 2rem !important;
+//   line-height: var(--line-height-relaxed) !important;
+//   border-radius: var(--ui-border-radius) !important;
+//   white-space: nowrap !important;
 // }
 
+// .p-button-icon {
+//   font-size: 1.1rem !important;
+// }
 
+// /* ============================================================================
+//    APEX GLOBAL BUTTON SYSTEM — PERFECTION
+//    Unified design for native .btn and PrimeNG .p-button
+//    ============================================================================ */
 
+// /* 1. Base Geometry & Shared Properties */
+// .btn,
+// .p-button {
+//   box-sizing: border-box !important;
+//   display: inline-flex !important;
+//   align-items: center !important;
+//   justify-content: center !important;
+//   height: 2rem !important;
+//   padding: 0 var(--spacing-lg) !important;
+//   font-family: var(--font-body) !important;
+//   font-size: var(--font-size-sm) !important;
+//   font-weight: var(--font-weight-semibold) !important;
+//   border-radius: var(--ui-border-radius) !important;
+//   white-space: nowrap !important;
+//   cursor: pointer !important;
+//   transition: var(--transition-base) !important;
+//   gap: var(--spacing-sm) !important;
+//   user-select: none !important;
+//   text-decoration: none !important;
+//   border: 1px solid transparent !important;
+//   outline: none !important;
+//   position: relative !important;
+//   overflow: hidden !important;
 
-// // /* ==========================================================================
-// //    APEX INFINITY — GLOBAL STYLESHEET (v3.0)
-// //    Architecture: Enterprise Canonical Token System + Atomic Utilities
-// //    Prefix: ax- (Apex Experience)
-// //    ========================================================================== */
+//   &:disabled,
+//   &.p-disabled {
+//     opacity: 0.5 !important;
+//     cursor: not-allowed !important;
+//     pointer-events: none !important;
+//   }
 
-// // /* ==========================================================================
-// //    1. IMPORTS
-// //    ========================================================================== */
-// // @use 'tailwindcss';
-// // @import 'primeicons/primeicons.css';
-// // @import 'leaflet/dist/leaflet.css';
+//   &:hover:not(:disabled):not(.p-disabled) {
+//     transform: translateY(-1px);
+//     box-shadow: var(--elevation-2);
+//   }
 
-// // /* ==========================================================================
-// //    2. GLOBAL TOKENS (Single Source of Truth)
-// //    ========================================================================== */
-// // :root {
-// //   /* Typography (Fluid Compact Scale) */
-// //   --font-body: 'Inter', -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-// //   --font-heading: 'Plus Jakarta Sans', -apple-system, system-ui, sans-serif;
-// //   --font-mono: 'Fira Code', 'Courier New', monospace;
+//   &:active:not(:disabled):not(.p-disabled) {
+//     transform: translateY(0);
+//   }
 
-// //   --font-size-xs: clamp(0.55rem, 0.2vw + 0.5rem, 0.65rem);
-// //   --font-size-sm: clamp(0.65rem, 0.2vw + 0.6rem, 0.75rem);
-// //   --font-size-base: clamp(0.75rem, 0.2vw + 0.7rem, 0.8125rem);
-// //   --font-size-md: clamp(0.8125rem, 0.2vw + 0.75rem, 0.875rem);
-// //   --font-size-lg: clamp(0.875rem, 0.2vw + 0.8rem, 0.9375rem);
-// //   --font-size-xl: clamp(0.9375rem, 0.3vw + 0.85rem, 1rem);
-// //   --font-size-2xl: clamp(1rem, 0.4vw + 0.9rem, 1.125rem);
-// //   --font-size-3xl: clamp(1.125rem, 0.8vw + 0.9rem, 1.375rem);
-// //   --font-size-4xl: clamp(1.375rem, 1.2vw + 1rem, 1.75rem);
+//   &:focus-visible {
+//     box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus) !important;
+//   }
+// }
 
-// //   --line-height-tight: 1.1;
-// //   --line-height-normal: 1.3;
-// //   --line-height-relaxed: 1.5;
+// /* 2. Style Variants */
 
-// //   --font-weight-normal: 400;
-// //   --font-weight-medium: 500;
-// //   --font-weight-semibold: 600;
-// //   --font-weight-bold: 700;
+// /* Default / Secondary (Outlined Look) */
+// .btn,
+// .p-button:not([severity]):not(.p-button-primary):not(.p-button-secondary):not(.p-button-success):not(.p-button-info):not(.p-button-warn):not(.p-button-danger) {
+//   background: var(--bg-ternary) !important;
+//   border: 1px solid var(--border-primary) !important;
+//   color: var(--text-secondary) !important;
+//   box-shadow: var(--shadow-xs) !important;
 
-// //   /* Spacing (Fluid) */
-// //   --spacing-xs: clamp(0.125rem, 0.2vw + 0.1rem, 0.25rem);
-// //   --spacing-sm: clamp(0.25rem, 0.3vw + 0.15rem, 0.375rem);
-// //   --spacing-md: clamp(0.375rem, 0.4vw + 0.2rem, 0.5rem);
-// //   --spacing-lg: clamp(0.5rem, 0.5vw + 0.3rem, 0.75rem);
-// //   --spacing-xl: clamp(0.75rem, 0.8vw + 0.4rem, 1rem);
-// //   --spacing-2xl: clamp(1rem, 1.2vw + 0.5rem, 1.5rem);
-// //   --spacing-3xl: clamp(1.5rem, 1.5vw + 0.75rem, 2rem);
-// //   --spacing-4xl: clamp(2rem, 2vw + 1rem, 2.75rem);
+//   &:hover:not(:disabled) {
+//     background: var(--component-bg-hover) !important;
+//     border-color: var(--border-secondary) !important;
+//     color: var(--text-primary) !important;
+//   }
+// }
 
-// //   /* Geometry & Borders */
-// //   --ui-border-radius-sm: 6px;
-// //   --ui-border-radius: 10px;
-// //   --ui-border-radius-lg: clamp(16px, 2vw, 20px);
-// //   --ui-border-radius-xl: clamp(20px, 3vw, 28px);
-// //   --ui-border-radius-pill: 9999px;
-// //   --ui-border-width: 1px;
+// /* Primary / Accent (Gradient Look) */
+// .btn-primary,
+// .p-button-primary,
+// .p-button[severity="primary"] {
+//   background: var(--accent-gradient) !important;
+//   color: #fff !important;
+//   box-shadow: var(--elevation-1) !important;
 
-// //   /* Base Shadows */
-// //   --shadow-xs: 0 0.5px 1px rgba(0, 0, 0, 0.04);
-// //   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-// //   --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.08);
+//   &:hover:not(:disabled) {
+//     filter: brightness(1.08);
+//   }
+// }
 
-// //   /* Interactions */
-// //   --transition-fast: all 0.12s cubic-bezier(0.23, 1, 0.32, 1);
-// //   --transition-base: all 0.22s cubic-bezier(0.2, 0.9, 0.2, 1);
-// //   --focus-ring-width: 2px;
-// //   --z-sticky: 200;
-// //   --z-modal: 500;
-// // }
+// /* Success */
+// .btn-success,
+// .p-button-success,
+// .p-button[severity="success"] {
+//   background: var(--color-success) !important;
+//   color: #fff !important;
 
-// // /* ==========================================================================
-// //    3. CSS RESET & DOCUMENT BASE
-// //    ========================================================================== */
-// // html,
-// // body {
-// //   margin: 0;
-// //   padding: 0;
-// //   width: 100%;
-// //   height: 100%;
-// // }
+//   &.p-button-outlined {
+//     background: transparent !important;
+//     border-color: var(--color-success-border) !important;
+//     color: var(--color-success) !important;
 
-// // body {
-// //   font-family: var(--font-body);
-// //   background-color: var(--bg-primary);
-// //   color: var(--text-primary);
-// //   -webkit-font-smoothing: antialiased;
-// //   -moz-osx-font-smoothing: grayscale;
-// //   line-height: var(--line-height-normal);
-// // }
+//     &:hover:not(:disabled) {
+//       background: var(--color-success-bg) !important;
+//     }
+//   }
+// }
 
-// // *,
-// // *::before,
-// // *::after {
-// //   box-sizing: border-box;
-// // }
+// /* Danger / Error */
+// .btn-danger,
+// .p-button-danger,
+// .p-button[severity="danger"] {
+//   background: var(--color-error) !important;
+//   color: #fff !important;
 
-// // /* Custom Scrollbars */
-// // * {
-// //   scrollbar-width: thin;
-// //   scrollbar-color: var(--scroll-thumb-c, var(--border-primary)) transparent;
-// // }
+//   &.p-button-outlined {
+//     background: transparent !important;
+//     border-color: var(--color-error-border) !important;
+//     color: var(--color-error) !important;
 
-// // ::-webkit-scrollbar {
-// //   width: 6px;
-// //   height: 6px;
-// // }
+//     &:hover:not(:disabled) {
+//       background: var(--color-error-bg) !important;
+//     }
+//   }
+// }
 
-// // ::-webkit-scrollbar-track {
-// //   background: transparent;
-// // }
+// /* Warning */
+// .btn-warn,
+// .p-button-warn,
+// .p-button[severity="warn"] {
+//   background: var(--color-warning) !important;
+//   color: #fff !important;
 
-// // ::-webkit-scrollbar-thumb {
-// //   background: var(--scroll-thumb-c, var(--border-primary));
-// //   border-radius: var(--ui-border-radius-pill);
-// // }
+//   &.p-button-outlined {
+//     background: transparent !important;
+//     border-color: var(--color-warning-border) !important;
+//     color: var(--color-warning) !important;
 
-// // /* ==========================================================================
-// //    4. ATOMIC UTILITY FRAMEWORK (ax- prefix)
-// //    ========================================================================== */
+//     &:hover:not(:disabled) {
+//       background: var(--color-warning-bg) !important;
+//     }
+//   }
+// }
 
-// // /* ── Display & Position ── */
-// // .ax-flex {
+// /* Info */
+// .btn-info,
+// .p-button-info,
+// .p-button[severity="info"] {
+//   background: var(--color-info) !important;
+//   color: #fff !important;
+// }
+
+// /* 3. Global Outlined Mode Override */
+// .p-button-outlined {
+//   background: transparent !important;
+//   border: 1px solid var(--border-secondary) !important;
+//   color: var(--text-secondary) !important;
+
+//   &:hover:not(:disabled) {
+//     background: var(--component-bg-hover) !important;
+//   }
+// }
+
+// /* 4. Global Text Mode Override (Borderless) */
+// .btn-text,
+// .p-button-text,
+// .btn.borderless {
+//   background: transparent !important;
+//   border: none !important;
+//   box-shadow: none !important;
+//   padding: 0 var(--spacing-md) !important;
+//   color: var(--text-secondary) !important;
+
+//   &:hover:not(:disabled) {
+//     background: var(--component-bg-hover) !important;
+//     color: var(--text-primary) !important;
+//     transform: none !important;
+//     box-shadow: none !important;
+//   }
+// }
+
+// /* 5. Size Adjustments */
+// .btn-sm,
+// .p-button-sm {
+//   height: 1.75rem !important;
+//   font-size: var(--font-size-xs) !important;
+//   padding: 0 var(--spacing-sm) !important;
+// }
+
+// .btn-lg,
+// .p-button-lg {
+//   height: 2.5rem !important;
+//   font-size: var(--font-size-base) !important;
+//   padding: 0 var(--spacing-xl) !important;
+// }
+
+// /* 6. Icon Handling Synchronization */
+// .btn .pi,
+// .p-button .p-button-icon {
+//   font-size: 1rem !important;
+
+//   &:only-child {
+//     font-size: 1.125rem !important;
+//     margin: 0 !important;
+//   }
+// }
+
+// /* ============================================================================
+//    APEX GLOBAL INPUT & SELECT SYSTEM — PERFECTION
+//    Unified design for all PrimeNG input components (40px / 2.5rem standard)
+//    ============================================================================ */
+
+// /* 1. Universal Input Base (InputText, DatePicker, Select, etc.) */
+// .p-inputtext,
+// .p-select,
+// .p-multiselect,
+// .p-datepicker-input,
+// .p-inputnumber-input {
+//   box-sizing: border-box !important;
+//   height: 2rem !important;
+//   font-family: var(--font-body) !important;
+//   font-size: var(--font-size-sm) !important;
+//   border-radius: var(--ui-border-radius) !important;
+//   border: 1px solid var(--border-primary) !important;
+//   background: var(--bg-primary) !important;
+//   color: var(--text-primary) !important;
+//   padding: 0 var(--spacing-lg) !important;
+//   transition: var(--transition-base) !important;
+//   box-shadow: var(--shadow-xs) !important;
+//   display: inline-flex !important;
+//   align-items: center !important;
+
+//   &:hover:not(:disabled):not(.p-disabled):not(.p-invalid) {
+//     border-color: var(--border-secondary) !important;
+//     background: var(--component-bg-hover) !important;
+//   }
+
+//   &:focus,
+//   &.p-focus {
+//     border-color: var(--accent-primary) !important;
+//     box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus) !important;
+//     outline: none !important;
+//     background: var(--bg-primary) !important;
+//   }
+
+//   &.p-invalid {
+//     border-color: var(--color-error) !important;
+
+//     &:focus {
+//       box-shadow: 0 0 0 var(--focus-ring-width) var(--color-error-bg) !important;
+//     }
+//   }
+
+//   &::placeholder {
+//     color: var(--text-tertiary) !important;
+//     opacity: 1 !important;
+//   }
+// }
+
+// /* 2. Select & MultiSelect Internal Label Alignment (Centering Fix) */
+// .p-select,
+// .p-multiselect {
+//   padding: 0 !important;
+//   /* Reset container padding to let label handle it */
+
+//   .p-select-label,
+//   .p-multiselect-label {
+//     padding: 0 var(--spacing-lg) !important;
+//     height: 100% !important;
+//     display: flex !important;
+//     align-items: center !important;
+//     line-height: normal !important;
+//     color: var(--text-primary) !important;
+//     background: transparent !important;
+//     border: none !important;
+//     white-space: nowrap !important;
+//     overflow: hidden !important;
+//     text-overflow: ellipsis !important;
+
+//     &.p-placeholder {
+//       color: var(--text-tertiary) !important;
+//     }
+//   }
+
+//   /* Dropdown Icon Centering */
+//   .p-select-dropdown,
+//   .p-multiselect-dropdown {
+//     width: 2rem !important;
+//     display: flex !important;
+//     align-items: center !important;
+//     justify-content: center !important;
+//     color: var(--text-tertiary) !important;
+
+//     .p-icon,
+//     svg {
+//       width: 0.875rem !important;
+//       height: 0.875rem !important;
+//     }
+//   }
+// }
+
+// /* 3. MultiSelect Chip/Token Alignment */
+// .p-multiselect-token {
+//   padding: 2px 8px !important;
+//   margin-right: 4px !important;
+//   background: var(--accent-focus) !important;
+//   color: var(--accent-primary) !important;
+//   border-radius: var(--ui-border-radius-sm) !important;
+//   font-size: var(--font-size-xs) !important;
+//   font-weight: 600 !important;
+
+//   .p-multiselect-token-icon {
+//     margin-left: 4px !important;
+//     font-size: 0.75rem !important;
+//   }
+// }
+
+// /* 4. Filter Panel Specific Alignment (Refined) */
+// .app-filter-panel {
+
+//   .filter-actions,
+//   .filter-actions-right {
+//     display: flex !important;
+//     align-items: center !important;
+//     /* Changed from flex-end to center */
+//     gap: var(--spacing-md) !important;
+//     height: 2rem !important;
+//     /* Match input height */
+//   }
+// }
+
+// // Global — PrimeNG dialog overrides for apex-chart-dialog
+// .apex-chart-dialog {
+//   &.p-dialog {
+//     height: 80vh !important;
+//     max-height: 80vh !important;
+//     border-radius: var(--ui-border-radius-xl) !important;
+//     border: 1px solid var(--border-primary) !important;
+//     box-shadow: var(--elevation-3) !important;
+//     overflow: hidden !important;
+//   }
+
+//   .p-dialog-content {
+//     flex: 1;
+//     height: 100%;
+//     padding: 0 !important;
+//     overflow: hidden !important;
+//     border-radius: 0 !important;
+//   }
+// }
+
+// /* ============================================================================
+//    APEX GLOBAL 3D GLASSMORPHIC GRID SYSTEM — ENTIRE PROJECT INTEGRATION
+//    ============================================================================ */
+
+// /* 1. Global tag layout sizing to prevent collapse in flex wrappers */
+// app-shared-grid,
+// app-ag-share-grid {
+//   display: block !important;
+//   flex: 1 !important;
+//   height: 100% !important;
+//   width: 100% !important;
+//   min-height: 0 !important;
+// }
+
+// /* 2. Unified 3D Glassmorphic Surface styling for all grids by default */
+// .shared-grid-root,
+// .shared-grid-container {
+//   background: var(--component-bg, rgba(17, 24, 39, 0.7)) !important;
+//   border: 1px solid var(--border-primary, rgba(255, 255, 255, 0.08)) !important;
+//   border-radius: 1.25rem !important;
+//   backdrop-filter: blur(16px) !important;
+//   -webkit-backdrop-filter: blur(16px) !important;
+//   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37) !important;
+//   overflow: hidden !important;
+// }
+
+// /* 3. Outer card-padded container for storefront layouts */
+// .premium-grid-container {
+//   flex: 1;
+//   background: var(--component-bg, rgba(17, 24, 39, 0.7));
+//   border: 1px solid var(--border-primary, rgba(255, 255, 255, 0.08));
+//   border-radius: 1.25rem;
+//   padding: 1.5rem;
+//   backdrop-filter: blur(16px);
+//   -webkit-backdrop-filter: blur(16px);
+//   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+//   display: flex;
+//   flex-direction: column;
+//   position: relative;
+
+//   /* Dissolve grid inner borders/backgrounds when wrapped inside padded card */
+//   app-shared-grid .shared-grid-container,
+//   app-ag-share-grid .shared-grid-root {
+//     border: none !important;
+//     background: transparent !important;
+//     box-shadow: none !important;
+//     backdrop-filter: none !important;
+//     -webkit-backdrop-filter: none !important;
+//     border-radius: 0 !important;
+//   }
+// }
+
+// /* ============================================================================
+//    ENTERPRISE COMPACT LIST DENSITY
+//    Keeps list headers and filter regions subordinate to the data grid.
+//    ============================================================================ */
+
+// .app-container {
+//   .container-header {
+//     padding: var(--spacing-md) var(--spacing-lg) !important;
+//     gap: var(--spacing-sm) !important;
+//     min-height: 56px;
+
+//     .container-title {
+//       font-size: var(--font-size-lg) !important;
+//       line-height: 1.2 !important;
+//     }
+
+//     .container-subtitle {
+//       font-size: var(--font-size-xs) !important;
+//       margin-top: 2px !important;
+//       line-height: 1.25 !important;
+//     }
+//   }
+
+//   .container-body {
+//     padding: var(--spacing-md) !important;
+//     gap: var(--spacing-sm) !important;
+//     min-height: 0;
+//   }
+// }
+
+// .list-page-container {
+//   padding: var(--spacing-md) !important;
+//   gap: var(--spacing-sm) !important;
+//   min-height: 0;
+// }
+
+// .list-header,
+// .page-header,
+// .dashboard-header {
+//   margin-bottom: var(--spacing-sm) !important;
+//   padding: var(--spacing-sm) var(--spacing-md) !important;
+//   min-height: 44px;
+// }
+
+// .list-title,
+// .page-header h1,
+// .page-header h2,
+// .dashboard-header h1,
+// .dashboard-header h2 {
+//   font-size: var(--font-size-xl) !important;
+//   line-height: 1.2 !important;
+// }
+
+// .themed-card,
+// .list-content-area {
+//   padding: var(--spacing-md) !important;
+//   gap: var(--spacing-sm) !important;
+//   min-height: 0 !important;
+// }
+
+// .app-filter-panel,
+// .se-filter-bar,
+// .filters {
+//   gap: var(--spacing-sm) !important;
+//   padding: var(--spacing-sm) var(--spacing-md) !important;
+//   margin-bottom: var(--spacing-sm) !important;
+//   align-items: center !important;
+//   min-height: 44px;
+// }
+
+// .app-filter-panel {
+//   border-radius: var(--ui-border-radius) !important;
+
+//   &.single-row {
+//     padding-bottom: var(--spacing-sm) !important;
+//   }
+// }
+
+// .app-filter-panel .filter-field,
+// .se-filter-bar .se-filter-field {
+//   gap: 3px !important;
+//   min-width: 150px !important;
+//   max-width: 240px !important;
+//   flex: 1 1 170px !important;
+
+//   label {
+//     font-size: 10px !important;
+//     line-height: 1.1 !important;
+//     letter-spacing: 0.04em !important;
+//   }
+// }
+
+// .app-filter-panel .filter-actions,
+// .app-filter-panel .filter-actions-right,
+// .se-filter-actions,
+// .header-actions {
+//   gap: var(--spacing-xs) !important;
+//   min-height: 2rem !important;
+// }
+
+// .app-filter-panel .p-inputtext,
+// .app-filter-panel .p-select,
+// .app-filter-panel .p-multiselect,
+// .app-filter-panel .p-datepicker,
+// .se-filter-bar .p-inputtext,
+// .se-filter-bar .p-select,
+// .se-filter-bar .p-multiselect,
+// .se-filter-bar .p-datepicker,
+// .filters input,
+// .filters select {
+//   min-height: 2rem !important;
+//   height: 2rem !important;
+//   font-size: var(--font-size-xs) !important;
+// }
+
+// .app-filter-panel .p-button,
+// .se-filter-bar .p-button,
+// .filters .p-button,
+// .header-actions .p-button {
+//   min-height: 2rem !important;
+//   padding: 0.35rem 0.65rem !important;
+//   font-size: var(--font-size-xs) !important;
+// }
+
+// .stats-strip {
+//   gap: var(--spacing-xs) !important;
+
+//   .stat-card {
+//     padding: var(--spacing-sm) var(--spacing-md) !important;
+//     gap: 2px !important;
+//     min-height: 48px !important;
+//   }
+
+//   .stat-val {
+//     font-size: var(--font-size-md) !important;
+//     line-height: 1.15 !important;
+//   }
+// }
+
+// .list-grid-wrapper,
+// .list-grid-area,
+// .grid-container,
+// .classic-grid-wrapper {
+//   flex: 1 1 auto !important;
+//   min-height: 0 !important;
+// }
+
+// // /* =============================================================================
+// //    APEX CRM — AG Grid Cell Utility Classes
+// //    Add this block to apex-ui-classes.scss (or import as a partial)
+// //    These classes are used by the invoice-list.columns.ts cell renderers.
+// //    All values reference theme tokens from apex-themes-v2.scss.
+// //    ============================================================================= */
+
+// // /* ── Layout helpers ─────────────────────────────────────────────────────────── */
+// // .cell-flex-center {
 // //   display: flex;
-// // }
-
-// // .ax-inline-flex {
-// //   display: inline-flex;
-// // }
-
-// // .ax-grid {
-// //   display: grid;
-// // }
-
-// // .ax-block {
-// //   display: block;
-// // }
-
-// // .ax-hidden {
-// //   display: none !important;
-// // }
-
-// // .ax-relative {
-// //   position: relative;
-// // }
-
-// // .ax-absolute {
-// //   position: absolute;
-// // }
-
-// // .ax-fixed {
-// //   position: fixed;
-// // }
-
-// // .ax-sticky {
-// //   position: sticky;
-// //   top: 0;
-// //   z-index: var(--z-sticky);
-// // }
-
-// // .ax-inset-0 {
-// //   position: absolute;
-// //   top: 0;
-// //   right: 0;
-// //   bottom: 0;
-// //   left: 0;
-// // }
-
-// // .ax-w-full {
-// //   width: 100%;
-// // }
-
-// // .ax-h-full {
-// //   height: 100%;
-// // }
-
-// // /* ── Flex Alignment ── */
-// // .ax-flex-col {
-// //   flex-direction: column;
-// // }
-
-// // .ax-flex-row {
-// //   flex-direction: row;
-// // }
-
-// // .ax-wrap {
-// //   flex-wrap: wrap;
-// // }
-
-// // .ax-nowrap {
-// //   flex-wrap: nowrap;
-// // }
-
-// // .ax-items-start {
-// //   align-items: flex-start;
-// // }
-
-// // .ax-items-center {
 // //   align-items: center;
+// //   height: 100%;
+// //   overflow: hidden;
 // // }
 
-// // .ax-items-end {
+// // .cell-flex-end {
+// //   display: flex;
+// //   align-items: center;
+// //   justify-content: flex-end;
+// //   height: 100%;
+// //   overflow: hidden;
+// // }
+
+// // .cell-stack {
+// //   display: flex;
+// //   flex-direction: column;
+// //   justify-content: center;
+// //   gap: 2px;
+// //   height: 100%;
+// //   overflow: hidden;
+// // }
+
+// // .cell-stack.align-end {
 // //   align-items: flex-end;
 // // }
 
-// // .ax-items-stretch {
-// //   align-items: stretch;
-// // }
-
-// // .ax-justify-start {
-// //   justify-content: flex-start;
-// // }
-
-// // .ax-justify-center {
-// //   justify-content: center;
-// // }
-
-// // .ax-justify-end {
-// //   justify-content: flex-end;
-// // }
-
-// // .ax-justify-between {
-// //   justify-content: space-between;
-// // }
-
-// // .ax-flex-1 {
-// //   flex: 1;
-// //   min-width: 0;
-// //   min-height: 0;
-// // }
-
-// // .ax-shrink-0 {
-// //   flex-shrink: 0;
-// // }
-
-// // /* ── Spacing (Gap) ── */
-// // .ax-gap-xs {
-// //   gap: var(--spacing-xs);
-// // }
-
-// // .ax-gap-sm {
+// // .cell-customer {
+// //   display: flex;
+// //   align-items: center;
 // //   gap: var(--spacing-sm);
+// //   height: 100%;
+// //   overflow: hidden;
+
+// //   .customer-info {
+// //     display: flex;
+// //     flex-direction: column;
+// //     gap: 1px;
+// //     min-width: 0;
+// //   }
+
+// //   .customer-name {
+// //     font-size: var(--font-size-sm);
+// //     font-weight: var(--font-weight-semibold);
+// //     color: var(--theme-text-primary);
+// //     white-space: nowrap;
+// //     overflow: hidden;
+// //     text-overflow: ellipsis;
+// //   }
+
+// //   .customer-contact {
+// //     display: flex;
+// //     align-items: center;
+// //     gap: 3px;
+// //     font-size: var(--font-size-xs);
+// //     color: var(--theme-text-tertiary);
+// //     white-space: nowrap;
+// //     overflow: hidden;
+// //     text-overflow: ellipsis;
+// //   }
 // // }
 
-// // .ax-gap-md {
-// //   gap: var(--spacing-md);
+// // /* ── Gap utilities ──────────────────────────────────────────────────────────── */
+// // .gap-xs {
+// //   gap: var(--spacing-xs, 4px);
 // // }
 
-// // .ax-gap-lg {
-// //   gap: var(--spacing-lg);
+// // .gap-sm {
+// //   gap: var(--spacing-sm, 6px);
 // // }
 
-// // .ax-gap-xl {
-// //   gap: var(--spacing-xl);
+// // /* ── Padding overrides ──────────────────────────────────────────────────────── */
+// // .px-sm {
+// //   padding-inline: var(--spacing-sm, 6px);
 // // }
 
-// // .ax-gap-2xl {
-// //   gap: var(--spacing-2xl);
+// // /* ── Width ──────────────────────────────────────────────────────────────────── */
+// // .w-full {
+// //   width: 100%;
 // // }
 
-// // /* ── Spacing (Padding) ── */
-// // .ax-p-0 {
-// //   padding: 0;
+// // /* ── Line height helpers ────────────────────────────────────────────────────── */
+// // .line-tight {
+// //   line-height: var(--line-height-tight, 1.1);
 // // }
 
-// // .ax-p-xs {
-// //   padding: var(--spacing-xs);
-// // }
-
-// // .ax-p-sm {
-// //   padding: var(--spacing-sm);
-// // }
-
-// // .ax-p-md {
-// //   padding: var(--spacing-md);
-// // }
-
-// // .ax-p-lg {
-// //   padding: var(--spacing-lg);
-// // }
-
-// // .ax-p-xl {
-// //   padding: var(--spacing-xl);
-// // }
-
-// // .ax-p-2xl {
-// //   padding: var(--spacing-2xl);
-// // }
-
-// // .ax-px-sm {
-// //   padding-left: var(--spacing-sm);
-// //   padding-right: var(--spacing-sm);
-// // }
-
-// // .ax-px-md {
-// //   padding-left: var(--spacing-md);
-// //   padding-right: var(--spacing-md);
-// // }
-
-// // .ax-px-lg {
-// //   padding-left: var(--spacing-lg);
-// //   padding-right: var(--spacing-lg);
-// // }
-
-// // .ax-px-xl {
-// //   padding-left: var(--spacing-xl);
-// //   padding-right: var(--spacing-xl);
-// // }
-
-// // .ax-py-sm {
-// //   padding-top: var(--spacing-sm);
-// //   padding-bottom: var(--spacing-sm);
-// // }
-
-// // .apex-py-md {
-// //   padding-top: var(--spacing-md);
-// //   padding-bottom: var(--spacing-md);
-// // }
-
-// // /* Kept legacy apex- temporarily to prevent breaks */
-// // .ax-py-md {
-// //   padding-top: var(--spacing-md);
-// //   padding-bottom: var(--spacing-md);
-// // }
-
-// // /* ── Spacing (Margin) ── */
-// // .ax-m-0 {
-// //   margin: 0;
-// // }
-
-// // .ax-mt-xs {
-// //   margin-top: var(--spacing-xs);
-// // }
-
-// // .ax-mt-sm {
-// //   margin-top: var(--spacing-sm);
-// // }
-
-// // .ax-mt-md {
-// //   margin-top: var(--spacing-md);
-// // }
-
-// // .ax-mb-sm {
-// //   margin-bottom: var(--spacing-sm);
-// // }
-
-// // .ax-mb-md {
-// //   margin-bottom: var(--spacing-md);
-// // }
-
-// // .ax-mb-lg {
-// //   margin-bottom: var(--spacing-lg);
-// // }
-
-// // .ax-ml-auto {
-// //   margin-left: auto;
-// // }
-
-// // .ax-mr-auto {
-// //   margin-right: auto;
-// // }
-
-// // /* ── Typography ── */
-// // .ax-font-heading {
-// //   font-family: var(--font-heading);
-// // }
-
-// // .ax-font-mono {
-// //   font-family: var(--font-mono);
-// // }
-
-// // .ax-text-3xl {
-// //   font-size: var(--font-size-3xl);
-// // }
-
-// // .ax-text-2xl {
-// //   font-size: var(--font-size-2xl);
-// // }
-
-// // .ax-text-xl {
-// //   font-size: var(--font-size-xl);
-// // }
-
-// // .ax-text-lg {
-// //   font-size: var(--font-size-lg);
-// // }
-
-// // .ax-text-base {
-// //   font-size: var(--font-size-base);
-// // }
-
-// // .ax-text-sm {
-// //   font-size: var(--font-size-sm);
-// // }
-
-// // .ax-text-xs {
-// //   font-size: var(--font-size-xs);
-// // }
-
-// // .ax-font-normal {
-// //   font-weight: var(--font-weight-normal);
-// // }
-
-// // .ax-font-medium {
-// //   font-weight: var(--font-weight-medium);
-// // }
-
-// // .ax-font-semibold {
-// //   font-weight: var(--font-weight-semibold);
-// // }
-
-// // .ax-font-bold {
-// //   font-weight: var(--font-weight-bold);
-// // }
-
-// // .ax-text-center {
-// //   text-align: center;
-// // }
-
-// // .ax-text-right {
-// //   text-align: right;
-// // }
-
-// // .ax-uppercase {
-// //   text-transform: uppercase;
-// // }
-
-// // .ax-capitalize {
-// //   text-transform: capitalize;
-// // }
-
-// // .ax-line-tight {
-// //   line-height: 1.1 !important;
-// //   display: block;
-// //   margin: 0;
-// // }
-
-// // .ax-truncate {
+// // /* ── Ellipsis truncation ────────────────────────────────────────────────────── */
+// // .ellipsis {
 // //   white-space: nowrap;
 // //   overflow: hidden;
 // //   text-overflow: ellipsis;
-// //   display: block;
-// //   max-width: 100%;
 // // }
 
-// // /* Semantic Colors */
-// // .ax-text-primary {
-// //   color: var(--text-primary);
+// // /* ── Typography helpers ─────────────────────────────────────────────────────── */
+// // .font-mono {
+// //   font-family: var(--font-mono);
 // // }
 
-// // .ax-text-secondary {
-// //   color: var(--text-secondary);
+// // .font-bold {
+// //   font-weight: var(--font-weight-bold);
 // // }
 
-// // .ax-text-tertiary {
-// //   color: var(--text-tertiary);
+// // .font-semibold {
+// //   font-weight: var(--font-weight-semibold);
 // // }
 
-// // .ax-text-accent {
-// //   color: var(--accent-primary);
+// // .text-xs {
+// //   font-size: var(--font-size-xs);
 // // }
 
-// // .ax-text-success {
-// //   color: var(--color-success);
+// // .text-sm {
+// //   font-size: var(--font-size-sm);
 // // }
 
-// // .ax-text-warning {
-// //   color: var(--color-warning);
+// // .text-primary {
+// //   color: var(--theme-text-primary);
 // // }
 
-// // .ax-text-error {
-// //   color: var(--color-error);
+// // .text-secondary {
+// //   color: var(--theme-text-secondary);
 // // }
 
-// // .ax-text-info {
-// //   color: var(--color-info);
+// // .text-tertiary {
+// //   color: var(--theme-text-tertiary);
 // // }
 
-// // /* ── Backgrounds & Borders ── */
-// // .ax-bg-primary {
-// //   background-color: var(--bg-primary);
+// // .text-accent {
+// //   color: var(--theme-accent-primary);
 // // }
 
-// // .ax-bg-secondary {
-// //   background-color: var(--bg-secondary);
+// // .text-info {
+// //   color: var(--theme-info);
 // // }
 
-// // .ax-bg-tertiary {
-// //   background-color: var(--bg-ternary);
+// // .text-success {
+// //   color: var(--theme-success);
 // // }
 
-// // .ax-bg-gradient {
-// //   background: var(--accent-gradient);
-// //   color: #fff;
+// // .text-warning {
+// //   color: var(--theme-warning);
 // // }
 
-// // .ax-border {
-// //   border: var(--ui-border-width) solid var(--border-primary);
+// // .text-error {
+// //   color: var(--theme-error);
 // // }
 
-// // .ax-border-b {
-// //   border-bottom: var(--ui-border-width) solid var(--component-divider);
+// // .tracking-tight {
+// //   letter-spacing: -0.02em;
 // // }
 
-// // .ax-border-t {
-// //   border-top: var(--ui-border-width) solid var(--component-divider);
-// // }
-
-// // .ax-border-transparent {
-// //   border: var(--ui-border-width) solid transparent;
-// // }
-
-// // /* Semantic Backgrounds */
-// // .ax-bg-success-soft {
-// //   background: var(--color-success-bg);
-// //   color: var(--color-success);
-// //   border: 1px solid var(--color-success-border);
-// // }
-
-// // .ax-bg-warning-soft {
-// //   background: var(--color-warning-bg);
-// //   color: var(--color-warning);
-// //   border: 1px solid var(--color-warning-border);
-// // }
-
-// // .ax-bg-error-soft {
-// //   background: var(--color-error-bg);
-// //   color: var(--color-error);
-// //   border: 1px solid var(--color-error-border);
-// // }
-
-// // .ax-bg-info-soft {
-// //   background: var(--color-info-bg);
-// //   color: var(--color-info);
-// //   border: 1px solid var(--color-info-border);
-// // }
-
-// // /* ── Radius & Elevation ── */
-// // .ax-rounded-sm {
-// //   border-radius: var(--ui-border-radius-sm);
-// // }
-
-// // .ax-rounded {
-// //   border-radius: var(--ui-border-radius);
-// // }
-
-// // .ax-rounded-lg {
-// //   border-radius: var(--ui-border-radius-lg);
-// // }
-
-// // .ax-rounded-xl {
-// //   border-radius: var(--ui-border-radius-xl);
-// // }
-
-// // .ax-rounded-pill {
-// //   border-radius: var(--ui-border-radius-pill);
-// // }
-
-// // .ax-rounded-full {
-// //   border-radius: 50%;
-// // }
-
-// // .ax-shadow-1 {
-// //   box-shadow: var(--elevation-1);
-// // }
-
-// // .ax-shadow-2 {
-// //   box-shadow: var(--elevation-2);
-// // }
-
-// // .ax-shadow-3 {
-// //   box-shadow: var(--elevation-3);
-// // }
-
-// // /* ── Interactive ── */
-// // .ax-cursor-pointer {
+// // /* ── Cursor / interaction ───────────────────────────────────────────────────── */
+// // .cursor-pointer {
 // //   cursor: pointer;
 // // }
 
-// // .ax-hover-bg {
-// //   transition: background-color var(--transition-fast);
+// // .hover-underline:hover {
+// //   text-decoration: underline;
 // // }
 
-// // .ax-hover-bg:hover {
-// //   background-color: var(--component-bg-hover);
-// // }
-
-// // /* ==========================================================================
-// //    5. COMPONENT ABSTRACTIONS (Built from Utilities)
-// //    ========================================================================== */
-
-// // /* The Standard Card */
-// // .ax-card {
-// //   background: var(--bg-secondary);
-// //   border: var(--ui-border-width) solid var(--border-primary);
-// //   border-radius: var(--ui-border-radius-lg);
-// //   box-shadow: var(--elevation-1);
-// // }
-
-// // /* The Luxury Glass Card */
-// // .ax-glass-card {
-// //   background: var(--glass-bg-c);
-// //   backdrop-filter: blur(var(--glass-blur-c));
-// //   -webkit-backdrop-filter: blur(var(--glass-blur-c));
-// //   border: 1px solid var(--glass-border-c);
-// //   box-shadow: var(--glass-shadow-c);
-// //   border-radius: var(--ui-border-radius-xl);
-// // }
-
-// // /* Base CRM Badge (Strict Height & Padding fix for grids) */
-// // .ax-badge {
+// // /* ── Avatar tokens ──────────────────────────────────────────────────────────── */
+// // /* Used by inline renderers that still build avatars manually (legacy support) */
+// // .avatar-xs {
 // //   display: inline-flex;
 // //   align-items: center;
 // //   justify-content: center;
-// //   padding: 0 8px;
-// //   height: 20px;
-// //   border-radius: var(--ui-border-radius-pill);
-// //   font-size: 10px;
+// //   width: 24px;
+// //   height: 24px;
+// //   border-radius: 50%;
+// //   font-size: 9px;
 // //   font-weight: var(--font-weight-bold);
-// //   text-transform: uppercase;
-// //   letter-spacing: 0.05em;
-// //   white-space: nowrap;
-// //   line-height: 1 !important;
+// //   flex-shrink: 0;
+// //   letter-spacing: 0.02em;
 // // }
 
-// // /* ==========================================================================
-// //    6. LAYOUT & STRUCTURAL SYSTEMS
-// //    ========================================================================== */
-
-// // /* Page Level Layout */
-// // .ax-page-layout {
-// //   padding: var(--spacing-xl);
-// //   display: flex;
-// //   flex-direction: column;
-// //   gap: var(--spacing-xl);
-// //   height: 100%;
-// //   width: 100%;
-// //   overflow: hidden;
-
-// //   @media (max-width: 768px) {
-// //     padding: var(--spacing-md);
-// //     gap: var(--spacing-md);
-// //   }
-// // }
-
-// // /* Data Density: Compact Header/Filter Overrides */
-// // .ax-compact-header {
-// //   margin-bottom: var(--spacing-sm);
-// //   padding: var(--spacing-sm) var(--spacing-md);
-// //   min-height: 44px;
-// // }
-
-// // /* Unified Filters Area */
-// // .ax-filter-bar {
-// //   display: flex;
+// // .avatar-sm {
+// //   display: inline-flex;
 // //   align-items: center;
-// //   gap: var(--spacing-sm);
-// //   padding: var(--spacing-sm) var(--spacing-md);
-// //   background: var(--bg-secondary);
-// //   border: var(--ui-border-width) solid var(--border-primary);
-// //   border-radius: var(--ui-border-radius);
-// //   flex-wrap: wrap;
-// //   min-height: 44px;
-
-// //   .ax-filter-item {
-// //     display: flex;
-// //     flex-direction: column;
-// //     gap: 3px;
-// //     flex: 1 1 170px;
-// //     min-width: 150px;
-// //     max-width: 240px;
-
-// //     label {
-// //       font-size: 10px;
-// //       line-height: 1.1;
-// //       letter-spacing: 0.04em;
-// //       color: var(--text-tertiary);
-// //       text-transform: uppercase;
-// //       font-weight: var(--font-weight-bold);
-// //     }
-// //   }
-
-// //   .ax-filter-actions {
-// //     display: flex;
-// //     align-items: flex-end;
-// //     gap: var(--spacing-xs);
-// //     margin-left: auto;
-// //   }
+// //   justify-content: center;
+// //   width: 32px;
+// //   height: 32px;
+// //   border-radius: 50%;
+// //   font-size: 11px;
+// //   font-weight: var(--font-weight-bold);
+// //   flex-shrink: 0;
+// //   letter-spacing: 0.02em;
 // // }
 
-// // /* Bulletproof AG-Grid Wrapper (The Fix) */
-// // .ax-grid-host {
-// //   flex: 1 1 auto;
-// //   position: relative;
-// //   min-height: 350px;
-// //   /* Prevents Zero-Height blowout */
+// // /* ── Icon size helpers ──────────────────────────────────────────────────────── */
+// // /* Works for both Tabler (ti) and PrimeIcons (pi) */
+// // .icon-xxs {
+// //   font-size: 10px;
+// // }
+
+// // .icon-xs {
+// //   font-size: 13px;
+// // }
+
+// // .icon-sm {
+// //   font-size: 15px;
+// // }
+
+// // .icon-md {
+// //   font-size: 18px;
+// // }
+
+// // .icon-accent-muted {
+// //   color: color-mix(in srgb, var(--theme-accent-primary) 60%, transparent 40%);
+// // }
+
+// // /* ── Grid badge (pill) ─────────────────────────────────────────────────────── */
+// // .grid-badge {
+// //   display: inline-flex;
+// //   align-items: center;
+// //   padding: 3px 10px;
+// //   border-radius: var(--ui-border-radius-pill);
+// //   font-size: 11px;
+// //   font-weight: var(--font-weight-semibold);
+// //   letter-spacing: 0.02em;
+// //   white-space: nowrap;
+// //   line-height: 1.4;
+// // }
+
+// // /* Semantic variants */
+// // .badge-info-soft {
+// //   background: var(--color-info-bg);
+// //   color: var(--color-info-dark);
+// // }
+
+// // .badge-warning-soft {
+// //   background: var(--color-warning-bg);
+// //   color: var(--color-warning-dark);
+// // }
+
+// // .badge-success-soft {
+// //   background: var(--color-success-bg);
+// //   color: var(--color-success-dark);
+// // }
+
+// // .badge-error-soft {
+// //   background: var(--color-error-bg);
+// //   color: var(--color-error-dark);
+// // }
+
+// // .badge-neutral-soft {
+// //   background: var(--theme-bg-secondary);
+// //   color: var(--theme-text-secondary);
+// // }
+
+// // /* Dynamic badge — colour injected via style attribute from _resolveBadgeTheme() */
+// // .badge-dynamic {
+// //   /* base styles only; bg & color set inline */
+// // }
+
+// // /* Solid success (used for "✓ Paid") */
+// // .badge-success-solid {
+// //   display: inline-flex;
+// //   align-items: center;
+// //   gap: 4px;
+// //   padding: 3px 10px;
+// //   border-radius: var(--ui-border-radius-pill);
+// //   background: var(--theme-success);
+// //   color: #fff;
+// //   font-size: 11px;
+// //   font-weight: var(--font-weight-bold);
+// // }
+
+// // /* ── Alert tag (inline overdue / due-soon label) ───────────────────────────── */
+// // .tag-alert {
+// //   display: inline-flex;
+// //   align-items: center;
+// //   gap: 3px;
+// //   font-size: 10px;
+// //   font-weight: var(--font-weight-semibold);
+// //   letter-spacing: 0.02em;
+// //   line-height: 1;
+// // }
+
+// // /* ── Progress bar (balance due cell) ──────────────────────────────────────── */
+// // .progress-track {
 // //   width: 100%;
-// //   border-radius: var(--ui-border-radius-lg);
+// //   height: 3px;
+// //   background: color-mix(in srgb, var(--theme-border-primary) 60%, transparent 40%);
+// //   border-radius: 99px;
 // //   overflow: hidden;
 // // }
 
-// // .ax-grid-fill {
-// //   position: absolute;
-// //   top: 0;
-// //   left: 0;
-// //   right: 0;
-// //   bottom: 0;
-// //   display: flex;
-// //   flex-direction: column;
+// // .progress-fill {
+// //   height: 100%;
+// //   background: var(--theme-accent-primary);
+// //   border-radius: 99px;
+// //   transition: width 0.3s ease;
 // // }
 
-// // /* Container component abstraction (for App/Dashboard) */
-// // .ax-container {
-// //   display: flex;
-// //   flex-direction: column;
-// //   background: var(--bg-primary);
-// //   border-radius: var(--ui-border-radius-lg);
-// //   box-shadow: var(--shadow-sm);
-// //   border: var(--ui-border-width) solid var(--border-primary);
-// //   overflow: hidden;
 
-// //   .ax-container-header {
-// //     padding: var(--spacing-md) var(--spacing-lg);
-// //     border-bottom: var(--ui-border-width) solid var(--border-secondary);
-// //     display: flex;
-// //     justify-content: space-between;
-// //     align-items: center;
-// //   }
 
-// //   .ax-container-body {
-// //     padding: var(--spacing-md);
-// //     flex: 1;
-// //     overflow-y: auto;
-// //   }
-// // }
 
-// // /* ==========================================================================
-// //    7. PRIME-NG OVERRIDES (Mapped to Tokens)
-// //    ========================================================================== */
+// // // /* ==========================================================================
+// // //    APEX INFINITY — GLOBAL STYLESHEET (v3.0)
+// // //    Architecture: Enterprise Canonical Token System + Atomic Utilities
+// // //    Prefix: ax- (Apex Experience)
+// // //    ========================================================================== */
 
-// // /* Universal Input Bases */
-// // .p-inputtext,
-// // .p-select,
-// // .p-multiselect,
-// // .p-datepicker-input,
-// // .p-inputnumber-input {
-// //   height: 2.25rem !important;
-// //   /* Forces all inputs to uniform height */
-// //   font-family: var(--font-body) !important;
-// //   font-size: var(--font-size-sm) !important;
-// //   border-radius: var(--ui-border-radius-sm) !important;
-// //   border: var(--ui-border-width) solid var(--border-primary) !important;
-// //   background: transparent !important;
-// //   color: var(--text-primary) !important;
-// //   padding: 0 var(--spacing-md) !important;
-// //   transition: var(--transition-base) !important;
-// //   display: inline-flex !important;
-// //   align-items: center !important;
+// // // /* ==========================================================================
+// // //    1. IMPORTS
+// // //    ========================================================================== */
+// // // @use 'tailwindcss';
+// // // @import 'primeicons/primeicons.css';
+// // // @import 'leaflet/dist/leaflet.css';
 
-// //   &:hover:not(:disabled) {
-// //     border-color: var(--border-secondary) !important;
-// //     background: var(--component-bg-hover) !important;
-// //   }
+// // // /* ==========================================================================
+// // //    2. GLOBAL TOKENS (Single Source of Truth)
+// // //    ========================================================================== */
+// // // :root {
+// // //   /* Typography (Fluid Compact Scale) */
+// // //   --font-body: 'Inter', -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+// // //   --font-heading: 'Plus Jakarta Sans', -apple-system, system-ui, sans-serif;
+// // //   --font-mono: 'Fira Code', 'Courier New', monospace;
 
-// //   &:focus,
-// //   &.p-focus {
-// //     border-color: var(--accent-primary) !important;
-// //     box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus) !important;
-// //     outline: none !important;
-// //   }
+// // //   --font-size-xs: clamp(0.55rem, 0.2vw + 0.5rem, 0.65rem);
+// // //   --font-size-sm: clamp(0.65rem, 0.2vw + 0.6rem, 0.75rem);
+// // //   --font-size-base: clamp(0.75rem, 0.2vw + 0.7rem, 0.8125rem);
+// // //   --font-size-md: clamp(0.8125rem, 0.2vw + 0.75rem, 0.875rem);
+// // //   --font-size-lg: clamp(0.875rem, 0.2vw + 0.8rem, 0.9375rem);
+// // //   --font-size-xl: clamp(0.9375rem, 0.3vw + 0.85rem, 1rem);
+// // //   --font-size-2xl: clamp(1rem, 0.4vw + 0.9rem, 1.125rem);
+// // //   --font-size-3xl: clamp(1.125rem, 0.8vw + 0.9rem, 1.375rem);
+// // //   --font-size-4xl: clamp(1.375rem, 1.2vw + 1rem, 1.75rem);
 
-// //   &::placeholder {
-// //     color: var(--text-tertiary) !important;
-// //   }
-// // }
+// // //   --line-height-tight: 1.1;
+// // //   --line-height-normal: 1.3;
+// // //   --line-height-relaxed: 1.5;
 
-// // /* Universal Button Bases */
-// // .p-button {
-// //   display: inline-flex !important;
-// //   align-items: center !important;
-// //   justify-content: center !important;
-// //   height: 2.25rem !important;
-// //   /* Match Input Heights */
-// //   padding: 0 var(--spacing-md) !important;
-// //   font-family: var(--font-body) !important;
-// //   font-size: var(--font-size-sm) !important;
-// //   font-weight: var(--font-weight-semibold) !important;
-// //   border-radius: var(--ui-border-radius-sm) !important;
-// //   white-space: nowrap !important;
-// //   transition: var(--transition-base) !important;
-// //   border: 1px solid transparent !important;
+// // //   --font-weight-normal: 400;
+// // //   --font-weight-medium: 500;
+// // //   --font-weight-semibold: 600;
+// // //   --font-weight-bold: 700;
 
-// //   /* Icon logic */
-// //   .p-button-icon {
-// //     font-size: 1rem !important;
-// //     margin-right: 6px !important;
-// //   }
+// // //   /* Spacing (Fluid) */
+// // //   --spacing-xs: clamp(0.125rem, 0.2vw + 0.1rem, 0.25rem);
+// // //   --spacing-sm: clamp(0.25rem, 0.3vw + 0.15rem, 0.375rem);
+// // //   --spacing-md: clamp(0.375rem, 0.4vw + 0.2rem, 0.5rem);
+// // //   --spacing-lg: clamp(0.5rem, 0.5vw + 0.3rem, 0.75rem);
+// // //   --spacing-xl: clamp(0.75rem, 0.8vw + 0.4rem, 1rem);
+// // //   --spacing-2xl: clamp(1rem, 1.2vw + 0.5rem, 1.5rem);
+// // //   --spacing-3xl: clamp(1.5rem, 1.5vw + 0.75rem, 2rem);
+// // //   --spacing-4xl: clamp(2rem, 2vw + 1rem, 2.75rem);
 
-// //   &.p-button-icon-only {
-// //     padding: 0 !important;
-// //     width: 2.25rem !important;
+// // //   /* Geometry & Borders */
+// // //   --ui-border-radius-sm: 6px;
+// // //   --ui-border-radius: 10px;
+// // //   --ui-border-radius-lg: clamp(16px, 2vw, 20px);
+// // //   --ui-border-radius-xl: clamp(20px, 3vw, 28px);
+// // //   --ui-border-radius-pill: 9999px;
+// // //   --ui-border-width: 1px;
 
-// //     .p-button-icon {
-// //       margin: 0 !important;
-// //     }
-// //   }
+// // //   /* Base Shadows */
+// // //   --shadow-xs: 0 0.5px 1px rgba(0, 0, 0, 0.04);
+// // //   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+// // //   --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.08);
 
-// //   /* Button Variants */
-// //   &.p-button-primary {
-// //     background: var(--accent-gradient) !important;
-// //     color: #fff !important;
-// //   }
+// // //   /* Interactions */
+// // //   --transition-fast: all 0.12s cubic-bezier(0.23, 1, 0.32, 1);
+// // //   --transition-base: all 0.22s cubic-bezier(0.2, 0.9, 0.2, 1);
+// // //   --focus-ring-width: 2px;
+// // //   --z-sticky: 200;
+// // //   --z-modal: 500;
+// // // }
 
-// //   &.p-button-primary:hover:not(:disabled) {
-// //     filter: brightness(1.1);
-// //     transform: translateY(-1px);
-// //     box-shadow: var(--elevation-2);
-// //   }
+// // // /* ==========================================================================
+// // //    3. CSS RESET & DOCUMENT BASE
+// // //    ========================================================================== */
+// // // html,
+// // // body {
+// // //   margin: 0;
+// // //   padding: 0;
+// // //   width: 100%;
+// // //   height: 100%;
+// // // }
 
-// //   &.p-button-outlined {
-// //     background: transparent !important;
-// //     border-color: var(--border-secondary) !important;
-// //     color: var(--text-secondary) !important;
+// // // body {
+// // //   font-family: var(--font-body);
+// // //   background-color: var(--bg-primary);
+// // //   color: var(--text-primary);
+// // //   -webkit-font-smoothing: antialiased;
+// // //   -moz-osx-font-smoothing: grayscale;
+// // //   line-height: var(--line-height-normal);
+// // // }
 
-// //     &:hover:not(:disabled) {
-// //       background: var(--component-bg-hover) !important;
-// //       color: var(--text-primary) !important;
-// //     }
-// //   }
+// // // *,
+// // // *::before,
+// // // *::after {
+// // //   box-sizing: border-box;
+// // // }
 
-// //   &.p-button-text {
-// //     background: transparent !important;
-// //     border: none !important;
-// //     color: var(--text-secondary) !important;
+// // // /* Custom Scrollbars */
+// // // * {
+// // //   scrollbar-width: thin;
+// // //   scrollbar-color: var(--scroll-thumb-c, var(--border-primary)) transparent;
+// // // }
 
-// //     &:hover:not(:disabled) {
-// //       background: var(--component-bg-hover) !important;
-// //       color: var(--text-primary) !important;
-// //     }
-// //   }
-// // }
+// // // ::-webkit-scrollbar {
+// // //   width: 6px;
+// // //   height: 6px;
+// // // }
 
-// // /* Universal Dialog Overrides */
-// // .p-dialog-mask {
-// //   background-color: rgba(0, 0, 0, 0.6) !important;
-// //   backdrop-filter: blur(8px);
-// //   -webkit-backdrop-filter: blur(8px);
-// // }
+// // // ::-webkit-scrollbar-track {
+// // //   background: transparent;
+// // // }
 
-// // .p-dialog {
-// //   background: var(--component-surface-raised) !important;
-// //   border: 1px solid var(--border-primary) !important;
-// //   border-radius: var(--ui-border-radius-xl) !important;
-// //   box-shadow: var(--elevation-3) !important;
+// // // ::-webkit-scrollbar-thumb {
+// // //   background: var(--scroll-thumb-c, var(--border-primary));
+// // //   border-radius: var(--ui-border-radius-pill);
+// // // }
 
-// //   .p-dialog-header {
-// //     background: transparent !important;
-// //     border-bottom: 1px solid var(--component-divider) !important;
-// //     padding: var(--spacing-lg) var(--spacing-xl) !important;
+// // // /* ==========================================================================
+// // //    4. ATOMIC UTILITY FRAMEWORK (ax- prefix)
+// // //    ========================================================================== */
 
-// //     .p-dialog-title {
-// //       font-family: var(--font-heading);
-// //       font-size: var(--font-size-lg);
-// //       font-weight: var(--font-weight-semibold);
-// //     }
-// //   }
+// // // /* ── Display & Position ── */
+// // // .ax-flex {
+// // //   display: flex;
+// // // }
 
-// //   .p-dialog-content {
-// //     background: transparent !important;
-// //     color: var(--text-primary) !important;
-// //     padding: var(--spacing-xl) !important;
-// //   }
+// // // .ax-inline-flex {
+// // //   display: inline-flex;
+// // // }
 
-// //   .p-dialog-footer {
-// //     background: var(--bg-secondary) !important;
-// //     border-top: 1px solid var(--component-divider) !important;
-// //     padding: var(--spacing-lg) var(--spacing-xl) !important;
-// //   }
-// // }
+// // // .ax-grid {
+// // //   display: grid;
+// // // }
 
-// // /* ==========================================================================
-// //    8. AG-GRID OVERRIDES & INTEGRATION
-// //    ========================================================================== */
-// // app-shared-grid,
-// // app-ag-share-grid {
-// //   display: block !important;
-// //   flex: 1 !important;
-// //   height: 100% !important;
-// //   width: 100% !important;
-// //   min-height: 0 !important;
-// // }
+// // // .ax-block {
+// // //   display: block;
+// // // }
 
-// // /* Removes double borders when grid is inside an ax-card */
-// // .ax-card app-shared-grid .shared-grid-container,
-// // .ax-card app-ag-share-grid .shared-grid-root,
-// // .ax-glass-card app-ag-share-grid .shared-grid-root {
-// //   border: none !important;
-// //   background: transparent !important;
-// //   box-shadow: none !important;
-// //   backdrop-filter: none !important;
-// //   -webkit-backdrop-filter: none !important;
-// //   border-radius: 0 !important;
-// // }
+// // // .ax-hidden {
+// // //   display: none !important;
+// // // }
+
+// // // .ax-relative {
+// // //   position: relative;
+// // // }
+
+// // // .ax-absolute {
+// // //   position: absolute;
+// // // }
+
+// // // .ax-fixed {
+// // //   position: fixed;
+// // // }
+
+// // // .ax-sticky {
+// // //   position: sticky;
+// // //   top: 0;
+// // //   z-index: var(--z-sticky);
+// // // }
+
+// // // .ax-inset-0 {
+// // //   position: absolute;
+// // //   top: 0;
+// // //   right: 0;
+// // //   bottom: 0;
+// // //   left: 0;
+// // // }
+
+// // // .ax-w-full {
+// // //   width: 100%;
+// // // }
+
+// // // .ax-h-full {
+// // //   height: 100%;
+// // // }
+
+// // // /* ── Flex Alignment ── */
+// // // .ax-flex-col {
+// // //   flex-direction: column;
+// // // }
+
+// // // .ax-flex-row {
+// // //   flex-direction: row;
+// // // }
+
+// // // .ax-wrap {
+// // //   flex-wrap: wrap;
+// // // }
+
+// // // .ax-nowrap {
+// // //   flex-wrap: nowrap;
+// // // }
+
+// // // .ax-items-start {
+// // //   align-items: flex-start;
+// // // }
+
+// // // .ax-items-center {
+// // //   align-items: center;
+// // // }
+
+// // // .ax-items-end {
+// // //   align-items: flex-end;
+// // // }
+
+// // // .ax-items-stretch {
+// // //   align-items: stretch;
+// // // }
+
+// // // .ax-justify-start {
+// // //   justify-content: flex-start;
+// // // }
+
+// // // .ax-justify-center {
+// // //   justify-content: center;
+// // // }
+
+// // // .ax-justify-end {
+// // //   justify-content: flex-end;
+// // // }
+
+// // // .ax-justify-between {
+// // //   justify-content: space-between;
+// // // }
+
+// // // .ax-flex-1 {
+// // //   flex: 1;
+// // //   min-width: 0;
+// // //   min-height: 0;
+// // // }
+
+// // // .ax-shrink-0 {
+// // //   flex-shrink: 0;
+// // // }
+
+// // // /* ── Spacing (Gap) ── */
+// // // .ax-gap-xs {
+// // //   gap: var(--spacing-xs);
+// // // }
+
+// // // .ax-gap-sm {
+// // //   gap: var(--spacing-sm);
+// // // }
+
+// // // .ax-gap-md {
+// // //   gap: var(--spacing-md);
+// // // }
+
+// // // .ax-gap-lg {
+// // //   gap: var(--spacing-lg);
+// // // }
+
+// // // .ax-gap-xl {
+// // //   gap: var(--spacing-xl);
+// // // }
+
+// // // .ax-gap-2xl {
+// // //   gap: var(--spacing-2xl);
+// // // }
+
+// // // /* ── Spacing (Padding) ── */
+// // // .ax-p-0 {
+// // //   padding: 0;
+// // // }
+
+// // // .ax-p-xs {
+// // //   padding: var(--spacing-xs);
+// // // }
+
+// // // .ax-p-sm {
+// // //   padding: var(--spacing-sm);
+// // // }
+
+// // // .ax-p-md {
+// // //   padding: var(--spacing-md);
+// // // }
+
+// // // .ax-p-lg {
+// // //   padding: var(--spacing-lg);
+// // // }
+
+// // // .ax-p-xl {
+// // //   padding: var(--spacing-xl);
+// // // }
+
+// // // .ax-p-2xl {
+// // //   padding: var(--spacing-2xl);
+// // // }
+
+// // // .ax-px-sm {
+// // //   padding-left: var(--spacing-sm);
+// // //   padding-right: var(--spacing-sm);
+// // // }
+
+// // // .ax-px-md {
+// // //   padding-left: var(--spacing-md);
+// // //   padding-right: var(--spacing-md);
+// // // }
+
+// // // .ax-px-lg {
+// // //   padding-left: var(--spacing-lg);
+// // //   padding-right: var(--spacing-lg);
+// // // }
+
+// // // .ax-px-xl {
+// // //   padding-left: var(--spacing-xl);
+// // //   padding-right: var(--spacing-xl);
+// // // }
+
+// // // .ax-py-sm {
+// // //   padding-top: var(--spacing-sm);
+// // //   padding-bottom: var(--spacing-sm);
+// // // }
+
+// // // .apex-py-md {
+// // //   padding-top: var(--spacing-md);
+// // //   padding-bottom: var(--spacing-md);
+// // // }
+
+// // // /* Kept legacy apex- temporarily to prevent breaks */
+// // // .ax-py-md {
+// // //   padding-top: var(--spacing-md);
+// // //   padding-bottom: var(--spacing-md);
+// // // }
+
+// // // /* ── Spacing (Margin) ── */
+// // // .ax-m-0 {
+// // //   margin: 0;
+// // // }
+
+// // // .ax-mt-xs {
+// // //   margin-top: var(--spacing-xs);
+// // // }
+
+// // // .ax-mt-sm {
+// // //   margin-top: var(--spacing-sm);
+// // // }
+
+// // // .ax-mt-md {
+// // //   margin-top: var(--spacing-md);
+// // // }
+
+// // // .ax-mb-sm {
+// // //   margin-bottom: var(--spacing-sm);
+// // // }
+
+// // // .ax-mb-md {
+// // //   margin-bottom: var(--spacing-md);
+// // // }
+
+// // // .ax-mb-lg {
+// // //   margin-bottom: var(--spacing-lg);
+// // // }
+
+// // // .ax-ml-auto {
+// // //   margin-left: auto;
+// // // }
+
+// // // .ax-mr-auto {
+// // //   margin-right: auto;
+// // // }
+
+// // // /* ── Typography ── */
+// // // .ax-font-heading {
+// // //   font-family: var(--font-heading);
+// // // }
+
+// // // .ax-font-mono {
+// // //   font-family: var(--font-mono);
+// // // }
+
+// // // .ax-text-3xl {
+// // //   font-size: var(--font-size-3xl);
+// // // }
+
+// // // .ax-text-2xl {
+// // //   font-size: var(--font-size-2xl);
+// // // }
+
+// // // .ax-text-xl {
+// // //   font-size: var(--font-size-xl);
+// // // }
+
+// // // .ax-text-lg {
+// // //   font-size: var(--font-size-lg);
+// // // }
+
+// // // .ax-text-base {
+// // //   font-size: var(--font-size-base);
+// // // }
+
+// // // .ax-text-sm {
+// // //   font-size: var(--font-size-sm);
+// // // }
+
+// // // .ax-text-xs {
+// // //   font-size: var(--font-size-xs);
+// // // }
+
+// // // .ax-font-normal {
+// // //   font-weight: var(--font-weight-normal);
+// // // }
+
+// // // .ax-font-medium {
+// // //   font-weight: var(--font-weight-medium);
+// // // }
+
+// // // .ax-font-semibold {
+// // //   font-weight: var(--font-weight-semibold);
+// // // }
+
+// // // .ax-font-bold {
+// // //   font-weight: var(--font-weight-bold);
+// // // }
+
+// // // .ax-text-center {
+// // //   text-align: center;
+// // // }
+
+// // // .ax-text-right {
+// // //   text-align: right;
+// // // }
+
+// // // .ax-uppercase {
+// // //   text-transform: uppercase;
+// // // }
+
+// // // .ax-capitalize {
+// // //   text-transform: capitalize;
+// // // }
+
+// // // .ax-line-tight {
+// // //   line-height: 1.1 !important;
+// // //   display: block;
+// // //   margin: 0;
+// // // }
+
+// // // .ax-truncate {
+// // //   white-space: nowrap;
+// // //   overflow: hidden;
+// // //   text-overflow: ellipsis;
+// // //   display: block;
+// // //   max-width: 100%;
+// // // }
+
+// // // /* Semantic Colors */
+// // // .ax-text-primary {
+// // //   color: var(--text-primary);
+// // // }
+
+// // // .ax-text-secondary {
+// // //   color: var(--text-secondary);
+// // // }
+
+// // // .ax-text-tertiary {
+// // //   color: var(--text-tertiary);
+// // // }
+
+// // // .ax-text-accent {
+// // //   color: var(--accent-primary);
+// // // }
+
+// // // .ax-text-success {
+// // //   color: var(--color-success);
+// // // }
+
+// // // .ax-text-warning {
+// // //   color: var(--color-warning);
+// // // }
+
+// // // .ax-text-error {
+// // //   color: var(--color-error);
+// // // }
+
+// // // .ax-text-info {
+// // //   color: var(--color-info);
+// // // }
+
+// // // /* ── Backgrounds & Borders ── */
+// // // .ax-bg-primary {
+// // //   background-color: var(--bg-primary);
+// // // }
+
+// // // .ax-bg-secondary {
+// // //   background-color: var(--bg-secondary);
+// // // }
+
+// // // .ax-bg-tertiary {
+// // //   background-color: var(--bg-ternary);
+// // // }
+
+// // // .ax-bg-gradient {
+// // //   background: var(--accent-gradient);
+// // //   color: #fff;
+// // // }
+
+// // // .ax-border {
+// // //   border: var(--ui-border-width) solid var(--border-primary);
+// // // }
+
+// // // .ax-border-b {
+// // //   border-bottom: var(--ui-border-width) solid var(--component-divider);
+// // // }
+
+// // // .ax-border-t {
+// // //   border-top: var(--ui-border-width) solid var(--component-divider);
+// // // }
+
+// // // .ax-border-transparent {
+// // //   border: var(--ui-border-width) solid transparent;
+// // // }
+
+// // // /* Semantic Backgrounds */
+// // // .ax-bg-success-soft {
+// // //   background: var(--color-success-bg);
+// // //   color: var(--color-success);
+// // //   border: 1px solid var(--color-success-border);
+// // // }
+
+// // // .ax-bg-warning-soft {
+// // //   background: var(--color-warning-bg);
+// // //   color: var(--color-warning);
+// // //   border: 1px solid var(--color-warning-border);
+// // // }
+
+// // // .ax-bg-error-soft {
+// // //   background: var(--color-error-bg);
+// // //   color: var(--color-error);
+// // //   border: 1px solid var(--color-error-border);
+// // // }
+
+// // // .ax-bg-info-soft {
+// // //   background: var(--color-info-bg);
+// // //   color: var(--color-info);
+// // //   border: 1px solid var(--color-info-border);
+// // // }
+
+// // // /* ── Radius & Elevation ── */
+// // // .ax-rounded-sm {
+// // //   border-radius: var(--ui-border-radius-sm);
+// // // }
+
+// // // .ax-rounded {
+// // //   border-radius: var(--ui-border-radius);
+// // // }
+
+// // // .ax-rounded-lg {
+// // //   border-radius: var(--ui-border-radius-lg);
+// // // }
+
+// // // .ax-rounded-xl {
+// // //   border-radius: var(--ui-border-radius-xl);
+// // // }
+
+// // // .ax-rounded-pill {
+// // //   border-radius: var(--ui-border-radius-pill);
+// // // }
+
+// // // .ax-rounded-full {
+// // //   border-radius: 50%;
+// // // }
+
+// // // .ax-shadow-1 {
+// // //   box-shadow: var(--elevation-1);
+// // // }
+
+// // // .ax-shadow-2 {
+// // //   box-shadow: var(--elevation-2);
+// // // }
+
+// // // .ax-shadow-3 {
+// // //   box-shadow: var(--elevation-3);
+// // // }
+
+// // // /* ── Interactive ── */
+// // // .ax-cursor-pointer {
+// // //   cursor: pointer;
+// // // }
+
+// // // .ax-hover-bg {
+// // //   transition: background-color var(--transition-fast);
+// // // }
+
+// // // .ax-hover-bg:hover {
+// // //   background-color: var(--component-bg-hover);
+// // // }
+
+// // // /* ==========================================================================
+// // //    5. COMPONENT ABSTRACTIONS (Built from Utilities)
+// // //    ========================================================================== */
+
+// // // /* The Standard Card */
+// // // .ax-card {
+// // //   background: var(--bg-secondary);
+// // //   border: var(--ui-border-width) solid var(--border-primary);
+// // //   border-radius: var(--ui-border-radius-lg);
+// // //   box-shadow: var(--elevation-1);
+// // // }
+
+// // // /* The Luxury Glass Card */
+// // // .ax-glass-card {
+// // //   background: var(--glass-bg-c);
+// // //   backdrop-filter: blur(var(--glass-blur-c));
+// // //   -webkit-backdrop-filter: blur(var(--glass-blur-c));
+// // //   border: 1px solid var(--glass-border-c);
+// // //   box-shadow: var(--glass-shadow-c);
+// // //   border-radius: var(--ui-border-radius-xl);
+// // // }
+
+// // // /* Base CRM Badge (Strict Height & Padding fix for grids) */
+// // // .ax-badge {
+// // //   display: inline-flex;
+// // //   align-items: center;
+// // //   justify-content: center;
+// // //   padding: 0 8px;
+// // //   height: 20px;
+// // //   border-radius: var(--ui-border-radius-pill);
+// // //   font-size: 10px;
+// // //   font-weight: var(--font-weight-bold);
+// // //   text-transform: uppercase;
+// // //   letter-spacing: 0.05em;
+// // //   white-space: nowrap;
+// // //   line-height: 1 !important;
+// // // }
+
+// // // /* ==========================================================================
+// // //    6. LAYOUT & STRUCTURAL SYSTEMS
+// // //    ========================================================================== */
+
+// // // /* Page Level Layout */
+// // // .ax-page-layout {
+// // //   padding: var(--spacing-xl);
+// // //   display: flex;
+// // //   flex-direction: column;
+// // //   gap: var(--spacing-xl);
+// // //   height: 100%;
+// // //   width: 100%;
+// // //   overflow: hidden;
+
+// // //   @media (max-width: 768px) {
+// // //     padding: var(--spacing-md);
+// // //     gap: var(--spacing-md);
+// // //   }
+// // // }
+
+// // // /* Data Density: Compact Header/Filter Overrides */
+// // // .ax-compact-header {
+// // //   margin-bottom: var(--spacing-sm);
+// // //   padding: var(--spacing-sm) var(--spacing-md);
+// // //   min-height: 44px;
+// // // }
+
+// // // /* Unified Filters Area */
+// // // .ax-filter-bar {
+// // //   display: flex;
+// // //   align-items: center;
+// // //   gap: var(--spacing-sm);
+// // //   padding: var(--spacing-sm) var(--spacing-md);
+// // //   background: var(--bg-secondary);
+// // //   border: var(--ui-border-width) solid var(--border-primary);
+// // //   border-radius: var(--ui-border-radius);
+// // //   flex-wrap: wrap;
+// // //   min-height: 44px;
+
+// // //   .ax-filter-item {
+// // //     display: flex;
+// // //     flex-direction: column;
+// // //     gap: 3px;
+// // //     flex: 1 1 170px;
+// // //     min-width: 150px;
+// // //     max-width: 240px;
+
+// // //     label {
+// // //       font-size: 10px;
+// // //       line-height: 1.1;
+// // //       letter-spacing: 0.04em;
+// // //       color: var(--text-tertiary);
+// // //       text-transform: uppercase;
+// // //       font-weight: var(--font-weight-bold);
+// // //     }
+// // //   }
+
+// // //   .ax-filter-actions {
+// // //     display: flex;
+// // //     align-items: flex-end;
+// // //     gap: var(--spacing-xs);
+// // //     margin-left: auto;
+// // //   }
+// // // }
+
+// // // /* Bulletproof AG-Grid Wrapper (The Fix) */
+// // // .ax-grid-host {
+// // //   flex: 1 1 auto;
+// // //   position: relative;
+// // //   min-height: 350px;
+// // //   /* Prevents Zero-Height blowout */
+// // //   width: 100%;
+// // //   border-radius: var(--ui-border-radius-lg);
+// // //   overflow: hidden;
+// // // }
+
+// // // .ax-grid-fill {
+// // //   position: absolute;
+// // //   top: 0;
+// // //   left: 0;
+// // //   right: 0;
+// // //   bottom: 0;
+// // //   display: flex;
+// // //   flex-direction: column;
+// // // }
+
+// // // /* Container component abstraction (for App/Dashboard) */
+// // // .ax-container {
+// // //   display: flex;
+// // //   flex-direction: column;
+// // //   background: var(--bg-primary);
+// // //   border-radius: var(--ui-border-radius-lg);
+// // //   box-shadow: var(--shadow-sm);
+// // //   border: var(--ui-border-width) solid var(--border-primary);
+// // //   overflow: hidden;
+
+// // //   .ax-container-header {
+// // //     padding: var(--spacing-md) var(--spacing-lg);
+// // //     border-bottom: var(--ui-border-width) solid var(--border-secondary);
+// // //     display: flex;
+// // //     justify-content: space-between;
+// // //     align-items: center;
+// // //   }
+
+// // //   .ax-container-body {
+// // //     padding: var(--spacing-md);
+// // //     flex: 1;
+// // //     overflow-y: auto;
+// // //   }
+// // // }
+
+// // // /* ==========================================================================
+// // //    7. PRIME-NG OVERRIDES (Mapped to Tokens)
+// // //    ========================================================================== */
+
+// // // /* Universal Input Bases */
+// // // .p-inputtext,
+// // // .p-select,
+// // // .p-multiselect,
+// // // .p-datepicker-input,
+// // // .p-inputnumber-input {
+// // //   height: 2.25rem !important;
+// // //   /* Forces all inputs to uniform height */
+// // //   font-family: var(--font-body) !important;
+// // //   font-size: var(--font-size-sm) !important;
+// // //   border-radius: var(--ui-border-radius-sm) !important;
+// // //   border: var(--ui-border-width) solid var(--border-primary) !important;
+// // //   background: transparent !important;
+// // //   color: var(--text-primary) !important;
+// // //   padding: 0 var(--spacing-md) !important;
+// // //   transition: var(--transition-base) !important;
+// // //   display: inline-flex !important;
+// // //   align-items: center !important;
+
+// // //   &:hover:not(:disabled) {
+// // //     border-color: var(--border-secondary) !important;
+// // //     background: var(--component-bg-hover) !important;
+// // //   }
+
+// // //   &:focus,
+// // //   &.p-focus {
+// // //     border-color: var(--accent-primary) !important;
+// // //     box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus) !important;
+// // //     outline: none !important;
+// // //   }
+
+// // //   &::placeholder {
+// // //     color: var(--text-tertiary) !important;
+// // //   }
+// // // }
+
+// // // /* Universal Button Bases */
+// // // .p-button {
+// // //   display: inline-flex !important;
+// // //   align-items: center !important;
+// // //   justify-content: center !important;
+// // //   height: 2.25rem !important;
+// // //   /* Match Input Heights */
+// // //   padding: 0 var(--spacing-md) !important;
+// // //   font-family: var(--font-body) !important;
+// // //   font-size: var(--font-size-sm) !important;
+// // //   font-weight: var(--font-weight-semibold) !important;
+// // //   border-radius: var(--ui-border-radius-sm) !important;
+// // //   white-space: nowrap !important;
+// // //   transition: var(--transition-base) !important;
+// // //   border: 1px solid transparent !important;
+
+// // //   /* Icon logic */
+// // //   .p-button-icon {
+// // //     font-size: 1rem !important;
+// // //     margin-right: 6px !important;
+// // //   }
+
+// // //   &.p-button-icon-only {
+// // //     padding: 0 !important;
+// // //     width: 2.25rem !important;
+
+// // //     .p-button-icon {
+// // //       margin: 0 !important;
+// // //     }
+// // //   }
+
+// // //   /* Button Variants */
+// // //   &.p-button-primary {
+// // //     background: var(--accent-gradient) !important;
+// // //     color: #fff !important;
+// // //   }
+
+// // //   &.p-button-primary:hover:not(:disabled) {
+// // //     filter: brightness(1.1);
+// // //     transform: translateY(-1px);
+// // //     box-shadow: var(--elevation-2);
+// // //   }
+
+// // //   &.p-button-outlined {
+// // //     background: transparent !important;
+// // //     border-color: var(--border-secondary) !important;
+// // //     color: var(--text-secondary) !important;
+
+// // //     &:hover:not(:disabled) {
+// // //       background: var(--component-bg-hover) !important;
+// // //       color: var(--text-primary) !important;
+// // //     }
+// // //   }
+
+// // //   &.p-button-text {
+// // //     background: transparent !important;
+// // //     border: none !important;
+// // //     color: var(--text-secondary) !important;
+
+// // //     &:hover:not(:disabled) {
+// // //       background: var(--component-bg-hover) !important;
+// // //       color: var(--text-primary) !important;
+// // //     }
+// // //   }
+// // // }
+
+// // // /* Universal Dialog Overrides */
+// // // .p-dialog-mask {
+// // //   background-color: rgba(0, 0, 0, 0.6) !important;
+// // //   backdrop-filter: blur(8px);
+// // //   -webkit-backdrop-filter: blur(8px);
+// // // }
+
+// // // .p-dialog {
+// // //   background: var(--component-surface-raised) !important;
+// // //   border: 1px solid var(--border-primary) !important;
+// // //   border-radius: var(--ui-border-radius-xl) !important;
+// // //   box-shadow: var(--elevation-3) !important;
+
+// // //   .p-dialog-header {
+// // //     background: transparent !important;
+// // //     border-bottom: 1px solid var(--component-divider) !important;
+// // //     padding: var(--spacing-lg) var(--spacing-xl) !important;
+
+// // //     .p-dialog-title {
+// // //       font-family: var(--font-heading);
+// // //       font-size: var(--font-size-lg);
+// // //       font-weight: var(--font-weight-semibold);
+// // //     }
+// // //   }
+
+// // //   .p-dialog-content {
+// // //     background: transparent !important;
+// // //     color: var(--text-primary) !important;
+// // //     padding: var(--spacing-xl) !important;
+// // //   }
+
+// // //   .p-dialog-footer {
+// // //     background: var(--bg-secondary) !important;
+// // //     border-top: 1px solid var(--component-divider) !important;
+// // //     padding: var(--spacing-lg) var(--spacing-xl) !important;
+// // //   }
+// // // }
+
+// // // /* ==========================================================================
+// // //    8. AG-GRID OVERRIDES & INTEGRATION
+// // //    ========================================================================== */
+// // // app-shared-grid,
+// // // app-ag-share-grid {
+// // //   display: block !important;
+// // //   flex: 1 !important;
+// // //   height: 100% !important;
+// // //   width: 100% !important;
+// // //   min-height: 0 !important;
+// // // }
+
+// // // /* Removes double borders when grid is inside an ax-card */
+// // // .ax-card app-shared-grid .shared-grid-container,
+// // // .ax-card app-ag-share-grid .shared-grid-root,
+// // // .ax-glass-card app-ag-share-grid .shared-grid-root {
+// // //   border: none !important;
+// // //   background: transparent !important;
+// // //   box-shadow: none !important;
+// // //   backdrop-filter: none !important;
+// // //   -webkit-backdrop-filter: none !important;
+// // //   border-radius: 0 !important;
+// // // }
+
+// /* ============================================================================
+//    FILTER PANEL COMPONENT HEIGHT NORMALIZATION
+//    Forces absolute pixel-perfect alignment for all inputs, dropdowns, and buttons
+//    ============================================================================ */
+// .app-filter-panel,
+// .se-filter-bar,
+// .filters {
+
+//   .p-inputtext,
+//   .p-select,
+//   .p-select .p-select,
+//   .p-dropdown,
+//   .p-dropdown .p-dropdown,
+//   .p-multiselect,
+//   .p-multiselect .p-multiselect,
+//   .p-datepicker,
+//   .p-datepicker .p-datepicker,
+//   .p-datepicker-input,
+//   .p-button,
+//   app-master-dropdown>div,
+//   input,
+//   select,
+//   button {
+//     height: 36px !important;
+//     min-height: 36px !important;
+//     max-height: 36px !important;
+//     box-sizing: border-box !important;
+//     margin: 0 !important;
+//   }
+
+//   /* Ensure PrimeNG flex containers stretch inner elements correctly */
+//   .p-select,
+//   .p-dropdown,
+//   .p-multiselect,
+//   .p-datepicker {
+//     display: inline-flex !important;
+//     align-items: center !important;
+//   }
+
+//   .p-select-label,
+//   .p-dropdown-label,
+//   .p-multiselect-label {
+//     height: 100% !important;
+//     display: flex !important;
+//     align-items: center !important;
+//     line-height: normal !important;
+//   }
+
+//   .filter-actions,
+//   .filter-actions-right {
+//     height: 36px !important;
+//     min-height: 36px !important;
+//     align-items: center !important;
+//   }
+// }

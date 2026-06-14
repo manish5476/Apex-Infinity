@@ -253,7 +253,8 @@ export const SIDEBAR_MENU: MenuItem[] = [
         icon: 'pi pi-users',
         permissions: [PERMISSIONS.USER.READ, PERMISSIONS.ATTENDANCE.MANAGE],
         items: [
-          { label: 'Employee Directory', icon: 'pi pi-users', routerLink: ['/user/list'], permissions: [PERMISSIONS.USER.READ] },
+          { label: 'User Directory', icon: 'pi pi-users', routerLink: ['/user/list'], permissions: [PERMISSIONS.USER.READ] },
+          { label: 'Employee Directory', icon: 'pi pi-users', routerLink: ['/hrms/employees/list'], permissions: [PERMISSIONS.USER.READ] },
           { label: 'Live Punches', icon: 'pi pi-bolt', routerLink: ['/hrms/attendance/live-feed'], permissions: [PERMISSIONS.ATTENDANCE.MANAGE] },
           { label: 'Attendance Admin', icon: 'pi pi-shield', routerLink: ['/hrms/attendance/admin'], permissions: [PERMISSIONS.ATTENDANCE.MANAGE] },
           { label: 'HR Reports', icon: 'pi pi-chart-bar', routerLink: ['/hrms/daily-attendance/reports'], permissions: [PERMISSIONS.ATTENDANCE.MANAGE] },

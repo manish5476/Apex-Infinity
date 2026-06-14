@@ -58,7 +58,7 @@ import { SelectModule } from 'primeng/select';
               <div class="apex-filter-group flex-1 min-w-15rem">
                 <label class="apex-input-label">Search</label>
                 <div class="p-input-icon-left w-full">
-                  <i class="pi pi-search"></i>
+                  <!-- <i class="pi pi-search"></i> -->
                   <input type="text" pInputText
                     [ngModel]="shiftFilter().search" 
                     (ngModelChange)="onSearchChange($event)"
