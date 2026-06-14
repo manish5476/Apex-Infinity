@@ -13,6 +13,16 @@ const adminSurfaceRoute = (path: string, surfaceKey: string, title: string): Rou
   data: { permissions: [PERMISSIONS.STOREFRONT.READ], surfaceKey }
 });
 
+const placeholderRoute = (path: string, title: string, icon: string): Routes[number] => ({
+  path,
+  loadComponent: () =>
+    import('./pages/storefront-placeholder/storefront-placeholder.component')
+      .then(m => m.StorefrontPlaceholderComponent),
+  title,
+  canActivate: [permissionGuard],
+  data: { permissions: [PERMISSIONS.STOREFRONT.READ], title, icon }
+});
+
 export const STOREFRONT_ADMIN_ROUTES: Routes = [
   {
     path: '',
@@ -88,29 +98,44 @@ export const STOREFRONT_ADMIN_ROUTES: Routes = [
     canActivate: [permissionGuard],
     data: { permissions: [PERMISSIONS.STOREFRONT.LAYOUT_MANAGE] }
   },
-  ...[
-    ['activity', 'activity-logs', 'Activity Logs'],
-    ['notifications', 'notifications-center', 'Notifications Center'],
-    ['audit-history', 'audit-history', 'Audit History'],
-    ['themes', 'theme-marketplace', 'Theme Marketplace'],
-    ['templates', 'templates-library', 'Templates Library'],
-    ['seo', 'seo-dashboard', 'SEO Dashboard'],
-    ['analytics', 'analytics-overview', 'Analytics Overview'],
-    ['reports/sales', 'sales-reports', 'Sales Reports'],
-    ['abandoned-carts', 'abandoned-carts', 'Abandoned Carts'],
-    ['discounts', 'discount-manager', 'Discount Manager'],
-    ['segments', 'customer-segmentation', 'Customer Segmentation'],
-    ['roles', 'role-management', 'Role Management'],
-    ['integrations', 'integrations', 'Integrations'],
-    ['domains', 'domain-settings', 'Domain Settings'],
-    ['billing', 'billing-subscription', 'Billing'],
-    ['onboarding', 'onboarding-flow', 'Onboarding'],
-    ['setup', 'setup-wizard', 'Setup Wizard'],
-    ['publish-history', 'publish-history', 'Publish History'],
-    ['revisions', 'page-revisions', 'Page Revisions'],
-    ['media', 'media-manager', 'Media Manager'],
-    ['settings', 'settings', 'Storefront Settings']
-  ].map(([path, surfaceKey, title]) => adminSurfaceRoute(path, surfaceKey, title))
+  {
+    path: 'rules',
+    loadComponent: () =>
+      import('./pages/smart-rules/smart-rules.component').then(m => m.SmartRulesComponent),
+    title: 'Smart Rules',
+    canActivate: [permissionGuard],
+    data: { permissions: [PERMISSIONS.STOREFRONT.READ] }
+  },
+
+  // --- Dynamic Placeholders for Missing Modules ---
+  {
+    path: 'analytics',
+    loadComponent: () =>
+      import('./pages/storefront-analytics/storefront-analytics.component').then(m => m.StorefrontAnalyticsComponent),
+    title: 'Analytics & Insights',
+    canActivate: [permissionGuard],
+    data: { permissions: [PERMISSIONS.STOREFRONT.READ] }
+  },
+
+  placeholderRoute('reports/sales', 'Sales Reports', 'pi pi-chart-bar'),
+  placeholderRoute('templates', 'Templates Library', 'pi pi-file'),
+  placeholderRoute('media', 'Media Manager', 'pi pi-image'),
+  placeholderRoute('abandoned-carts', 'Abandoned Carts', 'pi pi-shopping-cart'),
+  placeholderRoute('discounts', 'Discount Manager', 'pi pi-percentage'),
+  placeholderRoute('segments', 'Customer Segments', 'pi pi-users'),
+  placeholderRoute('seo', 'SEO Dashboard', 'pi pi-search'),
+  placeholderRoute('settings', 'Storefront Settings', 'pi pi-cog'),
+  placeholderRoute('domains', 'Domain Settings', 'pi pi-globe'),
+  placeholderRoute('integrations', 'Integrations', 'pi pi-link'),
+  placeholderRoute('roles', 'Role Management', 'pi pi-id-card'),
+  placeholderRoute('billing', 'Billing & Subscriptions', 'pi pi-credit-card'),
+  placeholderRoute('activity', 'System Logs', 'pi pi-history'),
+  placeholderRoute('notifications', 'Notification Center', 'pi pi-bell'),
+  placeholderRoute('audit-history', 'Audit History', 'pi pi-list'),
+  placeholderRoute('publish-history', 'Publish History', 'pi pi-send'),
+  placeholderRoute('revisions', 'Page Revisions', 'pi pi-replay'),
+  placeholderRoute('onboarding', 'Store Setup', 'pi pi-flag'),
+  placeholderRoute('setup', 'Quick Setup', 'pi pi-forward'),
 ];
 
 

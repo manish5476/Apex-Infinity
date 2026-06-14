@@ -1,9 +1,10 @@
-import { Component, OnInit, inject, signal, effect, ChangeDetectionStrategy, ViewChild, OnDestroy } from '@angular/core';
-
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy, ViewChild, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ConfirmationService } from 'primeng/api';
+import { Subject } from 'rxjs';
+import { takeUntil, finalize } from 'rxjs/operators';
 
-// PrimeNG Imports
+// --- PrimeNG Imports ---
 import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -14,17 +15,14 @@ import { InputTextModule } from 'primeng/inputtext';
 import { DialogModule } from 'primeng/dialog';
 import { SelectModule } from 'primeng/select';
 
-// Services
+// --- Services ---
 import { MasterService } from '../../../../core/services/master.service';
 import { LoadingService } from '../../../../core/services/loading.service';
 import { AppMessageService } from '../../../../core/services/message.service';
 
-// Grid Components & Types
+// --- Grid Components & Types ---
 import { AppSharedGrid, SharedGridEvent } from "../../AgGrid/grid/app-shared-grid/app-shared-grid";
 import { GridColDef } from "../../AgGrid/grid/grid.types";
-import { Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
-import { AppSharedGridActionButton } from '../../AgGrid/grid/app-shared-grid-action-button/app-shared-grid-action-button';
 
 // --- Interface based on Mongoose Schema ---
 export interface Master {
@@ -61,160 +59,162 @@ export interface Master {
     AppSharedGrid
   ],
   providers: [ConfirmationService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  styleUrls: ['./master-list.scss'],
   template: `
-    <div class="master-page-container">
-      <div class="themed-card master-card">
-    
-        <!-- TOOLBAR -->
-        <p-toolbar styleClass="master-toolbar">
-          <div class="p-toolbar-group-start gap-3">
-            <h2 class="section-heading m-0">Master Data</h2>
-    
-            <p-iconfield iconPosition="left">
-              <!-- <p-inputicon styleClass="pi pi-search"></p-inputicon> -->
-              <input pInputText type="text" (input)="onQuickFilter($event)"
-                placeholder="Search..." class="p-inputtext-sm w-64" />
-              </p-iconfield>
+    <!-- MAIN APPLICATION CONTAINER -->
+    <div class="app-container h-full flex flex-col absolute inset-0">
+      
+      <!-- Premium Header Section -->
+      <div class="container-header shrink-0">
+        <div class="header-titles">
+          <h2 class="container-title flex items-center gap-3">
+            <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-purple-50 text-purple-600">
+              <i class="pi pi-server text-xl"></i>
             </div>
-    
-            <div class="p-toolbar-group-end flex gap-2">
-    
-              <!-- Bulk Actions for Selection -->
-              @if (selectedRows().length > 0) {
-                <div class="flex gap-2 mr-2 border-r pr-2 border-gray-300">
-                  <p-button
-                    label="Delete ({{selectedRows().length}})"
-                    icon="pi pi-trash"
-                    severity="danger"
-                    (click)="confirmBulkDelete()">
-                  </p-button>
-                </div>
-              }
-    
-              <!-- Bulk Edit Toggle -->
-              <div class="flex gap-2 mr-2">
-                @if (!isBulkEditing()) {
-                  <p-button
-label="Bulk Edit"
-icon="pi pi-pencil"
-[text]="true"
-                    (click)="toggleBulkEdit()">
-                  </p-button>
-                }
-    
-                @if (isBulkEditing()) {
-                  <p-button label="Cancel" icon="pi pi-times" severity="secondary" [text]="true" (click)="cancelBulkEdit()"></p-button>
-                  <p-button label="Save All" icon="pi pi-check" (click)="saveBulkEdit()"></p-button>
-                }
-              </div>
-    
-              <div class="stats mr-4 align-content-center">
-                <span class="text-sm text-gray-500">Total: {{ masters().length }}</span>
-              </div>
-    
-              <!-- Bulk Import Button -->
-              <p-button label="Import" icon="pi pi-upload" styleClass="p-button-outlined"
-              (click)="openBulkDialog()"></p-button>
-    
-              <p-button icon="pi pi-refresh" styleClass="p-button-text"
-              (click)="loadMasters()" [loading]="loading()"></p-button>
-    
-              <!-- ADD NEW: Calls Grid Method directly -->
-              <p-button label="Add New" icon="pi pi-plus" (click)="onAddNew()"></p-button>
-            </div>
-          </p-toolbar>
-    
-          <!-- MAIN DATA GRID -->
-          <div class="master-grid-wrapper" style="height: calc(100vh - 200px);">
-            <app-shared-grid
-              #mainGrid
-              [columns]="columns"
-              [data]="masters()"
-              [selectionMode]="'multiple'"
-              [showActions]="true"
-              (gridEvent)="onGridEvent($event)">
-            </app-shared-grid>
+            Master Data Dictionary
+          </h2>
+          <p class="container-subtitle ml-13">Centralized repository for system lookups, classifications, and global variables.</p>
+        </div>
+        
+        <div class="header-actions flex items-center gap-3">
+          <!-- Total Stats Badge -->
+          <div class="hidden md:flex items-center gap-2 bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-lg shadow-sm">
+            <i class="pi pi-chart-bar text-[var(--accent-primary)]"></i>
+            <span class="text-sm font-semibold text-gray-700">Total Entries: {{ masters().length }}</span>
           </div>
-    
+          <div class="hidden md:block w-px h-6 bg-gray-300 mx-1"></div>
+          
+          <!-- Core Action Buttons -->
+          <p-button label="Import Data" icon="pi pi-cloud-upload" outlined="true" severity="secondary" (click)="openBulkDialog()"></p-button>
+          <p-button label="Refresh" icon="pi pi-sync" outlined="true" severity="secondary" (click)="loadMasters()" [loading]="loading()"></p-button>
+          <p-button label="Add New Entry" icon="pi pi-plus" (click)="onAddNew()"></p-button>
         </div>
       </div>
-    
-      <!-- BULK ENTRY DIALOG (Import) -->
-      <p-dialog header="Bulk Import" [(visible)]="isBulkDialogVisible" [modal]="true"
-        [style]="{ width: '95vw', height: '90vh' }" [draggable]="false" [resizable]="false"
-        [maximizable]="true">
-    
-        <div class="flex flex-col h-full gap-2">
-          <div class="bg-blue-50 p-3 rounded-md text-sm text-blue-700 mb-2 border border-blue-100 flex items-center">
-            <i class="pi pi-info-circle mr-2"></i>
-            <span>
-              Enter details below. <b>Name</b> and <b>Type</b> are required.
-              Rows without a Name will be ignored.
-            </span>
-          </div>
-    
-          <!-- Reusing AppSharedGrid for Bulk Entry -->
-          <div class="flex-1 overflow-hidden border rounded-md">
-            <app-shared-grid
-              #bulkGrid
-              [columns]="columns"
-              [data]="bulkData()"
-              [selectionMode]="'multiple'"
-              [showActions]="true"
-              (gridEvent)="onBulkGridEvent($event)">
-            </app-shared-grid>
-          </div>
+
+      <!-- Advanced Toolbar / Filter Area -->
+      <div class="bg-white border-b border-[var(--border-secondary)] p-4 shrink-0 flex flex-wrap items-center justify-between gap-4 z-10 relative">
+        <div class="flex items-center gap-4 w-full max-w-md">
+          <span class="relative w-full">
+            <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 z-10"></i>
+            <input pInputText type="text" (input)="onQuickFilter($event)" placeholder="Search across all master data..." 
+                   class="w-full pl-10 bg-gray-50 hover:bg-white focus:bg-white transition-colors" />
+          </span>
         </div>
-    
-        <ng-template pTemplate="footer">
-          <div class="flex justify-between w-full">
-            <!-- Left Side: Add Row Button -->
-            <p-button label="Add Empty Row" icon="pi pi-plus" [text]="true" severity="secondary"
-            (click)="addBulkRow()"></p-button>
-    
-            <!-- Right Side: Actions -->
-            <div class="flex gap-2">
-              <p-button label="Cancel" icon="pi pi-times" [text]="true" (click)="isBulkDialogVisible = false"></p-button>
-              <p-button label="Create All" icon="pi pi-check" [loading]="isBulkSaving"
-              (click)="saveBulkImport()"></p-button>
+        
+        <div class="flex items-center gap-3 w-full md:w-auto">
+          <!-- Contextual Bulk Delete Actions -->
+          @if (selectedRows().length > 0) {
+            <div class="flex items-center bg-red-50 border border-red-100 rounded-lg px-2 py-1 gap-2 transition-all duration-300">
+               <span class="text-sm font-semibold text-red-700 ml-2 whitespace-nowrap">{{ selectedRows().length }} Selected</span>
+               <p-button label="Delete" icon="pi pi-trash" severity="danger" size="small" [text]="true" (click)="confirmBulkDelete()"></p-button>
             </div>
-          </div>
-        </ng-template>
-      </p-dialog>
-    
-      <p-toast></p-toast>
-      <p-confirmDialog></p-confirmDialog>
-    `,
-  styleUrls: ['./master-list.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+            <div class="w-px h-6 bg-gray-300 mx-1"></div>
+          }
+
+          <!-- Contextual Bulk Edit Actions -->
+          @if (!isBulkEditing()) {
+            <p-button label="Enable Bulk Edit" icon="pi pi-file-edit" [text]="true" severity="secondary" (click)="toggleBulkEdit()"></p-button>
+          } @else {
+            <p-button label="Discard Changes" icon="pi pi-times" severity="secondary" [text]="true" (click)="cancelBulkEdit()"></p-button>
+            <p-button label="Commit Changes" icon="pi pi-save" severity="success" (click)="saveBulkEdit()"></p-button>
+          }
+        </div>
+      </div>
+
+      <!-- Main Data Grid Area -->
+      <div class="container-body no-padding flex-1 relative bg-gray-50/50">
+        <app-shared-grid
+          #mainGrid
+          [columns]="columns"
+          [data]="masters()"
+          [selectionMode]="'multiple'"
+          [showActions]="true"
+          (gridEvent)="onGridEvent($event)"
+          class="absolute inset-0 w-full h-full">
+        </app-shared-grid>
+      </div>
+    </div>
+
+    <!-- ======================================================================= -->
+    <!-- BULK DATA ENTRY WORKSPACE (MODAL)                                       -->
+    <!-- ======================================================================= -->
+    <p-dialog appendTo="body" [visible]="isBulkDialogVisible()" (visibleChange)="isBulkDialogVisible.set($event)" [modal]="true"
+      [style]="{ width: '90vw', height: '85vh', 'max-width': '1400px' }" 
+      [contentStyle]="{ 'padding': '0', 'background': 'var(--bg-primary)', 'overflow': 'hidden', 'display': 'flex', 'flex-direction': 'column' }"
+      header="Bulk Data Import Workspace" 
+      [draggable]="false" [resizable]="false" [maximizable]="true"
+      styleClass="shadow-3xl">
+
+      <div class="flex flex-col h-full bg-gray-50/50">
+        
+        <!-- Import Instructions Banner -->
+        <div class="p-5 bg-white border-b border-gray-200 shrink-0 flex items-start gap-4">
+           <div class="mt-0.5 text-blue-600 bg-blue-50 p-2 rounded-lg shadow-sm"><i class="pi pi-info-circle text-xl"></i></div>
+           <div>
+             <h4 class="text-base font-bold text-gray-900 tracking-tight">Import Instructions</h4>
+             <p class="text-sm text-gray-600 mt-1 leading-relaxed">Enter multiple master records directly into the grid below. <strong>Name</strong> and <strong>Type</strong> are strictly required fields. Rows left entirely blank or lacking a valid name will be automatically ignored during the import process.</p>
+           </div>
+        </div>
+
+        <!-- Bulk Data Grid -->
+        <div class="flex-1 relative no-padding">
+           <app-shared-grid
+             #bulkGrid
+             [columns]="columns"
+             [data]="bulkData()"
+             [selectionMode]="'multiple'"
+             [showActions]="true"
+             (gridEvent)="onBulkGridEvent($event)"
+             class="absolute inset-0 w-full h-full">
+           </app-shared-grid>
+        </div>
+      </div>
+
+      <!-- Premium Footer Actions -->
+      <ng-template pTemplate="footer">
+         <div class="flex justify-between items-center w-full px-6 py-4 bg-white border-t border-[var(--border-primary)] shadow-[0_-4px_12px_-4px_rgba(0,0,0,0.05)]">
+           <p-button label="Insert Empty Row" icon="pi pi-plus" [text]="true" severity="secondary" (click)="addBulkRow()"></p-button>
+           <div class="flex gap-3">
+             <p-button label="Cancel" icon="pi pi-times" styleClass="p-button-text !text-gray-600 hover:!bg-gray-100" (click)="isBulkDialogVisible.set(false)"></p-button>
+             <p-button label="Execute Import" icon="pi pi-check-circle" [loading]="isBulkSaving()" (click)="saveBulkImport()"></p-button>
+           </div>
+         </div>
+      </ng-template>
+    </p-dialog>
+
+    <p-toast></p-toast>
+    <p-confirmDialog></p-confirmDialog>
+  `
 })
 export class MasterList implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
+
   // --- Services ---
   private masterService = inject(MasterService);
   private appMessage = inject(AppMessageService);
   private confirmationService = inject(ConfirmationService);
   private loadingService = inject(LoadingService);
 
-  // --- ViewChilds for calling Grid Methods ---
+  // --- ViewChilds for Grid Control ---
   @ViewChild('mainGrid') mainGrid!: AppSharedGrid<Master>;
   @ViewChild('bulkGrid') bulkGrid!: AppSharedGrid<Master>;
 
-  // --- Signals ---
+  // --- Reactive Signals State Management ---
   masters = signal<Master[]>([]);
   bulkData = signal<Master[]>([]);
   selectedRows = signal<Master[]>([]);
+
   loading = signal(false);
   isBulkEditing = signal(false);
+  isBulkDialogVisible = signal(false);
+  isBulkSaving = signal(false);
 
-  // --- Bulk Dialog State ---
-  isBulkDialogVisible = false;
-  isBulkSaving = false;
-
+  // --- Grid APIs ---
   gridApi: any;
   bulkGridApi: any;
 
-  // --- Master Types Definition ---
+  // --- Master Lookup Definition ---
   readonly masterTypes = [
     { label: 'Department', value: 'department' },
     { label: 'Category', value: 'category' },
@@ -226,11 +226,12 @@ export class MasterList implements OnInit, OnDestroy {
     { label: 'Product Condition', value: 'product_condition' }
   ];
 
+  // --- Enterprise Grid Columns ---
   columns: GridColDef<Master>[] = [
     {
       field: 'type',
       headerName: 'Type',
-      width: 150,
+      width: 160,
       pinned: 'left',
       cellConfig: {
         type: 'select',
@@ -245,18 +246,18 @@ export class MasterList implements OnInit, OnDestroy {
       field: 'name',
       headerName: 'Master Name',
       flex: 1,
-      minWidth: 200,
+      minWidth: 220,
       pinned: 'left',
       cellConfig: {
         type: 'text',
         placeholder: 'Enter name...',
-        truncateAt: 40
+        truncateAt: 50
       }
     },
     {
       field: 'imageUrl',
       headerName: 'Media',
-      width: 120,
+      width: 100,
       cellConfig: {
         type: 'avatar', // MasterCell renders image or initials
         labelField: 'name'
@@ -264,8 +265,8 @@ export class MasterList implements OnInit, OnDestroy {
     },
     {
       field: 'code',
-      headerName: 'Code',
-      width: 120,
+      headerName: 'Code Ref',
+      width: 140,
       cellConfig: {
         type: 'text',
         placeholder: 'CODE-001'
@@ -291,51 +292,41 @@ export class MasterList implements OnInit, OnDestroy {
     {
       field: 'description',
       headerName: 'Description',
-      width: 250,
+      width: 300,
       cellConfig: {
         type: 'textarea',
         rows: 2,
-        placeholder: 'Internal notes...'
+        placeholder: 'Internal notes and descriptions...'
       }
-    },
-    // {
-    //   headerName: 'Actions',
-    //   width: 180,
-    //   pinned: 'right',
-    //   sortable: false,
-    //   filter: false,
-    //   resizable: false,
-    //   cellClass: 'action-column-cell',
-    //   cellRenderer: AppSharedGridActionButton,
-    //   cellRendererParams: {
-    //   }
-    // }
+    }
   ];
-  constructor() {
-    effect(() => { });
-  }
 
   ngOnInit() {
     this.loadMasters();
   }
 
-  // --- Load Data ---
+  // ==========================================================================
+  // DATA LOADING
+  // ==========================================================================
   loadMasters() {
     this.loading.set(true);
-    this.masterService.getMasters().pipe(takeUntil(this.destroy$)).subscribe({
+    this.masterService.getMasters().pipe(
+      takeUntil(this.destroy$),
+      finalize(() => this.loading.set(false))
+    ).subscribe({
       next: (res) => {
         const data = res.data?.masters || res.data || [];
         this.masters.set(data);
-        this.loading.set(false);
       },
       error: (err) => {
         this.appMessage.handleHttpError(err);
-        this.loading.set(false);
       }
     });
   }
 
-  // --- 1. MAIN GRID EVENT HANDLER ---
+  // ==========================================================================
+  // MAIN GRID EVENT HANDLER
+  // ==========================================================================
   onGridEvent(event: SharedGridEvent<Master>) {
     switch (event.type) {
       case 'init':
@@ -348,29 +339,24 @@ export class MasterList implements OnInit, OnDestroy {
         }
         break;
 
-      // Handle Single Row Save (Create or Update)
-      // Your grid emits 'save' with { data: T } which is the merged final row
       case 'save':
         if (event.data) {
           this.handleSingleSave(event.data);
         }
         break;
 
-      // Handle Single Row Delete
       case 'delete':
         if (event.row) {
           this.handleSingleDelete(event.row);
         }
         break;
 
-      // Handle Bulk Save (Inline Edit)
       case 'bulkSave':
         if (event.rows) {
           this.handleBulkUpdate(event.rows);
         }
         break;
 
-      // Handle Bulk Delete (Triggered by grid)
       case 'bulkDelete':
         if (event.rows) {
           this.handleBulkDelete(event.rows);
@@ -379,59 +365,59 @@ export class MasterList implements OnInit, OnDestroy {
     }
   }
 
-  // --- 2. SINGLE ROW ACTIONS ---
-
+  // ==========================================================================
+  // SINGLE ROW ACTIONS
+  // ==========================================================================
   onAddNew() {
-    // Call method directly on your shared grid via ViewChild
     this.mainGrid.addNewRow();
   }
 
   handleSingleSave(row: Master) {
-    if (!row.name || !row.type) {
-      this.appMessage.showWarn('Name and Type are required');
+    if (!row.name?.trim() || !row.type) {
+      this.appMessage.showWarn('Validation Error: Master Name and Type are strictly required fields.');
       return;
     }
 
     const payload = this.preparePayload(row);
 
-    // Check if it's a new row based on temp ID logic
+    // Identify if it's a completely new row (temp ID)
     if (row._id.startsWith('new_') || row._tempId) {
       this.masterService.createMaster(payload).pipe(takeUntil(this.destroy$)).subscribe({
         next: () => {
-          this.appMessage.showSuccess('Master created successfully');
+          this.appMessage.showSuccess('Master record created successfully');
           this.loadMasters();
         },
         error: (err) => this.appMessage.handleHttpError(err)
       });
     } else {
       this.masterService.updateMaster(row._id, payload).pipe(takeUntil(this.destroy$)).subscribe({
-        next: () => this.appMessage.showSuccess('Master updated successfully'),
+        next: () => {
+          this.appMessage.showSuccess('Master record updated successfully');
+        },
         error: (err) => this.appMessage.handleHttpError(err)
       });
     }
   }
 
   handleSingleDelete(row: Master) {
-    // If it was a temp row, the grid already removed it from UI.
     if (row._id.startsWith('new_')) return;
 
     this.masterService.deleteMaster(row._id).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
-        this.appMessage.showSuccess(`${row.name} removed successfully`);
-        // Grid already updated via transaction, but we can sync signal if needed
+        this.appMessage.showSuccess(`'${row.name}' was removed successfully.`);
       },
       error: (err) => {
         this.appMessage.handleHttpError(err);
-        this.loadMasters(); // Revert on error
+        this.loadMasters(); // Revert UI visually on API error
       }
     });
   }
 
-  // --- 3. BULK ACTIONS (IN-GRID) ---
-
+  // ==========================================================================
+  // BULK GRID ACTIONS (Inline Editing)
+  // ==========================================================================
   toggleBulkEdit() {
     this.isBulkEditing.set(true);
-    // Call grid method to enable edit mode for selected rows
     this.mainGrid.enableBulkEdit();
   }
 
@@ -441,44 +427,47 @@ export class MasterList implements OnInit, OnDestroy {
   }
 
   saveBulkEdit() {
-    // This triggers the grid to gather data and emit 'bulkSave' event
+    // Command the grid component to dispatch the 'bulkSave' event back up
     this.mainGrid.saveBulkEdit();
   }
 
   handleBulkUpdate(rows: Master[]) {
-    // Prepare items for API
     const items = rows.map(r => ({
       _id: r._id,
       ...this.preparePayload(r)
     }));
 
     this.loading.set(true);
-    this.masterService.bulkUpdateMasters(items).pipe(takeUntil(this.destroy$)).subscribe({
+    this.masterService.bulkUpdateMasters(items).pipe(
+      takeUntil(this.destroy$),
+      finalize(() => this.loading.set(false))
+    ).subscribe({
       next: (res) => {
-        this.appMessage.showSuccess(res.message || 'Bulk Update Completed');
+        this.appMessage.showSuccess(res.message || 'Bulk Update Completed Successfully.');
         this.loadMasters();
         this.isBulkEditing.set(false);
       },
       error: (err) => {
         this.appMessage.handleHttpError(err);
-        this.loadMasters(); // Revert
+        this.loadMasters();
       }
     });
   }
 
-  // --- 4. BULK DELETE ---
-
+  // ==========================================================================
+  // BULK DELETION
+  // ==========================================================================
   confirmBulkDelete() {
     const selected = this.selectedRows();
     if (selected.length === 0) return;
 
     this.confirmationService.confirm({
-      message: `Are you sure you want to delete <b>${selected.length}</b> items?`,
+      message: `Are you entirely certain you want to delete <b>${selected.length}</b> records? This action cannot be undone.`,
       header: 'Confirm Bulk Delete',
       icon: 'pi pi-exclamation-triangle',
-      acceptButtonStyleClass: 'p-button-danger p-button-text',
+      acceptButtonStyleClass: 'p-button-danger',
+      rejectButtonStyleClass: 'p-button-text',
       accept: () => {
-        // Trigger grid method to remove from UI and emit 'bulkDelete'
         this.mainGrid.deleteSelected();
       }
     });
@@ -486,39 +475,39 @@ export class MasterList implements OnInit, OnDestroy {
 
   handleBulkDelete(rows: Master[]) {
     const ids = rows.map(m => m._id).filter(id => !id.startsWith('new_'));
-
     if (ids.length === 0) return;
 
     this.loading.set(true);
-    this.masterService.bulkDeleteMasters(ids).pipe(takeUntil(this.destroy$)).subscribe({
+    this.masterService.bulkDeleteMasters(ids).pipe(
+      takeUntil(this.destroy$),
+      finalize(() => this.loading.set(false))
+    ).subscribe({
       next: (res) => {
-        this.appMessage.showSuccess(res.message || 'Items deleted');
+        this.appMessage.showSuccess(res.message || 'Selected records deleted successfully.');
         this.selectedRows.set([]);
-        this.loading.set(false);
         this.loadMasters();
-
-        // UI is already updated by grid
       },
       error: (err) => {
         this.appMessage.handleHttpError(err);
-        this.loadMasters(); // Revert
+        this.loadMasters();
       }
     });
   }
 
-  // --- 5. BULK IMPORT (DIALOG) ---
-
+  // ==========================================================================
+  // BULK ENTRY IMPORT DIALOG
+  // ==========================================================================
   openBulkDialog() {
+    // Generate empty ghost rows to easily accept paste/typing
     const initialRows = Array.from({ length: 5 }, () => this.createEmptyMaster());
     this.bulkData.set(initialRows);
-    this.isBulkDialogVisible = true;
+    this.isBulkDialogVisible.set(true);
   }
 
   addBulkRow() {
     if (this.bulkGrid) {
-      this.bulkGrid.addNewRow(); // Use grid method for smooth add
+      this.bulkGrid.addNewRow();
     } else {
-      // Fallback if viewchild not ready
       const newRow = this.createEmptyMaster();
       this.bulkData.update(d => [newRow, ...d]);
     }
@@ -533,6 +522,7 @@ export class MasterList implements OnInit, OnDestroy {
   saveBulkImport() {
     if (!this.bulkGrid) return;
     if (this.bulkGridApi) this.bulkGridApi.stopEditing();
+
     const validItems: any[] = [];
 
     this.bulkGridApi.forEachNode((node: any) => {
@@ -542,39 +532,43 @@ export class MasterList implements OnInit, OnDestroy {
       const name = data.name;
       const type = (typeof data.type === 'object' && data.type !== null) ? data.type.value : data.type;
 
+      // Extract valid rows (Rows left blank by user are ignored)
       if (name && name.trim() !== '' && type) {
         const payload = this.preparePayload(data);
         if (!payload.slug) {
-          payload['slug'] = this.generateSlug(payload.name);
+          payload['slug'] = this.generateSlug(payload.name || '');
         }
         validItems.push(payload);
       }
     });
 
     if (validItems.length === 0) {
-      this.appMessage.showWarn('Please enter valid details (Name & Type) for at least one item.');
+      this.appMessage.showWarn('Validation Error: No valid rows detected. Ensure you populate the Name and Type columns.');
       return;
     }
 
-    this.isBulkSaving = true;
+    this.isBulkSaving.set(true);
 
-    this.masterService.createBulkMasters(validItems).pipe(takeUntil(this.destroy$)).subscribe({
+    this.masterService.createBulkMasters(validItems).pipe(
+      takeUntil(this.destroy$),
+      finalize(() => this.isBulkSaving.set(false))
+    ).subscribe({
       next: (res) => {
         if (res.status === 'partial_success') {
-          this.appMessage.showWarn('Partial Import. Check duplicates.');
+          this.appMessage.showWarn('Partial Import: Process completed with some duplicate or invalid rows ignored.');
         } else {
-          this.appMessage.showSuccess(`${validItems.length} items imported successfully`);
+          this.appMessage.showSuccess(`Bulk Import Successful: ${validItems.length} records processed.`);
         }
-        this.isBulkDialogVisible = false;
+        this.isBulkDialogVisible.set(false);
         this.loadMasters();
       },
-      error: (err) => this.appMessage.handleHttpError(err),
-      complete: () => this.isBulkSaving = false
+      error: (err) => this.appMessage.handleHttpError(err)
     });
   }
 
-  // --- HELPERS ---
-
+  // ==========================================================================
+  // HELPERS & UTILITIES
+  // ==========================================================================
   onQuickFilter(event: any) {
     if (this.gridApi) {
       this.gridApi.setGridOption('quickFilterText', event.target.value);
@@ -582,10 +576,10 @@ export class MasterList implements OnInit, OnDestroy {
   }
 
   private createEmptyMaster(): Master {
-    const tempId = `new_${Date.now()}_${Math.random()}`;
+    const tempId = `new_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
     return {
       _id: tempId,
-      _tempId: tempId, // Match grid expectation
+      _tempId: tempId, // Match AG Grid internal expectation
       type: 'category',
       name: '',
       code: '',
@@ -596,7 +590,7 @@ export class MasterList implements OnInit, OnDestroy {
     };
   }
 
-  private preparePayload(row: any): any {
+  private preparePayload(row: any): Partial<Master> {
     const typeValue = (row.type && typeof row.type === 'object') ? row.type.value : row.type;
     const isFeatured = row['metadata.isFeatured'] ?? row.metadata?.isFeatured ?? false;
     const sortOrder = row.metadata?.sortOrder ?? 0;
@@ -604,10 +598,10 @@ export class MasterList implements OnInit, OnDestroy {
     return {
       type: typeValue,
       name: row.name,
-      code: row.code ? row.code.toUpperCase() : null,
-      description: row.description,
-      imageUrl: row.imageUrl,
-      isActive: row.isActive,
+      code: row.code ? String(row.code).toUpperCase() : '',
+      description: row.description || '',
+      imageUrl: row.imageUrl || '',
+      isActive: row.isActive ?? true,
       metadata: {
         isFeatured: isFeatured,
         sortOrder: sortOrder
@@ -615,7 +609,7 @@ export class MasterList implements OnInit, OnDestroy {
     };
   }
 
-  private generateSlug(text: string): string {
+  private generateSlug(text: any): string {
     if (!text) return '';
     const slug = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
     const random = Math.random().toString(36).substring(2, 8);

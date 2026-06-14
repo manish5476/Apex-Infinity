@@ -57,7 +57,6 @@ import { MasterDropdownComponent } from '../../../components/masterFilterDropdow
       (click)="onViewClick($event)"
     >
 
-      <!-- ════════════ EDITOR MODE ════════════ -->
       @if (showEditor) {
         @switch (config.type) {
 
@@ -90,7 +89,7 @@ import { MasterDropdownComponent } from '../../../components/masterFilterDropdow
           }
 
           @case ('number') {
-            <p-inputNumber class="mc-input-number"
+            <p-inputNumber class="mc-component-host"
               [ngModel]="draftValue" (ngModelChange)="onDraftChange($event)"
               mode="decimal"
               [minFractionDigits]="config.minFractionDigits ?? 0"
@@ -102,7 +101,7 @@ import { MasterDropdownComponent } from '../../../components/masterFilterDropdow
           }
 
           @case ('currency') {
-            <p-inputNumber class="mc-input-number"
+            <p-inputNumber class="mc-component-host"
               [ngModel]="draftValue" (ngModelChange)="onDraftChange($event)"
               mode="currency"
               [currency]="config.currencyCode ?? 'INR'"
@@ -115,7 +114,7 @@ import { MasterDropdownComponent } from '../../../components/masterFilterDropdow
           }
 
           @case ('date') {
-            <p-datepicker class="mc-datepicker"
+            <p-datepicker class="mc-component-host mc-datepicker"
               [ngModel]="draftValue" (ngModelChange)="onDraftChange($event)"
               appendTo="body"
               [dateFormat]="config.datePickerFormat ?? 'dd/mm/yy'"
@@ -128,7 +127,7 @@ import { MasterDropdownComponent } from '../../../components/masterFilterDropdow
           }
 
           @case ('select') {
-            <p-select class="mc-select"
+            <p-select class="mc-component-host mc-select"
               [ngModel]="draftValue" (ngModelChange)="onDraftChange($event)"
               [options]="config.options ?? []"
               [optionLabel]="config.optionLabel ?? 'label'"
@@ -142,7 +141,7 @@ import { MasterDropdownComponent } from '../../../components/masterFilterDropdow
           }
 
           @case ('master-dropdown') {
-            <app-master-dropdown class="mc-select"
+            <app-master-dropdown class="mc-component-host mc-select"
               [ngModel]="draftValue" (ngModelChange)="onDraftChange($event)"
               [endpoint]="config.endpoint!"
               [placeholder]="config.placeholder || 'Select…'"
@@ -173,12 +172,9 @@ import { MasterDropdownComponent } from '../../../components/masterFilterDropdow
         }
       }
 
-      <!-- ════════════ VIEW MODE ════════════ -->
       @if (!showEditor) {
         <div class="mcell-viewer">
-
           @switch (config.type) {
-
             @case ('text') {
               @if (value) {
                 <span class="mcell-text" [title]="value">
@@ -427,62 +423,42 @@ import { MasterDropdownComponent } from '../../../components/masterFilterDropdow
   `,
   styles: [`
     /* ══════════════════════════════════════════════════════════════
-       MASTER CELL — Complete Polished Styles
-       Design System: Token-first, AG Grid–aware, Stripe/Linear grade
+       MASTER CELL — Perfect Fit & Alignment Updates
     ══════════════════════════════════════════════════════════════ */
-
-    /*
-      WHY CELLS WERE BREAKING — ROOT CAUSE ANALYSIS:
-      ─────────────────────────────────────────────
-      1. AG Grid wraps each cell in: .ag-cell > .ag-cell-wrapper > .ag-cell-value
-         All three use display:flex + align-items:stretch by default.
-         If the component host (app-master-cell) has display:block, it fills
-         width but NOT height, causing vertical misalignment.
-         FIX: host must be display:flex with height:100%.
-
-      2. .mcell-root needs to be display:flex + align-items:center to vertically
-         center content. Without this, children float to the top of the cell.
-
-      3. Chips/badges inside flex containers stretch to fill height unless
-         align-self:center + height:max-content is set explicitly.
-
-      4. AG Grid cells have 0 padding by default — all internal spacing must
-         come from the renderer, not the cell. We own the full cell box.
-    */
 
     /* ── HOST: Bridge between AG Grid cell-value div and our root ── */
     app-master-cell {
-      display: flex;          /* Critical: flex not block */
-      align-items: stretch;   /* Inherit full cell height */
+      display: flex;
+      align-items: stretch;
       width: 100%;
       height: 100%;
-      overflow: hidden;       /* Prevent any overflow leaking into grid row */
+      overflow: hidden;
     }
 
     /* ── ROOT CONTAINER ─────────────────────────────────────────── */
     .mcell-root {
       display: flex;
-      align-items: center;     /* Vertical centering of all content */
+      align-items: center;
       width: 100%;
       height: 100%;
-      /* 
-        Horizontal padding owns all spacing inside the cell.
-        AG Grid row height 42px → we use 6px top/bottom via flex centering.
-        Left/right padding: 10px to match header padding and feel balanced.
-      */
-      padding: 0 10px;
+      /* FIX 1: Removed manual padding. AG Grid inherently provides 
+         horizontal padding. This prevents the "squished" effect. */
+      padding: 0;
       box-sizing: border-box;
       overflow: hidden;
       transition: background 0.15s ease;
     }
 
-    /* Editing state: subtle tinted background signals active field */
+    /* Editing state: Expand fully with negative margins if necessary to 
+       override grid padding and allow inputs to stretch edge-to-edge. */
     .mcell-root.is-editing {
-      background: color-mix(in srgb, var(--accent-primary) 5%, transparent 95%);
-      padding: 0 6px; /* Tighter padding to give editor inputs more room */
+      width: calc(100% + 8px); 
+      margin-left: -4px; 
+      margin-right: -4px;
+      /* Subtle background to highlight the active cell area */
+      background: color-mix(in srgb, var(--accent-primary) 3%, transparent 97%);
     }
 
-    /* Read-only: muted appearance + blocked interaction */
     .mcell-root.is-readonly .mcell-viewer {
       opacity: 0.45;
       cursor: not-allowed;
@@ -490,29 +466,24 @@ import { MasterDropdownComponent } from '../../../components/masterFilterDropdow
     }
 
     /* ── VIEWER SHELL ───────────────────────────────────────────── */
-    /*
-      This wraps all view-mode content. It must:
-      - Fill width (flex:1) so text truncation works
-      - Stay vertically centered (align-items:center)
-      - Never overflow the cell (overflow:hidden)
-    */
     .mcell-viewer {
       display: flex;
       align-items: center;
       width: 100%;
-      min-width: 0;            /* Key: allows flex children to shrink+truncate */
+      height: 100%;
+      min-width: 0;
       gap: 5px;
       font-family: var(--font-body);
       font-size: var(--font-size-sm);
       color: var(--text-primary);
-      overflow: hidden;        /* Clips any runaway content */
+      overflow: hidden;
     }
 
     /* ── SHARED ICON ────────────────────────────────────────────── */
     .mcell-icon {
       font-size: 11px;
       color: var(--text-tertiary);
-      flex-shrink: 0;           /* Never squeeze the icon */
+      flex-shrink: 0;
       line-height: 1;
     }
 
@@ -531,7 +502,7 @@ import { MasterDropdownComponent } from '../../../components/masterFilterDropdow
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      min-width: 0;            /* Allows truncation inside flex parent */
+      min-width: 0;
       font-size: var(--font-size-sm);
       font-weight: var(--font-weight-medium);
       color: var(--text-primary);
@@ -550,7 +521,6 @@ import { MasterDropdownComponent } from '../../../components/masterFilterDropdow
       -webkit-box-orient: vertical;
       overflow: hidden;
       min-width: 0;
-      /* Small vertical margin so text doesn't touch top/bottom borders */
       padding: 3px 0;
     }
 
@@ -643,13 +613,8 @@ import { MasterDropdownComponent } from '../../../components/masterFilterDropdow
     }
 
     /* ── BOOLEAN CHIP ───────────────────────────────────────────── */
-    /*
-      CRITICAL FIX: Flex parent (.mcell-viewer) defaults to align-items:center.
-      Without explicit height constraint, the chip tries to fill the cell height.
-      Solution: align-self:center + height:max-content on the chip itself.
-    */
     .mcell-bool {
-      display: contents; /* Transparent wrapper — lets chip live directly in viewer flex */
+      display: contents;
     }
     .mcell-bool-chip {
       display: inline-flex;
@@ -663,7 +628,6 @@ import { MasterDropdownComponent } from '../../../components/masterFilterDropdow
       letter-spacing: 0.02em;
       border: 1px solid transparent;
       line-height: 1;
-      /* Shape-lock: never stretch */
       width: max-content;
       height: max-content;
       align-self: center;
@@ -683,10 +647,6 @@ import { MasterDropdownComponent } from '../../../components/masterFilterDropdow
     }
 
     /* ── BADGE ──────────────────────────────────────────────────── */
-    /*
-      Same shape-lock pattern as bool-chip.
-      text-transform:uppercase + letter-spacing creates the "status label" feel.
-    */
     .mcell-badge {
       display: inline-flex;
       align-items: center;
@@ -703,7 +663,6 @@ import { MasterDropdownComponent } from '../../../components/masterFilterDropdow
       background: var(--bg-ternary);
       color: var(--text-tertiary);
       line-height: 1;
-      /* Shape-lock */
       width: max-content;
       height: max-content;
       align-self: center;
@@ -717,29 +676,11 @@ import { MasterDropdownComponent } from '../../../components/masterFilterDropdow
       opacity: 0.75;
       flex-shrink: 0;
     }
-
-    /* Semantic severity colors */
-    .mcell-badge[data-sev="success"] {
-      background: var(--color-success-bg);
-      color: var(--color-success-dark);
-      border-color: var(--color-success-border);
-    }
-    .mcell-badge[data-sev="warning"] {
-      background: var(--color-warning-bg);
-      color: var(--color-warning-dark);
-      border-color: var(--color-warning-border);
-    }
-    .mcell-badge[data-sev="danger"] {
-      background: var(--color-error-bg);
-      color: var(--color-error-dark);
-      border-color: var(--color-error-border);
-    }
+    .mcell-badge[data-sev="success"] { background: var(--color-success-bg); color: var(--color-success-dark); border-color: var(--color-success-border); }
+    .mcell-badge[data-sev="warning"] { background: var(--color-warning-bg); color: var(--color-warning-dark); border-color: var(--color-warning-border); }
+    .mcell-badge[data-sev="danger"] { background: var(--color-error-bg); color: var(--color-error-dark); border-color: var(--color-error-border); }
     .mcell-badge[data-sev="info"],
-    .mcell-badge[data-sev="primary"] {
-      background: var(--color-info-bg);
-      color: var(--color-info-dark);
-      border-color: var(--color-info-border);
-    }
+    .mcell-badge[data-sev="primary"] { background: var(--color-info-bg); color: var(--color-info-dark); border-color: var(--color-info-border); }
 
     /* ── AVATAR ─────────────────────────────────────────────────── */
     .mcell-avatar-wrap {
@@ -750,7 +691,6 @@ import { MasterDropdownComponent } from '../../../components/masterFilterDropdow
       min-width: 0;
     }
     .mcell-avatar {
-      /* Fixed dimensions — never stretch */
       width: 26px;
       height: 26px;
       flex: 0 0 26px;
@@ -761,199 +701,59 @@ import { MasterDropdownComponent } from '../../../components/masterFilterDropdow
       justify-content: center;
       box-shadow: 0 0 0 1.5px var(--border-primary);
     }
-    .mcell-avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-    .mcell-avatar-initials {
-      font-size: 10px;
-      font-weight: var(--font-weight-bold);
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-      line-height: 1;
-    }
-    .mcell-avatar-label {
-      font-size: var(--font-size-sm);
-      color: var(--text-primary);
-      font-weight: var(--font-weight-medium);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      min-width: 0;
-    }
+    .mcell-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .mcell-avatar-initials { font-size: 10px; font-weight: var(--font-weight-bold); letter-spacing: 0.03em; text-transform: uppercase; line-height: 1; }
+    .mcell-avatar-label { font-size: var(--font-size-sm); color: var(--text-primary); font-weight: var(--font-weight-medium); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
 
     /* ── INITIALS CHIP ──────────────────────────────────────────── */
-    .mcell-initials-chip {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 26px;
-      height: 26px;
-      flex: 0 0 26px;
-      border-radius: 50%;
-      font-size: 10px;
-      font-weight: var(--font-weight-bold);
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-      cursor: default;
-    }
+    .mcell-initials-chip { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; flex: 0 0 26px; border-radius: 50%; font-size: 10px; font-weight: var(--font-weight-bold); text-transform: uppercase; letter-spacing: 0.03em; cursor: default; }
 
     /* ── PROGRESS ───────────────────────────────────────────────── */
-    .mcell-progress-wrap {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      width: 100%;
-      min-width: 0;
-    }
-    .mcell-progress-track {
-      flex: 1;
-      min-width: 0;
-      height: 5px;
-      background: var(--bg-ternary);
-      border-radius: var(--ui-border-radius-pill);
-      overflow: hidden;
-    }
-    .mcell-progress-fill {
-      height: 100%;
-      background: var(--accent-primary);
-      border-radius: var(--ui-border-radius-pill);
-      transition: width 0.3s ease;
-    }
+    .mcell-progress-wrap { display: flex; align-items: center; gap: 7px; width: 100%; min-width: 0; }
+    .mcell-progress-track { flex: 1; min-width: 0; height: 5px; background: var(--bg-ternary); border-radius: var(--ui-border-radius-pill); overflow: hidden; }
+    .mcell-progress-fill { height: 100%; background: var(--accent-primary); border-radius: var(--ui-border-radius-pill); transition: width 0.3s ease; }
     .mcell-progress-fill.is-complete { background: var(--color-success); }
     .mcell-progress-fill.is-warning  { background: var(--color-warning); }
     .mcell-progress-fill.is-low      { background: var(--color-error); }
-    .mcell-progress-label {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      font-weight: var(--font-weight-bold);
-      color: var(--text-secondary);
-      min-width: 32px;
-      text-align: right;
-      flex-shrink: 0;
-    }
+    .mcell-progress-label { font-family: var(--font-mono); font-size: 11px; font-weight: var(--font-weight-bold); color: var(--text-secondary); min-width: 32px; text-align: right; flex-shrink: 0; }
     .mcell-progress-label.is-complete { color: var(--color-success); }
 
     /* ── TAGS ───────────────────────────────────────────────────── */
-    .mcell-tags {
-      display: flex;
-      align-items: center;
-      gap: 3px;
-      overflow: hidden;
-      min-width: 0;
-    }
-    .mcell-tag {
-      display: inline-flex;
-      align-items: center;
-      font-size: 11px;
-      font-weight: var(--font-weight-semibold);
-      padding: 2px 7px;
-      border-radius: 4px;
-      background: var(--bg-ternary);
-      color: var(--text-secondary);
-      white-space: nowrap;
-      border: 1px solid var(--border-secondary);
-      /* Shape-lock */
-      flex-shrink: 0;
-      height: max-content;
-      align-self: center;
-    }
-    .mcell-tag-more {
-      background: color-mix(in srgb, var(--accent-primary) 8%, transparent 92%);
-      color: var(--accent-primary);
-      border-color: color-mix(in srgb, var(--accent-primary) 20%, transparent 80%);
-      cursor: default;
-    }
+    .mcell-tags { display: flex; align-items: center; gap: 3px; overflow: hidden; min-width: 0; }
+    .mcell-tag { display: inline-flex; align-items: center; font-size: 11px; font-weight: var(--font-weight-semibold); padding: 2px 7px; border-radius: 4px; background: var(--bg-ternary); color: var(--text-secondary); white-space: nowrap; border: 1px solid var(--border-secondary); flex-shrink: 0; height: max-content; align-self: center; }
+    .mcell-tag-more { background: color-mix(in srgb, var(--accent-primary) 8%, transparent 92%); color: var(--accent-primary); border-color: color-mix(in srgb, var(--accent-primary) 20%, transparent 80%); cursor: default; }
 
-    /* ── LINK (email, phone, url) ───────────────────────────────── */
-    .mcell-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      color: var(--accent-primary);
-      text-decoration: none;
-      font-size: var(--font-size-sm);
-      font-weight: var(--font-weight-medium);
-      overflow: hidden;
-      min-width: 0;
-      transition: color 0.12s ease, opacity 0.12s ease;
-    }
-    .mcell-link:hover {
-      color: var(--accent-hover);
-      text-decoration: underline;
-      opacity: 0.9;
-    }
-    .mcell-link span {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
+    /* ── LINK ───────────────────────────────────────────────────── */
+    .mcell-link { display: inline-flex; align-items: center; gap: 4px; color: var(--accent-primary); text-decoration: none; font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); overflow: hidden; min-width: 0; transition: color 0.12s ease, opacity 0.12s ease; }
+    .mcell-link:hover { color: var(--accent-hover); text-decoration: underline; opacity: 0.9; }
+    .mcell-link span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-    /* ── COLOR SWATCH ───────────────────────────────────────────── */
-    .mcell-color {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .mcell-color-swatch {
-      width: 14px;
-      height: 14px;
-      flex-shrink: 0;
-      border-radius: 3px;
-      border: 1px solid var(--border-primary);
-      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08);
-    }
-    .mcell-color-label {
-      font-family: var(--font-mono);
-      font-size: var(--font-size-xs);
-      color: var(--text-secondary);
-      white-space: nowrap;
-    }
-
-    /* ── MONO CHIP (filesize, duration) ─────────────────────────── */
-    .mcell-mono-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-family: var(--font-mono);
-      font-size: var(--font-size-xs);
-      font-weight: var(--font-weight-medium);
-      color: var(--text-secondary);
-      white-space: nowrap;
-    }
-
-    /* ── RATING ─────────────────────────────────────────────────── */
-    .mcell-rating {
-      display: inline-flex;
-      align-items: center;
-      gap: 2px;
-    }
-    .mcell-rating .pi {
-      font-size: 12px;
-      color: var(--bg-ternary);
-      transition: color 0.12s ease;
-    }
+    /* ── COLOR / MONO / RATING ──────────────────────────────────── */
+    .mcell-color { display: inline-flex; align-items: center; gap: 6px; }
+    .mcell-color-swatch { width: 14px; height: 14px; flex-shrink: 0; border-radius: 3px; border: 1px solid var(--border-primary); box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08); }
+    .mcell-color-label { font-family: var(--font-mono); font-size: var(--font-size-xs); color: var(--text-secondary); white-space: nowrap; }
+    .mcell-mono-chip { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-mono); font-size: var(--font-size-xs); font-weight: var(--font-weight-medium); color: var(--text-secondary); white-space: nowrap; }
+    .mcell-rating { display: inline-flex; align-items: center; gap: 2px; }
+    .mcell-rating .pi { font-size: 12px; color: var(--bg-ternary); transition: color 0.12s ease; }
     .mcell-rating .pi.is-filled { color: #f59e0b; }
-    .mcell-rating-val {
-      font-family: var(--font-mono);
-      font-size: var(--font-size-xs);
-      font-weight: var(--font-weight-bold);
-      color: var(--text-tertiary);
-      margin-left: 4px;
-    }
+    .mcell-rating-val { font-family: var(--font-mono); font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); color: var(--text-tertiary); margin-left: 4px; }
+
 
     /* ══════════════════════════════════════════════════════════════
-       EDITOR INPUT FIELDS
-       All editor inputs must fit within the 42px row height.
-       Standard target: 30px height for inputs, leaving 6px top+bottom.
+       EDITOR INPUT FIELDS — FIXED FOR 100% FILL
     ══════════════════════════════════════════════════════════════ */
 
-    /* ── TEXT / EMAIL / PHONE / URL (native inputs via pInputText) ── */
+    /* FIX 2: PrimeNG Host wrappers need to be block-level explicitly 
+       to respect the width of the flex parent. */
+    .mc-component-host {
+      display: block;
+      width: 100%;
+    }
+
+    /* ── NATIVE INPUTS ── */
     .mc-input {
       width: 100%;
-      height: 30px;
+      height: 34px; /* Slightly taller for better click area inside the grid */
       padding: 0 8px;
       font-family: var(--font-body);
       font-size: var(--font-size-sm);
@@ -965,27 +765,17 @@ import { MasterDropdownComponent } from '../../../components/masterFilterDropdow
       outline: none;
       box-sizing: border-box;
       transition: border-color 0.12s ease, box-shadow 0.12s ease;
-      /* Prevent any overflow out of cell */
       min-width: 0;
-    }
-    .mc-input::placeholder {
-      color: var(--text-disabled);
-      font-weight: var(--font-weight-normal);
     }
     .mc-input:focus {
       border-color: var(--accent-primary);
       box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-primary) 18%, transparent 82%);
     }
 
-    /* ── NUMBER / CURRENCY (p-inputNumber wrapper) ──────────────── */
-    .mc-input-number {
-      width: 100%;
-      display: block;
-    }
-    /* Target the inner <input> PrimeNG generates */
-    .mc-input-number .p-inputnumber-input {
+    /* ── NUMBER / CURRENCY (p-inputNumber) ── */
+    .mc-component-host .p-inputnumber-input {
       width: 100% !important;
-      height: 30px;
+      height: 34px;
       padding: 0 8px;
       font-family: var(--font-mono);
       font-size: var(--font-size-sm);
@@ -998,19 +788,15 @@ import { MasterDropdownComponent } from '../../../components/masterFilterDropdow
       box-sizing: border-box;
       transition: border-color 0.12s ease, box-shadow 0.12s ease;
     }
-    .mc-input-number .p-inputnumber-input:focus {
+    .mc-component-host .p-inputnumber-input:focus {
       border-color: var(--accent-primary) !important;
       box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-primary) 18%, transparent 82%) !important;
     }
-    /* Hide PrimeNG's default spin buttons — AG Grid rows are too small for them */
-    .mc-input-number .p-inputnumber-button-group { display: none; }
+    .mc-component-host .p-inputnumber-button-group { display: none; }
 
-    /* ── SELECT (p-select) ──────────────────────────────────────── */
-    .mc-select {
-      width: 100%;
-    }
+    /* ── SELECT / DROPDOWN ── */
     .mc-select .p-select-label {
-      height: 30px;
+      height: 34px;
       padding: 0 8px;
       font-family: var(--font-body);
       font-size: var(--font-size-sm);
@@ -1028,23 +814,11 @@ import { MasterDropdownComponent } from '../../../components/masterFilterDropdow
       border-color: var(--accent-primary) !important;
       box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-primary) 18%, transparent 82%) !important;
     }
-    /* Dropdown panel (appended to body) */
-    .mc-dropdown-panel .p-select-list {
-      font-size: var(--font-size-sm);
-      padding: 4px;
-    }
-    .mc-dropdown-panel .p-select-option {
-      border-radius: 4px;
-      padding: 6px 8px;
-      font-size: var(--font-size-sm);
-    }
 
-    /* ── DATE PICKER (p-datepicker) ─────────────────────────────── */
-    .mc-datepicker {
-      width: 100%;
-    }
+    /* ── DATEPICKER ── */
     .mc-datepicker .p-datepicker-input {
-      height: 30px;
+      height: 34px;
+      width: 100%;
       padding: 0 8px;
       font-family: var(--font-body);
       font-size: var(--font-size-sm);
@@ -1060,30 +834,11 @@ import { MasterDropdownComponent } from '../../../components/masterFilterDropdow
       border-color: var(--accent-primary) !important;
       box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-primary) 18%, transparent 82%) !important;
     }
-    .mc-calendar-panel {
-      font-size: var(--font-size-sm);
-      border-radius: var(--ui-border-radius);
-      box-shadow: var(--shadow-xl);
-    }
 
-    /* ── CHECKBOX (p-checkbox) ──────────────────────────────────── */
-    .mc-checkbox-wrap {
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      width: 100%;
-      height: 100%;
-    }
-    .mc-checkbox-wrap .p-checkbox-box {
-      width: 18px !important;
-      height: 18px !important;
-      border-radius: 4px !important;
-    }
-
-    /* ── TEXTAREA ───────────────────────────────────────────────── */
+    /* ── TEXTAREA ── */
     .mc-textarea {
       width: 100%;
-      min-height: 30px;
+      min-height: 34px;
       padding: 4px 8px;
       font-family: var(--font-body);
       font-size: var(--font-size-sm);
@@ -1101,13 +856,9 @@ import { MasterDropdownComponent } from '../../../components/masterFilterDropdow
       border-color: var(--accent-primary);
       box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-primary) 18%, transparent 82%);
     }
-    .mc-textarea::placeholder {
-      color: var(--text-disabled);
-    }
   `]
 })
 export class MasterCellComponent implements ICellRendererAngularComp, OnDestroy {
-
   private readonly el = inject(ElementRef);
   private readonly cdr = inject(ChangeDetectorRef);
   readonly cm = inject(CommonMethodService);
@@ -1143,7 +894,6 @@ export class MasterCellComponent implements ICellRendererAngularComp, OnDestroy 
     return this.cm.isPast(this.value) && !this.cm.isToday(this.value);
   }
 
-  /* ── AG GRID LIFECYCLE ───────────────────────────────── */
   agInit(params: any): void {
     this.params = params;
     this.config = params.cellConfig || { type: 'text' };
@@ -1168,7 +918,6 @@ export class MasterCellComponent implements ICellRendererAngularComp, OnDestroy 
 
   ngOnDestroy(): void { }
 
-  /* ── FOCUS — microtask pattern ───────────────────────── */
   private focusEditor(): void {
     Promise.resolve().then(() => {
       const host = this.el.nativeElement as HTMLElement;
@@ -1188,7 +937,6 @@ export class MasterCellComponent implements ICellRendererAngularComp, OnDestroy 
     });
   }
 
-  /* ── EDITOR EVENTS ───────────────────────────────────── */
   onDraftChange(val: any): void {
     this.draftValue = val;
     const parent = this.params?.context?.componentParent;
@@ -1247,7 +995,6 @@ export class MasterCellComponent implements ICellRendererAngularComp, OnDestroy 
     }
   }
 
-  /* ── VIEW HELPERS ────────────────────────────────────── */
   getSelectLabel(value: any): string {
     if (!this.config.options) return value ?? '—';
     const opt = this.config.options.find(
@@ -1303,9 +1050,6 @@ export class MasterCellComponent implements ICellRendererAngularComp, OnDestroy 
     return Array.from({ length: max }, (_, i) => i < filled);
   }
 }
-
-
-
 // import {
 //   Component,
 //   ViewEncapsulation,
@@ -1337,6 +1081,7 @@ export class MasterCellComponent implements ICellRendererAngularComp, OnDestroy 
 //   SelectOption,
 // } from '../grid.types';
 // import { CommonMethodService } from '@core/utils/common-method.service';
+// import { MasterDropdownComponent } from '../../../components/masterFilterDropdown/master-dropdown.component';
 
 // @Component({
 //   selector: 'app-master-cell',
@@ -1353,6 +1098,7 @@ export class MasterCellComponent implements ICellRendererAngularComp, OnDestroy 
 //     CheckboxModule,
 //     TagModule,
 //     TooltipModule,
+//     MasterDropdownComponent,
 //   ],
 //   template: `
 //     <div
@@ -1444,6 +1190,14 @@ export class MasterCellComponent implements ICellRendererAngularComp, OnDestroy 
 //               [showClear]="true"
 //               [placeholder]="config.placeholder || 'Select…'"
 //               [panelStyleClass]="'mc-dropdown-panel'"
+//               (onFocus)="onEditorFocus($event)" (onBlur)="onBlur($event)" #focusTarget />
+//           }
+
+//           @case ('master-dropdown') {
+//             <app-master-dropdown class="mc-select"
+//               [ngModel]="draftValue" (ngModelChange)="onDraftChange($event)"
+//               [endpoint]="config.endpoint!"
+//               [placeholder]="config.placeholder || 'Select…'"
 //               (onFocus)="onEditorFocus($event)" (onBlur)="onBlur($event)" #focusTarget />
 //           }
 
@@ -1724,76 +1478,119 @@ export class MasterCellComponent implements ICellRendererAngularComp, OnDestroy 
 //     </div>
 //   `,
 //   styles: [`
-//     /* ══════════════════════════════════════════════════════
-//        MASTER CELL v2.4 — Tokens-Only "Billion Dollar" UI
-//        Fixes: Ag-Grid Flex stretching on chips/badges.
-//        Enhancements: Perfect typography spacing, pure theme vars.
-//     ══════════════════════════════════════════════════════ */
+//     /* ══════════════════════════════════════════════════════════════
+//        MASTER CELL — Complete Polished Styles
+//        Design System: Token-first, AG Grid–aware, Stripe/Linear grade
+//     ══════════════════════════════════════════════════════════════ */
 
+//     /*
+//       WHY CELLS WERE BREAKING — ROOT CAUSE ANALYSIS:
+//       ─────────────────────────────────────────────
+//       1. AG Grid wraps each cell in: .ag-cell > .ag-cell-wrapper > .ag-cell-value
+//          All three use display:flex + align-items:stretch by default.
+//          If the component host (app-master-cell) has display:block, it fills
+//          width but NOT height, causing vertical misalignment.
+//          FIX: host must be display:flex with height:100%.
+
+//       2. .mcell-root needs to be display:flex + align-items:center to vertically
+//          center content. Without this, children float to the top of the cell.
+
+//       3. Chips/badges inside flex containers stretch to fill height unless
+//          align-self:center + height:max-content is set explicitly.
+
+//       4. AG Grid cells have 0 padding by default — all internal spacing must
+//          come from the renderer, not the cell. We own the full cell box.
+//     */
+
+//     /* ── HOST: Bridge between AG Grid cell-value div and our root ── */
 //     app-master-cell {
-//       display: block; 
+//       display: flex;          /* Critical: flex not block */
+//       align-items: stretch;   /* Inherit full cell height */
 //       width: 100%;
 //       height: 100%;
+//       overflow: hidden;       /* Prevent any overflow leaking into grid row */
 //     }
 
-//     /* ── ROOT ──────────────────────────────────────────── */
+//     /* ── ROOT CONTAINER ─────────────────────────────────────────── */
 //     .mcell-root {
 //       display: flex;
-//       align-items: center;
+//       align-items: center;     /* Vertical centering of all content */
 //       width: 100%;
 //       height: 100%;
-//       padding: 0 var(--spacing-sm);
+//       /*
+//         Horizontal padding owns all spacing inside the cell.
+//         AG Grid row height 42px → we use 6px top/bottom via flex centering.
+//         Left/right padding: 10px to match header padding and feel balanced.
+//       */
+//       padding: 0 10px;
 //       box-sizing: border-box;
-//       transition: background var(--transition-base);
+//       overflow: hidden;
+//       transition: background 0.15s ease;
 //     }
+
+//     /* Editing state: subtle tinted background signals active field */
 //     .mcell-root.is-editing {
-//       background: var(--color-primary-bg);
+//       background: color-mix(in srgb, var(--accent-primary) 5%, transparent 95%);
+//       padding: 0 6px; /* Tighter padding to give editor inputs more room */
 //     }
+
+//     /* Read-only: muted appearance + blocked interaction */
 //     .mcell-root.is-readonly .mcell-viewer {
-//       opacity: 0.5;
+//       opacity: 0.45;
 //       cursor: not-allowed;
 //       pointer-events: none;
 //     }
 
-//     /* ── VIEWER SHELL ──────────────────────────────────── */
+//     /* ── VIEWER SHELL ───────────────────────────────────────────── */
+//     /*
+//       This wraps all view-mode content. It must:
+//       - Fill width (flex:1) so text truncation works
+//       - Stay vertically centered (align-items:center)
+//       - Never overflow the cell (overflow:hidden)
+//     */
 //     .mcell-viewer {
 //       display: flex;
 //       align-items: center;
 //       width: 100%;
-//       height: 100%;
-//       gap: var(--spacing-sm);
-//       font-size: var(--font-size-sm);
+//       min-width: 0;            /* Key: allows flex children to shrink+truncate */
+//       gap: 5px;
 //       font-family: var(--font-body);
+//       font-size: var(--font-size-sm);
 //       color: var(--text-primary);
+//       overflow: hidden;        /* Clips any runaway content */
 //     }
 
-//     /* ── SHARED ICON ───────────────────────────────────── */
+//     /* ── SHARED ICON ────────────────────────────────────────────── */
 //     .mcell-icon {
-//       font-size: var(--font-size-xs);
+//       font-size: 11px;
 //       color: var(--text-tertiary);
-//       flex-shrink: 0;
-//       transition: color var(--transition-fast);
+//       flex-shrink: 0;           /* Never squeeze the icon */
+//       line-height: 1;
 //     }
 
-//     /* ── EMPTY PLACEHOLDER ─────────────────────────────── */
+//     /* ── EMPTY PLACEHOLDER ──────────────────────────────────────── */
 //     .mcell-empty {
 //       color: var(--text-disabled);
 //       font-size: var(--font-size-xs);
+//       font-weight: var(--font-weight-normal);
 //       user-select: none;
+//       letter-spacing: 0.02em;
 //     }
 
-//     /* ── TEXT / SELECT ─────────────────────────────────── */
+//     /* ── TEXT ───────────────────────────────────────────────────── */
 //     .mcell-text,
 //     .mcell-select-val {
 //       overflow: hidden;
 //       text-overflow: ellipsis;
 //       white-space: nowrap;
+//       min-width: 0;            /* Allows truncation inside flex parent */
 //       font-size: var(--font-size-sm);
 //       font-weight: var(--font-weight-medium);
 //       color: var(--text-primary);
+//       line-height: var(--line-height-tight);
 //     }
 
-//     /* ── MULTILINE / DESCRIPTION ───────────────────────── */
+//     /* ── MULTILINE (textarea viewer) ────────────────────────────── */
 //     .mcell-multiline {
 //       font-size: var(--font-size-sm);
 //       line-height: var(--line-height-relaxed);
@@ -1804,49 +1601,128 @@ export class MasterCellComponent implements ICellRendererAngularComp, OnDestroy 
 //       -webkit-line-clamp: 2;
 //       -webkit-box-orient: vertical;
 //       overflow: hidden;
-//       margin: var(--spacing-sm) 0; /* Let it breathe away from borders */
-//       padding-right: var(--spacing-sm);
+//       min-width: 0;
+//       /* Small vertical margin so text doesn't touch top/bottom borders */
+//       padding: 3px 0;
 //     }
 
-//     /* ── NUMBER / CURRENCY ─────────────────────────────── */
-//     .mcell-number, .mcell-currency {
+//     /* ── NUMBER / CURRENCY ──────────────────────────────────────── */
+//     .mcell-number,
+//     .mcell-currency {
 //       font-family: var(--font-mono);
 //       font-size: var(--font-size-sm);
 //       font-weight: var(--font-weight-semibold);
 //       color: var(--text-primary);
-//       letter-spacing: -0.02em;
+//       letter-spacing: -0.03em;
+//       line-height: 1;
+//       white-space: nowrap;
 //     }
-//     .mcell-currency { display: inline-flex; align-items: center; gap: var(--spacing-xs); }
-//     .mcell-currency-arrow { font-size: 0.65rem; opacity: 0.5; }
+//     .mcell-currency {
+//       display: inline-flex;
+//       align-items: center;
+//       gap: 3px;
+//     }
+//     .mcell-currency-arrow {
+//       font-size: 10px;
+//       opacity: 0.5;
+//       flex-shrink: 0;
+//     }
 //     .mcell-currency.is-negative { color: var(--color-error); }
 
-//     /* ── BOOLEAN CHIP (Fixed Shape & Stretch) ──────────── */
-//     .mcell-bool { 
-//       display: flex; 
-//       align-items: center; 
+//     /* ── PERCENT ────────────────────────────────────────────────── */
+//     .mcell-percent-wrap {
+//       display: flex;
+//       align-items: center;
+//       gap: 6px;
+//       width: 100%;
+//       min-width: 0;
+//     }
+//     .mcell-percent {
+//       font-family: var(--font-mono);
+//       font-size: var(--font-size-xs);
+//       font-weight: var(--font-weight-bold);
+//       color: var(--text-secondary);
+//       white-space: nowrap;
+//       min-width: 34px;
+//       text-align: right;
+//     }
+//     .mcell-pct-bar-track {
+//       flex: 1;
+//       height: 4px;
+//       background: var(--bg-ternary);
+//       border-radius: var(--ui-border-radius-pill);
+//       overflow: hidden;
+//     }
+//     .mcell-pct-bar-fill {
 //       height: 100%;
+//       background: var(--accent-primary);
+//       border-radius: var(--ui-border-radius-pill);
+//       transition: width 0.3s ease;
+//     }
+
+//     /* ── DATE / DATETIME / TIMEAGO ──────────────────────────────── */
+//     .mcell-date,
+//     .mcell-timeago {
+//       display: inline-flex;
+//       align-items: center;
+//       gap: 5px;
+//       font-size: var(--font-size-sm);
+//       color: var(--text-secondary);
+//       white-space: nowrap;
+//       overflow: hidden;
+//       min-width: 0;
+//     }
+//     .mcell-date-text {
+//       overflow: hidden;
+//       text-overflow: ellipsis;
+//     }
+//     .mcell-date.is-today { color: var(--accent-primary); font-weight: var(--font-weight-semibold); }
+//     .mcell-date.is-overdue { color: var(--color-error); }
+//     .mcell-today-badge {
+//       display: inline-flex;
+//       align-items: center;
+//       font-size: 9px;
+//       font-weight: var(--font-weight-bold);
+//       letter-spacing: 0.06em;
+//       text-transform: uppercase;
+//       padding: 1px 5px;
+//       border-radius: var(--ui-border-radius-pill);
+//       background: color-mix(in srgb, var(--accent-primary) 12%, transparent 88%);
+//       color: var(--accent-primary);
+//       border: 1px solid color-mix(in srgb, var(--accent-primary) 25%, transparent 75%);
+//       flex-shrink: 0;
+//       line-height: 1.4;
+//     }
+
+//     /* ── BOOLEAN CHIP ───────────────────────────────────────────── */
+//     /*
+//       CRITICAL FIX: Flex parent (.mcell-viewer) defaults to align-items:center.
+//       Without explicit height constraint, the chip tries to fill the cell height.
+//       Solution: align-self:center + height:max-content on the chip itself.
+//     */
+//     .mcell-bool {
+//       display: contents; /* Transparent wrapper — lets chip live directly in viewer flex */
 //     }
 //     .mcell-bool-chip {
 //       display: inline-flex;
 //       align-items: center;
 //       justify-content: center;
-//       gap: var(--spacing-xs);
-//       padding: var(--spacing-xs) var(--spacing-md);
+//       gap: 4px;
+//       padding: 3px 8px;
 //       border-radius: var(--ui-border-radius-pill);
-//       font-size: var(--font-size-xs);
+//       font-size: 11px;
 //       font-weight: var(--font-weight-semibold);
 //       letter-spacing: 0.02em;
-//       border: var(--ui-border-width) solid transparent;
-//       line-height: var(--line-height-tight);
-      
-//       /* Stop Flexbox stretching it vertically */
-//       width: max-content; 
+//       border: 1px solid transparent;
+//       line-height: 1;
+//       /* Shape-lock: never stretch */
+//       width: max-content;
 //       height: max-content;
-//       align-self: center; 
+//       align-self: center;
 //       flex-shrink: 0;
 //     }
-//     .mcell-bool-chip i { font-size: 0.65rem; }
-    
+//     .mcell-bool-chip i { font-size: 9px; }
+
 //     .mcell-bool-chip.is-true {
 //       background: var(--color-success-bg);
 //       color: var(--color-success-dark);
@@ -1854,30 +1730,33 @@ export class MasterCellComponent implements ICellRendererAngularComp, OnDestroy 
 //     }
 //     .mcell-bool-chip.is-false {
 //       background: var(--bg-ternary);
-//       color: var(--text-secondary);
+//       color: var(--text-tertiary);
 //       border-color: var(--border-secondary);
 //     }
 
-//     /* ── BADGE (Fixed Shape & Stretch) ─────────────────── */
+//     /* ── BADGE ──────────────────────────────────────────────────── */
+//     /*
+//       Same shape-lock pattern as bool-chip.
+//       text-transform:uppercase + letter-spacing creates the "status label" feel.
+//     */
 //     .mcell-badge {
 //       display: inline-flex;
 //       align-items: center;
 //       justify-content: center;
-//       gap: var(--spacing-xs);
-//       padding: var(--spacing-xs) var(--spacing-md);
+//       gap: 4px;
+//       padding: 3px 8px;
 //       border-radius: var(--ui-border-radius-pill);
-//       font-size: var(--font-size-xs);
+//       font-size: 10px;
 //       font-weight: var(--font-weight-bold);
 //       text-transform: uppercase;
-//       letter-spacing: 0.04em;
+//       letter-spacing: 0.05em;
 //       white-space: nowrap;
-//       border: var(--ui-border-width) solid var(--border-secondary);
+//       border: 1px solid var(--border-secondary);
 //       background: var(--bg-ternary);
 //       color: var(--text-tertiary);
-//       line-height: var(--line-height-tight);
-
-//       /* Stop Flexbox stretching it vertically */
-//       width: max-content; 
+//       line-height: 1;
+//       /* Shape-lock */
+//       width: max-content;
 //       height: max-content;
 //       align-self: center;
 //       flex-shrink: 0;
@@ -1887,11 +1766,11 @@ export class MasterCellComponent implements ICellRendererAngularComp, OnDestroy 
 //       height: 5px;
 //       border-radius: 50%;
 //       background: currentColor;
-//       opacity: 0.8;
+//       opacity: 0.75;
 //       flex-shrink: 0;
 //     }
-    
-//     /* Elegant Semantic Colors mapped purely to your Tokens */
+
+//     /* Semantic severity colors */
 //     .mcell-badge[data-sev="success"] {
 //       background: var(--color-success-bg);
 //       color: var(--color-success-dark);
@@ -1907,36 +1786,45 @@ export class MasterCellComponent implements ICellRendererAngularComp, OnDestroy 
 //       color: var(--color-error-dark);
 //       border-color: var(--color-error-border);
 //     }
-//     .mcell-badge[data-sev="info"], .mcell-badge[data-sev="primary"] {
+//     .mcell-badge[data-sev="info"],
+//     .mcell-badge[data-sev="primary"] {
 //       background: var(--color-info-bg);
 //       color: var(--color-info-dark);
 //       border-color: var(--color-info-border);
 //     }
 
-//     /* ── AVATAR ────────────────────────────────────────── */
+//     /* ── AVATAR ─────────────────────────────────────────────────── */
 //     .mcell-avatar-wrap {
 //       display: flex;
 //       align-items: center;
-//       gap: var(--spacing-md);
+//       gap: 7px;
 //       overflow: hidden;
+//       min-width: 0;
 //     }
 //     .mcell-avatar {
-//       width: 28px;
-//       height: 28px;
-//       border-radius: var(--ui-border-radius-pill);
+//       /* Fixed dimensions — never stretch */
+//       width: 26px;
+//       height: 26px;
+//       flex: 0 0 26px;
+//       border-radius: 50%;
 //       overflow: hidden;
 //       display: flex;
 //       align-items: center;
 //       justify-content: center;
-//       flex-shrink: 0;
-//       box-shadow: var(--shadow-sm);
+//       box-shadow: 0 0 0 1.5px var(--border-primary);
 //     }
-//     .mcell-avatar img { width: 100%; height: 100%; object-fit: cover; }
+//     .mcell-avatar img {
+//       width: 100%;
+//       height: 100%;
+//       object-fit: cover;
+//       display: block;
+//     }
 //     .mcell-avatar-initials {
-//       font-size: var(--font-size-xs);
+//       font-size: 10px;
 //       font-weight: var(--font-weight-bold);
 //       letter-spacing: 0.03em;
 //       text-transform: uppercase;
+//       line-height: 1;
 //     }
 //     .mcell-avatar-label {
 //       font-size: var(--font-size-sm);
@@ -1945,19 +1833,37 @@ export class MasterCellComponent implements ICellRendererAngularComp, OnDestroy 
 //       overflow: hidden;
 //       text-overflow: ellipsis;
 //       white-space: nowrap;
+//       min-width: 0;
 //     }
 
-//     /* ── PROGRESS ──────────────────────────────────────── */
+//     /* ── INITIALS CHIP ──────────────────────────────────────────── */
+//     .mcell-initials-chip {
+//       display: inline-flex;
+//       align-items: center;
+//       justify-content: center;
+//       width: 26px;
+//       height: 26px;
+//       flex: 0 0 26px;
+//       border-radius: 50%;
+//       font-size: 10px;
+//       font-weight: var(--font-weight-bold);
+//       text-transform: uppercase;
+//       letter-spacing: 0.03em;
+//       cursor: default;
+//     }
+
+//     /* ── PROGRESS ───────────────────────────────────────────────── */
 //     .mcell-progress-wrap {
 //       display: flex;
 //       align-items: center;
-//       gap: var(--spacing-sm);
+//       gap: 7px;
 //       width: 100%;
-//       padding-right: var(--spacing-sm);
+//       min-width: 0;
 //     }
 //     .mcell-progress-track {
 //       flex: 1;
-//       height: 6px;
+//       min-width: 0;
+//       height: 5px;
 //       background: var(--bg-ternary);
 //       border-radius: var(--ui-border-radius-pill);
 //       overflow: hidden;
@@ -1966,74 +1872,289 @@ export class MasterCellComponent implements ICellRendererAngularComp, OnDestroy 
 //       height: 100%;
 //       background: var(--accent-primary);
 //       border-radius: var(--ui-border-radius-pill);
-//       transition: width var(--transition-slow);
+//       transition: width 0.3s ease;
 //     }
 //     .mcell-progress-fill.is-complete { background: var(--color-success); }
 //     .mcell-progress-fill.is-warning  { background: var(--color-warning); }
 //     .mcell-progress-fill.is-low      { background: var(--color-error); }
 //     .mcell-progress-label {
 //       font-family: var(--font-mono);
-//       font-size: var(--font-size-xs);
+//       font-size: 11px;
 //       font-weight: var(--font-weight-bold);
 //       color: var(--text-secondary);
-//       min-width: 30px;
+//       min-width: 32px;
 //       text-align: right;
+//       flex-shrink: 0;
 //     }
+//     .mcell-progress-label.is-complete { color: var(--color-success); }
 
-//     /* ── TAGS ──────────────────────────────────────────── */
+//     /* ── TAGS ───────────────────────────────────────────────────── */
 //     .mcell-tags {
 //       display: flex;
 //       align-items: center;
-//       height: 100%;
-//       gap: var(--spacing-xs);
+//       gap: 3px;
 //       overflow: hidden;
+//       min-width: 0;
 //     }
 //     .mcell-tag {
-//       display: inline-block;
-//       font-size: var(--font-size-xs);
+//       display: inline-flex;
+//       align-items: center;
+//       font-size: 11px;
 //       font-weight: var(--font-weight-semibold);
-//       padding: var(--spacing-xs) var(--spacing-md);
-//       border-radius: var(--ui-border-radius-sm);
+//       padding: 2px 7px;
+//       border-radius: 4px;
 //       background: var(--bg-ternary);
 //       color: var(--text-secondary);
 //       white-space: nowrap;
-      
+//       border: 1px solid var(--border-secondary);
+//       /* Shape-lock */
+//       flex-shrink: 0;
 //       height: max-content;
 //       align-self: center;
 //     }
+//     .mcell-tag-more {
+//       background: color-mix(in srgb, var(--accent-primary) 8%, transparent 92%);
+//       color: var(--accent-primary);
+//       border-color: color-mix(in srgb, var(--accent-primary) 20%, transparent 80%);
+//       cursor: default;
+//     }
 
-//     /* ══════════════════════════════════════════════════════
-//        EDITOR FIELDS
-//     ══════════════════════════════════════════════════════ */
-//     .mc-input, .mc-input-number .p-inputnumber-input, .mc-select, .mc-datepicker .p-datepicker-input {
+//     /* ── LINK (email, phone, url) ───────────────────────────────── */
+//     .mcell-link {
+//       display: inline-flex;
+//       align-items: center;
+//       gap: 4px;
+//       color: var(--accent-primary);
+//       text-decoration: none;
+//       font-size: var(--font-size-sm);
+//       font-weight: var(--font-weight-medium);
+//       overflow: hidden;
+//       min-width: 0;
+//       transition: color 0.12s ease, opacity 0.12s ease;
+//     }
+//     .mcell-link:hover {
+//       color: var(--accent-hover);
+//       text-decoration: underline;
+//       opacity: 0.9;
+//     }
+//     .mcell-link span {
+//       overflow: hidden;
+//       text-overflow: ellipsis;
+//       white-space: nowrap;
+//     }
+
+//     /* ── COLOR SWATCH ───────────────────────────────────────────── */
+//     .mcell-color {
+//       display: inline-flex;
+//       align-items: center;
+//       gap: 6px;
+//     }
+//     .mcell-color-swatch {
+//       width: 14px;
+//       height: 14px;
+//       flex-shrink: 0;
+//       border-radius: 3px;
+//       border: 1px solid var(--border-primary);
+//       box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08);
+//     }
+//     .mcell-color-label {
+//       font-family: var(--font-mono);
+//       font-size: var(--font-size-xs);
+//       color: var(--text-secondary);
+//       white-space: nowrap;
+//     }
+
+//     /* ── MONO CHIP (filesize, duration) ─────────────────────────── */
+//     .mcell-mono-chip {
+//       display: inline-flex;
+//       align-items: center;
+//       gap: 4px;
+//       font-family: var(--font-mono);
+//       font-size: var(--font-size-xs);
+//       font-weight: var(--font-weight-medium);
+//       color: var(--text-secondary);
+//       white-space: nowrap;
+//     }
+
+//     /* ── RATING ─────────────────────────────────────────────────── */
+//     .mcell-rating {
+//       display: inline-flex;
+//       align-items: center;
+//       gap: 2px;
+//     }
+//     .mcell-rating .pi {
+//       font-size: 12px;
+//       color: var(--bg-ternary);
+//       transition: color 0.12s ease;
+//     }
+//     .mcell-rating .pi.is-filled { color: #f59e0b; }
+//     .mcell-rating-val {
+//       font-family: var(--font-mono);
+//       font-size: var(--font-size-xs);
+//       font-weight: var(--font-weight-bold);
+//       color: var(--text-tertiary);
+//       margin-left: 4px;
+//     }
+
+//     /* ══════════════════════════════════════════════════════════════
+//        EDITOR INPUT FIELDS
+//        All editor inputs must fit within the 42px row height.
+//        Standard target: 30px height for inputs, leaving 6px top+bottom.
+//     ══════════════════════════════════════════════════════════════ */
+
+//     /* ── TEXT / EMAIL / PHONE / URL (native inputs via pInputText) ── */
+//     .mc-input {
 //       width: 100%;
-//       height: 32px; 
-//       padding: 0 var(--spacing-md);
+//       height: 30px;
+//       padding: 0 8px;
 //       font-family: var(--font-body);
 //       font-size: var(--font-size-sm);
+//       font-weight: var(--font-weight-normal);
 //       color: var(--text-primary);
 //       background: var(--bg-primary);
-//       border: var(--ui-border-width) solid var(--border-primary);
+//       border: 1.5px solid var(--border-primary);
 //       border-radius: var(--ui-border-radius-sm);
 //       outline: none;
-//       transition: var(--transition-fast);
+//       box-sizing: border-box;
+//       transition: border-color 0.12s ease, box-shadow 0.12s ease;
+//       /* Prevent any overflow out of cell */
+//       min-width: 0;
 //     }
-//     .mc-input:focus, .mc-input-number .p-inputnumber-input:focus, .mc-select.p-focus, .mc-datepicker .p-datepicker-input:focus {
+//     .mc-input::placeholder {
+//       color: var(--text-disabled);
+//       font-weight: var(--font-weight-normal);
+//     }
+//     .mc-input:focus {
 //       border-color: var(--accent-primary);
-//       box-shadow: 0 0 0 var(--focus-ring-width) var(--color-primary-bg);
+//       box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-primary) 18%, transparent 82%);
 //     }
-//     .mc-textarea {
+
+//     /* ── NUMBER / CURRENCY (p-inputNumber wrapper) ──────────────── */
+//     .mc-input-number {
 //       width: 100%;
-//       min-height: 32px;
-//       padding: var(--spacing-sm) var(--spacing-md);
+//       display: block;
+//     }
+//     /* Target the inner <input> PrimeNG generates */
+//     .mc-input-number .p-inputnumber-input {
+//       width: 100% !important;
+//       height: 30px;
+//       padding: 0 8px;
+//       font-family: var(--font-mono);
+//       font-size: var(--font-size-sm);
+//       font-weight: var(--font-weight-semibold);
+//       color: var(--text-primary);
+//       background: var(--bg-primary);
+//       border: 1.5px solid var(--border-primary) !important;
+//       border-radius: var(--ui-border-radius-sm) !important;
+//       outline: none !important;
+//       box-sizing: border-box;
+//       transition: border-color 0.12s ease, box-shadow 0.12s ease;
+//     }
+//     .mc-input-number .p-inputnumber-input:focus {
+//       border-color: var(--accent-primary) !important;
+//       box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-primary) 18%, transparent 82%) !important;
+//     }
+//     /* Hide PrimeNG's default spin buttons — AG Grid rows are too small for them */
+//     .mc-input-number .p-inputnumber-button-group { display: none; }
+
+//     /* ── SELECT (p-select) ──────────────────────────────────────── */
+//     .mc-select {
+//       width: 100%;
+//     }
+//     .mc-select .p-select-label {
+//       height: 30px;
+//       padding: 0 8px;
 //       font-family: var(--font-body);
 //       font-size: var(--font-size-sm);
 //       color: var(--text-primary);
 //       background: var(--bg-primary);
-//       border: var(--ui-border-width) solid var(--border-primary);
+//       border: 1.5px solid var(--border-primary) !important;
+//       border-radius: var(--ui-border-radius-sm) !important;
+//       display: flex;
+//       align-items: center;
+//       outline: none;
+//       transition: border-color 0.12s ease, box-shadow 0.12s ease;
+//     }
+//     .mc-select.p-focus .p-select-label,
+//     .mc-select .p-select-label:focus {
+//       border-color: var(--accent-primary) !important;
+//       box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-primary) 18%, transparent 82%) !important;
+//     }
+//     /* Dropdown panel (appended to body) */
+//     .mc-dropdown-panel .p-select-list {
+//       font-size: var(--font-size-sm);
+//       padding: 4px;
+//     }
+//     .mc-dropdown-panel .p-select-option {
+//       border-radius: 4px;
+//       padding: 6px 8px;
+//       font-size: var(--font-size-sm);
+//     }
+
+//     /* ── DATE PICKER (p-datepicker) ─────────────────────────────── */
+//     .mc-datepicker {
+//       width: 100%;
+//     }
+//     .mc-datepicker .p-datepicker-input {
+//       height: 30px;
+//       padding: 0 8px;
+//       font-family: var(--font-body);
+//       font-size: var(--font-size-sm);
+//       color: var(--text-primary);
+//       background: var(--bg-primary);
+//       border: 1.5px solid var(--border-primary) !important;
+//       border-radius: var(--ui-border-radius-sm) !important;
+//       outline: none;
+//       box-sizing: border-box;
+//       transition: border-color 0.12s ease, box-shadow 0.12s ease;
+//     }
+//     .mc-datepicker .p-datepicker-input:focus {
+//       border-color: var(--accent-primary) !important;
+//       box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-primary) 18%, transparent 82%) !important;
+//     }
+//     .mc-calendar-panel {
+//       font-size: var(--font-size-sm);
+//       border-radius: var(--ui-border-radius);
+//       box-shadow: var(--shadow-xl);
+//     }
+
+//     /* ── CHECKBOX (p-checkbox) ──────────────────────────────────── */
+//     .mc-checkbox-wrap {
+//       display: flex;
+//       align-items: center;
+//       justify-content: flex-start;
+//       width: 100%;
+//       height: 100%;
+//     }
+//     .mc-checkbox-wrap .p-checkbox-box {
+//       width: 18px !important;
+//       height: 18px !important;
+//       border-radius: 4px !important;
+//     }
+
+//     /* ── TEXTAREA ───────────────────────────────────────────────── */
+//     .mc-textarea {
+//       width: 100%;
+//       min-height: 30px;
+//       padding: 4px 8px;
+//       font-family: var(--font-body);
+//       font-size: var(--font-size-sm);
+//       color: var(--text-primary);
+//       background: var(--bg-primary);
+//       border: 1.5px solid var(--border-primary);
 //       border-radius: var(--ui-border-radius-sm);
 //       outline: none;
 //       resize: vertical;
+//       box-sizing: border-box;
+//       line-height: var(--line-height-normal);
+//       transition: border-color 0.12s ease, box-shadow 0.12s ease;
+//     }
+//     .mc-textarea:focus {
+//       border-color: var(--accent-primary);
+//       box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-primary) 18%, transparent 82%);
+//     }
+//     .mc-textarea::placeholder {
+//       color: var(--text-disabled);
 //     }
 //   `]
 // })
@@ -2217,14 +2338,17 @@ export class MasterCellComponent implements ICellRendererAngularComp, OnDestroy 
 //   }
 
 //   getAvatarColor(): string { return this.cm.getContrastColor(this.getAvatarBg()); }
+
 //   isImageUrl(val: any): boolean {
 //     return typeof val === 'string' && /\.(jpg|jpeg|png|webp|gif|svg)(\?|$)/i.test(val);
 //   }
+
 //   asTags(val: any): string[] {
 //     if (!val) return [];
 //     if (Array.isArray(val)) return val.map(String);
 //     return String(val).split(',').map((s) => s.trim()).filter(Boolean);
 //   }
+
 //   getRatingStars(): boolean[] {
 //     const max = this.config.max ?? 5;
 //     const filled = Math.round(Number(this.value) || 0);

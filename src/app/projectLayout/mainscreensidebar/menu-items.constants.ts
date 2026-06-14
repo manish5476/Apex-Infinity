@@ -299,6 +299,7 @@ export const SIDEBAR_MENU: MenuItem[] = [
       { label: 'Customer Segments', icon: 'pi pi-users', routerLink: ['/storefront/segments'], permissions: [PERMISSIONS.STOREFRONT.READ] },
       { label: 'Coupons', icon: 'pi pi-ticket', routerLink: ['/storefront/coupons'], permissions: [PERMISSIONS.STOREFRONT.READ] },
       { label: 'Discount Manager', icon: 'pi pi-percentage', routerLink: ['/storefront/discounts'], permissions: [PERMISSIONS.STOREFRONT.READ] },
+      { label: 'Smart Rules', icon: 'pi pi-bolt', routerLink: ['/storefront/rules'], permissions: [PERMISSIONS.STOREFRONT.READ] },
       { label: 'SEO Dashboard', icon: 'pi pi-search', routerLink: ['/storefront/seo'], permissions: [PERMISSIONS.STOREFRONT.READ] },
       {
         label: 'Design & Layout',

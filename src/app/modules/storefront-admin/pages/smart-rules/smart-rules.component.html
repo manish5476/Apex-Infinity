@@ -1,0 +1,96 @@
+<div class="page-layout">
+  <header class="dashboard-header">
+    <div class="header-left">
+      <h1>Smart Rules</h1>
+      <p class="text-secondary mt-2 mb-0">Manage automated product sorting, filtering, and segments.</p>
+    </div>
+    <div class="header-actions">
+      <button pButton label="New Smart Rule" icon="pi pi-plus" class="theme-btn-primary p-button"
+        (click)="openCreateForm()"></button>
+    </div>
+  </header>
+
+  <div class="layout-grid">
+    <main class="main-content">
+      @if (loading()) {
+      <div class="p-4 text-center"><i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i></div>
+      }
+      @if (error()) {
+      <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50">{{ error() }}</div>
+      }
+      @if (success()) {
+      <div class="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50">{{ success() }}</div>
+      }
+
+      <div class="grid-wrapper">
+        <app-shared-grid [columns]="columns" [data]="rules()" (gridEvent)="onGridEvent($event)" selectionMode="single">
+        </app-shared-grid>
+      </div>
+    </main>
+
+    @if (selectedRule() || isCreateMode()) {
+    <aside class="side-panel">
+      <div class="panel-header">
+        <h2>{{ isCreateMode() ? 'Create Smart Rule' : 'Edit Rule: ' + selectedRule()?.name }}</h2>
+        <button pButton icon="pi pi-times" class="p-button-rounded p-button-text" (click)="closePanel()"></button>
+      </div>
+
+      <div class="panel-body">
+        <div class="form-group">
+          <label>Rule Name <span class="text-red-500">*</span></label>
+          <input pInputText [(ngModel)]="ruleForm.name" placeholder="e.g. Summer Collection" />
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <input pInputText [(ngModel)]="ruleForm.description" placeholder="Brief details about this rule" />
+        </div>
+
+        <div class="form-group">
+          <label>Rule Type <span class="text-red-500">*</span></label>
+          <p-select [options]="ruleTypes" [(ngModel)]="ruleForm.ruleType" appendTo="body"
+            placeholder="Select Type"></p-select>
+        </div>
+
+        <div class="form-group">
+          <label>Sort By</label>
+          <p-select [options]="sortFields" [(ngModel)]="ruleForm.sortBy" appendTo="body"
+            placeholder="Sort By"></p-select>
+        </div>
+
+        <div class="form-group">
+          <label>Sort Order</label>
+          <p-select [options]="sortOrders" [(ngModel)]="ruleForm.sortOrder" appendTo="body"
+            placeholder="Sort Order"></p-select>
+        </div>
+
+        <div class="form-group">
+          <label>Result Limit</label>
+          <input pInputText type="number" [(ngModel)]="ruleForm.limit" placeholder="Max products to return" />
+        </div>
+
+        <div class="form-group">
+          <label>Cache Duration (sec)</label>
+          <input pInputText type="number" [(ngModel)]="ruleForm.cacheDuration" placeholder="e.g. 3600" />
+        </div>
+
+        <div class="form-group flex align-items-center gap-2 mt-4">
+          <p-checkbox [(ngModel)]="ruleForm.isActive" [binary]="true" inputId="active"></p-checkbox>
+          <label for="active" class="mb-0">Rule is Active</label>
+        </div>
+      </div>
+
+      <div class="panel-footer">
+        @if (!isCreateMode()) {
+        <button pButton label="Delete" icon="pi pi-trash" class="p-button-danger p-button-outlined"
+          (click)="deleteRule(selectedRule())"></button>
+        <button pButton label="Execute" icon="pi pi-play" class="p-button-secondary p-button-outlined"
+          (click)="executeRule(selectedRule())"></button>
+        }
+        <button pButton label="Save" icon="pi pi-check" class="theme-btn-primary p-button" (click)="saveRule()"
+          [disabled]="!ruleForm.name || !ruleForm.ruleType"></button>
+      </div>
+    </aside>
+    }
+  </div>
+</div>

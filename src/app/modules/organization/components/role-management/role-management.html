@@ -1,149 +1,192 @@
 <p-toast></p-toast>
 <p-confirmDialog></p-confirmDialog>
 
-<div class="list-page-container">
-  <div class="list-header">
-    <div class="flex flex-col">
-      <h2 class="list-title">
-        <i class="pi pi-shield text-[var(--accent-primary)]"></i>
+<!-- MAIN APPLICATION CONTAINER -->
+<div class="app-container h-full flex flex-col absolute inset-0">
+
+  <!-- Header -->
+  <div class="container-header shrink-0">
+    <div class="header-titles">
+      <h2 class="container-title flex items-center gap-3">
+        <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-blue-50 text-[var(--accent-primary)]">
+          <i class="pi pi-shield text-xl"></i>
+        </div>
         Role Management
       </h2>
-      <p class="text-sm text-[var(--text-secondary)] mt-1">Configure user roles and granular access permissions.</p>
+      <p class="container-subtitle ml-13">Configure system access levels and granular user permissions.</p>
     </div>
-    <p-button label="Create Role" icon="pi pi-plus" (click)="openNewRoleDialog()"></p-button>
+    <div class="header-actions">
+      <p-button label="Create New Role" icon="pi pi-plus" (click)="openNewRoleDialog()"></p-button>
+    </div>
   </div>
 
-  <div class="themed-card filter-card">
-    <div class="se-filter-bar">
-      <div class="se-filter-field">
+  <!-- Filter Panel -->
+  <div class="bg-white border-b border-[var(--border-secondary)] p-4 shrink-0">
+    <div class="app-filter-panel single-row !shadow-none !border-none !p-0 !bg-transparent">
+      <div class="filter-field">
         <label>Search Roles</label>
-        <span class="p-input-icon-left w-full">
-          <!-- <i class="pi pi-search"></i> -->
+        <span class="relative w-full">
+          <!-- <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 z-10"></i> -->
           <input type="text" pInputText [ngModel]="filterName()" (ngModelChange)="filterName.set($event)"
-            (keydown.enter)="applyFilters()" placeholder="e.g. Finance Admin..." class="w-full" />
+            (keydown.enter)="applyFilters()" placeholder="e.g. Finance Admin..." class="w-full pl-10" />
         </span>
       </div>
-      <div class="se-filter-actions">
-        <p-button label="Reset Filters" icon="pi pi-filter-slash" styleClass="p-button-outlined"
+      <div class="filter-actions-right">
+        <p-button label="Reset Filters" icon="pi pi-filter-slash" outlined="true" severity="secondary"
           (click)="resetFilters()"></p-button>
       </div>
     </div>
   </div>
 
-  <div class="themed-card list-grid-area shadow-sm">
+  <!-- Grid Body -->
+  <div class="container-body no-padding flex-1 relative">
     <app-ag-share-grid [columns]="columns" [data]="filteredRoles()" selectionMode="single"
-      (gridEvent)="eventFromGrid($event)" style="height: 100%; width: 100%; display: block;">
+      (gridEvent)="eventFromGrid($event)" class="absolute inset-0 w-full h-full">
     </app-ag-share-grid>
   </div>
 </div>
 
+<!-- ======================================================================= -->
+<!-- ROLE CONFIGURATION DIALOG                                               -->
+<!-- ======================================================================= -->
 <p-dialog appendTo="body" [visible]="showRoleDialog()" (visibleChange)="showRoleDialog.set($event)" [modal]="true"
-  [style]="{width: '85vw', height: '95vh', 'max-width': '1280px'}"
-  [contentStyle]="{ 'display': 'flex', 'flex-direction': 'column', 'height': '100%', 'overflow': 'hidden', 'padding': '0', 'background': 'var(--bg-primary)' }"
+  [style]="{width: '90vw', height: '85vh', 'max-width': '1400px', 'margin-top': '40px'}"
+  [contentStyle]="{ 'padding': '0', 'background': 'var(--bg-primary)', 'overflow': 'hidden', 'display': 'flex', 'flex-direction': 'column' }"
   [header]="isEditMode() ? 'Edit Role Configuration' : 'Create New Role'" (onHide)="hideDialog()" [draggable]="false"
-  [resizable]="false" styleClass="role-dialog shadow-2xl">
+  [resizable]="false" styleClass="role-dialog shadow-3xl">
 
-  <div class="dialog-content-wrapper flex flex-col h-full overflow-hidden">
+  <div class="flex flex-col h-full bg-gray-50/50">
 
-    <div class="p-6 border-b border-[var(--border-primary)] bg-white shrink-0 shadow-sm z-20">
-      <div class="form-field w-full max-w-xl">
-        <label for="roleName" class="text-sm font-semibold text-[var(--text-primary)] mb-2 block">
-          Role Name <span class="text-red-500">*</span>
+    <!-- Dialog Header Section: Role Name -->
+    <div class="p-6 bg-white border-b border-[var(--border-primary)] shrink-0 z-20 shadow-sm relative">
+      <div class="max-w-2xl">
+        <label for="roleName" class="text-xs font-bold uppercase tracking-wider text-[var(--text-tertiary)] mb-2 block">
+          Role Identity <span class="text-red-500">*</span>
         </label>
         <input id="roleName" type="text" pInputText [ngModel]="currentRole().name"
           (ngModelChange)="patchCurrentRole({ name: $event })" placeholder="e.g. Senior Warehouse Manager"
-          class="w-full p-inputtext-lg border-gray-300 focus:border-blue-500 transition-colors" />
+          class="w-full text-lg font-medium shadow-sm transition-colors" />
       </div>
     </div>
 
+    <!-- Sticky Toolbar: Permission Search & Selection Stats -->
     <div
-      class="flex items-center justify-between px-6 py-4 bg-white border-b border-[var(--border-primary)] shrink-0 z-10">
-      <div class="flex items-center gap-4 w-full max-w-md">
-        <span class="p-input-icon-left w-full">
-          <i class="pi pi-search text-gray-400"></i>
+      class="flex flex-wrap items-center justify-between gap-4 px-6 py-4 bg-white border-b border-[var(--border-primary)] shrink-0 z-10 sticky top-0 shadow-[0_4px_12px_-6px_rgba(0,0,0,0.05)]">
+      <div class="w-full max-w-md">
+        <span class="relative w-full">
+          <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 z-10"></i>
           <input type="text" pInputText [ngModel]="permissionSearch()" (ngModelChange)="permissionSearch.set($event)"
-            placeholder="Search specific permissions or tags..." class="w-full p-inputtext-sm bg-gray-50" />
+            placeholder="Search permissions or tags..." class="w-full pl-10 bg-gray-50 hover:bg-white focus:bg-white" />
         </span>
       </div>
-      <div class="flex items-center gap-3">
-        <span class="text-sm text-gray-500 font-medium border-r border-gray-300 pr-3">
+
+      <div class="flex items-center gap-4 bg-gray-50 px-4 py-2 rounded-lg border border-gray-200">
+        <span class="text-sm font-semibold text-[var(--accent-primary)] bg-[var(--accent-focus)] px-3 py-1 rounded-md">
           {{ selectedPermissions().length }} / {{ totalPermissions() }} Selected
         </span>
-        <p-checkbox [binary]="true" [ngModel]="isAllSelected()" (onChange)="toggleAllPermissions($event)"
-          label="Select All Permissions"
-          labelStyleClass="text-sm font-semibold text-[var(--text-primary)]"></p-checkbox>
+        <div class="w-px h-5 bg-gray-300"></div>
+        <p-button [label]="isAllSelected() ? 'Revoke All' : 'Grant Full Access'"
+          [icon]="isAllSelected() ? 'pi pi-times' : 'pi pi-check-square'" size="small"
+          [severity]="isAllSelected() ? 'danger' : 'secondary'" [text]="true"
+          (click)="toggleAllPermissions({checked: !isAllSelected()})"></p-button>
       </div>
     </div>
 
-    <div class="permissions-selection-area flex-1 overflow-y-auto p-6 min-h-0 bg-gray-50/50">
+    <!-- Permissions Scrolling Area -->
+    <div class="flex-1 overflow-y-auto p-6 min-h-0">
+
       @if (permissionGroups().length === 0) {
-      <div class="empty-state">
+      <div class="flex flex-col items-center justify-center h-full text-gray-500">
         <i class="pi pi-spin pi-spinner text-4xl mb-4 text-[var(--accent-primary)]"></i>
-        <p class="text-lg font-medium text-gray-600">Loading permission matrix...</p>
+        <p class="text-lg font-medium">Loading permission matrix...</p>
       </div>
       } @else if (filteredPermissionGroups().length === 0) {
-      <div class="empty-state py-12">
-        <i class="pi pi-search text-4xl mb-4 text-gray-300"></i>
-        <p class="text-lg font-medium text-gray-600">No permissions found matching "{{ permissionSearch() }}"</p>
-        <p-button label="Clear Search" styleClass="p-button-text mt-2" (click)="permissionSearch.set('')"></p-button>
+      <div class="flex flex-col items-center justify-center h-full py-16 text-gray-500">
+        <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+          <i class="pi pi-search text-3xl text-gray-400"></i>
+        </div>
+        <p class="text-lg font-medium text-gray-800">No permissions found</p>
+        <p class="text-sm text-gray-500 mt-1">We couldn't find anything matching "{{ permissionSearch() }}"</p>
+        <p-button label="Clear Search" styleClass="p-button-text mt-4" (click)="permissionSearch.set('')"></p-button>
       </div>
       } @else {
-      <div class="flex flex-col gap-6 max-w-6xl mx-auto">
-        @for (group of filteredPermissionGroups(); track group.name) {
-        <div class="perm-category-section shadow-sm hover:shadow-md transition-shadow duration-200">
 
-          <div class="category-header sticky top-0 z-10">
-            <div class="flex items-center gap-3 text-[var(--text-primary)] font-bold text-lg">
-              <i class="pi pi-folder text-[var(--accent-primary)] text-xl"></i>
-              <span>{{ group.name }}</span>
-              <span class="count-badge">{{ getGroupSelectionCount(group.name) }} / {{ group.items.length }}</span>
+      <div class="flex flex-col gap-8 max-w-[1600px] mx-auto pb-8">
+        @for (group of filteredPermissionGroups(); track group.name) {
+
+        <div class="flex flex-col gap-4">
+          <!-- Group Header -->
+          <div class="flex items-center justify-between pb-2 border-b border-gray-200">
+            <div class="flex items-center gap-3">
+              <div
+                class="w-8 h-8 rounded-lg bg-[var(--accent-focus)] flex items-center justify-center text-[var(--accent-primary)]">
+                <i class="pi pi-folder text-sm"></i>
+              </div>
+              <h3 class="text-lg font-bold text-gray-800">{{ group.name }}</h3>
+              <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-200 text-gray-600 ml-2">
+                {{ getGroupSelectionCount(group.name) }} / {{ group.items.length }}
+              </span>
             </div>
-            <div class="flex items-center gap-2">
-              <p-checkbox [binary]="true" [ngModel]="isGroupSelected(group.name)"
-                (onChange)="toggleGroup(group, $event)" label="Select Group"
-                labelStyleClass="text-sm text-gray-600 font-medium"></p-checkbox>
-            </div>
+            <p-button [label]="isGroupSelected(group.name) ? 'Deselect Group' : 'Select Entire Group'"
+              [icon]="isGroupSelected(group.name) ? 'pi pi-times' : 'pi pi-check-square'" size="small"
+              [severity]="isGroupSelected(group.name) ? 'danger' : 'secondary'" [text]="true"
+              (click)="toggleGroup(group, {checked: !isGroupSelected(group.name)})"></p-button>
           </div>
 
-          <div class="category-grid">
+          <!-- Modern Permission Cards Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
             @for (item of group.items; track item.tag) {
-            <div class="perm-toggle-card group" [class.selected]="selectedPermissions().includes(item.tag)"
+            <div
+              class="relative flex items-start gap-4 p-4 bg-white border border-gray-200 rounded-xl cursor-pointer transition-all duration-200 hover:shadow-[0_4px_12px_-4px_rgba(0,0,0,0.1)] hover:border-[var(--accent-primary)] group select-none overflow-hidden"
+              [class]="selectedPermissions().includes(item.tag) ? '!border-[var(--accent-primary)] !bg-[var(--accent-focus)] ring-1 ring-[var(--accent-primary)]' : ''"
               (click)="togglePermission(item.tag)">
 
-              <div class="checkbox-indicator group-hover:border-[var(--accent-primary)] transition-colors">
+              <!-- Fancy Checkbox Indicator -->
+              <div class="shrink-0 w-5 h-5 rounded border flex items-center justify-center transition-colors mt-0.5"
+                [class]="selectedPermissions().includes(item.tag) ? 'bg-[var(--accent-primary)] border-[var(--accent-primary)] text-white' : 'border-gray-300 group-hover:border-[var(--accent-primary)] bg-white'">
                 @if (selectedPermissions().includes(item.tag)) {
-                <i class="pi pi-check text-xs font-bold"></i>
+                <i class="pi pi-check text-[10px] font-bold"></i>
                 }
               </div>
 
-              <div class="perm-details">
-                <span class="perm-desc line-clamp-2" [title]="item.description">{{ item.description }}</span>
-                <span class="perm-tag">{{ item.tag }}</span>
+              <div class="flex flex-col min-w-0 flex-1">
+                <span class="font-mono text-xs font-bold tracking-tight mb-1"
+                  [class]="selectedPermissions().includes(item.tag) ? 'text-[var(--accent-primary)]' : 'text-gray-500'">
+                  {{ item.tag }}
+                </span>
+                <span class="text-sm font-medium leading-snug line-clamp-2"
+                  [class]="selectedPermissions().includes(item.tag) ? 'text-gray-900' : 'text-gray-700'"
+                  [title]="item.description">
+                  {{ item.description }}
+                </span>
               </div>
+
             </div>
             }
           </div>
-
         </div>
+
         }
       </div>
       }
     </div>
   </div>
 
+  <!-- Dialog Footer -->
   <ng-template pTemplate="footer">
     <div
-      class="dialog-footer flex justify-between items-center w-full px-6 py-4 bg-white border-t border-[var(--border-primary)] shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-      <div class="summary-text text-sm text-[var(--text-secondary)] flex items-center gap-2">
-        <i class="pi pi-info-circle"></i>
-        <span>Changes will be applied immediately to all users mapped to this role.</span>
+      class="flex justify-between items-center w-full px-6 py-4 bg-white border-t border-[var(--border-primary)] shadow-[0_-4px_12px_-4px_rgba(0,0,0,0.05)]">
+      <div
+        class="text-sm font-medium text-gray-500 flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
+        <i class="pi pi-info-circle text-[var(--accent-primary)]"></i>
+        <span>Changes apply instantly to all mapped users.</span>
       </div>
-      <div class="footer-actions flex gap-3">
-        <p-button label="Cancel" icon="pi pi-times" styleClass="p-button-text text-gray-600 hover:bg-gray-100"
+      <div class="flex gap-3">
+        <p-button label="Cancel" icon="pi pi-times" styleClass="p-button-text !text-gray-600 hover:!bg-gray-100"
           (click)="hideDialog()"></p-button>
-        <p-button label="Save Role Configuration" icon="pi pi-check" (click)="saveRole()"
-          [loading]="isSaving()"></p-button>
+        <p-button label="Save Configuration" icon="pi pi-check" (click)="saveRole()" [loading]="isSaving()"></p-button>
       </div>
     </div>
   </ng-template>
+
 </p-dialog>

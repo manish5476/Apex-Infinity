@@ -1,97 +1,97 @@
-/* ==========================================================================
-   AG SHARED GRID CONTAINER
-   Design System: Refined Compact
-   ========================================================================== */
+// /* ==========================================================================
+//    AG SHARED GRID CONTAINER
+//    Design System: Refined Compact
+//    ========================================================================== */
 
-/* --- CONTAINER SHELL --- */
-.shared-grid-container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  width: 100%;
-  
-  /* Theme Surfaces */
-  background-color: var(--theme-bg-primary);
-  border: 1px solid var(--theme-border-primary);
-  border-radius: var(--ui-border-radius-lg);
-  
-  /* Clip content for rounded corners */
-  overflow: hidden; 
-  box-shadow: var(--shadow-sm);
-}
+// /* --- CONTAINER SHELL --- */
+// .shared-grid-container {
+//   display: flex;
+//   flex-direction: column;
+//   height: 100%;
+//   width: 100%;
 
-/* --- TOOLBAR --- */
-.grid-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  
-  /* Compact Height & Padding */
-  min-height: 40px; 
-  padding: 4px var(--spacing-sm);
-  
-  /* Visuals: Slightly different bg to distinguish from grid */
-  background: var(--theme-bg-secondary);
-  border-bottom: 1px solid var(--theme-border-primary);
-  
-  position: relative;
-  z-index: 10;
-}
+//   /* Theme Surfaces */
+//   background-color: var(--theme-bg-primary);
+//   border: 1px solid var(--theme-border-primary);
+//   border-radius: var(--ui-border-radius-lg);
 
-/* --- SELECTION CHIP (Number of rows selected) --- */
-.selection-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  
-  padding: 4px 10px;
-  border-radius: 99px; /* Pill shape */
-  
-  /* Use RGB vars for transparency if available, else standard vars */
-  background-color: rgba(var(--accent-primary-rgb), 0.08); 
-  color: var(--theme-accent-primary);
-  border: 1px solid rgba(var(--accent-primary-rgb), 0.2);
-  
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  
-  animation: fadeIn 0.2s ease-out;
+//   /* Clip content for rounded corners */
+//   overflow: hidden; 
+//   box-shadow: var(--shadow-sm);
+// }
 
-  i { font-size: 0.7rem; }
-}
+// /* --- TOOLBAR --- */
+// .grid-toolbar {
+//   display: flex;
+//   align-items: center;
+//   justify-content: space-between;
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(2px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+//   /* Compact Height & Padding */
+//   min-height: 40px; 
+//   padding: 4px var(--spacing-sm);
 
-/* --- RIGHT SIDE ACTIONS --- */
-.toolbar-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-}
+//   /* Visuals: Slightly different bg to distinguish from grid */
+//   background: var(--theme-bg-secondary);
+//   border-bottom: 1px solid var(--theme-border-primary);
 
-.divider-vertical {
-  width: 1px;
-  height: 20px;
-  background-color: var(--theme-border-secondary);
-  margin: 0 4px;
-}
+//   position: relative;
+//   z-index: 10;
+// }
 
-.editing-indicator {
-  font-size: var(--font-size-sm);
-  color: var(--theme-text-tertiary);
-  font-style: italic;
-  margin-right: var(--spacing-sm);
-  font-weight: 500;
-}
-/* --- GRID WRAPPER --- */
-.grid-wrapper {
-  flex: 1;
-  width: 100%;
-  height: 100%;
-  background: var(--theme-bg-primary); /* Ensure background behind grid matches theme */
-}
+// /* --- SELECTION CHIP (Number of rows selected) --- */
+// .selection-chip {
+//   display: inline-flex;
+//   align-items: center;
+//   gap: var(--spacing-xs);
+
+//   padding: 4px 10px;
+//   border-radius: 99px; /* Pill shape */
+
+//   /* Use RGB vars for transparency if available, else standard vars */
+//   background-color: rgba(var(--accent-primary-rgb), 0.08); 
+//   color: var(--theme-accent-primary);
+//   border: 1px solid rgba(var(--accent-primary-rgb), 0.2);
+
+//   font-size: 11px;
+//   font-weight: 700;
+//   text-transform: uppercase;
+//   letter-spacing: 0.02em;
+
+//   animation: fadeIn 0.2s ease-out;
+
+//   i { font-size: 0.7rem; }
+// }
+
+// @keyframes fadeIn {
+//   from { opacity: 0; transform: translateY(2px); }
+//   to { opacity: 1; transform: translateY(0); }
+// }
+
+// /* --- RIGHT SIDE ACTIONS --- */
+// .toolbar-actions {
+//   display: flex;
+//   align-items: center;
+//   gap: var(--spacing-xs);
+// }
+
+// .divider-vertical {
+//   width: 1px;
+//   height: 20px;
+//   background-color: var(--theme-border-secondary);
+//   margin: 0 4px;
+// }
+
+// .editing-indicator {
+//   font-size: var(--font-size-sm);
+//   color: var(--theme-text-tertiary);
+//   font-style: italic;
+//   margin-right: var(--spacing-sm);
+//   font-weight: 500;
+// }
+// /* --- GRID WRAPPER --- */
+// .grid-wrapper {
+//   flex: 1;
+//   width: 100%;
+//   height: 100%;
+//   background: var(--theme-bg-primary); /* Ensure background behind grid matches theme */
+// }

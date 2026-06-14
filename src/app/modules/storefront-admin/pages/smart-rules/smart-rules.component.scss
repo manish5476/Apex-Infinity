@@ -1,0 +1,117 @@
+.page-layout {
+  padding: 1.5rem;
+  min-height: calc(100vh - 60px);
+  background: var(--bg-main, #f8f9fa);
+  position: relative;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  background: var(--bg-surface, #ffffff);
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+
+  h1 {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary, #111827);
+  }
+}
+
+.layout-grid {
+  display: flex;
+  gap: 1.5rem;
+  position: relative;
+}
+
+.main-content {
+  flex: 1;
+  background: var(--bg-surface, #ffffff);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+  padding: 1rem;
+  min-width: 0;
+}
+
+.side-panel {
+  width: 400px;
+  background: var(--bg-surface, #ffffff);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 1.5rem;
+  max-height: calc(100vh - 3rem);
+  
+  .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+
+    h2 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+  }
+
+  .panel-body {
+    padding: 1.5rem;
+    overflow-y: auto;
+    flex: 1;
+
+    .form-group {
+      margin-bottom: 1.5rem;
+
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: var(--text-secondary, #4b5563);
+      }
+
+      .p-inputtext, .p-dropdown {
+        width: 100%;
+      }
+    }
+  }
+
+  .panel-footer {
+    padding: 1.5rem;
+    border-top: 1px solid var(--border-color, #e5e7eb);
+    display: flex;
+    gap: 1rem;
+
+    button {
+      flex: 1;
+    }
+  }
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+
+  &.active {
+    background: #dcfce7;
+    color: #166534;
+  }
+  &.inactive {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+}
+
+.grid-wrapper {
+  height: calc(100vh - 250px);
+}

@@ -164,7 +164,7 @@ import { TooltipModule } from 'primeng/tooltip';
                       <div class="log-header">
                         <div class="log-title">
                           <span class="log-badge" [ngClass]="getMarkerClass(log.type)">{{ formatType(log.type) }}</span>
-                          <span class="log-time">{{ log.timestamp | date:'HH:mm:ss.SSS' }}</span>
+                          <span class="log-time">{{ log.timestamp | date:'dd MMM yyyy, HH:mm:ss' }}</span>
                         </div>
                         <div class="log-status">
                           @if (log.processingStatus === 'processed') {
@@ -237,7 +237,9 @@ import { TooltipModule } from 'primeng/tooltip';
       font-family: var(--font-body);
       background: var(--bg-primary, transparent);
       color: var(--text-primary);
-      overflow-y: auto;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
     .dashboard-header {
@@ -252,6 +254,7 @@ import { TooltipModule } from 'primeng/tooltip';
       border-radius: var(--ui-border-radius-xl);
       box-shadow: var(--shadow-md);
       margin-bottom: var(--spacing-3xl);
+      flex-shrink: 0;
     }
 
     .header-icon {
@@ -288,18 +291,29 @@ import { TooltipModule } from 'primeng/tooltip';
       display: grid;
       grid-template-columns: 380px 1fr; /* Rigid left column, expansive right */
       gap: var(--spacing-3xl);
-      align-items: start;
+      align-items: stretch;
+      flex: 1;
+      min-height: 0;
     }
 
     .left-column {
       display: flex;
       flex-direction: column;
       gap: var(--spacing-2xl);
+      overflow-y: auto;
+      padding-right: var(--spacing-sm);
     }
+
+    .left-column::-webkit-scrollbar { width: 4px; }
+    .left-column::-webkit-scrollbar-track { background: transparent; }
+    .left-column::-webkit-scrollbar-thumb { background: var(--scroll-thumb); border-radius: 4px; }
 
     .right-column {
       min-width: 0; /* Prevents flex blowout */
       height: 100%;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
     }
 
     .bento-card {
@@ -513,8 +527,8 @@ import { TooltipModule } from 'primeng/tooltip';
        DATA LOGS TIMELINE (RIGHT COLUMN)
        ========================================================================== */
     .timeline-card {
-      height: 100%;
-      min-height: 600px; /* Crucial structural height to prevent UI container collapse */
+      flex: 1;
+      min-height: 0;
       display: flex;
       flex-direction: column;
       padding: var(--spacing-3xl);
@@ -780,6 +794,7 @@ export class EmployeeAttendanceComponent implements OnInit, OnDestroy {
   private startClock() {
     this.clockInterval = setInterval(() => {
       this.currentTime.set(new Date());
+      this.updateStats();
     }, 1000);
   }
 
@@ -820,7 +835,6 @@ export class EmployeeAttendanceComponent implements OnInit, OnDestroy {
       logs.sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
       
       this.myLogs.set(logs);
-      this.summaryStats.set(res?.data?.summary || { totalHours: '0.0', breakHours: '0.0' });
 
       if (logs.length > 0) {
         const latest = logs[0];
@@ -833,6 +847,51 @@ export class EmployeeAttendanceComponent implements OnInit, OnDestroy {
           this.currentStatus.set('out');
         }
       }
+      
+      this.updateStats();
+    });
+  }
+
+  private updateStats() {
+    const logs = this.myLogs();
+    const todayStr = new Date().toISOString().split('T')[0];
+    const todayLogs = logs
+      .filter(l => l.timestamp.startsWith(todayStr))
+      .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+
+    let totalMs = 0;
+    let breakMs = 0;
+    let currentIn: number | null = null;
+    let currentBreak: number | null = null;
+
+    for (const l of todayLogs) {
+      const t = new Date(l.timestamp).getTime();
+      if ((l.type === 'in' || l.type === 'remote_in' || l.type === 'break_end') && !currentIn) {
+        currentIn = t;
+      } else if ((l.type === 'out' || l.type === 'remote_out' || l.type === 'break_start') && currentIn) {
+        totalMs += (t - currentIn);
+        currentIn = null;
+      }
+
+      if (l.type === 'break_start' && !currentBreak) {
+        currentBreak = t;
+      } else if (l.type === 'break_end' && currentBreak) {
+        breakMs += (t - currentBreak);
+        currentBreak = null;
+      }
+    }
+
+    const now = new Date().getTime();
+    if (currentIn) {
+      totalMs += (now - currentIn);
+    }
+    if (currentBreak) {
+      breakMs += (now - currentBreak);
+    }
+
+    this.summaryStats.set({
+      totalHours: (totalMs / (1000 * 60 * 60)).toFixed(2),
+      breakHours: (breakMs / (1000 * 60 * 60)).toFixed(2)
     });
   }
 

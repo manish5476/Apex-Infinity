@@ -1,0 +1,133 @@
+<div class="page-layout">
+  <header class="dashboard-header">
+    <div class="header-left">
+      <h1>Analytics & Insights</h1>
+      <p>Storefront performance at a glance. Data from {{ periodLabel() }}</p>
+    </div>
+    <div class="header-actions">
+      <p-select [options]="periods" [(ngModel)]="selectedPeriod" (onChange)="loadData()" appendTo="body"></p-select>
+      <button pButton icon="pi pi-refresh" class="p-button-outlined ml-2" (click)="loadData()" [loading]="loading()"></button>
+    </div>
+  </header>
+
+  @if (error()) {
+    <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50">{{ error() }}</div>
+  }
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-icon primary"><i class="pi pi-dollar"></i></div>
+      <div class="kpi-details">
+        <h3>Gross Revenue</h3>
+        <p class="kpi-value">{{ kpis().grossRevenue | currency:'INR' }}</p>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon success"><i class="pi pi-shopping-cart"></i></div>
+      <div class="kpi-details">
+        <h3>Total Orders</h3>
+        <p class="kpi-value">{{ kpis().totalOrders | number }}</p>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon warning"><i class="pi pi-chart-line"></i></div>
+      <div class="kpi-details">
+        <h3>Avg Order Value</h3>
+        <p class="kpi-value">{{ kpis().averageOrderValue | currency:'INR' }}</p>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon info"><i class="pi pi-users"></i></div>
+      <div class="kpi-details">
+        <h3>Total Customers</h3>
+        <p class="kpi-value">{{ kpis().storefrontCustomers | number }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Wide Chart Row -->
+  <div class="chart-row full-width">
+    <div class="chart-card">
+      <div class="chart-header">
+        <h2>Revenue Over Time</h2>
+      </div>
+      <div class="chart-container">
+        @if (!loading()) {
+          <p-chart type="line" [data]="revenueChartData" [options]="lineOptions" height="300px"></p-chart>
+        } @else {
+          <div class="flex justify-content-center align-items-center h-full">
+            <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Dual Chart Row -->
+  <div class="chart-row">
+    <div class="chart-card">
+      <div class="chart-header">
+        <h2>Orders By Status</h2>
+      </div>
+      <div class="chart-container">
+        @if (!loading()) {
+          <p-chart type="doughnut" [data]="statusChartData" [options]="pieOptions" height="300px"></p-chart>
+        } @else {
+          <div class="flex justify-content-center align-items-center h-full">
+            <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+          </div>
+        }
+      </div>
+    </div>
+    
+    <div class="chart-card">
+      <div class="chart-header">
+        <h2>Payment Methods</h2>
+      </div>
+      <div class="chart-container">
+        @if (!loading()) {
+          <p-chart type="bar" [data]="paymentChartData" [options]="barOptions" height="300px"></p-chart>
+        } @else {
+          <div class="flex justify-content-center align-items-center h-full">
+            <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity -->
+  <div class="activity-table mt-4">
+    <h2>Recent Orders</h2>
+    <p-table [value]="recentOrders()" [rowHover]="true" styleClass="p-datatable-sm" [loading]="loading()">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Order #</th>
+          <th>Customer</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th class="text-right">Amount</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-order>
+        <tr>
+          <td class="font-semibold">{{ order.orderNumber }}</td>
+          <td>{{ order.customerId?.firstName }} {{ order.customerId?.lastName }}</td>
+          <td>{{ order.createdAt | date:'medium' }}</td>
+          <td>
+            <span class="badge" [ngClass]="order.orderStatus === 'completed' ? 'badge-success' : 'badge-primary'">
+              {{ order.orderStatus | titlecase }}
+            </span>
+          </td>
+          <td class="text-right font-bold">{{ order.totals?.grandTotal | currency:'INR' }}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5" class="text-center p-4">No recent orders found.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
