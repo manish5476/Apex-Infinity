@@ -53,10 +53,8 @@ import { takeUntil } from "rxjs/operators";
   template: `
     <p-toast position="top-right"></p-toast>
     
-    <p-confirmDialog 
-      styleClass="premium-dialog" 
-      acceptButtonStyleClass="apex-btn apex-btn--primary" 
-      rejectButtonStyleClass="p-button-secondary p-button-text">
+    <p-confirmDialog acceptButtonStyleClass="apex-btn apex-btn--primary" 
+      rejectButtonStyleClass="p-button-secondary p-button-text" appendTo="body" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}">
     </p-confirmDialog>
 
     <div class="apex-page fade-in flex-col h-screen">
@@ -558,7 +556,7 @@ export class AdminDailyAttendanceComponent implements OnInit, OnDestroy {
 //   changeDetection: ChangeDetectionStrategy.OnPush,
 //   template: `
 //     <p-toast position="top-right"></p-toast>
-//     <p-confirmDialog styleClass="premium-confirm-dialog"></p-confirmDialog>
+//     <p-confirmDialog styleClass="premium-confirm-dialog" appendTo="body" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}"></p-confirmDialog>
 
 //     <div class="page-wrapper fade-in">
 //       <header class="dashboard-header slide-down mb-4">

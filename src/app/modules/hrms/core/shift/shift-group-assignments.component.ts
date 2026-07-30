@@ -250,7 +250,7 @@ import { error } from 'console';
       [modal]="true" 
       [style]="{ width: '500px' }"
       [draggable]="false"
-      styleClass="glass-panel border-radius-xl">
+      styleClass="glass-panel border-radius-xl" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
       
       <p class="text-secondary text-sm line-height-relaxed mb-xl mt-0">Select employees to attach to this rotation pattern. Their shifts will be mapped based on the group's effective dates.</p>
       
@@ -759,7 +759,7 @@ export class ShiftGroupAssignmentsComponent implements OnInit, OnDestroy {
 //       [modal]="true" 
 //       [style]="{ width: '500px' }"
 //       [draggable]="false"
-//       styleClass="premium-dialog">
+// appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
       
 //       <p class="text-secondary text-sm mb-4">Select employees to attach to this rotation pattern. Their shifts will be mapped based on the group's effective dates.</p>
       

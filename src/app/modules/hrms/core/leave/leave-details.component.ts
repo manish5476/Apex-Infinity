@@ -32,7 +32,7 @@ import { AppMessageService } from '@core/services/message.service';
   providers: [MessageService, ConfirmationService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <p-confirmDialog styleClass="premium-confirm-dialog"></p-confirmDialog>
+    <p-confirmDialog styleClass="premium-confirm-dialog" appendTo="body" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}"></p-confirmDialog>
     
     <div class="page-wrapper fade-in">
       @if (isLoading()) {
@@ -152,7 +152,7 @@ import { AppMessageService } from '@core/services/message.service';
       }
     </div>
     
-    <p-dialog [header]="actionDialog.title" [(visible)]="displayActionDialog" [modal]="true" [style]="{width: '400px'}" styleClass="premium-dialog">
+    <p-dialog [header]="actionDialog.title" [(visible)]="displayActionDialog" [modal]="true" [style]="{width: '400px'}" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
       <form [formGroup]="actionForm" class="flex-col gap-4 mt-2">
     
         <p class="m-0 text-secondary text-sm">{{ actionDialog.message }}</p>

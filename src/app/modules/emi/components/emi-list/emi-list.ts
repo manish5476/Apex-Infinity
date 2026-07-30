@@ -55,7 +55,7 @@ import { MasterDropdownComponent } from '../../../shared/components/masterFilter
   providers: [EmiService, ConfirmationService],
   template: `
     <p-toast position="bottom-right"></p-toast>
-    <p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
+    <p-confirmDialog [style]="{width: '450px'}" appendTo="body" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}"></p-confirmDialog>
 
     <div class="page-layout">
       

@@ -187,7 +187,7 @@ export class SupplierListComponent implements OnInit, OnDestroy {
         minWidth: 220,
         pinned: 'left',
         cellRenderer: (p: any) => {
-          const category = p.data.category || 'General';
+          const category = p.data.categoryId?.name || p.data.category || 'General';
           const avatar = p.data.avatar ? `<img src="${p.data.avatar}" style="width:20px; height:20px; border-radius:50%; margin-right:8px;">` : '';
 
           return `

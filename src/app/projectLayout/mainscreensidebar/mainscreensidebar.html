@@ -93,7 +93,7 @@
 </aside>
 
 <p-dialog [(visible)]="isSearchVisible" [modal]="true" [closable]="false" [dismissableMask]="true" [showHeader]="false"
-  [appendTo]="'body'" (onHide)="closeSearch()">
+  [appendTo]="'body'" (onHide)="closeSearch()" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}">
 
   <div class="spotlight-box">
 

@@ -1,0 +1,277 @@
+<!-- master-list.component.html -->
+<div class="master-page">
+
+    <!-- ========== PAGE HEADER ========== -->
+    <header class="page-header">
+        <div class="header-left">
+            <div class="title-group">
+                <h1 class="page-title">Master Data</h1>
+                <p class="page-subtitle">Manage brands, categories, suppliers, and other reference records</p>
+            </div>
+            <div class="record-count">
+                <span class="count-pill">
+                    <i class="pi pi-database"></i>
+                    {{ masters().length }} records
+                </span>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <button pButton label="Bulk Import" icon="pi pi-upload" class="p-button-outlined"
+                (click)="openBulkDialog()">
+            </button>
+
+            <button pButton label="Add New" icon="pi pi-plus" class="p-button-primary" (click)="onAddNew()">
+            </button>
+        </div>
+    </header>
+
+    <!-- ========== TOOLBAR ========== -->
+    <div class="toolbar-container">
+        <!-- Left: Search & Filters -->
+        <div class="toolbar-left">
+            <!-- Search -->
+            <div class="search-wrapper">
+                <i class="pi pi-search search-icon"></i>
+                <input pInputText type="text" placeholder="Search records..." class="search-input"
+                    (input)="onQuickFilter($event)">
+                <span class="search-shortcut">⌘K</span>
+            </div>
+
+            <!-- Filters -->
+            <p-select [options]="typeOptions()" placeholder="Type" styleClass="filter-select"
+                (onChange)="onTypeFilter($event)">
+            </p-select>
+
+            <p-select [options]="statusOptions" placeholder="Status" styleClass="filter-select"
+                (onChange)="onStatusFilter($event)">
+            </p-select>
+        </div>
+
+        <!-- Right: Actions -->
+        <div class="toolbar-right">
+            <button pButton icon="pi pi-pencil" label="Bulk Edit" class="p-button-text"
+                [disabled]="selectedRows().length === 0" (click)="toggleBulkEdit()">
+            </button>
+
+            <button pButton icon="pi pi-refresh" class="p-button-text" (click)="loadMasters()" [loading]="loading()">
+            </button>
+        </div>
+    </div>
+
+    <!-- ========== STATS ROW ========== -->
+    <div class="stats-row">
+        <div class="stat-item">
+            <span class="stat-value">{{ masters().length }}</span>
+            <span class="stat-label">Total</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-value">{{ activeCount() }}</span>
+            <span class="stat-label">Active</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-value">{{ featuredCount() }}</span>
+            <span class="stat-label">Featured</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-value">{{ typeCount() }}</span>
+            <span class="stat-label">Types</span>
+        </div>
+    </div>
+
+    <!-- ========== DATA TABLE ========== -->
+    <div class="table-container">
+        <p-table [value]="masters()" [loading]="loading()" [rowHover]="true" [selectable]="true"
+            [selectionMode]="'multiple'" [(selection)]="selectedRows" styleClass="premium-table"
+            [responsiveLayout]="'scroll'" [scrollable]="true" scrollHeight="flex" [rowTrackBy]="trackByFn">
+
+            <!-- Loading State -->
+            <ng-template pTemplate="loading">
+                <div class="loading-skeleton">
+                    @for (row of skeletonRows; track row) {
+                    <div class="skeleton-row">
+                        @for (col of skeletonColumns; track col) {
+                        <p-skeleton styleClass="skeleton-cell"></p-skeleton>
+                        }
+                    </div>
+                    }
+                </div>
+            </ng-template>
+
+            <!-- Empty State -->
+            <ng-template pTemplate="emptymessage">
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="pi pi-database"></i>
+                    </div>
+                    <h3 class="empty-title">No records found</h3>
+                    <p class="empty-message">Get started by creating your first master record.</p>
+                    <button pButton label="Add New Record" icon="pi pi-plus" class="p-button-primary"
+                        (click)="onAddNew()">
+                    </button>
+                </div>
+            </ng-template>
+
+            <!-- Columns -->
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="width: 48px">
+                        <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                    </th>
+                    <th style="width: 120px">Type</th>
+                    <th style="min-width: 200px">Name</th>
+                    <th style="width: 100px">Code</th>
+                    <th style="width: 120px">Status</th>
+                    <th style="width: 100px">Featured</th>
+                    <th style="width: 80px"></th>
+                </tr>
+            </ng-template>
+
+            <!-- Body -->
+            <ng-template pTemplate="body" let-master>
+                <tr [pSelectableRow]="master">
+                    <td>
+                        <p-tableCheckbox [value]="master"></p-tableCheckbox>
+                    </td>
+                    <td>
+                        <span class="type-chip" [class]="'type-' + master.type">
+                            {{ formatTypeLabel(master.type) }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="name-cell">
+                            @if (master.imageUrl) {
+                            <img [src]="master.imageUrl" class="cell-avatar" alt="Avatar">
+                            } @else {
+                            <div class="cell-avatar text-avatar">{{ getInitials(master.name) }}</div>
+                            }
+                            <div class="name-content">
+                                <span class="primary-name">{{ master.name }}</span>
+                                @if (master.description) {
+                                <span class="secondary-desc">{{ master.description | truncate:60 }}</span>
+                                }
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="code-text">{{ master.code || '-' }}</span>
+                    </td>
+                    <td>
+                        <p-chip [label]="master.isActive ? 'Active' : 'Inactive'"
+                            [icon]="master.isActive ? 'pi pi-check-circle' : 'pi pi-times-circle'"
+                            [styleClass]="master.isActive ? 'chip-active' : 'chip-inactive'" [rounded]="true">
+                        </p-chip>
+                    </td>
+                    <td>
+                        <i class="pi" [class.pi-star]="master.metadata?.isFeatured"
+                            [class.pi-star-fill]="master.metadata?.isFeatured"
+                            [class.featured-active]="master.metadata?.isFeatured"
+                            [class.featured-inactive]="!master.metadata?.isFeatured">
+                        </i>
+                    </td>
+                    <td>
+                        <button pButton icon="pi pi-ellipsis-v" class="p-button-text p-button-rounded"
+                            (click)="openActionMenu($event, master)">
+                        </button>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+
+    <!-- ========== BULK IMPORT DIALOG ========== -->
+    <p-dialog header="Bulk Import Records" [(visible)]="isBulkDialogVisible" [modal]="true"
+        [style]="{ width: '85vw', maxWidth: '1200px' }" [draggable]="false" [resizable]="false" [maximizable]="true" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
+
+        <div class="bulk-import-content">
+            <!-- Instruction Card -->
+            <p-card styleClass="instruction-card">
+                <div class="instruction-content">
+                    <div class="instruction-icon">
+                        <i class="pi pi-info-circle"></i>
+                    </div>
+                    <div class="instruction-text">
+                        <h4>Quick Import</h4>
+                        <p>Enter your master records below. <strong>Name</strong> and <strong>Type</strong> are required
+                            fields. Empty rows will be automatically ignored.</p>
+                    </div>
+                </div>
+            </p-card>
+
+            <!-- Editable Grid -->
+            <div class="bulk-grid-wrapper">
+                <p-table [value]="bulkData()" [editable]="true" styleClass="bulk-table" [scrollable]="true"
+                    scrollHeight="400px">
+
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th style="width: 48px"></th>
+                            <th style="width: 150px">Type*</th>
+                            <th style="min-width: 200px">Name*</th>
+                            <th style="width: 120px">Code</th>
+                            <th style="width: 200px">Description</th>
+                            <th style="width: 100px">Status</th>
+                            <th style="width: 80px"></th>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="body" let-row let-index="rowIndex">
+                        <tr>
+                            <td>{{ index + 1 }}</td>
+                            <td>
+                                <p-select [options]="masterTypes" optionLabel="label" optionValue="value"
+                                    [(ngModel)]="row.type" [editable]="true" placeholder="Select type">
+                                </p-select>
+                            </td>
+                            <td>
+                                <input pInputText [(ngModel)]="row.name" placeholder="Enter name" class="w-full">
+                            </td>
+                            <td>
+                                <input pInputText [(ngModel)]="row.code" placeholder="Optional" class="w-full">
+                            </td>
+                            <td>
+                                <input pInputText [(ngModel)]="row.description" placeholder="Optional" class="w-full">
+                            </td>
+                            <td>
+                                <p-select [options]="statusOptions" [(ngModel)]="row.isActive" placeholder="Status">
+                                </p-select>
+                            </td>
+                            <td>
+                                <button pButton icon="pi pi-trash" class="p-button-text p-button-danger"
+                                    (click)="removeBulkRow(index)">
+                                </button>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+
+        <ng-template pTemplate="footer">
+            <div class="dialog-footer">
+                <button pButton icon="pi pi-plus" label="Add Row" class="p-button-text" (click)="addBulkRow()">
+                </button>
+                <div class="footer-actions">
+                    <button pButton label="Cancel" icon="pi pi-times" class="p-button-text"
+                        (click)="isBulkDialogVisible = false">
+                    </button>
+                    <button pButton label="Import Records" icon="pi pi-check" [loading]="isBulkSaving"
+                        (click)="saveBulkImport()">
+                    </button>
+                </div>
+            </div>
+        </ng-template>
+    </p-dialog>
+
+    <!-- ========== ACTION MENU ========== -->
+    <p-menu #actionMenu [model]="actionMenuItems" [popup]="true" appendTo="body">
+    </p-menu>
+
+    <!-- ========== CONFIRM DIALOG ========== -->
+    <p-confirmDialog [baseZIndex]="1000" appendTo="body" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}">
+    </p-confirmDialog>
+
+    <!-- ========== TOAST NOTIFICATIONS ========== -->
+    <p-toast position="top-right" [baseZIndex]="5000">
+    </p-toast>
+</div>

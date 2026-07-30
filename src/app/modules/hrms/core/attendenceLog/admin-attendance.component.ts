@@ -52,7 +52,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
     <p-confirmDialog 
       styleClass="crextio-dialog" 
       acceptButtonStyleClass="btn-primary" 
-      rejectButtonStyleClass="btn-text">
+      rejectButtonStyleClass="btn-text" appendTo="body" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}">
     </p-confirmDialog>
 
     <div class="crextio-theme-wrapper fade-in">
@@ -132,7 +132,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
     </div>
 
     <!-- Flag Dialog -->
-    <p-dialog header="Flag Attendance Log" [(visible)]="displayFlagDialog" [modal]="true" [style]="{width: '450px'}" [draggable]="false" styleClass="crextio-dialog">
+    <p-dialog header="Flag Attendance Log" [(visible)]="displayFlagDialog" [modal]="true" [style]="{width: '450px'}" [draggable]="false" styleClass="crextio-dialog" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
       <p class="text-sm text-secondary mb-4">Marking this log as flagged will suspend it from payroll processing until manually reviewed.</p>
       
       <div class="input-group">
@@ -149,7 +149,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
     </p-dialog>
 
     <!-- Correct Dialog -->
-    <p-dialog header="Correct Attendance Log" [(visible)]="displayCorrectDialog" [modal]="true" [style]="{width: '450px'}" [draggable]="false" styleClass="crextio-dialog">
+    <p-dialog header="Correct Attendance Log" [(visible)]="displayCorrectDialog" [modal]="true" [style]="{width: '450px'}" [draggable]="false" styleClass="crextio-dialog" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
       <p class="text-sm text-secondary mb-4">Create a verified correction entry. The original raw log will be preserved for auditing purposes.</p>
       
       <form [formGroup]="correctForm" class="flex-col gap-4">

@@ -202,8 +202,8 @@
     </main>
   </div>
 
-  <p-dialog [(visible)]="isEditModalOpen" [modal]="true" styleClass="glass-dialog-spacious" header="Update Profile"
-    [style]="{ width: '700px', maxWidth: '95vw' }">
+  <p-dialog [(visible)]="isEditModalOpen" [modal]="true" header="Update Profile"
+    [style]="{ width: '700px', maxWidth: '95vw' }" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
     <ng-template pTemplate="header">
       <div class="flex align-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-primary-light text-primary flex align-center justify-center text-xl">
@@ -492,8 +492,8 @@
     </main>
   </div>
 
-  <p-dialog [(visible)]="isEditModalOpen" [modal]="true" styleClass="glass-dialog-spacious" header="Update Profile"
-    [style]="{ width: '700px', maxWidth: '95vw' }">
+  <p-dialog [(visible)]="isEditModalOpen" [modal]="true" header="Update Profile"
+    [style]="{ width: '700px', maxWidth: '95vw' }" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
     <ng-template pTemplate="header">
       <div class="flex align-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-primary-light text-primary flex align-center justify-center text-xl">

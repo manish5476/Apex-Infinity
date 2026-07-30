@@ -46,6 +46,9 @@ export class DynamicDialogServices {
       closable: true,
       closeOnEscape: true,
       dismissableMask: true,
+      focusTrap: true,
+      keepInViewport: true,
+      breakpoints: { '1199px': '75vw', '575px': '90vw' },
       maskStyleClass: 'app-dialog-mask', // For backdrop blur
       contentStyle: { padding: 'var(--spacing-2xl)', overflow: 'visible' },
     };

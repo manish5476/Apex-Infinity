@@ -81,7 +81,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
       position="right" 
       [modal]="true"
       [draggable]="false"
-      styleClass="glass-panel w-full md:w-30rem h-screen m-0 border-none border-left-1 border-solid border-primary border-radius-none">
+      styleClass="glass-panel w-full md:w-30rem h-screen m-0 border-none border-left-1 border-solid border-primary border-radius-none" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
       
       <ng-template pTemplate="header">
         <h2 class="font-heading m-0 flex align-items-center gap-sm text-primary text-xl font-bold">
@@ -638,7 +638,7 @@ export class UserAttendanceDetailsComponent implements OnInit, OnDestroy {
 //       }
 //     </div>
 
-//     <p-dialog [(visible)]="displayInspection" position="right" styleClass="premium-dialog w-full md:w-30rem">
+//     <p-dialog [(visible)]="displayInspection" position="right" styleClass="premium-dialog w-full md:w-30rem" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
 //       <ng-template pTemplate="header">
 //         <h2 class="font-heading m-0 flex-align gap-2 text-primary-color"><i class="pi pi-verified text-primary"></i> Punch Inspection</h2>
 //       </ng-template>

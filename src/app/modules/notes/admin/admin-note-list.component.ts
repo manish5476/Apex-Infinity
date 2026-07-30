@@ -39,7 +39,7 @@ import { takeUntil } from "rxjs/operators";
   encapsulation: ViewEncapsulation.None,
   template: `
     <p-toast></p-toast>
-    <p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+    <p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle" appendTo="body" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}"></p-confirmDialog>
     
     <div class="list-page-container">
       <div class="themed-card list-content-area">

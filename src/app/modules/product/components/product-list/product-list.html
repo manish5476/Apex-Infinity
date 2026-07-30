@@ -116,10 +116,10 @@
 
 <p-dialog appendTo="body" [visible]="bulkDialogVisible()" (visibleChange)="bulkDialogVisible.set($event)" [modal]="true"
   header="Bulk Product Editor" styleClass="bulk-dialog p-dialog-full" [draggable]="false" [resizable]="false"
-  [maximizable]="true">
+  [maximizable]="true" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
 
   <app-bulk-product-entry [selectedData]="selectedRows()"></app-bulk-product-entry>
 
 </p-dialog>
 
-<p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
+<p-confirmDialog [style]="{width: '450px'}" appendTo="body" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}"></p-confirmDialog>

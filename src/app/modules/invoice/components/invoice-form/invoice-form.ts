@@ -41,7 +41,7 @@ import { ConfirmationService } from 'primeng/api';
   providers: [ConfirmationService],
   template: `
     <p-toast></p-toast>
-    <p-confirmDialog [style]="{width: '400px'}" rejectButtonStyleClass="p-button-text"></p-confirmDialog>
+    <p-confirmDialog [style]="{width: '400px'}" rejectButtonStyleClass="p-button-text" appendTo="body" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}"></p-confirmDialog>
 
     <div class="page-layout">
       <form [formGroup]="invoiceForm" class="invoice-container">

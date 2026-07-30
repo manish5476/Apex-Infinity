@@ -1,5 +1,5 @@
 <p-toast position="top-right"></p-toast>
-<p-confirmDialog [style]="{width: '450px'}" styleClass="modern-confirm"></p-confirmDialog>
+<p-confirmDialog [style]="{width: '450px'}" appendTo="body" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}"></p-confirmDialog>
 
 <div class="page-container custom-scrollbar">
 
@@ -295,7 +295,7 @@
 </div>
 
 <p-dialog appendTo="body" header="Record Payment" [(visible)]="showPaymentModal" [modal]="true"
-  [style]="{width: '400px'}" [draggable]="false" [resizable]="false" styleClass="modern-dialog">
+  [style]="{width: '400px'}" [draggable]="false" [resizable]="false" styleClass="modern-dialog" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
   <form [formGroup]="paymentForm" class="flex flex-col gap-5 mt-2">
     <div class="form-group">
       <label>Amount Received</label>
@@ -327,7 +327,7 @@
 </p-dialog>
 
 <p-dialog appendTo="body" header="Cancel Invoice" [(visible)]="showCancelModal" [modal]="true"
-  [style]="{width: '450px'}" [draggable]="false" [resizable]="false" styleClass="modern-dialog">
+  [style]="{width: '450px'}" [draggable]="false" [resizable]="false" styleClass="modern-dialog" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
   <form [formGroup]="cancelForm" class="flex flex-col gap-4 mt-2">
     <div class="warning-banner">
       <i class="pi pi-exclamation-triangle"></i>

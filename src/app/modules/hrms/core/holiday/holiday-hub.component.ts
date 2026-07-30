@@ -37,7 +37,7 @@ import { AppMessageService } from '@core/services/message.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <p-toast position="top-right"></p-toast>
-    <p-confirmDialog styleClass="premium-confirm-dialog"></p-confirmDialog>
+    <p-confirmDialog styleClass="premium-confirm-dialog" appendTo="body" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}"></p-confirmDialog>
     
     <div class="apex-page fade-in flex-col h-screen">
     
@@ -189,7 +189,7 @@ import { AppMessageService } from '@core/services/message.service';
       </main>
     </div>
     
-    <p-dialog header="Clone Holiday Calendar" [(visible)]="displayCopyDialog" [modal]="true" [style]="{width: '400px'}" styleClass="premium-dialog">
+    <p-dialog header="Clone Holiday Calendar" [(visible)]="displayCopyDialog" [modal]="true" [style]="{width: '400px'}" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
       <p class="text-sm text-secondary mb-4">Quickly populate the new year by copying existing holidays. You can edit specific dates after cloning.</p>
     
       <div class="flex-col gap-4">

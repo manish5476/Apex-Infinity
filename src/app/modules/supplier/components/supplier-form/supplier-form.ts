@@ -164,7 +164,7 @@ export class SupplierFormComponent implements OnInit, OnDestroy {
       altPhone: supplier.altPhone,
       gstNumber: supplier.gstNumber,
       panNumber: supplier.panNumber,
-      categoryId: supplier.categoryId || null,
+      categoryId: supplier.categoryId?._id || supplier.categoryId || null,
       tags: supplier.tags || [],
       contacts: supplier.contacts || [],
       openingBalance: supplier.openingBalance,

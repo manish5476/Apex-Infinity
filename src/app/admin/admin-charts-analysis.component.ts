@@ -180,7 +180,7 @@ const CATEGORY_META: Record<string, { color: string; icon: string }> = {
       [showHeader]="false"
       styleClass="premium-lightbox"
       (onShow)="onDialogShow()"
-      (onHide)="onDialogHide()">
+      (onHide)="onDialogHide()" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}">
 
       @if (previewChart()) {
         <div class="dlg-root">
@@ -1261,7 +1261,7 @@ export class AdminChartsAnalysisComponent {
 //       [contentStyle]="{ padding: '0', height: '100%', overflow: 'hidden', background: 'var(--bg-primary)' }"
 //       [showHeader]="false"
 //       styleClass="premium-lightbox"
-//       (onHide)="onDialogHide()">
+//       (onHide)="onDialogHide()" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}">
 
 //       @if (previewChart()) {
 //         <div class="dlg-root">
@@ -2300,7 +2300,7 @@ export class AdminChartsAnalysisComponent {
 // //       [contentStyle]="{ padding: '0', height: '100%', overflow: 'hidden', background: 'var(--bg-primary)' }"
 // //       [showHeader]="false"
 // //       styleClass="premium-lightbox"
-// //       (onHide)="onDialogHide()">
+// //       (onHide)="onDialogHide()" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}">
 
 // //       @if (previewChart()) {
 // //         <div class="dlg-root">

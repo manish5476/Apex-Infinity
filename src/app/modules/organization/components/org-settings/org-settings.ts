@@ -53,7 +53,7 @@ import { MasterDropdownService } from '../../../../core/services/master-dropdown
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <p-toast position="top-right" [baseZIndex]="5000"></p-toast>
-    <p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
+    <p-confirmDialog [style]="{width: '450px'}" appendTo="body" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}"></p-confirmDialog>
 
     <div class="org-dashboard-container animate-fade-in">
       
@@ -315,7 +315,7 @@ import { MasterDropdownService } from '../../../../core/services/master-dropdown
       [style]="{ width: '95vw', height: '90vh' }"
       [contentStyle]="{ padding: '0', height: '100%', overflow: 'hidden', background: 'var(--bg-primary)' }"
       [showHeader]="false"
-      styleClass="premium-lightbox">
+      styleClass="premium-lightbox" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
       
       <div class="immersive-dialog-root">
         <div class="id-header">
@@ -338,7 +338,7 @@ import { MasterDropdownService } from '../../../../core/services/master-dropdown
     </p-dialog>
 
     <!-- ════════ INVITE DIALOG ════════ -->
-    <p-dialog header="Invite Team Member" [(visible)]="showInviteDialog" [modal]="true" [style]="{width: '480px'}" [draggable]="false" [resizable]="false">
+    <p-dialog header="Invite Team Member" [(visible)]="showInviteDialog" [modal]="true" [style]="{width: '480px'}" [draggable]="false" [resizable]="false" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
       <form [formGroup]="inviteForm" class="dialog-form mt-2">
         <div class="field-group">
           <label>Full Name</label>
@@ -382,7 +382,7 @@ import { MasterDropdownService } from '../../../../core/services/master-dropdown
     </p-dialog>
 
     <!-- ════════ TRANSFER DIALOG ════════ -->
-    <p-dialog header="Transfer Ownership" [(visible)]="showTransferDialog" [modal]="true" [style]="{width: '500px'}" [draggable]="false">
+    <p-dialog header="Transfer Ownership" [(visible)]="showTransferDialog" [modal]="true" [style]="{width: '500px'}" [draggable]="false" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
       <div class="dialog-content mt-2">
         <div class="alert-warn mb-4">
           <i class="pi pi-info-circle"></i>
@@ -415,7 +415,7 @@ import { MasterDropdownService } from '../../../../core/services/master-dropdown
     </p-dialog>
 
     <!-- ════════ DELETE DIALOG ════════ -->
-    <p-dialog header="Delete Organization" [(visible)]="showDeleteDialog" [modal]="true" [style]="{width: '500px'}" [draggable]="false">
+    <p-dialog header="Delete Organization" [(visible)]="showDeleteDialog" [modal]="true" [style]="{width: '500px'}" [draggable]="false" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
       <div class="dialog-content mt-2">
         <div class="alert-error-critical mb-4">
           <i class="pi pi-exclamation-triangle"></i>

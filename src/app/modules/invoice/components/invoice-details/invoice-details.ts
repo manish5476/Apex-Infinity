@@ -42,7 +42,7 @@ import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
   providers: [ConfirmationService],
   template: `
     <p-toast position="bottom-right"></p-toast>
-    <p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
+    <p-confirmDialog [style]="{width: '450px'}" appendTo="body" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}"></p-confirmDialog>
 
     <div class="page-layout">
       
@@ -311,7 +311,7 @@ import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
     </div>
 
     <p-dialog appendTo="body" header="Record Payment" [(visible)]="showPaymentModal" [modal]="true"
-      [style]="{width: '400px'}" [draggable]="false" [resizable]="false" styleClass="modern-dialog">
+      [style]="{width: '400px'}" [draggable]="false" [resizable]="false" styleClass="modern-dialog" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
       <form [formGroup]="paymentForm" class="dialog-form">
         <div class="form-group">
           <label>Amount Received</label>
@@ -340,7 +340,7 @@ import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
     </p-dialog>
 
     <p-dialog appendTo="body" header="Cancel Invoice" [(visible)]="showCancelModal" [modal]="true"
-      [style]="{width: '450px'}" [draggable]="false" [resizable]="false" styleClass="modern-dialog">
+      [style]="{width: '450px'}" [draggable]="false" [resizable]="false" styleClass="modern-dialog" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
       <form [formGroup]="cancelForm" class="dialog-form">
         <div class="warning-banner">
           <i class="pi pi-exclamation-triangle"></i>

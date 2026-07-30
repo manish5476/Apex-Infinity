@@ -48,7 +48,7 @@ import { takeUntil } from "rxjs/operators";
     <p-confirmDialog 
       styleClass="apex-card border-0 shadow-xl" 
       acceptButtonStyleClass="apex-btn apex-btn--primary bg-error border-error" 
-      rejectButtonStyleClass="apex-btn apex-btn--secondary">
+      rejectButtonStyleClass="apex-btn apex-btn--secondary" appendTo="body" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}">
     </p-confirmDialog>
 
     <div class="apex-page fade-in flex-col h-screen">

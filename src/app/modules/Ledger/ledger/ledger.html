@@ -351,7 +351,7 @@
 
 <!-- Export Dialog -->
 <p-dialog appendTo="body" header="Export Financial Data" [(visible)]="showExportDialog" [modal]="true"
-  [style]="{width: '500px'}" styleClass="standard-dialog">
+  [style]="{width: '500px'}" styleClass="standard-dialog" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
 
   <div [formGroup]="exportForm" class="flex flex-col gap-4 py-3">
     <div class="flex flex-col gap-3">

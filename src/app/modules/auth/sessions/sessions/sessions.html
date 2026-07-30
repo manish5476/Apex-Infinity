@@ -1,5 +1,5 @@
 <p-toast></p-toast>
-<p-confirmDialog></p-confirmDialog>
+<p-confirmDialog appendTo="body" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}"></p-confirmDialog>
 
 <div class="app-container h-full">
 
@@ -79,7 +79,7 @@
 </div>
 
 <p-dialog appendTo="body" header="Session Details" [(visible)]="displayDialog" [modal]="true" styleClass="app-dialog"
-  [draggable]="false" [resizable]="false" [style]="{width: '500px'}">
+  [draggable]="false" [resizable]="false" [style]="{width: '500px'}" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
 
   @if (selectedSession) {
   <div class="flex flex-col gap-lg pt-2">

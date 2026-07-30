@@ -85,7 +85,7 @@
           <span class="id-badge">
             <i class="pi pi-hashtag"></i> {{ s.code || (s._id | slice:-6) | uppercase }}
           </span>
-          <span class="category-badge">{{ s.category || 'Standard Vendor' }}</span>
+          <span class="category-badge">{{ s.categoryId?.name || s.category || 'Standard Vendor' }}</span>
         </div>
       </div>
       <button pButton icon="pi pi-sparkles" class="p-button-text p-button-rounded back-btn" pTooltip="Smart Dashboard"

@@ -165,7 +165,7 @@ import { AppMessageService } from '@core/services/message.service';
       }
     </div>
     
-    <p-dialog header="Request Regularization" [(visible)]="displayRegularize" [modal]="true" [style]="{width: '450px'}" styleClass="crextio-dialog">
+    <p-dialog header="Request Regularization" [(visible)]="displayRegularize" [modal]="true" [style]="{width: '450px'}" styleClass="crextio-dialog" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
       <p class="text-sm text-secondary mb-4">Request correction for <b>{{ selectedRecord?.date | date:'dd MMM yyyy' }}</b>.</p>
     
       <form [formGroup]="regForm" class="flex-col gap-4">

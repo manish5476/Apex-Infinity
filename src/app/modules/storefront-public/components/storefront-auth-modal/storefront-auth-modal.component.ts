@@ -55,7 +55,7 @@ const slideRight = [
   [showHeader]="false"
   appendTo="body"
   styleClass="apx-premium-dialog"
-  [style]="{ width: '100%', maxWidth: '960px', padding: '0', background: 'transparent', border: 'none', boxShadow: 'none' }">
+  [style]="{ width: '100%', maxWidth: '960px', padding: '0', background: 'transparent', border: 'none', boxShadow: 'none' }" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}">
 
   <div class="apx-split-shell">
     
@@ -655,7 +655,7 @@ export class StorefrontAuthModalComponent {
 //   [showHeader]="false"
 //   appendTo="body"
 //   styleClass="apx-auth-dialog"
-//   [style]="{ width: '100%', maxWidth: '480px', padding: '0', background: 'transparent', border: 'none', boxShadow: 'none' }">
+//   [style]="{ width: '100%', maxWidth: '480px', padding: '0', background: 'transparent', border: 'none', boxShadow: 'none' }" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}">
 
 //   <div class="apx-auth-shell">
 

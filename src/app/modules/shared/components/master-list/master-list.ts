@@ -142,7 +142,7 @@ icon="pi pi-pencil"
       <!-- BULK ENTRY DIALOG (Import) -->
       <p-dialog header="Bulk Import" [(visible)]="isBulkDialogVisible" [modal]="true"
         [style]="{ width: '95vw', height: '90vh' }" [draggable]="false" [resizable]="false"
-        [maximizable]="true">
+        [maximizable]="true" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
     
         <div class="flex flex-col h-full gap-2">
           <div class="bg-blue-50 p-3 rounded-md text-sm text-blue-700 mb-2 border border-blue-100 flex items-center">
@@ -183,7 +183,7 @@ icon="pi pi-pencil"
       </p-dialog>
     
       <p-toast></p-toast>
-      <p-confirmDialog></p-confirmDialog>
+      <p-confirmDialog appendTo="body" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}"></p-confirmDialog>
     `,
   styleUrls: ['./master-list.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -223,7 +223,8 @@ export class MasterList implements OnInit, OnDestroy {
     { label: 'Unit', value: 'unit' },
     { label: 'Tax Rate', value: 'tax_rate' },
     { label: 'Warranty Plan', value: 'warranty_plan' },
-    { label: 'Product Condition', value: 'product_condition' }
+    { label: 'Product Condition', value: 'product_condition' },
+    { label: 'Supplier Category', value: 'supplier_category' }
   ];
 
   columns: GridColDef<Master>[] = [

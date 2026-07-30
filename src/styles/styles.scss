@@ -666,9 +666,9 @@ body {
   border: 1px solid var(--border-primary) !important;
   border-radius: var(--ui-border-radius-xl) !important;
   box-shadow: var(--elevation-3) !important;
-  transform: translateY(0);
   animation: slideUpFade 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-  display: flex !important;
+  max-height: 90vh;
+  display: flex;
   flex-direction: column;
 
   .p-dialog-header {
@@ -708,6 +708,7 @@ body {
   .p-dialog-content {
     background: var(--component-surface-raised) !important;
     color: var(--text-primary) !important;
+    overflow-y: auto;
   }
 
   .p-dialog-footer {

@@ -180,7 +180,7 @@ import { takeUntil } from "rxjs/operators";
       </main>
     </div>
     
-    <p-dialog header="Bulk Device Status Update" [(visible)]="displayBulkDialog" [modal]="true" [style]="{width: '400px'}" styleClass="premium-dialog">
+    <p-dialog header="Bulk Device Status Update" [(visible)]="displayBulkDialog" [modal]="true" [style]="{width: '400px'}" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
       <p class="text-sm text-secondary mb-4">Change the administrative status for <b>{{ selectedMachines.length }}</b> selected devices.</p>
       <div class="flex-col gap-4">
         <div class="input-group">

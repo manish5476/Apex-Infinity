@@ -161,7 +161,7 @@ type TagSeverity = "success" | "secondary" | "info" | "warn" | "danger" | "contr
 
     <p-dialog appendTo="body" [visible]="showModal()" (visibleChange)="showModal.set($event)" [modal]="true"
       [dismissableMask]="true" [showHeader]="false" styleClass="pc-dialog"
-      [style]="{ width: '92vw', maxWidth: '1040px', padding: '0', borderRadius: '28px', overflow: 'hidden' }">
+      [style]="{ width: '92vw', maxWidth: '1040px', padding: '0', borderRadius: '28px', overflow: 'hidden' }" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}">
 
       <div class="pc-qv" [ngStyle]="{'background-color': config()?.design?.customBackground || 'var(--bg-secondary)'}">
         <button class="pc-qv__close" (click)="closeQuickView($event)" aria-label="Close">

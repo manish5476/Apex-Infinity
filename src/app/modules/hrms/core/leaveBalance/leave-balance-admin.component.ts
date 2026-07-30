@@ -199,7 +199,7 @@ import { takeUntil } from "rxjs/operators";
       </main>
     </div>
 
-    <p-dialog header="Bulk Initialize Financial Year" [(visible)]="displayBulkDialog" [modal]="true" [style]="{width: '450px'}" styleClass="premium-dialog">
+    <p-dialog header="Bulk Initialize Financial Year" [(visible)]="displayBulkDialog" [modal]="true" [style]="{width: '450px'}" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
       <p class="text-sm text-secondary mb-4">Initialize leave balances for all active employees for the upcoming financial year. This process will apply default organizational leave policies.</p>
       
       <form [formGroup]="bulkInitForm" class="flex-col gap-4">
@@ -221,7 +221,7 @@ import { takeUntil } from "rxjs/operators";
       </form>
     </p-dialog>
 
-    <p-dialog header="Adjust Leave Balance" [(visible)]="displayAdjustDialog" [modal]="true" [style]="{width: '450px'}" styleClass="premium-dialog">
+    <p-dialog header="Adjust Leave Balance" [(visible)]="displayAdjustDialog" [modal]="true" [style]="{width: '450px'}" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
       <div class="mb-4 bg-surface p-3 border-radius-md flex-align gap-3">
         <p-avatar [label]="getInitials(selectedBalance?.user?.name)" shape="circle" styleClass="bg-primary text-white"></p-avatar>
         <div class="flex-col">

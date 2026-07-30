@@ -33,7 +33,7 @@ import { AppMessageService } from '@core/services/message.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <p-toast position="top-right"></p-toast>
-    <p-confirmDialog styleClass="premium-confirm-dialog"></p-confirmDialog>
+    <p-confirmDialog styleClass="premium-confirm-dialog" appendTo="body" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}"></p-confirmDialog>
     
     <div class="page-wrapper fade-in">
     
