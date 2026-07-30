@@ -12,11 +12,15 @@ import { TransactionService } from '../../../transactions/transaction.service';
 import { SupplierService } from '../../services/supplier-service';
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
+import { LoadingComponent } from '@shared/ui/feedback/loading/loading.component';
+import { StatusBadgeComponent } from '@shared/ui/feedback/status-badge/status-badge.component';
+import { EmptyStateComponent } from '@shared/ui/feedback/empty-state/empty-state.component';
+import { ErrorStateComponent } from '@shared/ui/feedback/error-state/error-state.component';
 
 @Component({
   selector: 'app-supplier-dashboard',
   standalone: true,
-  imports: [CommonModule, TableModule, ButtonModule, TagModule, ProgressSpinnerModule],
+  imports: [CommonModule, TableModule, ButtonModule, TagModule, ProgressSpinnerModule, LoadingComponent, StatusBadgeComponent, EmptyStateComponent, ErrorStateComponent],
   templateUrl: './supplier-dashboard.html',
   styleUrl: './supplier-dashboard.scss',
 })
@@ -40,6 +44,10 @@ export class SupplierDashboardComponent implements OnInit, OnDestroy {
   activeTab = signal<'purchases' | 'payments'>('purchases');
 
   ngOnInit(): void {
+    this.loadData();
+  }
+
+  loadData(): void {
     const id = this.config.data?.supplierId || this.config.data?.productId;
 
     if (!id) {
@@ -48,6 +56,9 @@ export class SupplierDashboardComponent implements OnInit, OnDestroy {
       this.messageService.showError('Invalid configuration: Supplier ID is missing.');
       return;
     }
+
+    this.loading.set(true);
+    this.isError.set(false);
 
     this.supplierService.getSupplierDashboard(id).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
@@ -60,10 +71,11 @@ export class SupplierDashboardComponent implements OnInit, OnDestroy {
         }
         this.loading.set(false);
       },
-      error: (err) => {
+      error: (err: any) => {
         this.isError.set(true);
         this.loading.set(false);
-        this.messageService.handleHttpError(err);
+        this.messageService.showError('Error loading supplier dashboard.');
+        console.error(err);
       }
     });
   }

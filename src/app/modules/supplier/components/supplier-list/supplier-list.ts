@@ -17,10 +17,17 @@ import { PERMISSIONS } from '@core/auth/permissions.constants';
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 
+import { PageComponent } from '@shared/ui/layout/page/page.component';
+import { PageHeaderComponent } from '@shared/ui/layout/page-header/page-header.component';
+import { PageContentComponent } from '@shared/ui/layout/page-content/page-content.component';
+import { PageActionsComponent } from '@shared/ui/layout/page-actions/page-actions.component';
+import { PageToolbarComponent } from '@shared/ui/layout/page-toolbar/page-toolbar.component';
+import { CardComponent } from '@shared/ui/data/card/card.component';
+
 @Component({
   selector: 'app-supplier-list',
   standalone: true,
-  imports: [SelectModule, FormsModule, ButtonModule, InputTextModule, RouterModule, Toast, AgShareGrid, HasPermissionDirective],
+  imports: [SelectModule, FormsModule, ButtonModule, InputTextModule, RouterModule, Toast, AgShareGrid, HasPermissionDirective, PageComponent, PageHeaderComponent, PageContentComponent, PageActionsComponent, PageToolbarComponent, CardComponent],
   templateUrl: './supplier-list.html',
   styleUrl: './supplier-list.scss',
 })
