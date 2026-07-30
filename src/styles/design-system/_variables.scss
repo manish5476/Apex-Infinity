@@ -1,0 +1,13 @@
+/* src/styles/design-system/_variables.scss */
+
+@use 'colors';
+@use 'z-index';
+@use 'animations';
+@use 'typography';
+
+// Other semantic structural variables that don't fit perfectly into Tailwind layout classes
+:root {
+  --sidebar-width: 280px;
+  --sidebar-width-collapsed: 80px;
+  --header-height: 70px;
+}

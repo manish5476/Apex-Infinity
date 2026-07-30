@@ -1,0 +1,19 @@
+/* src/styles/utilities/_scrollbar.scss */
+
+.custom-scrollbar {
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: var(--scroll-track-c, transparent);
+    border-radius: 3px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--scroll-thumb-c, #cbd5e1);
+    border-radius: 3px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-primary, #3b82f6);
+  }
+}

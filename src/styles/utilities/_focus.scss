@@ -1,0 +1,11 @@
+/* src/styles/utilities/_focus.scss */
+
+.focus-ring {
+  outline: var(--focus-ring-width, 2px) solid var(--focus-ring-color, #3b82f6);
+  outline-offset: var(--focus-ring-offset, 2px);
+}
+
+.focus-ring-alt {
+  outline: var(--focus-ring-width, 2px) solid var(--focus-ring-color-alt, #94a3b8);
+  outline-offset: var(--focus-ring-offset, 2px);
+}

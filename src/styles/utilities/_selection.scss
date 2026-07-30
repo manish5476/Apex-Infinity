@@ -1,0 +1,6 @@
+/* src/styles/utilities/_selection.scss */
+
+::selection {
+  background-color: var(--accent-primary, #3b82f6);
+  color: white;
+}

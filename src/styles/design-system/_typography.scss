@@ -1,0 +1,7 @@
+/* src/styles/design-system/_typography.scss */
+
+:root {
+  // Typography base overrides that Tailwind might not catch or we want to pass to PrimeNG components
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-size-base: 14px;
+}

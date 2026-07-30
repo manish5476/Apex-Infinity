@@ -1,0 +1,30 @@
+/* src/styles/design-system/_colors.scss */
+
+:root {
+  // Brand Colors
+  --primary-color: #3b82f6; 
+  --primary-color-text: #ffffff;
+  --secondary-color: #64748b; 
+  
+  // Status Colors
+  --status-success: #22c55e;
+  --status-success-bg: #dcfce7;
+  --status-success-text: #166534;
+  
+  --status-warning: #eab308;
+  --status-warning-bg: #fef9c3;
+  --status-warning-text: #854d0e;
+  
+  --status-danger: #ef4444;
+  --status-danger-bg: #fee2e2;
+  --status-danger-text: #991b1b;
+  
+  --status-info: #3b82f6;
+  --status-info-bg: #dbeafe;
+  --status-info-text: #1e40af;
+  
+  // Surface / Structural
+  --surface-ground: #f8fafc; 
+  --surface-section: #ffffff;
+  --surface-border: #e2e8f0; 
+}
