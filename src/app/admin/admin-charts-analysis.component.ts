@@ -167,7 +167,7 @@ const CATEGORY_META: Record<string, { color: string; icon: string }> = {
       </div>
     </div>
 
-    <p-dialog
+    <p-dialog [modal]="true"
       [visible]="dialogVisible()"
       (visibleChange)="dialogVisible.set($event)"
       [modal]="true"
@@ -1249,7 +1249,7 @@ export class AdminChartsAnalysisComponent {
 //     </div>
 
 //     <!-- ════════ IMMERSIVE 95x90 LIGHTBOX ════════ -->
-//     <p-dialog
+//     <p-dialog [modal]="true"
 //       [visible]="dialogVisible()"
 //       (visibleChange)="dialogVisible.set($event)"
 //       [modal]="true"
@@ -2289,7 +2289,7 @@ export class AdminChartsAnalysisComponent {
 // //       </div>
 // //     </div>
 
-// //     <p-dialog
+// //     <p-dialog [modal]="true"
 // //       [(visible)]="dialogVisible"
 // //       [modal]="true"
 // //       [dismissableMask]="true"

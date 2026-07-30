@@ -1,20 +1,25 @@
 <div class="builder-layout builder-workbench h-full flex flex-col">
 
-  <header class="builder-header builder-workbench__header shrink-0 h-14 bg-white border-b border-surface-200 px-5 flex items-center justify-between shadow-sm z-20">
+  <header
+    class="builder-header builder-workbench__header shrink-0 h-14 bg-white border-b border-surface-200 px-5 flex items-center justify-between shadow-sm z-20">
 
     <div class="flex items-center gap-3">
-      <a routerLink="../../" class="flex items-center justify-center w-7 h-7 text-surface-400 hover:text-primary-600 hover:bg-surface-50 rounded-full transition-colors">
+      <a routerLink="../../"
+        class="flex items-center justify-center w-7 h-7 text-surface-400 hover:text-primary-600 hover:bg-surface-50 rounded-full transition-colors">
         <i class="pi pi-arrow-left text-xs"></i>
       </a>
 
       <div class="flex flex-col">
-        <h1 class="builder-workbench__title text-[13px] font-heading font-bold text-surface-800 leading-none tracking-tight">
+        <h1
+          class="builder-workbench__title text-[13px] font-heading font-bold text-surface-800 leading-none tracking-tight">
           {{ page()?.name || 'Untitled Page' }}
         </h1>
         <div class="flex items-center gap-1.5 mt-1">
           <span class="flex h-1.5 w-1.5 relative">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" [ngClass]="page()?.isPublished ? 'bg-green-400' : 'bg-amber-400'"></span>
-            <span class="relative inline-flex rounded-full h-1.5 w-1.5" [ngClass]="page()?.isPublished ? 'bg-green-500' : 'bg-amber-500'"></span>
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
+              [ngClass]="page()?.isPublished ? 'bg-green-400' : 'bg-amber-400'"></span>
+            <span class="relative inline-flex rounded-full h-1.5 w-1.5"
+              [ngClass]="page()?.isPublished ? 'bg-green-500' : 'bg-amber-500'"></span>
           </span>
           <span class="text-[9px] font-bold text-surface-400 uppercase tracking-widest">
             {{ page()?.status || 'Draft' }}
@@ -26,29 +31,35 @@
     <div class="flex gap-2 items-center">
 
       @if (saveError()) {
-        <div class="flex items-center gap-2 px-2.5 py-1 bg-red-50 border border-red-200 rounded-md text-red-600 text-[10px] font-medium mr-1">
-          <i class="pi pi-exclamation-triangle text-[10px] shrink-0"></i>
-          <span class="truncate max-w-[150px]">{{ saveError() }}</span>
-          <button (click)="saveError.set(null)" class="shrink-0 hover:text-red-800"><i class="pi pi-times text-[10px]"></i></button>
-        </div>
+      <div
+        class="flex items-center gap-2 px-2.5 py-1 bg-red-50 border border-red-200 rounded-md text-red-600 text-[10px] font-medium mr-1">
+        <i class="pi pi-exclamation-triangle text-[10px] shrink-0"></i>
+        <span class="truncate max-w-[150px]">{{ saveError() }}</span>
+        <button (click)="saveError.set(null)" class="shrink-0 hover:text-red-800"><i
+            class="pi pi-times text-[10px]"></i></button>
+      </div>
       }
 
       @if (isSaving()) {
-        <span class="text-[10px] text-surface-400 font-medium flex items-center gap-1 mr-1 animate-pulse">
-          <i class="pi pi-sync pi-spin text-primary-500 text-[10px]"></i> Saving…
-        </span>
+      <span class="text-[10px] text-surface-400 font-medium flex items-center gap-1 mr-1 animate-pulse">
+        <i class="pi pi-sync pi-spin text-primary-500 text-[10px]"></i> Saving…
+      </span>
       }
 
-      <button (click)="deletePage()" [disabled]="isSaving()" class="action-btn-secondary text-surface-400 hover:text-red-600 hover:bg-red-50" pTooltip="Delete Page" tooltipPosition="bottom">
+      <button (click)="deletePage()" [disabled]="isSaving()"
+        class="action-btn-secondary text-surface-400 hover:text-red-600 hover:bg-red-50" pTooltip="Delete Page"
+        tooltipPosition="bottom">
         <i class="pi pi-trash text-[11px]"></i>
       </button>
 
-      <button (click)="togglePublish()" [disabled]="isSaving()" class="action-btn-secondary flex items-center gap-1.5 px-3 text-[11px]">
+      <button (click)="togglePublish()" [disabled]="isSaving()"
+        class="action-btn-secondary flex items-center gap-1.5 px-3 text-[11px]">
         <i class="pi text-[10px]" [ngClass]="page()?.isPublished ? 'pi-eye-slash' : 'pi-cloud-upload'"></i>
         <span>{{ page()?.isPublished ? 'Unpublish' : 'Publish' }}</span>
       </button>
 
-      <button (click)="savePage()" [disabled]="isSaving()" class="action-btn-primary flex items-center gap-1.5 px-3.5 shadow-md shadow-primary-500/20 text-[11px]">
+      <button (click)="savePage()" [disabled]="isSaving()"
+        class="action-btn-primary flex items-center gap-1.5 px-3.5 shadow-md shadow-primary-500/20 text-[11px]">
         <i class="pi pi-save text-[10px]"></i>
         <span>Save</span>
       </button>
@@ -58,41 +69,50 @@
 
   <div class="flex-1 overflow-hidden relative min-h-0 bg-surface-100">
 
-    <p-splitter [panelSizes]="[25, 75]" [minSizes]="[20, 50]" [gutterSize]="4" stateKey="builder-main-splitter" stateStorage="local" styleClass="h-full border-none custom-splitter">
+    <p-splitter [panelSizes]="[25, 75]" [minSizes]="[20, 50]" [gutterSize]="4" stateKey="builder-main-splitter"
+      stateStorage="local" styleClass="h-full border-none custom-splitter">
 
       <ng-template pTemplate>
-        <div class="builder-workbench__sidebar h-full w-full flex flex-col bg-white border-r border-surface-200 z-10 overflow-hidden">
+        <div
+          class="builder-workbench__sidebar h-full w-full flex flex-col bg-white border-r border-surface-200 z-10 overflow-hidden">
 
-          <div class="builder-workbench__layers flex flex-col w-full border-b border-surface-200" [ngStyle]="{'max-height': selectedSection() ? '35%' : '100%', 'flex': selectedSection() ? '0 0 auto' : '1'}">
-            
+          <div class="builder-workbench__layers flex flex-col w-full border-b border-surface-200"
+            [ngStyle]="{'max-height': selectedSection() ? '35%' : '100%', 'flex': selectedSection() ? '0 0 auto' : '1'}">
+
             <div class="px-3 py-2 border-b border-surface-100 flex justify-between items-center bg-surface-50 shrink-0">
               <span class="text-[9px] font-black text-surface-400 uppercase tracking-widest">Page Layers</span>
               <span class="badge-count">{{ sections().length }}</span>
             </div>
 
-            <div class="p-2 flex-1 overflow-y-auto min-h-0 custom-scrollbar flex flex-col gap-1" cdkDropList (cdkDropListDropped)="drop($event)">
+            <div class="p-2 flex-1 overflow-y-auto min-h-0 custom-scrollbar flex flex-col gap-1" cdkDropList
+              (cdkDropListDropped)="drop($event)">
               @for (section of sections(); track section.id) {
-                <div cdkDrag class="layer-card group" [class.active]="selectedSection()?.id === section.id" (click)="selectSection(section)">
-                  
-                  <div class="drag-handle" cdkDragHandle>
-                    <i class="pi pi-ellipsis-v text-surface-300 text-[10px]"></i>
-                  </div>
+              <div cdkDrag class="layer-card group" [class.active]="selectedSection()?.id === section.id"
+                (click)="selectSection(section)">
 
-                  <div class="w-6 h-6 rounded-md bg-surface-50 border border-surface-100 flex items-center justify-center shrink-0">
-                    <i [ngClass]="sectionRegistry[section.type]?.icon || 'pi pi-box'" class="text-[9px] text-surface-400"></i>
-                  </div>
-
-                  <div class="flex-1 min-w-0 flex flex-col">
-                    <span class="layer-title text-[11px]">{{ sectionRegistry[section.type]?.name || section.type }}</span>
-                    @if (section.config['title']) { <span class="layer-subtitle text-[9px]">{{ section.config['title'] }}</span> }
-                  </div>
-
-                  <div class="w-1.5 h-1.5 rounded-full shrink-0 transition-colors" [ngClass]="section.isActive ? 'bg-green-400' : 'bg-surface-200'"></div>
-
-                  <button (click)="deleteSection(section.id, $event)" class="delete-btn">
-                    <i class="pi pi-trash text-[10px]"></i>
-                  </button>
+                <div class="drag-handle" cdkDragHandle>
+                  <i class="pi pi-ellipsis-v text-surface-300 text-[10px]"></i>
                 </div>
+
+                <div
+                  class="w-6 h-6 rounded-md bg-surface-50 border border-surface-100 flex items-center justify-center shrink-0">
+                  <i [ngClass]="sectionRegistry[section.type]?.icon || 'pi pi-box'"
+                    class="text-[9px] text-surface-400"></i>
+                </div>
+
+                <div class="flex-1 min-w-0 flex flex-col">
+                  <span class="layer-title text-[11px]">{{ sectionRegistry[section.type]?.name || section.type }}</span>
+                  @if (section.config['title']) { <span class="layer-subtitle text-[9px]">{{ section.config['title']
+                    }}</span> }
+                </div>
+
+                <div class="w-1.5 h-1.5 rounded-full shrink-0 transition-colors"
+                  [ngClass]="section.isActive ? 'bg-green-400' : 'bg-surface-200'"></div>
+
+                <button (click)="deleteSection(section.id, $event)" class="delete-btn">
+                  <i class="pi pi-trash text-[10px]"></i>
+                </button>
+              </div>
               }
 
               <button (click)="showAddMenu.set(true)" class="btn-dashed mt-1 py-1.5">
@@ -103,49 +123,54 @@
           </div>
 
           @if (selectedSection()) {
-            <div class="flex-1 flex flex-col bg-white overflow-hidden min-h-0 relative">
-              <div class="config-header shrink-0 shadow-sm z-10">
-                <div class="flex items-center gap-2">
-                  <span class="w-1.5 h-1.5 rounded-full bg-primary-500 shrink-0"></span>
-                  <span class="text-[9px] font-black text-surface-700 uppercase tracking-widest truncate">
-                    Editing: {{ sectionRegistry[selectedSection()!.type]?.name }}
-                  </span>
-                </div>
-                <button (click)="deselectSection()" class="icon-btn hover:text-red-500 hover:bg-red-50" pTooltip="Close Settings" tooltipPosition="left">
-                  <i class="pi pi-times text-[10px]"></i>
-                </button>
+          <div class="flex-1 flex flex-col bg-white overflow-hidden min-h-0 relative">
+            <div class="config-header shrink-0 shadow-sm z-10">
+              <div class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-primary-500 shrink-0"></span>
+                <span class="text-[9px] font-black text-surface-700 uppercase tracking-widest truncate">
+                  Editing: {{ sectionRegistry[selectedSection()!.type]?.name }}
+                </span>
               </div>
-
-              <div class="flex-1 overflow-y-auto min-h-0 custom-scrollbar bg-surface-50/30">
-                <app-config-form 
-                  [config]="selectedSection()!.config"
-                  [schema]="sectionRegistry[selectedSection()!.type]?.schema || {}" 
-                  [masters]="mastersData()"
-                  (configChange)="onConfigChange($event)">
-                </app-config-form>
-              </div>
+              <button (click)="deselectSection()" class="icon-btn hover:text-red-500 hover:bg-red-50"
+                pTooltip="Close Settings" tooltipPosition="left">
+                <i class="pi pi-times text-[10px]"></i>
+              </button>
             </div>
+
+            <div class="flex-1 overflow-y-auto min-h-0 custom-scrollbar bg-surface-50/30">
+              <app-config-form [config]="selectedSection()!.config"
+                [schema]="sectionRegistry[selectedSection()!.type]?.schema || {}" [masters]="mastersData()"
+                (configChange)="onConfigChange($event)">
+              </app-config-form>
+            </div>
+          </div>
           }
         </div>
       </ng-template>
 
       <ng-template pTemplate>
-        <p-splitter layout="vertical" [panelSizes]="[94, 6]" [minSizes]="[50, 4]" [gutterSize]="4" stateKey="builder-canvas-splitter" stateStorage="local" styleClass="h-full border-none custom-splitter canvas-v-splitter">
+        <p-splitter layout="vertical" [panelSizes]="[94, 6]" [minSizes]="[50, 4]" [gutterSize]="4"
+          stateKey="builder-canvas-splitter" stateStorage="local"
+          styleClass="h-full border-none custom-splitter canvas-v-splitter">
 
           <ng-template pTemplate>
-            <main id="preview-container" class="builder-workbench__canvas h-full w-full min-h-0 overflow-y-auto relative custom-scrollbar scroll-smooth">
-              
-              <div class="px-4 pt-4 pb-20">
-                <div class="w-full max-w-[1024px] mx-auto flex flex-col shadow-xl bg-white rounded-lg overflow-hidden ring-1 ring-surface-200 transition-all duration-300">
+            <main id="preview-container"
+              class="builder-workbench__canvas h-full w-full min-h-0 overflow-y-auto relative custom-scrollbar scroll-smooth">
 
-                  <div class="h-8 border-b border-surface-100 flex items-center px-3 justify-between bg-surface-50 shrink-0">
+              <div class="px-4 pt-4 pb-20">
+                <div
+                  class="w-full max-w-[1024px] mx-auto flex flex-col shadow-xl bg-white rounded-lg overflow-hidden ring-1 ring-surface-200 transition-all duration-300">
+
+                  <div
+                    class="h-8 border-b border-surface-100 flex items-center px-3 justify-between bg-surface-50 shrink-0">
                     <div class="flex gap-1.5">
                       <div class="w-2.5 h-2.5 bg-red-400 rounded-full"></div>
                       <div class="w-2.5 h-2.5 bg-amber-400 rounded-full"></div>
                       <div class="w-2.5 h-2.5 bg-green-400 rounded-full"></div>
                     </div>
                     <div class="flex-1 mx-4">
-                      <div class="h-5 bg-white border border-surface-200 rounded max-w-xs mx-auto flex items-center justify-center">
+                      <div
+                        class="h-5 bg-white border border-surface-200 rounded max-w-xs mx-auto flex items-center justify-center">
                         <span class="text-[9px] text-surface-400 font-mono">/{{ page()?.slug || 'page' }}</span>
                       </div>
                     </div>
@@ -154,38 +179,43 @@
 
                   <div class="bg-white relative min-h-[400px]">
                     @if (sections().length === 0) {
-                      <div class="flex flex-col items-center justify-center text-surface-300 gap-3 py-32">
-                        <div class="w-16 h-16 bg-surface-50 rounded-full flex items-center justify-center border border-surface-100">
-                          <i class="pi pi-box text-2xl opacity-25"></i>
-                        </div>
-                        <div class="text-center">
-                          <p class="text-[10px] font-black uppercase tracking-widest opacity-50 mb-1.5">Canvas Empty</p>
-                          <button (click)="showAddMenu.set(true)" class="px-4 py-1.5 bg-primary-50 text-primary-600 font-bold rounded-full hover:bg-primary-100 transition-colors text-[10px]">
-                            + Add First Section
-                          </button>
-                        </div>
+                    <div class="flex flex-col items-center justify-center text-surface-300 gap-3 py-32">
+                      <div
+                        class="w-16 h-16 bg-surface-50 rounded-full flex items-center justify-center border border-surface-100">
+                        <i class="pi pi-box text-2xl opacity-25"></i>
                       </div>
+                      <div class="text-center">
+                        <p class="text-[10px] font-black uppercase tracking-widest opacity-50 mb-1.5">Canvas Empty</p>
+                        <button (click)="showAddMenu.set(true)"
+                          class="px-4 py-1.5 bg-primary-50 text-primary-600 font-bold rounded-full hover:bg-primary-100 transition-colors text-[10px]">
+                          + Add First Section
+                        </button>
+                      </div>
+                    </div>
                     }
 
                     @for (section of sections(); track section.id) {
-                      <div class="relative group outline outline-2 outline-transparent transition-all duration-150"
-                           [class.outline-primary-500]="selectedSection()?.id === section.id"
-                           [class.z-20]="selectedSection()?.id === section.id" 
-                           (click)="selectSection(section)">
+                    <div class="relative group outline outline-2 outline-transparent transition-all duration-150"
+                      [class.outline-primary-500]="selectedSection()?.id === section.id"
+                      [class.z-20]="selectedSection()?.id === section.id" (click)="selectSection(section)">
 
-                        @if (selectedSection()?.id !== section.id) {
-                          <div class="absolute inset-0 bg-primary-500/[0.02] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-10"></div>
-                        }
-
-                        <div class="absolute top-0 right-0 z-30 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity -translate-y-full"
-                             [class.opacity-100]="selectedSection()?.id === section.id">
-                          <span class="bg-primary-600 text-white text-[8px] px-2 py-0.5 font-black uppercase tracking-wider rounded-t-md whitespace-nowrap shadow-sm">
-                            {{ sectionRegistry[section.type]?.name || section.type }}
-                          </span>
-                        </div>
-
-                        <app-storefront-section-renderer [section]="section" [orgSlug]="''" [isDev]="true" />
+                      @if (selectedSection()?.id !== section.id) {
+                      <div
+                        class="absolute inset-0 bg-primary-500/[0.02] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-10">
                       </div>
+                      }
+
+                      <div
+                        class="absolute top-0 right-0 z-30 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity -translate-y-full"
+                        [class.opacity-100]="selectedSection()?.id === section.id">
+                        <span
+                          class="bg-primary-600 text-white text-[8px] px-2 py-0.5 font-black uppercase tracking-wider rounded-t-md whitespace-nowrap shadow-sm">
+                          {{ sectionRegistry[section.type]?.name || section.type }}
+                        </span>
+                      </div>
+
+                      <app-storefront-section-renderer [section]="section" [orgSlug]="''" [isDev]="true" />
+                    </div>
                     }
                   </div>
                 </div>
@@ -195,7 +225,8 @@
           </ng-template>
 
           <ng-template pTemplate>
-            <div class="h-full w-full bg-white border-t border-surface-200 flex items-center px-4 gap-3 shrink-0 shadow-[0_-2px_4px_rgba(0,0,0,0.02)] z-10">
+            <div
+              class="h-full w-full bg-white border-t border-surface-200 flex items-center px-4 gap-3 shrink-0 shadow-[0_-2px_4px_rgba(0,0,0,0.02)] z-10">
               <div class="flex items-center gap-1.5">
                 <i class="pi pi-layers text-surface-300 text-[10px]"></i>
                 <span class="text-[9px] font-black text-surface-400 uppercase tracking-widest">
@@ -204,7 +235,9 @@
               </div>
               <div class="w-px h-3 bg-surface-200"></div>
               <div class="flex-1"></div>
-              <button (click)="scrollToTop()" class="text-[9px] font-bold text-surface-400 hover:text-primary-600 flex items-center gap-1 transition-colors uppercase tracking-wider" pTooltip="Scroll to top" tooltipPosition="top">
+              <button (click)="scrollToTop()"
+                class="text-[9px] font-bold text-surface-400 hover:text-primary-600 flex items-center gap-1 transition-colors uppercase tracking-wider"
+                pTooltip="Scroll to top" tooltipPosition="top">
                 <i class="pi pi-arrow-up text-[9px]"></i> Top
               </button>
             </div>
@@ -217,16 +250,10 @@
   </div>
 </div>
 
-<p-dialog 
-  [(visible)]="showAddMenu" 
-  (visibleChange)="showAddMenu.set($event)"
-  [modal]="true" 
-  appendTo="body" 
-  [draggable]="false" 
-  [resizable]="false" 
-  styleClass="component-library-dialog"
-  [style]="{ width: '850px', maxWidth: '95vw' }"
-  [breakpoints]="{ '960px': '75vw', '640px': '100vw' }" [blockScroll]="true" [dismissableMask]="true">
+<p-dialog [modal]="true" [(visible)]="showAddMenu" (visibleChange)="showAddMenu.set($event)" [modal]="true"
+  appendTo="body" [draggable]="false" [resizable]="false" styleClass="component-library-dialog"
+  [style]="{ width: '850px', maxWidth: '95vw' }" [breakpoints]="{ '960px': '75vw', '640px': '100vw' }"
+  [blockScroll]="true" [dismissableMask]="true">
 
   <ng-template pTemplate="header">
     <div class="flex flex-col">
@@ -237,23 +264,25 @@
 
   <div class="p-2 custom-scrollbar">
     @for (categoryGroup of groupedTypes; track categoryGroup.category) {
-      <div class="mb-6 last:mb-0">
-        <div class="flex items-center gap-2 mb-3">
-          <span class="text-[10px] font-black uppercase tracking-widest text-surface-400">{{ categoryGroup.category }}</span>
-          <div class="flex-1 h-px bg-surface-100"></div>
-        </div>
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-          @for (item of categoryGroup.items; track item.type) {
-            <button (click)="addSection(item.type)" class="library-card group text-left w-full">
-              <div class="icon-wrapper mb-2.5">
-                <i [ngClass]="item.icon || 'pi pi-wrench'" class="text-[20px]"></i>
-              </div>
-              <span class="block font-bold text-xs text-surface-800 group-hover:text-primary-600 mb-1 leading-snug">{{ item.name }}</span>
-              <span class="block text-[10px] text-surface-400 leading-relaxed line-clamp-2">{{ item.description }}</span>
-            </button>
-          }
-        </div>
+    <div class="mb-6 last:mb-0">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="text-[10px] font-black uppercase tracking-widest text-surface-400">{{ categoryGroup.category
+          }}</span>
+        <div class="flex-1 h-px bg-surface-100"></div>
       </div>
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+        @for (item of categoryGroup.items; track item.type) {
+        <button (click)="addSection(item.type)" class="library-card group text-left w-full">
+          <div class="icon-wrapper mb-2.5">
+            <i [ngClass]="item.icon || 'pi pi-wrench'" class="text-[20px]"></i>
+          </div>
+          <span class="block font-bold text-xs text-surface-800 group-hover:text-primary-600 mb-1 leading-snug">{{
+            item.name }}</span>
+          <span class="block text-[10px] text-surface-400 leading-relaxed line-clamp-2">{{ item.description }}</span>
+        </button>
+        }
+      </div>
+    </div>
     }
   </div>
 </p-dialog>

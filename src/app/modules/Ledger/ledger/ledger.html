@@ -28,10 +28,7 @@
 
       <div class="filter-field">
         <label>Branch</label>
-        <app-master-dropdown 
-          endpoint="branches" 
-          formControlName="branchId" 
-          (onSelect)="applyFilters()" 
+        <app-master-dropdown endpoint="branches" formControlName="branchId" (onSelect)="applyFilters()"
           placeholder="All Branches">
         </app-master-dropdown>
       </div>
@@ -53,10 +50,7 @@
       </div>
       <div class="filter-field">
         <label>Account</label>
-        <app-master-dropdown 
-          endpoint="accounts" 
-          formControlName="accountId" 
-          (onSelect)="applyFilters()" 
+        <app-master-dropdown endpoint="accounts" formControlName="accountId" (onSelect)="applyFilters()"
           placeholder="Select Account">
         </app-master-dropdown>
       </div>
@@ -72,10 +66,7 @@
       @if (currentTab() === 'customer') {
       <div class="filter-field" style="flex: 2">
         <label>Customer</label>
-        <app-master-dropdown 
-          endpoint="customers" 
-          formControlName="customerId" 
-          (onSelect)="applyFilters()" 
+        <app-master-dropdown endpoint="customers" formControlName="customerId" (onSelect)="applyFilters()"
           placeholder="Select Customer">
         </app-master-dropdown>
       </div>
@@ -83,10 +74,7 @@
       @if (currentTab() === 'supplier') {
       <div class="filter-field" style="flex: 2">
         <label>Supplier</label>
-        <app-master-dropdown 
-          endpoint="suppliers" 
-          formControlName="supplierId" 
-          (onSelect)="applyFilters()" 
+        <app-master-dropdown endpoint="suppliers" formControlName="supplierId" (onSelect)="applyFilters()"
           placeholder="Select Supplier">
         </app-master-dropdown>
       </div>
@@ -350,8 +338,9 @@
 </div>
 
 <!-- Export Dialog -->
-<p-dialog appendTo="body" header="Export Financial Data" [(visible)]="showExportDialog" [modal]="true"
-  [style]="{width: '500px'}" styleClass="standard-dialog" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
+<p-dialog [modal]="true" appendTo="body" header="Export Financial Data" [(visible)]="showExportDialog" [modal]="true"
+  [style]="{width: '500px'}" styleClass="standard-dialog" [blockScroll]="true"
+  [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
 
   <div [formGroup]="exportForm" class="flex flex-col gap-4 py-3">
     <div class="flex flex-col gap-3">

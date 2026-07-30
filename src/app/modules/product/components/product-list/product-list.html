@@ -65,10 +65,8 @@
 
       <div class="filter-field">
         <label for="subcategory">Sub-Category</label>
-        <app-master-dropdown endpoint="subcategories"
-          [extraParams]="{ parentId: productFilter().categoryId }"
-          [ngModel]="productFilter().subCategoryId"
-          (ngModelChange)="patchProductFilter('subCategoryId', $event)"
+        <app-master-dropdown endpoint="subcategories" [extraParams]="{ parentId: productFilter().categoryId }"
+          [ngModel]="productFilter().subCategoryId" (ngModelChange)="patchProductFilter('subCategoryId', $event)"
           placeholder="Select Sub-Category">
         </app-master-dropdown>
       </div>
@@ -82,19 +80,12 @@
 
       <div class="filter-field">
         <label for="status">Status</label>
-        <p-select
-          appendTo="body"
-          id="status"
-          [options]="[
+        <p-select appendTo="body" id="status" [options]="[
             { label: 'All', value: null },
             { label: 'Active', value: true },
             { label: 'Inactive', value: false }
-          ]"
-          [ngModel]="productFilter().isActive"
-          (ngModelChange)="patchProductFilter('isActive', $event)"
-          [showClear]="false"
-          placeholder="All"
-          styleClass="w-full">
+          ]" [ngModel]="productFilter().isActive" (ngModelChange)="patchProductFilter('isActive', $event)"
+          [showClear]="false" placeholder="All" styleClass="w-full">
         </p-select>
       </div>
 
@@ -114,12 +105,14 @@
   </div>
 </div>
 
-<p-dialog appendTo="body" [visible]="bulkDialogVisible()" (visibleChange)="bulkDialogVisible.set($event)" [modal]="true"
-  header="Bulk Product Editor" styleClass="bulk-dialog p-dialog-full" [draggable]="false" [resizable]="false"
-  [maximizable]="true" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
+<p-dialog [modal]="true" appendTo="body" [visible]="bulkDialogVisible()" (visibleChange)="bulkDialogVisible.set($event)"
+  [modal]="true" header="Bulk Product Editor" styleClass="bulk-dialog p-dialog-full" [draggable]="false"
+  [resizable]="false" [maximizable]="true" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}"
+  [dismissableMask]="true">
 
   <app-bulk-product-entry [selectedData]="selectedRows()"></app-bulk-product-entry>
 
 </p-dialog>
 
-<p-confirmDialog [style]="{width: '450px'}" appendTo="body" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}"></p-confirmDialog>
+<p-confirmDialog [style]="{width: '450px'}" appendTo="body"
+  [breakpoints]="{'1199px': '75vw', '575px': '90vw'}"></p-confirmDialog>

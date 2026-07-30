@@ -244,7 +244,7 @@ import { error } from 'console';
 
     </div>
 
-    <p-dialog 
+    <p-dialog [modal]="true" 
       header="Assign to Shift Group" 
       [(visible)]="displayAssignDialog" 
       [modal]="true" 
@@ -753,7 +753,7 @@ export class ShiftGroupAssignmentsComponent implements OnInit, OnDestroy {
 
 //     </div>
 
-//     <p-dialog 
+//     <p-dialog [modal]="true" 
 //       header="Assign to Shift Group" 
 //       [(visible)]="displayAssignDialog" 
 //       [modal]="true" 

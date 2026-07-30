@@ -189,7 +189,7 @@ import { AppMessageService } from '@core/services/message.service';
       </main>
     </div>
     
-    <p-dialog header="Clone Holiday Calendar" [(visible)]="displayCopyDialog" [modal]="true" [style]="{width: '400px'}" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
+    <p-dialog [modal]="true" header="Clone Holiday Calendar" [(visible)]="displayCopyDialog" [modal]="true" [style]="{width: '400px'}" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
       <p class="text-sm text-secondary mb-4">Quickly populate the new year by copying existing holidays. You can edit specific dates after cloning.</p>
     
       <div class="flex-col gap-4">
@@ -326,7 +326,7 @@ import { AppMessageService } from '@core/services/message.service';
   `]
 })
 export class HolidayHubComponent implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
   private confirmationService = inject(ConfirmationService);
@@ -437,8 +437,8 @@ export class HolidayHubComponent implements OnInit, OnDestroy {
     }
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

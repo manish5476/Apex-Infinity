@@ -13,9 +13,9 @@
         <h2 class="page-title">
           Announcements
           @if (totalUnread() > 0) {
-            <span class="unread-pill">
-              {{ totalUnread() }} unread
-            </span>
+          <span class="unread-pill">
+            {{ totalUnread() }} unread
+          </span>
           }
         </h2>
         <p class="page-subtitle">Broadcast messages to staff, customers, or everyone</p>
@@ -30,42 +30,42 @@
 
   <!-- ─────────── STATS STRIP ─────────── -->
   @if (stats()) {
-    <div class="stats-strip">
-      <div class="stat-card">
-        <div class="stat-icon stat-icon--primary"><i class="pi pi-megaphone"></i></div>
-        <div class="stat-body">
-          <span class="stat-label">Total</span>
-          <span class="stat-value">{{ stats().total }}</span>
-        </div>
+  <div class="stats-strip">
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--primary"><i class="pi pi-megaphone"></i></div>
+      <div class="stat-body">
+        <span class="stat-label">Total</span>
+        <span class="stat-value">{{ stats().total }}</span>
       </div>
-      <div class="stat-card" [class.stat-card--alert]="totalUnread() > 0">
-        <div class="stat-icon stat-icon--warn"><i class="pi pi-envelope"></i></div>
-        <div class="stat-body">
-          <span class="stat-label">Unread</span>
-          <span class="stat-value">{{ totalUnread() }}</span>
-        </div>
-      </div>
-      <!-- Audience breakdown -->
-      @if (stats().byAudience?.length) {
-        <div class="stat-card stat-card--wide">
-          <div class="stat-icon stat-icon--info"><i class="pi pi-users"></i></div>
-          <div class="stat-body">
-            <span class="stat-label">By Audience</span>
-            <div class="audience-chips">
-              @for (a of stats().byAudience; track a) {
-                <span class="aud-chip">
-                  <span class="aud-chip__name" style="text-transform:capitalize">{{ a.audience }}</span>
-                  <span class="aud-chip__count">{{ a.count }}</span>
-                  @if (a.unread > 0) {
-                    <span class="aud-chip__unread">{{ a.unread }} unread</span>
-                  }
-                </span>
-              }
-            </div>
-          </div>
-        </div>
-      }
     </div>
+    <div class="stat-card" [class.stat-card--alert]="totalUnread() > 0">
+      <div class="stat-icon stat-icon--warn"><i class="pi pi-envelope"></i></div>
+      <div class="stat-body">
+        <span class="stat-label">Unread</span>
+        <span class="stat-value">{{ totalUnread() }}</span>
+      </div>
+    </div>
+    <!-- Audience breakdown -->
+    @if (stats().byAudience?.length) {
+    <div class="stat-card stat-card--wide">
+      <div class="stat-icon stat-icon--info"><i class="pi pi-users"></i></div>
+      <div class="stat-body">
+        <span class="stat-label">By Audience</span>
+        <div class="audience-chips">
+          @for (a of stats().byAudience; track a) {
+          <span class="aud-chip">
+            <span class="aud-chip__name" style="text-transform:capitalize">{{ a.audience }}</span>
+            <span class="aud-chip__count">{{ a.count }}</span>
+            @if (a.unread > 0) {
+            <span class="aud-chip__unread">{{ a.unread }} unread</span>
+            }
+          </span>
+          }
+        </div>
+      </div>
+    </div>
+    }
+  </div>
   }
 
   <!-- ─────────── FILTER BAR ─────────── -->
@@ -115,9 +115,10 @@
 <!-- ═══════════════════════════════════════════════════════
 CREATE / EDIT DIALOG
 ═══════════════════════════════════════════════════════ -->
-<p-dialog [(visible)]="dialogOpen" [modal]="true" [draggable]="false" [resizable]="false"
+<p-dialog [modal]="true" [(visible)]="dialogOpen" [modal]="true" [draggable]="false" [resizable]="false"
   [style]="{ width: '580px', maxWidth: '95vw' }" styleClass="announce-dialog" [header]="dialogTitle"
-  (onHide)="closeDialog()" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
+  (onHide)="closeDialog()" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}"
+  [dismissableMask]="true">
 
   <div class="dialog-body">
 
@@ -158,11 +159,10 @@ CREATE / EDIT DIALOG
       <label class="form-label">Priority</label>
       <div class="priority-picker">
         @for (opt of priorityOptions; track opt) {
-          <button class="priority-btn"
-            [class.priority-btn--active]="form.priority === opt.value" [attr.data-priority]="opt.value" type="button"
-            (click)="form.priority = opt.value">
-            {{ opt.label }}
-          </button>
+        <button class="priority-btn" [class.priority-btn--active]="form.priority === opt.value"
+          [attr.data-priority]="opt.value" type="button" (click)="form.priority = opt.value">
+          {{ opt.label }}
+        </button>
         }
       </div>
     </div>
@@ -186,30 +186,30 @@ CREATE / EDIT DIALOG
       </div>
 
       @if (dialogMode() === 'edit') {
-        <div class="toggle-row">
-          <div class="toggle-info">
-            <span class="toggle-label">✅ Active</span>
-            <span class="toggle-sub">Visible to recipients</span>
-          </div>
-          <p-toggleSwitch [(ngModel)]="form.isActive"></p-toggleSwitch>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <span class="toggle-label">✅ Active</span>
+          <span class="toggle-sub">Visible to recipients</span>
         </div>
+        <p-toggleSwitch [(ngModel)]="form.isActive"></p-toggleSwitch>
+      </div>
       }
     </div>
 
     <!-- Type Preview Badge -->
     @if (form.type) {
-      <div class="type-preview">
-        <span class="type-preview__label">Preview badge:</span>
-        <span class="type-badge" [attr.data-type]="form.type">
-          {{ form.type | titlecase }}
-        </span>
-        @if (form.isUrgent) {
-          <span class="urgency-badge">URGENT</span>
-        }
-        @if (form.isPinned) {
-          <span class="pin-badge">📌 Pinned</span>
-        }
-      </div>
+    <div class="type-preview">
+      <span class="type-preview__label">Preview badge:</span>
+      <span class="type-badge" [attr.data-type]="form.type">
+        {{ form.type | titlecase }}
+      </span>
+      @if (form.isUrgent) {
+      <span class="urgency-badge">URGENT</span>
+      }
+      @if (form.isPinned) {
+      <span class="pin-badge">📌 Pinned</span>
+      }
+    </div>
     }
 
   </div>

@@ -180,8 +180,10 @@
     </div>
 
     <!-- ========== BULK IMPORT DIALOG ========== -->
-    <p-dialog header="Bulk Import Records" [(visible)]="isBulkDialogVisible" [modal]="true"
-        [style]="{ width: '85vw', maxWidth: '1200px' }" [draggable]="false" [resizable]="false" [maximizable]="true" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
+    <p-dialog [modal]="true" header="Bulk Import Records" [(visible)]="isBulkDialogVisible" [modal]="true"
+        [style]="{ width: '85vw', maxWidth: '1200px' }" [draggable]="false" [resizable]="false" [maximizable]="true"
+        appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}"
+        [dismissableMask]="true">
 
         <div class="bulk-import-content">
             <!-- Instruction Card -->

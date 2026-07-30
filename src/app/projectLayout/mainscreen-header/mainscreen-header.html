@@ -41,10 +41,11 @@
       <i class="pi pi-megaphone"></i>
     </button>
 
-    <p-dialog header="Organization Announcements" [visible]="announcementDialogVisible()"
+    <p-dialog [modal]="true" header="Organization Announcements" [visible]="announcementDialogVisible()"
       (visibleChange)="announcementDialogVisible.set($event)" [modal]="true"
       [style]="{width: '90vw', maxWidth: '1200px'}" [draggable]="false" [resizable]="false" appendTo="body"
-      styleClass="apex-announcement-dialog" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
+      styleClass="apex-announcement-dialog" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}"
+      [dismissableMask]="true">
       <app-announcement-list></app-announcement-list>
     </p-dialog>
 

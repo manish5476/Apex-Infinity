@@ -1,5 +1,6 @@
 <p-toast></p-toast>
-<p-confirmDialog [style]="{width: '450px'}" appendTo="body" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}"></p-confirmDialog>
+<p-confirmDialog [style]="{width: '450px'}" appendTo="body"
+  [breakpoints]="{'1199px': '75vw', '575px': '90vw'}"></p-confirmDialog>
 
 <div class="page-container animate-fadeIn">
 
@@ -231,7 +232,9 @@
   }
 </div>
 
-<p-dialog appendTo="body" [(visible)]="showPasswordDialog" [modal]="true" header="Force Password Reset" [style]="{width: '500px', maxWidth: '95vw'}" [draggable]="false" [resizable]="false" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
+<p-dialog [modal]="true" appendTo="body" [(visible)]="showPasswordDialog" [modal]="true" header="Force Password Reset"
+  [style]="{width: '500px', maxWidth: '95vw'}" [draggable]="false" [resizable]="false" [blockScroll]="true"
+  [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
 
   <ng-template pTemplate="header">
     <div class="flex align-center gap-3">

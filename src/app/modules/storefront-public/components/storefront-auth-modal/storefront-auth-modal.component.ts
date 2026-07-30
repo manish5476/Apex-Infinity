@@ -47,7 +47,7 @@ const slideRight = [
     ])
   ],
   template: `
-<p-dialog
+<p-dialog [modal]="true"
   [visible]="visible()"
   (visibleChange)="visibleChange.emit($event)"
   [modal]="true"
@@ -647,7 +647,7 @@ export class StorefrontAuthModalComponent {
 //     ])
 //   ],
 //   template: `
-// <p-dialog
+// <p-dialog [modal]="true"
 //   [visible]="visible()"
 //   (visibleChange)="visibleChange.emit($event)"
 //   [modal]="true"

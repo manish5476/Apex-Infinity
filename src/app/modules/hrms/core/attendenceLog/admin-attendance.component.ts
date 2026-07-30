@@ -132,7 +132,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
     </div>
 
     <!-- Flag Dialog -->
-    <p-dialog header="Flag Attendance Log" [(visible)]="displayFlagDialog" [modal]="true" [style]="{width: '450px'}" [draggable]="false" styleClass="crextio-dialog" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
+    <p-dialog [modal]="true" header="Flag Attendance Log" [(visible)]="displayFlagDialog" [modal]="true" [style]="{width: '450px'}" [draggable]="false" styleClass="crextio-dialog" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
       <p class="text-sm text-secondary mb-4">Marking this log as flagged will suspend it from payroll processing until manually reviewed.</p>
       
       <div class="input-group">
@@ -149,7 +149,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
     </p-dialog>
 
     <!-- Correct Dialog -->
-    <p-dialog header="Correct Attendance Log" [(visible)]="displayCorrectDialog" [modal]="true" [style]="{width: '450px'}" [draggable]="false" styleClass="crextio-dialog" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
+    <p-dialog [modal]="true" header="Correct Attendance Log" [(visible)]="displayCorrectDialog" [modal]="true" [style]="{width: '450px'}" [draggable]="false" styleClass="crextio-dialog" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
       <p class="text-sm text-secondary mb-4">Create a verified correction entry. The original raw log will be preserved for auditing purposes.</p>
       
       <form [formGroup]="correctForm" class="flex-col gap-4">
@@ -486,7 +486,7 @@ export class AdminAttendanceComponent implements OnInit, OnDestroy {
   columns: any[] = [];
 
   isProcessing = signal<boolean>(false);
-  
+
   displayFlagDialog = false;
   selectedLogForFlag: any = null;
   flagReason: string = '';
@@ -507,7 +507,7 @@ export class AdminAttendanceComponent implements OnInit, OnDestroy {
       type: [null, Validators.required],
       reason: ['', Validators.required]
     });
-    
+
     this.setupGridColumns();
     this.loadData();
   }
@@ -525,7 +525,7 @@ export class AdminAttendanceComponent implements OnInit, OnDestroy {
           const name = user.name || 'Unknown';
           const code = user.employeeProfile?.employeeId || user._id?.substring(0, 8) || 'N/A';
           const initials = this.getInitials(name);
-          
+
           return `
             <div style="display:flex; align-items:center; gap:12px; height:100%;">
               <div class="user-avatar">${initials}</div>
@@ -544,7 +544,7 @@ export class AdminAttendanceComponent implements OnInit, OnDestroy {
           const type = params.data?.type;
           const time = params.data?.timestamp ? this.datePipe.transform(params.data.timestamp, 'HH:mm:ss') : '--:--:--';
           const date = params.data?.timestamp ? this.datePipe.transform(params.data.timestamp, 'dd MMM yyyy') : '--';
-          
+
           const icon = this.getTypeIcon(type);
           const colorClass = this.getTypeColorClass(type);
           const typeStr = this.formatType(type);
@@ -566,7 +566,7 @@ export class AdminAttendanceComponent implements OnInit, OnDestroy {
           const address = params.data?.location?.address || 'Geo-Logged';
           const ip = params.data?.ipAddress;
           const hasGeo = !!params.data?.location?.geoJson?.coordinates;
-          
+
           let html = `<div style="display:flex; flex-direction:column; justify-content:center; height:100%; gap:4px; font-size:12px; color:var(--c-text-muted);">`;
           html += `<span style="text-transform:capitalize; display:flex; align-items:center; gap:6px; color:var(--c-text-main); font-weight:500;"><i class="pi pi-desktop"></i> ${source} <span style="font-family:var(--font-mono); font-size:10px; color:var(--c-text-light); font-weight:normal;">(${ip || 'N/A'})</span></span>`;
           if (hasGeo) {
@@ -602,9 +602,9 @@ export class AdminAttendanceComponent implements OnInit, OnDestroy {
         pinned: 'right',
         cellRenderer: (params: any) => {
           const status = params.data?.processingStatus;
-          
+
           let html = `<div style="display:flex; gap:8px; align-items:center; height:100%;">`;
-          
+
           if (status !== 'processed' && status !== 'rejected') {
             html += `<button class="action-btn verify-btn" data-action="verify" title="Verify Log"><i class="pi pi-check"></i></button>`;
           }
@@ -612,20 +612,20 @@ export class AdminAttendanceComponent implements OnInit, OnDestroy {
             html += `<button class="action-btn flag-btn" data-action="flag" title="Flag Anomaly"><i class="pi pi-flag"></i></button>`;
           }
           html += `<button class="action-btn" data-action="edit" title="Correct Log"><i class="pi pi-pencil"></i></button>`;
-          
+
           html += `</div>`;
           return html;
         }
       }
     ];
   }
-loadData() {
+  loadData() {
     this.isLoading.set(true);
 
     forkJoin({
       logsData: this.hrmsService.getAttendanceLogs().pipe(
         // Cast the fallback to 'any' to satisfy the TypeScript compiler
-        catchError(() => of({ data: [] } as any)) 
+        catchError(() => of({ data: [] } as any))
       ),
       statsData: this.hrmsService.getLogStats().pipe(
         catchError(() => of({ data: { total: [], byStatus: [], byType: [] } } as any))
@@ -633,18 +633,18 @@ loadData() {
     }).pipe(
       finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
     ).subscribe(({ logsData, statsData }) => {
-      
+
       // 1. Safely parse logs using 'any' to bypass strict type definition conflicts
       const resLogs = logsData as any;
       const extractedLogs = resLogs?.data?.data || resLogs?.data?.logs || resLogs?.logs || resLogs?.data || [];
       this.logs.set(Array.isArray(extractedLogs) ? extractedLogs : []);
-      
+
       // 2. Parse accurate stats from provided JSON format
       const st = (statsData as any)?.data || {};
       const presentCount = st.total?.[0]?.uniqueUsers || 0;
       const flaggedCount = st.byStatus?.find((s: any) => s._id === 'flagged')?.count || 0;
       const remoteCount = st.byType?.find((s: any) => s._id === 'remote_in')?.count || 0;
-      
+
       this.stats.set({ presentCount, flaggedCount, remoteCount });
     });
   }
@@ -660,7 +660,7 @@ loadData() {
       const nativeEvent = event.event as MouseEvent;
       const target = nativeEvent.target as HTMLElement;
       const btn = target.closest('.action-btn');
-      
+
       if (btn) {
         const action = btn.getAttribute('data-action');
         if (action === 'verify') this.onVerify(event.data);
@@ -677,7 +677,7 @@ loadData() {
       icon: 'pi pi-check-circle',
       accept: () => {
         this.hrmsService.verifyLog(log._id).pipe(takeUntil(this.destroy$)).subscribe({
-          next: (res:any) => {
+          next: (res: any) => {
             this.messageService.showSuccess(res.message || 'Log Verified');
             this.loadData();
           },
@@ -703,7 +703,7 @@ loadData() {
         this.displayFlagDialog = false;
       }), takeUntil(this.destroy$)
     ).subscribe({
-      next: (res:any) => {
+      next: (res: any) => {
         this.messageService.showSuccess(res.message || 'Log Flagged');
         this.loadData();
       },
@@ -733,7 +733,7 @@ loadData() {
         this.displayCorrectDialog = false;
       }), takeUntil(this.destroy$)
     ).subscribe({
-      next: (res:any) => {
+      next: (res: any) => {
         this.messageService.showSuccess(res.message || 'Correction Applied');
         this.loadData();
       },

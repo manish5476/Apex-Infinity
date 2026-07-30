@@ -310,7 +310,7 @@ import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
       }
     </div>
 
-    <p-dialog appendTo="body" header="Record Payment" [(visible)]="showPaymentModal" [modal]="true"
+    <p-dialog [modal]="true" appendTo="body" header="Record Payment" [(visible)]="showPaymentModal" [modal]="true"
       [style]="{width: '400px'}" [draggable]="false" [resizable]="false" styleClass="modern-dialog" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
       <form [formGroup]="paymentForm" class="dialog-form">
         <div class="form-group">
@@ -339,7 +339,7 @@ import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
       </ng-template>
     </p-dialog>
 
-    <p-dialog appendTo="body" header="Cancel Invoice" [(visible)]="showCancelModal" [modal]="true"
+    <p-dialog [modal]="true" appendTo="body" header="Cancel Invoice" [(visible)]="showCancelModal" [modal]="true"
       [style]="{width: '450px'}" [draggable]="false" [resizable]="false" styleClass="modern-dialog" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
       <form [formGroup]="cancelForm" class="dialog-form">
         <div class="warning-banner">

@@ -152,7 +152,7 @@ import { AppMessageService } from '@core/services/message.service';
       }
     </div>
     
-    <p-dialog [header]="actionDialog.title" [(visible)]="displayActionDialog" [modal]="true" [style]="{width: '400px'}" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
+    <p-dialog [modal]="true" [header]="actionDialog.title" [(visible)]="displayActionDialog" [modal]="true" [style]="{width: '400px'}" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
       <form [formGroup]="actionForm" class="flex-col gap-4 mt-2">
     
         <p class="m-0 text-secondary text-sm">{{ actionDialog.message }}</p>
@@ -273,7 +273,7 @@ import { AppMessageService } from '@core/services/message.service';
   `]
 })
 export class LeaveDetailsComponent implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
   private confirmationService = inject(ConfirmationService);
@@ -429,8 +429,8 @@ export class LeaveDetailsComponent implements OnInit, OnDestroy {
 
   onBack() { this.router.navigate(['/leave']); }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

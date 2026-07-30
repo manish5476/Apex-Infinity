@@ -138,9 +138,8 @@ icon="pi pi-pencil"
     
         </div>
       </div>
-    
-      <!-- BULK ENTRY DIALOG (Import) -->
-      <p-dialog header="Bulk Import" [(visible)]="isBulkDialogVisible" [modal]="true"
+    w
+      <p-dialog [modal]="true" header="Bulk Import" [(visible)]="isBulkDialogVisible" [modal]="true"
         [style]="{ width: '95vw', height: '90vh' }" [draggable]="false" [resizable]="false"
         [maximizable]="true" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
     

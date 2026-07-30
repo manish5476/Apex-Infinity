@@ -18,121 +18,112 @@
           <i class="pi pi-search"></i>
           <input type="text" pInputText [ngModel]="filterName()" (ngModelChange)="filterName.set($event)"
             (keydown.enter)="applyFilters()" placeholder="Search by role name..." class="w-full" />
-          </span>
-        </div>
-        <div class="se-filter-actions">
-          <p-button label="Apply" icon="pi pi-check" (click)="applyFilters()"></p-button>
-          <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined" (click)="resetFilters()"></p-button>
-        </div>
+        </span>
       </div>
-    </div>
-
-    <div class="themed-card list-grid-area">
-      <app-ag-share-grid [columns]="columns" [data]="filteredRoles()" selectionMode="multiple"
-        (gridEvent)="eventFromGrid($event)" style="height: 100%; width: 100%; display: block;">
-      </app-ag-share-grid>
+      <div class="se-filter-actions">
+        <p-button label="Apply" icon="pi pi-check" (click)="applyFilters()"></p-button>
+        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined" (click)="resetFilters()"></p-button>
+      </div>
     </div>
   </div>
 
-  <!-- IMPROVED ROLE DIALOG -->
-  <p-dialog
-    appendTo="body"
-    [visible]="showRoleDialog()"
-    (visibleChange)="showRoleDialog.set($event)"
-    [modal]="true"
-    [style]="{width: '80vw', height: '90vh', 'max-width': '1200px'}"
-      [contentStyle]="{
+  <div class="themed-card list-grid-area">
+    <app-ag-share-grid [columns]="columns" [data]="filteredRoles()" selectionMode="multiple"
+      (gridEvent)="eventFromGrid($event)" style="height: 100%; width: 100%; display: block;">
+    </app-ag-share-grid>
+  </div>
+</div>
+
+<!-- IMPROVED ROLE DIALOG -->
+<p-dialog [modal]="true" appendTo="body" [visible]="showRoleDialog()" (visibleChange)="showRoleDialog.set($event)"
+  [modal]="true" [style]="{width: '80vw', height: '90vh', 'max-width': '1200px'}" [contentStyle]="{
         'display': 'flex', 
         'flex-direction': 'column', 
         'height': '100%', 
         'overflow': 'hidden',
         'padding': '0'
-      }"
-    [header]="isEditMode() ? 'Edit Role Configuration' : 'Create New Role'"
-    (onHide)="hideDialog()"
-    [draggable]="false"
-    [resizable]="false"
-    styleClass="role-dialog" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
+      }" [header]="isEditMode() ? 'Edit Role Configuration' : 'Create New Role'" (onHide)="hideDialog()"
+  [draggable]="false" [resizable]="false" styleClass="role-dialog" [blockScroll]="true"
+  [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
 
-    <div class="dialog-content-wrapper flex flex-col h-full overflow-hidden">
+  <div class="dialog-content-wrapper flex flex-col h-full overflow-hidden">
 
-      <!-- Role Name Input (Sticky at top of dialog body) -->
-      <div class="p-4 border-b border-[var(--border-primary)] bg-white shrink-0">
-        <div class="form-field w-full">
-          <label for="roleName" class="text-xs font-bold uppercase text-[var(--text-secondary)] mb-1 block">Role Name <span class="text-red-500">*</span></label>
-          <input id="roleName" type="text" pInputText [ngModel]="currentRole().name"
-            (ngModelChange)="patchCurrentRole({ name: $event })" placeholder="e.g. Sales Manager, Warehouse Staff" class="w-full p-inputtext-lg" />
-          </div>
-        </div>
-
-        <!-- Scrollable Permission Matrix -->
-        <div class="permissions-selection-area flex-1 overflow-y-auto p-4 bg-[var(--bg-primary)] min-h-0">
-          @if (groupedPermissions().length === 0) {
-            <div class="empty-state">
-              <i class="pi pi-spin pi-spinner text-3xl mb-2 text-[var(--text-secondary)]"></i>
-              <p>Loading permissions...</p>
-            </div>
-          } @else {
-            <div class="flex flex-col gap-6">
-              @for (group of groupedPermissions(); track group.name) {
-                <div class="perm-category-section">
-
-                  <!-- Group Header -->
-                  <div class="category-header sticky top-0 z-10 bg-white">
-                    <div class="flex items-center gap-2 text-[var(--text-primary)] font-semibold">
-                      <i class="pi pi-folder-open text-[var(--accent-primary)]"></i>
-                      <span>{{ group.name }}</span>
-                      <span class="count-badge">{{ getGroupSelectionCount(group.name) }} / {{ group.items.length }}</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                      <p-checkbox [binary]="true"
-                        [ngModel]="isGroupSelected(group.name)"
-                        (onChange)="toggleGroup(group, $event)"
-                      label="Select Group"></p-checkbox>
-                    </div>
-                  </div>
-
-                  <!-- Permission Cards Grid -->
-                  <div class="category-grid">
-                    @for (item of group.items; track item.tag) {
-                      <div class="perm-toggle-card"
-                        [class.selected]="selectedPermissions().includes(item.tag)"
-                        (click)="togglePermission(item.tag)">
-
-                        <div class="checkbox-indicator">
-                          @if (selectedPermissions().includes(item.tag)) {
-                            <i class="pi pi-check"></i>
-                          }
-                        </div>
-
-                        <div class="perm-details">
-                          <span class="perm-desc">{{ item.description }}</span>
-                          <span class="perm-tag">{{ item.tag }}</span>
-                        </div>
-                      </div>
-                    }
-                  </div>
-
-                </div>
-              }
-            </div>
-          }
-        </div>
+    <!-- Role Name Input (Sticky at top of dialog body) -->
+    <div class="p-4 border-b border-[var(--border-primary)] bg-white shrink-0">
+      <div class="form-field w-full">
+        <label for="roleName" class="text-xs font-bold uppercase text-[var(--text-secondary)] mb-1 block">Role Name
+          <span class="text-red-500">*</span></label>
+        <input id="roleName" type="text" pInputText [ngModel]="currentRole().name"
+          (ngModelChange)="patchCurrentRole({ name: $event })" placeholder="e.g. Sales Manager, Warehouse Staff"
+          class="w-full p-inputtext-lg" />
       </div>
+    </div>
 
-      <ng-template pTemplate="footer">
-        <div class="dialog-footer flex justify-between items-center w-full pt-2 border-t border-[var(--border-primary)]">
-          <div class="summary-text text-xs text-[var(--text-secondary)]">
-            @if (selectedPermissions().length > 0) {
-              <strong class="text-[var(--text-primary)]">{{ selectedPermissions().length }}</strong> permissions assigned
-            } @else {
-              No permissions assigned yet.
+    <!-- Scrollable Permission Matrix -->
+    <div class="permissions-selection-area flex-1 overflow-y-auto p-4 bg-[var(--bg-primary)] min-h-0">
+      @if (groupedPermissions().length === 0) {
+      <div class="empty-state">
+        <i class="pi pi-spin pi-spinner text-3xl mb-2 text-[var(--text-secondary)]"></i>
+        <p>Loading permissions...</p>
+      </div>
+      } @else {
+      <div class="flex flex-col gap-6">
+        @for (group of groupedPermissions(); track group.name) {
+        <div class="perm-category-section">
+
+          <!-- Group Header -->
+          <div class="category-header sticky top-0 z-10 bg-white">
+            <div class="flex items-center gap-2 text-[var(--text-primary)] font-semibold">
+              <i class="pi pi-folder-open text-[var(--accent-primary)]"></i>
+              <span>{{ group.name }}</span>
+              <span class="count-badge">{{ getGroupSelectionCount(group.name) }} / {{ group.items.length }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <p-checkbox [binary]="true" [ngModel]="isGroupSelected(group.name)"
+                (onChange)="toggleGroup(group, $event)" label="Select Group"></p-checkbox>
+            </div>
+          </div>
+
+          <!-- Permission Cards Grid -->
+          <div class="category-grid">
+            @for (item of group.items; track item.tag) {
+            <div class="perm-toggle-card" [class.selected]="selectedPermissions().includes(item.tag)"
+              (click)="togglePermission(item.tag)">
+
+              <div class="checkbox-indicator">
+                @if (selectedPermissions().includes(item.tag)) {
+                <i class="pi pi-check"></i>
+                }
+              </div>
+
+              <div class="perm-details">
+                <span class="perm-desc">{{ item.description }}</span>
+                <span class="perm-tag">{{ item.tag }}</span>
+              </div>
+            </div>
             }
           </div>
-          <div class="footer-actions flex gap-2">
-            <p-button label="Cancel" icon="pi pi-times" styleClass="p-button-text" (click)="hideDialog()"></p-button>
-            <p-button label="Save Role" icon="pi pi-save" (click)="saveRole()" [loading]="isSaving()"></p-button>
-          </div>
+
         </div>
-      </ng-template>
-    </p-dialog>
+        }
+      </div>
+      }
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer flex justify-between items-center w-full pt-2 border-t border-[var(--border-primary)]">
+      <div class="summary-text text-xs text-[var(--text-secondary)]">
+        @if (selectedPermissions().length > 0) {
+        <strong class="text-[var(--text-primary)]">{{ selectedPermissions().length }}</strong> permissions assigned
+        } @else {
+        No permissions assigned yet.
+        }
+      </div>
+      <div class="footer-actions flex gap-2">
+        <p-button label="Cancel" icon="pi pi-times" styleClass="p-button-text" (click)="hideDialog()"></p-button>
+        <p-button label="Save Role" icon="pi pi-save" (click)="saveRole()" [loading]="isSaving()"></p-button>
+      </div>
+    </div>
+  </ng-template>
+</p-dialog>

@@ -159,7 +159,7 @@ type TagSeverity = "success" | "secondary" | "info" | "warn" | "danger" | "contr
       </article>
     }
 
-    <p-dialog appendTo="body" [visible]="showModal()" (visibleChange)="showModal.set($event)" [modal]="true"
+    <p-dialog [modal]="true" appendTo="body" [visible]="showModal()" (visibleChange)="showModal.set($event)" [modal]="true"
       [dismissableMask]="true" [showHeader]="false" styleClass="pc-dialog"
       [style]="{ width: '92vw', maxWidth: '1040px', padding: '0', borderRadius: '28px', overflow: 'hidden' }" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}">
 
@@ -416,7 +416,7 @@ export class ProductCardComponent {
   readonly normalizedDesign = computed(() => normalizeDesign(this.config()));
 
   // --- Dynamic Style Methods ---
-  
+
   cardStyle() {
     const base: any = {};
     const design = this.normalizedDesign();
@@ -435,7 +435,7 @@ export class ProductCardComponent {
   imageShellStyle(direction: 'top' | 'left' = 'top') {
     if (!this.normalizedDesign().borderRadius || this.normalizedDesign().borderRadius === 'none') return {};
     const radius = `var(--ui-border-radius-${this.normalizedDesign().borderRadius})`;
-    
+
     // We inherit the card's border radius based on grid vs list layout
     if (direction === 'top') {
       return { 'border-top-left-radius': radius, 'border-top-right-radius': radius, 'border-bottom-left-radius': '0', 'border-bottom-right-radius': '0' };

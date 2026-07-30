@@ -204,7 +204,7 @@ import { takeUntil } from "rxjs/operators";
       }
     </div>
     
-    <p-dialog header="New API Key Generated" [(visible)]="displayKeyModal" [modal]="true" [closable]="false" [style]="{width: '450px'}" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
+    <p-dialog [modal]="true" header="New API Key Generated" [(visible)]="displayKeyModal" [modal]="true" [closable]="false" [style]="{width: '450px'}" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
       <div class="text-center mb-4">
         <i class="pi pi-exclamation-triangle text-warning text-5xl mb-3"></i>
         <h3 class="m-0 font-heading">Security Key Rotated</h3>

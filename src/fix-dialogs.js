@@ -25,8 +25,8 @@ for (const file of files) {
     let content = fs.readFileSync(file, 'utf8');
     let original = content;
 
-    // Fix <p-dialog>
-    content = content.replace(/<p-dialog([^>]*?)>/g, (match, attrs) => {
+    // Fix <p-dialog [modal]="true">
+    content = content.replace(/<p-dialog [modal]="true"([^>]*?)>/g, (match, attrs) => {
         let newAttrs = attrs;
         if (!newAttrs.includes('appendTo=')) newAttrs += ' appendTo="body"';
         if (!newAttrs.includes('[blockScroll]=')) newAttrs += ' [blockScroll]="true"';
@@ -34,7 +34,7 @@ for (const file of files) {
         // Keep dismissableMask if present, add if not
         if (!newAttrs.includes('dismissableMask')) newAttrs += ' [dismissableMask]="true"';
         newAttrs = newAttrs.replace(/\s*styleClass="(premium-dialog|glass-dialog-spacious|modern-confirm|glass-confirm-dialog|premium-confirm|modern-confirm)"\s*/g, ' ');
-        return `<p-dialog${newAttrs}>`;
+        return `<p-dialog [modal]="true"${newAttrs}>`;
     });
 
     // Fix <p-confirmDialog>
