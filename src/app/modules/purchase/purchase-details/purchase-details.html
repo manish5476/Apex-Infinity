@@ -1,14 +1,11 @@
 <p-toast position="top-right"></p-toast>
-
 <div class="customer-page-container animate-fadeIn custom-scrollbar">
-
   @if (isLoading()) {
   <div class="loading-state">
     <i class="pi pi-spin pi-spinner text-4xl mb-4"></i>
     <p>Loading Purchase Details...</p>
   </div>
   }
-
   @else if (purchase(); as p) {
   <div class="product-details-card">
     <div class="details-header">
@@ -154,9 +151,7 @@
           </div>
         </div>
       </aside>
-
       <section class="main-details">
-
         <div class="metrics-grid animate-slideInUp" style="animation-delay: 0.1s;">
           <div class="metric-card primary-metric">
             <div class="metric-content">
@@ -220,7 +215,7 @@
               <p-tabpanel value="0">
                 <div class="tab-content-wrapper">
                   <div class="grid-wrapper" style="height: 400px; width: 100%;">
-                    <app-ag-share-grid [columns]="itemColumns" [data]="itemsData()" paginationPageSize="100">
+                    <app-ag-share-grid [columns]="itemColumns" [data]="itemsData()" [paginationPageSize]="100">
                     </app-ag-share-grid>
                   </div>
 

@@ -100,6 +100,9 @@ export interface ActionColumnConfig {
       [columnDefs]="resolvedColumns()"
       [gridOptions]="gridOptions"
       [rowSelection]="selectionOptions"
+      [pagination]="pagination()"
+      [paginationPageSize]="paginationPageSize()"
+      [paginationPageSizeSelector]="[10, 20, 50, 100]"
       (gridReady)="onGridReady($event)"
       (columnResized)="onColumnResized($event)"
       (cellClicked)="onCellClicked($event)"
@@ -128,18 +131,29 @@ export interface ActionColumnConfig {
       flex-direction: column;
       width: 100%;
       height: 100%;
-      background: var(--theme-bg-primary);
-      border: 1px solid var(--theme-border-primary);
-      border-radius: var(--ui-border-radius-lg);
+      background: var(--component-bg, var(--theme-bg-primary));
+      border: 1px solid var(--component-border, var(--theme-border-primary));
+      border-radius: var(--ui-border-radius-xl, 12px);
+      box-shadow: var(--shadow-sm, 0 1px 2px 0 rgba(0, 0, 0, 0.05));
       overflow: hidden;
+      transition: box-shadow 0.3s ease, border-color 0.3s ease;
+
+      /* Added padding for pill effect margin */
+      padding: 0 var(--spacing-md);
+
+      &:hover {
+        box-shadow: var(--shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06));
+        border-color: var(--border-secondary, var(--theme-border-secondary));
+      }
 
       .grid-top-bar {
         display: flex;
         justify-content: flex-end;
         align-items: center;
-        padding: 6px 12px;
-        background: var(--theme-bg-secondary);
-        border-bottom: 1px solid var(--theme-border-primary);
+        padding: 8px 16px;
+        background: transparent;
+        margin: 0 calc(var(--spacing-md) * -1); /* counter-act root padding */
+        border-bottom: 1px dashed var(--component-border, var(--theme-border-primary));
         flex-shrink: 0;
       }
 
@@ -147,6 +161,57 @@ export interface ActionColumnConfig {
         flex: 1;
         width: 100%;
         height: 100% !important;
+      }
+
+      ::ng-deep {
+        /* Remove outer grid borders */
+        .ag-root-wrapper {
+          border: none !important;
+          background: transparent !important;
+        }
+
+        /* Dashed row borders */
+        .ag-row {
+          border-bottom: 1px dashed var(--border-secondary) !important;
+          border-radius: var(--ui-border-radius-pill, 9999px) !important;
+          transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        /* Last row shouldn't have border */
+        .ag-row:last-child {
+          border-bottom: none !important;
+        }
+
+        /* Selected row pill styling */
+        .ag-row-selected {
+          background-color: var(--accent-primary) !important;
+          color: var(--text-on-accent, #ffffff) !important;
+          border-bottom: none !important;
+          box-shadow: 0 4px 12px rgba(0,0,0, 0.08) !important;
+          transform: scale(0.995);
+        }
+
+        /* Hover effect */
+        .ag-row-hover:not(.ag-row-selected) {
+          background-color: var(--component-bg-hover) !important;
+          border-bottom: 1px dashed transparent !important;
+        }
+        
+        /* Remove default header/cell borders */
+        .ag-header {
+          border-bottom: 1px dashed var(--border-secondary) !important;
+          background-color: transparent !important;
+        }
+        
+        .ag-cell {
+          border: none !important;
+          display: flex;
+          align-items: center; /* Center content vertically */
+        }
+        
+        .ag-header-cell::after {
+          display: none !important; /* Remove header column separators */
+        }
       }
     }
 
@@ -175,6 +240,9 @@ export class AgShareGrid<T = any> {
   readonly enableExcelExport = input(true);
   readonly excelExportPermission = input<string | undefined>(undefined);
   readonly excelFileName = input<string>('Exported_Data');
+  
+  readonly pagination = input(false);
+  readonly paginationPageSize = input(20);
 
   /* --------------------------------------------------
      OUTPUT — single event bus
@@ -214,8 +282,8 @@ export class AgShareGrid<T = any> {
       borderColor: 'var(--theme-border-primary)',
       headerColumnResizeHandleColor: 'var(--theme-border-secondary)',
 
-      rowHoverColor: 'var(--component-bg-hover)',
-      selectedRowBackgroundColor: 'rgba(var(--accent-primary-rgb), 0.08)',
+      rowHoverColor: 'transparent', // Handled by CSS
+      selectedRowBackgroundColor: 'transparent', // Handled by CSS
       rangeSelectionBackgroundColor: 'rgba(var(--accent-primary-rgb), 0.15)',
       rangeSelectionBorderColor: 'var(--theme-accent-primary)',
 
@@ -228,30 +296,17 @@ export class AgShareGrid<T = any> {
       checkboxUncheckedBackgroundColor: 'var(--theme-bg-ternary)',
       checkboxUncheckedBorderColor: 'var(--theme-border-secondary)',
 
-      rowHeight: 40,
-      headerHeight: 42,
-      spacing: 4,
-      cellHorizontalPaddingScale: 0.8,
+      rowHeight: 52,
+      headerHeight: 46,
+      spacing: 8,
+      cellHorizontalPaddingScale: 1.2,
+      wrapperBorderRadius: '0', // Managed by container
     })
   );
 
   /* --------------------------------------------------
      GRID OPTIONS
   --------------------------------------------------- */
-  // readonly gridOptions: GridOptions<T> = {
-  // defaultColDef: {
-  //   flex: 1,
-  //   minWidth: 100,
-  //   sortable: true,
-  //   // rowHeight: 52,
-  //   // headerHeight: 38,
-  //   // groupHeaderHeight: 32,
-  //   filter: true,
-  //   resizable: true,
-  //   editable: (params) =>
-  //     this.editingRowId() === this.resolveRowId(params.data),
-  // },
-
   onColumnResized(e: ColumnResizedEvent<T>): void {
     if (e.source === 'autosizeColumns' && e.finished) {
       const allColumnIds = e.api.getColumns()?.map((col) => col.getColId()) || [];
@@ -266,18 +321,14 @@ export class AgShareGrid<T = any> {
       sortable: true,
       filter: true,
       resizable: true,
-
-      // Add these two lines for auto row height:
-      // wrapText: true,
-      // autoHeight: true,
-
       editable: (params) =>
         this.editingRowId() === this.resolveRowId(params.data),
     },
-    suppressCellFocus: false,
-    animateRows: false,
+    suppressCellFocus: true, // Premium interaction (no outline on click)
+    animateRows: true, // Smooth transitions
     rowBuffer: 20,
-    suppressAnimationFrame: false,
+    suppressMenuHide: true,
+    overlayNoRowsTemplate: '<span class="text-[var(--text-secondary)] font-medium">No data available to display</span>',
     getRowId: (params) => String(this.resolveRowId(params.data)),
   };
 

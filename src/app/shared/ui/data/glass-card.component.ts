@@ -24,7 +24,7 @@ import { Component, ChangeDetectionStrategy, input, computed } from '@angular/co
         </div>
       }
 
-      <div class="relative z-10 h-full" [class.p-[var(--spacing-2xl)]]="padded()">
+      <div class="relative z-10 h-full" [class]="bodyClasses()">
         <ng-content></ng-content>
       </div>
     </div>
@@ -33,8 +33,18 @@ import { Component, ChangeDetectionStrategy, input, computed } from '@angular/co
 export class GlassCardComponent {
     title = input<string>();
     padded = input<boolean>(true);
+    padding = input<'sm' | 'md' | 'lg'>('lg');
     glow = input<boolean>(true);
     interactive = input<boolean>(true);
+
+    protected bodyClasses = computed(() => {
+        if (!this.padded()) return '';
+        return {
+            sm: 'p-[var(--spacing-lg)]',
+            md: 'p-[var(--spacing-xl)]',
+            lg: 'p-[var(--spacing-2xl)]'
+        }[this.padding()];
+    });
 
     protected cardClasses = computed(() => {
         const base = `relative overflow-hidden rounded-[var(--ui-border-radius-lg)] 

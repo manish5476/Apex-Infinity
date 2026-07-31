@@ -1,5 +1,5 @@
 // src/app/shared/ui/layout/section.component.ts
-import { Component, ChangeDetectionStrategy, input } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, computed } from '@angular/core';
 
 /**
  * Component: app-section
@@ -11,7 +11,7 @@ import { Component, ChangeDetectionStrategy, input } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block w-full' },
   template: `
-    <section class="flex flex-col gap-[var(--spacing-xl)] mb-[var(--spacing-4xl)]">
+    <section [class]="sectionClasses()">
       @if (title() || description()) {
         <div class="flex flex-col gap-[var(--spacing-xs)] px-1">
           @if (title()) {
@@ -35,4 +35,15 @@ import { Component, ChangeDetectionStrategy, input } from '@angular/core';
 export class SectionComponent {
   title = input<string>('');
   description = input<string>('');
+  spacing = input<'compact' | 'normal' | 'comfortable'>('normal');
+
+  protected sectionClasses = computed(() => {
+    const gaps = {
+      compact: 'gap-[var(--spacing-md)] mb-[var(--spacing-2xl)]',
+      normal: 'gap-[var(--spacing-xl)] mb-[var(--spacing-4xl)]',
+      comfortable: 'gap-[var(--spacing-2xl)] mb-[var(--spacing-6xl)]'
+    }[this.spacing()];
+
+    return `flex flex-col ${gaps}`;
+  });
 }

@@ -25,6 +25,10 @@ import { GridColDef } from "../../AgGrid/grid/grid.types";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { AppSharedGridActionButton } from '../../AgGrid/grid/app-shared-grid-action-button/app-shared-grid-action-button';
+import { PageComponent } from '../../../../shared/ui/layout/page/page.component';
+import { PageHeaderComponent } from '../../../../shared/ui/layout/page-header/page-header.component';
+import { PageContentComponent } from '../../../../shared/ui/layout/page-content/page-content.component';
+import { ButtonComponent } from '../../../../shared/ui/form/button.component';
 
 // --- Interface based on Mongoose Schema ---
 export interface Master {
@@ -49,96 +53,117 @@ export interface Master {
   standalone: true,
   imports: [
     FormsModule,
-    ButtonModule,
     ToastModule,
     ConfirmDialogModule,
-    ToolbarModule,
     IconFieldModule,
     InputIconModule,
     InputTextModule,
     DialogModule,
     SelectModule,
-    AppSharedGrid
+    AppSharedGrid,
+    PageComponent,
+    PageHeaderComponent,
+    PageContentComponent,
+    ButtonComponent
   ],
   providers: [ConfirmationService],
   template: `
-    <div class="master-page-container">
-      <div class="themed-card master-card">
-    
-        <!-- TOOLBAR -->
-        <p-toolbar styleClass="master-toolbar">
-          <div class="p-toolbar-group-start gap-3">
-            <h2 class="section-heading m-0">Master Data</h2>
-    
-            <p-iconfield iconPosition="left">
-              <!-- <p-inputicon styleClass="pi pi-search"></p-inputicon> -->
-              <input pInputText type="text" (input)="onQuickFilter($event)"
-                placeholder="Search..." class="p-inputtext-sm w-64" />
-              </p-iconfield>
-            </div>
-    
-            <div class="p-toolbar-group-end flex gap-2">
-    
-              <!-- Bulk Actions for Selection -->
-              @if (selectedRows().length > 0) {
-                <div class="flex gap-2 mr-2 border-r pr-2 border-gray-300">
-                  <p-button
-                    label="Delete ({{selectedRows().length}})"
-                    icon="pi pi-trash"
-                    severity="danger"
-                    (click)="confirmBulkDelete()">
-                  </p-button>
-                </div>
-              }
-    
-              <!-- Bulk Edit Toggle -->
-              <div class="flex gap-2 mr-2">
-                @if (!isBulkEditing()) {
-                  <p-button
-label="Bulk Edit"
-icon="pi pi-pencil"
-[text]="true"
-                    (click)="toggleBulkEdit()">
-                  </p-button>
-                }
-    
-                @if (isBulkEditing()) {
-                  <p-button label="Cancel" icon="pi pi-times" severity="secondary" [text]="true" (click)="cancelBulkEdit()"></p-button>
-                  <p-button label="Save All" icon="pi pi-check" (click)="saveBulkEdit()"></p-button>
-                }
-              </div>
-    
-              <div class="stats mr-4 align-content-center">
-                <span class="text-sm text-gray-500">Total: {{ masters().length }}</span>
-              </div>
-    
-              <!-- Bulk Import Button -->
-              <p-button label="Import" icon="pi pi-upload" styleClass="p-button-outlined"
-              (click)="openBulkDialog()"></p-button>
-    
-              <p-button icon="pi pi-refresh" styleClass="p-button-text"
-              (click)="loadMasters()" [loading]="loading()"></p-button>
-    
-              <!-- ADD NEW: Calls Grid Method directly -->
-              <p-button label="Add New" icon="pi pi-plus" (click)="onAddNew()"></p-button>
-            </div>
-          </p-toolbar>
-    
-          <!-- MAIN DATA GRID -->
-          <div class="master-grid-wrapper" style="height: calc(100vh - 200px);">
-            <app-shared-grid
-              #mainGrid
-              [columns]="columns"
-              [data]="masters()"
-              [selectionMode]="'multiple'"
-              [showActions]="true"
-              (gridEvent)="onGridEvent($event)">
-            </app-shared-grid>
-          </div>
-    
+    <app-page>
+      <app-page-header density="compact" title="Master Data" subtitle="Manage your master reference data across all modules">
+        <div class="flex items-center gap-3">
+          <p-iconfield iconPosition="left">
+            <input pInputText type="text" (input)="onQuickFilter($event)"
+              placeholder="Search..." class="p-inputtext-sm w-64" />
+          </p-iconfield>
+          <div class="w-px h-6 bg-[var(--border-secondary)] mx-1"></div>
+
+          @if (selectedRows().length > 0) {
+            <app-button
+              variant="danger"
+              size="sm"
+              [rounded]="true"
+              icon="pi pi-trash"
+              [label]="'Delete (' + selectedRows().length + ')'"
+              (onClick)="confirmBulkDelete()">
+            </app-button>
+          }
+          
+          @if (!isBulkEditing()) {
+            <app-button
+              variant="secondary"
+              size="sm"
+              [rounded]="true"
+              icon="pi pi-pencil"
+              label="Bulk Edit"
+              (onClick)="toggleBulkEdit()">
+            </app-button>
+          } @else {
+            <app-button 
+              variant="secondary" 
+              size="sm" 
+              [rounded]="true"
+              icon="pi pi-times" 
+              label="Cancel" 
+              (onClick)="cancelBulkEdit()">
+            </app-button>
+            <app-button 
+              variant="primary" 
+              size="sm" 
+              [rounded]="true"
+              icon="pi pi-check" 
+              label="Save All" 
+              (onClick)="saveBulkEdit()">
+            </app-button>
+          }
+
+          <div class="w-px h-6 bg-[var(--border-secondary)] mx-1"></div>
+
+          <app-button 
+            variant="secondary" 
+            size="sm" 
+            [rounded]="true"
+            icon="pi pi-upload" 
+            label="Import" 
+            (onClick)="openBulkDialog()">
+          </app-button>
+
+          <app-button 
+            variant="secondary" 
+            size="sm" 
+            [rounded]="true"
+            [icon]="loading() ? 'pi pi-spinner pi-spin' : 'pi pi-refresh'" 
+            (onClick)="loadMasters()">
+          </app-button>
+
+          <app-button 
+            variant="primary" 
+            size="sm" 
+            [rounded]="true"
+            icon="pi pi-plus" 
+            label="Add New" 
+            (onClick)="onAddNew()">
+          </app-button>
         </div>
-      </div>
-    w
+      </app-page-header>
+
+      <app-page-content>
+        <div class="flex flex-col w-full h-[calc(100vh-220px)]">
+          <!-- <div class="text-[length:var(--font-size-sm)] text-[var(--text-secondary)] mb-3 flex items-center justify-between">
+            <span>Total records: {{ masters().length }}</span>
+          </div> -->
+          <app-shared-grid
+            class="flex-1 block w-full h-full"
+            #mainGrid
+            [columns]="columns"
+            [data]="masters()"
+            [selectionMode]="'multiple'"
+            [showActions]="true"
+            (gridEvent)="onGridEvent($event)">
+          </app-shared-grid>
+        </div>
+      </app-page-content>
+    </app-page>
+
       <p-dialog [modal]="true" header="Bulk Import" [(visible)]="isBulkDialogVisible" [modal]="true"
         [style]="{ width: '95vw', height: '90vh' }" [draggable]="false" [resizable]="false"
         [maximizable]="true" appendTo="body" [blockScroll]="true" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}" [dismissableMask]="true">
@@ -168,14 +193,28 @@ icon="pi pi-pencil"
         <ng-template pTemplate="footer">
           <div class="flex justify-between w-full">
             <!-- Left Side: Add Row Button -->
-            <p-button label="Add Empty Row" icon="pi pi-plus" [text]="true" severity="secondary"
-            (click)="addBulkRow()"></p-button>
+            <app-button 
+              label="Add Empty Row" 
+              icon="pi pi-plus" 
+              variant="secondary"
+              (onClick)="addBulkRow()">
+            </app-button>
     
             <!-- Right Side: Actions -->
             <div class="flex gap-2">
-              <p-button label="Cancel" icon="pi pi-times" [text]="true" (click)="isBulkDialogVisible = false"></p-button>
-              <p-button label="Create All" icon="pi pi-check" [loading]="isBulkSaving"
-              (click)="saveBulkImport()"></p-button>
+              <app-button 
+                label="Cancel" 
+                icon="pi pi-times" 
+                variant="secondary" 
+                (onClick)="isBulkDialogVisible = false">
+              </app-button>
+              <app-button 
+                label="Create All" 
+                icon="pi pi-check" 
+                variant="primary"
+                [loading]="isBulkSaving"
+                (onClick)="saveBulkImport()">
+              </app-button>
             </div>
           </div>
         </ng-template>
@@ -184,7 +223,6 @@ icon="pi pi-pencil"
       <p-toast></p-toast>
       <p-confirmDialog appendTo="body" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}"></p-confirmDialog>
     `,
-  styleUrls: ['./master-list.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MasterList implements OnInit, OnDestroy {
@@ -298,18 +336,6 @@ export class MasterList implements OnInit, OnDestroy {
         placeholder: 'Internal notes...'
       }
     },
-    // {
-    //   headerName: 'Actions',
-    //   width: 180,
-    //   pinned: 'right',
-    //   sortable: false,
-    //   filter: false,
-    //   resizable: false,
-    //   cellClass: 'action-column-cell',
-    //   cellRenderer: AppSharedGridActionButton,
-    //   cellRendererParams: {
-    //   }
-    // }
   ];
   constructor() {
     effect(() => { });

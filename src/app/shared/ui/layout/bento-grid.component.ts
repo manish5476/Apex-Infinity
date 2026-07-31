@@ -52,8 +52,20 @@ export class BentoItemComponent {
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
     host: {
-        class: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[var(--spacing-xl)] w-full auto-rows-[220px]'
+        '[class]': 'gridClasses()'
     },
     template: `<ng-content></ng-content>`
 })
-export class BentoGridComponent { }
+export class BentoGridComponent {
+    gap = input<'sm' | 'md' | 'lg'>('lg');
+
+    protected gridClasses = computed(() => {
+        const gapClass = {
+            sm: 'gap-[var(--spacing-md)]',
+            md: 'gap-[var(--spacing-lg)]',
+            lg: 'gap-[var(--spacing-xl)]'
+        }[this.gap()];
+
+        return `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 w-full ${gapClass}`;
+    });
+}

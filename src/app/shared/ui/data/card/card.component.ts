@@ -1,5 +1,5 @@
 // src/app/shared/ui/data/card.component.ts
-import { Component, ChangeDetectionStrategy, input } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, computed } from '@angular/core';
 
 /**
  * Component: app-card
@@ -14,7 +14,7 @@ import { Component, ChangeDetectionStrategy, input } from '@angular/core';
     class: 'block w-full h-full'
   },
   template: `
-    <div class="bg-[var(--component-bg)] rounded-[var(--ui-border-radius)] shadow-[var(--elevation-1)] border border-[var(--component-border)] overflow-hidden flex flex-col h-full transition-[var(--transition-base)] hover:shadow-[var(--elevation-2)]">
+    <div [class]="cardClasses()">
       
       @if (title() || subtitle()) {
         <div class="px-[var(--spacing-2xl)] py-[var(--spacing-xl)] border-b border-[var(--component-divider)] flex flex-col md:flex-row justify-between items-start md:items-center gap-[var(--spacing-md)] bg-[var(--bg-secondary)]">
@@ -36,7 +36,7 @@ import { Component, ChangeDetectionStrategy, input } from '@angular/core';
         </div>
       }
       
-      <div class="flex-1" [class.p-[var(--spacing-2xl)]]="padded()">
+      <div class="flex-1" [class]="bodyClasses()">
         <ng-content></ng-content>
       </div>
       
@@ -49,4 +49,27 @@ export class CardComponent {
   title = input<string>();
   subtitle = input<string>();
   padded = input<boolean>(true);
+  padding = input<'sm' | 'md' | 'lg'>('lg');
+  shadow = input<'none' | 'sm' | 'md' | 'lg'>('sm');
+
+  protected cardClasses = computed(() => {
+    const s = {
+      none: '',
+      sm: 'shadow-[var(--elevation-1)]',
+      md: 'shadow-[var(--elevation-2)]',
+      lg: 'shadow-[var(--elevation-3)]'
+    }[this.shadow()];
+
+    return `bg-[var(--component-bg)] rounded-[var(--ui-border-radius)] ${s} border border-[var(--component-border)] overflow-hidden flex flex-col h-full transition-[var(--transition-base)] hover:shadow-[var(--elevation-2)]`;
+  });
+
+  protected bodyClasses = computed(() => {
+    if (!this.padded()) return '';
+    const p = {
+      sm: 'p-[var(--spacing-lg)]',
+      md: 'p-[var(--spacing-xl)]',
+      lg: 'p-[var(--spacing-2xl)]'
+    }[this.padding()];
+    return p;
+  });
 }

@@ -4,9 +4,7 @@ import {
 } from '@angular/core';
 import { CommonModule, DecimalPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SelectModule } from 'primeng/select';
 import { DatePicker } from 'primeng/datepicker';
 
@@ -18,1368 +16,379 @@ import { MasterDropdownComponent } from '../../modules/shared/components/masterF
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 
+// Shared UI Components
+import { PageComponent } from '../../shared/ui/layout/page/page.component';
+import { PageHeaderComponent } from '../../shared/ui/layout/page-header/page-header.component';
+import { PageContentComponent } from '../../shared/ui/layout/page-content/page-content.component';
+import { PageToolbarComponent } from '../../shared/ui/layout/page-toolbar/page-toolbar.component';
+import { SectionComponent } from '../../shared/ui/layout/section/section.component';
+import { BentoGridComponent, BentoItemComponent } from '../../shared/ui/layout/bento-grid.component';
+import { StatCardComponent } from '../../shared/ui/data/stat-card.component';
+import { GlassCardComponent } from '../../shared/ui/data/glass-card.component';
+import { CardComponent } from '../../shared/ui/data/card/card.component';
+import { GradientBannerComponent } from '../../shared/ui/data/gradient-banner.component';
+import { StatusBadgeComponent } from '../../shared/ui/badge/status-badge.component';
+import { ButtonComponent } from '../../shared/ui/form/button.component';
+import { LoadingComponent } from '../../shared/ui/feedback/loading/loading.component';
+import { AvatarComponent } from '../../shared/ui/media/avatar.component';
+import { WidgetRailComponent } from '@shared/ui/layout/widget-rail.component';
+import { DataListComponent } from '../../shared/ui/data/list/data-list.component';
+import { DataListRowComponent } from '../../shared/ui/data/list/data-list-row.component';
+import { DataListCardComponent } from '../../shared/ui/data/list/data-list-card.component';
+
 @Component({
   selector: 'app-admin-dashboard-ui',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule, FormsModule,
-    TagModule, TooltipModule, ProgressSpinnerModule,
-    SelectModule, DatePicker,
-    AgShareGrid, MasterDropdownComponent
+    TooltipModule, SelectModule, DatePicker,
+    AgShareGrid, MasterDropdownComponent,
+    PageComponent, PageHeaderComponent, PageContentComponent,
+    SectionComponent, WidgetRailComponent,
+    StatCardComponent, CardComponent,
+    DataListComponent, DataListRowComponent, DataListCardComponent,
+    GradientBannerComponent, StatusBadgeComponent, ButtonComponent, LoadingComponent, AvatarComponent
   ],
   template: `
-<div class="dash-root">
-
-  <header class="dash-header glass-header">
-    <div class="header-brand">
-      <span class="brand-dot"></span>
-      <div>
-        <h1 class="brand-title">Executive Dashboard</h1>
-        <p class="brand-period">
-          @if (dashboard()?.period) {
-            {{ dashboard()!.period.start | date:'d MMM' }} – {{ dashboard()!.period.end | date:'d MMM yyyy' }}
-            <span class="period-chip">{{ dashboard()!.period.days }}d</span>
-          } @else {
-            &mdash;
-          }
-        </p>
-      </div>
-    </div>
-
-    <div class="header-controls">
-      <div class="ctrl-group">
-        <label class="ctrl-label">Branch</label>
+<app-page>
+  <app-page-header title="Executive Dashboard" density="compact">
+    <div class="flex items-end gap-4 compact-toolbar">
+      <!-- Branch Selector -->
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[10px] font-bold text-[var(--text-tertiary)] uppercase tracking-wider">Branch</label>
         <app-master-dropdown
           endpoint="branches"
           [(ngModel)]="selectedBranch"
           (onChange)="onFilterChange()"
-          placeholder="All branches">
+          placeholder="All branches"
+          class="w-[200px]">
         </app-master-dropdown>
       </div>
 
-      <div class="ctrl-divider"></div>
-
-      <div class="ctrl-group">
-        <label class="ctrl-label">Period</label>
+      <!-- Period Selector -->
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[10px] font-bold text-[var(--text-tertiary)] uppercase tracking-wider">Period</label>
         <p-datepicker
           [(ngModel)]="dateRange"
           selectionMode="range"
           [showIcon]="true"
           (onSelect)="onFilterChange()"
           placeholder="Start – End"
-          styleClass="dash-datepicker">
+          styleClass="w-[240px]">
         </p-datepicker>
       </div>
-
-      <div class="ctrl-divider"></div>
-
-      @if (dashboard()?.financial?.performance?.executionTime) {
-        <span class="exec-pill">
-          <i class="pi pi-bolt"></i>
-          {{ dashboard()!.financial.performance.executionTime }}
-        </span>
-      }
-
-      <button
-        class="icon-btn focus-ring"
-        (click)="loadDashboard()"
-        [disabled]="loading()"
-        pTooltip="Refresh data"
-        tooltipPosition="bottom">
-        <i class="pi pi-refresh" [class.spin]="loading()"></i>
-      </button>
-    </div>
-  </header>
-
-  @if (loading()) {
-    <div class="loader-overlay">
-      <div class="loader-card glass-card elevated-2">
-        <p-progressSpinner styleClass="w-8 h-8" strokeWidth="3"></p-progressSpinner>
-        <span class="loader-label">Synchronising data…</span>
+      
+      <!-- Refresh Button -->
+      <div class="flex items-center h-[36px]">
+         <app-button 
+            variant="secondary" 
+            size="sm" 
+            [icon]="loading() ? 'pi pi-refresh spin' : 'pi pi-refresh'" 
+            (onClick)="loadDashboard()" 
+            [disabled]="loading()" 
+            pTooltip="Refresh data">
+         </app-button>
       </div>
     </div>
-  }
+  </app-page-header>
 
-  @if (!loading() && dashboard()) {
-    <div class="dash-body">
+  <app-page-content density="compact">
+    @if (loading()) {
+      <div class="py-12">
+        <app-loading text="Synchronising data..."></app-loading>
+      </div>
+    }
 
-      <section class="kpi-strip" aria-label="Key performance indicators">
-
-        <article class="kpi-card glass-card interactive kpi-card--revenue">
-          <div class="kpi-header">
-            <span class="kpi-label">Gross Revenue</span>
-            @if (dashboard()!.financial.totalRevenue.growth != null) {
-              <span class="badge badge--up">
-                <i class="pi pi-arrow-up-right"></i>
-                {{ dashboard()!.financial.totalRevenue.growth }}%
-              </span>
-            }
-          </div>
-          <p class="kpi-amount">₹{{ dashboard()!.financial.totalRevenue.value | number }}</p>
-          <p class="kpi-meta">{{ dashboard()!.financial.totalRevenue.count }} transaction(s)</p>
-          <div class="kpi-bar">
-            <div class="kpi-bar-fill" style="width:100%"></div>
-          </div>
-        </article>
-
-        <article class="kpi-card glass-card interactive kpi-card--profit">
-          <div class="kpi-header">
-            <span class="kpi-label">Net Profit</span>
-            <span class="badge"
-              [class.badge--success]="dashboard()!.financial.netProfit.status === 'profitable'"
-              [class.badge--error]="dashboard()!.financial.netProfit.status !== 'profitable'">
-              {{ dashboard()!.financial.netProfit.status }}
-            </span>
-          </div>
-          <p class="kpi-amount kpi-amount--success">₹{{ dashboard()!.financial.netProfit.value | number }}</p>
-          <p class="kpi-meta">Margin: {{ dashboard()!.financial.netProfit.margin }}%</p>
-          <div class="kpi-bar">
-            <div class="kpi-bar-fill kpi-bar-fill--success"
-              [style.width.%]="dashboard()!.financial.netProfit.margin"></div>
-          </div>
-        </article>
-
-        <article class="kpi-card glass-card interactive kpi-card--inventory">
-          <div class="kpi-header">
-            <span class="kpi-label">Inventory Value</span>
-            <i class="pi pi-box kpi-icon"></i>
-          </div>
-          <p class="kpi-amount">₹{{ dashboard()!.inventory.summary.valuation | number:'1.0-0' }}</p>
-          <p class="kpi-meta">
-            {{ dashboard()!.inventory.inventoryValuation.totalItems }} items
-            · {{ dashboard()!.inventory.inventoryValuation.productCount }} SKUs
-          </p>
-          <div class="kpi-bar">
-            <div class="kpi-bar-fill kpi-bar-fill--info"
-              [style.width.%]="dashboard()!.inventory.healthScore"></div>
-          </div>
-        </article>
-
-        <article class="kpi-card glass-card interactive kpi-card--debt">
-          <div class="kpi-header">
-            <span class="kpi-label">Outstanding Debt</span>
-            <i class="pi pi-exclamation-circle kpi-icon kpi-icon--error"></i>
-          </div>
-          <p class="kpi-amount kpi-amount--error">₹{{ dashboard()!.financial.outstanding.receivables | number }}</p>
-          <p class="kpi-meta">{{ dashboard()!.alerts.highRiskDebtCount }} high-risk account(s)</p>
-          <div class="kpi-bar">
-            <div class="kpi-bar-fill kpi-bar-fill--error" style="width:100%"></div>
-          </div>
-        </article>
-
-        @if (dashboard()!.inventory.healthScore != null) {
-          <article class="kpi-card glass-card interactive kpi-card--health">
-            <div class="kpi-header">
-              <span class="kpi-label">System Health</span>
-            </div>
-            <div class="health-wrap">
-              <svg viewBox="0 0 36 36" class="health-ring" aria-label="Health score ring">
-                <path class="ring-track"
-                  d="M18 2.0845 a15.9155 15.9155 0 0 1 0 31.831 a15.9155 15.9155 0 0 1 0-31.831"/>
-                <path class="ring-arc"
-                  [attr.stroke-dasharray]="dashboard()!.inventory.healthScore + ' 100'"
-                  [class.ring-arc--good]="dashboard()!.inventory.healthScore >= 70"
-                  [class.ring-arc--warn]="dashboard()!.inventory.healthScore >= 40 && dashboard()!.inventory.healthScore < 70"
-                  [class.ring-arc--bad]="dashboard()!.inventory.healthScore < 40"
-                  d="M18 2.0845 a15.9155 15.9155 0 0 1 0 31.831 a15.9155 15.9155 0 0 1 0-31.831"/>
-              </svg>
-              <span class="health-value">{{ dashboard()!.inventory.healthScore }}%</span>
-            </div>
-            <p class="kpi-meta">{{ dashboard()!.inventory.summary.criticalAlerts }} critical alerts</p>
-          </article>
+    @if (!loading() && dashboard()) {
+      <div class="flex flex-col gap-[var(--spacing-3xl)] pb-8">
+        
+        <!-- Alerts Ribbon -->
+        @if ((dashboard()!.alerts.lowStockCount ?? 0) > 0) {
+          <app-gradient-banner variant="warning" icon="pi pi-exclamation-triangle" title="Action Required" size="sm">
+            <strong>{{ dashboard()!.alerts.lowStockCount }} items</strong> below reorder level — action required to prevent stockouts.
+          </app-gradient-banner>
         }
 
-      </section>
-
-      @if ((dashboard()!.alerts.lowStockCount ?? 0) > 0) {
-        <div class="alert-ribbon">
-          <i class="pi pi-exclamation-triangle"></i>
-          <strong>{{ dashboard()!.alerts.lowStockCount }} items</strong> below reorder level —
-          action required to prevent stockouts.
-          <span class="ribbon-items">
-            @for (item of dashboard()!.alerts.itemsToReorder.slice(0, 3); track item) {
-              <span class="ribbon-chip">{{ item }}</span>
-            }
-            @if (dashboard()!.alerts.itemsToReorder.length > 3) {
-              <span class="ribbon-chip ribbon-chip--more">
-                +{{ dashboard()!.alerts.itemsToReorder.length - 3 }} more
-              </span>
-            }
-          </span>
-        </div>
-      }
-
-      <div class="body-grid">
-
-        <div class="col-main">
-
-          <section class="panel glass-card">
-            <div class="panel-head">
-              <div class="panel-head-left">
-                <span class="panel-icon"><i class="pi pi-sparkles"></i></span>
-                <h2 class="panel-title">AI Business Insights</h2>
+        <!-- Top KPIs -->
+        <app-widget-rail gap="var(--spacing-lg)" cardWidth="min(320px, 85vw)">
+            <app-stat-card 
+              label="Gross Revenue" 
+              density="compact" [accent]="true" shadow="md" variant="primary"
+              [value]="'₹' + (dashboard()!.financial.totalRevenue.value | number)"
+              [change]="dashboard()!.financial.totalRevenue.growth != null ? dashboard()!.financial.totalRevenue.growth + '%' : undefined"
+              trend="up"
+              [description]="(dashboard()!.financial.totalRevenue.count | number) + ' transaction(s)'">
+            </app-stat-card>
+          
+            <app-stat-card 
+              label="Net Profit" 
+              density="compact" [accent]="true" shadow="md"
+              [value]="'₹' + (dashboard()!.financial.netProfit.value | number)"
+              [change]="dashboard()!.financial.netProfit.status"
+              [trend]="dashboard()!.financial.netProfit.status === 'profitable' ? 'up' : 'down'"
+              [variant]="dashboard()!.financial.netProfit.status === 'profitable' ? 'success' : 'error'"
+              [description]="'Margin: ' + dashboard()!.financial.netProfit.margin + '%'">
+              <div sparkline class="w-full h-1 bg-[var(--border-secondary)] rounded-full mt-4 overflow-hidden">
+                <div class="h-full bg-[var(--color-success)]" [style.width.%]="dashboard()!.financial.netProfit.margin"></div>
               </div>
-              <span class="panel-chip">{{ dashboard()!.insights.count }} insights</span>
-            </div>
+            </app-stat-card>
 
-            <div class="insights-list">
-              @for (insight of dashboard()!.insights.insights; track insight.title) {
-                <div class="insight-item"
-                  [class.insight-item--positive]="insight.type === 'positive'"
-                  [class.insight-item--warning]="insight.type === 'warning'"
-                  [class.insight-item--info]="insight.type === 'info'">
-                  <span class="insight-icon">
-                    <i class="pi"
-                      [class.pi-check-circle]="insight.type === 'positive'"
-                      [class.pi-exclamation-triangle]="insight.type === 'warning'"
-                      [class.pi-info-circle]="insight.type === 'info'">
-                    </i>
-                  </span>
-                  <div class="insight-content">
-                    <div class="insight-top">
-                      <span class="insight-title">{{ insight.title }}</span>
-                      <span class="insight-priority"
-                        [class.insight-priority--high]="insight.priority === 'high'"
-                        [class.insight-priority--medium]="insight.priority === 'medium'">
-                        {{ insight.priority }}
-                      </span>
-                    </div>
-                    <p class="insight-msg">{{ insight.message }}</p>
-                  </div>
-                </div>
-              }
-            </div>
-          </section>
+            <app-stat-card 
+              label="Inventory Value" 
+              icon="pi pi-box"
+              density="compact" [accent]="true" shadow="md" variant="info"
+              [value]="'₹' + (dashboard()!.inventory.summary.valuation | number:'1.0-0')"
+              [description]="(dashboard()!.inventory.inventoryValuation.totalItems | number) + ' items · ' + (dashboard()!.inventory.inventoryValuation.productCount | number) + ' SKUs'">
+               <div sparkline class="w-full h-1 bg-[var(--border-secondary)] rounded-full mt-4 overflow-hidden">
+                 <div class="h-full bg-[var(--color-info)]" [style.width.%]="dashboard()!.inventory.healthScore"></div>
+               </div>
+            </app-stat-card>
 
-          <section class="panel glass-card">
-            <div class="panel-head">
-              <div class="panel-head-left">
-                <span class="panel-icon panel-icon--error"><i class="pi pi-warehouse"></i></span>
-                <h2 class="panel-title">Stock Urgency Monitor</h2>
-              </div>
-              <span class="panel-chip panel-chip--error">
-                {{ dashboard()!.inventory.lowStockAlerts.length }} Critical
-              </span>
-            </div>
-            <div class="grid-host">
-              <app-ag-share-grid
-                [columns]="alertColumns"
-                [data]="dashboard()!.inventory.lowStockAlerts"
-                class="compact-grid">
-              </app-ag-share-grid>
-            </div>
-          </section>
+             <app-stat-card 
+              label="Outstanding Debt" 
+              icon="pi pi-exclamation-circle"
+              variant="error"
+              density="compact" [accent]="true" shadow="md"
+              [value]="'₹' + (dashboard()!.financial.outstanding.receivables | number)"
+              [description]="dashboard()!.alerts.highRiskDebtCount + ' high-risk account(s)'">
+            </app-stat-card>
 
-          @if (dashboard()!.topCategories?.length) {
-            <section class="panel glass-card">
-              <div class="panel-head">
-                <div class="panel-head-left">
-                  <span class="panel-icon"><i class="pi pi-chart-bar"></i></span>
-                  <h2 class="panel-title">Category Performance</h2>
-                </div>
-              </div>
-              <div class="category-list">
-                @for (cat of dashboard()!.topCategories; track cat.name) {
-                  <div class="category-row">
-                    <div class="category-info">
-                      <span class="category-name">{{ cat.name }}</span>
-                      <span class="category-margin">{{ cat.margin | number:'1.1-1' }}% margin</span>
-                    </div>
-                    <div class="category-bars">
-                      <div class="category-bar-wrap">
-                        <span class="bar-label">Revenue</span>
-                        <div class="bar-track">
-                          <div class="bar-fill bar-fill--accent" style="width:100%"></div>
-                        </div>
-                        <span class="bar-value">₹{{ cat.revenue | number:'1.0-0' }}</span>
+          @if (dashboard()!.inventory.healthScore != null) {
+               <app-stat-card 
+                label="System Health" 
+                icon="pi pi-heart"
+                density="compact" [accent]="true" shadow="md" variant="success"
+                [value]="dashboard()!.inventory.healthScore + '%'"
+                [description]="dashboard()!.inventory.summary.criticalAlerts + ' critical alerts'">
+               </app-stat-card>
+          }
+        </app-widget-rail>
+
+        <!-- Main Dashboard Split (Synchronized Gaps) -->
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-[var(--spacing-3xl)]">
+           
+           <!-- Left Column: Heavy Data & Insights -->
+           <div class="xl:col-span-2 flex flex-col gap-[var(--spacing-3xl)]">
+             
+             <!-- AI Insights -->
+             <app-section title="AI Business Insights" spacing="compact">
+                <ng-container ngProjectAs="[actions]">
+                  <app-status-badge status="info" variant="subtle" size="sm" [label]="dashboard()!.insights.count + ' generated'"></app-status-badge>
+                </ng-container>
+                
+                <div class="flex flex-col gap-[var(--spacing-md)]">
+                  @for (insight of dashboard()!.insights.insights; track insight.title) {
+                    <app-card padding="md" class="border-l-4 transition-transform hover:-translate-y-0.5" 
+                      [class.border-l-[var(--color-success)]]="insight.type === 'positive'"
+                      [class.border-l-[var(--color-warning)]]="insight.type === 'warning'"
+                      [class.border-l-[var(--color-info)]]="insight.type === 'info'">
+                      
+                      <div class="flex items-start gap-4">
+                         <!-- Polished Icon Wrapper -->
+                         <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                              [class.bg-[var(--color-success-bg)]]="insight.type === 'positive'"
+                              [class.bg-[var(--color-warning-bg)]]="insight.type === 'warning'"
+                              [class.bg-[var(--color-info-bg)]]="insight.type === 'info'">
+                           <i class="pi text-lg"
+                              [class.pi-check-circle]="insight.type === 'positive'"
+                              [class.pi-exclamation-triangle]="insight.type === 'warning'"
+                              [class.pi-info-circle]="insight.type === 'info'"
+                              [class.text-[var(--color-success)]]="insight.type === 'positive'"
+                              [class.text-[var(--color-warning)]]="insight.type === 'warning'"
+                              [class.text-[var(--color-info)]]="insight.type === 'info'"></i>
+                         </div>
+                         
+                         <!-- Insight Content -->
+                         <div class="flex-1 flex flex-col gap-1 pt-0.5">
+                            <div class="flex items-start sm:items-center justify-between flex-col sm:flex-row gap-2 mb-0.5">
+                              <h4 class="font-bold text-[length:var(--font-size-md)] text-[var(--text-primary)] tracking-tight m-0">{{ insight.title }}</h4>
+                              <app-status-badge [status]="insight.priority === 'high' ? 'error' : 'neutral'" size="sm" [label]="insight.priority"></app-status-badge>
+                            </div>
+                            <p class="text-[length:var(--font-size-sm)] text-[var(--text-secondary)] m-0 leading-relaxed max-w-3xl">{{ insight.message }}</p>
+                         </div>
                       </div>
-                      <div class="category-bar-wrap">
-                        <span class="bar-label">Profit</span>
-                        <div class="bar-track">
-                          <div class="bar-fill bar-fill--success"
-                            [style.width.%]="(cat.profit / cat.revenue) * 100"></div>
-                        </div>
-                        <span class="bar-value">₹{{ cat.profit | number:'1.0-0' }}</span>
-                      </div>
-                    </div>
-                  </div>
-                }
-              </div>
-            </section>
-          }
+                    </app-card>
+                  }
+                </div>
+             </app-section>
 
+             <!-- Category Performance -->
+             @if (dashboard()!.topCategories?.length) {
+                <app-section title="Category Performance" icon="pi pi-chart-bar" spacing="compact">
+                   <app-card>
+                     <div class="flex flex-col divide-y divide-[var(--border-secondary)]">
+                        @for (cat of dashboard()!.topCategories; track cat.name) {
+                          <div class="py-[var(--spacing-lg)] first:pt-2 last:pb-2 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                            
+                            <!-- Category Name & Margin -->
+                            <div class="w-full lg:w-1/3">
+                              <div class="font-bold text-[length:var(--font-size-md)] text-[var(--text-primary)] tracking-tight">{{ cat.name }}</div>
+                              <div class="text-[length:var(--font-size-xs)] text-[var(--text-tertiary)] font-medium mt-0.5">{{ cat.margin | number:'1.1-1' }}% margin</div>
+                            </div>
+                            
+                            <!-- Progress Bars -->
+                            <div class="w-full lg:w-2/3 flex flex-col sm:flex-row gap-6">
+                              
+                               <!-- Revenue Bar -->
+                               <div class="flex-1 flex flex-col gap-1.5">
+                                 <div class="flex justify-between items-end text-[length:var(--font-size-xs)]">
+                                   <span class="text-[var(--text-secondary)] font-semibold uppercase tracking-widest">Revenue</span>
+                                   <span class="font-bold text-[length:var(--font-size-sm)] text-[var(--text-primary)]">₹{{ cat.revenue | number:'1.0-0' }}</span>
+                                 </div>
+                                 <div class="w-full h-2 bg-[var(--bg-ternary)] rounded-full overflow-hidden shadow-inner">
+                                    <div class="h-full bg-[var(--accent-primary)] rounded-full" style="width:100%"></div>
+                                 </div>
+                               </div>
+                               
+                               <!-- Profit Bar -->
+                               <div class="flex-1 flex flex-col gap-1.5">
+                                 <div class="flex justify-between items-end text-[length:var(--font-size-xs)]">
+                                   <span class="text-[var(--text-secondary)] font-semibold uppercase tracking-widest">Profit</span>
+                                   <span class="font-bold text-[length:var(--font-size-sm)] text-[var(--color-success)]">₹{{ cat.profit | number:'1.0-0' }}</span>
+                                 </div>
+                                 <div class="w-full h-2 bg-[var(--bg-ternary)] rounded-full overflow-hidden shadow-inner">
+                                    <div class="h-full bg-[var(--color-success)] rounded-full transition-all duration-500" [style.width.%]="(cat.profit / cat.revenue) * 100"></div>
+                                 </div>
+                               </div>
+                            </div>
+                          </div>
+                        }
+                     </div>
+                   </app-card>
+                </app-section>
+             }
+
+             <!-- Stock Urgency Grid -->
+             <app-section title="Stock Urgency Monitor" spacing="compact">
+                 <ng-container ngProjectAs="[actions]">
+                    <app-status-badge status="error" variant="solid" [label]="dashboard()!.inventory.lowStockAlerts.length + ' Critical'"></app-status-badge>
+                 </ng-container>
+                 <!-- Wrapped in a border to match the cards -->
+                 <div class="border border-[var(--border-secondary)] rounded-[var(--ui-border-radius-lg)] overflow-hidden">
+                   <app-ag-share-grid
+                    [columns]="alertColumns"
+                    [data]="dashboard()!.inventory.lowStockAlerts"
+                    class="h-[320px] block">
+                   </app-ag-share-grid>
+                 </div>
+             </app-section>
+           </div>
+           
+           <!-- Right Column: Lists & Quick Stats -->
+           <div class="flex flex-col gap-[var(--spacing-3xl)]">
+             
+             <!-- Operations -->
+             <app-data-list title="Operations" icon="pi pi-cog" maxHeight="320px">
+                 <app-data-list-row label="Avg Order Value">
+                   <span class="font-mono font-bold text-[var(--text-primary)]">₹{{ dashboard()!.operations.orderEfficiency.averageOrderValue | number:'1.0-0' }}</span>
+                 </app-data-list-row>
+                 <app-data-list-row label="Discount Rate">
+                   <span class="font-mono font-bold text-[var(--text-primary)]">{{ dashboard()!.operations.discountMetrics.discountRate }}%</span>
+                 </app-data-list-row>
+                 <app-data-list-row label="Cancellation Rate">
+                   <span class="font-mono font-bold text-[var(--color-error)]">{{ dashboard()!.operations.orderEfficiency.cancellationRate }}%</span>
+                 </app-data-list-row>
+                 <app-data-list-row label="Active Customers">
+                   <span class="font-mono font-bold text-[var(--text-primary)]">{{ dashboard()!.financial.customers.active | number }}</span>
+                 </app-data-list-row>
+                 <app-data-list-row label="New Customers">
+                   <span class="font-mono font-bold text-[var(--color-success)]">+{{ dashboard()!.financial.customers.new | number }}</span>
+                 </app-data-list-row>
+                 <app-data-list-row label="SKUs Sold">
+                   <span class="font-mono font-bold text-[var(--text-primary)]">{{ dashboard()!.financial.products.unique | number }}</span>
+                 </app-data-list-row>
+             </app-data-list>
+
+             <!-- Top Products -->
+             @if (dashboard()!.leaders.topProducts?.length) {
+               <app-data-list title="Top Products" icon="pi pi-star" variant="spaced" maxHeight="360px" [cardStyle]="false">
+                   @for (prod of dashboard()!.leaders.topProducts; track prod._id; let i = $index) {
+                     <app-data-list-card [title]="prod.name" [subtitle]="(prod.soldQty | number) + ' sold · ₹' + (prod.profit | number:'1.0-0') + ' profit'">
+                        <div leading class="font-bold text-[var(--text-tertiary)] text-[length:var(--font-size-md)] w-6 text-center">#{{ i + 1 }}</div>
+                        <div trailing class="font-bold text-[var(--text-primary)]">₹{{ prod.revenue | number:'1.0-0' }}</div>
+                     </app-data-list-card>
+                   }
+               </app-data-list>
+             }
+
+             <!-- Top Customers -->
+             @if (dashboard()!.leaders.topCustomers?.length) {
+               <app-data-list title="Top Customers" icon="pi pi-users" variant="spaced" maxHeight="360px" [cardStyle]="false">
+                   @for (cust of dashboard()!.leaders.topCustomers; track cust._id; let i = $index) {
+                     <app-data-list-card [title]="cust.name" [subtitle]="(cust.transactions | number) + ' transaction(s)'">
+                        <div leading><app-avatar [name]="cust.name" size="sm"></app-avatar></div>
+                        <div trailing class="font-bold text-[var(--color-success)]">₹{{ cust.totalSpent | number:'1.0-0' }}</div>
+                     </app-data-list-card>
+                   }
+               </app-data-list>
+             }
+             
+             <!-- Segments -->
+             @if (dashboard()!.customers?.segmentation?.length) {
+               <app-data-list title="Segments" icon="pi pi-chart-pie" maxHeight="300px">
+                   @for (seg of dashboard()!.customers.segmentation; track seg._id) {
+                     <app-data-list-row [label]="seg._id">
+                       <span class="font-mono text-[length:var(--font-size-sm)] font-bold text-[var(--text-primary)]">{{ seg.count | number }}</span>
+                     </app-data-list-row>
+                   }
+               </app-data-list>
+             }
+             
+             <!-- Top Staff -->
+             @if (dashboard()!.operations.topStaff?.length) {
+                <app-data-list title="Top Staff" icon="pi pi-id-card" variant="spaced" maxHeight="360px" [cardStyle]="false">
+                    @for (staff of dashboard()!.operations.topStaff; track staff._id) {
+                      <app-data-list-card [title]="staff.name" [subtitle]="(staff.count | number) + ' order(s)'">
+                         <div leading><app-avatar [name]="staff.name" size="sm"></app-avatar></div>
+                         <div trailing class="font-bold text-[var(--color-success)]">₹{{ staff.revenue | number:'1.0-0' }}</div>
+                      </app-data-list-card>
+                    }
+                </app-data-list>
+             }
+           </div>
         </div>
-
-        <aside class="col-side">
-
-          <section class="panel glass-card">
-            <h3 class="side-panel-title">
-              <i class="pi pi-cog"></i> Operations
-            </h3>
-            <ul class="stat-list" aria-label="Operational efficiency stats">
-              <li class="stat-row interactive-list-item">
-                <span class="stat-label">Avg Order Value</span>
-                <span class="stat-value mono">₹{{ dashboard()!.operations.orderEfficiency.averageOrderValue | number:'1.0-0' }}</span>
-              </li>
-              <li class="stat-row interactive-list-item">
-                <span class="stat-label">Discount Rate</span>
-                <span class="stat-value mono">{{ dashboard()!.operations.discountMetrics.discountRate }}%</span>
-              </li>
-              <li class="stat-row interactive-list-item">
-                <span class="stat-label">Cancellation Rate</span>
-                <span class="stat-value mono text-error">{{ dashboard()!.operations.orderEfficiency.cancellationRate }}%</span>
-              </li>
-              <li class="stat-row interactive-list-item">
-                <span class="stat-label">Active Customers</span>
-                <span class="stat-value mono">{{ dashboard()!.financial.customers.active }}</span>
-              </li>
-              <li class="stat-row interactive-list-item">
-                <span class="stat-label">New Customers</span>
-                <span class="stat-value mono stat-value--success">+{{ dashboard()!.financial.customers.new }}</span>
-              </li>
-              <li class="stat-row interactive-list-item">
-                <span class="stat-label">SKUs Sold</span>
-                <span class="stat-value mono">{{ dashboard()!.financial.products.unique }}</span>
-              </li>
-            </ul>
-          </section>
-
-          @if (dashboard()!.leaders.topProducts?.length) {
-            <section class="panel glass-card">
-              <h3 class="side-panel-title">
-                <i class="pi pi-star"></i> Top Products
-              </h3>
-              <div class="leaders-list">
-                @for (prod of dashboard()!.leaders.topProducts; track prod._id; let i = $index) {
-                  <div class="leader-row interactive-list-item">
-                    <span class="leader-rank">#{{ i + 1 }}</span>
-                    <div class="leader-info">
-                      <p class="leader-name">{{ prod.name }}</p>
-                      <p class="leader-sub">{{ prod.soldQty }} sold · {{ prod.profit | number:'1.0-0' }} profit</p>
-                    </div>
-                    <span class="leader-revenue">₹{{ prod.revenue | number:'1.0-0' }}</span>
-                  </div>
-                }
-              </div>
-            </section>
-          }
-
-          @if (dashboard()!.leaders.topCustomers?.length) {
-            <section class="panel glass-card">
-              <h3 class="side-panel-title">
-                <i class="pi pi-users"></i> Top Customers
-              </h3>
-              <div class="leaders-list">
-                @for (cust of dashboard()!.leaders.topCustomers; track cust._id; let i = $index) {
-                  <div class="leader-row interactive-list-item">
-                    <span class="leader-avatar">{{ cust.name.charAt(0).toUpperCase() }}</span>
-                    <div class="leader-info">
-                      <p class="leader-name">{{ cust.name }}</p>
-                      <p class="leader-sub">{{ cust.transactions }} transaction(s)</p>
-                    </div>
-                    <span class="leader-revenue">₹{{ cust.totalSpent | number:'1.0-0' }}</span>
-                  </div>
-                }
-              </div>
-            </section>
-          }
-
-          @if (dashboard()!.customers?.segmentation?.length) {
-            <section class="panel glass-card">
-              <h3 class="side-panel-title">
-                <i class="pi pi-chart-pie"></i> Segments
-              </h3>
-              <div class="seg-list">
-                @for (seg of dashboard()!.customers.segmentation; track seg._id) {
-                  <div class="seg-row">
-                    <div class="seg-left">
-                      <span class="seg-dot"></span>
-                      <span class="seg-name">{{ seg._id }}</span>
-                    </div>
-                    <span class="seg-count">{{ seg.count }}</span>
-                  </div>
-                }
-              </div>
-            </section>
-          }
-
-          @if (dashboard()!.operations.topStaff?.length) {
-            <section class="panel glass-card">
-              <h3 class="side-panel-title">
-                <i class="pi pi-id-card"></i> Top Staff
-              </h3>
-              <div class="staff-list">
-                @for (staff of dashboard()!.operations.topStaff; track staff._id) {
-                  <div class="staff-row interactive-list-item">
-                    <span class="staff-avatar">{{ staff.name.charAt(0).toUpperCase() }}</span>
-                    <div class="staff-info">
-                      <p class="staff-name">{{ staff.name }}</p>
-                      <p class="staff-sub">{{ staff.count }} order(s)</p>
-                    </div>
-                    <span class="staff-rev">₹{{ staff.revenue | number:'1.0-0' }}</span>
-                  </div>
-                }
-              </div>
-            </section>
-          }
-
-        </aside>
       </div>
-
-    </div>
-  }
-
-</div>
+    }
+  </app-page-content>
+</app-page>
   `,
   styles: [`
-/* ═══════════════════════════════════════════════════════════════════
-   EXECUTIVE DASHBOARD — GLASS/LUXURY INTEGRATION
-   ═══════════════════════════════════════════════════════════════════ */
-
-:host { display: block; width: 100%; }
-
-.dash-root {
-  min-height: 100%;
-  background: var(--bg-primary);
-  font-family: var(--font-body);
-  color: var(--text-primary);
-  display: flex;
-  flex-direction: column;
-}
-
-/* ═══════════════════════════════════════════════════════
-   HEADER (FROSTED GLASS)
-   ═══════════════════════════════════════════════════════ */
-.glass-header {
-  position: sticky;
-  top: 0;
-  z-index: var(--z-sticky);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--spacing-xl);
-  padding: var(--spacing-md) var(--spacing-2xl);
-  
-  background: var(--glass-bg-c);
-  backdrop-filter: blur(var(--glass-blur-c));
-  -webkit-backdrop-filter: blur(var(--glass-blur-c));
-  border-bottom: 1px solid var(--glass-border-c);
-  box-shadow: var(--glass-shadow-c);
-  flex-wrap: wrap;
-  transition: var(--transition-base);
-}
-
-.header-brand {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
-  flex-shrink: 0;
-}
-
-.brand-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--accent-primary);
-  box-shadow: 0 0 0 3px var(--accent-focus);
-  flex-shrink: 0;
-}
-
-.brand-title {
-  font-family: var(--font-heading);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-bold);
-  color: var(--text-primary);
-  letter-spacing: -0.02em;
-  margin: 0;
-  line-height: 1;
-}
-
-.brand-period {
-  font-size: var(--font-size-xs);
-  color: var(--text-tertiary);
-  margin: var(--spacing-xs) 0 0;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-.period-chip {
-  background: var(--bg-ternary);
-  border: var(--ui-border-width) solid var(--border-secondary);
-  color: var(--text-tertiary);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
-  padding: 1px var(--spacing-sm);
-  border-radius: var(--ui-border-radius-pill);
-  font-family: var(--font-mono);
-}
-
-/* Controls */
-.header-controls {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  flex-wrap: wrap;
-}
-
-.ctrl-group {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.ctrl-label {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-tertiary);
-  line-height: 1;
-}
-
-.ctrl-divider {
-  width: var(--ui-border-width);
-  height: 28px;
-  background: var(--border-primary);
-  flex-shrink: 0;
-}
-
-.exec-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  font-family: var(--font-mono);
-  font-size: var(--font-size-xs);
-  color: var(--text-tertiary);
-  background: var(--bg-secondary);
-  border: var(--ui-border-width) solid var(--border-primary);
-  padding: var(--spacing-xs) var(--spacing-md);
-  border-radius: var(--ui-border-radius-sm);
-  white-space: nowrap;
-
-  i { color: var(--accent-primary); }
-}
-
-.icon-btn {
-  width: 32px;
-  height: 32px;
-  border: var(--ui-border-width) solid var(--border-primary);
-  background: var(--bg-secondary);
-  color: var(--text-secondary);
-  border-radius: var(--ui-border-radius-sm);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--font-size-base);
-  transition: var(--transition-fast);
-  flex-shrink: 0;
-
-  &:hover:not(:disabled) {
-    background: var(--accent-primary);
-    color: #fff;
-    border-color: var(--accent-primary);
-    box-shadow: 0 4px 12px var(--accent-focus);
-  }
-
-  &:disabled { opacity: 0.45; cursor: not-allowed; }
-}
-
-.spin { animation: spin 0.7s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* ═══════════════════════════════════════════════════════
-   LOADING
-   ═══════════════════════════════════════════════════════ */
-.loader-overlay {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--spacing-5xl);
-}
-
-.loader-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-lg);
-  padding: var(--spacing-3xl) var(--spacing-4xl);
-}
-
-.loader-label {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--text-tertiary);
-}
-
-/* ═══════════════════════════════════════════════════════
-   BODY LAYOUT
-   ═══════════════════════════════════════════════════════ */
-.dash-body {
-  padding: var(--spacing-xl) var(--spacing-2xl);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2xl);
-  flex: 1;
-
-  @media (max-width: 768px) {
-    padding: var(--spacing-lg) var(--spacing-lg);
-    gap: var(--spacing-lg);
-  }
-}
-
-/* ═══════════════════════════════════════════════════════
-   KPI STRIP
-   ═══════════════════════════════════════════════════════ */
-.kpi-strip {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: var(--spacing-lg);
-
-  @media (max-width: 1400px) { grid-template-columns: repeat(3, 1fr); }
-  @media (max-width: 900px)  { grid-template-columns: repeat(2, 1fr); }
-  @media (max-width: 480px)  { grid-template-columns: 1fr; }
-}
-
-.kpi-card {
-  padding: var(--spacing-xl);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-  position: relative;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    border-radius: var(--ui-border-radius-lg) var(--ui-border-radius-lg) 0 0;
-    background: var(--border-secondary);
-    transition: var(--transition-base);
-  }
-
-  &--revenue::before { background: var(--accent-primary); }
-  &--profit::before  { background: var(--color-success); }
-  &--inventory::before { background: var(--color-info); }
-  &--debt::before    { background: var(--color-error); }
-  &--health::before  { background: var(--color-warning); }
-}
-
-.kpi-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--spacing-sm);
-}
-
-.kpi-label {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--text-tertiary);
-}
-
-.kpi-icon {
-  font-size: var(--font-size-base);
-  color: var(--text-tertiary);
-  opacity: 0.6;
-
-  &--error { color: var(--color-error); opacity: 1; }
-}
-
-.kpi-amount {
-  font-family: var(--font-heading);
-  font-size: var(--font-size-3xl);
-  font-weight: var(--font-weight-bold);
-  color: var(--text-primary);
-  letter-spacing: -0.03em;
-  line-height: var(--line-height-tight);
-  margin: var(--spacing-xs) 0;
-
-  &--success { color: var(--color-success); }
-  &--error   { color: var(--color-error); }
-}
-
-.kpi-meta {
-  font-size: var(--font-size-xs);
-  color: var(--text-tertiary);
-  margin: 0;
-}
-
-.kpi-bar {
-  height: 3px;
-  background: var(--bg-ternary);
-  border-radius: var(--ui-border-radius-pill);
-  overflow: hidden;
-  margin-top: var(--spacing-sm);
-}
-
-.kpi-bar-fill {
-  height: 100%;
-  border-radius: var(--ui-border-radius-pill);
-  background: var(--accent-primary);
-  transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-
-  &--success { background: var(--color-success); }
-  &--error   { background: var(--color-error); }
-  &--info    { background: var(--color-info); }
-}
-
-/* Badges */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
-  text-transform: capitalize;
-  padding: 2px var(--spacing-sm);
-  border-radius: var(--ui-border-radius-pill);
-  background: var(--bg-ternary);
-  color: var(--text-tertiary);
-  border: var(--ui-border-width) solid var(--border-secondary);
-  white-space: nowrap;
-
-  &--up, &--success {
-    background: var(--color-success-bg);
-    color: var(--color-success);
-    border-color: var(--color-success-border);
-  }
-  &--error {
-    background: var(--color-error-bg);
-    color: var(--color-error);
-    border-color: var(--color-error-border);
-  }
-}
-
-/* ─── Health Ring ─── */
-.health-wrap {
-  position: relative;
-  width: 56px;
-  height: 56px;
-  margin: var(--spacing-sm) 0;
-}
-
-.health-ring {
-  width: 100%;
-  height: 100%;
-
-  .ring-track {
-    fill: none;
-    stroke: var(--bg-ternary);
-    stroke-width: 3;
-  }
-
-  .ring-arc {
-    fill: none;
-    stroke-width: 2.5;
-    stroke-linecap: round;
-    transform: rotate(-90deg);
-    transform-origin: 18px 18px;
-    animation: arc-in 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-
-    &--good { stroke: var(--color-success); }
-    &--warn { stroke: var(--color-warning); }
-    &--bad  { stroke: var(--color-error); }
-  }
-}
-
-.health-value {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-mono);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
-  color: var(--text-primary);
-}
-
-/* ═══════════════════════════════════════════════════════
-   ALERT RIBBON
-   ═══════════════════════════════════════════════════════ */
-.alert-ribbon {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  padding: var(--spacing-md) var(--spacing-lg);
-  background: var(--color-warning-bg);
-  border: var(--ui-border-width) solid var(--color-warning-border);
-  border-radius: var(--ui-border-radius);
-  font-size: var(--font-size-sm);
-  color: var(--color-warning);
-  flex-wrap: wrap;
-
-  i {
-    font-size: var(--font-size-md);
-    flex-shrink: 0;
-  }
-
-  strong { color: var(--color-warning-dark); }
-}
-
-.ribbon-items {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  flex-wrap: wrap;
-  margin-left: auto;
-}
-
-.ribbon-chip {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
-  padding: 1px var(--spacing-sm);
-  border-radius: var(--ui-border-radius-pill);
-  background: var(--color-warning-bg);
-  border: var(--ui-border-width) solid var(--color-warning-border);
-  color: var(--color-warning-dark);
-  white-space: nowrap;
-
-  &--more {
-    background: var(--bg-ternary);
-    border-color: var(--border-secondary);
-    color: var(--text-tertiary);
-  }
-}
-
-/* ═══════════════════════════════════════════════════════
-   BODY GRID
-   ═══════════════════════════════════════════════════════ */
-.body-grid {
-  display: grid;
-  grid-template-columns: 1fr 280px;
-  gap: var(--spacing-xl);
-  align-items: start;
-
-  @media (max-width: 1100px) { grid-template-columns: 1fr; }
-}
-
-.col-main,
-.col-side {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xl);
-}
-
-/* ═══════════════════════════════════════════════════════
-   PANEL BASE (Replaces .panel entirely with global .glass-card)
-   ═══════════════════════════════════════════════════════ */
-.panel {
-  padding: var(--spacing-xl);
-}
-
-.panel-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--spacing-lg);
-  padding-bottom: var(--spacing-md);
-  border-bottom: var(--ui-border-width) solid var(--component-divider);
-}
-
-.panel-head-left {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-}
-
-.panel-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: var(--ui-border-radius-sm);
-  background: var(--color-primary-bg);
-  color: var(--accent-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--font-size-sm);
-  flex-shrink: 0;
-
-  &--error {
-    background: var(--color-error-bg);
-    color: var(--color-error);
-  }
-}
-
-.panel-title {
-  font-family: var(--font-body);
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-semibold);
-  color: var(--text-primary);
-  margin: 0;
-}
-
-.panel-chip {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
-  padding: 2px var(--spacing-md);
-  border-radius: var(--ui-border-radius-pill);
-  background: var(--bg-ternary);
-  color: var(--text-tertiary);
-  border: var(--ui-border-width) solid var(--border-secondary);
-
-  &--error {
-    background: var(--color-error-bg);
-    color: var(--color-error);
-    border-color: var(--color-error-border);
-  }
-}
-
-.side-panel-title {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-tertiary);
-  margin: 0 0 var(--spacing-lg);
-  padding-bottom: var(--spacing-md);
-  border-bottom: var(--ui-border-width) solid var(--component-divider);
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-
-  i { color: var(--accent-primary); font-size: var(--font-size-sm); }
-}
-
-/* Hover effects for all list rows */
-.interactive-list-item {
-  transition: var(--transition-fast);
-  border-radius: var(--ui-border-radius-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  margin: 0 calc(var(--spacing-md) * -1);
-}
-.interactive-list-item:hover {
-  background-color: var(--component-bg-hover);
-}
-
-/* ═══════════════════════════════════════════════════════
-   AI INSIGHTS
-   ═══════════════════════════════════════════════════════ */
-.insights-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-}
-
-.insight-item {
-  display: flex;
-  gap: var(--spacing-md);
-  padding: var(--spacing-md) var(--spacing-lg);
-  border-radius: var(--ui-border-radius-sm);
-  background: transparent;
-  border-left: 3px solid var(--border-secondary);
-  transition: var(--transition-fast);
-
-  &:hover { background: var(--component-bg-hover); }
-
-  &--positive {
-    background: var(--color-success-bg);
-    border-left-color: var(--color-success);
-    .insight-icon i { color: var(--color-success); }
-  }
-  &--warning {
-    background: var(--color-warning-bg);
-    border-left-color: var(--color-warning);
-    .insight-icon i { color: var(--color-warning); }
-  }
-  &--info {
-    background: var(--color-info-bg);
-    border-left-color: var(--color-info);
-    .insight-icon i { color: var(--color-info); }
-  }
-}
-
-.insight-icon {
-  font-size: var(--font-size-md);
-  flex-shrink: 0;
-  margin-top: 1px;
-  i { color: var(--text-tertiary); }
-}
-
-.insight-content { flex: 1; min-width: 0; }
-
-.insight-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-xs);
-}
-
-.insight-title {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  color: var(--text-primary);
-}
-
-.insight-priority {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-tertiary);
-  background: var(--bg-ternary);
-  border: var(--ui-border-width) solid var(--border-secondary);
-  padding: 1px var(--spacing-sm);
-  border-radius: var(--ui-border-radius-pill);
-  flex-shrink: 0;
-
-  &--high   { background: var(--color-error-bg); color: var(--color-error); border-color: var(--color-error-border); }
-  &--medium { background: var(--color-warning-bg); color: var(--color-warning); border-color: var(--color-warning-border); }
-}
-
-.insight-msg {
-  font-size: var(--font-size-sm);
-  color: var(--text-secondary);
-  margin: 0;
-  line-height: var(--line-height-relaxed);
-}
-
-/* ═══════════════════════════════════════════════════════
-   AG-GRID HOST
-   ═══════════════════════════════════════════════════════ */
-.grid-host {
-  height: 300px;
-  border-radius: var(--ui-border-radius-sm);
-  overflow: hidden;
-  border: var(--ui-border-width) solid var(--border-primary);
-  background: transparent;
-}
-
-/* ═══════════════════════════════════════════════════════
-   CATEGORY PERFORMANCE
-   ═══════════════════════════════════════════════════════ */
-.category-list { display: flex; flex-direction: column; gap: var(--spacing-lg); }
-
-.category-row {
-  display: flex;
-  gap: var(--spacing-xl);
-  align-items: flex-start;
-  padding-bottom: var(--spacing-md);
-  border-bottom: 1px solid var(--component-divider);
-
-  &:last-child { border-bottom: none; }
-
-  @media (max-width: 600px) { flex-direction: column; gap: var(--spacing-md); }
-}
-
-.category-info { width: 160px; flex-shrink: 0; }
-
-.category-name {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  color: var(--text-primary);
-  display: block;
-}
-
-.category-margin {
-  font-size: var(--font-size-xs);
-  color: var(--text-tertiary);
-  font-family: var(--font-mono);
-}
-
-.category-bars { flex: 1; display: flex; flex-direction: column; gap: var(--spacing-sm); }
-
-.category-bar-wrap { display: flex; align-items: center; gap: var(--spacing-md); }
-
-.bar-label {
-  font-size: var(--font-size-xs);
-  color: var(--text-tertiary);
-  width: 46px;
-  flex-shrink: 0;
-  text-align: right;
-}
-
-.bar-track {
-  flex: 1;
-  height: 6px;
-  background: var(--bg-ternary);
-  border-radius: var(--ui-border-radius-pill);
-  overflow: hidden;
-}
-
-.bar-fill {
-  height: 100%;
-  border-radius: var(--ui-border-radius-pill);
-  transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-
-  &--accent   { background: var(--accent-primary); }
-  &--success  { background: var(--color-success); }
-}
-
-.bar-value {
-  font-family: var(--font-mono);
-  font-size: var(--font-size-xs);
-  color: var(--text-secondary);
-  width: 80px;
-  flex-shrink: 0;
-  text-align: right;
-}
-
-/* ═══════════════════════════════════════════════════════
-   STAT LIST
-   ═══════════════════════════════════════════════════════ */
-.stat-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.stat-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: var(--ui-border-width) dashed var(--component-divider);
-
-  &:last-child { border-bottom: none; }
-}
-
-.stat-label {
-  font-size: var(--font-size-sm);
-  color: var(--text-secondary);
-}
-
-.stat-value {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  color: var(--text-primary);
-
-  &.mono { font-family: var(--font-mono); }
-  &--success { color: var(--color-success); }
-  &.text-error { color: var(--color-error); }
-}
-
-/* ═══════════════════════════════════════════════════════
-   LEADERS LIST (products, customers)
-   ═══════════════════════════════════════════════════════ */
-.leaders-list { display: flex; flex-direction: column; }
-
-.leader-row {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  border-bottom: var(--ui-border-width) solid var(--component-divider);
-
-  &:last-child { border-bottom: none; }
-}
-
-.leader-rank {
-  font-family: var(--font-mono);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
-  color: var(--accent-primary);
-  width: 20px;
-  flex-shrink: 0;
-}
-
-.leader-avatar {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--color-primary-bg);
-  color: var(--accent-primary);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.leader-info { flex: 1; min-width: 0; }
-
-.leader-name {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  color: var(--text-primary);
-  margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.leader-sub {
-  font-size: var(--font-size-xs);
-  color: var(--text-tertiary);
-  margin: 0;
-}
-
-.leader-revenue {
-  font-family: var(--font-mono);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  color: var(--text-primary);
-  flex-shrink: 0;
-}
-
-/* ═══════════════════════════════════════════════════════
-   CUSTOMER SEGMENTS
-   ═══════════════════════════════════════════════════════ */
-.seg-list { display: flex; flex-direction: column; gap: var(--spacing-sm); }
-
-.seg-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--spacing-md) var(--spacing-lg);
-  background: transparent;
-  border: var(--ui-border-width) solid var(--border-primary);
-  border-radius: var(--ui-border-radius-sm);
-  transition: var(--transition-fast);
-
-  &:hover { border-color: var(--border-secondary); background: var(--component-bg-hover); }
-}
-
-.seg-left { display: flex; align-items: center; gap: var(--spacing-md); }
-
-.seg-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--accent-primary);
-  flex-shrink: 0;
-}
-
-.seg-name {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  color: var(--text-primary);
-}
-
-.seg-count {
-  font-family: var(--font-mono);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
-  background: var(--accent-primary);
-  color: #fff;
-  padding: 1px var(--spacing-md);
-  border-radius: var(--ui-border-radius-pill);
-}
-
-/* ═══════════════════════════════════════════════════════
-   STAFF LIST
-   ═══════════════════════════════════════════════════════ */
-.staff-list { display: flex; flex-direction: column; }
-
-.staff-row {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  border-bottom: var(--ui-border-width) solid var(--component-divider);
-
-  &:last-child { border-bottom: none; }
-}
-
-.staff-avatar {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: var(--accent-gradient);
-  color: #fff;
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-bold);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  box-shadow: var(--elevation-1);
-}
-
-.staff-info { flex: 1; min-width: 0; }
-
-.staff-name {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  color: var(--text-primary);
-  margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.staff-sub {
-  font-size: var(--font-size-xs);
-  color: var(--text-tertiary);
-  margin: 0;
-}
-
-.staff-rev {
-  font-family: var(--font-mono);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  color: var(--text-primary);
-  flex-shrink: 0;
-}
-
-/* ═══════════════════════════════════════════════════════
-   PRIMENG OVERRIDES — token-driven
-   ═══════════════════════════════════════════════════════ */
-::ng-deep .dash-select {
-  .p-select {
-    border: var(--ui-border-width) solid var(--border-primary) !important;
-    border-radius: var(--ui-border-radius-sm) !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    min-width: 140px;
-
-    &:hover   { border-color: var(--border-secondary) !important; background: var(--component-bg-hover) !important; }
-    &.p-focus { border-color: var(--accent-primary) !important; box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus) !important; }
-  }
-
-  .p-select-label {
-    font-size: var(--font-size-sm) !important;
-    font-weight: var(--font-weight-medium) !important;
-    color: var(--text-primary) !important;
-    padding: var(--spacing-sm) var(--spacing-md) !important;
-    font-family: var(--font-body) !important;
-  }
-}
-
-::ng-deep .dash-datepicker {
-  .p-datepicker-input {
-    border: var(--ui-border-width) solid var(--border-primary) !important;
-    border-radius: var(--ui-border-radius-sm) !important;
-    background: transparent !important;
-    font-size: var(--font-size-sm) !important;
-    font-family: var(--font-body) !important;
-    color: var(--text-primary) !important;
-    padding: var(--spacing-sm) var(--spacing-md) !important;
-    width: 190px;
-    transition: var(--transition-fast) !important;
-
-    &:hover { border-color: var(--border-secondary) !important; background: var(--component-bg-hover) !important; }
-    &:focus {
-      border-color: var(--accent-primary) !important;
-      box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus) !important;
-      outline: none !important;
+    :host { display: block; width: 100%; }
+    
+    .spin { animation: spin 0.7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    /* Toolbar Alignment & Sizes */
+    .compact-toolbar {
+      ::ng-deep .master-dropdown__control.p-select,
+      ::ng-deep .master-dropdown__control.p-multiselect {
+        min-height: 36px;
+        height: 36px;
+        border-radius: var(--ui-border-radius);
+      }
+      ::ng-deep .master-dropdown__control .p-select-label {
+        padding: 0.35rem 0.75rem;
+        font-size: 0.875rem;
+      }
+      ::ng-deep .p-datepicker-input {
+        padding: 0.35rem 0.75rem;
+        font-size: 0.875rem;
+        height: 36px;
+        border-radius: var(--ui-border-radius);
+      }
+      ::ng-deep .p-datepicker-trigger {
+        width: 36px;
+        height: 36px;
+        border-top-right-radius: var(--ui-border-radius);
+        border-bottom-right-radius: var(--ui-border-radius);
+      }
+      ::ng-deep .p-button.p-button-icon-only {
+        width: 36px;
+        height: 36px;
+        padding: 0;
+      }
     }
-  }
-}
-
-/* ═══════════════════════════════════════════════════════
-   SCROLLBAR — themed
-   ═══════════════════════════════════════════════════════ */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: var(--scroll-thumb) var(--scroll-track);
-}
-
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: var(--scroll-track); }
-::-webkit-scrollbar-thumb {
-  background: var(--scroll-thumb);
-  border-radius: var(--ui-border-radius-pill);
-}
   `]
 })
 export class AdminDashboardUiComponent implements OnInit, OnDestroy {
@@ -1444,7 +453,7 @@ export class AdminDashboardUiComponent implements OnInit, OnDestroy {
             display:inline-flex; align-items:center;
             font-size:var(--font-size-xs); font-weight:var(--font-weight-bold);
             text-transform:uppercase; letter-spacing:0.05em;
-            padding:1px 6px; border-radius:9999px;
+            padding:2px 8px; border-radius:var(--ui-border-radius-pill);
             background:var(--color-error-bg); color:var(--color-error);
             border:1px solid var(--color-error-border);
           ">${p.value}</span>`
@@ -1464,13 +473,20 @@ export class AdminDashboardUiComponent implements OnInit, OnDestroy {
       end = this.dateRange[1]?.toISOString();
     }
 
-    this.analyticsService.getDashboardOverview(start, end, this.selectedBranch).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (res) => { this.dashboard.set(res.data); this.loading.set(false); },
-      error: () => this.loading.set(false)
-    });
+    this.analyticsService.getDashboardOverview(start, end, this.selectedBranch)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res) => { 
+          this.dashboard.set(res.data); 
+          this.loading.set(false); 
+        },
+        error: () => this.loading.set(false)
+      });
   }
 
-  onFilterChange(): void { this.loadDashboard(); }
+  onFilterChange(): void { 
+    this.loadDashboard(); 
+  }
 
   ngOnDestroy(): void {
     this.destroy$.next();
