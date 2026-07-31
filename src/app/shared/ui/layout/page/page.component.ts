@@ -1,17 +1,16 @@
+// src/app/shared/ui/layout/page.component.ts
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 
 /**
  * Component: app-page
- * Purpose: Standard base layout wrapper for all feature pages.
- * Content Projection: Header, Content, etc.
- * Used By: Global
+ * Purpose: Base layout context. Applies theme background and full-screen flex.
  */
 @Component({
   selector: 'app-page',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    class: 'block w-full min-h-screen flex flex-col bg-slate-50'
+    class: 'block w-full min-h-screen flex flex-col bg-[var(--bg-secondary)] text-[var(--text-primary)]'
   },
   template: `
     <div class="flex-1 flex flex-col w-full h-full">
@@ -19,4 +18,4 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
     </div>
   `
 })
-export class PageComponent {}
+export class PageComponent { }

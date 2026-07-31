@@ -1,11 +1,10 @@
+// src/app/shared/ui/data/card.component.ts
 import { Component, ChangeDetectionStrategy, input } from '@angular/core';
 
 /**
  * Component: app-card
- * Purpose: Standard enterprise card container.
- * Inputs: title (string), subtitle (string), padded (boolean)
- * Content Projection: Default content, "card-actions", "card-footer"
- * Used By: Global
+ * Purpose: Universal enterprise data container synced with APEX theme tokens.
+ * Slots: [card-actions], Default (Body), [card-footer]
  */
 @Component({
   selector: 'app-card',
@@ -15,15 +14,20 @@ import { Component, ChangeDetectionStrategy, input } from '@angular/core';
     class: 'block w-full h-full'
   },
   template: `
-    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-full transition-shadow duration-200 hover:shadow-md">
+    <div class="bg-[var(--component-bg)] rounded-[var(--ui-border-radius)] shadow-[var(--elevation-1)] border border-[var(--component-border)] overflow-hidden flex flex-col h-full transition-[var(--transition-base)] hover:shadow-[var(--elevation-2)]">
+      
       @if (title() || subtitle()) {
-        <div class="px-6 py-5 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-50/50">
-          <div class="flex flex-col gap-1">
+        <div class="px-[var(--spacing-2xl)] py-[var(--spacing-xl)] border-b border-[var(--component-divider)] flex flex-col md:flex-row justify-between items-start md:items-center gap-[var(--spacing-md)] bg-[var(--bg-secondary)]">
+          <div class="flex flex-col gap-[var(--spacing-xs)]">
             @if (title()) {
-              <h3 class="text-base font-semibold text-slate-900 m-0 tracking-tight">{{ title() }}</h3>
+              <h3 class="text-[length:var(--font-size-md)] font-[var(--font-weight-semibold)] text-[var(--text-primary)] m-0 tracking-tight">
+                {{ title() }}
+              </h3>
             }
             @if (subtitle()) {
-              <p class="text-sm text-slate-500 m-0">{{ subtitle() }}</p>
+              <p class="text-[length:var(--font-size-sm)] text-[var(--text-secondary)] m-0">
+                {{ subtitle() }}
+              </p>
             }
           </div>
           <div>
@@ -32,7 +36,7 @@ import { Component, ChangeDetectionStrategy, input } from '@angular/core';
         </div>
       }
       
-      <div class="flex-1" [class.p-6]="padded()">
+      <div class="flex-1" [class.p-[var(--spacing-2xl)]]="padded()">
         <ng-content></ng-content>
       </div>
       
@@ -42,7 +46,7 @@ import { Component, ChangeDetectionStrategy, input } from '@angular/core';
   `
 })
 export class CardComponent {
-  title = input<string>('');
-  subtitle = input<string>('');
+  title = input<string>();
+  subtitle = input<string>();
   padded = input<boolean>(true);
 }

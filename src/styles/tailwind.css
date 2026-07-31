@@ -1,0 +1,31 @@
+/* src/styles/tailwind.css — NEW file, plain .css not .scss */
+@import "tailwindcss";
+@source "../../libs/**/*.{html,ts}";
+
+@theme inline {
+    --color-surface: var(--bg-primary);
+    --color-surface-alt: var(--bg-secondary);
+    --color-surface-raised: var(--component-surface-raised);
+
+    --color-text-primary: var(--text-primary);
+    --color-text-secondary: var(--text-secondary);
+    --color-text-muted: var(--text-muted);
+
+    --color-border-default: var(--border-primary);
+    --color-border-subtle: var(--border-secondary);
+
+    --color-accent: var(--accent-primary);
+    --color-accent-hover: var(--accent-hover);
+
+    --color-success: var(--color-success);
+    --color-warning: var(--color-warning);
+    --color-danger: var(--color-error);
+    --color-info: var(--color-info);
+
+    --radius-default: var(--ui-border-radius);
+    --radius-lg: var(--ui-border-radius-lg);
+    --radius-xl: var(--ui-border-radius-xl);
+
+    --shadow-elevation-1: var(--elevation-1);
+    --shadow-elevation-2: var(--elevation-2);
+}

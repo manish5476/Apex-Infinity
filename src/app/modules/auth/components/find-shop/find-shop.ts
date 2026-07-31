@@ -1,21 +1,46 @@
 import { Component, inject, signal, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+
+// PrimeNG
 import { ToastModule } from 'primeng/toast';
 import { InputTextModule } from 'primeng/inputtext';
-import { ButtonModule } from 'primeng/button';
+import { MessageService } from 'primeng/api';
+
+// Services
 import { AppMessageService } from '../../../../core/services/message.service';
 import { OrganizationService } from '../../../organization/organization.service';
-import { Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
+
+// UI Components (Shared)
+import { PageComponent } from '@shared/ui/layout/page/page.component';
+import { FloatingSplitLayoutComponent } from '@shared/ui/layout/floating-split-layout.component';
+import { FieldComponent } from '@shared/ui/form/field.component';
+import { ButtonComponent } from '@shared/ui/form/button.component';
+import { StatusBadgeComponent } from '@shared/ui/badge/status-badge.component';
 
 @Component({
   selector: 'app-find-shop',
   standalone: true,
-  imports: [ReactiveFormsModule, ToastModule, InputTextModule, ButtonModule, RouterLink],
-  providers: [AppMessageService],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink,
+    // PrimeNG
+    ToastModule,
+    InputTextModule,
+    // UI Components
+    PageComponent,
+    FloatingSplitLayoutComponent,
+    FieldComponent,
+    ButtonComponent,
+    StatusBadgeComponent,
+  ],
+  providers: [AppMessageService, MessageService],
   templateUrl: './find-shop.html',
-  styleUrl: './find-shop.scss'
+  styleUrls: ['./find-shop.scss']
 })
 export class FindShopComponent implements OnDestroy {
   private readonly destroy$ = new Subject<void>();
@@ -37,18 +62,21 @@ export class FindShopComponent implements OnDestroy {
 
     this.isLoading.set(true);
 
-    this.orgService.lookupOrganizations({ email: this.findForm.value.email! }).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (res) => {
-        this.isLoading.set(false);
-        // Emulate sending real time id to verify
-        this.messageService.showSuccess('A verification email with your Shop ID has been sent to ' + this.findForm.value.email!);
-        this.findForm.reset();
-      },
-      error: (err) => {
-        this.isLoading.set(false);
-        this.messageService.handleHttpError(err);
-      }
-    });
+    this.orgService.lookupOrganizations({ email: this.findForm.value.email! })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res) => {
+          this.isLoading.set(false);
+          this.messageService.showSuccess(
+            'A verification email with your Shop ID has been sent to ' + this.findForm.value.email!
+          );
+          this.findForm.reset();
+        },
+        error: (err) => {
+          this.isLoading.set(false);
+          this.messageService.handleHttpError(err);
+        }
+      });
   }
 
   ngOnDestroy(): void {

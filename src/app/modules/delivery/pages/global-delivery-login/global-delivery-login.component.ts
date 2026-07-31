@@ -1,91 +1,143 @@
-import { Component, inject, ViewEncapsulation } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+
+// UI Components (Shared)
+import { PageComponent } from '@shared/ui/layout/page/page.component';
+import { FloatingSplitLayoutComponent } from '@shared/ui/layout/floating-split-layout.component';
+import { FieldComponent } from '@shared/ui/form/field.component';
+import { ButtonComponent } from '@shared/ui/form/button.component';
+import { StatusBadgeComponent } from '@shared/ui/badge/status-badge.component';
 
 @Component({
   selector: 'app-global-delivery-login',
   standalone: true,
-  imports: [FormsModule],
-  encapsulation: ViewEncapsulation.None,
+  imports: [
+    FormsModule,
+    RouterModule,
+    // UI Components
+    PageComponent,
+    FloatingSplitLayoutComponent,
+    FieldComponent,
+    ButtonComponent,
+    StatusBadgeComponent
+  ],
   template: `
-<div class="auth-root">
-  <aside class="brand-panel">
-    <div class="grid-lines" aria-hidden="true"></div>
-    <div class="orb orb-1" aria-hidden="true"></div>
-    <div class="orb orb-2" aria-hidden="true"></div>
+    <app-page>
+      <app-floating-split-layout
+        imageSrc="https://images.pexels.com/photos/16846298/pexels-photo-16846298.jpeg"
+        imageAlt="Apex Global Logistics"
+        [reverse]="true">
 
-    <div class="brand-inner">
-      <div class="wordmark">
-        <div class="logo-glyph">
-          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M4 28 L16 4 L28 28" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
-            <path d="M8.5 20 L23.5 20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
-          </svg>
-        </div>
-        <span class="wordmark-text">Apex</span>
-      </div>
+        <!-- ========================================== -->
+        <!-- BRAND OVERLAY: Left side                   -->
+        <!-- ========================================== -->
+        <div brand-overlay class="relative z-10 flex flex-col h-full justify-between text-white">
 
-      <div class="hero-copy">
-        <p class="overline-text">Global Logistics</p>
-        <h1 class="hero-headline">
-          Route<br>
-          with<br>
-          <em>impact.</em>
-        </h1>
-        <p class="hero-body">
-          Seamlessly connect your local store operations with the global Apex delivery infrastructure.
-        </p>
-      </div>
+          <!-- Top: Logo & Brand -->
+          <div class="flex items-center gap-3">
+            <div class="h-10 w-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center shadow-sm">
+              <i class="pi pi-box text-xl"></i>
+            </div>
+            <span class="text-2xl font-[var(--font-heading)] font-bold tracking-tight">Apex</span>
+          </div>
 
-      <footer class="brand-footer">
-        <span>© 2026 Apex Inc.</span>
-      </footer>
-    </div>
-  </aside>
+          <!-- Bottom: Hero Content -->
+          <div>
+            <i class="pi pi-quote-left text-4xl opacity-40 mb-4 block"></i>
+            <h2 class="text-4xl xl:text-5xl font-[var(--font-heading)] font-bold leading-tight mb-6 max-w-lg">
+              Route<br>
+              with<br>
+              <em>impact.</em>
+            </h2>
 
-  <main class="form-panel" id="main-content">
-    <div class="form-inner">
-      <div class="form-header">
-        <h2 class="form-title">Store Delivery Portal</h2>
-        <p class="form-subtitle">Enter your assigned Store ID to manage dispatch, tracking, and local logistics.</p>
-      </div>
-
-      @if (error) {
-        <div class="error-banner" role="alert">
-          <svg class="error-icon" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-          </svg>
-          <span>{{ error }}</span>
-        </div>
-      }
-
-      <form (ngSubmit)="onSubmit()" #loginForm="ngForm" class="auth-form" novalidate>
-        <div class="field-group">
-          <label class="field-label" for="storeId">Organization ID</label>
-          <input type="text" id="storeId" name="storeId" [(ngModel)]="storeId" required class="apex-input" placeholder="e.g. apex-store-1" autocomplete="off" spellcheck="false">
+            <div class="flex items-center justify-between mt-8">
+              <div class="flex items-center gap-4 text-sm font-medium tracking-widest opacity-80">
+                <span>Local</span>
+                <span class="w-12 border-b border-white/30"></span>
+                <span>Global</span>
+              </div>
+              <div class="flex gap-3">
+                <app-status-badge status="info" label="Store Portal" variant="solid" size="sm"></app-status-badge>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <button type="submit" class="submit-btn" [class.loading]="loading" [disabled]="loginForm.invalid || loading">
-          @if (loading) {
-            <span class="spinner" aria-hidden="true"></span>
-            <span>Locating…</span>
-          } @else {
-            <span>Continue to Login</span>
-            <svg class="btn-arrow" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-            </svg>
+        <!-- ========================================== -->
+        <!-- LOGIN FORM: Right side                      -->
+        <!-- ========================================== -->
+        <div class="w-full flex flex-col justify-center py-6">
+
+          <!-- Header -->
+          <div class="mb-8">
+            <h1 class="text-[length:var(--font-size-4xl)] font-[var(--font-weight-bold)] text-[var(--text-primary)] tracking-tight">
+              Store Delivery Portal
+            </h1>
+            <p class="text-[length:var(--font-size-sm)] text-[var(--text-secondary)] mt-1">
+              Enter your assigned Organization ID to manage dispatch, tracking, and local logistics.
+            </p>
+          </div>
+
+          <!-- Error Banner -->
+          @if (error) {
+            <div class="mb-4 p-3 rounded-[var(--ui-border-radius)] bg-[var(--color-error-bg)] border border-[var(--color-error-border)] flex items-start gap-3 animate-fade-in">
+              <i class="pi pi-exclamation-circle text-[var(--color-error)] text-lg mt-0.5"></i>
+              <div class="flex-1">
+                <p class="text-[length:var(--font-size-xs)] text-[var(--color-error-dark)] m-0 font-medium">
+                  {{ error }}
+                </p>
+              </div>
+            </div>
           }
-        </button>
 
-        <button type="button" class="submit-btn" (click)="goBack()" style="margin-top: 1rem; background: transparent; color: var(--text-primary); border: 1px solid var(--border);">
-          Return to Main ERP
-        </button>
-      </form>
-    </div>
-  </main>
-</div>
-`,
-  styleUrl: '../../../../modules/auth/_auth.shared.scss'
+          <!-- Form -->
+          <form (ngSubmit)="onSubmit()" #loginForm="ngForm" class="flex flex-col w-full">
+
+            <!-- Store ID -->
+            <div class="mb-6">
+              <app-field label="Organization ID" [required]="true">
+                <input 
+                  pInputText 
+                  type="text" 
+                  name="storeId" 
+                  [(ngModel)]="storeId" 
+                  required
+                  placeholder="e.g. apex-store-1" 
+                  autocomplete="off" 
+                  spellcheck="false"
+                  class="w-full rounded-[var(--ui-border-radius)] bg-[var(--input-bg)] border border-[var(--input-border)] hover:border-[var(--accent-primary)] focus:bg-[var(--bg-primary)] transition-all px-4 py-2.5" />
+              </app-field>
+            </div>
+
+            <!-- Submit -->
+            <app-button 
+              type="submit" 
+              variant="primary" 
+              [label]="loading ? 'Locating...' : 'Continue to Login'"
+              [icon]="loading ? 'pi pi-spinner pi-spin' : 'pi pi-arrow-right'" 
+              iconPosition="right"
+              [loading]="loading" 
+              [disabled]="loginForm.invalid || loading" 
+              class="w-full">
+            </app-button>
+
+            <!-- Return Button -->
+            <app-button 
+              type="button" 
+              variant="secondary" 
+              label="Return to Main ERP"
+              (clicked)="goBack()"
+              class="w-full mt-4">
+            </app-button>
+
+          </form>
+        </div>
+
+      </app-floating-split-layout>
+    </app-page>
+  `,
+  styleUrls: ['./global-delivery-login.component.scss']
 })
 export class GlobalDeliveryLoginComponent {
   private router = inject(Router);

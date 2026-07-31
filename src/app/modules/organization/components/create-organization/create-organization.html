@@ -1,242 +1,191 @@
-<!-- create-organization.component.html -->
-<div class="auth-root fade-in">
+<app-page>
+  <app-floating-split-layout imageSrc="https://images.pexels.com/photos/16846298/pexels-photo-16846298.jpeg"
+    imageAlt="Apex Infinity Deep Space" [reverse]="true">
 
-  <!-- ══════════════════════════════════════════════════════
-       LEFT — Brand Panel
-  ═══════════════════════════════════════════════════════ -->
-  <aside class="brand-panel">
-    <div class="grid-lines" aria-hidden="true"></div>
-    <div class="orb orb-1" aria-hidden="true"></div>
-    <div class="orb orb-2" aria-hidden="true"></div>
+    <!-- ========================================== -->
+    <!-- OVERLAY: Projected into the left side      -->
+    <!-- ========================================== -->
+    <div brand-overlay class="relative z-10 flex flex-col h-full justify-between text-white">
 
-    <div class="brand-inner z-10">
-      <a routerLink="/" class="wordmark group">
-        <div class="logo-glyph group-hover:shadow-lg transition-all">
-          <svg viewBox="0 0 32 32" fill="none">
-            <path d="M4 28L16 4L28 28" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-              stroke-linejoin="round" />
-            <path d="M8.5 20L23.5 20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
-          </svg>
+      <!-- Top Content: Project Name -->
+      <div class="flex items-center gap-3">
+        <div class="h-10 w-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center shadow-sm">
+          <i class="pi pi-box text-xl"></i>
         </div>
-        <span class="wordmark-text">Apex</span>
-      </a>
+        <span class="text-2xl font-[var(--font-heading)] font-bold tracking-tight">Apex Infinity</span>
+      </div>
 
-      <div class="hero-copy mt-5xl">
-        <p class="overline-text">Enterprise Setup</p>
-        <h1 class="hero-headline">
-          Build your<br>
-          digital <em>HQ.</em>
+      <!-- Bottom Content: Catchphrase & UI Slider -->
+      <div>
+        <i class="pi pi-quote-left text-4xl opacity-40 mb-4 block"></i>
+        <h2 class="text-4xl xl:text-5xl font-[var(--font-heading)] font-bold leading-tight mb-6 max-w-lg">
+          Go anywhere you want in a Galaxy full of wonders!
+        </h2>
+
+        <!-- Decorative slider indicators -->
+        <div class="flex items-center justify-between mt-8">
+          <div class="flex items-center gap-4 text-sm font-medium tracking-widest opacity-80">
+            <span>01</span>
+            <span class="w-12 border-b border-white/30"></span>
+            <span>06</span>
+          </div>
+          <div class="flex gap-3">
+            <button type="button"
+              class="w-12 h-12 rounded-full border border-white/30 flex items-center justify-center hover:bg-white/10 transition-colors backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white/50">
+              <i class="pi pi-arrow-left"></i>
+            </button>
+            <button type="button"
+              class="w-12 h-12 rounded-full border border-white/30 flex items-center justify-center hover:bg-white/10 transition-colors backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white/50">
+              <i class="pi pi-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- FORM WIZARD: Rendered on the right side    -->
+    <!-- ========================================== -->
+    <div class="w-full max-w-lg mx-auto lg:mx-0 flex flex-col h-full">
+
+      <!-- Header -->
+      <div class="mb-10">
+        <h1
+          class="text-[length:var(--font-size-4xl)] font-[var(--font-weight-bold)] text-[var(--text-primary)] tracking-tight">
+          Create Workspace
         </h1>
-        <p class="hero-body">
-          Configure your organization, establish your headquarters, and secure your super-admin access in one seamless
-          flow.
+        <p class="text-[length:var(--font-size-md)] text-[var(--text-secondary)] mt-2">
+          Enterprise Ready • Secure • Multi-User
         </p>
       </div>
 
-      <!-- Step Tracker (Synced with Stepper via activeSection) -->
-      <div class="step-tracker hidden md:flex">
-        @for (step of sections; track step; let i = $index) {
-        <div class="step-item" [class.active]="activeSection() === i" [class.done]="activeSection() > i">
-          <div class="step-dot">
-            @if (activeSection() > i) {
-            <i class="pi pi-check text-xs"></i>
-            } @else {
-            <span>{{ i + 1 }}</span>
-            }
-          </div>
-          <span class="step-label">{{ step }}</span>
+      <!-- Main Form Wrapper (Height fix applied here) -->
+      <form [formGroup]="organizationForm" class="flex flex-col w-full max-w-lg mx-auto lg:mx-0">
+
+        <div class="mb-8">
+          <app-tab-bar [tabs]="myTabs" [(activeTabId)]="activeTab"></app-tab-bar>
         </div>
-        }
-      </div>
-    </div>
 
-    <footer class="brand-footer z-10">
-      <span>© 2026 Apex Intelligence</span>
-    </footer>
-  </aside>
+        <!-- Animation Trigger applied to the wrapper -->
+        <div class="min-h-[320px] mb-8" [@wizardStep]="currentStepIndex()">
 
-  <!-- ══════════════════════════════════════════════════════
-       RIGHT — Form Panel with PrimeNG Stepper
-  ═══════════════════════════════════════════════════════ -->
-  <main class="form-panel">
-    <div class="form-inner">
+          <!-- STEP 1: ORGANIZATION -->
+          @if (currentStepIndex() === 0) {
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+            <div class="md:col-span-2">
+              <app-field label="Organization Name" [required]="true" [error]="getFieldError('organizationName')">
+                <input pInputText type="text" formControlName="organizationName" placeholder="e.g. Shivam Electronics"
+                  (blur)="generateShopId()"
+                  class="w-full rounded-[var(--ui-border-radius)] bg-[var(--input-bg)] border border-[var(--input-border)] hover:border-[var(--accent-primary)] focus:bg-[var(--bg-primary)] transition-all text-[var(--input-text)] px-4 py-3" />
+              </app-field>
+            </div>
 
-      <div class="form-header mb-xl">
-        <h2 class="form-title m-0 text-3xl font-heading font-bold text-primary">Onboarding Wizard</h2>
-        <p class="form-subtitle mt-sm text-secondary">Follow the steps to register your organization.</p>
-      </div>
+            <app-field label="Unique Shop ID" [required]="true" [error]="getFieldError('uniqueShopId')">
+              <input pInputText type="text" formControlName="uniqueShopId" placeholder="SHIVAM-HQ"
+                class="w-full rounded-[var(--ui-border-radius)] bg-[var(--input-bg)] border border-[var(--input-border)] hover:border-[var(--accent-primary)] focus:bg-[var(--bg-primary)] transition-all text-[var(--input-text)] px-4 py-3 uppercase" />
+            </app-field>
 
-      <!-- UI Feedback -->
-      @if (successMessage()) {
-      <div class="bg-success-bg border-success-border text-success-dark p-md rounded-md mb-lg border" role="status">
-        <i class="pi pi-check-circle mr-sm"></i> {{ successMessage() }}
-      </div>
-      }
-      @if (errorMessage()) {
-      <div class="bg-error-bg border-error-border text-error-dark p-md rounded-md mb-lg border" role="alert">
-        <i class="pi pi-exclamation-triangle mr-sm"></i> {{ errorMessage() }}
-      </div>
-      }
+            <app-field label="GST Number" hint="Optional" [error]="getFieldError('gstNumber')">
+              <input pInputText type="text" formControlName="gstNumber" placeholder="22AAAAA0000A1Z5"
+                class="w-full rounded-[var(--ui-border-radius)] bg-[var(--input-bg)] border border-[var(--input-border)] hover:border-[var(--accent-primary)] focus:bg-[var(--bg-primary)] transition-all text-[var(--input-text)] px-4 py-3 uppercase" />
+            </app-field>
 
-      <form [formGroup]="organizationForm" (ngSubmit)="onSubmit()" novalidate class="card-anim-1">
+            <app-field label="Primary Email" [required]="true" [error]="getFieldError('primaryEmail')">
+              <input pInputText type="email" formControlName="primaryEmail" placeholder="admin@shivamelectronics.com"
+                class="w-full rounded-[var(--ui-border-radius)] bg-[var(--input-bg)] border border-[var(--input-border)] hover:border-[var(--accent-primary)] focus:bg-[var(--bg-primary)] transition-all text-[var(--input-text)] px-4 py-3" />
+            </app-field>
 
-        <p-stepper [value]="activeSection() + 1" (valueChange)="activeSection.set(($event || 1) - 1)"
-          class="custom-stepper">
+            <app-field label="Primary Phone" [required]="true" [error]="getFieldError('primaryPhone')">
+              <input pInputText type="tel" formControlName="primaryPhone" placeholder="+91 9876543210"
+                class="w-full rounded-[var(--ui-border-radius)] bg-[var(--input-bg)] border border-[var(--input-border)] hover:border-[var(--accent-primary)] focus:bg-[var(--bg-primary)] transition-all text-[var(--input-text)] px-4 py-3" />
+            </app-field>
+          </div>
+          }
 
-          <!-- Hidden List to satisfy PrimeNG Structure -->
-          <p-step-list class="hidden">
-            <p-step [value]="1">Profile</p-step>
-            <p-step [value]="2">Location</p-step>
-            <p-step [value]="3">Security</p-step>
-          </p-step-list>
+          <!-- STEP 2: HEADQUARTERS -->
+          @if (currentStepIndex() === 1) {
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+            <div class="md:col-span-2">
+              <app-field label="Branch Name" [required]="true" [error]="getBranchFieldError('mainBranchName')">
+                <input pInputText type="text" formControlName="mainBranchName" placeholder="Head Office"
+                  class="w-full rounded-[var(--ui-border-radius)] bg-[var(--input-bg)] border border-[var(--input-border)] hover:border-[var(--accent-primary)] focus:bg-[var(--bg-primary)] transition-all px-4 py-3" />
+              </app-field>
+            </div>
+          </div>
 
-          <p-step-panels>
-            <!-- STEP 1: ORGANIZATION PROFILE -->
-            <p-step-panel [value]="1">
-              <ng-template pTemplate="content" let-activateCallback="activateCallback">
-                <div class="form-section">
-                  <div class="section-heading mb-xl">
-                    <div class="section-badge"><i class="pi pi-building"></i></div>
-                    <div class="section-info">
-                      <h3 class="section-title">Organization Profile</h3>
-                      <p class="section-desc">Basic identification details for your company.</p>
-                    </div>
-                  </div>
+          <div formGroupName="mainBranchAddress" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5 pt-5">
+            <div class="md:col-span-2">
+              <app-field label="Street Address" [required]="true" [error]="getBranchFieldError('street')">
+                <input pInputText type="text" formControlName="street" placeholder="Main Market Road"
+                  class="w-full rounded-[var(--ui-border-radius)] bg-[var(--input-bg)] border border-[var(--input-border)] hover:border-[var(--accent-primary)] focus:bg-[var(--bg-primary)] transition-all px-4 py-3" />
+              </app-field>
+            </div>
 
-                  <div class="fields-grid">
-                    <div class="field-group col-span-2">
-                      <label class="field-label">Legal Entity Name</label>
-                      <input type="text" pInputText class="premium-input w-full" formControlName="organizationName"
-                        placeholder="e.g. Apex Global" (blur)="generateShopId()" />
-                    </div>
-                    <div class="field-group">
-                      <label class="field-label">Workspace ID</label>
-                      <input type="text" pInputText class="premium-input w-full uppercase" formControlName="uniqueShopId"
-                        placeholder="APEX-HQ" />
-                    </div>
-                    <div class="field-group">
-                      <label class="field-label">Tax ID / GST <span
-                          class="text-xs text-tertiary ml-xs font-normal">(Optional)</span></label>
-                      <input type="text" pInputText class="premium-input w-full uppercase" formControlName="gstNumber" />
-                    </div>
-                    <div class="field-group">
-                      <label class="field-label">Contact Email</label>
-                      <input type="email" pInputText class="premium-input w-full" formControlName="primaryEmail" />
-                    </div>
-                    <div class="field-group">
-                      <label class="field-label">Contact Phone</label>
-                      <input type="tel" pInputText class="premium-input w-full" formControlName="primaryPhone" />
-                    </div>
-                  </div>
+            <app-field label="City" [error]="getBranchFieldError('city')">
+              <input pInputText type="text" formControlName="city" placeholder="Mumbai"
+                class="w-full rounded-[var(--ui-border-radius)] bg-[var(--input-bg)] border border-[var(--input-border)] hover:border-[var(--accent-primary)] focus:bg-[var(--bg-primary)] transition-all px-4 py-3" />
+            </app-field>
 
-                  <div class="flex justify-end mt-3xl">
-                    <p-button label="Next Step" icon="pi pi-arrow-right" iconPos="right" (onClick)="activateCallback(2)"
-                      [disabled]="f['organizationName']?.invalid || f['uniqueShopId']?.invalid"
-                      styleClass="btn-primary" />
-                  </div>
-                </div>
-              </ng-template>
-            </p-step-panel>
+            <div class="grid grid-cols-2 gap-4">
+              <app-field label="State" [error]="getBranchFieldError('state')">
+                <input pInputText type="text" formControlName="state" placeholder="Maharashtra"
+                  class="w-full rounded-[var(--ui-border-radius)] bg-[var(--input-bg)] border border-[var(--input-border)] hover:border-[var(--accent-primary)] focus:bg-[var(--bg-primary)] transition-all px-4 py-3" />
+              </app-field>
 
-            <!-- STEP 2: HEADQUARTERS -->
-            <p-step-panel [value]="2">
-              <ng-template pTemplate="content" let-activateCallback="activateCallback">
-                <div class="form-section">
-                  <div class="section-heading mb-xl">
-                    <div class="section-badge"><i class="pi pi-map-marker"></i></div>
-                    <div class="section-info">
-                      <h3 class="section-title">Headquarters Location</h3>
-                      <p class="section-desc">The physical base of your operation.</p>
-                    </div>
-                  </div>
+              <app-field label="ZIP / Postal Code" [error]="getBranchFieldError('zipCode')">
+                <input pInputText type="text" formControlName="zipCode" placeholder="400001"
+                  class="w-full rounded-[var(--ui-border-radius)] bg-[var(--input-bg)] border border-[var(--input-border)] hover:border-[var(--accent-primary)] focus:bg-[var(--bg-primary)] transition-all px-4 py-3" />
+              </app-field>
+            </div>
+          </div>
+          }
 
-                  <div class="fields-grid" formGroupName="mainBranchAddress">
-                    <div class="field-group col-span-2">
-                      <label class="field-label">Branch Designation</label>
-                      <input type="text" pInputText class="premium-input w-full"
-                        [formControl]="$any(organizationForm.get('mainBranchName'))!" placeholder="Head Office" />
-                    </div>
-                    <div class="field-group col-span-2">
-                      <label class="field-label">Street Address</label>
-                      <input type="text" pInputText class="premium-input w-full" formControlName="street" />
-                    </div>
-                    <div class="field-group">
-                      <label class="field-label">City</label>
-                      <input type="text" pInputText class="premium-input w-full" formControlName="city" />
-                    </div>
-                    <div class="field-group">
-                      <label class="field-label">State</label>
-                      <input type="text" pInputText class="premium-input w-full" formControlName="state" />
-                    </div>
-                    <div class="field-group col-span-2 sm:col-span-1">
-                      <label class="field-label">Zip Code</label>
-                      <input type="text" pInputText class="premium-input w-full" formControlName="zipCode" />
-                    </div>
-                  </div>
+          <!-- STEP 3: SUPER ADMIN -->
+          @if (currentStepIndex() === 2) {
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+            <app-field label="Full Name" hint="Administrator's name" [error]="getFieldError('ownerName')">
+              <input pInputText type="text" formControlName="ownerName" placeholder="Jane Doe"
+                class="w-full rounded-[var(--ui-border-radius)] bg-[var(--input-bg)] border border-[var(--input-border)] hover:border-[var(--accent-primary)] focus:bg-[var(--bg-primary)] transition-all px-4 py-3" />
+            </app-field>
 
-                  <div class="flex justify-between mt-3xl">
-                    <p-button label="Back" severity="secondary" icon="pi pi-arrow-left" (onClick)="activateCallback(1)"
-                      styleClass="btn-back" />
-                    <p-button label="Next Step" icon="pi pi-arrow-right" iconPos="right" (onClick)="activateCallback(3)"
-                      [disabled]="organizationForm.get('mainBranchAddress')?.invalid" styleClass="btn-primary" />
-                  </div>
-                </div>
-              </ng-template>
-            </p-step-panel>
+            <app-field label="Login Email" hint="Used for sign in" [error]="getFieldError('ownerEmail')">
+              <input pInputText type="email" formControlName="ownerEmail" placeholder="jane@company.com"
+                class="w-full rounded-[var(--ui-border-radius)] bg-[var(--input-bg)] border border-[var(--input-border)] hover:border-[var(--accent-primary)] focus:bg-[var(--bg-primary)] transition-all px-4 py-3" />
+            </app-field>
 
-            <!-- STEP 3: SUPER ADMIN -->
-            <p-step-panel [value]="3">
-              <ng-template pTemplate="content" let-activateCallback="activateCallback">
-                <div class="form-section admin-section">
-                  <div class="section-heading mb-xl">
-                    <div class="section-badge section-badge--admin"><i class="pi pi-shield"></i></div>
-                    <div class="section-info">
-                      <h3 class="section-title">Super Admin Credentials</h3>
-                      <p class="section-desc">The master account for your organization.</p>
-                    </div>
-                  </div>
+            <div class="md:col-span-2 max-w-md pt-2">
+              <app-field label="Password" hint="Minimum 8 characters required."
+                [error]="getFieldError('ownerPassword')">
+                <p-password formControlName="ownerPassword" [toggleMask]="true" [feedback]="true" placeholder="••••••••"
+                  styleClass="w-full"
+                  inputStyleClass="w-full rounded-[var(--ui-border-radius)] bg-[var(--input-bg)] border border-[var(--input-border)] hover:border-[var(--accent-primary)] focus:bg-[var(--bg-primary)] transition-all px-4 py-3">
+                </p-password>
+              </app-field>
+            </div>
+          </div>
+          }
+        </div>
 
-                  <div class="fields-grid bg-surface border-tertiary p-xl rounded-lg border-dashed border">
-                    <div class="field-group col-span-2">
-                      <label class="field-label">Admin Full Name</label>
-                      <input type="text" pInputText class="premium-input w-full" formControlName="ownerName" />
-                    </div>
-                    <div class="field-group col-span-2">
-                      <label class="field-label">Login Email</label>
-                      <input type="email" pInputText class="premium-input w-full" formControlName="ownerEmail" />
-                    </div>
-                    <div class="field-group col-span-2">
-                      <label class="field-label">Access Password</label>
-                      <div class="password-wrap relative">
-                        <input [type]="passwordVisible() ? 'text' : 'password'" pInputText
-                          class="premium-input w-full pr-5xl" formControlName="ownerPassword" />
-                        <button type="button"
-                          class="absolute right-0 top-0 h-full px-md text-tertiary hover:text-primary transition-base cursor-pointer bg-transparent border-none"
-                          (click)="togglePassword()" tabindex="-1">
-                          <i [class]="passwordVisible() ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+        <!-- FOOTER (Button rendering fix applied here) -->
+        <div class="pt-6 border-t border-[var(--border-secondary)] flex items-center justify-between">
+          <app-button variant="ghost" label="Previous" [disabled]="currentStepIndex() === 0 || isLoading()"
+            (clicked)="prevStep()">
+          </app-button>
 
-                  <div class="flex justify-between mt-3xl">
-                    <p-button label="Back" severity="secondary" icon="pi pi-arrow-left" (onClick)="activateCallback(2)"
-                      styleClass="btn-back" />
-                    <p-button [label]="isLoading() ? 'Deploying...' : 'Complete Setup'"
-                      [icon]="isLoading() ? 'pi pi-spin pi-spinner' : 'pi pi-check-circle'" iconPos="right" type="submit"
-                      [disabled]="isLoading() || organizationForm.invalid" styleClass="btn-primary px-xl" />
-                  </div>
-                </div>
-              </ng-template>
-            </p-step-panel>
-          </p-step-panels>
-        </p-stepper>
+          @if (currentStepIndex() < 2) { <app-button variant="primary" label="Continue" icon="pi pi-arrow-right"
+            iconPosition="right"
+            [disabled]="(currentStepIndex() === 0 && !step1Valid) || (currentStepIndex() === 1 && !step2Valid) || isLoading()"
+            (clicked)="nextStep()">
+            </app-button>
+            } @else {
+            <app-button variant="success" [label]="isLoading() ? 'Initializing...' : 'Complete Setup'"
+              [icon]="isLoading() ? 'pi pi-spinner pi-spin' : 'pi pi-check'" iconPosition="right"
+              [loading]="isLoading()" [disabled]="!step3Valid || isLoading()" (clicked)="onComplete()">
+            </app-button>
+            }
+        </div>
       </form>
-
-      <p class="text-center text-secondary text-sm mt-5xl">
-        Need help? <a href="#" class="text-primary font-medium hover:underline text-accent">Contact Support</a>
-      </p>
-
     </div>
-  </main>
-</div>
+
+  </app-floating-split-layout>
+</app-page>

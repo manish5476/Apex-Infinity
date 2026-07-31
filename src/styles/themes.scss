@@ -31,6 +31,7 @@
   --font-size-3xl: clamp(1.125rem, 0.8vw + 0.9rem, 1.375rem);
   --font-size-4xl: clamp(1.375rem, 1.2vw + 1rem, 1.75rem);
   --font-size-5xl: clamp(1.75rem, 1.5vw + 1.25rem, 2.25rem);
+  --font-size-2xs: clamp(0.5rem, 0.15vw + 0.45rem, 0.55rem);
 
   --line-height-tight: 1.1;
   --line-height-normal: 1.3;
@@ -298,19 +299,26 @@
 @media (prefers-color-scheme: light) {
   :root:not([class*="theme-"]) {
     /* 1. SURFACES: High contrast depth */
-    --theme-bg-primary: #F4F7F9; /* A cool, modern off-white for the main app background */
+    --theme-bg-primary: #F4F7F9;
+    /* A cool, modern off-white for the main app background */
     --theme-bg-primary-color: #F4F7F9;
-    --theme-bg-secondary: #FFFFFF; /* Pure white for cards to make them pop off the background */
-    --theme-bg-ternary: #EAF0F5; /* Soft, slightly darker tone for hover states/menus */
+    --theme-bg-secondary: #FFFFFF;
+    /* Pure white for cards to make them pop off the background */
+    --theme-bg-ternary: #EAF0F5;
+    /* Soft, slightly darker tone for hover states/menus */
 
     /* 2. TEXT: Sharper, starker hierarchy */
-    --theme-text-primary: #111827; /* Near-black for crisp, high-contrast headers */
-    --theme-text-secondary: #4B5563; /* Slate gray for highly readable body text */
-    --theme-text-tertiary: #6B7280; /* Lighter gray for metadata */
-    --theme-text-label: #9CA3AF; /* Soft gray for input labels and placeholders */
+    --theme-text-primary: #111827;
+    /* Near-black for crisp, high-contrast headers */
+    --theme-text-secondary: #4B5563;
+    /* Slate gray for highly readable body text */
+    --theme-text-tertiary: #6B7280;
+    /* Lighter gray for metadata */
+    --theme-text-label: #9CA3AF;
+    /* Soft gray for input labels and placeholders */
 
     /* 3. BORDERS: Clean and subtle */
-    --theme-border-primary: #E5E7EB; 
+    --theme-border-primary: #E5E7EB;
     --theme-border-secondary: #D1D5DB;
 
     /* 4. ACCENTS: Vibrant and modern (Blue Base) */
@@ -327,7 +335,7 @@
     --theme-warning: #F59E0B;
     --theme-error: #EF4444;
     --theme-info: #0EA5E9;
-    
+
     --theme-disabled: #F3F4F6;
     --theme-disabled-text: #9CA3AF;
 
@@ -335,29 +343,30 @@
     --glass-bg: rgba(255, 255, 255, 0.85);
     --glass-blur: 20px;
     --glass-border: rgba(255, 255, 255, 0.9);
-    
+
     /* Adding a subtle inset white line creates a sharp glass 'edge' */
     --glass-shadow: 0 8px 32px rgba(17, 24, 39, 0.04), inset 0 1px 0 rgba(255, 255, 255, 1);
-    
+
     /* Using a cool-gray tint for shadows instead of pure black looks much more expensive */
     --theme-elevation-shadow-color: rgba(17, 24, 39, 0.06);
-    
+
     /* 7. COMPONENT FALLBACKS */
     --theme-component-bg-hover: #F9FAFB;
     --theme-component-bg-active: #F3F4F6;
     --theme-component-border-focus: #2563EB;
     --theme-component-surface-raised: #FFFFFF;
     --theme-component-divider: #E5E7EB;
-    
+
     --theme-scroll-thumb: #D1D5DB;
     --theme-scroll-track: transparent;
-    
+
     --font-heading: 'Plus Jakarta Sans', sans-serif;
     --font-body: 'Inter', sans-serif;
-    
+
     @include apply-canonical-mapping;
   }
 }
+
 @media (prefers-color-scheme: dark) {
   :root:not([class*="theme-"]) {
     --theme-bg-primary: #08080a;
@@ -370,9 +379,9 @@
     --theme-text-label: #52525b;
     --theme-border-primary: #27272a;
     --theme-border-secondary: #3f3f46;
-  --theme-accent-primary: #818cf8;
-  --theme-accent-secondary: #a5b4fc;
-  --theme-text-on-accent: #10132e;
+    --theme-accent-primary: #818cf8;
+    --theme-accent-secondary: #a5b4fc;
+    --theme-text-on-accent: #10132e;
     --theme-accent-tertiary: #c7d2fe;
     --theme-accent-gradient: linear-gradient(135deg, #4f46e5 0%, #6366f1 45%, #818cf8 100%);
     --theme-accent-gradient-angle: 135deg;
@@ -402,6 +411,35 @@
   }
 }
 
+/* apex-tailwind-bridge.css — import after your theme file */
+@theme inline {
+  --color-surface: var(--bg-primary);
+  --color-surface-alt: var(--bg-secondary);
+  --color-surface-raised: var(--component-surface-raised);
+
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+
+  --color-border-default: var(--border-primary);
+  --color-border-subtle: var(--border-secondary);
+
+  --color-accent: var(--accent-primary);
+  --color-accent-hover: var(--accent-hover);
+
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-danger: var(--color-error);
+  --color-info: var(--color-info);
+
+  --radius-default: var(--ui-border-radius);
+  --radius-lg: var(--ui-border-radius-lg);
+  --radius-xl: var(--ui-border-radius-xl);
+
+  --shadow-elevation-1: var(--elevation-1);
+  --shadow-elevation-2: var(--elevation-2);
+}
+
 /* ============================================================================
    GLOBAL UTILITIES & COMPONENTS
    ============================================================================ */
@@ -413,23 +451,24 @@
 .container-3d-curved {
   /* Dynamic radius using your system constraints */
   border-radius: clamp(24px, 4vw, 40px);
-  
+
   /* Volumetric Surface: Mixes current theme bg with soft lighting */
-  background: linear-gradient(
-    var(--accent-gradient-angle, 145deg), 
-    color-mix(in srgb, var(--bg-secondary) 100%, white 8%) 0%, 
-    var(--bg-secondary) 40%, 
-    color-mix(in srgb, var(--bg-secondary) 100%, black 8%) 100%
-  );
+  background: linear-gradient(var(--accent-gradient-angle, 145deg),
+      color-mix(in srgb, var(--bg-secondary) 100%, white 8%) 0%,
+      var(--bg-secondary) 40%,
+      color-mix(in srgb, var(--bg-secondary) 100%, black 8%) 100%);
 
   /* Bevel & Structural Shadows */
-  box-shadow: 
-    var(--elevation-3), /* Base drop shadow */
-    inset 0 2px 4px rgba(255, 255, 255, 0.12), /* Top specular highlight */
-    inset 0 -8px 16px rgba(0, 0, 0, 0.08); /* Deep bottom concave shadow */
+  box-shadow:
+    var(--elevation-3),
+    /* Base drop shadow */
+    inset 0 2px 4px rgba(255, 255, 255, 0.12),
+    /* Top specular highlight */
+    inset 0 -8px 16px rgba(0, 0, 0, 0.08);
+  /* Deep bottom concave shadow */
 
   border: 1px solid var(--border-tertiary);
-  
+
   position: relative;
   overflow: hidden;
   backdrop-filter: blur(var(--glass-blur-c));
@@ -450,7 +489,7 @@
   }
 
   /* Ensure child content stays above the glowing pseudo-element */
-  > * {
+  >* {
     position: relative;
     z-index: 1;
   }
@@ -481,17 +520,27 @@
 }
 
 /* Elevation Utility Classes (Enhancement 4) */
-.elevated-1 { box-shadow: var(--elevation-1); }
-.elevated-2 { box-shadow: var(--elevation-2); }
-.elevated-3 { box-shadow: var(--elevation-3); }
+.elevated-1 {
+  box-shadow: var(--elevation-1);
+}
+
+.elevated-2 {
+  box-shadow: var(--elevation-2);
+}
+
+.elevated-3 {
+  box-shadow: var(--elevation-3);
+}
 
 /* Floating Text Effects */
 .text-float-primary {
   text-shadow: 0 0 20px rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.08);
 }
+
 .text-float-soft {
   text-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
 }
+
 .text-float-label {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
   letter-spacing: 0.06em;
@@ -505,14 +554,37 @@
 }
 
 /* Semantic Text & BG Colors */
-.text-success { color: var(--color-success); }
-.bg-success { background-color: var(--color-success-bg); }
-.text-error { color: var(--color-error); }
-.bg-error { background-color: var(--color-error-bg); }
-.text-warning { color: var(--color-warning); }
-.bg-warning { background-color: var(--color-warning-bg); }
-.text-info { color: var(--color-info); }
-.bg-info { background-color: var(--color-info-bg); }
+.text-success {
+  color: var(--color-success);
+}
+
+.bg-success {
+  background-color: var(--color-success-bg);
+}
+
+.text-error {
+  color: var(--color-error);
+}
+
+.bg-error {
+  background-color: var(--color-error-bg);
+}
+
+.text-warning {
+  color: var(--color-warning);
+}
+
+.bg-warning {
+  background-color: var(--color-warning-bg);
+}
+
+.text-info {
+  color: var(--color-info);
+}
+
+.bg-info {
+  background-color: var(--color-info-bg);
+}
 
 /* ============================================================================
    GLOBAL BASELINE — makes the theme tokens actually take effect app-wide.
@@ -538,6 +610,7 @@ body {
   color: var(--selection-text);
   text-shadow: none;
 }
+
 ::-moz-selection {
   background: var(--selection-bg);
   color: var(--selection-text);
@@ -550,10 +623,15 @@ a {
   text-decoration-color: color-mix(in srgb, var(--link-color) 40%, transparent);
   transition: var(--transition-fast);
 }
-a:hover { color: var(--link-hover); }
+
+a:hover {
+  color: var(--link-hover);
+}
 
 /* Inline code */
-code, kbd, samp {
+code,
+kbd,
+samp {
   font-family: var(--font-mono);
   background: var(--code-bg);
   color: var(--text-primary);
@@ -566,7 +644,9 @@ code, kbd, samp {
    FORM CONTROLS — inputs/selects/textareas inherit themed surface + text +
    placeholder so they stop rendering with the browser's own white/black.
    ---------------------------------------------------------------------------- */
-input, select, textarea {
+input,
+select,
+textarea {
   background-color: var(--input-bg);
   color: var(--input-text);
   border: var(--ui-border-width) solid var(--input-border);
@@ -576,13 +656,24 @@ input, select, textarea {
   transition: var(--transition-fast);
   caret-color: var(--accent-primary);
 }
-input::placeholder, textarea::placeholder { color: var(--input-placeholder); opacity: 1; }
-input:focus-visible, select:focus-visible, textarea:focus-visible {
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--input-placeholder);
+  opacity: 1;
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
   outline: none;
   border-color: var(--component-border-focus);
   box-shadow: 0 0 0 3px var(--accent-focus);
 }
-input:disabled, select:disabled, textarea:disabled {
+
+input:disabled,
+select:disabled,
+textarea:disabled {
   background-color: var(--color-disabled);
   color: var(--color-disabled-text);
   cursor: not-allowed;
@@ -607,31 +698,65 @@ select:-webkit-autofill {
    accent/status color. They guarantee the text on top stays readable across
    ALL 30 themes (this is the core fix for disappearing button/badge labels).
    ---------------------------------------------------------------------------- */
-.on-accent, .btn-primary, .badge-accent {
+.on-accent,
+.btn-primary,
+.badge-accent {
   background: var(--accent-primary);
   color: var(--text-on-accent);
 }
+
 .on-accent-gradient {
   background: var(--accent-gradient);
   color: var(--text-on-accent);
 }
-.on-success { background: var(--color-success); color: var(--text-on-success); }
-.on-warning { background: var(--color-warning); color: var(--text-on-warning); }
-.on-error   { background: var(--color-error);   color: var(--text-on-error); }
-.on-info    { background: var(--color-info);    color: var(--text-on-info); }
+
+.on-success {
+  background: var(--color-success);
+  color: var(--text-on-success);
+}
+
+.on-warning {
+  background: var(--color-warning);
+  color: var(--text-on-warning);
+}
+
+.on-error {
+  background: var(--color-error);
+  color: var(--text-on-error);
+}
+
+.on-info {
+  background: var(--color-info);
+  color: var(--text-on-info);
+}
 
 /* Make sure descendant text/icons of an on-color surface also inherit it */
-.on-accent *, .btn-primary *, .badge-accent *,
+.on-accent *,
+.btn-primary *,
+.badge-accent *,
 .on-accent-gradient *,
-.on-success *, .on-warning *, .on-error *, .on-info * { color: inherit; }
+.on-success *,
+.on-warning *,
+.on-error *,
+.on-info * {
+  color: inherit;
+}
 
 /* Custom scrollbars (uses the themed scroll tokens) */
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--scroll-thumb) var(--scroll-track);
 }
-*::-webkit-scrollbar { width: 10px; height: 10px; }
-*::-webkit-scrollbar-track { background: var(--scroll-track); }
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--scroll-track);
+}
+
 *::-webkit-scrollbar-thumb {
   background: var(--scroll-thumb);
   border-radius: var(--ui-border-radius-pill);
@@ -688,15 +813,17 @@ select:-webkit-autofill {
 .theme-light {
   --font-heading: 'Plus Jakarta Sans', sans-serif;
   --font-body: 'Inter', sans-serif;
-  
+
   /* 1. SURFACES: High contrast depth */
-  --theme-bg-primary: #F4F7F9; /* Cool off-white background */
+  --theme-bg-primary: #F4F7F9;
+  /* Cool off-white background */
   --theme-bg-primary-color: #F4F7F9;
-  --theme-bg-secondary: #FFFFFF; /* Pure white surface cards */
+  --theme-bg-secondary: #FFFFFF;
+  /* Pure white surface cards */
   --theme-bg-ternary: #EAF0F5;
 
   /* 2. TEXT: Sharper hierarchy */
-  --theme-text-primary: #111827; 
+  --theme-text-primary: #111827;
   --theme-text-secondary: #4B5563;
   --theme-text-tertiary: #6B7280;
   --theme-text-label: #9CA3AF;
@@ -719,7 +846,7 @@ select:-webkit-autofill {
   --theme-warning: #F59E0B;
   --theme-error: #EF4444;
   --theme-info: #0EA5E9;
-  
+
   --theme-disabled: #F3F4F6;
   --theme-disabled-text: #9CA3AF;
 
@@ -736,12 +863,13 @@ select:-webkit-autofill {
   --theme-component-border-focus: #2563EB;
   --theme-component-surface-raised: #FFFFFF;
   --theme-component-divider: #E5E7EB;
-  
+
   --theme-scroll-thumb: #D1D5DB;
   --theme-scroll-track: transparent;
-  
+
   @include apply-canonical-mapping;
 }
+
 /* 2. DARK DEFAULT */
 .theme-dark {
   --font-heading: 'Plus Jakarta Sans', sans-serif;
@@ -2262,7 +2390,7 @@ select:-webkit-autofill {
 //     --theme-warning: #F59E0B;
 //     --theme-error: #EF4444;
 //     --theme-info: #0EA5E9;
-    
+
 //     --theme-disabled: #F3F4F6;
 //     --theme-disabled-text: #9CA3AF;
 
@@ -2270,26 +2398,26 @@ select:-webkit-autofill {
 //     --glass-bg: rgba(255, 255, 255, 0.85);
 //     --glass-blur: 20px;
 //     --glass-border: rgba(255, 255, 255, 0.9);
-    
+
 //     /* Adding a subtle inset white line creates a sharp glass 'edge' */
 //     --glass-shadow: 0 8px 32px rgba(17, 24, 39, 0.04), inset 0 1px 0 rgba(255, 255, 255, 1);
-    
+
 //     /* Using a cool-gray tint for shadows instead of pure black looks much more expensive */
 //     --theme-elevation-shadow-color: rgba(17, 24, 39, 0.06);
-    
+
 //     /* 7. COMPONENT FALLBACKS */
 //     --theme-component-bg-hover: #F9FAFB;
 //     --theme-component-bg-active: #F3F4F6;
 //     --theme-component-border-focus: #2563EB;
 //     --theme-component-surface-raised: #FFFFFF;
 //     --theme-component-divider: #E5E7EB;
-    
+
 //     --theme-scroll-thumb: #D1D5DB;
 //     --theme-scroll-track: transparent;
-    
+
 //     --font-heading: 'Plus Jakarta Sans', sans-serif;
 //     --font-body: 'Inter', sans-serif;
-    
+
 //     @include apply-canonical-mapping;
 //   }
 // }
@@ -2347,7 +2475,7 @@ select:-webkit-autofill {
 // .container-3d-curved {
 //   /* Dynamic radius using your system constraints */
 //   border-radius: clamp(24px, 4vw, 40px);
-  
+
 //   /* Volumetric Surface: Mixes current theme bg with soft lighting */
 //   background: linear-gradient(
 //     var(--accent-gradient-angle, 145deg), 
@@ -2363,7 +2491,7 @@ select:-webkit-autofill {
 //     inset 0 -8px 16px rgba(0, 0, 0, 0.08); /* Deep bottom concave shadow */
 
 //   border: 1px solid var(--border-tertiary);
-  
+
 //   position: relative;
 //   overflow: hidden;
 //   backdrop-filter: blur(var(--glass-blur-c));
@@ -2497,7 +2625,7 @@ select:-webkit-autofill {
 // .theme-light {
 //   --font-heading: 'Plus Jakarta Sans', sans-serif;
 //   --font-body: 'Inter', sans-serif;
-  
+
 //   /* 1. SURFACES: High contrast depth */
 //   --theme-bg-primary: #F4F7F9; /* Cool off-white background */
 //   --theme-bg-primary-color: #F4F7F9;
@@ -2528,7 +2656,7 @@ select:-webkit-autofill {
 //   --theme-warning: #F59E0B;
 //   --theme-error: #EF4444;
 //   --theme-info: #0EA5E9;
-  
+
 //   --theme-disabled: #F3F4F6;
 //   --theme-disabled-text: #9CA3AF;
 
@@ -2545,10 +2673,10 @@ select:-webkit-autofill {
 //   --theme-component-border-focus: #2563EB;
 //   --theme-component-surface-raised: #FFFFFF;
 //   --theme-component-divider: #E5E7EB;
-  
+
 //   --theme-scroll-thumb: #D1D5DB;
 //   --theme-scroll-track: transparent;
-  
+
 //   @include apply-canonical-mapping;
 // }
 // /* 2. DARK DEFAULT */

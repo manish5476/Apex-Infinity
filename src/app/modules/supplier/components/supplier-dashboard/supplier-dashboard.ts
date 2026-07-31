@@ -13,9 +13,9 @@ import { SupplierService } from '../../services/supplier-service';
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { LoadingComponent } from '@shared/ui/feedback/loading/loading.component';
-import { StatusBadgeComponent } from '@shared/ui/feedback/status-badge/status-badge.component';
 import { EmptyStateComponent } from '@shared/ui/feedback/empty-state/empty-state.component';
 import { ErrorStateComponent } from '@shared/ui/feedback/error-state/error-state.component';
+import { StatusBadgeComponent } from '@shared/ui/badge/status-badge.component';
 
 @Component({
   selector: 'app-supplier-dashboard',
@@ -25,7 +25,7 @@ import { ErrorStateComponent } from '@shared/ui/feedback/error-state/error-state
   styleUrl: './supplier-dashboard.scss',
 })
 export class SupplierDashboardComponent implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   private config = inject(DynamicDialogConfig);
   private ref = inject(DynamicDialogRef);
 
@@ -98,8 +98,8 @@ export class SupplierDashboardComponent implements OnInit, OnDestroy {
     this.ref.close();
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

@@ -1,57 +1,78 @@
-import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
-
+import { Component, OnInit, inject, signal, DestroyRef, computed } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
-import { finalize, takeUntil } from 'rxjs/operators';
-import { ToastModule } from 'primeng/toast';
+import { Router } from '@angular/router';
+import { finalize } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { CommonModule } from '@angular/common';
 import { PasswordModule } from 'primeng/password';
-import { StepperModule } from 'primeng/stepper';
-import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { AuthService } from '../../../auth/services/auth-service';
 import { OrganizationService } from '../../organization.service';
-// import { MasterListService } from '../../../../core/services/master-list.service';
 import { AppMessageService } from '../../../../core/services/message.service';
-import { Subject } from "rxjs";
+
+import { PageComponent } from '@shared/ui/layout/page/page.component';
+import { PageContentComponent } from '@shared/ui/layout/page-content/page-content.component';
+import { GradientBannerComponent } from '@shared/ui/data/gradient-banner.component';
+import { TabBarComponent, TabItem } from '@shared/ui/tabs/tab-bar.component';
+import { SectionComponent } from '@shared/ui/layout/section/section.component';
+import { FieldComponent } from '@shared/ui/form/field.component';
+import { PageActionsComponent } from '@shared/ui/layout/page-actions/page-actions.component';
+import { ButtonComponent } from "@shared/ui/form/button.component";
+import { FloatingSplitLayoutComponent } from "@shared/ui/layout/floating-split-layout.component";
 
 @Component({
   selector: 'app-create-organization',
   standalone: true,
   imports: [
+    CommonModule,
     ReactiveFormsModule,
-    RouterModule,
-    ToastModule,
     PasswordModule,
-    StepperModule,
-    ButtonModule,
-    InputTextModule
+    InputTextModule,
+    PageComponent,
+    TabBarComponent,
+    FieldComponent,
+    ButtonComponent,
+    FloatingSplitLayoutComponent
   ],
   providers: [AppMessageService],
   templateUrl: './create-organization.html',
-  styleUrl: './create-organization.scss'
 })
-export class CreateOrganizationComponent implements OnInit, OnDestroy {
-  private readonly destroy$ = new Subject<void>();
+export class CreateOrganizationComponent implements OnInit {
+  private destroyRef = inject(DestroyRef);
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private messageService = inject(AppMessageService);
   private orgService = inject(OrganizationService);
   private authService = inject(AuthService);
-  // private masterList = inject(MasterListService);
 
   isLoading = signal(false);
-  successMessage = signal<string | null>(null);
-  errorMessage = signal<string | null>(null);
-  passwordVisible = signal(false);
-  focusedField = signal<string | null>(null);
+  activeTab = signal('org');
+  myTabs: TabItem[] = [
+    { id: 'org', label: 'Organization', emoji: '🏢' },
+    { id: 'hq', label: 'Headquarters', emoji: '📍' },
+    { id: 'admin', label: 'Super Admin', emoji: '👤' }
+  ];
+  currentStepIndex = computed(() => this.myTabs.findIndex(t => t.id === this.activeTab()));
+
+  nextStep(): void {
+    const idx = this.currentStepIndex();
+    if (idx < this.myTabs.length - 1) {
+      this.activeTab.set(this.myTabs[idx + 1].id);
+    }
+  }
+
+  prevStep(): void {
+    const idx = this.currentStepIndex();
+    if (idx > 0) {
+      this.activeTab.set(this.myTabs[idx - 1].id);
+    }
+  }
 
   organizationForm!: FormGroup;
 
-  // Multi-step: 3 sections, track which is active for progress indicator
-  activeSection: any = signal(0);
-  readonly sections = ['Organization', 'Location', 'Admin'];
-
-  ngOnInit(): void { this.initForm(); }
+  ngOnInit(): void {
+    this.initForm();
+  }
 
   private initForm(): void {
     this.organizationForm = this.fb.group({
@@ -73,18 +94,27 @@ export class CreateOrganizationComponent implements OnInit, OnDestroy {
     });
   }
 
-  get f() { return this.organizationForm.controls; }
-  get branch() { return (this.organizationForm.get('mainBranchAddress') as FormGroup).controls; }
+  get f() {
+    return this.organizationForm.controls;
+  }
 
-  onFocus(field: string) { this.focusedField.set(field); this.highlightSection(field); }
-  onBlur() { this.focusedField.set(null); }
+  protected get step1Valid(): boolean {
+    return !this.f['organizationName'].invalid
+      && !this.f['uniqueShopId'].invalid
+      && !this.f['primaryEmail'].invalid
+      && !this.f['primaryPhone'].invalid
+      && !this.f['gstNumber'].invalid;
+  }
 
-  private highlightSection(field: string) {
-    const section1 = ['organizationName', 'uniqueShopId', 'primaryEmail', 'primaryPhone', 'gstNumber'];
-    const section2 = ['mainBranchName', 'street', 'city', 'state', 'zipCode'];
-    if (section1.includes(field)) this.activeSection.set(0);
-    else if (section2.includes(field)) this.activeSection.set(1);
-    else this.activeSection.set(2);
+  protected get step2Valid(): boolean {
+    return !this.f['mainBranchName'].invalid
+      && !this.organizationForm.get('mainBranchAddress')!.invalid;
+  }
+
+  protected get step3Valid(): boolean {
+    return !this.f['ownerName'].invalid
+      && !this.f['ownerEmail'].invalid
+      && !this.f['ownerPassword'].invalid;
   }
 
   generateShopId(): void {
@@ -96,22 +126,7 @@ export class CreateOrganizationComponent implements OnInit, OnDestroy {
     }
   }
 
-  togglePassword(): void { this.passwordVisible.update(v => !v); }
-
-  // Password strength (reused from signup pattern)
-  get passwordStrength(): number {
-    const val: string = this.f['ownerPassword'].value || '';
-    let score = 0;
-    if (val.length >= 8) score++;
-    if (/[A-Z]/.test(val)) score++;
-    if (/[0-9]/.test(val)) score++;
-    if (/[^a-zA-Z0-9]/.test(val)) score++;
-    return score;
-  }
-  get strengthLabel() { return ['', 'Weak', 'Fair', 'Good', 'Strong'][this.passwordStrength]; }
-  get strengthClass() { return ['', 'weak', 'fair', 'good', 'strong'][this.passwordStrength]; }
-
-  onSubmit(): void {
+  onComplete(): void {
     if (this.organizationForm.invalid) {
       this.organizationForm.markAllAsTouched();
       this.messageService.showWarn('Please check all required fields.');
@@ -119,38 +134,49 @@ export class CreateOrganizationComponent implements OnInit, OnDestroy {
     }
 
     this.isLoading.set(true);
-    this.successMessage.set(null);
-    this.errorMessage.set(null);
-
     const payload = { ...this.organizationForm.value };
     payload.uniqueShopId = payload.uniqueShopId.toUpperCase();
     if (payload.gstNumber) payload.gstNumber = payload.gstNumber.toUpperCase();
 
     this.orgService.createNewOrganization(payload)
-      .pipe(finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$))
+      .pipe(finalize(() => this.isLoading.set(false)), takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res: any) => {
-          const msg = 'Organization created! Logging you in…';
-          this.successMessage.set(msg);
-          this.messageService.showSuccess(msg);
+          this.messageService.showSuccess('Organization created! Logging you in…');
           if (res.token) {
             this.authService.handleLoginSuccess(res);
-            // this.masterList.load();
             setTimeout(() => this.router.navigate(['/dashboard']), 1000);
           } else {
             this.router.navigate(['/auth/login']);
           }
         },
         error: (err: any) => {
-          const msg = err.error?.message || 'Failed to create organization. Please try again.';
-          this.errorMessage.set(msg);
           this.messageService.handleHttpError(err);
         },
       });
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+  getFieldError(controlName: string): string | null {
+    const control = this.organizationForm.get(controlName);
+    if (control && control.invalid && (control.dirty || control.touched)) {
+      if (control.errors?.['required']) return 'This field is required.';
+      if (control.errors?.['email']) return 'Please enter a valid email address.';
+      if (control.errors?.['minlength']) return `Minimum length is ${control.errors['minlength'].requiredLength} characters.`;
+      if (control.errors?.['pattern']) return 'Invalid format.';
+    }
+    return null;
+  }
+
+  getBranchFieldError(controlName: string): string | null {
+    if (controlName === 'mainBranchName') {
+      const ctrl = this.organizationForm.get('mainBranchName');
+      return ctrl && ctrl.invalid && (ctrl.dirty || ctrl.touched) ? 'Branch name is required.' : null;
+    }
+    const branchGroup = this.organizationForm.get('mainBranchAddress') as FormGroup;
+    const control = branchGroup?.get(controlName);
+    if (control && control.invalid && (control.dirty || control.touched)) {
+      if (control.errors?.['required']) return 'Field is required.';
+    }
+    return null;
   }
 }

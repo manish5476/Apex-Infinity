@@ -1,0 +1,34 @@
+:host {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+// --- PrimeNG Overrides ---
+::ng-deep {
+    .p-password {
+        &.p-inputwrapper-focus {
+            .p-inputtext {
+                border-color: var(--accent-primary) !important;
+                box-shadow: 0 0 0 3px var(--accent-focus) !important;
+            }
+        }
+    }
+}
+
+// --- Animations ---
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+}

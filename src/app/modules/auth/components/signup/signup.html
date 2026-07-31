@@ -1,329 +1,239 @@
-<!-- signup.component.html -->
-<div class="auth-root">
+<app-page>
+  <app-floating-split-layout imageSrc="https://images.pexels.com/photos/16846298/pexels-photo-16846298.jpeg"
+    imageAlt="Apex Infinity Deep Space" [reverse]="true">
 
-  <!-- ══════════════════════════════════════════════════════
-       LEFT — Brand Panel (mirrors login design)
-  ═══════════════════════════════════════════════════════ -->
-  <aside class="brand-panel">
-    <div class="grid-lines" aria-hidden="true"></div>
-    <div class="orb orb-1" aria-hidden="true"></div>
-    <div class="orb orb-2" aria-hidden="true"></div>
+    <!-- ========================================== -->
+    <!-- BRAND OVERLAY: Left side                   -->
+    <!-- ========================================== -->
+    <div brand-overlay class="relative z-10 flex flex-col h-full justify-between text-white">
 
-    <div class="brand-inner">
-
-      <div class="wordmark">
-        <div class="logo-glyph">
-          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M4 28 L16 4 L28 28" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-              stroke-linejoin="round" />
-            <path d="M8.5 20 L23.5 20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
-          </svg>
+      <!-- Top: Logo & Brand -->
+      <div class="flex items-center gap-3">
+        <div class="h-10 w-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center shadow-sm">
+          <i class="pi pi-box text-xl"></i>
         </div>
-        <span class="wordmark-text">Apex</span>
+        <span class="text-2xl font-[var(--font-heading)] font-bold tracking-tight">Apex</span>
       </div>
 
-      <div class="hero-copy">
-        <p class="overline-text">Get started free</p>
-        <h1 class="hero-headline">
+      <!-- Bottom: Hero Content -->
+      <div>
+        <i class="pi pi-quote-left text-4xl opacity-40 mb-4 block"></i>
+        <h2 class="text-4xl xl:text-5xl font-[var(--font-heading)] font-bold leading-tight mb-6 max-w-lg">
           Build without<br>
           <em>limits.</em>
+        </h2>
+
+        <div class="flex items-center justify-between mt-8">
+          <div class="flex items-center gap-4 text-sm font-medium tracking-widest opacity-80">
+            <span>Free Trial</span>
+            <span class="w-12 border-b border-white/30"></span>
+            <span>No CC</span>
+          </div>
+          <div class="flex gap-3">
+            <app-status-badge status="active" label="14 Days" variant="solid" size="sm"></app-status-badge>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SIGNUP FORM: Right side (Center-Verified)   -->
+    <!-- ========================================== -->
+    <div class="w-full">
+
+      <!-- Header -->
+      <div class="mb-5">
+        <h1
+          class="text-[length:var(--font-size-4xl)] font-[var(--font-weight-bold)] text-[var(--text-primary)] tracking-tight">
+          Create account
         </h1>
-        <p class="hero-body">
-          Join thousands of engineering teams who ship faster, collaborate better, and scale without friction.
+        <p class="text-[length:var(--font-size-sm)] text-[var(--text-secondary)] mt-1">
+          Set up your workspace in under a minute
         </p>
       </div>
 
-      <!-- Feature checklist -->
-      <ul class="feature-list">
-        <li class="feature-item">
-          <span class="feature-check">
-            <svg viewBox="0 0 16 16" fill="none">
-              <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round" />
-            </svg>
-          </span>
-          <span>14-day free trial, no credit card</span>
-        </li>
-        <li class="feature-item">
-          <span class="feature-check">
-            <svg viewBox="0 0 16 16" fill="none">
-              <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round" />
-            </svg>
-          </span>
-          <span>Unlimited team members</span>
-        </li>
-        <li class="feature-item">
-          <span class="feature-check">
-            <svg viewBox="0 0 16 16" fill="none">
-              <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round" />
-            </svg>
-          </span>
-          <span>99.9% uptime SLA</span>
-        </li>
-        <li class="feature-item">
-          <span class="feature-check">
-            <svg viewBox="0 0 16 16" fill="none">
-              <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round" />
-            </svg>
-          </span>
-          <span>SOC 2 Type II certified</span>
-        </li>
-      </ul>
-
-      <footer class="brand-footer">
-        <span>© 2026 Apex Inc.</span>
-        <nav class="footer-nav">
-          <a href="#" tabindex="-1">Privacy</a>
-          <a href="#" tabindex="-1">Terms</a>
-          <a href="#" tabindex="-1">Status</a>
-        </nav>
-      </footer>
-
-    </div>
-  </aside>
-
-  <!-- ══════════════════════════════════════════════════════
-       RIGHT — Signup Form Panel
-  ═══════════════════════════════════════════════════════ -->
-  <main class="form-panel">
-    <div class="form-inner">
-
-      <!-- Mobile logo -->
-      <div class="mobile-logo">
-        <div class="logo-glyph">
-          <svg viewBox="0 0 32 32" fill="none">
-            <path d="M4 28 L16 4 L28 28" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-              stroke-linejoin="round" />
-            <path d="M8.5 20 L23.5 20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
-          </svg>
-        </div>
-        <span>Apex</span>
-      </div>
-
-      <div class="form-header">
-        <h2 class="form-title">Create account</h2>
-        <p class="form-subtitle">Set up your workspace in under a minute</p>
-      </div>
-
-      <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="auth-form" novalidate>
-
-        <!-- ── Row 1: Full name ── -->
-        <div class="field-group" [class.focused]="focusedField() === 'name'" [class.has-value]="f['name'].value"
-          [class.has-error]="f['name'].touched && f['name'].invalid">
-          <label class="field-label" for="name">
-            <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-            </svg>
-            Full Name <span class="required-star">*</span>
-          </label>
-          <input id="name" type="text" formControlName="name" placeholder="Jane Smith" class="apex-input"
-            (focus)="onFocus('name')" (blur)="onBlur()" />
-          @if (f['name'].touched && f['name'].invalid) {
-          <p class="field-error">
-            @if (f['name'].errors?.['required']) { Name is required }
-            @else if (f['name'].errors?.['minlength']) { Minimum 2 characters }
+      <!-- Error / Success Banner -->
+      @if (errorMessage()) {
+      <div
+        class="mb-4 p-3 rounded-[var(--ui-border-radius)] bg-[var(--color-error-bg)] border border-[var(--color-error-border)] flex items-start gap-3 animate-fade-in">
+        <i class="pi pi-exclamation-circle text-[var(--color-error)] text-lg mt-0.5"></i>
+        <div class="flex-1">
+          <p class="text-[length:var(--font-size-xs)] text-[var(--color-error-dark)] m-0 font-medium">
+            {{ errorMessage() }}
           </p>
-          }
         </div>
+        <button type="button"
+          class="text-[var(--color-error)] hover:text-[var(--color-error-dark)] transition-colors focus:outline-none"
+          (click)="errorMessage.set(null)">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+      }
 
-        <!-- ── Row 2: Email + Phone (split) ── -->
-        <div class="field-row-split">
-
-          <div class="field-group" [class.focused]="focusedField() === 'email'" [class.has-value]="f['email'].value"
-            [class.has-error]="f['email'].touched && f['email'].invalid">
-            <label class="field-label" for="email">
-              <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-              </svg>
-              Email <span class="required-star">*</span>
-            </label>
-            <input id="email" type="email" formControlName="email" placeholder="you@company.com" class="apex-input"
-              (focus)="onFocus('email')" (blur)="onBlur()" />
-            @if (f['email'].touched && f['email'].invalid) {
-            <p class="field-error">
-              @if (f['email'].errors?.['required']) { Required }
-              @else { Invalid email }
-            </p>
-            }
-          </div>
-
-          <div class="field-group" [class.focused]="focusedField() === 'phone'" [class.has-value]="f['phone'].value"
-            [class.has-error]="f['phone'].touched && f['phone'].invalid">
-            <label class="field-label" for="phone">
-              <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor">
-                <path
-                  d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-              </svg>
-              Phone <span class="required-star">*</span>
-            </label>
-            <input id="phone" type="tel" formControlName="phone" placeholder="+91 98765 43210" class="apex-input"
-              (focus)="onFocus('phone')" (blur)="onBlur()" />
-            @if (f['phone'].touched && f['phone'].invalid) {
-            <p class="field-error">
-              @if (f['phone'].errors?.['required']) { Required }
-              @else { Invalid number }
-            </p>
-            }
-          </div>
-
-        </div>
-
-        <!-- ── Row 3: Shop ID ── -->
-        <div class="field-group" [class.focused]="focusedField() === 'shopId'"
-          [class.has-value]="f['uniqueShopId'].value"
-          [class.has-error]="f['uniqueShopId'].touched && f['uniqueShopId'].invalid">
-          <label class="field-label" for="shopId">
-            <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd"
-                d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z"
-                clip-rule="evenodd" />
-            </svg>
-            Shop ID <span class="required-star">*</span>
-          </label>
-          <div class="input-with-hint">
-            <input id="shopId" type="text" formControlName="uniqueShopId" placeholder="APEX-001"
-              class="apex-input shop-id-input" (focus)="onFocus('shopId')" (blur)="onBlur()" />
-            <span class="input-hint-badge">Unique workspace identifier</span>
-          </div>
-          @if (f['uniqueShopId'].touched && f['uniqueShopId'].invalid) {
-          <p class="field-error">
-            @if (f['uniqueShopId'].errors?.['required']) { Shop ID is required }
-            @else { Only letters, numbers and hyphens }
+      @if (successMessage()) {
+      <div
+        class="mb-4 p-3 rounded-[var(--ui-border-radius)] bg-[var(--color-success-bg)] border border-[var(--color-success-border)] flex items-start gap-3 animate-fade-in">
+        <i class="pi pi-check-circle text-[var(--color-success)] text-lg mt-0.5"></i>
+        <div class="flex-1">
+          <p class="text-[length:var(--font-size-xs)] text-[var(--color-success-dark)] m-0 font-medium">
+            {{ successMessage() }}
           </p>
-          }
+        </div>
+      </div>
+      }
+
+      <!-- Form -->
+      <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="flex flex-col w-full">
+
+        <!-- ROW 1: Name -->
+        <div class="mb-3">
+          <app-field label="Full Name" [required]="true" [error]="getFieldError('name')">
+            <input pInputText type="text" formControlName="name" placeholder="Jane Smith" (focus)="onFocus('name')"
+              (blur)="onBlur()"
+              class="w-full rounded-[var(--ui-border-radius)] bg-[var(--input-bg)] border border-[var(--input-border)] hover:border-[var(--accent-primary)] focus:bg-[var(--bg-primary)] transition-all px-4 py-2.5" />
+          </app-field>
         </div>
 
-        <!-- ── Row 4: Password + Confirm (split) ── -->
-        <div class="field-row-split">
+        <!-- ROW 2: Email + Phone (Split) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
+          <app-field label="Email" [required]="true" [error]="getFieldError('email')">
+            <input pInputText type="email" formControlName="email" placeholder="you@company.com"
+              (focus)="onFocus('email')" (blur)="onBlur()"
+              class="w-full rounded-[var(--ui-border-radius)] bg-[var(--input-bg)] border border-[var(--input-border)] hover:border-[var(--accent-primary)] focus:bg-[var(--bg-primary)] transition-all px-4 py-2.5" />
+          </app-field>
 
-          <div class="field-group" [class.focused]="focusedField() === 'password'"
-            [class.has-value]="f['password'].value" [class.has-error]="f['password'].touched && f['password'].invalid">
-            <label class="field-label" for="password">
-              <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd"
-                  d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                  clip-rule="evenodd" />
-              </svg>
-              Password <span class="required-star">*</span>
-            </label>
-            <p-password inputId="password" formControlName="password" [toggleMask]="true" [feedback]="false"
-              placeholder="Min. 8 chars" styleClass="apex-password w-full" inputStyleClass="apex-input"
-              (onFocus)="onFocus('password')" (onBlur)="onBlur()">
-            </p-password>
-            @if (f['password'].touched && f['password'].invalid) {
-            <p class="field-error">
-              @if (f['password'].errors?.['required']) { Required }
-              @else { Minimum 8 characters }
-            </p>
-            }
-          </div>
-
-          <div class="field-group" [class.focused]="focusedField() === 'confirm'"
-            [class.has-value]="f['passwordConfirm'].value"
-            [class.has-error]="f['passwordConfirm'].touched && f['passwordConfirm'].invalid">
-            <label class="field-label" for="confirm">
-              <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd"
-                  d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                  clip-rule="evenodd" />
-              </svg>
-              Confirm <span class="required-star">*</span>
-            </label>
-            <p-password inputId="confirm" formControlName="passwordConfirm" [toggleMask]="true" [feedback]="false"
-              placeholder="Repeat password" styleClass="apex-password w-full" inputStyleClass="apex-input"
-              (onFocus)="onFocus('confirm')" (onBlur)="onBlur()">
-            </p-password>
-            @if (f['passwordConfirm'].touched && f['passwordConfirm'].invalid) {
-            <p class="field-error">Required</p>
-            }
-            @if (signupForm.errors?.['passwordMismatch'] && f['passwordConfirm'].touched) {
-            <p class="field-error">Passwords don't match</p>
-            }
-          </div>
-
+          <app-field label="Phone" [required]="true" [error]="getFieldError('phone')">
+            <input pInputText type="tel" formControlName="phone" placeholder="+91 98765 43210"
+              (focus)="onFocus('phone')" (blur)="onBlur()"
+              class="w-full rounded-[var(--ui-border-radius)] bg-[var(--input-bg)] border border-[var(--input-border)] hover:border-[var(--accent-primary)] focus:bg-[var(--bg-primary)] transition-all px-4 py-2.5" />
+          </app-field>
         </div>
 
-        <!-- Password strength bar (shown while password field has value) -->
-        @if (f['password'].value) {
-        <div class="strength-row">
-          <div class="strength-bar">
-            <div class="strength-track">
-              <div class="strength-fill" [class]="strengthClass" [style.width.%]="passwordStrength * 25"></div>
+        <!-- ROW 3: Shop ID -->
+        <div class="mb-3">
+          <app-field label="Shop ID" [required]="true" [error]="getFieldError('uniqueShopId')">
+            <div class="relative">
+              <input pInputText type="text" formControlName="uniqueShopId" placeholder="APEX-001"
+                (focus)="onFocus('shopId')" (blur)="onBlur()"
+                class="w-full rounded-[var(--ui-border-radius)] bg-[var(--input-bg)] border border-[var(--input-border)] hover:border-[var(--accent-primary)] focus:bg-[var(--bg-primary)] transition-all px-4 py-2.5 uppercase" />
+              <span
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-[length:var(--font-size-2xs)] text-[var(--text-tertiary)] bg-[var(--bg-secondary)] px-2 py-0.5 rounded border border-[var(--border-secondary)]">
+                Unique ID
+              </span>
             </div>
-          </div>
-          <span class="strength-label" [class]="strengthClass">{{ strengthLabel }}</span>
+          </app-field>
         </div>
-        }
+
+        <!-- ROW 4: Password + Confirm (Split) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
+          <app-field label="Password" [required]="true" [error]="getFieldError('password')">
+            <p-password formControlName="password" [toggleMask]="true" [feedback]="false" placeholder="Min. 8 chars"
+              (onFocus)="onFocus('password')" (onBlur)="onBlur()" styleClass="w-full"
+              inputStyleClass="w-full rounded-[var(--ui-border-radius)] bg-[var(--input-bg)] border border-[var(--input-border)] hover:border-[var(--accent-primary)] focus:bg-[var(--bg-primary)] transition-all px-4 py-2.5">
+            </p-password>
+
+            <!-- Password Strength Bar -->
+            @if (f['password'].value) {
+            <div class="mt-2 flex items-center gap-2">
+              <div class="flex-1 h-1 rounded-full bg-[var(--bg-ternary)] overflow-hidden">
+                <div class="h-full rounded-full transition-all duration-300" [class]="strengthClass"
+                  [style.width.%]="passwordStrength * 25"></div>
+              </div>
+              <span class="text-[length:var(--font-size-2xs)] font-medium min-w-[2.5rem] text-right"
+                [class]="strengthClass">
+                {{ strengthLabel }}
+              </span>
+            </div>
+            }
+          </app-field>
+
+          <app-field label="Confirm" [required]="true" [error]="getFieldError('passwordConfirm')">
+            <p-password formControlName="passwordConfirm" [toggleMask]="true" [feedback]="false" placeholder="Repeat"
+              (onFocus)="onFocus('confirm')" (onBlur)="onBlur()" styleClass="w-full"
+              inputStyleClass="w-full rounded-[var(--ui-border-radius)] bg-[var(--input-bg)] border border-[var(--input-border)] hover:border-[var(--accent-primary)] focus:bg-[var(--bg-primary)] transition-all px-4 py-2.5">
+            </p-password>
+            @if (signupForm.errors?.['passwordMismatch'] && f['passwordConfirm'].touched) {
+            <p class="text-[length:var(--font-size-2xs)] text-[var(--color-error)] mt-1 flex items-center gap-1">
+              <i class="pi pi-exclamation-circle"></i> Passwords don't match
+            </p>
+            }
+          </app-field>
+        </div>
 
         <!-- Terms -->
-        <div class="terms-row" [class.has-error]="f['terms'].touched && f['terms'].invalid"
-          (click)="f['terms'].setValue(!f['terms'].value); f['terms'].markAsTouched()">
-          <p-checkbox formControlName="terms" [binary]="true" inputId="terms" styleClass="apex-checkbox"
-            (click)="$event.stopPropagation()">
-          </p-checkbox>
-          <label class="terms-label" (click)="$event.stopPropagation()">
-            I agree to the
-            <a href="#" class="terms-link" (click)="$event.stopPropagation()">Terms of Service</a>
-            and
-            <a href="#" class="terms-link" (click)="$event.stopPropagation()">Privacy Policy</a>
-          </label>
+        <div class="mb-5 mt-1">
+          <div class="flex items-start gap-3">
+            <p-checkbox formControlName="terms" [binary]="true" inputId="terms" styleClass="apex-checkbox mt-0.5">
+            </p-checkbox>
+            <label for="terms"
+              class="text-[length:var(--font-size-xs)] text-[var(--text-secondary)] cursor-pointer select-none leading-relaxed">
+              I agree to the
+              <a href="#" class="text-[var(--accent-primary)] hover:underline">Terms of Service</a>
+              and
+              <a href="#" class="text-[var(--accent-primary)] hover:underline">Privacy Policy</a>
+            </label>
+          </div>
+          @if (f['terms'].touched && f['terms'].invalid) {
+          <p class="text-[length:var(--font-size-2xs)] text-[var(--color-error)] mt-1 flex items-center gap-1">
+            <i class="pi pi-exclamation-circle"></i> You must accept the terms to continue
+          </p>
+          }
         </div>
-        @if (f['terms'].touched && f['terms'].invalid) {
-        <p class="field-error terms-error">You must accept the terms to continue</p>
-        }
 
         <!-- Submit -->
-        <button type="submit" class="submit-btn" [class.loading]="isLoading()" [disabled]="isLoading()">
-          @if (isLoading()) {
-          <span class="spinner" aria-hidden="true"></span>
-          <span>Creating account…</span>
-          } @else {
-          <span>Create account</span>
-          <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd"
-              d="M10 3a7 7 0 100 14A7 7 0 0010 3zm1 9.5V11h1.5a.5.5 0 000-1H11V8.5a.5.5 0 00-1 0V10H8.5a.5.5 0 000 1H10v1.5a.5.5 0 001 0z"
-              clip-rule="evenodd" />
-          </svg>
-          }
-        </button>
+        <app-button type="submit" variant="primary" [label]="isLoading() ? 'Creating account...' : 'Create account'"
+          [icon]="isLoading() ? 'pi pi-spinner pi-spin' : 'pi pi-check'" iconPosition="right" [loading]="isLoading()"
+          [disabled]="signupForm.invalid || isLoading()" class="w-full">
+        </app-button>
 
       </form>
 
-      <!-- Footer links -->
-      <div class="form-footer">
-        <p class="signin-nudge">
-          Already have an account?
-          <a routerLink="/auth/login" class="footer-link">Sign in</a>
-        </p>
-        <div class="footer-divider"></div>
-        <p class="org-nudge">
-          Registering an organization?
-          <a routerLink="/auth/org" class="footer-link footer-link--accent">
-            Create org
-            <svg class="inline-arrow" viewBox="0 0 16 16" fill="currentColor">
-              <path fill-rule="evenodd"
-                d="M3.75 8a.75.75 0 01.75-.75h5.19l-1.72-1.72a.75.75 0 011.06-1.06l3 3a.75.75 0 010 1.06l-3 3a.75.75 0 11-1.06-1.06l1.72-1.72H4.5A.75.75 0 013.75 8z"
-                clip-rule="evenodd" />
-            </svg>
+      <!-- Footer Links -->
+      <div
+        class="mt-5 flex flex-col sm:flex-row items-center justify-between gap-2 w-full text-[length:var(--font-size-xs)]">
+        <div class="flex items-center gap-1">
+          <span class="text-[var(--text-tertiary)]">Already have an account?</span>
+          <a routerLink="/auth/login"
+            class="text-[var(--accent-primary)] font-medium hover:underline transition-colors focus:outline-none">
+            Sign in
           </a>
-        </p>
-        
-        <!-- Delivery portals -->
-        <div class="delivery-nudge" style="margin-top: 1.5rem; text-align: center; border-top: 1px solid var(--border); padding-top: 1.5rem;">
-          <p style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em; margin-bottom: 0.75rem;">Delivery Portals</p>
-          <div style="display: flex; gap: 1rem; justify-content: center; font-size: 0.875rem;">
-            <a routerLink="/apex-delivery/login" style="color: var(--ink-80); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--ink-80)'">Apex Network</a>
-            <span style="color: var(--border);">|</span>
-            <a routerLink="/delivery-agent/login" style="color: var(--ink-80); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--ink-80)'">Store Agent Login</a>
+        </div>
+        <a routerLink="/auth/org"
+          class="text-[var(--text-tertiary)] hover:text-[var(--accent-primary)] transition-colors focus:outline-none flex items-center gap-1">
+          Register an organization
+          <i class="pi pi-arrow-right text-[10px]"></i>
+        </a>
+      </div>
+
+      <!-- Delivery Portals (Compact) -->
+      <div class="mt-4 pt-3 border-t border-[var(--border-secondary)]">
+        <div class="flex items-center justify-center gap-2 mb-1.5">
+          <span
+            class="text-[length:var(--font-size-3xs)] font-semibold text-[var(--text-tertiary)] uppercase tracking-widest">
+            Delivery Portals
+          </span>
+        </div>
+        <div class="inline-flex items-center justify-center w-full">
+          <div
+            class="flex items-center rounded-full bg-[var(--bg-secondary)] px-1 py-1 border border-[var(--border-secondary)] shadow-sm">
+            <a routerLink="/apex-delivery/login"
+              class="px-3 py-1 text-[length:var(--font-size-2xs)] font-medium text-[var(--text-secondary)] hover:text-[var(--accent-primary)] hover:bg-[var(--bg-primary)] rounded-full transition-all duration-200">
+              Apex Network
+            </a>
+            <div class="h-3 w-px bg-[var(--border-secondary)] mx-1" aria-hidden="true"></div>
+            <a routerLink="/delivery-agent/login"
+              class="px-3 py-1 text-[length:var(--font-size-2xs)] font-medium text-[var(--text-secondary)] hover:text-[var(--accent-primary)] hover:bg-[var(--bg-primary)] rounded-full transition-all duration-200">
+              Store Agent Login
+            </a>
           </div>
         </div>
       </div>
 
     </div>
-  </main>
 
-</div>
+  </app-floating-split-layout>
+</app-page>
+
+<!-- Confirm Dialog (if needed for signup) -->
+<!-- <p-confirmDialog key="signupDialog" styleClass="custom-confirm-dialog" appendTo="body">
+</p-confirmDialog> -->

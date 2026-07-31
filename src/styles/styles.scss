@@ -19,45 +19,45 @@
 /* ==========================================================================
    TAILWIND THEME CONFIGURATION
    ========================================================================== */
-@theme {
-  /* Colors */
-  --color-accent-primary: var(--accent-primary);
-  --color-accent-secondary: var(--accent-secondary);
-  --color-accent-tertiary: var(--accent-tertiary);
-  --color-accent-hover: var(--accent-hover);
-  --color-success: var(--color-success);
-  --color-warning: var(--color-warning);
-  --color-error: var(--color-error);
-  --color-info: var(--color-info);
+// @theme {
+//   /* Colors */
+//   --color-accent-primary: var(--accent-primary);
+//   --color-accent-secondary: var(--accent-secondary);
+//   --color-accent-tertiary: var(--accent-tertiary);
+//   --color-accent-hover: var(--accent-hover);
+//   --color-success: var(--color-success);
+//   --color-warning: var(--color-warning);
+//   --color-error: var(--color-error);
+//   --color-info: var(--color-info);
 
-  /* Backgrounds & Text */
-  --color-surface-primary: var(--bg-primary);
-  --color-surface-secondary: var(--bg-secondary);
-  --color-text-primary: var(--text-primary);
-  --color-text-secondary: var(--text-secondary);
-  --color-border-primary: var(--border-primary);
+//   /* Backgrounds & Text */
+//   --color-surface-primary: var(--bg-primary);
+//   --color-surface-secondary: var(--bg-secondary);
+//   --color-text-primary: var(--text-primary);
+//   --color-text-secondary: var(--text-secondary);
+//   --color-border-primary: var(--border-primary);
 
-  /* Spacing */
-  --spacing-xs: var(--spacing-xs);
-  --spacing-sm: var(--spacing-sm);
-  --spacing-md: var(--spacing-md);
-  --spacing-lg: var(--spacing-lg);
-  --spacing-xl: var(--spacing-xl);
-  --spacing-2xl: var(--spacing-2xl);
+//   /* Spacing */
+//   --spacing-xs: var(--spacing-xs);
+//   --spacing-sm: var(--spacing-sm);
+//   --spacing-md: var(--spacing-md);
+//   --spacing-lg: var(--spacing-lg);
+//   --spacing-xl: var(--spacing-xl);
+//   --spacing-2xl: var(--spacing-2xl);
 
-  /* Border Radius */
-  --radius-sm: var(--ui-border-radius-sm);
-  --radius-md: var(--ui-border-radius);
-  --radius-lg: var(--ui-border-radius-lg);
-  --radius-xl: var(--ui-border-radius-xl);
+//   /* Border Radius */
+//   --radius-sm: var(--ui-border-radius-sm);
+//   --radius-md: var(--ui-border-radius);
+//   --radius-lg: var(--ui-border-radius-lg);
+//   --radius-xl: var(--ui-border-radius-xl);
 
-  /* Shadows */
-  --shadow-xs: var(--shadow-xs);
-  --shadow-sm: var(--shadow-sm);
-  --shadow-md: var(--shadow-md);
-  --shadow-lg: var(--shadow-lg);
-  --shadow-xl: var(--shadow-xl);
-}
+//   /* Shadows */
+//   --shadow-xs: var(--shadow-xs);
+//   --shadow-sm: var(--shadow-sm);
+//   --shadow-md: var(--shadow-md);
+//   --shadow-lg: var(--shadow-lg);
+//   --shadow-xl: var(--shadow-xl);
+// }
 
 /* ==========================================================================
    2. GLOBAL VARIABLES & OVERRIDES

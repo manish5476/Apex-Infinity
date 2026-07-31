@@ -1,23 +1,41 @@
 import { Component, inject, signal, OnDestroy } from '@angular/core';
-
+import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { ToastModule } from 'primeng/toast';
-import { InputTextModule } from 'primeng/inputtext';
-import { ButtonModule } from 'primeng/button';
-import { MessageService } from 'primeng/api';
-import { AuthService } from '../../services/auth-service';
-import { AppMessageService } from '../../../../core/services/message.service';
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
+
+// PrimeNG
+import { ToastModule } from 'primeng/toast';
+import { InputTextModule } from 'primeng/inputtext';
+
+// Services
+import { AuthService } from '../../services/auth-service';
+import { AppMessageService } from '../../../../core/services/message.service';
+
+// UI Components
+import { PageComponent } from '@shared/ui/layout/page/page.component';
+import { FloatingSplitLayoutComponent } from '@shared/ui/layout/floating-split-layout.component';
+import { FieldComponent } from '@shared/ui/form/field.component';
+import { ButtonComponent } from '@shared/ui/form/button.component';
 
 @Component({
   selector: 'app-forgot-password',
   standalone: true,
-  imports: [ReactiveFormsModule, ToastModule, InputTextModule, ButtonModule, RouterLink],
+  imports: [
+    CommonModule, 
+    ReactiveFormsModule, 
+    RouterLink,
+    ToastModule, 
+    InputTextModule,
+    PageComponent,
+    FloatingSplitLayoutComponent,
+    FieldComponent,
+    ButtonComponent
+  ],
   providers: [AppMessageService],
   templateUrl: './forgot-password.html',
-  styleUrl: './forgot-password.scss'
+  styleUrls: ['./forgot-password.scss']
 })
 export class ForgotPasswordComponent implements OnDestroy {
     private readonly destroy$ = new Subject<void>();

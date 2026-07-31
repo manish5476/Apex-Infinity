@@ -1,77 +1,96 @@
-<p-toast></p-toast>
-  
-<div class="immersive-auth">
-  <div class="bg-visual" [style.background-image]="'url(https://images.pexels.com/photos/33784246/pexels-photo-33784246.jpeg)'">
-    <div class="bg-overlay"></div>
-  </div>
+<app-page>
+  <app-floating-split-layout imageSrc="https://images.pexels.com/photos/33784246/pexels-photo-33784246.jpeg"
+    imageAlt="Apex Infinity Find Shop ID" [reverse]="true">
 
-  <div class="layout-grid">
-    
-    <div class="hero-panel">
-      <div class="brand-header">
-        <div class="logo-mark">
-          <i class="pi pi-infinity"></i>
+    <!-- ========================================== -->
+    <!-- BRAND OVERLAY: Left side                   -->
+    <!-- ========================================== -->
+    <div brand-overlay class="relative z-10 flex flex-col h-full justify-between text-white">
+
+      <!-- Top: Logo & Brand -->
+      <div class="flex items-center gap-3">
+        <div class="h-10 w-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center shadow-sm">
+          <i class="pi pi-infinity text-xl"></i>
         </div>
-        <span class="brand-name">Apex Infinity</span>
+        <span class="text-2xl font-[var(--font-heading)] font-bold tracking-tight">Apex Infinity</span>
       </div>
 
-      <div class="hero-content">
-        <h1 class="display-title">
-          Find Your <br>
-          <span class="text-gradient">Shop ID.</span>
+      <!-- Bottom: Hero Content -->
+      <div>
+        <i class="pi pi-quote-left text-4xl opacity-40 mb-4 block"></i>
+        <h2 class="text-4xl xl:text-5xl font-[var(--font-heading)] font-bold leading-tight mb-6 max-w-lg">
+          Find Your<br>
+          <em>Shop ID.</em>
+        </h2>
+
+        <p class="text-[length:var(--font-size-lg)] opacity-80 max-w-md font-light leading-relaxed">
+          Can't remember your unique shop identifier? Securely request it to the email registered with your
+          organization.
+        </p>
+
+        <div class="flex items-center justify-between mt-8">
+          <div class="flex items-center gap-4 text-sm font-medium tracking-widest opacity-80">
+            <span>Secure</span>
+            <span class="w-12 border-b border-white/30"></span>
+            <span>Instant</span>
+          </div>
+          <div class="flex gap-3">
+            <app-status-badge status="info" label="Verification" variant="solid" size="sm"></app-status-badge>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- FIND SHOP FORM: Right side                  -->
+    <!-- ========================================== -->
+    <div class="w-full max-w-lg mx-auto lg:mx-0 flex flex-col justify-center min-h-full py-6 lg:py-10">
+
+      <!-- Header -->
+      <div class="mb-6">
+        <h1
+          class="text-[length:var(--font-size-4xl)] font-[var(--font-weight-bold)] text-[var(--text-primary)] tracking-tight">
+          Find Shop ID
         </h1>
-        <p class="hero-desc">
-          Can't remember your unique shop identifier? Securely request it to the email registered with your organization. 
+        <p class="text-[length:var(--font-size-sm)] text-[var(--text-secondary)] mt-1">
+          Enter your email and we'll send your ID instantly for verification.
         </p>
       </div>
 
-      <div class="hero-footer">
-        <span>© 2026 Apex Inc.</span>
-        <div class="footer-links">
-          <a href="#">Support</a>
-          <a href="#">Security</a>
-        </div>
-      </div>
-    </div>
+      <!-- Form -->
+      <form [formGroup]="findForm" (ngSubmit)="onSubmit()" class="flex flex-col w-full">
 
-    <div class="form-panel glass-sidebar">
-      <div class="form-content-wrapper">
-        
-        <div class="auth-header">
-          <div class="icon-badge">
-            <i class="pi pi-search"></i>
-          </div>
-          <h2 class="auth-title">Find Shop ID</h2>
-          <p class="auth-subtitle">Enter your email and we'll send your ID instantly for verification.</p>
+        <!-- Email Field -->
+        <div class="mb-6">
+          <app-field label="Registered Email" [required]="true">
+            <input pInputText type="email" formControlName="email" placeholder="you@company.com"
+              class="w-full rounded-[var(--ui-border-radius)] bg-[var(--input-bg)] border border-[var(--input-border)] hover:border-[var(--accent-primary)] focus:bg-[var(--bg-primary)] transition-all px-4 py-2.5" />
+          </app-field>
         </div>
 
-        <form [formGroup]="findForm" (ngSubmit)="onSubmit()" class="auth-form">
-          
-          <div class="form-group">
-            <label class="input-label">Registered Email <span class="req">*</span></label>
-            <div class="input-wrapper">
-              <i class="field-icon pi pi-envelope"></i>
-              <input pInputText formControlName="email" placeholder="you@company.com" class="w-full glass-input-field" />
-            </div>
-          </div>
+        <!-- Submit Button -->
+        <app-button type="submit" variant="primary" [label]="isLoading() ? 'Sending...' : 'Send Shop ID'"
+          [icon]="isLoading() ? 'pi pi-spinner pi-spin' : 'pi pi-send'" iconPosition="right" [loading]="isLoading()"
+          [disabled]="findForm.invalid || isLoading()" class="w-full">
+        </app-button>
 
-          <button pButton label="Send Shop ID" icon="pi pi-send" iconPos="right" 
-            class="submit-btn" type="submit" [loading]="isLoading()" [disabled]="findForm.invalid">
-          </button>
+      </form>
 
-          <div class="auth-footer-text">
-            <a routerLink="/auth/verify-shop" class="back-link">
-              Got your ID? Verify
-            </a>
-            &nbsp; | &nbsp;
-            <a routerLink="/auth/login" class="back-link">
-              Back to Login
-            </a>
-          </div>
-
-        </form>
+      <!-- Footer Links -->
+      <div
+        class="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4 w-full text-[length:var(--font-size-sm)]">
+        <a routerLink="/auth/verify-shop"
+          class="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors font-medium focus:outline-none">
+          Got your ID? Verify
+        </a>
+        <span class="text-[var(--border-secondary)]">|</span>
+        <a routerLink="/auth/login"
+          class="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors font-medium focus:outline-none">
+          Back to Login
+        </a>
       </div>
+
     </div>
 
-  </div>
-</div>
+  </app-floating-split-layout>
+</app-page>

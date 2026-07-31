@@ -1,100 +1,168 @@
-import { Component, inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { DeliveryService } from '../../services/delivery.service';
+import { CommonModule } from '@angular/common';
+
+// UI Components
+import { PageComponent } from '@shared/ui/layout/page/page.component';
+import { FloatingSplitLayoutComponent } from '@shared/ui/layout/floating-split-layout.component';
+import { FieldComponent } from '@shared/ui/form/field.component';
+import { ButtonComponent } from '@shared/ui/form/button.component';
+import { StatusBadgeComponent } from '@shared/ui/badge/status-badge.component';
+
+// PrimeNG
+import { InputTextModule } from 'primeng/inputtext';
+import { PasswordModule } from 'primeng/password';
 
 @Component({
   selector: 'app-delivery-login',
   standalone: true,
-  imports: [FormsModule, RouterLink],
-  encapsulation: ViewEncapsulation.None,
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterLink,
+    InputTextModule,
+    PasswordModule,
+    PageComponent,
+    FloatingSplitLayoutComponent,
+    FieldComponent,
+    ButtonComponent,
+    StatusBadgeComponent
+  ],
   template: `
-<div class="auth-root">
-  <aside class="brand-panel">
-    <div class="grid-lines" aria-hidden="true"></div>
-    <div class="orb orb-1" aria-hidden="true"></div>
-    <div class="orb orb-2" aria-hidden="true"></div>
+    <app-page>
+      <app-floating-split-layout
+        imageSrc="https://images.pexels.com/photos/16846298/pexels-photo-16846298.jpeg"
+        imageAlt="Apex Delivery Network"
+        [reverse]="true">
 
-    <div class="brand-inner">
-      <div class="wordmark">
-        <div class="logo-glyph">
-          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M4 28 L16 4 L28 28" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
-            <path d="M8.5 20 L23.5 20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
-          </svg>
-        </div>
-        <span class="wordmark-text">Apex</span>
-      </div>
+        <!-- ========================================== -->
+        <!-- BRAND OVERLAY: Left side                   -->
+        <!-- ========================================== -->
+        <div brand-overlay class="relative z-10 flex flex-col h-full justify-between text-white">
 
-      <div class="hero-copy">
-        <p class="overline-text">Store Fleet</p>
-        <h1 class="hero-headline">
-          Deliver<br>
-          with<br>
-          <em>precision.</em>
-        </h1>
-        <p class="hero-body">
-          Access real-time order tracking, customer delivery details, and instant proof-of-delivery tools on the go.
-        </p>
-      </div>
-
-      <footer class="brand-footer">
-        <span>© 2026 Apex Inc.</span>
-      </footer>
-    </div>
-  </aside>
-
-  <main class="form-panel" id="main-content">
-    <div class="form-inner">
-      <div class="form-header">
-        <h2 class="form-title">Agent Login</h2>
-        <p class="form-subtitle">Login to manage assigned orders for <span style="font-weight: 600; color: var(--text-primary);">{{ orgSlug || 'your store' }}</span></p>
-      </div>
-
-      @if (error) {
-        <div class="error-banner" role="alert">
-          <svg class="error-icon" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-          </svg>
-          <span>{{ error }}</span>
-        </div>
-      }
-
-      <form (ngSubmit)="onSubmit()" #loginForm="ngForm" class="auth-form" novalidate>
-        <div class="field-group">
-          <label class="field-label" for="phone">Phone Number</label>
-          <input type="tel" id="phone" name="phone" [(ngModel)]="credentials.phone" required class="apex-input" placeholder="e.g. 9876543210" autocomplete="tel">
-        </div>
-
-        <div class="field-group">
-          <div class="field-label-row">
-            <label class="field-label" for="password">Password</label>
-            <a (click)="goToForgotPassword()" style="cursor:pointer" class="forgot-link">Forgot?</a>
+          <!-- Top: Logo & Brand -->
+          <div class="flex items-center gap-3">
+            <div class="h-10 w-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center shadow-sm">
+              <i class="pi pi-box text-xl"></i>
+            </div>
+            <span class="text-2xl font-[var(--font-heading)] font-bold tracking-tight">Apex</span>
           </div>
-          <input type="password" id="password" name="password" [(ngModel)]="credentials.password" required class="apex-input" placeholder="Enter password">
+
+          <!-- Bottom: Hero Content -->
+          <div>
+            <i class="pi pi-quote-left text-4xl opacity-40 mb-4 block"></i>
+            <h2 class="text-4xl xl:text-5xl font-[var(--font-heading)] font-bold leading-tight mb-6 max-w-lg">
+              Deliver<br>
+              with<br>
+              <em>precision.</em>
+            </h2>
+
+            <p class="text-[length:var(--font-size-lg)] opacity-80 max-w-md font-light leading-relaxed mb-8">
+              Access real-time order tracking, customer delivery details, and instant proof-of-delivery tools on the go.
+            </p>
+
+            <div class="flex gap-3">
+              <app-status-badge status="active" label="Store Fleet" variant="solid" size="sm"></app-status-badge>
+            </div>
+          </div>
         </div>
 
-        <button type="submit" class="submit-btn" [class.loading]="loading" [disabled]="loginForm.invalid || loading">
-          @if (loading) {
-            <span class="spinner" aria-hidden="true"></span>
-            <span>Signing in…</span>
-          } @else {
-            <span>Secure Login</span>
-            <svg class="btn-arrow" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-            </svg>
-          }
-        </button>
-      </form>
+        <!-- ========================================== -->
+        <!-- LOGIN FORM: Right side                      -->
+        <!-- ========================================== -->
+        <div class="w-full flex flex-col justify-center py-6">
 
-      <p class="signup-nudge">
-        Not an agent? <a routerLink="/" class="signup-link">Back to Home</a>
-      </p>
-    </div>
-  </main>
-</div>
-`,
-  styleUrl: '../../../../modules/auth/_auth.shared.scss'
+          <!-- Header -->
+          <div class="mb-5">
+            <h1 class="text-[length:var(--font-size-4xl)] font-[var(--font-weight-bold)] text-[var(--text-primary)] tracking-tight">
+              Agent Login
+            </h1>
+            <p class="text-[length:var(--font-size-sm)] text-[var(--text-secondary)] mt-1">
+              Login to manage assigned orders for <span class="font-semibold text-[var(--text-primary)]">{{ orgSlug || 'your store' }}</span>
+            </p>
+          </div>
+
+          <!-- Error Banner -->
+          @if (error) {
+            <div class="mb-4 p-3 rounded-[var(--ui-border-radius)] bg-[var(--color-error-bg)] border border-[var(--color-error-border)] flex items-start gap-3 animate-fade-in">
+              <i class="pi pi-exclamation-circle text-[var(--color-error)] text-lg mt-0.5"></i>
+              <div class="flex-1">
+                <p class="text-[length:var(--font-size-xs)] text-[var(--color-error-dark)] m-0 font-medium">
+                  {{ error }}
+                </p>
+              </div>
+            </div>
+          }
+
+          <!-- Form -->
+          <form (ngSubmit)="onSubmit()" #loginForm="ngForm" class="flex flex-col w-full">
+
+            <!-- Phone Number -->
+            <div class="mb-4">
+              <app-field label="Phone Number" [required]="true">
+                <input 
+                  pInputText 
+                  type="tel" 
+                  id="phone" 
+                  name="phone" 
+                  [(ngModel)]="credentials.phone" 
+                  required
+                  placeholder="e.g. 9876543210" 
+                  autocomplete="tel"
+                  class="w-full rounded-[var(--ui-border-radius)] bg-[var(--input-bg)] border border-[var(--input-border)] hover:border-[var(--accent-primary)] focus:bg-[var(--bg-primary)] transition-all px-4 py-2.5" />
+              </app-field>
+            </div>
+
+            <!-- Password -->
+            <div class="mb-6">
+              <div class="flex items-center justify-between mb-1.5">
+                <label for="password" class="text-[length:var(--font-size-sm)] font-[var(--font-weight-semibold)] text-[var(--text-primary)]">Password <span class="text-[var(--color-error)]">*</span></label>
+                <a (click)="goToForgotPassword()" class="text-[length:var(--font-size-xs)] text-[var(--accent-primary)] hover:underline cursor-pointer font-medium focus:outline-none">Forgot?</a>
+              </div>
+              <p-password 
+                name="password" 
+                [(ngModel)]="credentials.password" 
+                required
+                [toggleMask]="true" 
+                [feedback]="false"
+                placeholder="Enter password" 
+                styleClass="w-full"
+                inputStyleClass="w-full rounded-[var(--ui-border-radius)] bg-[var(--input-bg)] border border-[var(--input-border)] hover:border-[var(--accent-primary)] focus:bg-[var(--bg-primary)] transition-all px-4 py-2.5">
+              </p-password>
+            </div>
+
+            <!-- Submit Button -->
+            <app-button 
+              type="submit" 
+              variant="primary" 
+              [label]="loading ? 'Signing in...' : 'Secure Login'"
+              [icon]="loading ? 'pi pi-spinner pi-spin' : 'pi pi-arrow-right'" 
+              iconPosition="right"
+              [loading]="loading" 
+              [disabled]="loginForm.invalid || loading" 
+              class="w-full">
+            </app-button>
+
+          </form>
+          
+          <!-- Footer Links -->
+          <div class="mt-5 flex flex-col items-center justify-center gap-2 w-full text-[length:var(--font-size-xs)]">
+            <div class="flex items-center gap-1">
+              <span class="text-[var(--text-tertiary)]">Not an agent?</span>
+              <a routerLink="/" class="text-[var(--accent-primary)] font-medium hover:underline transition-colors focus:outline-none">
+                Back to Home
+              </a>
+            </div>
+          </div>
+
+        </div>
+
+      </app-floating-split-layout>
+    </app-page>
+  `,
+  styleUrls: []
 })
 export class DeliveryLoginComponent implements OnInit {
   private deliveryService = inject(DeliveryService);

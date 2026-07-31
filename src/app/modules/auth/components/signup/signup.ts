@@ -1,38 +1,51 @@
-
-
-
-
-
-
 import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
-
+import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+
+// PrimeNG
 import { ToastModule } from 'primeng/toast';
 import { PasswordModule } from 'primeng/password';
 import { CheckboxModule } from 'primeng/checkbox';
+
+// Services
 import { AuthService } from '../../services/auth-service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { passwordMatchValidator } from '../../../../core/validators/password-match.validator';
-import { Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
+
+// UI Components (Shared)
+import { PageComponent } from '@shared/ui/layout/page/page.component';
+import { FloatingSplitLayoutComponent } from '@shared/ui/layout/floating-split-layout.component';
+import { FieldComponent } from '@shared/ui/form/field.component';
+import { ButtonComponent } from '@shared/ui/form/button.component';
+import { StatusBadgeComponent } from '@shared/ui/badge/status-badge.component';
+import { ConfirmDialog } from "primeng/confirmdialog";
 
 @Component({
   selector: 'app-signup',
   standalone: true,
   imports: [
+    CommonModule,
     ReactiveFormsModule,
     RouterModule,
+    // PrimeNG
     ToastModule,
     PasswordModule,
-    CheckboxModule
-],
+    CheckboxModule,
+    // UI Components
+    PageComponent,
+    FloatingSplitLayoutComponent,
+    FieldComponent,
+    ButtonComponent,
+    StatusBadgeComponent],
   templateUrl: './signup.html',
-  styleUrl: './signup.scss',
+  styleUrls: ['./signup.scss'],
   providers: [AppMessageService]
 })
 export class Signup implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
@@ -42,7 +55,6 @@ export class Signup implements OnInit, OnDestroy {
   successMessage = signal<string | null>(null);
   errorMessage = signal<string | null>(null);
   focusedField = signal<string | null>(null);
-  // Track current step for the multi-step progress indicator
   currentStep = signal(1);
   totalSteps = 2;
 
@@ -71,7 +83,6 @@ export class Signup implements OnInit, OnDestroy {
   onFocus(field: string): void { this.focusedField.set(field); }
   onBlur(): void { this.focusedField.set(null); }
 
-  // Password strength helpers for the inline strength bar
   get passwordStrength(): number {
     const val: string = this.f['password'].value || '';
     let score = 0;
@@ -90,8 +101,28 @@ export class Signup implements OnInit, OnDestroy {
     return ['', 'weak', 'fair', 'good', 'strong'][this.passwordStrength];
   }
 
+  getFieldError(fieldName: string): string | null {
+    const control = this.signupForm.get(fieldName);
+    if (control && control.invalid && (control.dirty || control.touched)) {
+      if (control.errors?.['required']) {
+        const labels: Record<string, string> = {
+          name: 'Full Name',
+          email: 'Email',
+          phone: 'Phone',
+          uniqueShopId: 'Shop ID',
+          password: 'Password',
+          passwordConfirm: 'Confirm Password'
+        };
+        return `${labels[fieldName] || fieldName} is required.`;
+      }
+      if (control.errors?.['email']) return 'Enter a valid email address.';
+      if (control.errors?.['minlength']) return `Minimum ${control.errors['minlength'].requiredLength} characters required.`;
+      if (control.errors?.['pattern']) return 'Invalid format.';
+    }
+    return null;
+  }
+
   onSubmit(): void {
-    console.log(this.signupForm.value);
     if (this.signupForm.invalid) {
       this.signupForm.markAllAsTouched();
       this.messageService.showWarn('Please fill out all fields correctly.');
@@ -102,7 +133,6 @@ export class Signup implements OnInit, OnDestroy {
     this.successMessage.set(null);
     this.errorMessage.set(null);
 
-    // FIX: Include passwordConfirm in payload
     const { terms, ...payload } = this.signupForm.value;
     if (payload.uniqueShopId) {
       payload.uniqueShopId = payload.uniqueShopId.toUpperCase();
@@ -125,8 +155,8 @@ export class Signup implements OnInit, OnDestroy {
     });
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

@@ -1,260 +1,189 @@
-<!-- login.component.html -->
-<!-- ══════════════════════════════════════════════════════════════════════════
-     APEX — LOGIN PAGE
-     Angular 17+ (standalone), PrimeNG v17, Reactive Forms
-     All methods, signals, and form controls preserved from original.
-═══════════════════════════════════════════════════════════════════════════ -->
+<app-page>
+  <app-floating-split-layout imageSrc="https://images.pexels.com/photos/16846298/pexels-photo-16846298.jpeg"
+    imageAlt="Apex Infinity Deep Space" [reverse]="true">
 
-<p-toast></p-toast>
+    <!-- ========================================== -->
+    <!-- BRAND OVERLAY: Left side                   -->
+    <!-- ========================================== -->
+    <div brand-overlay class="relative z-10 flex flex-col h-full justify-between text-white">
 
-<div class="auth-root">
-
-  <!-- ════════════════════════════════════
-       LEFT — Brand Panel
-  ════════════════════════════════════ -->
-  <aside class="brand-panel">
-
-    <!-- Geometric grid lines (CSS-drawn, decorative) -->
-    <div class="grid-lines" aria-hidden="true"></div>
-
-    <!-- Floating orbs -->
-    <div class="orb orb-1" aria-hidden="true"></div>
-    <div class="orb orb-2" aria-hidden="true"></div>
-
-    <div class="brand-inner">
-
-      <!-- Wordmark -->
-      <a routerLink="/" class="wordmark" aria-label="Apex home">
-        <div class="logo-glyph">
-          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M4 28 L16 4 L28 28" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-              stroke-linejoin="round" />
-            <path d="M8.5 20 L23.5 20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
-          </svg>
+      <!-- Top: Logo & Brand -->
+      <div class="flex items-center gap-3">
+        <div class="h-10 w-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center shadow-sm">
+          <i class="pi pi-box text-xl"></i>
         </div>
-        <span class="wordmark-text">Apex</span>
-      </a>
+        <span class="text-2xl font-[var(--font-heading)] font-bold tracking-tight">Apex</span>
+      </div>
 
-      <!-- Hero copy -->
-      <div class="hero-copy">
-        <p class="overline-text">Workspace 2.0</p>
-        <h1 class="hero-headline">
-          Built for<br>
-          teams who<br>
-          <em>move fast.</em>
+      <!-- Bottom: Hero Content -->
+      <div>
+        <i class="pi pi-quote-left text-4xl opacity-40 mb-4 block"></i>
+        <h2 class="text-4xl xl:text-5xl font-[var(--font-heading)] font-bold leading-tight mb-6 max-w-lg">
+          One workspace.<br>
+          Endless possibilities.
+        </h2>
+
+        <!-- Stats / Indicators -->
+        <div class="flex items-center justify-between mt-8">
+          <div class="flex items-center gap-4 text-sm font-medium tracking-widest opacity-80">
+            <span>Secure</span>
+            <span class="w-12 border-b border-white/30"></span>
+            <span>Scalable</span>
+          </div>
+          <div class="flex gap-3">
+            <app-status-badge status="active" label="Enterprise" variant="solid" size="sm"></app-status-badge>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- LOGIN FORM: Right side                      -->
+    <!-- ========================================== -->
+    <div class="w-full">
+
+      <!-- Header -->
+      <div class="mb-5">
+        <h1
+          class="text-[length:var(--font-size-4xl)] font-[var(--font-weight-bold)] text-[var(--text-primary)] tracking-tight">
+          Sign in
         </h1>
-        <p class="hero-body">
-          Precision tooling for engineering teams. From sprint planning to production — one unified surface.
+        <p class="text-[length:var(--font-size-md)] text-[var(--text-secondary)] mt-2">
+          Welcome back to your workspace
         </p>
       </div>
 
-      <!-- Stats strip -->
-      <div class="stats-strip" role="list" aria-label="Platform statistics">
-        <div class="stat-item" role="listitem">
-          <span class="stat-value">10k+</span>
-          <span class="stat-label">Engineers</span>
-        </div>
-        <div class="stat-divider" aria-hidden="true"></div>
-        <div class="stat-item" role="listitem">
-          <span class="stat-value">99.9%</span>
-          <span class="stat-label">Uptime</span>
-        </div>
-        <div class="stat-divider" aria-hidden="true"></div>
-        <div class="stat-item" role="listitem">
-          <span class="stat-value">v2.0</span>
-          <span class="stat-label">Released</span>
-        </div>
-      </div>
-
-      <!-- Footer -->
-      <footer class="brand-footer">
-        <span>© 2026 Apex Inc.</span>
-        <nav class="footer-nav" aria-label="Footer links">
-          <a href="#" tabindex="-1">Privacy</a>
-          <a href="#" tabindex="-1">Terms</a>
-          <a href="#" tabindex="-1">Status</a>
-        </nav>
-      </footer>
-
-    </div>
-  </aside>
-
-  <!-- ════════════════════════════════════
-       RIGHT — Login Form
-  ════════════════════════════════════ -->
-  <main class="form-panel" id="main-content">
-    <div class="form-inner">
-
-      <!-- Mobile-only logo -->
-      <a routerLink="/" class="mobile-logo" aria-label="Apex home">
-        <div class="logo-glyph">
-          <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
-            <path d="M4 28 L16 4 L28 28" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-              stroke-linejoin="round" />
-            <path d="M8.5 20 L23.5 20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
-          </svg>
-        </div>
-        <span>Apex</span>
-      </a>
-
-      <!-- Header -->
-      <div class="form-header">
-        <h2 class="form-title">Sign in</h2>
-        <p class="form-subtitle">Enter your credentials to continue</p>
-      </div>
-
-      <!-- ── Error banner (signal-driven) ── -->
+      <!-- Error Banner -->
       @if (errorMessage()) {
-      <div class="error-banner" role="alert" aria-live="polite">
-        <svg class="error-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-          <path fill-rule="evenodd"
-            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-            clip-rule="evenodd" />
-        </svg>
-        <span>{{ errorMessage() }}</span>
-        <button type="button" class="error-dismiss" (click)="errorMessage.set(null)" aria-label="Dismiss error">
-          <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path fill-rule="evenodd"
-              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-              clip-rule="evenodd" />
-          </svg>
+      <div
+        class="mb-6 p-4 rounded-[var(--ui-border-radius)] bg-[var(--color-error-bg)] border border-[var(--color-error-border)] flex items-start gap-3 animate-fade-in">
+        <i class="pi pi-exclamation-circle text-[var(--color-error)] text-lg mt-0.5"></i>
+        <div class="flex-1">
+          <p class="text-[length:var(--font-size-sm)] text-[var(--color-error-dark)] m-0 font-medium">
+            {{ errorMessage() }}
+          </p>
+        </div>
+        <button type="button"
+          class="text-[var(--color-error)] hover:text-[var(--color-error-dark)] transition-colors focus:outline-none"
+          (click)="errorMessage.set(null)">
+          <i class="pi pi-times"></i>
         </button>
       </div>
       }
 
-      <!-- ══ LOGIN FORM ══ -->
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form" novalidate aria-label="Login form">
+      <!-- Login Form -->
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-col w-full">
 
         <!-- Email / Phone -->
-        <div class="field-group" [class.focused]="focusedField() === 'email'" [class.has-value]="f['email'].value"
-          [class.has-error]="f['email'].touched && f['email'].invalid">
-
-          <label class="field-label" for="email">
-            <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-              <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-            </svg>
-            Email or Phone
-          </label>
-
-          <p-autoComplete inputId="email" formControlName="email" [suggestions]="filteredEmails"
-            (completeMethod)="filterEmail($event)" (onFocus)="onFocus('email')" (onBlur)="onBlur()"
-            placeholder="name@company.com" styleClass="apex-autocomplete w-full" inputStyleClass="apex-input"
-            panelStyleClass="apex-dropdown" appendTo="body"
-            [attr.aria-invalid]="f['email'].touched && f['email'].invalid">
-          </p-autoComplete>
-
-          @if (f['email'].touched && f['email'].invalid) {
-          <p class="field-error" role="alert">
-            @if (f['email'].errors?.['required']) { Email or phone is required }
-            @else if (f['email'].errors?.['domainNotAllowed']) {
-            Domain not allowed — use {{ emailDomains.slice(0,3).join(', ') }}…
-            }
-            @else if (f['email'].errors?.['invalidIdentifier']) {
-            Enter a valid email or phone number
-            }
-          </p>
-          }
+        <div class="mb-5">
+          <app-field label="Email or Phone" [required]="true" [error]="getFieldError('email')">
+            <p-autoComplete formControlName="email" [suggestions]="filteredEmails"
+              (completeMethod)="filterEmail($event)" (onFocus)="onFocus('email')" (onBlur)="onBlur()"
+              placeholder="name@company.com" styleClass="w-full"
+              inputStyleClass="w-full rounded-[var(--ui-border-radius)] bg-[var(--input-bg)] border border-[var(--input-border)] hover:border-[var(--accent-primary)] focus:bg-[var(--bg-primary)] transition-all px-4 py-3"
+              panelStyleClass="apex-dropdown" appendTo="body">
+            </p-autoComplete>
+          </app-field>
         </div>
 
         <!-- Shop ID -->
-        <div class="field-group" [class.focused]="focusedField() === 'shopId'"
-          [class.has-value]="f['uniqueShopId'].value"
-          [class.has-error]="f['uniqueShopId'].touched && f['uniqueShopId'].invalid">
-
-          <div class="field-label-row">
-            <label class="field-label" for="shopId">
-              <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fill-rule="evenodd"
-                  d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z"
-                  clip-rule="evenodd" />
-              </svg>
-              Shop ID
-            </label>
-            <a routerLink="/auth/find-shop" class="forgot-link">Find Shop ID</a>
-          </div>
-
-          <input id="shopId" type="text" formControlName="uniqueShopId" placeholder="e.g. SHOP-1042" class="apex-input"
-            (focus)="onFocus('shopId')" (blur)="onBlur()"
-            [attr.aria-invalid]="f['uniqueShopId'].touched && f['uniqueShopId'].invalid" />
-
-          @if (f['uniqueShopId'].touched && f['uniqueShopId'].invalid) {
-          <p class="field-error" role="alert">Shop ID is required</p>
-          }
+        <div class="mb-5">
+          <app-field label="Shop ID" [required]="true" [error]="getFieldError('uniqueShopId')">
+            <div class="relative">
+              <input pInputText type="text" formControlName="uniqueShopId" placeholder="e.g. SHOP-1042"
+                (focus)="onFocus('shopId')" (blur)="onBlur()"
+                class="w-full rounded-[var(--ui-border-radius)] bg-[var(--input-bg)] border border-[var(--input-border)] hover:border-[var(--accent-primary)] focus:bg-[var(--bg-primary)] transition-all px-4 py-3" />
+              <a routerLink="/auth/find-shop"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-[length:var(--font-size-xs)] text-[var(--accent-primary)] hover:underline focus:outline-none">
+                Find?
+              </a>
+            </div>
+          </app-field>
         </div>
 
         <!-- Password -->
-        <div class="field-group" [class.focused]="focusedField() === 'password'" [class.has-value]="f['password'].value"
-          [class.has-error]="f['password'].touched && f['password'].invalid">
-
-          <div class="field-label-row">
-            <label class="field-label" for="password">
-              <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fill-rule="evenodd"
-                  d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                  clip-rule="evenodd" />
-              </svg>
-              Password
-            </label>
-            <a routerLink="/auth/forgot-password" class="forgot-link">Forgot?</a>
-          </div>
-
-          <p-password inputId="password" formControlName="password" [toggleMask]="true" [feedback]="false"
-            placeholder="••••••••" styleClass="apex-password w-full" inputStyleClass="apex-input"
-            (onFocus)="onFocus('password')" (onBlur)="onBlur()"
-            [attr.aria-invalid]="f['password'].touched && f['password'].invalid">
-          </p-password>
-
-          @if (f['password'].touched && f['password'].invalid) {
-          <p class="field-error" role="alert">Password is required</p>
-          }
+        <div class="mb-6">
+          <app-field label="Password" [required]="true" [error]="getFieldError('password')">
+            <p-password formControlName="password" [toggleMask]="true" [feedback]="false" placeholder="••••••••"
+              (onFocus)="onFocus('password')" (onBlur)="onBlur()" styleClass="w-full"
+              inputStyleClass="w-full rounded-[var(--ui-border-radius)] bg-[var(--input-bg)] border border-[var(--input-border)] hover:border-[var(--accent-primary)] focus:bg-[var(--bg-primary)] transition-all px-4 py-3">
+            </p-password>
+            <a routerLink="/auth/forgot-password"
+              class="block text-right mt-1 text-[length:var(--font-size-xs)] text-[var(--accent-primary)] hover:underline focus:outline-none">
+              Forgot password?
+            </a>
+          </app-field>
         </div>
 
-        <!-- Remember me -->
-        <div class="remember-row">
+        <!-- Remember Me -->
+        <div class="flex items-center gap-3 mb-8">
           <p-checkbox formControlName="remember" [binary]="true" inputId="remember" styleClass="apex-checkbox">
           </p-checkbox>
-          <label for="remember" class="remember-label">Keep me signed in for 30 days</label>
+          <label for="remember"
+            class="text-[length:var(--font-size-sm)] text-[var(--text-secondary)] cursor-pointer select-none">
+            Keep me signed in for 30 days
+          </label>
         </div>
 
-        <!-- Submit -->
-        <button type="submit" class="submit-btn" [class.loading]="isLoading()" [disabled]="isLoading()"
-          [attr.aria-busy]="isLoading()">
-          @if (isLoading()) {
-          <span class="spinner" aria-hidden="true"></span>
-          <span>Signing in…</span>
-          } @else {
-          <span>Sign in</span>
-          <svg class="btn-arrow" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path fill-rule="evenodd"
-              d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
-              clip-rule="evenodd" />
-          </svg>
-          }
-        </button>
+        <!-- Submit Button -->
+        <!-- Submit Button -->
+        <app-button type="submit" variant="primary" [label]="isLoading() ? 'Signing in...' : 'Sign in'"
+          [icon]="isLoading() ? 'pi pi-spinner pi-spin' : 'pi pi-arrow-right'" iconPosition="right"
+          [loading]="isLoading()" [disabled]="loginForm.invalid || isLoading()" class="w-full">
+        </app-button>
 
       </form>
 
-      <!-- Sign-up nudge -->
-      <p class="signup-nudge">
-        No account?
-        <a routerLink="/auth/signup" class="signup-link">Start your free trial</a>
-      </p>
+      <div class="mt-3 flex flex-col sm:flex-row items-center justify-between gap-3 w-full">
+        <div class="flex items-center gap-1.5">
+          <span class="text-[length:var(--font-size-sm)] text-[var(--text-secondary)]">
+            No account?
+          </span>
+          <a routerLink="/auth/signup"
+            class="text-[length:var(--font-size-sm)] text-[var(--accent-primary)] font-medium hover:underline transition-colors focus:outline-none">
+            Start your free trial
+          </a>
+        </div>
 
-      <div class="delivery-nudge" style="margin-top: 1.5rem; text-align: center; border-top: 1px solid var(--border); padding-top: 1.5rem;">
-        <p style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em; margin-bottom: 0.75rem;">Delivery Portals</p>
-        <div style="display: flex; gap: 1rem; justify-content: center; font-size: 0.875rem;">
-          <a routerLink="/apex-delivery/login" style="color: var(--ink-80); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--ink-80)'">Apex Network</a>
-          <span style="color: var(--border);">|</span>
-          <a routerLink="/delivery-agent/login" style="color: var(--ink-80); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--ink-80)'">Store Agent Login</a>
+        <!-- Optional: Keeps the layout balanced -->
+        <a routerLink="/auth/forgot-password"
+          class="text-[length:var(--font-size-sm)] text-[var(--text-tertiary)] hover:text-[var(--accent-primary)] transition-colors focus:outline-none">
+          Need help?
+        </a>
+      </div>
+
+      <!-- 2. Delivery Portals (Pill container with subtle separation) -->
+      <div class="mt-4 pt-3 border-t border-[var(--border-secondary)]">
+        <!-- Label -->
+        <div class="flex items-center justify-center gap-3 mb-3">
+          <span
+            class="text-[length:var(--font-size-2xs)] font-semibold text-[var(--text-tertiary)] uppercase tracking-widest">
+            Delivery Portals
+          </span>
+        </div>
+
+        <!-- Portal Links Container -->
+        <div class="inline-flex items-center justify-center w-full">
+          <div
+            class="flex items-center rounded-full bg-[var(--bg-secondary)] px-1.5 py-1.5 border border-[var(--border-secondary)] shadow-sm">
+            <a routerLink="/apex-delivery/login"
+              class="px-4 py-1.5 text-[length:var(--font-size-xs)] font-medium text-[var(--text-secondary)] hover:text-[var(--accent-primary)] hover:bg-[var(--bg-primary)] rounded-full transition-all duration-200">
+              Apex Network
+            </a>
+
+            <div class="h-4 w-px bg-[var(--border-secondary)] mx-1" aria-hidden="true"></div>
+
+            <a routerLink="/delivery-agent/login"
+              class="px-4 py-1.5 text-[length:var(--font-size-xs)] font-medium text-[var(--text-secondary)] hover:text-[var(--accent-primary)] hover:bg-[var(--bg-primary)] rounded-full transition-all duration-200">
+              Store Agent Login
+            </a>
+          </div>
         </div>
       </div>
 
     </div>
-  </main>
-
-</div>
-
-<!-- PrimeNG confirm dialog (login limit warning — key preserved) -->
-<p-confirmDialog key="loginLimitDialog" styleClass="custom-confirm-dialog" appendTo="body" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}">
+  </app-floating-split-layout>
+</app-page>
+<!-- Confirm Dialog -->
+<p-confirmDialog key="loginLimitDialog" styleClass="custom-confirm-dialog" appendTo="body">
 </p-confirmDialog>

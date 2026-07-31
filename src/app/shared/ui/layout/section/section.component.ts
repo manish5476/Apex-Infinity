@@ -1,28 +1,28 @@
+// src/app/shared/ui/layout/section.component.ts
 import { Component, ChangeDetectionStrategy, input } from '@angular/core';
 
 /**
  * Component: app-section
  * Purpose: Standardized section divider with optional title for splitting page content.
- * Inputs: title (string), description (string)
- * Content Projection: Section content
- * Used By: Global
  */
 @Component({
   selector: 'app-section',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: {
-    class: 'block w-full'
-  },
+  host: { class: 'block w-full' },
   template: `
-    <section class="flex flex-col gap-4 mb-8">
+    <section class="flex flex-col gap-[var(--spacing-xl)] mb-[var(--spacing-4xl)]">
       @if (title() || description()) {
-        <div class="flex flex-col gap-1 px-1">
+        <div class="flex flex-col gap-[var(--spacing-xs)] px-1">
           @if (title()) {
-            <h2 class="text-lg font-medium text-slate-900 m-0 tracking-tight">{{ title() }}</h2>
+            <h2 class="text-[length:var(--font-size-2xl)] font-[var(--font-weight-medium)] text-[var(--text-primary)] m-0 tracking-tight">
+              {{ title() }}
+            </h2>
           }
           @if (description()) {
-            <p class="text-sm text-slate-500 m-0">{{ description() }}</p>
+            <p class="text-[length:var(--font-size-sm)] text-[var(--text-secondary)] m-0">
+              {{ description() }}
+            </p>
           }
         </div>
       }
@@ -30,7 +30,7 @@ import { Component, ChangeDetectionStrategy, input } from '@angular/core';
         <ng-content></ng-content>
       </div>
     </section>
-  `
+  `,
 })
 export class SectionComponent {
   title = input<string>('');
