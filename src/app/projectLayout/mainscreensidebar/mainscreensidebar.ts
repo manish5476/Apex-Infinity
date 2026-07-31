@@ -63,7 +63,7 @@ export class Mainscreensidebar implements OnInit {
     effect(() => {
       const items = this.menuItems(); // register dependency
       untracked(() => this.checkActiveRoutes(items));
-    }, { allowSignalWrites: true }); // ✅ FIX 2: Explicitly allow signal writes inside this effect
+    }); // ✅ FIX 2: Explicitly allow signal writes inside this effect
   }
 
   // --- SEARCH STATE ---

@@ -14,9 +14,10 @@ import {
   },
   template: `
     <header
-      class="w-full bg-[var(--bg-primary)] transition-all duration-200"
-      [class.border-b]="border()"
+      class="bg-[var(--bg-primary)] transition-all duration-200 mx-6 mt-6 mb-4 rounded-2xl"
+      [class.border]="border()"
       [class.border-[var(--border-secondary)]]="border()"
+      [class.shadow-lg]="true"
       [class.shadow-[var(--shadow-xs)]]="shadow() === 'sm'"
       [class.shadow-[var(--shadow-md)]]="shadow() === 'md'">
 
@@ -36,9 +37,9 @@ import {
 
           @if (title()) {
             <h1 class="text-[var(--text-primary)] font-[var(--font-weight-bold)] tracking-tight leading-tight m-0"
-                [class.text-[length:var(--font-size-lg)]]="density() === 'compact'"
-                [class.text-[length:var(--font-size-2xl)]]="density() === 'normal'"
-                [class.text-[length:var(--font-size-3xl)]]="density() === 'comfortable'">
+                [class.text-lg]="density() === 'compact'"
+                [class.text-xl]="density() === 'normal'"
+                [class.text-2xl]="density() === 'comfortable'">
               {{ title() }}
             </h1>
           }

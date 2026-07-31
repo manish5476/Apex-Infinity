@@ -181,22 +181,21 @@ interface UnifiedActionParams extends ICellRendererParams {
 
     /* ── BASE BUTTON ── */
     .act-btn {
-      width: 28px;
-      height: 28px;
-      border-radius: var(--ui-border-radius, 6px);
-      border: 1px solid transparent;
+      width: 32px;
+      height: 32px;
+      border-radius: 50% !important; /* Premium circular buttons */
+      border: 1px solid transparent !important;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.15s ease, color 0.15s ease,
-                  border-color 0.15s ease, transform 0.12s ease,
-                  box-shadow 0.15s ease;
-      background: transparent;
-      color: var(--theme-text-tertiary);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      background: transparent !important; /* Fully transparent until hovered */
+      color: var(--theme-text-tertiary, #9ca3af) !important;
       line-height: 1;
+      padding: 0;
 
-      i { font-size: 0.78rem; }
+      i { font-size: 0.85rem; }
 
       &:focus-visible {
         outline: 2px solid var(--theme-accent-primary);

@@ -104,32 +104,33 @@ import { TooltipModule } from 'primeng/tooltip';
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 5px;
+      gap: 8px; /* Slightly more breathing room */
       height: 100%;
     }
 
     /* ── BASE BUTTON ── */
     .act-btn {
-      width: 28px;
-      height: 28px;
-      border-radius: var(--ui-border-radius, 5px);
-      border: 1px solid transparent;
-      background: transparent;
-      color: var(--theme-text-tertiary);
+      width: 32px; /* Slightly larger hit area */
+      height: 32px;
+      border-radius: 50% !important; /* Premium circular buttons */
+      border: 1px solid transparent !important; /* Force no weird global borders */
+      background: transparent !important; /* Force transparent background */
+      color: var(--text-tertiary, #9ca3af) !important;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.13s, color 0.13s, border-color 0.13s, transform 0.1s, box-shadow 0.13s;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       line-height: 1;
+      padding: 0;
 
-      i { font-size: 0.78rem; }
+      i { font-size: 0.85rem; }
 
       &:focus-visible {
-        outline: 2px solid var(--theme-accent-primary);
+        outline: 2px solid var(--accent-primary);
         outline-offset: 2px;
       }
-      &:active { transform: scale(0.9); }
+      &:active { transform: scale(0.92); }
     }
 
     /* ── SEMANTIC VARIANTS ── */

@@ -36,6 +36,8 @@ export type SharedGridEvent<T> =
   | { type: 'cancel'; row: T }
   | { type: 'delete'; row: T }
   | { type: 'return'; row: T }
+  | { type: 'bulkSave'; rows: T[] }
+  | { type: 'bulkDelete'; rows: T[] }
   | { type: 'reachedBottom' };
 
 
@@ -240,7 +242,7 @@ export class AgShareGrid<T = any> {
   readonly enableExcelExport = input(true);
   readonly excelExportPermission = input<string | undefined>(undefined);
   readonly excelFileName = input<string>('Exported_Data');
-  
+
   readonly pagination = input(false);
   readonly paginationPageSize = input(20);
 
@@ -362,7 +364,7 @@ export class AgShareGrid<T = any> {
 
     // Auto-calculate width if not specified
     const visibleCount = [ac.showView, ac.showEdit, ac.showDelete, ac.showReturn].filter(Boolean).length;
-    const colWidth = ac.width ?? Math.max(visibleCount * 38 + 20, 80);
+    const colWidth = ac.width ?? Math.max(visibleCount * 48 + 20, 80);
 
 
     const actionColDef: ColDef<T> = {
@@ -488,12 +490,26 @@ export class AgShareGrid<T = any> {
   private restoreRow(rowId: string | number): void {
     if (!this.originalRowSnapshot) return;
     const node = this.api.getRowNode(String(rowId));
-    node?.setData(this.originalRowSnapshot);
+    if (node) node.setData(this.originalRowSnapshot);
   }
 
   /* --------------------------------------------------
      PUBLIC API — callable from parent via viewChild
   --------------------------------------------------- */
+  addNewRow(): void {
+    // Generate a temporary ID and create a blank row
+    const tempId = `new_${Date.now()}`;
+    const newRow = { _id: tempId, _tempId: tempId, isNew: true } as unknown as T;
+
+    // Add to top of grid
+    this.api?.applyTransaction({ add: [newRow], addIndex: 0 });
+
+    // Set grid state to edit this new row immediately
+    this.editingRowId.set(tempId);
+    this.originalRowSnapshot = { ...newRow };
+    this.api?.refreshCells({ columns: ['__actions__'], force: true });
+  }
+
   applyTransaction(update: T[], add?: T[], remove?: T[]): void {
     this.api?.applyTransaction({ update, add, remove });
   }
