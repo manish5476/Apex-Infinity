@@ -55,20 +55,20 @@ app-data-grid {
     top: 0;
     z-index: 10;
     background: var(--bg-secondary);
-    box-shadow: 0 1px 0 var(--border-secondary);
-    /* Border attached to sticky element */
+    box-shadow: inset 0 -2px 0 var(--border-secondary);
+    /* Border attached to sticky element without causing layout shift */
 }
 
 .apex-dg-th {
     padding: 12px 16px;
-    height: 48px;
+    height: 44px;
     white-space: nowrap;
     text-align: left;
     font-size: 11px;
-    font-weight: 700;
-    color: var(--text-secondary);
+    font-weight: 800;
+    color: var(--text-primary);
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.05em;
     user-select: none;
     background: inherit;
     /* Inherits the sticky bg */
@@ -127,18 +127,29 @@ app-data-grid {
 
     /* Status Row Modifiers */
     &.apex-dg-row--editing {
-        background: color-mix(in srgb, var(--color-success) 6%, var(--bg-primary));
+        background: color-mix(in srgb, var(--accent-primary) 3%, var(--bg-secondary));
+
+        .apex-dg-td {
+            border-bottom: 1px solid color-mix(in srgb, var(--accent-primary) 20%, var(--border-primary));
+        }
 
         .apex-dg-td:first-child {
-            box-shadow: inset 3px 0 0 var(--color-success);
+            box-shadow: inset 3px 0 0 var(--accent-primary);
         }
     }
 
     &.apex-dg-row--new {
-        background: color-mix(in srgb, var(--accent-primary) 6%, var(--bg-primary));
+        background: color-mix(in srgb, var(--color-success) 4%, var(--bg-primary));
+        box-shadow: var(--shadow-sm);
+        position: relative;
+        z-index: 5;
+
+        .apex-dg-td {
+            border-bottom: 1px solid color-mix(in srgb, var(--color-success) 20%, var(--border-primary));
+        }
 
         .apex-dg-td:first-child {
-            box-shadow: inset 3px 0 0 var(--accent-primary);
+            box-shadow: inset 3px 0 0 var(--color-success);
         }
     }
 
@@ -164,14 +175,40 @@ app-data-grid {
 /* ─── Cell Geometry ─── */
 .apex-dg-td {
     vertical-align: middle;
-    padding: 14px 16px;
+    padding: 12px 16px;
     font-size: var(--font-size-sm);
     color: var(--text-secondary);
 }
 
+/* ─── Inputs in Cells (Jump-free Layout) ─── */
+.apex-dg-td {
+    input[type="text"], input[type="number"], select, .p-dropdown {
+        height: 32px !important;
+        min-height: 32px !important;
+        padding-top: 0;
+        padding-bottom: 0;
+        line-height: 30px;
+        box-sizing: border-box;
+        border-radius: var(--ui-border-radius-sm);
+        font-family: inherit;
+        font-size: inherit;
+        width: 100%;
+        display: flex;
+        align-items: center;
+    }
+    .p-dropdown .p-dropdown-label {
+        padding-top: 0;
+        padding-bottom: 0;
+        line-height: 30px;
+        height: 30px;
+    }
+}
+
 /* ─── Checkboxes ─── */
 .apex-dg-checkbox {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 16px;
     height: 16px;
     margin: 0 auto;

@@ -63,18 +63,12 @@ export interface Master {
         density="compact"
         title="Master Data"
         subtitle="Manage your master reference data across all modules"
-        class="!mx-8 !mt-8">
+        class="!m-0 !mb-4">
       </app-page-header>
 
-      <app-page-content [fullWidth]="true">
-        <div class="flex flex-col flex-1 min-h-0 w-full px-8 pb-8">
-
-          <!-- Premium Grid Container -->
-          <div class="flex flex-col flex-1 min-h-0 bg-[var(--bg-primary)] rounded-[32px] shadow-[var(--shadow-xl)] 
-                      border border-[color-mix(in_srgb,var(--accent-primary)_5%,var(--border-secondary))]
-                      p-4 md:p-6 overflow-hidden">
-            
-            <!-- Enterprise DataGrid -->
+      <app-page-content  [density]="'compact'"  [fullWidth]="true">
+        <div class="flex flex-col flex-1 min-h-0 w-full px-6 pb-6">
+          <!-- Enterprise DataGrid -->
           <app-data-grid
             gridId="master-data"
             dataKey="_id"
@@ -99,8 +93,6 @@ export interface Master {
             (addNew)="onAddNew()"
             (refresh)="loadMasters()">
           </app-data-grid>
-
-          </div> 
 
         </div>
       </app-page-content>

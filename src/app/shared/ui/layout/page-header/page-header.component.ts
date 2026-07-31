@@ -14,7 +14,7 @@ import {
   },
   template: `
     <header
-      class="transition-all duration-200 mx-6 mt-6 mb-4"
+      class="transition-all duration-200 w-full"
       [class.rounded-2xl]="variant() === 'solid'"
       [class.bg-[var(--bg-primary)]]="variant() === 'solid'"
       [class.bg-transparent]="variant() === 'transparent'"
@@ -87,6 +87,7 @@ export class PageHeaderComponent {
     return [
       'block',
       'w-full',
+      'mx-6 mt-6 mb-4',
       this.sticky() ? 'sticky top-0 z-[var(--z-sticky)]' : ''
     ].filter(Boolean).join(' ');
   });

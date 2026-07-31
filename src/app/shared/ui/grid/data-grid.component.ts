@@ -1,6 +1,6 @@
 import {
   Component, ChangeDetectionStrategy,
-  input, output, signal, computed, effect,
+  input, output, signal, computed, effect, untracked,
   inject, OnDestroy, HostListener, ElementRef
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -11,6 +11,7 @@ import {
   GridFilterState, GridPageState, GridDensity, GridSavedView,
   GridPersistedState, GridCellChangeEvent, GridContext, GridUndoEntry
 } from './grid-types';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { GridService } from './grid.service';
 import { GridStateService } from './grid-state.service';
 
@@ -70,41 +71,42 @@ import { GridContextMenuComponent, ContextMenuActionEvent } from './components/g
   template: `
     <div class="apex-dg flex flex-col w-full flex-1 min-h-0" [class]="densityCssClass()">
 
-      <!-- ───────────── TOOLBAR ───────────── -->
-      @if (toolbar()) {
-        <app-grid-toolbar
-          [searchQuery]="searchQuery()"
-          [selectedCount]="selectedRowIds().size"
-          [totalCount]="data().length"
-          [filteredCount]="filteredData().length"
-          [loading]="loading()"
-          [filterActive]="filterState().length > 0"
-          [activeFilterCount]="filterState().length"
-          [density]="densitySignal()"
-          [enableAdd]="enableAdd()"
-          [enableExport]="enableExport()"
-          [bulkActions]="bulkActions()"
-          (searchChange)="onSearch($event)"
-          (filterToggle)="showFilterBar.update(v => !v)"
-          (refresh)="refresh.emit()"
-          (addRow)="onAddRow()"
-          (densityChange)="onDensityChange($event)"
-          (exportAs)="onExport($event)"
-          (columnManagerToggle)="showColumnManager.update(v => !v)"
-          (savedViewsToggle)="showSavedViews.update(v => !v)"
-          (clearSelection)="clearSelection()"
-          (bulkAction)="onBulkActionById($event)">
-
-          <!-- Slot for projected custom actions -->
-          <ng-content select="[grid-actions]" ngProjectAs="[grid-actions]"></ng-content>
-        </app-grid-toolbar>
-      }
-
       <!-- ───────────── CARD WRAPPER ───────────── -->
       <div class="relative flex flex-col flex-1 min-h-0
                   bg-[var(--bg-primary)] border border-[color-mix(in_srgb,var(--border-secondary)_50%,transparent)]
                   rounded-2xl overflow-hidden
                   shadow-[var(--elevation-1)]">
+
+        <!-- ───────────── TOOLBAR ───────────── -->
+        @if (toolbar()) {
+          <app-grid-toolbar
+            [searchQuery]="searchQuery()"
+            [selectedCount]="selectedRowIds().size"
+            [totalCount]="data().length"
+            [filteredCount]="filteredData().length"
+            [loading]="loading()"
+            [filterActive]="filterState().length > 0"
+            [activeFilterCount]="filterState().length"
+            [density]="densitySignal()"
+            [enableAdd]="enableAdd()"
+            [enableExport]="enableExport()"
+            [bulkActions]="bulkActions()"
+            [isEditing]="!!editingRowId()"
+            (searchChange)="onSearch($event)"
+            (filterToggle)="showFilterBar.update(v => !v)"
+            (refresh)="refresh.emit()"
+            (addRow)="onAddRow()"
+            (densityChange)="onDensityChange($event)"
+            (exportAs)="onExport($event)"
+            (columnManagerToggle)="showColumnManager.update(v => !v)"
+            (savedViewsToggle)="showSavedViews.update(v => !v)"
+            (clearSelection)="clearSelection()"
+            (bulkAction)="onBulkActionById($event)">
+
+            <!-- Slot for projected custom actions -->
+            <ng-content select="[grid-actions]" ngProjectAs="[grid-actions]"></ng-content>
+          </app-grid-toolbar>
+        }
 
         <!-- Filter Bar -->
         @if (showFilterBar()) {
@@ -192,6 +194,7 @@ import { GridContextMenuComponent, ContextMenuActionEvent } from './components/g
                     <app-grid-empty-state
                       [title]="emptyMessage()"
                       subtitle="Try adjusting your search or filter criteria."
+                      actionLabel="Add Record"
                       (action)="onAddRow()">
                     </app-grid-empty-state>
                   </td>
@@ -251,6 +254,7 @@ import { GridContextMenuComponent, ContextMenuActionEvent } from './components/g
                       [row]="row"
                       [rowActions]="rowActions()"
                       [isEditing]="rowIsEditing"
+                      [isEditingAnyRow]="!!editingRowId()"
                       (edit)="startEditRow(row)"
                       (save)="saveEditRow()"
                       (cancel)="cancelEditRow()"
@@ -326,6 +330,7 @@ export class DataGridComponent implements OnDestroy {
   // ─── Services ─────────────────────────────────────────────────────────────
   readonly gridService = inject(GridService);
   private stateService = inject(GridStateService);
+  private messageService = inject(MessageService, { optional: true });
 
   // ─── Required Inputs ──────────────────────────────────────────────────────
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -514,6 +519,21 @@ export class DataGridComponent implements OnDestroy {
       const ctx = this.buildContext();
       this.plugins().forEach(p => p.onInit?.(ctx));
     });
+
+    // Auto-edit workflow: automatically edit new rows when they appear in data
+    effect(() => {
+      const data = this.data();
+      const currentEditId = this.editingRowId();
+      // Find a row that is new and not currently being edited
+      const uneditedNewRow = data.find(r => this.isNewRow(r) && this.getRowId(r) !== currentEditId);
+      
+      if (uneditedNewRow) {
+        // Run untracked to avoid triggering recursive effect updates
+        untracked(() => {
+          this.startEditRow(uneditedNewRow);
+        });
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -596,8 +616,16 @@ export class DataGridComponent implements OnDestroy {
 
     // Restore snapshot to the source row
     const rowId = this.editingRowId()!;
+    const isNew = rowId.startsWith('new_');
     const sourceRow = this.data().find(r => this.getRowId(r) === rowId);
-    if (sourceRow) Object.assign(sourceRow, this.editSnapshot);
+
+    if (isNew) {
+      // If the row was brand new and we cancelled it, discard it completely
+      // by telling the parent to refresh/discard.
+      this.refresh.emit();
+    } else if (sourceRow) {
+      Object.assign(sourceRow, this.editSnapshot);
+    }
 
     this.editingRowId.set(null);
     this.editDraft.set(null);
@@ -772,6 +800,17 @@ export class DataGridComponent implements OnDestroy {
   // ─── Add Row ─────────────────────────────────────────────────────────────
 
   onAddRow(): void {
+    if (this.editingRowId()) {
+      const hasNew = this.data().some(r => this.isNewRow(r));
+      if (hasNew) {
+        this.messageService?.add({
+          severity: 'warn',
+          summary: 'Action Blocked',
+          detail: 'Finish editing the current record before adding another.'
+        });
+        return;
+      }
+    }
     this.addNew.emit();
   }
 

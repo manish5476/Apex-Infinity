@@ -15,12 +15,10 @@ import { GridBulkAction, GridDensity } from '../grid-types';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="flex flex-col gap-2 mb-3">
+    <div class="flex flex-col">
 
       <!-- Main Toolbar Row -->
-      <div class="flex items-center justify-between gap-3 px-3 py-2
-                  bg-[var(--bg-primary)] border border-[color-mix(in_srgb,var(--border-secondary)_40%,transparent)]
-                  rounded-[var(--ui-border-radius-pill)] shadow-[var(--shadow-sm)]">
+      <div class="flex items-center justify-between gap-3 px-4 py-3 border-b border-[var(--border-secondary)] bg-[var(--bg-primary)]">
 
         <!-- LEFT: Search + Filter toggle + Record count -->
         <div class="flex items-center gap-2">
@@ -99,6 +97,8 @@ import { GridBulkAction, GridDensity } from '../grid-types';
             <button type="button"
                     class="apex-tb-btn"
                     title="Density"
+                    [disabled]="isEditing()"
+                    [class.opacity-50]="isEditing()" [class.cursor-not-allowed]="isEditing()"
                     (click)="showDensityMenu.set(!showDensityMenu())">
               <i class="pi pi-bars text-xs"></i>
             </button>
@@ -127,12 +127,16 @@ import { GridBulkAction, GridDensity } from '../grid-types';
 
           <!-- Column Manager toggle -->
           <button type="button" class="apex-tb-btn" title="Manage Columns"
+                  [disabled]="isEditing()"
+                  [class.opacity-50]="isEditing()" [class.cursor-not-allowed]="isEditing()"
                   (click)="columnManagerToggle.emit()">
             <i class="pi pi-table text-xs"></i>
           </button>
 
           <!-- Saved Views toggle -->
           <button type="button" class="apex-tb-btn" title="Saved Views"
+                  [disabled]="isEditing()"
+                  [class.opacity-50]="isEditing()" [class.cursor-not-allowed]="isEditing()"
                   (click)="savedViewsToggle.emit()">
             <i class="pi pi-bookmark text-xs"></i>
           </button>
@@ -144,6 +148,8 @@ import { GridBulkAction, GridDensity } from '../grid-types';
           @if (enableExport()) {
             <div class="relative">
               <button type="button" class="apex-tb-btn" title="Export"
+                      [disabled]="isEditing()"
+                      [class.opacity-50]="isEditing()" [class.cursor-not-allowed]="isEditing()"
                       (click)="showExportMenu.set(!showExportMenu())">
                 <i class="pi pi-download text-xs"></i>
               </button>
@@ -168,6 +174,8 @@ import { GridBulkAction, GridDensity } from '../grid-types';
 
           <!-- Refresh -->
           <button type="button" class="apex-tb-btn" title="Refresh"
+                  [disabled]="isEditing()"
+                  [class.opacity-50]="isEditing()" [class.cursor-not-allowed]="isEditing()"
                   [class.animate-spin]="loading()"
                   (click)="refresh.emit()">
             <i class="pi pi-refresh text-xs"></i>
@@ -176,11 +184,13 @@ import { GridBulkAction, GridDensity } from '../grid-types';
           <!-- Add New -->
           @if (enableAdd()) {
             <button type="button"
+                    [disabled]="isEditing()"
                     class="flex items-center gap-1.5 px-3 py-1.5
                            bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)]
                            text-[var(--text-on-accent)] text-[length:var(--font-size-xs)]
                            font-[var(--font-weight-semibold)] rounded-[var(--ui-border-radius-pill)]
-                           shadow-[var(--shadow-sm)] transition-[var(--transition-fast)] outline-none"
+                           shadow-[var(--shadow-sm)] transition-[var(--transition-fast)] outline-none
+                           disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[var(--accent-primary)]"
                     (click)="addRow.emit()">
               <i class="pi pi-plus text-[10px]"></i>
               Add
@@ -217,14 +227,16 @@ import { GridBulkAction, GridDensity } from '../grid-types';
           <div class="flex items-center gap-1">
             @for (action of bulkActions(); track action.id) {
               <button type="button"
+                      [disabled]="isEditing()"
                       class="flex items-center gap-1.5 px-3 py-1.5
                              text-[length:var(--font-size-xs)] font-[var(--font-weight-medium)]
-                             rounded-[var(--ui-border-radius-sm)] border transition-[var(--transition-fast)] outline-none"
+                             rounded-[var(--ui-border-radius-sm)] border transition-[var(--transition-fast)] outline-none
+                             disabled:opacity-50 disabled:cursor-not-allowed"
                       [class]="action.variant === 'danger'
-                        ? 'text-[var(--color-error)] border-[var(--color-error)] hover:bg-[color-mix(in_srgb,var(--color-error)_8%,transparent)]'
+                        ? 'text-[var(--color-error)] border-[var(--color-error)] hover:bg-[color-mix(in_srgb,var(--color-error)_8%,transparent)] disabled:hover:bg-transparent'
                         : action.variant === 'primary'
-                          ? 'text-[var(--text-on-accent)] bg-[var(--accent-primary)] border-[var(--accent-primary)] hover:bg-[var(--accent-hover)]'
-                          : 'text-[var(--text-secondary)] border-[var(--border-secondary)] hover:bg-[var(--component-bg-hover)]'"
+                          ? 'text-[var(--text-on-accent)] bg-[var(--accent-primary)] border-[var(--accent-primary)] hover:bg-[var(--accent-hover)] disabled:hover:bg-[var(--accent-primary)]'
+                          : 'text-[var(--text-secondary)] border-[var(--border-secondary)] hover:bg-[var(--component-bg-hover)] disabled:hover:bg-transparent'"
                       (click)="bulkAction.emit(action.id)">
                 <i [class]="action.icon + ' text-xs'"></i>
                 {{ action.label }}
@@ -288,6 +300,7 @@ export class GridToolbarComponent {
   enableAdd        = input<boolean>(true);
   enableExport     = input<boolean>(true);
   bulkActions      = input<GridBulkAction[]>([]);
+  isEditing        = input<boolean>(false);
 
   searchChange        = output<string>();
   filterToggle        = output<void>();

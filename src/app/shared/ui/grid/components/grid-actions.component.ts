@@ -35,33 +35,35 @@ import { TooltipModule } from 'primeng/tooltip';
       </button>
     } @else {
       <!-- View mode: Edit + custom actions -->
-      <button type="button"
-              class="apex-act-btn apex-act-btn--edit apex-act-btn--reveal"
-              pTooltip="Edit row (E)" tooltipPosition="top"
-              (click)="edit.emit()">
-        <i class="pi pi-pencil text-[10px]"></i>
-      </button>
-
-      <!-- Custom row actions (always visible) -->
-      @for (action of visibleAlwaysActions(); track action.id) {
+      @if (!isEditingAnyRow()) {
         <button type="button"
-                class="apex-act-btn apex-act-btn--reveal"
-                [class.apex-act-btn--danger]="action.variant === 'danger'"
-                [class.apex-act-btn--success]="action.variant === 'success'"
-                [pTooltip]="action.tooltip ?? action.label ?? action.id"
-                tooltipPosition="top"
-                (click)="customAction.emit(action)">
-          <i [class]="action.icon + ' text-[10px]'"></i>
+                class="apex-act-btn apex-act-btn--edit apex-act-btn--reveal"
+                pTooltip="Edit row (E)" tooltipPosition="top"
+                (click)="edit.emit()">
+          <i class="pi pi-pencil text-[10px]"></i>
+        </button>
+
+        <!-- Custom row actions (always visible when not editing any) -->
+        @for (action of visibleAlwaysActions(); track action.id) {
+          <button type="button"
+                  class="apex-act-btn apex-act-btn--reveal"
+                  [class.apex-act-btn--danger]="action.variant === 'danger'"
+                  [class.apex-act-btn--success]="action.variant === 'success'"
+                  [pTooltip]="action.tooltip ?? action.label ?? action.id"
+                  tooltipPosition="top"
+                  (click)="customAction.emit(action)">
+            <i [class]="action.icon + ' text-[10px]'"></i>
+          </button>
+        }
+
+        <!-- Delete (always available when not editing any) -->
+        <button type="button"
+                class="apex-act-btn apex-act-btn--danger apex-act-btn--reveal"
+                pTooltip="Delete row (Del)" tooltipPosition="top"
+                (click)="delete.emit()">
+          <i class="pi pi-trash text-[10px]"></i>
         </button>
       }
-
-      <!-- Delete (always available) -->
-      <button type="button"
-              class="apex-act-btn apex-act-btn--danger apex-act-btn--reveal"
-              pTooltip="Delete row (Del)" tooltipPosition="top"
-              (click)="delete.emit()">
-        <i class="pi pi-trash text-[10px]"></i>
-      </button>
     }
   `,
   styles: [`
@@ -124,7 +126,8 @@ export class GridActionsComponent {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   row        = input<any>(null);
   rowActions = input<GridRowAction[]>([]);
-  isEditing  = input<boolean>(false);
+  isEditing = input<boolean>(false);
+  isEditingAnyRow = input<boolean>(false);
 
   edit         = output<void>();
   save         = output<void>();

@@ -167,12 +167,8 @@ import { DataListCardComponent } from '../../shared/ui/data/list/data-list-card.
 
         <!-- Main Dashboard Split (Synchronized Gaps) -->
         <div class="grid grid-cols-1 xl:grid-cols-3 gap-[var(--spacing-3xl)]">
-           
-           <!-- Left Column: Heavy Data & Insights -->
-           <div class="xl:col-span-2 flex flex-col gap-[var(--spacing-3xl)]">
-             
-             <!-- AI Insights -->
-             <app-section title="AI Business Insights" spacing="compact">
+                      <div class="xl:col-span-2 flex flex-col gap-[var(--spacing-3xl)]">
+                          <app-section title="AI Business Insights" spacing="compact">
                 <ng-container ngProjectAs="[actions]">
                   <app-status-badge status="info" variant="subtle" size="sm" [label]="dashboard()!.insights.count + ' generated'"></app-status-badge>
                 </ng-container>
@@ -476,16 +472,16 @@ export class AdminDashboardUiComponent implements OnInit, OnDestroy {
     this.analyticsService.getDashboardOverview(start, end, this.selectedBranch)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (res) => { 
-          this.dashboard.set(res.data); 
-          this.loading.set(false); 
+        next: (res) => {
+          this.dashboard.set(res.data);
+          this.loading.set(false);
         },
         error: () => this.loading.set(false)
       });
   }
 
-  onFilterChange(): void { 
-    this.loadDashboard(); 
+  onFilterChange(): void {
+    this.loadDashboard();
   }
 
   ngOnDestroy(): void {
