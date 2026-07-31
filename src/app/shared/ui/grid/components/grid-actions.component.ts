@@ -16,7 +16,7 @@ import { TooltipModule } from 'primeng/tooltip';
   imports: [TooltipModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    class: 'flex items-center justify-end gap-1',
+    class: 'flex items-center justify-end gap-1 h-full',
   },
   template: `
     @if (isEditing()) {

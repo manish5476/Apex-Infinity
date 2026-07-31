@@ -82,8 +82,8 @@ import { GridContextMenuComponent, ContextMenuActionEvent } from './components/g
           <app-grid-toolbar
             [searchQuery]="searchQuery()"
             [selectedCount]="selectedRowIds().size"
-            [totalCount]="data().length"
-            [filteredCount]="filteredData().length"
+            [totalCount]="lazy() ? totalRecords() : data().length"
+            [filteredCount]="lazy() ? totalRecords() : filteredData().length"
             [loading]="loading()"
             [filterActive]="filterState().length > 0"
             [activeFilterCount]="filterState().length"
@@ -272,9 +272,9 @@ import { GridContextMenuComponent, ContextMenuActionEvent } from './components/g
         <!-- ─── PAGINATION ─── -->
         @if (pagination() && !loading() && data().length > 0) {
           <app-grid-pagination
-            [total]="filteredData().length"
-            [page]="currentPage()"
+            [total]="lazy() ? totalRecords() : filteredData().length"
             [pageSize]="pageSizeSignal()"
+            [page]="currentPage()"
             (pageChange)="onPageChange($event)">
           </app-grid-pagination>
         }
@@ -340,6 +340,8 @@ export class DataGridComponent implements OnDestroy {
   // ─── Behaviour Inputs ─────────────────────────────────────────────────────
   gridId = input<string>('default');
   dataKey = input<string>('id');
+  lazy = input<boolean>(false);
+  totalRecords = input<number>(0);
   toolbar = input<boolean>(true);
   rowSelection = input<boolean>(true);
   multipleSelection = input<boolean>(true);
@@ -367,6 +369,7 @@ export class DataGridComponent implements OnDestroy {
   pageChange = output<GridPageState>();
   sortChange = output<GridSortState[]>();
   filterChange = output<GridFilterState[]>();
+  searchChange = output<string>();
   selectionChange = output<unknown[]>();
   rowClick = output<unknown>();
   rowDoubleClick = output<unknown>();
@@ -399,6 +402,7 @@ export class DataGridComponent implements OnDestroy {
   contextMenuPos = signal<{ x: number; y: number }>({ x: 0, y: 0 });
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   contextMenuRow = signal<any>(null);
+  private searchTimeout: any;
 
   // Track last shift-click row for range selection
   private lastClickedId: string | null = null;
@@ -423,6 +427,8 @@ export class DataGridComponent implements OnDestroy {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   filteredData = computed<any[]>(() => {
+    if (this.lazy()) return this.data();
+    
     let data = this.data();
     const q = this.searchQuery().trim().toLowerCase();
     const filters = this.filterState();
@@ -482,7 +488,7 @@ export class DataGridComponent implements OnDestroy {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   displayData = computed<any[]>(() => {
-    if (!this.pagination()) return this.filteredData();
+    if (this.lazy() || !this.pagination()) return this.filteredData();
     const start = this.currentPage() * this.pageSizeSignal();
     return this.filteredData().slice(start, start + this.pageSizeSignal());
   });
@@ -512,6 +518,18 @@ export class DataGridComponent implements OnDestroy {
       const cols = this.columns();
       if (!cols.length) return;
       this.loadPersistedState();
+    });
+
+    // Handle lazy debounced search emission
+    effect(() => {
+      const query = this.searchQuery();
+      untracked(() => {
+        // Simple debounce using setTimeout for search emission
+        if (this.searchTimeout) clearTimeout(this.searchTimeout);
+        this.searchTimeout = setTimeout(() => {
+          this.searchChange.emit(query);
+        }, 300);
+      });
     });
 
     // Init plugins

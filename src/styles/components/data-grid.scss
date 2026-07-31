@@ -127,14 +127,18 @@ app-data-grid {
 
     /* Status Row Modifiers */
     &.apex-dg-row--editing {
-        background: color-mix(in srgb, var(--accent-primary) 3%, var(--bg-secondary));
+        background: var(--bg-primary);
+        position: relative;
+        z-index: 5;
 
         .apex-dg-td {
-            border-bottom: 1px solid color-mix(in srgb, var(--accent-primary) 20%, var(--border-primary));
+            border-bottom: 1px solid var(--border-secondary);
+            border-top: 1px solid var(--border-secondary);
+            box-shadow: 0 4px 6px -4px rgba(0, 0, 0, 0.05), 0 -4px 6px -4px rgba(0, 0, 0, 0.05); /* Simulated elevation */
         }
 
         .apex-dg-td:first-child {
-            box-shadow: inset 3px 0 0 var(--accent-primary);
+            box-shadow: inset 3px 0 0 var(--accent-primary), 0 4px 6px -4px rgba(0, 0, 0, 0.05), 0 -4px 6px -4px rgba(0, 0, 0, 0.05);
         }
     }
 

@@ -60,13 +60,15 @@ import { AvatarComponent } from '../../media/avatar.component';
     :host .apex-inline { all: unset; }
 
     .apex-ie {
-      width: 100%;
-      min-height: 24px;
+      width: 95% !important;
+      max-width: calc(100% - 12px);
+      height: 36px !important;
+      margin: 0 auto; /* Center horizontally */
       background: transparent !important;
       border: 1px solid transparent !important;
       border-radius: var(--ui-border-radius-sm) !important;
       box-shadow: none !important;
-      padding: 4px 6px !important;
+      padding: 0 10px !important;
       font-size: var(--font-size-xs) !important;
       color: var(--text-primary) !important;
       outline: none !important;
@@ -75,27 +77,31 @@ import { AvatarComponent } from '../../media/avatar.component';
     }
     .apex-ie:focus { 
       border-color: var(--border-secondary) !important;
+      background: var(--bg-primary) !important;
       box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-primary) 15%, transparent) !important;
     }
 
     /* Override PrimeNG component wrappers */
     :host ::ng-deep .p-inputtext.apex-ie,
     :host ::ng-deep .p-inputnumber-input.apex-ie,
-    :host ::ng-deep p-inputnumber .p-inputnumber { width: 100%; }
+    :host ::ng-deep p-inputnumber .p-inputnumber { width: 95%; margin: 0 auto; display: block; }
     :host ::ng-deep p-inputnumber .p-inputtext { width: 100%; }
+    :host ::ng-deep p-select { width: 95%; margin: 0 auto; display: block; }
     :host ::ng-deep p-select .p-select { width: 100%; border: 1px solid transparent; border-radius: var(--ui-border-radius-sm); background: transparent; box-shadow: none; padding: 2px 4px; transition: var(--transition-fast); }
     :host ::ng-deep p-select .p-select:focus,
     :host ::ng-deep p-select.p-select-focus .p-select,
-    :host ::ng-deep p-select.p-focus .p-select { border-color: var(--border-secondary); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-primary) 15%, transparent); }
-    :host ::ng-deep p-select .p-select-label { font-size: var(--font-size-xs); padding: 0; }
+    :host ::ng-deep p-select.p-focus .p-select { border-color: var(--border-secondary); background: var(--bg-primary); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-primary) 15%, transparent); }
+    :host ::ng-deep p-select .p-select-label { font-size: var(--font-size-xs); padding: 0; line-height: 28px; }
     :host ::ng-deep p-select .p-select-dropdown { width: 20px; }
+    :host ::ng-deep p-datepicker { width: 95%; margin: 0 auto; display: block; }
     :host ::ng-deep p-datepicker .p-datepicker-input-icon-container { width: 100%; }
     :host ::ng-deep p-datepicker .p-inputtext { width: 100%; }
+    :host ::ng-deep p-autocomplete { width: 95%; margin: 0 auto; display: block; }
     :host ::ng-deep p-autocomplete .p-autocomplete { width: 100%; }
     :host ::ng-deep p-autocomplete .p-inputtext { width: 100%; }
-    :host ::ng-deep p-toggleswitch { display: flex; align-items: center; }
+    :host ::ng-deep p-toggleswitch { display: flex; align-items: center; justify-content: center; }
     :host ::ng-deep p-checkbox { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
-    :host ::ng-deep textarea.apex-ie { resize: none; min-height: 24px; height: auto; line-height: 1.4; padding: 4px 6px !important; }
+    :host ::ng-deep textarea.apex-ie { resize: none; min-height: 36px; height: auto; line-height: 1.4; padding: 8px 10px !important; }
   `],
   template: `
     <div class="flex items-center w-full h-full">

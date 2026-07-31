@@ -85,7 +85,11 @@ export interface Master {
             [enableAdd]="true"
             [enableUndo]="true"
             [enableContextMenu]="true"
-            [persistState]="true"
+            [lazy]="true"
+            [totalRecords]="totalRecords()"
+            (pageChange)="onPageChange($event)"
+            (sortChange)="onSortChange($event)"
+            (searchChange)="onSearchChange($event)"
             (rowSave)="onRowSave($event)"
             (rowDelete)="onRowDelete($event)"
             (rowDuplicate)="onRowDuplicate($event)"
@@ -115,6 +119,15 @@ export class MasterList implements OnInit, OnDestroy {
   masters = signal<Master[]>([]);
   selectedRows = signal<Master[]>([]);
   loading = signal(false);
+  totalRecords = signal<number>(0);
+
+  // Lazy Load State
+  gridState = signal<{ page: number; pageSize: number; sort: string; search: string }>({
+    page: 1,
+    pageSize: 15,
+    sort: '',
+    search: '',
+  });
 
   // Master type options (used in 'type' column)
   readonly masterTypes = [
@@ -233,15 +246,28 @@ export class MasterList implements OnInit, OnDestroy {
 
   loadMasters(): void {
     this.loading.set(true);
-    this.masterService.getMasters().pipe(takeUntil(this.destroy$)).subscribe({
+
+    const state = this.gridState();
+    const params = {
+      page: state.page,
+      limit: state.pageSize,
+      sort: state.sort,
+      search: state.search,
+    };
+
+    this.masterService.getMasters(params).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const data = res.data?.masters || res.data || [];
+        const data = res.data?.masters || res.data?.items || res.data || [];
+        const total = res.data?.totalRecords ?? res.data?.total ?? data.length;
+        
         const mapped = data.map((d: Master) => ({
           ...d,
           isFeatured: d.metadata?.isFeatured ?? false,
         }));
+        
         this.masters.set(mapped);
+        this.totalRecords.set(total);
         this.selectedRows.set([]);
         this.loading.set(false);
       },
@@ -250,6 +276,26 @@ export class MasterList implements OnInit, OnDestroy {
         this.loading.set(false);
       },
     });
+  }
+
+  // ─── Server Side Grid Events ──────────────────────────────────────────────
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onPageChange(event: any): void {
+    this.gridState.update(s => ({ ...s, page: event.pageIndex + 1, pageSize: event.pageSize }));
+    this.loadMasters();
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onSortChange(sortData: any[]): void {
+    const sortParams = sortData.map(s => `${s.field}:${s.direction}`).join(',');
+    this.gridState.update(s => ({ ...s, sort: sortParams }));
+    this.loadMasters();
+  }
+
+  onSearchChange(query: string): void {
+    this.gridState.update(s => ({ ...s, search: query, page: 1 }));
+    this.loadMasters();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
