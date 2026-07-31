@@ -6,11 +6,12 @@ import { Component, ChangeDetectionStrategy, input } from '@angular/core';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    class: 'block w-full flex-1'
+    class: 'flex flex-col flex-1 min-h-0 w-full'
   },
   template: `
     <main 
-      class="flex-1 w-full mx-auto max-w-[1600px]" 
+      class="flex flex-col flex-1 min-h-0 w-full mx-auto" 
+      [class.max-w-[1600px]]="!fullWidth()"
       [class.p-[var(--spacing-xl)]]="padded() && density() === 'compact'"
       [class.p-[var(--spacing-3xl)]]="padded() && density() === 'normal'"
       [class.p-[var(--spacing-4xl)]]="padded() && density() === 'comfortable'">
@@ -20,5 +21,6 @@ import { Component, ChangeDetectionStrategy, input } from '@angular/core';
 })
 export class PageContentComponent {
   padded = input<boolean>(true);
+  fullWidth = input<boolean>(false);
   density = input<'compact' | 'normal' | 'comfortable'>('normal');
 }

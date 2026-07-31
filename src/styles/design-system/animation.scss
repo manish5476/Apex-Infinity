@@ -1,13 +1,19 @@
-@layer utilities {
-  /* ============================
-     PREMIUM ANIMATIONS
-     Smooth, refined motion
-  ============================ */
+/* ==========================================================================
+   APEX CRM — PREMIUM ANIMATIONS
+   Layer: utilities
+   Note: pulse, spin, and bounce are provided natively by Tailwind.
+   ========================================================================== */
 
+@layer utilities {
+
+  /* ============================
+     KEYFRAMES
+  ============================ */
   @keyframes fadeIn {
     from {
       opacity: 0;
     }
+
     to {
       opacity: 1;
     }
@@ -18,6 +24,7 @@
       transform: translateY(20px);
       opacity: 0;
     }
+
     to {
       transform: translateY(0);
       opacity: 1;
@@ -29,6 +36,7 @@
       transform: translateY(-20px);
       opacity: 0;
     }
+
     to {
       transform: translateY(0);
       opacity: 1;
@@ -40,6 +48,7 @@
       transform: translateX(-20px);
       opacity: 0;
     }
+
     to {
       transform: translateX(0);
       opacity: 1;
@@ -51,6 +60,7 @@
       transform: translateX(20px);
       opacity: 0;
     }
+
     to {
       transform: translateX(0);
       opacity: 1;
@@ -62,18 +72,10 @@
       transform: scale(0.95);
       opacity: 0;
     }
+
     to {
       transform: scale(1);
       opacity: 1;
-    }
-  }
-
-  @keyframes pulse {
-    0%, 100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.6;
     }
   }
 
@@ -81,76 +83,48 @@
     0% {
       background-position: -1000px 0;
     }
+
     100% {
       background-position: 1000px 0;
     }
   }
 
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
+  /* ============================
+     UTILITY CLASSES
+  ============================ */
 
-  @keyframes bounce {
-    0%, 100% {
-      transform: translateY(0);
-      animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
-    }
-    50% {
-      transform: translateY(-15px);
-      animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
-    }
-  }
-
-  /* Animation utility classes */
+  /* Uses your token transition timing for a unified feel */
   .animate-fadeIn {
-    animation: fadeIn 0.3s ease-in-out;
+    animation: fadeIn 0.3s cubic-bezier(0.2, 0.9, 0.2, 1);
   }
 
   .animate-slideInUp {
-    animation: slideInUp 0.4s ease-out;
+    animation: slideInUp 0.4s cubic-bezier(0.2, 0.9, 0.2, 1);
   }
 
   .animate-slideInDown {
-    animation: slideInDown 0.4s ease-out;
+    animation: slideInDown 0.4s cubic-bezier(0.2, 0.9, 0.2, 1);
   }
 
   .animate-slideInLeft {
-    animation: slideInLeft 0.4s ease-out;
+    animation: slideInLeft 0.4s cubic-bezier(0.2, 0.9, 0.2, 1);
   }
 
   .animate-slideInRight {
-    animation: slideInRight 0.4s ease-out;
+    animation: slideInRight 0.4s cubic-bezier(0.2, 0.9, 0.2, 1);
   }
 
   .animate-scaleIn {
-    animation: scaleIn 0.3s ease-out;
-  }
-
-  .animate-pulse {
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-
-  .animate-spin {
-    animation: spin 1s linear infinite;
-  }
-
-  .animate-bounce {
-    animation: bounce 1s infinite;
+    animation: scaleIn 0.3s cubic-bezier(0.2, 0.9, 0.2, 1);
   }
 
   .animate-shimmer {
     animation: shimmer 2s linear infinite;
-    background: linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(255, 255, 255, 0.2) 50%,
-      rgba(255, 255, 255, 0) 100%
-    );
+    background: linear-gradient(90deg,
+        transparent 0%,
+        var(--component-bg-hover) 50%,
+        /* Themed shimmer */
+        transparent 100%);
     background-size: 1000px 100%;
   }
 }

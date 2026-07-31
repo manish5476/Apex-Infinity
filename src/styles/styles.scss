@@ -1,1614 +1,1656 @@
 /* ==========================================================================
-   APEX CRM — MAIN STYLESHEET (PERFECTED)
-   Aligned with Master Theme Tokens & PrimeNG Overrides
+   APEX CRM — MASTER ARCHITECTURE ORCHESTRATOR
    ========================================================================== */
+@use './design-system/variables';
 
-/* ==========================================================================
-   1. IMPORTS & DEPENDENCIES
-   ========================================================================== */
-@use 'tailwindcss';
-@use './design-system/variables.scss';
-@use './utilities/scrollbar';
-@use './utilities/focus';
-@use './utilities/selection';
+/* 1. LAYER SPECIFICITY LAW (Lowest to Highest) */
+@layer tailwind-base, primeng-theme, base, components, primeng-overrides, tailwind-utilities;
 
+/* 2. EXTERNAL DEPENDENCIES */
 @import 'primeicons/primeicons.css';
 @import 'leaflet/dist/leaflet.css';
 
-
-body {
-  font-family: var(--font-body);
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  -webkit-font-smoothing: antialiased;
-  line-height: var(--line-height-relaxed);
-}
-
-/* ==========================================================================
-   3. LAYOUT CONTAINERS
-   ========================================================================== */
-.app-container {
-  background: var(--bg-primary);
-  border-radius: var(--ui-border-radius-lg);
-  box-shadow: var(--shadow-sm);
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  overflow: hidden;
-  transition: box-shadow var(--transition-base), border-color var(--transition-base);
-  border: 1px solid transparent;
-
-  &.interactive-container:hover {
-    box-shadow: var(--elevation-1);
-    border-color: var(--border-secondary);
-  }
-
-  .container-header {
-    padding: var(--spacing-xl) var(--spacing-2xl);
-    border-bottom: 1px solid var(--border-secondary);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: var(--spacing-md);
-
-    .header-titles {
-      display: flex;
-      flex-direction: column;
-      gap: var(--spacing-xs);
-    }
-
-    .container-title {
-      margin: 0;
-      font-family: var(--font-heading);
-      font-size: var(--font-size-xl);
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-
-    .container-subtitle {
-      margin: 0;
-      font-size: var(--font-size-sm);
-      color: var(--text-secondary);
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-md);
-      flex-wrap: wrap;
-    }
-  }
-
-  /* Body Section */
-  .container-body {
-    padding: var(--spacing-2xl);
-    flex: 1;
-    overflow-y: auto;
-
-    &.no-padding {
-      padding: 0;
-    }
-  }
-
-  /* Footer Section */
-  .container-footer {
-    padding: var(--spacing-lg) var(--spacing-2xl);
-    border-top: 1px solid var(--border-secondary);
-    background: var(--bg-secondary);
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: var(--spacing-md);
-    flex-wrap: wrap;
-  }
-
-  /* Mobile Responsiveness for App Container */
-  @media (max-width: 768px) {
-    border-radius: 0;
-    border-left: none;
-    border-right: none;
-
-    .container-header {
-      padding: var(--spacing-lg) var(--spacing-xl);
-    }
-
-    .container-body {
-      padding: var(--spacing-xl);
-    }
-
-    .container-footer {
-      padding: var(--spacing-lg) var(--spacing-xl);
-    }
-  }
-}
-
-/* ==========================================================================
-   4. UI COMPONENTS (Cards & Stats)
-   ========================================================================== */
-
-/* Premium Standard Card */
-.premium-card {
-  background: var(--card-bg);
-  border: var(--card-border);
-  border-radius: var(--card-radius);
-  box-shadow: var(--card-shadow);
-  transition: all var(--transition-base);
-  overflow: hidden;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-
-  &:hover {
-    box-shadow: var(--card-shadow-hover);
-    border-color: var(--border-secondary);
-  }
-
-  .card-header {
-    padding: var(--card-padding) var(--card-padding) calc(var(--card-padding) * 0.75);
-    border-bottom: var(--ui-border-width) solid var(--border-primary);
-    background: var(--bg-secondary);
-    font-weight: 600;
-    font-family: var(--font-heading);
-    color: var(--text-primary);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .card-body {
-    padding: var(--card-padding);
-    flex: 1;
-  }
-
-  .card-footer {
-    padding: calc(var(--card-padding) * 0.75) var(--card-padding);
-    border-top: var(--ui-border-width) solid var(--border-primary);
-    background: var(--bg-secondary);
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-md);
-  }
-
-  /* Variants */
-  &.compact {
-    --card-padding: var(--spacing-lg);
-    --card-radius: var(--ui-border-radius-lg);
-  }
-
-  &.borderless {
-    border: none;
-    box-shadow: none;
-    background: transparent;
-
-    &:hover {
-      box-shadow: none;
-      border: none;
-    }
-  }
-
-  &.interactive {
-    cursor: pointer;
-
-    &:hover {
-      transform: translateY(-2px);
-    }
-
-    &:active {
-      transform: translateY(0);
-    }
-  }
-}
-
-/* Dashboard Statistic Card */
-.stat-card {
-  background: var(--card-bg);
-  border: var(--card-border);
-  border-radius: var(--ui-border-radius-lg);
-  padding: var(--spacing-xl);
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
-  box-shadow: var(--shadow-sm);
-  transition: all var(--transition-base);
-  position: relative;
-  overflow: hidden;
-
-  &:hover {
-    box-shadow: var(--elevation-2);
-    transform: translateY(-2px);
-    border-color: var(--border-secondary);
-  }
-
-  .stat-icon {
-    width: 56px;
-    height: 56px;
-    border-radius: var(--ui-border-radius);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    flex-shrink: 0;
-
-    &.primary {
-      background: var(--color-primary-bg);
-      color: var(--color-primary);
-    }
-
-    &.success {
-      background: var(--color-success-bg);
-      color: var(--color-success);
-    }
-
-    &.info {
-      background: var(--color-info-bg);
-      color: var(--color-info);
-    }
-
-    &.warning {
-      background: var(--color-warning-bg);
-      color: var(--color-warning);
-    }
-  }
-
-  .stat-content {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xs);
-    min-width: 0;
-
-    .stat-label {
-      font-size: var(--font-size-xs);
-      color: var(--text-tertiary);
-      text-transform: uppercase;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .stat-value {
-      font-size: var(--font-size-3xl);
-      font-weight: 700;
-      color: var(--text-primary);
-      line-height: 1;
-    }
-  }
-
-  /* Top Border Accents */
-  &.border-top-primary {
-    border-top: 4px solid var(--color-primary);
-  }
-
-  &.border-top-success {
-    border-top: 4px solid var(--color-success);
-  }
-
-  &.border-top-info {
-    border-top: 4px solid var(--color-info);
-  }
-}
-
-/* ==========================================================================
-   5. SHARED FILTER PANEL (Grid/Table Headers)
-   ========================================================================== */
-.app-filter-panel {
-  display: flex;
-  align-items: flex-end;
-  gap: var(--spacing-xl);
-  width: 100%;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-secondary);
-  border-radius: var(--ui-border-radius-lg);
-  padding: var(--spacing-xl);
-  box-shadow: var(--shadow-xs);
-  transition: box-shadow var(--transition-base);
-  flex-wrap: wrap;
-
-  &:hover {
-    box-shadow: var(--shadow-sm);
-  }
-
-  /* === SINGLE ROW MODIFIER === */
-  &.single-row {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    padding-bottom: var(--spacing-xl);
-
-    &::-webkit-scrollbar {
-      height: 6px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: var(--scroll-thumb);
-      border-radius: var(--ui-border-radius-pill);
-    }
-
-    &::-webkit-scrollbar-thumb:hover {
-      background: var(--accent-primary);
-    }
-
-    .filter-field {
-      flex: 0 0 auto;
-      width: 180px;
-    }
-
-    .filter-actions,
-    .filter-actions-right {
-      flex-shrink: 0;
-    }
-  }
-
-  .filter-field {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xs);
-    flex: 1 1 220px;
-    min-width: 200px;
-    max-width: 320px;
-
-    label {
-      font-size: var(--font-size-xs);
-      font-weight: 600;
-      color: var(--text-label);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      white-space: nowrap;
-    }
-  }
-
-  .filter-actions {
-    display: flex;
-    gap: var(--spacing-md);
-    align-items: flex-end;
-  }
-
-  .filter-actions-right {
-    margin-left: auto;
-    display: flex;
-    align-items: flex-end;
-    gap: var(--spacing-md);
-  }
-}
-
-@media (max-width: 768px) {
-  .app-filter-panel {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: var(--spacing-lg);
-    gap: var(--spacing-lg);
-
-    &::-webkit-scrollbar {
-      height: 4px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: var(--scroll-thumb);
-      border-radius: var(--ui-border-radius-pill);
-    }
-
-    .filter-field {
-      flex: 0 0 220px;
-      max-width: none;
-    }
-
-    .filter-actions,
-    .filter-actions-right {
-      flex-shrink: 0;
-      margin-left: 0;
-    }
-
-    .filter-actions-right::after {
-      content: '';
-      padding-right: var(--spacing-md);
-    }
-  }
-}
-
-/* ==========================================================================
-   6. UTILITIES & BACKGROUND EFFECTS
-   ========================================================================== */
-
-.bg-theme-gradient {
-  background-image: var(--accent-gradient);
-  color: #ffffff;
-}
-
-.bg-theme-soft-gradient {
-  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-ternary) 100%);
-}
-
-/* Animated Meteor Background Effect */
-.meteor {
-  position: absolute;
-  inset: 0;
-  background: var(--bg-primary);
-  overflow: hidden;
-
-  &::before {
-    content: "";
-    position: absolute;
-    inset: -145%;
-    rotate: -45deg;
-    background: transparent;
-
-    background-image:
-      radial-gradient(2px 80px at 0px 235px, color-mix(in srgb, var(--accent-primary) 15%, transparent), transparent),
-      radial-gradient(2px 80px at 300px 235px, color-mix(in srgb, var(--accent-primary) 15%, transparent), transparent),
-      radial-gradient(1px 1px at 150px 117.5px, color-mix(in srgb, var(--accent-primary) 30%, transparent) 100%, transparent 150%),
-      radial-gradient(2px 80px at 0px 252px, color-mix(in srgb, var(--accent-secondary) 10%, transparent), transparent),
-      radial-gradient(2px 80px at 300px 252px, color-mix(in srgb, var(--color-info) 10%, transparent), transparent),
-      radial-gradient(1px 1px at 150px 126px, color-mix(in srgb, var(--accent-secondary) 20%, transparent) 100%, transparent 150%),
-      radial-gradient(2px 80px at 0px 150px, color-mix(in srgb, var(--accent-primary) 15%, transparent), transparent),
-      radial-gradient(2px 80px at 300px 150px, color-mix(in srgb, var(--accent-primary) 15%, transparent), transparent),
-      radial-gradient(1px 1px at 150px 75px, color-mix(in srgb, var(--accent-primary) 30%, transparent) 100%, transparent 150%),
-      radial-gradient(2px 80px at 0px 253px, color-mix(in srgb, var(--color-warning) 12%, transparent), transparent),
-      radial-gradient(2px 80px at 300px 253px, color-mix(in srgb, var(--color-warning) 12%, transparent), transparent),
-      radial-gradient(1px 1px at 150px 126.5px, color-mix(in srgb, var(--color-warning) 25%, transparent) 100%, transparent 150%),
-      radial-gradient(2px 80px at 0px 204px, color-mix(in srgb, var(--accent-primary) 15%, transparent), transparent),
-      radial-gradient(2px 80px at 300px 204px, color-mix(in srgb, var(--accent-primary) 15%, transparent), transparent),
-      radial-gradient(1px 1px at 150px 102px, color-mix(in srgb, var(--accent-primary) 30%, transparent) 100%, transparent 150%),
-      radial-gradient(2px 80px at 0px 134px, color-mix(in srgb, var(--accent-primary) 12%, transparent), transparent),
-      radial-gradient(2px 80px at 300px 134px, color-mix(in srgb, var(--accent-primary) 12%, transparent), transparent),
-      radial-gradient(1px 1px at 150px 67px, color-mix(in srgb, var(--accent-primary) 25%, transparent) 100%, transparent 150%),
-      radial-gradient(2px 80px at 0px 179px, color-mix(in srgb, var(--color-warning) 15%, transparent), transparent),
-      radial-gradient(2px 80px at 300px 179px, color-mix(in srgb, var(--color-warning) 15%, transparent), transparent),
-      radial-gradient(1px 1px at 150px 89.5px, color-mix(in srgb, var(--color-warning) 30%, transparent) 100%, transparent 150%),
-      radial-gradient(2px 80px at 0px 299px, color-mix(in srgb, var(--accent-primary) 10%, transparent), transparent),
-      radial-gradient(2px 80px at 300px 299px, color-mix(in srgb, var(--accent-primary) 10%, transparent), transparent),
-      radial-gradient(1px 1px at 150px 149.5px, color-mix(in srgb, var(--accent-primary) 20%, transparent) 100%, transparent 150%),
-      radial-gradient(2px 80px at 0px 215px, color-mix(in srgb, var(--color-warning) 12%, transparent), transparent),
-      radial-gradient(2px 80px at 300px 215px, color-mix(in srgb, var(--color-warning) 12%, transparent), transparent),
-      radial-gradient(1px 1px at 150px 107.5px, color-mix(in srgb, var(--color-warning) 25%, transparent) 100%, transparent 150%),
-      radial-gradient(2px 80px at 0px 281px, color-mix(in srgb, var(--color-error) 10%, transparent), transparent),
-      radial-gradient(2px 80px at 300px 281px, color-mix(in srgb, var(--color-warning) 10%, transparent), transparent),
-      radial-gradient(1px 1px at 150px 140.5px, color-mix(in srgb, var(--color-error) 20%, transparent) 100%, transparent 150%),
-      radial-gradient(2px 80px at 0px 158px, color-mix(in srgb, var(--accent-tertiary) 12%, transparent), transparent),
-      radial-gradient(2px 80px at 300px 158px, color-mix(in srgb, var(--accent-tertiary) 12%, transparent), transparent),
-      radial-gradient(1px 1px at 150px 79px, color-mix(in srgb, var(--accent-tertiary) 25%, transparent) 100%, transparent 150%),
-      radial-gradient(2px 80px at 0px 210px, color-mix(in srgb, var(--accent-primary) 12%, transparent), transparent),
-      radial-gradient(2px 80px at 300px 210px, color-mix(in srgb, var(--accent-primary) 12%, transparent), transparent),
-      radial-gradient(1px 1px at 150px 105px, color-mix(in srgb, var(--accent-primary) 25%, transparent) 100%, transparent 150%);
-
-    background-size:
-      300px 235px, 300px 235px, 300px 235px,
-      300px 252px, 300px 252px, 300px 252px,
-      300px 150px, 300px 150px, 300px 150px,
-      300px 253px, 300px 253px, 300px 253px,
-      300px 204px, 300px 204px, 300px 204px,
-      300px 134px, 300px 134px, 300px 134px,
-      300px 179px, 300px 179px, 300px 179px,
-      300px 299px, 300px 299px, 300px 299px,
-      300px 215px, 300px 215px, 300px 215px,
-      300px 281px, 300px 281px, 300px 281px,
-      300px 158px, 300px 158px, 300px 158px,
-      300px 210px, 300px 210px, 300px 210px;
-
-    animation: gentleFloat 180s linear infinite;
-    opacity: 0.8;
-  }
-
-  /* Fade Overlay for Depth */
-  &::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--bg-secondary) 40%, transparent) 0%, transparent 80%);
-    pointer-events: none;
-  }
-}
-
-@keyframes gentleFloat {
-  0% {
-    background-position:
-      0px 220px, 3px 220px, 151.5px 337.5px,
-      25px 24px, 28px 24px, 176.5px 150px,
-      50px 16px, 53px 16px, 201.5px 91px,
-      75px 224px, 78px 224px, 226.5px 350.5px,
-      100px 19px, 103px 19px, 251.5px 121px,
-      125px 120px, 128px 120px, 276.5px 187px,
-      150px 31px, 153px 31px, 301.5px 120.5px,
-      175px 235px, 178px 235px, 326.5px 384.5px,
-      200px 121px, 203px 121px, 351.5px 228.5px,
-      225px 224px, 228px 224px, 376.5px 364.5px,
-      250px 26px, 253px 26px, 401.5px 105px,
-      275px 75px, 278px 75px, 426.5px 180px;
-  }
-
-  to {
-    background-position:
-      0px 6800px, 3px 6800px, 151.5px 6917.5px,
-      25px 13632px, 28px 13632px, 176.5px 13758px,
-      50px 5416px, 53px 5416px, 201.5px 5491px,
-      75px 17175px, 78px 17175px, 226.5px 17301.5px,
-      100px 5119px, 103px 5119px, 251.5px 5221px,
-      125px 8428px, 128px 8428px, 276.5px 8495px,
-      150px 9876px, 153px 9876px, 301.5px 9965.5px,
-      175px 13391px, 178px 13391px, 326.5px 13540.5px,
-      200px 14741px, 203px 14741px, 351.5px 14848.5px,
-      225px 18770px, 228px 18770px, 376.5px 18910.5px,
-      250px 5082px, 253px 5082px, 401.5px 5161px,
-      275px 6375px, 278px 6375px, 426.5px 6480px;
-  }
-}
-
-/* ==========================================================================
-   7. PRIME-NG DYNAMIC DIALOG CUSTOMIZATION (Synced)
-   ========================================================================== */
-
-/* Backdrop Styling */
-.app-dialog-mask {
-  background-color: rgba(0, 0, 0, 0.56) !important;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  animation: fadeInMask 0.2s ease-out;
-}
-
-@keyframes fadeInMask {
-  from {
-    opacity: 0;
-    backdrop-filter: blur(0px);
-  }
-
-  to {
-    opacity: 1;
-    backdrop-filter: blur(4px);
-  }
-}
-
-/* Main Dialog Window */
-.app-dialog {
-  background: var(--component-surface-raised) !important;
-  border: 1px solid var(--border-primary) !important;
-  border-radius: var(--ui-border-radius-xl) !important;
-  box-shadow: var(--elevation-3) !important;
-  animation: slideUpFade 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-
-  .p-dialog-header {
-    background: var(--component-surface-raised) !important;
-    border-bottom: 1px solid var(--border-primary) !important;
-    padding: var(--spacing-xl) var(--spacing-2xl) !important;
-    border-top-left-radius: var(--ui-border-radius-xl) !important;
-    border-top-right-radius: var(--ui-border-radius-xl) !important;
-
-    .p-dialog-title {
-      font-family: var(--font-heading);
-      font-size: var(--font-size-xl);
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-
-    .p-dialog-header-icons button {
-      background: transparent;
-      color: var(--text-tertiary);
-      border: none;
-      border-radius: var(--ui-border-radius);
-      width: 32px;
-      height: 32px;
-      transition: all var(--transition-base);
-
-      &:hover {
-        background: var(--component-bg-hover);
-        color: var(--text-primary);
-      }
-
-      &:focus {
-        box-shadow: 0 0 0 2px var(--accent-focus);
-      }
-    }
-  }
-
-  .p-dialog-content {
-    background: var(--component-surface-raised) !important;
-    color: var(--text-primary) !important;
-    overflow-y: auto;
-  }
-
-  .p-dialog-footer {
-    background: var(--bg-secondary) !important;
-    border-top: 1px solid var(--border-primary) !important;
-    padding: var(--spacing-lg) var(--spacing-2xl) !important;
-    display: flex;
-    justify-content: flex-end;
-    gap: var(--spacing-md);
-    border-bottom-left-radius: var(--ui-border-radius-xl) !important;
-    border-bottom-right-radius: var(--ui-border-radius-xl) !important;
-  }
-}
-
-.enterprise-dialog {
-  border-radius: calc(var(--ui-border-radius-xl) * 1.5) !important;
-
-  &.p-dialog-maximized {
-    border-radius: 0 !important;
-    border: none !important;
-  }
-}
-
-@keyframes slideUpFade {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.98);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* ==========================================================================
-   8. SHARED COMPONENT MIXINS (Fixed with Master Tokens)
-   ========================================================================== */
-
-// ── Icon Alignment ────────────────────────────────────────────────────────
-@mixin icon-host {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  line-height: 1;
-
-  .p-icon,
-  svg {
-    display: block;
-    flex-shrink: 0;
-    width: 1.25rem;
-    height: 1.25rem;
-    fill: currentColor;
-  }
-}
-
-// ── Base input reset ────────────────────────────────────────────────────────
-@mixin input-reset {
-  appearance: none;
-  -webkit-appearance: none;
-  box-sizing: border-box;
-  margin: 0;
-  outline: none;
-}
-
-// ── Input base ──────────────────────────────────────────────────────────────
-@mixin input-base {
-  @include input-reset;
-  display: block;
-  width: 100%;
-  height: 2.25rem;
-  /* Matches your 2.5rem PrimeNG geometry override */
-  padding: 0 var(--spacing-md);
-  font-family: var(--font-body);
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-normal);
-  color: var(--text-primary);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-primary);
-  border-radius: var(--ui-border-radius);
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
-
-  &::placeholder {
-    color: var(--text-label);
-  }
-
-  &:hover:not(:disabled):not(:focus) {
-    border-color: var(--border-secondary);
-    background: var(--component-bg-hover);
-  }
-
-  &:focus {
-    border-color: var(--accent-primary);
-    box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus);
-    background: var(--bg-primary);
-  }
-
-  &:disabled {
-    background: var(--color-disabled);
-    color: var(--color-disabled-text);
-    border-color: var(--border-primary);
-    cursor: not-allowed;
-    opacity: var(--p-disabled-opacity, 0.6);
-  }
-}
-
-// ── Overlay/dropdown panel ─────────────────────────────────────────────────
-@mixin overlay-panel {
-  background: var(--component-surface-raised);
-  border: 1px solid var(--border-primary);
-  border-radius: var(--ui-border-radius-lg);
-  box-shadow: var(--elevation-2);
-}
-
-// ── List item (dropdown options, menu items) ─────────────────────────────
-@mixin list-item {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  height: 32px;
-  border-radius: var(--ui-border-radius-sm);
-  font-size: var(--font-size-sm);
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: background var(--transition-fast);
-  white-space: nowrap;
-  user-select: none;
-
-  .p-icon,
-  svg {
-    width: 1.25rem;
-    height: 1.25rem;
-    flex-shrink: 0;
-    display: block;
-  }
-
-  &:hover:not(.p-disabled):not(.p-highlight) {
-    background: var(--component-bg-hover);
-    color: var(--text-primary);
-  }
-
-  &.p-highlight {
-    background: var(--accent-focus);
-    color: var(--accent-primary);
-    font-weight: var(--font-weight-medium);
-  }
-
-  &.p-disabled {
-    opacity: var(--p-disabled-opacity, 0.6);
-    cursor: not-allowed;
-    pointer-events: none;
-  }
-}
-
-// ── Icon-only action button ───────────────────────────────────────────────
-@mixin icon-button($size: 28px) {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: $size;
-  height: $size;
-  padding: 0;
-  border: none;
-  border-radius: var(--ui-border-radius-sm);
-  background: transparent;
-  color: var(--text-tertiary);
-  cursor: pointer;
-  transition: background var(--transition-fast), color var(--transition-fast);
-  outline: none;
-
-  .p-icon,
-  svg {
-    width: 1.25rem;
-    height: 1.25rem;
-    display: block;
-    flex-shrink: 0;
-  }
-
-  &:hover {
-    background: var(--component-bg-hover);
-    color: var(--text-primary);
-  }
-
-  &:active {
-    background: var(--component-bg-active);
-  }
-
-  &:focus-visible {
-    box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus);
-  }
-}
-
-// ── Invalid state modifier ───────────────────────────────────────────────
-@mixin invalid-state {
-  border-color: var(--color-error) !important;
-
-  &:focus {
-    box-shadow: 0 0 0 var(--focus-ring-width) var(--color-error-bg) !important;
-  }
-}
-
-// ── Feedback severity ────────────────────────────────────────────────────
-@mixin severity($bg, $border, $text) {
-  background: $bg;
-  border-color: $border;
-  color: $text;
-
-  .p-message-icon,
-  .p-toast-message-icon {
-    color: $text;
-    width: 1.5rem;
-    height: 1.5rem;
-  }
-}
-
-.p-button {
-  min-height: 2.25rem !important;
-  line-height: var(--line-height-relaxed) !important;
-  border-radius: var(--ui-border-radius) !important;
-  white-space: nowrap !important;
-}
-
-.p-button-icon {
-  font-size: 1.1rem !important;
-}
-
-/* ============================================================================
-   APEX GLOBAL BUTTON SYSTEM — PERFECTION
-   Unified design for native .btn and PrimeNG .p-button
-   ============================================================================ */
-
-/* 1. Base Geometry & Shared Properties */
-.btn,
-.p-button {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  height: 2.25rem !important;
-  padding: 0 var(--spacing-lg) !important;
-  font-family: var(--font-body) !important;
-  font-size: var(--font-size-sm) !important;
-  font-weight: var(--font-weight-semibold) !important;
-  border-radius: var(--ui-border-radius) !important;
-  white-space: nowrap !important;
-  cursor: pointer !important;
-  transition: var(--transition-base) !important;
-  gap: var(--spacing-sm) !important;
-  user-select: none !important;
-  text-decoration: none !important;
-  border: 1px solid transparent !important;
-  outline: none !important;
-  position: relative !important;
-  overflow: hidden !important;
-
-  &:disabled,
-  &.p-disabled {
-    opacity: 0.5 !important;
-    cursor: not-allowed !important;
-    pointer-events: none !important;
-  }
-
-  &:hover:not(:disabled):not(.p-disabled) {
-    transform: translateY(-1px);
-    box-shadow: var(--elevation-2);
-  }
-
-  &:active:not(:disabled):not(.p-disabled) {
-    transform: translateY(0);
-  }
-
-  &:focus-visible {
-    box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus) !important;
-  }
-}
-
-/* 2. Style Variants */
-
-/* Default / Secondary (Outlined Look) */
-.btn,
-.p-button:not([severity]):not(.p-button-primary):not(.p-button-secondary):not(.p-button-success):not(.p-button-info):not(.p-button-warn):not(.p-button-danger) {
-  background: var(--bg-ternary) !important;
-  border: 1px solid var(--border-primary) !important;
-  color: var(--text-secondary) !important;
-  box-shadow: var(--shadow-xs) !important;
-
-  &:hover:not(:disabled) {
-    background: var(--component-bg-hover) !important;
-    border-color: var(--border-secondary) !important;
-    color: var(--text-primary) !important;
-  }
-}
-
-/* Primary / Accent (Gradient Look) */
-.btn-primary,
-.p-button-primary,
-.p-button[severity="primary"] {
-  background: var(--accent-gradient) !important;
-  color: #fff !important;
-  box-shadow: var(--elevation-1) !important;
-
-  &:hover:not(:disabled) {
-    filter: brightness(1.08);
-  }
-}
-
-/* Success */
-.btn-success,
-.p-button-success,
-.p-button[severity="success"] {
-  background: var(--color-success) !important;
-  color: #fff !important;
-
-  &.p-button-outlined {
-    background: transparent !important;
-    border-color: var(--color-success-border) !important;
-    color: var(--color-success) !important;
-
-    &:hover:not(:disabled) {
-      background: var(--color-success-bg) !important;
-    }
-  }
-}
-
-/* Danger / Error */
-.btn-danger,
-.p-button-danger,
-.p-button[severity="danger"] {
-  background: var(--color-error) !important;
-  color: #fff !important;
-
-  &.p-button-outlined {
-    background: transparent !important;
-    border-color: var(--color-error-border) !important;
-    color: var(--color-error) !important;
-
-    &:hover:not(:disabled) {
-      background: var(--color-error-bg) !important;
-    }
-  }
-}
-
-/* Warning */
-.btn-warn,
-.p-button-warn,
-.p-button[severity="warn"] {
-  background: var(--color-warning) !important;
-  color: #fff !important;
-
-  &.p-button-outlined {
-    background: transparent !important;
-    border-color: var(--color-warning-border) !important;
-    color: var(--color-warning) !important;
-
-    &:hover:not(:disabled) {
-      background: var(--color-warning-bg) !important;
-    }
-  }
-}
-
-/* Info */
-.btn-info,
-.p-button-info,
-.p-button[severity="info"] {
-  background: var(--color-info) !important;
-  color: #fff !important;
-}
-
-/* 3. Global Outlined Mode Override */
-.p-button-outlined {
-  background: transparent !important;
-  border: 1px solid var(--border-secondary) !important;
-  color: var(--text-secondary) !important;
-
-  &:hover:not(:disabled) {
-    background: var(--component-bg-hover) !important;
-  }
-}
-
-/* 4. Global Text Mode Override (Borderless) */
-.btn-text,
-.p-button-text,
-.btn.borderless {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0 var(--spacing-md) !important;
-  color: var(--text-secondary) !important;
-
-  &:hover:not(:disabled) {
-    background: var(--component-bg-hover) !important;
-    color: var(--text-primary) !important;
-    transform: none !important;
-    box-shadow: none !important;
-  }
-}
-
-/* 5. Size Adjustments */
-.btn-sm,
-.p-button-sm {
-  height: 2rem !important;
-  font-size: var(--font-size-xs) !important;
-  padding: 0 var(--spacing-md) !important;
-}
-
-.btn-lg,
-.p-button-lg {
-  height: 3rem !important;
-  font-size: var(--font-size-base) !important;
-  padding: 0 var(--spacing-xl) !important;
-}
-
-/* 6. Icon Handling Synchronization */
-.btn .pi,
-.p-button .p-button-icon {
-  font-size: 1rem !important;
-
-  &:only-child {
-    font-size: 1.125rem !important;
-    margin: 0 !important;
-  }
-}
-
-/* ============================================================================
-   APEX GLOBAL INPUT & SELECT SYSTEM — PERFECTION
-   Unified design for all PrimeNG input components (40px / 2.5rem standard)
-   ============================================================================ */
-
-/* 1. Universal Input Base (InputText, DatePicker, Select, etc.) */
-.p-inputtext,
-.p-select,
-.p-multiselect,
-.p-datepicker-input,
-.p-inputnumber-input {
-  height: 2.25rem !important;
-  font-family: var(--font-body) !important;
-  font-size: var(--font-size-sm) !important;
-  border-radius: var(--ui-border-radius) !important;
-  border: 1px solid var(--border-primary) !important;
-  background: var(--bg-primary) !important;
-  color: var(--text-primary) !important;
-  padding: 0 var(--spacing-lg) !important;
-  transition: var(--transition-base) !important;
-  box-shadow: var(--shadow-xs) !important;
-  display: inline-flex !important;
-  align-items: center !important;
-
-  &:hover:not(:disabled):not(.p-disabled):not(.p-invalid) {
-    border-color: var(--border-secondary) !important;
-    background: var(--component-bg-hover) !important;
-  }
-
-  &:focus,
-  &.p-focus {
-    border-color: var(--accent-primary) !important;
-    box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus) !important;
-    outline: none !important;
-    background: var(--bg-primary) !important;
-  }
-
-  &.p-invalid {
-    border-color: var(--color-error) !important;
-
-    &:focus {
-      box-shadow: 0 0 0 var(--focus-ring-width) var(--color-error-bg) !important;
-    }
-  }
-
-  &::placeholder {
-    color: var(--text-tertiary) !important;
-    opacity: 1 !important;
-  }
-}
-
-/* 2. Select & MultiSelect Internal Label Alignment (Centering Fix) */
-.p-select,
-.p-multiselect {
-  padding: 0 !important;
-  /* Reset container padding to let label handle it */
-
-  .p-select-label,
-  .p-multiselect-label {
-    padding: 0 var(--spacing-lg) !important;
-    height: 100% !important;
-    display: flex !important;
-    align-items: center !important;
-    line-height: normal !important;
-    color: var(--text-primary) !important;
-    background: transparent !important;
-    border: none !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-
-    &.p-placeholder {
-      color: var(--text-tertiary) !important;
-    }
-  }
-
-  /* Dropdown Icon Centering */
-  .p-select-dropdown,
-  .p-multiselect-dropdown {
-    width: 2.25rem !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    color: var(--text-tertiary) !important;
-
-    .p-icon,
-    svg {
-      width: 0.875rem !important;
-      height: 0.875rem !important;
-    }
-  }
-}
-
-/* 3. MultiSelect Chip/Token Alignment */
-.p-multiselect-token {
-  padding: 2px 8px !important;
-  margin-right: 4px !important;
-  background: var(--accent-focus) !important;
-  color: var(--accent-primary) !important;
-  border-radius: var(--ui-border-radius-sm) !important;
-  font-size: var(--font-size-xs) !important;
-  font-weight: 600 !important;
-
-  .p-multiselect-token-icon {
-    margin-left: 4px !important;
-    font-size: 0.75rem !important;
-  }
-}
-
-/* 4. Filter Panel Specific Alignment (Refined) */
-.app-filter-panel {
-
-  .filter-actions,
-  .filter-actions-right {
-    display: flex !important;
-    align-items: center !important;
-    /* Changed from flex-end to center */
-    gap: var(--spacing-md) !important;
-    height: 2.25rem !important;
-    /* Match input height */
-  }
-}
-
-// Global — PrimeNG dialog overrides for apex-chart-dialog
-.apex-chart-dialog {
-  &.p-dialog {
-    height: 80vh !important;
-    max-height: 80vh !important;
-    border-radius: var(--ui-border-radius-xl) !important;
-    border: 1px solid var(--border-primary) !important;
-    box-shadow: var(--elevation-3) !important;
-    overflow: hidden !important;
-  }
-
-  .p-dialog-content {
-    flex: 1;
-    height: 100%;
-    padding: 0 !important;
-    overflow: hidden !important;
-    border-radius: 0 !important;
-  }
-}
-
-/* ============================================================================
-   APEX GLOBAL 3D GLASSMORPHIC GRID SYSTEM — ENTIRE PROJECT INTEGRATION
-   ============================================================================ */
-
-/* 1. Global tag layout sizing to prevent collapse in flex wrappers */
-app-shared-grid,
-app-ag-share-grid {
-  display: block !important;
-  flex: 1 !important;
-  height: 100% !important;
-  width: 100% !important;
-  min-height: 0 !important;
-}
-
-/* 2. Unified 3D Glassmorphic Surface styling for all grids by default */
-.shared-grid-root,
-.shared-grid-container {
-  background: var(--component-bg, rgba(17, 24, 39, 0.7)) !important;
-  border: 1px solid var(--border-primary, rgba(255, 255, 255, 0.08)) !important;
-  border-radius: 1.25rem !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37) !important;
-  overflow: hidden !important;
-}
-
-/* 3. Outer card-padded container for storefront layouts */
-.premium-grid-container {
-  flex: 1;
-  background: var(--component-bg, rgba(17, 24, 39, 0.7));
-  border: 1px solid var(--border-primary, rgba(255, 255, 255, 0.08));
-  border-radius: 1.25rem;
-  padding: 1.5rem;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  display: flex;
-  flex-direction: column;
-  position: relative;
-
-  /* Dissolve grid inner borders/backgrounds when wrapped inside padded card */
-  app-shared-grid .shared-grid-container,
-  app-ag-share-grid .shared-grid-root {
-    border: none !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    border-radius: 0 !important;
-  }
-}
-
-/* ============================================================================
-   ENTERPRISE COMPACT LIST DENSITY
-   Keeps list headers and filter regions subordinate to the data grid.
-   ============================================================================ */
-
-.app-container {
-  .container-header {
-    padding: var(--spacing-md) var(--spacing-lg) !important;
-    gap: var(--spacing-sm) !important;
-    min-height: 56px;
-
-    .container-title {
-      font-size: var(--font-size-lg) !important;
-      line-height: 1.2 !important;
-    }
-
-    .container-subtitle {
-      font-size: var(--font-size-xs) !important;
-      margin-top: 2px !important;
-      line-height: 1.25 !important;
-    }
-  }
-
-  .container-body {
-    padding: var(--spacing-md) !important;
-    gap: var(--spacing-sm) !important;
-    min-height: 0;
-  }
-}
-
-.list-page-container {
-  padding: var(--spacing-md) !important;
-  gap: var(--spacing-sm) !important;
-  min-height: 0;
-}
-
-.list-header,
-.page-header,
-.dashboard-header {
-  margin-bottom: var(--spacing-sm) !important;
-  padding: var(--spacing-sm) var(--spacing-md) !important;
-  min-height: 44px;
-}
-
-.list-title,
-.page-header h1,
-.page-header h2,
-.dashboard-header h1,
-.dashboard-header h2 {
-  font-size: var(--font-size-xl) !important;
-  line-height: 1.2 !important;
-}
-
-.themed-card,
-.list-content-area {
-  padding: var(--spacing-md) !important;
-  gap: var(--spacing-sm) !important;
-  min-height: 0 !important;
-}
-
-.app-filter-panel,
-.se-filter-bar,
-.filters {
-  gap: var(--spacing-sm) !important;
-  padding: var(--spacing-sm) var(--spacing-md) !important;
-  margin-bottom: var(--spacing-sm) !important;
-  align-items: center !important;
-  min-height: 44px;
-}
-
-.app-filter-panel {
-  border-radius: var(--ui-border-radius) !important;
-
-  &.single-row {
-    padding-bottom: var(--spacing-sm) !important;
-  }
-}
-
-.app-filter-panel .filter-field,
-.se-filter-bar .se-filter-field {
-  gap: 3px !important;
-  min-width: 150px !important;
-  max-width: 240px !important;
-  flex: 1 1 170px !important;
-
-  label {
-    font-size: 10px !important;
-    line-height: 1.1 !important;
-    letter-spacing: 0.04em !important;
-  }
-}
-
-.app-filter-panel .filter-actions,
-.app-filter-panel .filter-actions-right,
-.se-filter-actions,
-.header-actions {
-  gap: var(--spacing-xs) !important;
-  min-height: 2rem !important;
-}
-
-.app-filter-panel .p-inputtext,
-.app-filter-panel .p-select,
-.app-filter-panel .p-multiselect,
-.app-filter-panel .p-datepicker,
-.se-filter-bar .p-inputtext,
-.se-filter-bar .p-select,
-.se-filter-bar .p-multiselect,
-.se-filter-bar .p-datepicker,
-.filters input,
-.filters select {
-  min-height: 2rem !important;
-  height: 2rem !important;
-  font-size: var(--font-size-xs) !important;
-}
-
-.app-filter-panel .p-button,
-.se-filter-bar .p-button,
-.filters .p-button,
-.header-actions .p-button {
-  min-height: 2rem !important;
-  padding: 0.35rem 0.65rem !important;
-  font-size: var(--font-size-xs) !important;
-}
-
-.stats-strip {
-  gap: var(--spacing-xs) !important;
-
-  .stat-card {
-    padding: var(--spacing-sm) var(--spacing-md) !important;
-    gap: 2px !important;
-    min-height: 48px !important;
-  }
-
-  .stat-val {
-    font-size: var(--font-size-md) !important;
-    line-height: 1.15 !important;
-  }
-}
-
-.list-grid-wrapper,
-.list-grid-area,
-.grid-container,
-.classic-grid-wrapper {
-  flex: 1 1 auto !important;
-  min-height: 0 !important;
-}
-
-/* ─── Host ─────────────────────────────────────────────────────────────── */
-app-data-grid {
-  display: block;
-  width: 100%;
-}
-
-/* ─── Scroll container ──────────────────────────────────────────────────── */
-.apex-dg-scroll {
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  scrollbar-color: var(--scroll-thumb-c, var(--accent-primary)) transparent;
-  border-radius: var(--ui-border-radius-lg);
-}
-
-.apex-dg-scroll::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-.apex-dg-scroll::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.apex-dg-scroll::-webkit-scrollbar-thumb {
-  background: var(--accent-primary);
-  border-radius: 99px;
-}
-
-/* ─── Table ─────────────────────────────────────────────────────────────── */
-.apex-dg-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  /* CRITICAL: Removed the gap to make it look solid */
-  table-layout: auto;
-  background: var(--bg-primary);
-  /* Solid white/light background like the reference */
-  border-radius: var(--ui-border-radius-lg);
-  border: 1px solid var(--border-secondary);
-  overflow: hidden;
-  /* Ensures the corners stay rounded */
-}
-
-/* ─── Header ────────────────────────────────────────────────────────────── */
-.apex-dg-thead {
-  background: var(--bg-secondary);
-  /* Slight contrast for header */
-}
-
-.apex-dg-th {
-  padding: 12px 16px;
-  height: 48px;
-  white-space: nowrap;
-  text-align: left;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  border-bottom: 1px solid var(--border-secondary);
-  user-select: none;
-}
-
-.apex-dg-th--checkbox {
-  width: 40px;
-  min-width: 40px;
-  max-width: 40px;
-  padding: 0 8px;
-}
-
-.apex-dg-th--actions {
-  width: 80px;
-  min-width: 80px;
-  text-align: right;
-}
-
-/* ─── Row States ────────────────────────────────────────────────────────── */
-.apex-dg-row {
-  background: transparent;
-  transition: background 0.15s ease;
-  border-bottom: 1px solid var(--border-primary);
-}
-
-/* Last row should not have a bottom border */
-.apex-dg-row:last-child {
-  border-bottom: none;
-}
-
-/* Hover Effect: Pill-Shape Background (Like the reference) */
-.apex-dg-row:hover:not(.apex-dg-row--editing):not(.apex-dg-row--selected) {
-  background: var(--component-bg-hover);
-  box-shadow: none;
-  transform: none;
-}
-
-/* Selected Row (Vibrant like reference) */
-.apex-dg-row--selected {
-  background: var(--accent-focus) !important;
-  color: var(--text-primary) !important;
-  box-shadow: none;
-  transform: none;
-}
-
-/* Editing — only this row gets inputs */
-.apex-dg-row--editing {
-  background: color-mix(in srgb, var(--color-success) 6%, transparent) !important;
-  box-shadow: inset 3px 0 0 var(--color-success);
-}
-
-/* New / unsaved */
-.apex-dg-row--new {
-  background: color-mix(in srgb, var(--accent-primary) 6%, transparent) !important;
-  box-shadow: inset 3px 0 0 var(--accent-primary);
-}
-
-/* Modified */
-.apex-dg-row--modified {
-  box-shadow: inset 3px 0 0 var(--color-warning);
-}
-
-/* Error */
-.apex-dg-row--error {
-  background: color-mix(in srgb, var(--color-error) 6%, transparent) !important;
-  box-shadow: inset 3px 0 0 var(--color-error);
-}
-
-/* Saving */
-.apex-dg-row--saving {
-  opacity: 0.6;
-  pointer-events: none;
-}
-
-.apex-dg-row--deleted {
-  opacity: 0.4;
-  text-decoration: line-through;
-}
-
-/* ─── Cells ─────────────────────────────────────────────────────────────── */
-.apex-dg-td {
-  vertical-align: middle;
-  border: none;
-  background: inherit;
-  color: inherit;
-  padding: 14px 16px;
-  /* Comfortable padding like the reference */
-  font-size: var(--font-size-sm);
-}
-
-.apex-dg-td--checkbox {
-  width: 40px;
-  min-width: 40px;
-  max-width: 40px;
-  padding: 0 8px;
-}
-
-.apex-dg-td--actions {
-  width: 80px;
-  min-width: 80px;
-  text-align: right;
-}
-
-/* Ensure text inside selected rows does NOT turn white unless intended */
-.apex-dg-row--selected .apex-dg-td,
-.apex-dg-row--selected i,
-.apex-dg-row--selected span {
-  color: inherit;
-}
-
-/* ─── Density Variants ──────────────────────────────────────────────────── */
-.apex-dg--compact .apex-dg-td {
-  padding: 10px 16px;
-  font-size: var(--font-size-xs);
-}
-
-.apex-dg--compact .apex-dg-th {
-  height: 40px;
-  padding: 8px 16px;
-}
-
-.apex-dg--compact .apex-dg-td--checkbox {
-  padding: 0 8px;
-}
-
-.apex-dg--normal .apex-dg-td {
-  height: 52px;
-  padding: 12px 16px;
-}
-
-.apex-dg--normal .apex-dg-th {
-  height: 48px;
-}
-
-.apex-dg--comfortable .apex-dg-td {
-  height: 64px;
-  padding: 16px 20px;
-}
-
-.apex-dg--comfortable .apex-dg-th {
-  height: 52px;
-}
-
-/* ─── Checkbox ──────────────────────────────────────────────────────────── */
-.apex-dg-checkbox {
-  display: block;
-  width: 16px;
-  height: 16px;
-  margin: 0;
-  cursor: pointer;
-  accent-color: var(--accent-primary);
-  border-radius: 4px;
-  outline: none;
-  flex-shrink: 0;
-  transition: all 0.2s ease;
-}
-
-.apex-dg-checkbox:focus-visible {
-  outline: 2px solid var(--accent-primary);
-  outline-offset: 2px;
-}
-
-.apex-dg-row--selected .apex-dg-checkbox {
-  accent-color: var(--text-on-accent);
-}
-
-/* ─── Reveal action buttons on row hover ────────────────────────────────── */
-.apex-dg-row:hover app-grid-actions .apex-act-btn--reveal,
-.apex-dg-row.apex-dg-row--editing app-grid-actions .apex-act-btn--reveal {
-  opacity: 1 !important;
-  transform: scale(1) !important;
-}
+/* 3. TAILWIND */
+@import "tailwindcss/base" layer(tailwind-base);
+@import "tailwindcss/components" layer(components);
+@import "tailwindcss/utilities" layer(tailwind-utilities);
+
+/* 4. TOKENS & VARIABLES */
+/* If you have core SCSS variables */
+@import './components/themes.scss';
+
+/* 5. BASE HTML RESETS */
+@import './components/base-styles.scss';
+
+/* 6. PRIME-NG ENGINE TOKENS */
+@import './components/primeng-theme.scss';
+
+/* 7. CUSTOM COMPONENTS */
+@layer components {
+  @import './components/custom-components.scss';
+  @import './components/common-layout.scss';
+  @import './components/layout-cards.scss';
+  @import './components/data-grid.scss';
+}
+
+/* 8. PRIME-NG CLASS FIXES */
+@import './components/primeng-overrides.scss';
+
+/* 9. UTILITIES */
+@import './design-system/animation.scss';
+
+
+// /* ==========================================================================
+//    APEX CRM — MAIN STYLESHEET (PERFECTED)
+//    Aligned with Master Theme Tokens & PrimeNG Overrides
+//    ========================================================================== */
+
+// /* ==========================================================================
+//    1. IMPORTS & DEPENDENCIES
+//    ========================================================================== */
+// @use 'tailwindcss';
+// @use './design-system/variables.scss';
+// @use './utilities/scrollbar';
+// @use './utilities/focus';
+// @use './utilities/selection';
+
+// @import 'primeicons/primeicons.css';
+// @import 'leaflet/dist/leaflet.css';
+
+
+// body {
+//   font-family: var(--font-body);
+//   background-color: var(--bg-primary);
+//   color: var(--text-primary);
+//   -webkit-font-smoothing: antialiased;
+//   line-height: var(--line-height-relaxed);
+// }
+
+// /* ==========================================================================
+//    3. LAYOUT CONTAINERS
+//    ========================================================================== */
+// .app-container {
+//   background: var(--bg-primary);
+//   border-radius: var(--ui-border-radius-lg);
+//   box-shadow: var(--shadow-sm);
+//   display: flex;
+//   flex-direction: column;
+//   width: 100%;
+//   overflow: hidden;
+//   transition: box-shadow var(--transition-base), border-color var(--transition-base);
+//   border: 1px solid transparent;
+
+//   &.interactive-container:hover {
+//     box-shadow: var(--elevation-1);
+//     border-color: var(--border-secondary);
+//   }
+
+//   .container-header {
+//     padding: var(--spacing-xl) var(--spacing-2xl);
+//     border-bottom: 1px solid var(--border-secondary);
+//     display: flex;
+//     justify-content: space-between;
+//     align-items: center;
+//     flex-wrap: wrap;
+//     gap: var(--spacing-md);
+
+//     .header-titles {
+//       display: flex;
+//       flex-direction: column;
+//       gap: var(--spacing-xs);
+//     }
+
+//     .container-title {
+//       margin: 0;
+//       font-family: var(--font-heading);
+//       font-size: var(--font-size-xl);
+//       font-weight: 600;
+//       color: var(--text-primary);
+//     }
+
+//     .container-subtitle {
+//       margin: 0;
+//       font-size: var(--font-size-sm);
+//       color: var(--text-secondary);
+//     }
+
+//     .header-actions {
+//       display: flex;
+//       align-items: center;
+//       gap: var(--spacing-md);
+//       flex-wrap: wrap;
+//     }
+//   }
+
+//   /* Body Section */
+//   .container-body {
+//     padding: var(--spacing-2xl);
+//     flex: 1;
+//     overflow-y: auto;
+
+//     &.no-padding {
+//       padding: 0;
+//     }
+//   }
+
+//   /* Footer Section */
+//   .container-footer {
+//     padding: var(--spacing-lg) var(--spacing-2xl);
+//     border-top: 1px solid var(--border-secondary);
+//     background: var(--bg-secondary);
+//     display: flex;
+//     justify-content: flex-end;
+//     align-items: center;
+//     gap: var(--spacing-md);
+//     flex-wrap: wrap;
+//   }
+
+//   /* Mobile Responsiveness for App Container */
+//   @media (max-width: 768px) {
+//     border-radius: 0;
+//     border-left: none;
+//     border-right: none;
+
+//     .container-header {
+//       padding: var(--spacing-lg) var(--spacing-xl);
+//     }
+
+//     .container-body {
+//       padding: var(--spacing-xl);
+//     }
+
+//     .container-footer {
+//       padding: var(--spacing-lg) var(--spacing-xl);
+//     }
+//   }
+// }
+
+// /* ==========================================================================
+//    4. UI COMPONENTS (Cards & Stats)
+//    ========================================================================== */
+
+// /* Premium Standard Card */
+// .premium-card {
+//   background: var(--card-bg);
+//   border: var(--card-border);
+//   border-radius: var(--card-radius);
+//   box-shadow: var(--card-shadow);
+//   transition: all var(--transition-base);
+//   overflow: hidden;
+//   height: 100%;
+//   display: flex;
+//   flex-direction: column;
+
+//   &:hover {
+//     box-shadow: var(--card-shadow-hover);
+//     border-color: var(--border-secondary);
+//   }
+
+//   .card-header {
+//     padding: var(--card-padding) var(--card-padding) calc(var(--card-padding) * 0.75);
+//     border-bottom: var(--ui-border-width) solid var(--border-primary);
+//     background: var(--bg-secondary);
+//     font-weight: 600;
+//     font-family: var(--font-heading);
+//     color: var(--text-primary);
+//     display: flex;
+//     align-items: center;
+//     justify-content: space-between;
+//   }
+
+//   .card-body {
+//     padding: var(--card-padding);
+//     flex: 1;
+//   }
+
+//   .card-footer {
+//     padding: calc(var(--card-padding) * 0.75) var(--card-padding);
+//     border-top: var(--ui-border-width) solid var(--border-primary);
+//     background: var(--bg-secondary);
+//     display: flex;
+//     align-items: center;
+//     gap: var(--spacing-md);
+//   }
+
+//   /* Variants */
+//   &.compact {
+//     --card-padding: var(--spacing-lg);
+//     --card-radius: var(--ui-border-radius-lg);
+//   }
+
+//   &.borderless {
+//     border: none;
+//     box-shadow: none;
+//     background: transparent;
+
+//     &:hover {
+//       box-shadow: none;
+//       border: none;
+//     }
+//   }
+
+//   &.interactive {
+//     cursor: pointer;
+
+//     &:hover {
+//       transform: translateY(-2px);
+//     }
+
+//     &:active {
+//       transform: translateY(0);
+//     }
+//   }
+// }
+
+// /* Dashboard Statistic Card */
+// .stat-card {
+//   background: var(--card-bg);
+//   border: var(--card-border);
+//   border-radius: var(--ui-border-radius-lg);
+//   padding: var(--spacing-xl);
+//   display: flex;
+//   align-items: center;
+//   gap: var(--spacing-lg);
+//   box-shadow: var(--shadow-sm);
+//   transition: all var(--transition-base);
+//   position: relative;
+//   overflow: hidden;
+
+//   &:hover {
+//     box-shadow: var(--elevation-2);
+//     transform: translateY(-2px);
+//     border-color: var(--border-secondary);
+//   }
+
+//   .stat-icon {
+//     width: 56px;
+//     height: 56px;
+//     border-radius: var(--ui-border-radius);
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+//     font-size: 24px;
+//     flex-shrink: 0;
+
+//     &.primary {
+//       background: var(--color-primary-bg);
+//       color: var(--color-primary);
+//     }
+
+//     &.success {
+//       background: var(--color-success-bg);
+//       color: var(--color-success);
+//     }
+
+//     &.info {
+//       background: var(--color-info-bg);
+//       color: var(--color-info);
+//     }
+
+//     &.warning {
+//       background: var(--color-warning-bg);
+//       color: var(--color-warning);
+//     }
+//   }
+
+//   .stat-content {
+//     display: flex;
+//     flex-direction: column;
+//     gap: var(--spacing-xs);
+//     min-width: 0;
+
+//     .stat-label {
+//       font-size: var(--font-size-xs);
+//       color: var(--text-tertiary);
+//       text-transform: uppercase;
+//       font-weight: 600;
+//       letter-spacing: 0.5px;
+//       white-space: nowrap;
+//       overflow: hidden;
+//       text-overflow: ellipsis;
+//     }
+
+//     .stat-value {
+//       font-size: var(--font-size-3xl);
+//       font-weight: 700;
+//       color: var(--text-primary);
+//       line-height: 1;
+//     }
+//   }
+
+//   /* Top Border Accents */
+//   &.border-top-primary {
+//     border-top: 4px solid var(--color-primary);
+//   }
+
+//   &.border-top-success {
+//     border-top: 4px solid var(--color-success);
+//   }
+
+//   &.border-top-info {
+//     border-top: 4px solid var(--color-info);
+//   }
+// }
+
+// /* ==========================================================================
+//    5. SHARED FILTER PANEL (Grid/Table Headers)
+//    ========================================================================== */
+// .app-filter-panel {
+//   display: flex;
+//   align-items: flex-end;
+//   gap: var(--spacing-xl);
+//   width: 100%;
+//   background: var(--bg-secondary);
+//   border: 1px solid var(--border-secondary);
+//   border-radius: var(--ui-border-radius-lg);
+//   padding: var(--spacing-xl);
+//   box-shadow: var(--shadow-xs);
+//   transition: box-shadow var(--transition-base);
+//   flex-wrap: wrap;
+
+//   &:hover {
+//     box-shadow: var(--shadow-sm);
+//   }
+
+//   /* === SINGLE ROW MODIFIER === */
+//   &.single-row {
+//     flex-wrap: nowrap;
+//     overflow-x: auto;
+//     padding-bottom: var(--spacing-xl);
+
+//     &::-webkit-scrollbar {
+//       height: 6px;
+//     }
+
+//     &::-webkit-scrollbar-track {
+//       background: transparent;
+//     }
+
+//     &::-webkit-scrollbar-thumb {
+//       background: var(--scroll-thumb);
+//       border-radius: var(--ui-border-radius-pill);
+//     }
+
+//     &::-webkit-scrollbar-thumb:hover {
+//       background: var(--accent-primary);
+//     }
+
+//     .filter-field {
+//       flex: 0 0 auto;
+//       width: 180px;
+//     }
+
+//     .filter-actions,
+//     .filter-actions-right {
+//       flex-shrink: 0;
+//     }
+//   }
+
+//   .filter-field {
+//     display: flex;
+//     flex-direction: column;
+//     gap: var(--spacing-xs);
+//     flex: 1 1 220px;
+//     min-width: 200px;
+//     max-width: 320px;
+
+//     label {
+//       font-size: var(--font-size-xs);
+//       font-weight: 600;
+//       color: var(--text-label);
+//       text-transform: uppercase;
+//       letter-spacing: 0.5px;
+//       white-space: nowrap;
+//     }
+//   }
+
+//   .filter-actions {
+//     display: flex;
+//     gap: var(--spacing-md);
+//     align-items: flex-end;
+//   }
+
+//   .filter-actions-right {
+//     margin-left: auto;
+//     display: flex;
+//     align-items: flex-end;
+//     gap: var(--spacing-md);
+//   }
+// }
+
+// @media (max-width: 768px) {
+//   .app-filter-panel {
+//     flex-wrap: nowrap;
+//     overflow-x: auto;
+//     -webkit-overflow-scrolling: touch;
+//     padding-bottom: var(--spacing-lg);
+//     gap: var(--spacing-lg);
+
+//     &::-webkit-scrollbar {
+//       height: 4px;
+//     }
+
+//     &::-webkit-scrollbar-track {
+//       background: transparent;
+//     }
+
+//     &::-webkit-scrollbar-thumb {
+//       background: var(--scroll-thumb);
+//       border-radius: var(--ui-border-radius-pill);
+//     }
+
+//     .filter-field {
+//       flex: 0 0 220px;
+//       max-width: none;
+//     }
+
+//     .filter-actions,
+//     .filter-actions-right {
+//       flex-shrink: 0;
+//       margin-left: 0;
+//     }
+
+//     .filter-actions-right::after {
+//       content: '';
+//       padding-right: var(--spacing-md);
+//     }
+//   }
+// }
+
+// /* ==========================================================================
+//    6. UTILITIES & BACKGROUND EFFECTS
+//    ========================================================================== */
+
+// .bg-theme-gradient {
+//   background-image: var(--accent-gradient);
+//   color: #ffffff;
+// }
+
+// .bg-theme-soft-gradient {
+//   background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-ternary) 100%);
+// }
+
+// /* Animated Meteor Background Effect */
+// .meteor {
+//   position: absolute;
+//   inset: 0;
+//   background: var(--bg-primary);
+//   overflow: hidden;
+
+//   &::before {
+//     content: "";
+//     position: absolute;
+//     inset: -145%;
+//     rotate: -45deg;
+//     background: transparent;
+
+//     background-image:
+//       radial-gradient(2px 80px at 0px 235px, color-mix(in srgb, var(--accent-primary) 15%, transparent), transparent),
+//       radial-gradient(2px 80px at 300px 235px, color-mix(in srgb, var(--accent-primary) 15%, transparent), transparent),
+//       radial-gradient(1px 1px at 150px 117.5px, color-mix(in srgb, var(--accent-primary) 30%, transparent) 100%, transparent 150%),
+//       radial-gradient(2px 80px at 0px 252px, color-mix(in srgb, var(--accent-secondary) 10%, transparent), transparent),
+//       radial-gradient(2px 80px at 300px 252px, color-mix(in srgb, var(--color-info) 10%, transparent), transparent),
+//       radial-gradient(1px 1px at 150px 126px, color-mix(in srgb, var(--accent-secondary) 20%, transparent) 100%, transparent 150%),
+//       radial-gradient(2px 80px at 0px 150px, color-mix(in srgb, var(--accent-primary) 15%, transparent), transparent),
+//       radial-gradient(2px 80px at 300px 150px, color-mix(in srgb, var(--accent-primary) 15%, transparent), transparent),
+//       radial-gradient(1px 1px at 150px 75px, color-mix(in srgb, var(--accent-primary) 30%, transparent) 100%, transparent 150%),
+//       radial-gradient(2px 80px at 0px 253px, color-mix(in srgb, var(--color-warning) 12%, transparent), transparent),
+//       radial-gradient(2px 80px at 300px 253px, color-mix(in srgb, var(--color-warning) 12%, transparent), transparent),
+//       radial-gradient(1px 1px at 150px 126.5px, color-mix(in srgb, var(--color-warning) 25%, transparent) 100%, transparent 150%),
+//       radial-gradient(2px 80px at 0px 204px, color-mix(in srgb, var(--accent-primary) 15%, transparent), transparent),
+//       radial-gradient(2px 80px at 300px 204px, color-mix(in srgb, var(--accent-primary) 15%, transparent), transparent),
+//       radial-gradient(1px 1px at 150px 102px, color-mix(in srgb, var(--accent-primary) 30%, transparent) 100%, transparent 150%),
+//       radial-gradient(2px 80px at 0px 134px, color-mix(in srgb, var(--accent-primary) 12%, transparent), transparent),
+//       radial-gradient(2px 80px at 300px 134px, color-mix(in srgb, var(--accent-primary) 12%, transparent), transparent),
+//       radial-gradient(1px 1px at 150px 67px, color-mix(in srgb, var(--accent-primary) 25%, transparent) 100%, transparent 150%),
+//       radial-gradient(2px 80px at 0px 179px, color-mix(in srgb, var(--color-warning) 15%, transparent), transparent),
+//       radial-gradient(2px 80px at 300px 179px, color-mix(in srgb, var(--color-warning) 15%, transparent), transparent),
+//       radial-gradient(1px 1px at 150px 89.5px, color-mix(in srgb, var(--color-warning) 30%, transparent) 100%, transparent 150%),
+//       radial-gradient(2px 80px at 0px 299px, color-mix(in srgb, var(--accent-primary) 10%, transparent), transparent),
+//       radial-gradient(2px 80px at 300px 299px, color-mix(in srgb, var(--accent-primary) 10%, transparent), transparent),
+//       radial-gradient(1px 1px at 150px 149.5px, color-mix(in srgb, var(--accent-primary) 20%, transparent) 100%, transparent 150%),
+//       radial-gradient(2px 80px at 0px 215px, color-mix(in srgb, var(--color-warning) 12%, transparent), transparent),
+//       radial-gradient(2px 80px at 300px 215px, color-mix(in srgb, var(--color-warning) 12%, transparent), transparent),
+//       radial-gradient(1px 1px at 150px 107.5px, color-mix(in srgb, var(--color-warning) 25%, transparent) 100%, transparent 150%),
+//       radial-gradient(2px 80px at 0px 281px, color-mix(in srgb, var(--color-error) 10%, transparent), transparent),
+//       radial-gradient(2px 80px at 300px 281px, color-mix(in srgb, var(--color-warning) 10%, transparent), transparent),
+//       radial-gradient(1px 1px at 150px 140.5px, color-mix(in srgb, var(--color-error) 20%, transparent) 100%, transparent 150%),
+//       radial-gradient(2px 80px at 0px 158px, color-mix(in srgb, var(--accent-tertiary) 12%, transparent), transparent),
+//       radial-gradient(2px 80px at 300px 158px, color-mix(in srgb, var(--accent-tertiary) 12%, transparent), transparent),
+//       radial-gradient(1px 1px at 150px 79px, color-mix(in srgb, var(--accent-tertiary) 25%, transparent) 100%, transparent 150%),
+//       radial-gradient(2px 80px at 0px 210px, color-mix(in srgb, var(--accent-primary) 12%, transparent), transparent),
+//       radial-gradient(2px 80px at 300px 210px, color-mix(in srgb, var(--accent-primary) 12%, transparent), transparent),
+//       radial-gradient(1px 1px at 150px 105px, color-mix(in srgb, var(--accent-primary) 25%, transparent) 100%, transparent 150%);
+
+//     background-size:
+//       300px 235px, 300px 235px, 300px 235px,
+//       300px 252px, 300px 252px, 300px 252px,
+//       300px 150px, 300px 150px, 300px 150px,
+//       300px 253px, 300px 253px, 300px 253px,
+//       300px 204px, 300px 204px, 300px 204px,
+//       300px 134px, 300px 134px, 300px 134px,
+//       300px 179px, 300px 179px, 300px 179px,
+//       300px 299px, 300px 299px, 300px 299px,
+//       300px 215px, 300px 215px, 300px 215px,
+//       300px 281px, 300px 281px, 300px 281px,
+//       300px 158px, 300px 158px, 300px 158px,
+//       300px 210px, 300px 210px, 300px 210px;
+
+//     animation: gentleFloat 180s linear infinite;
+//     opacity: 0.8;
+//   }
+
+//   /* Fade Overlay for Depth */
+//   &::after {
+//     content: "";
+//     position: absolute;
+//     inset: 0;
+//     background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--bg-secondary) 40%, transparent) 0%, transparent 80%);
+//     pointer-events: none;
+//   }
+// }
+
+// @keyframes gentleFloat {
+//   0% {
+//     background-position:
+//       0px 220px, 3px 220px, 151.5px 337.5px,
+//       25px 24px, 28px 24px, 176.5px 150px,
+//       50px 16px, 53px 16px, 201.5px 91px,
+//       75px 224px, 78px 224px, 226.5px 350.5px,
+//       100px 19px, 103px 19px, 251.5px 121px,
+//       125px 120px, 128px 120px, 276.5px 187px,
+//       150px 31px, 153px 31px, 301.5px 120.5px,
+//       175px 235px, 178px 235px, 326.5px 384.5px,
+//       200px 121px, 203px 121px, 351.5px 228.5px,
+//       225px 224px, 228px 224px, 376.5px 364.5px,
+//       250px 26px, 253px 26px, 401.5px 105px,
+//       275px 75px, 278px 75px, 426.5px 180px;
+//   }
+
+//   to {
+//     background-position:
+//       0px 6800px, 3px 6800px, 151.5px 6917.5px,
+//       25px 13632px, 28px 13632px, 176.5px 13758px,
+//       50px 5416px, 53px 5416px, 201.5px 5491px,
+//       75px 17175px, 78px 17175px, 226.5px 17301.5px,
+//       100px 5119px, 103px 5119px, 251.5px 5221px,
+//       125px 8428px, 128px 8428px, 276.5px 8495px,
+//       150px 9876px, 153px 9876px, 301.5px 9965.5px,
+//       175px 13391px, 178px 13391px, 326.5px 13540.5px,
+//       200px 14741px, 203px 14741px, 351.5px 14848.5px,
+//       225px 18770px, 228px 18770px, 376.5px 18910.5px,
+//       250px 5082px, 253px 5082px, 401.5px 5161px,
+//       275px 6375px, 278px 6375px, 426.5px 6480px;
+//   }
+// }
+
+// /* ==========================================================================
+//    7. PRIME-NG DYNAMIC DIALOG CUSTOMIZATION (Synced)
+//    ========================================================================== */
+
+// /* Backdrop Styling */
+// .app-dialog-mask {
+//   background-color: rgba(0, 0, 0, 0.56) !important;
+//   backdrop-filter: blur(8px);
+//   -webkit-backdrop-filter: blur(8px);
+//   animation: fadeInMask 0.2s ease-out;
+// }
+
+// @keyframes fadeInMask {
+//   from {
+//     opacity: 0;
+//     backdrop-filter: blur(0px);
+//   }
+
+//   to {
+//     opacity: 1;
+//     backdrop-filter: blur(4px);
+//   }
+// }
+
+// /* Main Dialog Window */
+// .app-dialog {
+//   background: var(--component-surface-raised) !important;
+//   border: 1px solid var(--border-primary) !important;
+//   border-radius: var(--ui-border-radius-xl) !important;
+//   box-shadow: var(--elevation-3) !important;
+//   animation: slideUpFade 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+//   max-height: 90vh;
+//   display: flex;
+//   flex-direction: column;
+
+//   .p-dialog-header {
+//     background: var(--component-surface-raised) !important;
+//     border-bottom: 1px solid var(--border-primary) !important;
+//     padding: var(--spacing-xl) var(--spacing-2xl) !important;
+//     border-top-left-radius: var(--ui-border-radius-xl) !important;
+//     border-top-right-radius: var(--ui-border-radius-xl) !important;
+
+//     .p-dialog-title {
+//       font-family: var(--font-heading);
+//       font-size: var(--font-size-xl);
+//       font-weight: 600;
+//       color: var(--text-primary);
+//     }
+
+//     .p-dialog-header-icons button {
+//       background: transparent;
+//       color: var(--text-tertiary);
+//       border: none;
+//       border-radius: var(--ui-border-radius);
+//       width: 32px;
+//       height: 32px;
+//       transition: all var(--transition-base);
+
+//       &:hover {
+//         background: var(--component-bg-hover);
+//         color: var(--text-primary);
+//       }
+
+//       &:focus {
+//         box-shadow: 0 0 0 2px var(--accent-focus);
+//       }
+//     }
+//   }
+
+//   .p-dialog-content {
+//     background: var(--component-surface-raised) !important;
+//     color: var(--text-primary) !important;
+//     overflow-y: auto;
+//   }
+
+//   .p-dialog-footer {
+//     background: var(--bg-secondary) !important;
+//     border-top: 1px solid var(--border-primary) !important;
+//     padding: var(--spacing-lg) var(--spacing-2xl) !important;
+//     display: flex;
+//     justify-content: flex-end;
+//     gap: var(--spacing-md);
+//     border-bottom-left-radius: var(--ui-border-radius-xl) !important;
+//     border-bottom-right-radius: var(--ui-border-radius-xl) !important;
+//   }
+// }
+
+// .enterprise-dialog {
+//   border-radius: calc(var(--ui-border-radius-xl) * 1.5) !important;
+
+//   &.p-dialog-maximized {
+//     border-radius: 0 !important;
+//     border: none !important;
+//   }
+// }
+
+// @keyframes slideUpFade {
+//   from {
+//     opacity: 0;
+//     transform: translateY(20px) scale(0.98);
+//   }
+
+//   to {
+//     opacity: 1;
+//     transform: translateY(0) scale(1);
+//   }
+// }
+
+// /* ==========================================================================
+//    8. SHARED COMPONENT MIXINS (Fixed with Master Tokens)
+//    ========================================================================== */
+
+// // ── Icon Alignment ────────────────────────────────────────────────────────
+// @mixin icon-host {
+//   display: inline-flex;
+//   align-items: center;
+//   gap: var(--spacing-xs);
+//   line-height: 1;
+
+//   .p-icon,
+//   svg {
+//     display: block;
+//     flex-shrink: 0;
+//     width: 1.25rem;
+//     height: 1.25rem;
+//     fill: currentColor;
+//   }
+// }
+
+// // ── Base input reset ────────────────────────────────────────────────────────
+// @mixin input-reset {
+//   appearance: none;
+//   -webkit-appearance: none;
+//   box-sizing: border-box;
+//   margin: 0;
+//   outline: none;
+// }
+
+// // ── Input base ──────────────────────────────────────────────────────────────
+// @mixin input-base {
+//   @include input-reset;
+//   display: block;
+//   width: 100%;
+//   height: 2.25rem;
+//   /* Matches your 2.5rem PrimeNG geometry override */
+//   padding: 0 var(--spacing-md);
+//   font-family: var(--font-body);
+//   font-size: var(--font-size-md);
+//   font-weight: var(--font-weight-normal);
+//   color: var(--text-primary);
+//   background: var(--bg-secondary);
+//   border: 1px solid var(--border-primary);
+//   border-radius: var(--ui-border-radius);
+//   transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+
+//   &::placeholder {
+//     color: var(--text-label);
+//   }
+
+//   &:hover:not(:disabled):not(:focus) {
+//     border-color: var(--border-secondary);
+//     background: var(--component-bg-hover);
+//   }
+
+//   &:focus {
+//     border-color: var(--accent-primary);
+//     box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus);
+//     background: var(--bg-primary);
+//   }
+
+//   &:disabled {
+//     background: var(--color-disabled);
+//     color: var(--color-disabled-text);
+//     border-color: var(--border-primary);
+//     cursor: not-allowed;
+//     opacity: var(--p-disabled-opacity, 0.6);
+//   }
+// }
+
+// // ── Overlay/dropdown panel ─────────────────────────────────────────────────
+// @mixin overlay-panel {
+//   background: var(--component-surface-raised);
+//   border: 1px solid var(--border-primary);
+//   border-radius: var(--ui-border-radius-lg);
+//   box-shadow: var(--elevation-2);
+// }
+
+// // ── List item (dropdown options, menu items) ─────────────────────────────
+// @mixin list-item {
+//   display: flex;
+//   align-items: center;
+//   gap: var(--spacing-sm);
+//   padding: var(--spacing-sm) var(--spacing-md);
+//   height: 32px;
+//   border-radius: var(--ui-border-radius-sm);
+//   font-size: var(--font-size-sm);
+//   color: var(--text-secondary);
+//   cursor: pointer;
+//   transition: background var(--transition-fast);
+//   white-space: nowrap;
+//   user-select: none;
+
+//   .p-icon,
+//   svg {
+//     width: 1.25rem;
+//     height: 1.25rem;
+//     flex-shrink: 0;
+//     display: block;
+//   }
+
+//   &:hover:not(.p-disabled):not(.p-highlight) {
+//     background: var(--component-bg-hover);
+//     color: var(--text-primary);
+//   }
+
+//   &.p-highlight {
+//     background: var(--accent-focus);
+//     color: var(--accent-primary);
+//     font-weight: var(--font-weight-medium);
+//   }
+
+//   &.p-disabled {
+//     opacity: var(--p-disabled-opacity, 0.6);
+//     cursor: not-allowed;
+//     pointer-events: none;
+//   }
+// }
+
+// // ── Icon-only action button ───────────────────────────────────────────────
+// @mixin icon-button($size: 28px) {
+//   display: inline-flex;
+//   align-items: center;
+//   justify-content: center;
+//   flex-shrink: 0;
+//   width: $size;
+//   height: $size;
+//   padding: 0;
+//   border: none;
+//   border-radius: var(--ui-border-radius-sm);
+//   background: transparent;
+//   color: var(--text-tertiary);
+//   cursor: pointer;
+//   transition: background var(--transition-fast), color var(--transition-fast);
+//   outline: none;
+
+//   .p-icon,
+//   svg {
+//     width: 1.25rem;
+//     height: 1.25rem;
+//     display: block;
+//     flex-shrink: 0;
+//   }
+
+//   &:hover {
+//     background: var(--component-bg-hover);
+//     color: var(--text-primary);
+//   }
+
+//   &:active {
+//     background: var(--component-bg-active);
+//   }
+
+//   &:focus-visible {
+//     box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus);
+//   }
+// }
+
+// // ── Invalid state modifier ───────────────────────────────────────────────
+// @mixin invalid-state {
+//   border-color: var(--color-error) !important;
+
+//   &:focus {
+//     box-shadow: 0 0 0 var(--focus-ring-width) var(--color-error-bg) !important;
+//   }
+// }
+
+// // ── Feedback severity ────────────────────────────────────────────────────
+// @mixin severity($bg, $border, $text) {
+//   background: $bg;
+//   border-color: $border;
+//   color: $text;
+
+//   .p-message-icon,
+//   .p-toast-message-icon {
+//     color: $text;
+//     width: 1.5rem;
+//     height: 1.5rem;
+//   }
+// }
+
+// .p-button {
+//   min-height: 2.25rem !important;
+//   line-height: var(--line-height-relaxed) !important;
+//   border-radius: var(--ui-border-radius) !important;
+//   white-space: nowrap !important;
+// }
+
+// .p-button-icon {
+//   font-size: 1.1rem !important;
+// }
+
+// /* ============================================================================
+//    APEX GLOBAL BUTTON SYSTEM — PERFECTION
+//    Unified design for native .btn and PrimeNG .p-button
+//    ============================================================================ */
+
+// /* 1. Base Geometry & Shared Properties */
+// .btn,
+// .p-button {
+//   display: inline-flex !important;
+//   align-items: center !important;
+//   justify-content: center !important;
+//   height: 2.25rem !important;
+//   padding: 0 var(--spacing-lg) !important;
+//   font-family: var(--font-body) !important;
+//   font-size: var(--font-size-sm) !important;
+//   font-weight: var(--font-weight-semibold) !important;
+//   border-radius: var(--ui-border-radius) !important;
+//   white-space: nowrap !important;
+//   cursor: pointer !important;
+//   transition: var(--transition-base) !important;
+//   gap: var(--spacing-sm) !important;
+//   user-select: none !important;
+//   text-decoration: none !important;
+//   border: 1px solid transparent !important;
+//   outline: none !important;
+//   position: relative !important;
+//   overflow: hidden !important;
+
+//   &:disabled,
+//   &.p-disabled {
+//     opacity: 0.5 !important;
+//     cursor: not-allowed !important;
+//     pointer-events: none !important;
+//   }
+
+//   &:hover:not(:disabled):not(.p-disabled) {
+//     transform: translateY(-1px);
+//     box-shadow: var(--elevation-2);
+//   }
+
+//   &:active:not(:disabled):not(.p-disabled) {
+//     transform: translateY(0);
+//   }
+
+//   &:focus-visible {
+//     box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus) !important;
+//   }
+// }
+
+// /* 2. Style Variants */
+
+// /* Default / Secondary (Outlined Look) */
+// .btn,
+// .p-button:not([severity]):not(.p-button-primary):not(.p-button-secondary):not(.p-button-success):not(.p-button-info):not(.p-button-warn):not(.p-button-danger) {
+//   background: var(--bg-ternary) !important;
+//   border: 1px solid var(--border-primary) !important;
+//   color: var(--text-secondary) !important;
+//   box-shadow: var(--shadow-xs) !important;
+
+//   &:hover:not(:disabled) {
+//     background: var(--component-bg-hover) !important;
+//     border-color: var(--border-secondary) !important;
+//     color: var(--text-primary) !important;
+//   }
+// }
+
+// /* Primary / Accent (Gradient Look) */
+// .btn-primary,
+// .p-button-primary,
+// .p-button[severity="primary"] {
+//   background: var(--accent-gradient) !important;
+//   color: #fff !important;
+//   box-shadow: var(--elevation-1) !important;
+
+//   &:hover:not(:disabled) {
+//     filter: brightness(1.08);
+//   }
+// }
+
+// /* Success */
+// .btn-success,
+// .p-button-success,
+// .p-button[severity="success"] {
+//   background: var(--color-success) !important;
+//   color: #fff !important;
+
+//   &.p-button-outlined {
+//     background: transparent !important;
+//     border-color: var(--color-success-border) !important;
+//     color: var(--color-success) !important;
+
+//     &:hover:not(:disabled) {
+//       background: var(--color-success-bg) !important;
+//     }
+//   }
+// }
+
+// /* Danger / Error */
+// .btn-danger,
+// .p-button-danger,
+// .p-button[severity="danger"] {
+//   background: var(--color-error) !important;
+//   color: #fff !important;
+
+//   &.p-button-outlined {
+//     background: transparent !important;
+//     border-color: var(--color-error-border) !important;
+//     color: var(--color-error) !important;
+
+//     &:hover:not(:disabled) {
+//       background: var(--color-error-bg) !important;
+//     }
+//   }
+// }
+
+// /* Warning */
+// .btn-warn,
+// .p-button-warn,
+// .p-button[severity="warn"] {
+//   background: var(--color-warning) !important;
+//   color: #fff !important;
+
+//   &.p-button-outlined {
+//     background: transparent !important;
+//     border-color: var(--color-warning-border) !important;
+//     color: var(--color-warning) !important;
+
+//     &:hover:not(:disabled) {
+//       background: var(--color-warning-bg) !important;
+//     }
+//   }
+// }
+
+// /* Info */
+// .btn-info,
+// .p-button-info,
+// .p-button[severity="info"] {
+//   background: var(--color-info) !important;
+//   color: #fff !important;
+// }
+
+// /* 3. Global Outlined Mode Override */
+// .p-button-outlined {
+//   background: transparent !important;
+//   border: 1px solid var(--border-secondary) !important;
+//   color: var(--text-secondary) !important;
+
+//   &:hover:not(:disabled) {
+//     background: var(--component-bg-hover) !important;
+//   }
+// }
+
+// /* 4. Global Text Mode Override (Borderless) */
+// .btn-text,
+// .p-button-text,
+// .btn.borderless {
+//   background: transparent !important;
+//   border: none !important;
+//   box-shadow: none !important;
+//   padding: 0 var(--spacing-md) !important;
+//   color: var(--text-secondary) !important;
+
+//   &:hover:not(:disabled) {
+//     background: var(--component-bg-hover) !important;
+//     color: var(--text-primary) !important;
+//     transform: none !important;
+//     box-shadow: none !important;
+//   }
+// }
+
+// /* 5. Size Adjustments */
+// .btn-sm,
+// .p-button-sm {
+//   height: 2rem !important;
+//   font-size: var(--font-size-xs) !important;
+//   padding: 0 var(--spacing-md) !important;
+// }
+
+// .btn-lg,
+// .p-button-lg {
+//   height: 3rem !important;
+//   font-size: var(--font-size-base) !important;
+//   padding: 0 var(--spacing-xl) !important;
+// }
+
+// /* 6. Icon Handling Synchronization */
+// .btn .pi,
+// .p-button .p-button-icon {
+//   font-size: 1rem !important;
+
+//   &:only-child {
+//     font-size: 1.125rem !important;
+//     margin: 0 !important;
+//   }
+// }
+
+// /* ============================================================================
+//    APEX GLOBAL INPUT & SELECT SYSTEM — PERFECTION
+//    Unified design for all PrimeNG input components (40px / 2.5rem standard)
+//    ============================================================================ */
+
+// /* 1. Universal Input Base (InputText, DatePicker, Select, etc.) */
+// .p-inputtext,
+// .p-select,
+// .p-multiselect,
+// .p-datepicker-input,
+// .p-inputnumber-input {
+//   height: 2.25rem !important;
+//   font-family: var(--font-body) !important;
+//   font-size: var(--font-size-sm) !important;
+//   border-radius: var(--ui-border-radius) !important;
+//   border: 1px solid var(--border-primary) !important;
+//   background: var(--bg-primary) !important;
+//   color: var(--text-primary) !important;
+//   padding: 0 var(--spacing-lg) !important;
+//   transition: var(--transition-base) !important;
+//   box-shadow: var(--shadow-xs) !important;
+//   display: inline-flex !important;
+//   align-items: center !important;
+
+//   &:hover:not(:disabled):not(.p-disabled):not(.p-invalid) {
+//     border-color: var(--border-secondary) !important;
+//     background: var(--component-bg-hover) !important;
+//   }
+
+//   &:focus,
+//   &.p-focus {
+//     border-color: var(--accent-primary) !important;
+//     box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus) !important;
+//     outline: none !important;
+//     background: var(--bg-primary) !important;
+//   }
+
+//   &.p-invalid {
+//     border-color: var(--color-error) !important;
+
+//     &:focus {
+//       box-shadow: 0 0 0 var(--focus-ring-width) var(--color-error-bg) !important;
+//     }
+//   }
+
+//   &::placeholder {
+//     color: var(--text-tertiary) !important;
+//     opacity: 1 !important;
+//   }
+// }
+
+// /* 2. Select & MultiSelect Internal Label Alignment (Centering Fix) */
+// .p-select,
+// .p-multiselect {
+//   padding: 0 !important;
+//   /* Reset container padding to let label handle it */
+
+//   .p-select-label,
+//   .p-multiselect-label {
+//     padding: 0 var(--spacing-lg) !important;
+//     height: 100% !important;
+//     display: flex !important;
+//     align-items: center !important;
+//     line-height: normal !important;
+//     color: var(--text-primary) !important;
+//     background: transparent !important;
+//     border: none !important;
+//     white-space: nowrap !important;
+//     overflow: hidden !important;
+//     text-overflow: ellipsis !important;
+
+//     &.p-placeholder {
+//       color: var(--text-tertiary) !important;
+//     }
+//   }
+
+//   /* Dropdown Icon Centering */
+//   .p-select-dropdown,
+//   .p-multiselect-dropdown {
+//     width: 2.25rem !important;
+//     display: flex !important;
+//     align-items: center !important;
+//     justify-content: center !important;
+//     color: var(--text-tertiary) !important;
+
+//     .p-icon,
+//     svg {
+//       width: 0.875rem !important;
+//       height: 0.875rem !important;
+//     }
+//   }
+// }
+
+// /* 3. MultiSelect Chip/Token Alignment */
+// .p-multiselect-token {
+//   padding: 2px 8px !important;
+//   margin-right: 4px !important;
+//   background: var(--accent-focus) !important;
+//   color: var(--accent-primary) !important;
+//   border-radius: var(--ui-border-radius-sm) !important;
+//   font-size: var(--font-size-xs) !important;
+//   font-weight: 600 !important;
+
+//   .p-multiselect-token-icon {
+//     margin-left: 4px !important;
+//     font-size: 0.75rem !important;
+//   }
+// }
+
+// /* 4. Filter Panel Specific Alignment (Refined) */
+// .app-filter-panel {
+
+//   .filter-actions,
+//   .filter-actions-right {
+//     display: flex !important;
+//     align-items: center !important;
+//     /* Changed from flex-end to center */
+//     gap: var(--spacing-md) !important;
+//     height: 2.25rem !important;
+//     /* Match input height */
+//   }
+// }
+
+// // Global — PrimeNG dialog overrides for apex-chart-dialog
+// .apex-chart-dialog {
+//   &.p-dialog {
+//     height: 80vh !important;
+//     max-height: 80vh !important;
+//     border-radius: var(--ui-border-radius-xl) !important;
+//     border: 1px solid var(--border-primary) !important;
+//     box-shadow: var(--elevation-3) !important;
+//     overflow: hidden !important;
+//   }
+
+//   .p-dialog-content {
+//     flex: 1;
+//     height: 100%;
+//     padding: 0 !important;
+//     overflow: hidden !important;
+//     border-radius: 0 !important;
+//   }
+// }
+
+// /* ============================================================================
+//    APEX GLOBAL 3D GLASSMORPHIC GRID SYSTEM — ENTIRE PROJECT INTEGRATION
+//    ============================================================================ */
+
+// /* 1. Global tag layout sizing to prevent collapse in flex wrappers */
+// app-shared-grid,
+// app-ag-share-grid {
+//   display: block !important;
+//   flex: 1 !important;
+//   height: 100% !important;
+//   width: 100% !important;
+//   min-height: 0 !important;
+// }
+
+// /* 2. Unified 3D Glassmorphic Surface styling for all grids by default */
+// .shared-grid-root,
+// .shared-grid-container {
+//   background: var(--component-bg, rgba(17, 24, 39, 0.7)) !important;
+//   border: 1px solid var(--border-primary, rgba(255, 255, 255, 0.08)) !important;
+//   border-radius: 1.25rem !important;
+//   backdrop-filter: blur(16px) !important;
+//   -webkit-backdrop-filter: blur(16px) !important;
+//   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37) !important;
+//   overflow: hidden !important;
+// }
+
+// /* 3. Outer card-padded container for storefront layouts */
+// .premium-grid-container {
+//   flex: 1;
+//   background: var(--component-bg, rgba(17, 24, 39, 0.7));
+//   border: 1px solid var(--border-primary, rgba(255, 255, 255, 0.08));
+//   border-radius: 1.25rem;
+//   padding: 1.5rem;
+//   backdrop-filter: blur(16px);
+//   -webkit-backdrop-filter: blur(16px);
+//   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+//   display: flex;
+//   flex-direction: column;
+//   position: relative;
+
+//   /* Dissolve grid inner borders/backgrounds when wrapped inside padded card */
+//   app-shared-grid .shared-grid-container,
+//   app-ag-share-grid .shared-grid-root {
+//     border: none !important;
+//     background: transparent !important;
+//     box-shadow: none !important;
+//     backdrop-filter: none !important;
+//     -webkit-backdrop-filter: none !important;
+//     border-radius: 0 !important;
+//   }
+// }
+
+// /* ============================================================================
+//    ENTERPRISE COMPACT LIST DENSITY
+//    Keeps list headers and filter regions subordinate to the data grid.
+//    ============================================================================ */
+
+// .app-container {
+//   .container-header {
+//     padding: var(--spacing-md) var(--spacing-lg) !important;
+//     gap: var(--spacing-sm) !important;
+//     min-height: 56px;
+
+//     .container-title {
+//       font-size: var(--font-size-lg) !important;
+//       line-height: 1.2 !important;
+//     }
+
+//     .container-subtitle {
+//       font-size: var(--font-size-xs) !important;
+//       margin-top: 2px !important;
+//       line-height: 1.25 !important;
+//     }
+//   }
+
+//   .container-body {
+//     padding: var(--spacing-md) !important;
+//     gap: var(--spacing-sm) !important;
+//     min-height: 0;
+//   }
+// }
+
+// .list-page-container {
+//   padding: var(--spacing-md) !important;
+//   gap: var(--spacing-sm) !important;
+//   min-height: 0;
+// }
+
+// .list-header,
+// .page-header,
+// .dashboard-header {
+//   margin-bottom: var(--spacing-sm) !important;
+//   padding: var(--spacing-sm) var(--spacing-md) !important;
+//   min-height: 44px;
+// }
+
+// .list-title,
+// .page-header h1,
+// .page-header h2,
+// .dashboard-header h1,
+// .dashboard-header h2 {
+//   font-size: var(--font-size-xl) !important;
+//   line-height: 1.2 !important;
+// }
+
+// .themed-card,
+// .list-content-area {
+//   padding: var(--spacing-md) !important;
+//   gap: var(--spacing-sm) !important;
+//   min-height: 0 !important;
+// }
+
+// .app-filter-panel,
+// .se-filter-bar,
+// .filters {
+//   gap: var(--spacing-sm) !important;
+//   padding: var(--spacing-sm) var(--spacing-md) !important;
+//   margin-bottom: var(--spacing-sm) !important;
+//   align-items: center !important;
+//   min-height: 44px;
+// }
+
+// .app-filter-panel {
+//   border-radius: var(--ui-border-radius) !important;
+
+//   &.single-row {
+//     padding-bottom: var(--spacing-sm) !important;
+//   }
+// }
+
+// .app-filter-panel .filter-field,
+// .se-filter-bar .se-filter-field {
+//   gap: 3px !important;
+//   min-width: 150px !important;
+//   max-width: 240px !important;
+//   flex: 1 1 170px !important;
+
+//   label {
+//     font-size: 10px !important;
+//     line-height: 1.1 !important;
+//     letter-spacing: 0.04em !important;
+//   }
+// }
+
+// .app-filter-panel .filter-actions,
+// .app-filter-panel .filter-actions-right,
+// .se-filter-actions,
+// .header-actions {
+//   gap: var(--spacing-xs) !important;
+//   min-height: 2rem !important;
+// }
+
+// .app-filter-panel .p-inputtext,
+// .app-filter-panel .p-select,
+// .app-filter-panel .p-multiselect,
+// .app-filter-panel .p-datepicker,
+// .se-filter-bar .p-inputtext,
+// .se-filter-bar .p-select,
+// .se-filter-bar .p-multiselect,
+// .se-filter-bar .p-datepicker,
+// .filters input,
+// .filters select {
+//   min-height: 2rem !important;
+//   height: 2rem !important;
+//   font-size: var(--font-size-xs) !important;
+// }
+
+// .app-filter-panel .p-button,
+// .se-filter-bar .p-button,
+// .filters .p-button,
+// .header-actions .p-button {
+//   min-height: 2rem !important;
+//   padding: 0.35rem 0.65rem !important;
+//   font-size: var(--font-size-xs) !important;
+// }
+
+// .stats-strip {
+//   gap: var(--spacing-xs) !important;
+
+//   .stat-card {
+//     padding: var(--spacing-sm) var(--spacing-md) !important;
+//     gap: 2px !important;
+//     min-height: 48px !important;
+//   }
+
+//   .stat-val {
+//     font-size: var(--font-size-md) !important;
+//     line-height: 1.15 !important;
+//   }
+// }
+
+// .list-grid-wrapper,
+// .list-grid-area,
+// .grid-container,
+// .classic-grid-wrapper {
+//   flex: 1 1 auto !important;
+//   min-height: 0 !important;
+// }
+
+// /* ─── Host ─────────────────────────────────────────────────────────────── */
+// app-data-grid {
+//   display: block;
+//   width: 100%;
+// }
+
+// /* ─── Scroll container ──────────────────────────────────────────────────── */
+// .apex-dg-scroll {
+//   overflow: auto;
+//   -webkit-overflow-scrolling: touch;
+//   scrollbar-width: thin;
+//   scrollbar-color: var(--scroll-thumb-c, var(--accent-primary)) transparent;
+//   border-radius: var(--ui-border-radius-lg);
+// }
+
+// .apex-dg-scroll::-webkit-scrollbar {
+//   width: 6px;
+//   height: 6px;
+// }
+
+// .apex-dg-scroll::-webkit-scrollbar-track {
+//   background: transparent;
+// }
+
+// .apex-dg-scroll::-webkit-scrollbar-thumb {
+//   background: var(--accent-primary);
+//   border-radius: 99px;
+// }
+
+// /* ─── Table ─────────────────────────────────────────────────────────────── */
+// .apex-dg-table {
+//   width: 100%;
+//   border-collapse: separate;
+//   border-spacing: 0;
+//   /* CRITICAL: Removed the gap to make it look solid */
+//   table-layout: auto;
+//   background: var(--bg-primary);
+//   /* Solid white/light background like the reference */
+//   border-radius: var(--ui-border-radius-lg);
+//   border: 1px solid var(--border-secondary);
+//   overflow: hidden;
+//   /* Ensures the corners stay rounded */
+// }
+
+// /* ─── Header ────────────────────────────────────────────────────────────── */
+// .apex-dg-thead {
+//   background: var(--bg-secondary);
+//   /* Slight contrast for header */
+// }
+
+// .apex-dg-th {
+//   padding: 12px 16px;
+//   height: 48px;
+//   white-space: nowrap;
+//   text-align: left;
+//   font-size: 11px;
+//   font-weight: 700;
+//   color: var(--text-secondary);
+//   text-transform: uppercase;
+//   letter-spacing: 0.04em;
+//   border-bottom: 1px solid var(--border-secondary);
+//   user-select: none;
+// }
+
+// .apex-dg-th--checkbox {
+//   width: 40px;
+//   min-width: 40px;
+//   max-width: 40px;
+//   padding: 0 8px;
+// }
+
+// .apex-dg-th--actions {
+//   width: 80px;
+//   min-width: 80px;
+//   text-align: right;
+// }
+
+// /* ─── Row States ────────────────────────────────────────────────────────── */
+// .apex-dg-row {
+//   background: transparent;
+//   transition: background 0.15s ease;
+//   border-bottom: 1px solid var(--border-primary);
+// }
+
+// /* Last row should not have a bottom border */
+// .apex-dg-row:last-child {
+//   border-bottom: none;
+// }
+
+// /* Hover Effect: Pill-Shape Background (Like the reference) */
+// .apex-dg-row:hover:not(.apex-dg-row--editing):not(.apex-dg-row--selected) {
+//   background: var(--component-bg-hover);
+//   box-shadow: none;
+//   transform: none;
+// }
+
+// /* Selected Row (Vibrant like reference) */
+// .apex-dg-row--selected {
+//   background: var(--accent-focus) !important;
+//   color: var(--text-primary) !important;
+//   box-shadow: none;
+//   transform: none;
+// }
+
+// /* Editing — only this row gets inputs */
+// .apex-dg-row--editing {
+//   background: color-mix(in srgb, var(--color-success) 6%, transparent) !important;
+//   box-shadow: inset 3px 0 0 var(--color-success);
+// }
+
+// /* New / unsaved */
+// .apex-dg-row--new {
+//   background: color-mix(in srgb, var(--accent-primary) 6%, transparent) !important;
+//   box-shadow: inset 3px 0 0 var(--accent-primary);
+// }
+
+// /* Modified */
+// .apex-dg-row--modified {
+//   box-shadow: inset 3px 0 0 var(--color-warning);
+// }
+
+// /* Error */
+// .apex-dg-row--error {
+//   background: color-mix(in srgb, var(--color-error) 6%, transparent) !important;
+//   box-shadow: inset 3px 0 0 var(--color-error);
+// }
+
+// /* Saving */
+// .apex-dg-row--saving {
+//   opacity: 0.6;
+//   pointer-events: none;
+// }
+
+// .apex-dg-row--deleted {
+//   opacity: 0.4;
+//   text-decoration: line-through;
+// }
+
+// /* ─── Cells ─────────────────────────────────────────────────────────────── */
+// .apex-dg-td {
+//   vertical-align: middle;
+//   border: none;
+//   background: inherit;
+//   color: inherit;
+//   padding: 14px 16px;
+//   /* Comfortable padding like the reference */
+//   font-size: var(--font-size-sm);
+// }
+
+// .apex-dg-td--checkbox {
+//   width: 40px;
+//   min-width: 40px;
+//   max-width: 40px;
+//   padding: 0 8px;
+// }
+
+// .apex-dg-td--actions {
+//   width: 80px;
+//   min-width: 80px;
+//   text-align: right;
+// }
+
+// /* Ensure text inside selected rows does NOT turn white unless intended */
+// .apex-dg-row--selected .apex-dg-td,
+// .apex-dg-row--selected i,
+// .apex-dg-row--selected span {
+//   color: inherit;
+// }
+
+// /* ─── Density Variants ──────────────────────────────────────────────────── */
+// .apex-dg--compact .apex-dg-td {
+//   padding: 10px 16px;
+//   font-size: var(--font-size-xs);
+// }
+
+// .apex-dg--compact .apex-dg-th {
+//   height: 40px;
+//   padding: 8px 16px;
+// }
+
+// .apex-dg--compact .apex-dg-td--checkbox {
+//   padding: 0 8px;
+// }
+
+// .apex-dg--normal .apex-dg-td {
+//   height: 52px;
+//   padding: 12px 16px;
+// }
+
+// .apex-dg--normal .apex-dg-th {
+//   height: 48px;
+// }
+
+// .apex-dg--comfortable .apex-dg-td {
+//   height: 64px;
+//   padding: 16px 20px;
+// }
+
+// .apex-dg--comfortable .apex-dg-th {
+//   height: 52px;
+// }
+
+// /* ─── Checkbox ──────────────────────────────────────────────────────────── */
+// .apex-dg-checkbox {
+//   display: block;
+//   width: 16px;
+//   height: 16px;
+//   margin: 0;
+//   cursor: pointer;
+//   accent-color: var(--accent-primary);
+//   border-radius: 4px;
+//   outline: none;
+//   flex-shrink: 0;
+//   transition: all 0.2s ease;
+// }
+
+// .apex-dg-checkbox:focus-visible {
+//   outline: 2px solid var(--accent-primary);
+//   outline-offset: 2px;
+// }
+
+// .apex-dg-row--selected .apex-dg-checkbox {
+//   accent-color: var(--text-on-accent);
+// }
+
+// /* ─── Reveal action buttons on row hover ────────────────────────────────── */
+// .apex-dg-row:hover app-grid-actions .apex-act-btn--reveal,
+// .apex-dg-row.apex-dg-row--editing app-grid-actions .apex-act-btn--reveal {
+//   opacity: 1 !important;
+//   transform: scale(1) !important;
+// }

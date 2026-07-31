@@ -32,11 +32,11 @@
               "node_modules/quill/dist/quill.snow.css",
               "libs/design-tokens/src/styles/tokens.scss",
               "libs/storefront-tokens/src/styles/storefront-tokens.scss",
-              "src/styles/themes.scss",
+              "src/styles/components/themes.scss",
               "src/styles/tailwind.css",
-              "src/styles/animation.scss",
-              "src/styles/base-styles.scss",
-              "src/styles/primeng-theme.scss",
+              "src/styles/design-system/animation.scss",
+              "src/styles/components/base-styles.scss",
+              "src/styles/components/primeng-theme.scss",
               "node_modules/primeicons/primeicons.css"
             ],
             "allowedCommonJsDependencies": [
@@ -131,9 +131,9 @@
               }
             ],
             "styles": [
-              "src/styles/themes.scss",
-              "src/styles/base-styles.scss",
-              "src/styles/primeng-theme.scss",
+              "src/styles/components/themes.scss",
+              "src/styles/components/base-styles.scss",
+              "src/styles/components/primeng-theme.scss",
               "src/styles/styles.scss",
               "node_modules/primeicons/primeicons.css"
             ]

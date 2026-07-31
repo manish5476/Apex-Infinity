@@ -23,6 +23,7 @@ import { TabKeyboardService } from './Tabbing';
     LoadingComponent,
     AnnouncementListenerComponent
   ],
+
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

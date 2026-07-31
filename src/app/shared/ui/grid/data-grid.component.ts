@@ -56,7 +56,7 @@ import { GridContextMenuComponent, ContextMenuActionEvent } from './components/g
     GridSavedViewsComponent,
     GridContextMenuComponent,
   ],
-  host: { class: 'block w-full' },
+  host: { class: 'flex flex-col flex-1 min-h-0 w-full' },
   styles: [`
     /* ── Row reveal hover for action buttons ─────────────────────── */
     .apex-dg-row:hover .apex-act-btn--reveal {
@@ -68,7 +68,7 @@ import { GridContextMenuComponent, ContextMenuActionEvent } from './components/g
     .apex-dg-td--sticky-right { box-shadow: -2px 0 6px -2px color-mix(in srgb, var(--text-primary) 10%, transparent); }
   `],
   template: `
-    <div class="apex-dg flex flex-col w-full" [class]="densityCssClass()">
+    <div class="apex-dg flex flex-col w-full flex-1 min-h-0" [class]="densityCssClass()">
 
       <!-- ───────────── TOOLBAR ───────────── -->
       @if (toolbar()) {

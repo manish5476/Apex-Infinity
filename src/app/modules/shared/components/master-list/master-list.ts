@@ -66,13 +66,13 @@ export interface Master {
         class="!mx-8 !mt-8">
       </app-page-header>
 
-      <app-page-content>
-        <div class="h-[calc(100vh-160px)] w-full flex flex-col px-8 pb-8">
+      <app-page-content [fullWidth]="true">
+        <div class="flex flex-col flex-1 min-h-0 w-full px-8 pb-8">
 
           <!-- Premium Grid Container -->
-          <div class="flex-1 bg-[var(--bg-primary)] rounded-[32px] shadow-[var(--shadow-xl)] 
+          <div class="flex flex-col flex-1 min-h-0 bg-[var(--bg-primary)] rounded-[32px] shadow-[var(--shadow-xl)] 
                       border border-[color-mix(in_srgb,var(--accent-primary)_5%,var(--border-secondary))]
-                      p-4 md:p-6 overflow-hidden flex flex-col">
+                      p-4 md:p-6 overflow-hidden">
             
             <!-- Enterprise DataGrid -->
           <app-data-grid

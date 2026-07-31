@@ -1,0 +1,217 @@
+/* ==========================================================================
+   APEX CRM — PRIME NG CLASS OVERRIDES
+   Layer: primeng-overrides
+   ========================================================================== */
+@layer primeng-overrides {
+
+    /* Global Fonts */
+    .p-component,
+    .p-inputtext,
+    .p-button,
+    .p-select,
+    .p-multiselect,
+    .p-autocomplete,
+    .p-datepicker,
+    .p-dialog,
+    .p-menu,
+    .p-menubar,
+    .p-datatable,
+    .p-card,
+    .p-panel,
+    .p-accordion,
+    .p-tabs,
+    .p-toast,
+    .p-message,
+    .p-badge,
+    .p-tag,
+    .p-chip,
+    .p-paginator,
+    .p-progressbar,
+    .p-skeleton,
+    .p-tooltip,
+    .p-drawer,
+    .p-popover {
+        font-family: var(--font-body);
+    }
+
+    .p-card-title,
+    .p-panel-header,
+    .p-dialog-title,
+    .p-datatable-column-title,
+    .p-accordion-header,
+    .p-tabs-tab {
+        font-family: var(--font-heading);
+    }
+
+    /* Form Geometry (2.5rem standard) */
+    .p-inputtext,
+    .p-select,
+    .p-multiselect,
+    .p-password input,
+    .p-inputnumber input,
+    .p-autocomplete input,
+    .p-cascadeselect,
+    .p-treeselect,
+    .p-datepicker input {
+        min-height: 2.5rem;
+        line-height: var(--line-height-relaxed);
+        border-radius: var(--ui-border-radius);
+        border: 1px solid var(--border-primary);
+        transition: border-color var(--transition-base), box-shadow var(--transition-base);
+    }
+
+    .p-textarea {
+        min-height: 5rem;
+        resize: vertical;
+        border-radius: var(--ui-border-radius);
+        border: 1px solid var(--border-primary);
+    }
+
+    /* Focus States */
+    .p-inputtext:enabled:focus,
+    .p-select:not(.p-disabled):not(.p-invalid).p-focus,
+    .p-multiselect:not(.p-disabled):not(.p-invalid).p-focus,
+    .p-password input:enabled:focus,
+    .p-inputnumber input:enabled:focus {
+        border-color: var(--accent-primary);
+        box-shadow: 0 0 0 4px var(--accent-focus);
+        outline: none;
+    }
+
+    /* Overlay Panels */
+    .p-select-overlay,
+    .p-multiselect-overlay,
+    .p-autocomplete-overlay,
+    .p-cascadeselect-overlay,
+    .p-listbox,
+    .p-treeselect-overlay {
+        background: var(--component-surface-raised);
+        border: 1px solid var(--border-primary);
+        border-radius: var(--ui-border-radius-lg);
+        box-shadow: var(--elevation-2);
+        color: var(--text-primary);
+        overflow: hidden;
+        z-index: var(--z-dropdown);
+    }
+
+    .p-select-option,
+    .p-multiselect-option,
+    .p-listbox-option {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: var(--ui-border-radius-sm);
+        font-size: var(--font-size-sm);
+        color: var(--text-secondary);
+        transition: background 0.12s ease, color 0.12s ease;
+    }
+
+    .p-select-option:hover,
+    .p-select-option.p-focus {
+        background: var(--component-bg-hover);
+        color: var(--text-primary);
+    }
+
+    .p-select-option.p-select-option-selected {
+        background: var(--accent-focus);
+        color: var(--accent-primary);
+        font-weight: 500;
+    }
+
+    /* Dialog Full Layout Fix */
+    .p-dialog-mask {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        inset: 0;
+        z-index: var(--z-modal-backdrop);
+        background-color: rgba(0, 0, 0, 0.56);
+        backdrop-filter: blur(8px);
+    }
+
+    .p-dialog {
+        z-index: var(--z-modal);
+        background: var(--component-surface-raised);
+        border: var(--ui-border-width) solid var(--border-primary);
+        border-radius: var(--ui-border-radius-xl);
+        box-shadow: var(--elevation-3);
+        color: var(--text-primary);
+        display: flex;
+        flex-direction: column;
+        max-height: 90vh;
+        min-width: 360px;
+    }
+
+    .p-dialog-header {
+        padding: var(--spacing-xl) var(--spacing-2xl);
+        border-bottom: 1px solid var(--border-primary);
+        background: transparent;
+    }
+
+    .p-dialog-content {
+        flex: 1 1 auto;
+        overflow-y: auto;
+        padding: var(--spacing-2xl) var(--spacing-3xl);
+        scrollbar-width: thin;
+        scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+    }
+
+    .p-dialog-footer {
+        padding: var(--spacing-2xl) var(--spacing-3xl);
+        border-top: 1px solid var(--border-primary);
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    /* Drawer / Sidebar */
+    .p-drawer {
+        background: var(--component-surface-raised);
+        box-shadow: var(--elevation-3);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .p-drawer-content {
+        flex: 1 1 auto;
+        overflow-y: auto;
+    }
+
+    /* Toast */
+    .p-toast {
+        z-index: var(--z-toast);
+        width: var(--p-toast-width);
+    }
+
+    .p-toast-message {
+        border-radius: var(--p-toast-border-radius);
+        background: color-mix(in srgb, var(--bg-secondary) 88%, transparent);
+        backdrop-filter: blur(var(--p-toast-blur)) saturate(160%);
+        box-shadow: var(--elevation-2);
+        border: 1px solid var(--border-primary);
+        transition: transform var(--transition-base), box-shadow var(--transition-base);
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--elevation-3);
+        }
+    }
+
+    .p-toast-message-info {
+        border-left: 3px solid var(--color-info);
+    }
+
+    .p-toast-message-success {
+        border-left: 3px solid var(--color-success);
+    }
+
+    .p-toast-message-warn {
+        border-left: 3px solid var(--color-warning);
+    }
+
+    .p-toast-message-error {
+        border-left: 3px solid var(--color-error);
+    }
+}

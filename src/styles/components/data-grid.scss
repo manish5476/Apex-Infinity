@@ -1,0 +1,224 @@
+/* ==========================================================================
+   APEX CRM — HIGH PERFORMANCE DATA GRID
+   Layer: components
+   ========================================================================== */
+
+/* ─── Host & Containers ─── */
+app-data-grid {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    /* Critical flex layout fix */
+}
+
+.apex-dg-scroll {
+    flex: 1;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--ui-border-radius-lg);
+    border: 1px solid var(--border-secondary);
+    background: var(--bg-primary);
+
+    /* Themed Scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: var(--scroll-thumb) transparent;
+
+    &::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--scroll-thumb);
+        border-radius: var(--ui-border-radius-pill);
+    }
+}
+
+/* ─── Table Structure ─── */
+.apex-dg-table {
+    width: 100%;
+    border-collapse: separate;
+    /* Required for sticky headers */
+    border-spacing: 0;
+    table-layout: auto;
+}
+
+/* ─── Sticky Headers ─── */
+.apex-dg-thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--bg-secondary);
+    box-shadow: 0 1px 0 var(--border-secondary);
+    /* Border attached to sticky element */
+}
+
+.apex-dg-th {
+    padding: 12px 16px;
+    height: 48px;
+    white-space: nowrap;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    user-select: none;
+    background: inherit;
+    /* Inherits the sticky bg */
+}
+
+.apex-dg-th--checkbox,
+.apex-dg-td--checkbox {
+    width: 48px;
+    min-width: 48px;
+    max-width: 48px;
+    padding: 0 12px;
+    text-align: center;
+}
+
+.apex-dg-th--actions,
+.apex-dg-td--actions {
+    width: 80px;
+    min-width: 80px;
+    text-align: right;
+    padding-right: 16px;
+}
+
+/* ─── Row Architecture ─── */
+.apex-dg-row {
+    background: var(--bg-primary);
+    transition: background var(--transition-fast);
+
+    /* Use cell borders instead of row borders to prevent table reflow jitter */
+    .apex-dg-td {
+        border-bottom: 1px solid var(--border-primary);
+    }
+
+    &:last-child .apex-dg-td {
+        border-bottom: none;
+    }
+
+    /* Interaction States */
+    &:hover:not(.apex-dg-row--editing):not(.apex-dg-row--selected) {
+        background: var(--component-bg-hover);
+    }
+
+    /* Selected State */
+    &.apex-dg-row--selected {
+        background: var(--accent-focus);
+
+        .apex-dg-td,
+        i,
+        span {
+            color: var(--text-primary);
+        }
+
+        .apex-dg-checkbox {
+            accent-color: var(--accent-primary);
+        }
+    }
+
+    /* Status Row Modifiers */
+    &.apex-dg-row--editing {
+        background: color-mix(in srgb, var(--color-success) 6%, var(--bg-primary));
+
+        .apex-dg-td:first-child {
+            box-shadow: inset 3px 0 0 var(--color-success);
+        }
+    }
+
+    &.apex-dg-row--new {
+        background: color-mix(in srgb, var(--accent-primary) 6%, var(--bg-primary));
+
+        .apex-dg-td:first-child {
+            box-shadow: inset 3px 0 0 var(--accent-primary);
+        }
+    }
+
+    &.apex-dg-row--error {
+        background: color-mix(in srgb, var(--color-error) 6%, var(--bg-primary));
+
+        .apex-dg-td:first-child {
+            box-shadow: inset 3px 0 0 var(--color-error);
+        }
+    }
+
+    &.apex-dg-row--saving {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+
+    &.apex-dg-row--deleted {
+        opacity: 0.4;
+        text-decoration: line-through;
+    }
+}
+
+/* ─── Cell Geometry ─── */
+.apex-dg-td {
+    vertical-align: middle;
+    padding: 14px 16px;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+/* ─── Checkboxes ─── */
+.apex-dg-checkbox {
+    display: block;
+    width: 16px;
+    height: 16px;
+    margin: 0 auto;
+    cursor: pointer;
+    accent-color: var(--accent-primary);
+    border-radius: var(--ui-border-radius-sm);
+    transition: outline 0.2s ease;
+
+    &:focus-visible {
+        outline: 2px solid var(--accent-primary);
+        outline-offset: 2px;
+    }
+}
+
+/* ─── Density Modifiers ─── */
+.apex-dg--compact {
+    .apex-dg-th {
+        height: 40px;
+        padding: 8px 16px;
+    }
+
+    .apex-dg-td {
+        padding: 8px 16px;
+        font-size: var(--font-size-xs);
+    }
+}
+
+.apex-dg--comfortable {
+    .apex-dg-th {
+        height: 56px;
+    }
+
+    .apex-dg-td {
+        padding: 18px 20px;
+        font-size: var(--font-size-base);
+    }
+}
+
+/* ─── Row Actions Reveal ─── */
+.apex-act-btn--reveal {
+    opacity: 0;
+    transform: scale(0.95);
+    transition: all var(--transition-fast);
+}
+
+.apex-dg-row:hover .apex-act-btn--reveal,
+.apex-dg-row--editing .apex-act-btn--reveal {
+    opacity: 1;
+    transform: scale(1);
+}

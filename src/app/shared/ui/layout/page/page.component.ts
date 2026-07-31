@@ -10,7 +10,7 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    class: 'block w-full min-h-screen flex flex-col bg-[var(--bg-secondary)] text-[var(--text-primary)]'
+    class: 'flex flex-col w-full min-h-screen bg-[var(--bg-secondary)] text-[var(--text-primary)]'
   },
   template: `
     <div class="flex-1 flex flex-col w-full h-full">
