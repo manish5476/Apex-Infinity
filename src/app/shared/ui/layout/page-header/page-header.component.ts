@@ -14,12 +14,15 @@ import {
   },
   template: `
     <header
-      class="bg-[var(--bg-primary)] transition-all duration-200 mx-6 mt-6 mb-4 rounded-2xl"
-      [class.border]="border()"
-      [class.border-[var(--border-secondary)]]="border()"
-      [class.shadow-lg]="true"
-      [class.shadow-[var(--shadow-xs)]]="shadow() === 'sm'"
-      [class.shadow-[var(--shadow-md)]]="shadow() === 'md'">
+      class="transition-all duration-200 mx-6 mt-6 mb-4"
+      [class.rounded-2xl]="variant() === 'solid'"
+      [class.bg-[var(--bg-primary)]]="variant() === 'solid'"
+      [class.bg-transparent]="variant() === 'transparent'"
+      [class.border]="border() && variant() === 'solid'"
+      [class.border-[var(--border-secondary)]]="border() && variant() === 'solid'"
+      [class.shadow-[var(--shadow-sm)]]="shadow() === 'sm' && variant() === 'solid'"
+      [class.shadow-[var(--shadow-md)]]="shadow() === 'md' && variant() === 'solid'"
+      [class.shadow-lg]="shadow() === 'lg' && variant() === 'solid'">
 
       <!-- Main Header -->
       <div
@@ -74,9 +77,10 @@ export class PageHeaderComponent {
   subtitle = input<string>();
 
   density = input<'compact' | 'normal' | 'comfortable'>('normal');
+  variant = input<'solid' | 'transparent'>('solid');
   sticky = input<boolean>(true);
   border = input<boolean>(true);
-  shadow = input<'none' | 'sm' | 'md'>('sm');
+  shadow = input<'none' | 'sm' | 'md' | 'lg'>('sm');
   showToolbar = input<boolean>(false);
 
   protected hostClasses = computed(() => {

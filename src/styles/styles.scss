@@ -2728,3 +2728,206 @@ app-ag-share-grid {
 // //   -webkit-backdrop-filter: none !important;
 // //   border-radius: 0 !important;
 // // }
+
+/* ==========================================================================
+   APEX ENTERPRISE DATA GRID  (app-data-grid)
+   All values reference design tokens — zero hardcoded colours.
+   Prefix: .apex-dg-*  (BEM-style, collision-safe)
+   ========================================================================== */
+
+/* ─── Host ─────────────────────────────────────────────────────────────── */
+app-data-grid { 
+  display: block; 
+  width: 100%;
+}
+
+/* ─── Scroll container ──────────────────────────────────────────────────── */
+.apex-dg-scroll {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb-c, var(--accent-primary)) transparent;
+}
+.apex-dg-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
+.apex-dg-scroll::-webkit-scrollbar-track  { background: transparent; }
+.apex-dg-scroll::-webkit-scrollbar-thumb  { background: color-mix(in srgb, var(--accent-primary) 40%, transparent); border-radius: 99px; }
+
+/* ─── Table ─────────────────────────────────────────────────────────────── */
+.apex-dg-table {
+  width: 100%;
+  border-collapse: separate; /* Allow rounded row corners & spacing */
+  border-spacing: 0 6px;     /* Gap between rows */
+  table-layout: auto;
+}
+
+/* ─── Header ────────────────────────────────────────────────────────────── */
+.apex-dg-thead { 
+  background: transparent;
+}
+
+.apex-dg-th {
+  padding: 0 16px;
+  height: 40px;
+  white-space: nowrap;
+  text-align: left;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium); /* Softer font weight */
+  color: var(--text-tertiary);
+  text-transform: capitalize; /* Soft capitalization like reference */
+  letter-spacing: 0;
+  border-bottom: 1px dashed color-mix(in srgb, var(--border-secondary) 50%, transparent);
+  user-select: none;
+  background: transparent;
+}
+.apex-dg-th--checkbox { width: 48px; min-width: 48px; max-width: 48px; }
+.apex-dg-th--actions  { width: 96px;  min-width: 96px; }
+
+/* ─── Row States ────────────────────────────────────────────────────────── */
+.apex-dg-row {
+  /* Use a pure white or very light background for individual floating rows */
+  background: var(--bg-primary);
+  transition: all 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
+  box-shadow: var(--shadow-sm); /* Subtle depth for floating rows */
+}
+
+/* Remove hover bg if it clashes, or make it very subtle */
+.apex-dg-row:hover:not(.apex-dg-row--editing):not(.apex-dg-row--selected) {
+  background: var(--component-bg-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Selected Row (Vibrant like reference) */
+.apex-dg-row--selected {
+  background: var(--accent-primary) !important;
+  color: var(--text-on-accent) !important;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent-primary) 30%, transparent);
+  transform: translateY(-1px);
+}
+
+/* Editing — only this row gets inputs */
+.apex-dg-row--editing {
+  background: color-mix(in srgb, var(--color-success) 4%, transparent) !important;
+  box-shadow: inset 3px 0 0 var(--color-success), var(--shadow-sm);
+}
+
+/* New / unsaved */
+.apex-dg-row--new {
+  background: color-mix(in srgb, var(--accent-primary) 5%, transparent) !important;
+  box-shadow: inset 3px 0 0 var(--accent-primary), var(--shadow-sm);
+  animation: apex-row-pulse 2s ease infinite;
+}
+
+/* Modified (saved locally, not yet sent to server) */
+.apex-dg-row--modified {
+  box-shadow: inset 3px 0 0 var(--color-warning), var(--shadow-sm);
+}
+
+/* Error */
+.apex-dg-row--error {
+  background: color-mix(in srgb, var(--color-error) 4%, transparent) !important;
+  box-shadow: inset 3px 0 0 var(--color-error), var(--shadow-sm);
+}
+
+/* Saving */
+.apex-dg-row--saving { opacity: 0.6; pointer-events: none; }
+/* Deleted (soft-delete) */
+.apex-dg-row--deleted {
+  opacity: 0.4;
+  text-decoration: line-through;
+}
+
+@keyframes apex-row-pulse {
+  0%, 100% { box-shadow: inset 3px 0 0 var(--accent-primary), var(--shadow-sm); }
+  50%      { box-shadow: inset 3px 0 0 color-mix(in srgb, var(--accent-primary) 50%, transparent), var(--shadow-sm); }
+}
+
+/* ─── Cells ─────────────────────────────────────────────────────────────── */
+.apex-dg-td {
+  vertical-align: middle;
+  border: none;
+  background: inherit;
+  color: inherit;
+}
+
+/* Apply border radius to the first and last cells to make row pill-shaped */
+.apex-dg-td:first-child {
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+}
+.apex-dg-td:last-child {
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+.apex-dg-td--checkbox {
+  width: 48px;
+  min-width: 48px;
+  max-width: 48px;
+  padding: 0;
+}
+.apex-dg-td--actions {
+  width: 96px;
+  min-width: 96px;
+  padding: 0 8px;
+}
+
+/* Ensure text inside selected rows turns white (or correct contrasting color) */
+.apex-dg-row--selected .apex-dg-td,
+.apex-dg-row--selected i,
+.apex-dg-row--selected span {
+  color: var(--text-on-accent) !important;
+}
+
+/* ─── Density Variants ──────────────────────────────────────────────────── */
+.apex-dg--compact .apex-dg-td     { height: 44px; padding: 0 16px; font-size: var(--font-size-xs); }
+.apex-dg--compact .apex-dg-th     { height: 36px; }
+.apex-dg--normal .apex-dg-td      { height: 56px; padding: 0 16px; font-size: var(--font-size-sm); }
+.apex-dg--normal .apex-dg-th      { height: 44px; }
+.apex-dg--comfortable .apex-dg-td { height: 72px; padding: 0 20px; font-size: var(--font-size-base); }
+.apex-dg--comfortable .apex-dg-th { height: 52px; }
+
+/* Override cells with density-aware padding */
+.apex-dg--compact .apex-dg-td--checkbox,
+.apex-dg--normal .apex-dg-td--checkbox,
+.apex-dg--comfortable .apex-dg-td--checkbox { padding: 0; }
+
+/* ─── Sticky Columns ────────────────────────────────────────────────────── */
+.apex-dg-td--sticky-left,
+.apex-dg-th.sticky { position: sticky; z-index: 4; background: inherit; }
+
+.apex-dg-td--sticky-left { left: 0; }
+.apex-dg-td--sticky-right { right: 0; }
+
+/* Sticky shadow separators (subtle) */
+.apex-dg-td--sticky-left  { box-shadow: 2px 0 5px -2px color-mix(in srgb, var(--text-primary) 5%, transparent); }
+.apex-dg-td--sticky-right { box-shadow: -2px 0 5px -2px color-mix(in srgb, var(--text-primary) 5%, transparent); }
+
+/* ─── Checkbox ──────────────────────────────────────────────────────────── */
+.apex-dg-checkbox {
+  display: block;
+  width: 16px;
+  height: 16px;
+  margin: 0 auto;
+  cursor: pointer;
+  accent-color: var(--accent-primary);
+  border-radius: 4px;
+  outline: none;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+.apex-dg-checkbox:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+/* In selected rows, the checkbox should stand out (e.g. white border/check) */
+.apex-dg-row--selected .apex-dg-checkbox {
+  accent-color: var(--text-on-accent);
+}
+
+/* ─── Reveal action buttons on row hover ────────────────────────────────── */
+.apex-dg-row:hover app-grid-actions .apex-act-btn--reveal,
+.apex-dg-row.apex-dg-row--editing app-grid-actions .apex-act-btn--reveal {
+  opacity: 1 !important;
+  transform: scale(1) !important;
+}

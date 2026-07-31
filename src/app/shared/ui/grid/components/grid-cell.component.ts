@@ -1,17 +1,17 @@
-import { Component, ChangeDetectionStrategy, input } from '@angular/core';
-import { CommonModule, CurrencyPipe, DatePipe, DecimalPipe, PercentPipe } from '@angular/common';
+import {
+  Component, ChangeDetectionStrategy, input, output,
+  computed, signal, OnChanges, SimpleChanges
+} from '@angular/core';
+import { CommonModule, CurrencyPipe, DatePipe, PercentPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 // PrimeNG Form Modules
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputMaskModule } from 'primeng/inputmask';
-import { InputOtpModule } from 'primeng/inputotp';
-// import { InputTagsModule } from 'primeng/inputtags';
-// import { InputColorModule } from 'primeng/inputcolor';
+import { ColorPickerModule } from 'primeng/colorpicker';
 import { TextareaModule } from 'primeng/textarea';
 import { SelectModule } from 'primeng/select';
-import { SelectButtonModule } from 'primeng/selectbutton';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { DatePickerModule } from 'primeng/datepicker';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -19,255 +19,539 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { ToggleButtonModule } from 'primeng/togglebutton';
 import { RatingModule } from 'primeng/rating';
 import { SliderModule } from 'primeng/slider';
-import { KnobModule } from 'primeng/knob';
-import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
 // Custom Shared Components
-import { GridColumn } from '../grid-types';
+import { GridColumn, GridCellChangeEvent } from '../grid-types';
 import { StatusBadgeComponent } from '../../badge/status-badge.component';
 import { AvatarComponent } from '../../media/avatar.component';
 
+/**
+ * Component: app-grid-cell
+ * The heart of the progressive editing system.
+ *
+ * VIEW MODE  (isEditing = false):
+ *   Renders only text, badges, links, icons — zero form controls.
+ *   Clean, professional, enterprise look.
+ *
+ * EDIT MODE  (isEditing = true):
+ *   Renders minimal inline inputs: bottom-border only, height matches cell.
+ *   Inputs inherit table styling. No giant borders or oversized PrimeNG controls.
+ *
+ * The cellChange output carries {field, previousValue, newValue} for undo tracking.
+ */
 @Component({
   selector: 'app-grid-cell',
   standalone: true,
   imports: [
     CommonModule, FormsModule,
-    InputTextModule, InputNumberModule, InputMaskModule, InputOtpModule, //InputTagsModule, InputColorModule,
-    TextareaModule, SelectModule, SelectButtonModule, AutoCompleteModule, DatePickerModule,
-    CheckboxModule, ToggleSwitchModule, ToggleButtonModule, RatingModule, SliderModule, KnobModule,
-    TagModule, TooltipModule, StatusBadgeComponent, AvatarComponent,
-    CurrencyPipe, DatePipe, DecimalPipe, PercentPipe
+    InputTextModule, InputNumberModule, InputMaskModule, ColorPickerModule,
+    TextareaModule, SelectModule, AutoCompleteModule, DatePickerModule,
+    CheckboxModule, ToggleSwitchModule, ToggleButtonModule, RatingModule, SliderModule,
+    TooltipModule, StatusBadgeComponent, AvatarComponent,
+    CurrencyPipe, DatePipe, PercentPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block w-full h-full' },
+  styles: [`
+    :host { display: flex; align-items: center; width: 100%; }
+
+    /* === INLINE EDITOR OVERRIDES === */
+    /* All form controls in edit mode lose their default border and get only a bottom border */
+    :host .apex-inline { all: unset; }
+
+    .apex-ie {
+      width: 100%;
+      background: transparent !important;
+      border: none !important;
+      border-bottom: 1.5px solid var(--accent-primary) !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      padding: 1px 2px !important;
+      font-size: var(--font-size-xs) !important;
+      color: var(--text-primary) !important;
+      outline: none !important;
+      font-family: var(--font-body) !important;
+    }
+    .apex-ie:focus { border-bottom-color: var(--accent-primary) !important; }
+
+    /* Override PrimeNG component wrappers */
+    :host ::ng-deep .p-inputtext.apex-ie,
+    :host ::ng-deep .p-inputnumber-input.apex-ie,
+    :host ::ng-deep p-inputnumber .p-inputnumber { width: 100%; }
+    :host ::ng-deep p-inputnumber .p-inputtext { width: 100%; }
+    :host ::ng-deep p-select .p-select { width: 100%; border: none; border-bottom: 1.5px solid var(--accent-primary); border-radius: 0; background: transparent; box-shadow: none; padding: 1px 2px; }
+    :host ::ng-deep p-select .p-select-label { font-size: var(--font-size-xs); padding: 0; }
+    :host ::ng-deep p-select .p-select-dropdown { width: 20px; }
+    :host ::ng-deep p-datepicker .p-datepicker-input-icon-container { width: 100%; }
+    :host ::ng-deep p-datepicker .p-inputtext { width: 100%; }
+    :host ::ng-deep p-autocomplete .p-autocomplete { width: 100%; }
+    :host ::ng-deep p-autocomplete .p-inputtext { width: 100%; }
+    :host ::ng-deep p-toggleswitch { display: flex; align-items: center; }
+    :host ::ng-deep p-checkbox { display: flex; align-items: center; justify-content: center; }
+    :host ::ng-deep textarea.apex-ie { resize: none; height: 28px; line-height: 1.4; }
+  `],
   template: `
-    <div class="flex items-center w-full h-full min-h-[32px]">
-      
-      <!-- ========================================== -->
-      <!-- EDITOR MODE                                -->
-      <!-- ========================================== -->
+    <div class="flex items-center w-full h-full">
+
+      <!-- ======================= EDIT MODE ======================= -->
       @if (isEditing() && column().editable !== false && !column().readOnly) {
-        
         @switch (column().type) {
-          
+
           @case ('number') {
-            <p-inputNumber 
-              [(ngModel)]="rowData()[column().field]" 
+            <p-inputNumber
+              [(ngModel)]="editValue"
               [minFractionDigits]="column().minFractionDigits ?? 0"
               [maxFractionDigits]="column().maxFractionDigits ?? 2"
-              [min]="column().min ?? null" 
+              [min]="column().min ?? null"
               [max]="column().max ?? null"
-              class="w-full" styleClass="w-full p-inputtext-sm">
+              [inputStyleClass]="'apex-ie'"
+              (ngModelChange)="onValueChange($event)"
+              class="w-full">
             </p-inputNumber>
           }
 
           @case ('currency') {
-            <p-inputNumber 
-              [(ngModel)]="rowData()[column().field]" 
-              mode="currency" 
-              [currency]="column().currencyCode ?? 'USD'"
-              class="w-full" styleClass="w-full p-inputtext-sm">
+            <p-inputNumber
+              [(ngModel)]="editValue"
+              mode="currency"
+              [currency]="column().currencyCode ?? 'INR'"
+              [inputStyleClass]="'apex-ie'"
+              (ngModelChange)="onValueChange($event)"
+              class="w-full">
+            </p-inputNumber>
+          }
+
+          @case ('percentage') {
+            <p-inputNumber
+              [(ngModel)]="editValue"
+              suffix="%"
+              [min]="column().min ?? 0"
+              [max]="column().max ?? 100"
+              [inputStyleClass]="'apex-ie'"
+              (ngModelChange)="onValueChange($event)"
+              class="w-full">
             </p-inputNumber>
           }
 
           @case ('mask') {
-            <p-inputMask 
-              [(ngModel)]="rowData()[column().field]" 
-              [mask]="column().maskPattern || '999-99-9999'" 
-              [slotChar]="column().slotChar || '_'" 
-              [placeholder]="column().placeholder || ''"
-              styleClass="w-full p-inputtext-sm">
+            <p-inputMask
+              [(ngModel)]="editValue"
+              [mask]="column().maskPattern ?? '999-99-9999'"
+              [slotChar]="column().slotChar ?? '_'"
+              [placeholder]="column().placeholder ?? ''"
+              (ngModelChange)="onValueChange($event)"
+              class="w-full">
             </p-inputMask>
+            <!-- /* [inputStyleClass]="'apex-ie'" */ -->
           }
 
-          @case ('otp') {
-            <p-inputOtp [(ngModel)]="rowData()[column().field]" [mask]="true"></p-inputOtp>
-          }
-
-          @case ('tags') {
-            <p-inputtags 
-              [(ngModel)]="rowData()[column().field]" 
-              [max]="column().maxTags" 
-              styleClass="w-full p-inputtext-sm">
-            </p-inputtags>
-          }
-
-          @case ('color') {
-            <div class="flex items-center justify-center w-full">
-               <p-inputcolor [(ngModel)]="rowData()[column().field]" [format]="column().colorFormat || 'hex'"></p-inputcolor>
-            </div>
+          @case ('textarea') {
+            <textarea
+              class="apex-ie resize-none w-full"
+              rows="1"
+              [(ngModel)]="editValue"
+              [placeholder]="column().placeholder ?? ''"
+              (ngModelChange)="onValueChange($event)"
+              (keydown.enter)="$event.stopPropagation()">
+            </textarea>
           }
 
           @case ('select') {
-            <p-select 
-              [options]="column().options ?? []" 
-              [(ngModel)]="rowData()[column().field]" 
-              appendTo="body" 
-              [placeholder]="column().placeholder || 'Select...'"
-              class="w-full" styleClass="w-full p-inputtext-sm">
+            <p-select
+              [(ngModel)]="editValue"
+              [options]="column().options ?? []"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+              [placeholder]="column().placeholder ?? 'Select…'"
+              class="w-full"
+              (ngModelChange)="onValueChange($event)">
             </p-select>
           }
 
-          @case ('selectbutton') {
-            <p-selectbutton 
-              [options]="column().options ?? []" 
-              [(ngModel)]="rowData()[column().field]" 
-              optionLabel="label" optionValue="value">
-            </p-selectbutton>
+          @case ('autocomplete') {
+            <p-autoComplete
+              [(ngModel)]="editValue"
+              [suggestions]="column().options ?? []"
+              [placeholder]="column().placeholder ?? 'Search…'"
+              appendTo="body"
+              class="w-full"
+              (ngModelChange)="onValueChange($event)">
+            </p-autoComplete>
+          }
+
+          @case ('tags') {
+            <p-autoComplete
+              [(ngModel)]="editValue"
+              [multiple]="true"
+              [placeholder]="column().placeholder ?? 'Add tags…'"
+              appendTo="body"
+              class="w-full"
+              (ngModelChange)="onValueChange($event)">
+            </p-autoComplete>
           }
 
           @case ('date') {
-            <p-datepicker 
-              [(ngModel)]="rowData()[column().field]" 
-              appendTo="body" 
+            <p-datepicker
+              [(ngModel)]="editValue"
+              appendTo="body"
               [dateFormat]="column().dateFormat ?? 'yy-mm-dd'"
-              [timeOnly]="column().timeOnly || false"
-              [showTime]="column().showTime || false"
-              [selectionMode]="column().selectionMode || 'single'"
-              class="w-full" styleClass="w-full p-inputtext-sm">
+              [timeOnly]="column().timeOnly ?? false"
+              [showTime]="column().showTime ?? false"
+              [selectionMode]="column().selectionMode ?? 'single'"
+              [inputStyleClass]="'apex-ie'"
+              class="w-full"
+              (ngModelChange)="onValueChange($event)">
+            </p-datepicker>
+          }
+
+          @case ('datetime') {
+            <p-datepicker
+              [(ngModel)]="editValue"
+              appendTo="body"
+              [showTime]="true"
+              [dateFormat]="column().dateFormat ?? 'yy-mm-dd'"
+              [inputStyleClass]="'apex-ie'"
+              class="w-full"
+              (ngModelChange)="onValueChange($event)">
             </p-datepicker>
           }
 
           @case ('boolean') {
-            <p-checkbox [(ngModel)]="rowData()[column().field]" [binary]="true"></p-checkbox>
-          }
-
-          @case ('toggleswitch') {
-            <p-toggleswitch [(ngModel)]="rowData()[column().field]"></p-toggleswitch>
-          }
-
-          @case ('togglebutton') {
-            <p-togglebutton 
-              [(ngModel)]="rowData()[column().field]" 
-              [onLabel]="column().onLabel || 'On'" 
-              [offLabel]="column().offLabel || 'Off'">
-            </p-togglebutton>
-          }
-
-          @case ('slider') {
-            <div class="w-full px-2">
-              <p-slider [(ngModel)]="rowData()[column().field]" [min]="column().min || 0" [max]="column().max || 100" [step]="column().step || 1"></p-slider>
+            <div class="flex items-center justify-center w-full">
+              <p-checkbox
+                [(ngModel)]="editValue"
+                [binary]="true"
+                (ngModelChange)="onValueChange($event)">
+              </p-checkbox>
             </div>
           }
 
-          @case ('knob') {
-            <div class="flex justify-center w-full">
-               <p-knob [(ngModel)]="rowData()[column().field]" [size]="40" [min]="column().min || 0" [max]="column().max || 100" [step]="column().step || 1"></p-knob>
+          @case ('toggleswitch') {
+            <div class="flex items-center w-full">
+              <p-toggleswitch
+                [(ngModel)]="editValue"
+                (ngModelChange)="onValueChange($event)">
+              </p-toggleswitch>
+            </div>
+          }
+
+          @case ('togglebutton') {
+            <p-togglebutton
+              [(ngModel)]="editValue"
+              [onLabel]="column().onLabel ?? 'On'"
+              [offLabel]="column().offLabel ?? 'Off'"
+              (ngModelChange)="onValueChange($event)">
+            </p-togglebutton>
+          }
+
+          @case ('color') {
+            <div class="flex items-center gap-2 w-full">
+              <p-colorPicker
+                [(ngModel)]="editValue"
+                [format]="column().colorFormat ?? 'hex'"
+                appendTo="body"
+                (ngModelChange)="onValueChange($event)">
+              </p-colorPicker>
+              <span class="text-[10px] font-mono text-[var(--text-secondary)]">
+                {{ editValue || '—' }}
+              </span>
             </div>
           }
 
           @case ('rating') {
-            <p-rating [(ngModel)]="rowData()[column().field]" [cancel]="false"></p-rating>
+            <p-rating
+              [(ngModel)]="editValue"
+              (ngModelChange)="onValueChange($event)">
+            </p-rating>
+          }
+
+          @case ('slider') {
+            <div class="w-full px-1 flex items-center gap-2">
+              <p-slider
+                [(ngModel)]="editValue"
+                [min]="column().min ?? 0"
+                [max]="column().max ?? 100"
+                [step]="column().step ?? 1"
+                class="flex-1"
+                (ngModelChange)="onValueChange($event)">
+              </p-slider>
+              <span class="text-[10px] font-mono text-[var(--text-secondary)] w-6 text-right shrink-0">
+                {{ editValue ?? 0 }}
+              </span>
+            </div>
           }
 
           @default {
-            <input pInputText [(ngModel)]="rowData()[column().field]" type="text" [placeholder]="column().placeholder || ''" class="w-full p-inputtext-sm" />
+            <!-- Default text editor -->
+            <input
+              type="text"
+              class="apex-ie w-full"
+              [(ngModel)]="editValue"
+              [placeholder]="column().placeholder ?? ''"
+              (ngModelChange)="onValueChange($event)">
           }
         }
 
-      } 
-      <!-- ========================================== -->
-      <!-- VIEW MODE                                  -->
-      <!-- ========================================== -->
-      @else {
-        
+      <!-- ======================= VIEW MODE ======================= -->
+      } @else {
         @switch (column().type) {
-          
+
           @case ('user') {
-            <div class="flex items-center gap-3">
-              <app-avatar [imageUrl]="rowData()[column().field + 'Avatar']" [name]="rowData()[column().field] || 'Unknown'" size="sm"></app-avatar>
-              <span class="font-[var(--font-weight-semibold)] text-[var(--text-primary)] text-[length:var(--font-size-sm)]">{{ rowData()[column().field] }}</span>
+            <div class="flex items-center gap-2 min-w-0">
+              <app-avatar
+                [imageUrl]="rowData()[column().field + 'Avatar']"
+                [name]="rowData()[column().field] || 'Unknown'"
+                size="sm">
+              </app-avatar>
+              <span class="truncate text-[length:var(--font-size-xs)]
+                           font-[var(--font-weight-semibold)] text-[var(--text-primary)]">
+                {{ rowData()[column().field] }}
+              </span>
             </div>
           }
 
           @case ('badge') {
-            <app-status-badge [status]="rowData()[column().field]" variant="subtle" size="sm"></app-status-badge>
-          }
-
-          @case ('color') {
             @if (rowData()[column().field]) {
-              <div class="flex items-center gap-2">
-                <span class="w-4 h-4 rounded-full border border-[var(--border-secondary)] shadow-sm" [style.backgroundColor]="rowData()[column().field]"></span>
-                <span class="font-mono text-[10px] text-[var(--text-secondary)] uppercase">{{ rowData()[column().field] }}</span>
-              </div>
-            } @else { <span class="text-[var(--text-tertiary)]">—</span> }
+              <app-status-badge
+                [status]="rowData()[column().field]"
+                variant="subtle"
+                size="sm">
+              </app-status-badge>
+            } @else {
+              <span class="text-[var(--text-tertiary)]">—</span>
+            }
           }
 
-          @case ('tags') {
-            <div class="flex flex-wrap gap-1">
-              @for (tag of (rowData()[column().field] || []).slice(0, column().maxTags || 3); track tag) {
-                <span class="px-2 py-0.5 bg-[var(--bg-ternary)] text-[var(--text-secondary)] text-[10px] rounded-full font-medium border border-[var(--border-secondary)]">{{ tag }}</span>
-              }
-              @if ((rowData()[column().field] || []).length > (column().maxTags || 3)) {
-                <span class="px-2 py-0.5 bg-[var(--bg-secondary)] text-[var(--text-tertiary)] text-[10px] rounded-full">+{{ rowData()[column().field].length - (column().maxTags || 3) }}</span>
-              }
-            </div>
+          @case ('status') {
+            @if (rowData()[column().field]) {
+              <app-status-badge
+                [status]="rowData()[column().field]"
+                variant="subtle"
+                size="sm">
+              </app-status-badge>
+            } @else {
+              <span class="text-[var(--text-tertiary)]">—</span>
+            }
           }
 
           @case ('currency') {
-            <span class="font-mono font-medium" [class.text-[var(--color-error)]]="rowData()[column().field] < 0">
-              {{ rowData()[column().field] | currency:(column().currencyCode || 'USD'):'symbol':'1.2-2' }}
+            <span class="font-mono text-[length:var(--font-size-xs)] font-[var(--font-weight-medium)]"
+                  [class.text-[var(--color-error)]]="rowData()[column().field] < 0">
+              {{ rowData()[column().field] | currency:(column().currencyCode ?? 'INR'):'symbol':'1.2-2' }}
             </span>
           }
 
           @case ('percentage') {
-            <span class="font-mono font-medium">{{ rowData()[column().field] / 100 | percent:'1.1-2' }}</span>
+            <span class="font-mono text-[length:var(--font-size-xs)] font-[var(--font-weight-medium)]">
+              {{ (rowData()[column().field] ?? 0) / 100 | percent:'1.1-2' }}
+            </span>
           }
 
-          @case ('slider') {
-            <div class="w-full flex items-center gap-2">
-               <div class="flex-1 h-1.5 bg-[var(--border-secondary)] rounded-full overflow-hidden">
-                 <div class="h-full bg-[var(--accent-primary)]" [style.width.%]="rowData()[column().field]"></div>
-               </div>
-               <span class="text-[10px] font-mono text-[var(--text-secondary)]">{{ rowData()[column().field] || 0 }}%</span>
-            </div>
+          @case ('number') {
+            <span class="font-mono text-[length:var(--font-size-xs)] text-[var(--text-primary)] tabular-nums">
+              {{ rowData()[column().field] ?? '—' }}
+            </span>
           }
 
           @case ('date') {
-            <span class="text-[var(--text-secondary)] text-[length:var(--font-size-sm)]">
-              <i class="pi pi-calendar text-xs mr-1 opacity-70"></i> 
-              {{ rowData()[column().field] | date:(column().dateFormat || 'mediumDate') }}
+            @if (rowData()[column().field]) {
+              <span class="flex items-center gap-1 text-[length:var(--font-size-xs)] text-[var(--text-secondary)]">
+                <i class="pi pi-calendar text-[10px] opacity-60"></i>
+                {{ rowData()[column().field] | date:(column().dateFormat ?? 'mediumDate') }}
+              </span>
+            } @else {
+              <span class="text-[var(--text-tertiary)]">—</span>
+            }
+          }
+
+          @case ('datetime') {
+            @if (rowData()[column().field]) {
+              <span class="flex items-center gap-1 text-[length:var(--font-size-xs)] text-[var(--text-secondary)]">
+                <i class="pi pi-clock text-[10px] opacity-60"></i>
+                {{ rowData()[column().field] | date:(column().dateFormat ?? 'medium') }}
+              </span>
+            } @else {
+              <span class="text-[var(--text-tertiary)]">—</span>
+            }
+          }
+
+          @case ('timeago') {
+            <span class="text-[length:var(--font-size-xs)] text-[var(--text-secondary)]">
+              {{ rowData()[column().field] | date:'short' }}
             </span>
           }
 
           @case ('boolean') {
-          <!-- Handles both standard boolean, toggleswitch, and togglebutton beautifully in view mode -->
-            <i class="pi" 
-               [class.pi-check-circle]="rowData()[column().field]" 
-               [class.text-[var(--color-success)]]="rowData()[column().field]" 
-               [class.pi-minus-circle]="!rowData()[column().field]" 
+            <i class="pi text-sm"
+               [class.pi-check-circle]="rowData()[column().field]"
+               [class.text-[var(--color-success)]]="rowData()[column().field]"
+               [class.pi-minus-circle]="!rowData()[column().field]"
                [class.text-[var(--text-tertiary)]]="!rowData()[column().field]">
             </i>
           }
 
           @case ('toggleswitch') {
-             <!-- Alternative read-only view for a toggle switch -->
-             <p-toggleswitch [ngModel]="rowData()[column().field]" [disabled]="true"></p-toggleswitch>
+            <p-toggleswitch [ngModel]="rowData()[column().field]" [disabled]="true"></p-toggleswitch>
+          }
+
+          @case ('tags') {
+            <div class="flex flex-wrap gap-1 min-w-0">
+              @for (tag of (rowData()[column().field] ?? []).slice(0, column().maxTags ?? 3); track tag) {
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-medium
+                             bg-[var(--bg-secondary)] text-[var(--text-secondary)]
+                             border border-[var(--border-secondary)]">
+                  {{ tag }}
+                </span>
+              }
+              @if ((rowData()[column().field] ?? []).length > (column().maxTags ?? 3)) {
+                <span class="px-2 py-0.5 rounded-full text-[9px]
+                             bg-[var(--bg-ternary)] text-[var(--text-tertiary)]">
+                  +{{ (rowData()[column().field]).length - (column().maxTags ?? 3) }}
+                </span>
+              }
+            </div>
+          }
+
+          @case ('color') {
+            @if (rowData()[column().field]) {
+              <div class="flex items-center gap-2">
+                <span class="w-4 h-4 rounded-full border border-[var(--border-secondary)] shadow-sm shrink-0"
+                      [style.background-color]="rowData()[column().field]">
+                </span>
+                <span class="font-mono text-[10px] text-[var(--text-secondary)] uppercase truncate">
+                  {{ rowData()[column().field] }}
+                </span>
+              </div>
+            } @else {
+              <span class="text-[var(--text-tertiary)]">—</span>
+            }
+          }
+
+          @case ('slider') {
+            <div class="w-full flex items-center gap-2">
+              <div class="flex-1 h-1 bg-[var(--border-secondary)] rounded-full overflow-hidden">
+                <div class="h-full bg-[var(--accent-primary)] transition-[width_0.2s]"
+                     [style.width.%]="rowData()[column().field] ?? 0">
+                </div>
+              </div>
+              <span class="text-[10px] font-mono text-[var(--text-secondary)] tabular-nums shrink-0">
+                {{ rowData()[column().field] ?? 0 }}%
+              </span>
+            </div>
           }
 
           @case ('email') {
-            <a [href]="'mailto:' + rowData()[column().field]" class="text-[var(--link-color)] hover:underline flex items-center gap-1 text-[length:var(--font-size-sm)]">
-              <i class="pi pi-envelope text-xs opacity-70"></i> {{ rowData()[column().field] }}
-            </a>
+            @if (rowData()[column().field]) {
+              <a [href]="'mailto:' + rowData()[column().field]"
+                 class="flex items-center gap-1 text-[length:var(--font-size-xs)]
+                        text-[var(--link-color)] hover:underline truncate">
+                <i class="pi pi-envelope text-[10px] opacity-70 shrink-0"></i>
+                <span class="truncate">{{ rowData()[column().field] }}</span>
+              </a>
+            } @else {
+              <span class="text-[var(--text-tertiary)]">—</span>
+            }
+          }
+
+          @case ('phone') {
+            @if (rowData()[column().field]) {
+              <a [href]="'tel:' + rowData()[column().field]"
+                 class="flex items-center gap-1 text-[length:var(--font-size-xs)]
+                        text-[var(--link-color)] hover:underline">
+                <i class="pi pi-phone text-[10px] opacity-70 shrink-0"></i>
+                {{ rowData()[column().field] }}
+              </a>
+            } @else {
+              <span class="text-[var(--text-tertiary)]">—</span>
+            }
+          }
+
+          @case ('url') {
+            @if (rowData()[column().field]) {
+              <a [href]="rowData()[column().field]" target="_blank" rel="noopener"
+                 class="flex items-center gap-1 text-[length:var(--font-size-xs)]
+                        text-[var(--link-color)] hover:underline truncate">
+                <i class="pi pi-external-link text-[10px] opacity-70 shrink-0"></i>
+                <span class="truncate">{{ rowData()[column().field] }}</span>
+              </a>
+            } @else {
+              <span class="text-[var(--text-tertiary)]">—</span>
+            }
           }
 
           @case ('rating') {
-            <p-rating [ngModel]="rowData()[column().field]" [readonly]="true" [cancel]="false"></p-rating>
+            <p-rating [ngModel]="rowData()[column().field]" [readonly]="true"></p-rating>
+          }
+
+          @case ('avatar') {
+            <app-avatar
+              [imageUrl]="rowData()[column().field]"
+              [name]="rowData()[column().field] || '?'"
+              size="sm">
+            </app-avatar>
+          }
+
+          @case ('initials') {
+            <app-avatar
+              [name]="rowData()[column().field] || '?'"
+              size="sm">
+            </app-avatar>
           }
 
           @default {
-            <span class="text-[length:var(--font-size-sm)] text-[var(--text-primary)] truncate block w-full" [pTooltip]="rowData()[column().field]">
-              {{ rowData()[column().field] || '—' }}
+            <!-- Default: text with tooltip on overflow -->
+            <span class="truncate block w-full text-[length:var(--font-size-xs)] text-[var(--text-primary)]"
+                  [pTooltip]="rowData()[column().field]"
+                  tooltipPosition="top"
+                  [tooltipDisabled]="!rowData()[column().field]">
+              {{ (column().formatter
+                  ? column().formatter!(rowData()[column().field], rowData())
+                  : rowData()[column().field]) ?? '—' }}
             </span>
           }
         }
       }
     </div>
-  `
+  `,
 })
-export class GridCellComponent {
-  column = input.required<GridColumn>();
+export class GridCellComponent implements OnChanges {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   rowData = input.required<any>();
+  column = input.required<GridColumn>();
   isEditing = input<boolean>(false);
+
+  cellChange = output<GridCellChangeEvent>();
+
+  // Local mutable edit value — initialised from rowData when isEditing becomes true
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  protected editValue: any = null;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private previousValue: any = null;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // When entering edit mode, snapshot the current value
+    if (changes['isEditing'] && this.isEditing()) {
+      this.previousValue = this.rowData()[this.column().field];
+      this.editValue = this.previousValue;
+    }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  protected onValueChange(newValue: any): void {
+    // Mutate the row object in-place so parent has the latest value
+    this.rowData()[this.column().field] = newValue;
+
+    // Emit change event for undo tracking
+    this.cellChange.emit({
+      field: this.column().field,
+      previousValue: this.previousValue,
+      newValue,
+    });
+
+    // Update previous value for next change tracking
+    this.previousValue = newValue;
+  }
 }
