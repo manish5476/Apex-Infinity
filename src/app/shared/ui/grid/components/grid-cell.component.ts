@@ -54,33 +54,39 @@ import { AvatarComponent } from '../../media/avatar.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block w-full h-full' },
   styles: [`
-    :host { display: flex; align-items: center; width: 100%; }
+    :host { display: flex; align-items: center; width: 100%; height: 100%; }
 
     /* === INLINE EDITOR OVERRIDES === */
-    /* All form controls in edit mode lose their default border and get only a bottom border */
     :host .apex-inline { all: unset; }
 
     .apex-ie {
       width: 100%;
+      min-height: 24px;
       background: transparent !important;
-      border: none !important;
-      border-bottom: 1.5px solid var(--accent-primary) !important;
-      border-radius: 0 !important;
+      border: 1px solid transparent !important;
+      border-radius: var(--ui-border-radius-sm) !important;
       box-shadow: none !important;
-      padding: 1px 2px !important;
+      padding: 4px 6px !important;
       font-size: var(--font-size-xs) !important;
       color: var(--text-primary) !important;
       outline: none !important;
       font-family: var(--font-body) !important;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast) !important;
     }
-    .apex-ie:focus { border-bottom-color: var(--accent-primary) !important; }
+    .apex-ie:focus { 
+      border-color: var(--border-secondary) !important;
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-primary) 15%, transparent) !important;
+    }
 
     /* Override PrimeNG component wrappers */
     :host ::ng-deep .p-inputtext.apex-ie,
     :host ::ng-deep .p-inputnumber-input.apex-ie,
     :host ::ng-deep p-inputnumber .p-inputnumber { width: 100%; }
     :host ::ng-deep p-inputnumber .p-inputtext { width: 100%; }
-    :host ::ng-deep p-select .p-select { width: 100%; border: none; border-bottom: 1.5px solid var(--accent-primary); border-radius: 0; background: transparent; box-shadow: none; padding: 1px 2px; }
+    :host ::ng-deep p-select .p-select { width: 100%; border: 1px solid transparent; border-radius: var(--ui-border-radius-sm); background: transparent; box-shadow: none; padding: 2px 4px; transition: var(--transition-fast); }
+    :host ::ng-deep p-select .p-select:focus,
+    :host ::ng-deep p-select.p-select-focus .p-select,
+    :host ::ng-deep p-select.p-focus .p-select { border-color: var(--border-secondary); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-primary) 15%, transparent); }
     :host ::ng-deep p-select .p-select-label { font-size: var(--font-size-xs); padding: 0; }
     :host ::ng-deep p-select .p-select-dropdown { width: 20px; }
     :host ::ng-deep p-datepicker .p-datepicker-input-icon-container { width: 100%; }
@@ -88,8 +94,8 @@ import { AvatarComponent } from '../../media/avatar.component';
     :host ::ng-deep p-autocomplete .p-autocomplete { width: 100%; }
     :host ::ng-deep p-autocomplete .p-inputtext { width: 100%; }
     :host ::ng-deep p-toggleswitch { display: flex; align-items: center; }
-    :host ::ng-deep p-checkbox { display: flex; align-items: center; justify-content: center; }
-    :host ::ng-deep textarea.apex-ie { resize: none; height: 28px; line-height: 1.4; }
+    :host ::ng-deep p-checkbox { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
+    :host ::ng-deep textarea.apex-ie { resize: none; min-height: 24px; height: auto; line-height: 1.4; padding: 4px 6px !important; }
   `],
   template: `
     <div class="flex items-center w-full h-full">

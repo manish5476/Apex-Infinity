@@ -64,8 +64,8 @@ import { GridContextMenuComponent, ContextMenuActionEvent } from './components/g
       transform: scale(1) !important;
     }
     /* ── Sticky shadow decorators ────────────────────────────────── */
-    .apex-dg-cell--sticky-left  { box-shadow: 2px 0 6px -2px color-mix(in srgb, var(--text-primary) 10%, transparent); }
-    .apex-dg-cell--sticky-right { box-shadow: -2px 0 6px -2px color-mix(in srgb, var(--text-primary) 10%, transparent); }
+    .apex-dg-td--sticky-left  { box-shadow: 2px 0 6px -2px color-mix(in srgb, var(--text-primary) 10%, transparent); }
+    .apex-dg-td--sticky-right { box-shadow: -2px 0 6px -2px color-mix(in srgb, var(--text-primary) 10%, transparent); }
   `],
   template: `
     <div class="apex-dg flex flex-col w-full" [class]="densityCssClass()">
@@ -102,9 +102,9 @@ import { GridContextMenuComponent, ContextMenuActionEvent } from './components/g
 
       <!-- ───────────── CARD WRAPPER ───────────── -->
       <div class="relative flex flex-col flex-1 min-h-0
-                  bg-[var(--bg-primary)] border border-[var(--border-secondary)]
-                  rounded-[var(--ui-border-radius-lg)] overflow-hidden
-                  shadow-[var(--shadow-sm)]">
+                  bg-[var(--bg-primary)] border border-[color-mix(in_srgb,var(--border-secondary)_50%,transparent)]
+                  rounded-2xl overflow-hidden
+                  shadow-[var(--elevation-1)]">
 
         <!-- Filter Bar -->
         @if (showFilterBar()) {

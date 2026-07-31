@@ -66,12 +66,12 @@ import { TooltipModule } from 'primeng/tooltip';
   `,
   styles: [`
     .apex-act-btn {
-      width: 26px;
-      height: 26px;
+      width: 24px;
+      height: 24px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      border-radius: var(--ui-border-radius-sm);
+      border-radius: 50%;
       color: var(--text-tertiary);
       background: transparent;
       border: none;
@@ -86,8 +86,8 @@ import { TooltipModule } from 'primeng/tooltip';
     /* Only shown on row hover — parent row's :hover triggers this via CSS */
     .apex-act-btn--reveal {
       opacity: 0;
-      transform: scale(0.9);
-      transition: opacity 0.12s ease, transform 0.12s ease, background 0.12s ease;
+      transform: scale(0.95);
+      transition: opacity 0.15s cubic-bezier(0.4, 0, 0.2, 1), transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), background 0.15s ease;
     }
     /* The parent tr:hover will un-hide these via the global apex-dg-row:hover .apex-act-btn--reveal selector */
     .apex-act-btn--edit:hover {

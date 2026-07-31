@@ -18,18 +18,21 @@ import { GridBulkAction, GridDensity } from '../grid-types';
     <div class="flex flex-col gap-2 mb-3">
 
       <!-- Main Toolbar Row -->
-      <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center justify-between gap-3 px-3 py-2
+                  bg-[var(--bg-primary)] border border-[color-mix(in_srgb,var(--border-secondary)_40%,transparent)]
+                  rounded-[var(--ui-border-radius-pill)] shadow-[var(--shadow-sm)]">
 
         <!-- LEFT: Search + Filter toggle + Record count -->
         <div class="flex items-center gap-2">
 
           <!-- Search pill -->
           <div class="flex items-center gap-2 px-3 py-1.5
-                      bg-[var(--bg-primary)] border border-transparent
+                      bg-[color-mix(in_srgb,var(--bg-secondary)_40%,transparent)] border border-transparent
                       rounded-[var(--ui-border-radius-pill)]
-                      shadow-[var(--shadow-sm)]
-                      focus-within:shadow-[0_0_0_3px_color-mix(in_srgb,var(--accent-primary)_15%,transparent)]
-                      transition-[var(--transition-fast)] min-w-[180px]">
+                      focus-within:bg-[var(--bg-primary)]
+                      focus-within:border-[color-mix(in_srgb,var(--border-secondary)_50%,transparent)]
+                      focus-within:shadow-[0_0_0_2px_color-mix(in_srgb,var(--accent-primary)_15%,transparent)]
+                      transition-[var(--transition-fast)] min-w-[200px]">
             <i class="pi pi-search text-[10px] text-[var(--text-tertiary)] shrink-0"></i>
             <input
               type="text"
@@ -53,10 +56,10 @@ import { GridBulkAction, GridDensity } from '../grid-types';
           <button type="button"
                   class="flex items-center gap-1.5 px-3 py-1.5
                          rounded-[var(--ui-border-radius-pill)] text-[length:var(--font-size-xs)]
-                         font-[var(--font-weight-medium)] border border-transparent transition-[var(--transition-fast)] outline-none shadow-[var(--shadow-sm)]"
+                         font-[var(--font-weight-medium)] border border-transparent transition-[var(--transition-fast)] outline-none"
                   [class]="filterActive()
                     ? 'bg-[color-mix(in_srgb,var(--accent-primary)_10%,transparent)] text-[var(--accent-primary)]'
-                    : 'bg-[var(--bg-primary)] text-[var(--text-secondary)] hover:text-[var(--accent-primary)]'"
+                    : 'bg-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--component-bg-hover)]'"
                   (click)="filterToggle.emit()">
             <i class="pi text-[10px]"
                [class.pi-filter-fill]="filterActive()"
@@ -188,11 +191,11 @@ import { GridBulkAction, GridDensity } from '../grid-types';
 
       <!-- SELECTION BANNER (slides in when rows are selected) -->
       @if (selectedCount() > 0) {
-        <div class="flex items-center justify-between gap-3 px-4 py-2
-                    bg-[color-mix(in_srgb,var(--accent-primary)_8%,transparent)]
+        <div class="flex items-center justify-between gap-3 px-4 py-2 mt-2
+                    bg-[var(--bg-primary)]
                     border border-[color-mix(in_srgb,var(--accent-primary)_25%,transparent)]
-                    rounded-[var(--ui-border-radius)]
-                    animate-[apex-slide-down_0.15s_ease]">
+                    rounded-[var(--ui-border-radius-pill)] shadow-[var(--shadow-md)]
+                    animate-[apex-slide-down_0.15s_ease] relative z-10">
 
           <!-- Count chip + deselect -->
           <div class="flex items-center gap-2">
@@ -234,12 +237,12 @@ import { GridBulkAction, GridDensity } from '../grid-types';
   `,
   styles: [`
     .apex-tb-btn {
-      width: 30px;
-      height: 30px;
+      width: 28px;
+      height: 28px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      border-radius: var(--ui-border-radius-sm);
+      border-radius: 50%;
       color: var(--text-secondary);
       background: transparent;
       border: none;

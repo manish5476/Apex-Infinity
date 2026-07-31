@@ -28,8 +28,8 @@ import { GridDensity } from '../grid-types';
           }
           <!-- Actions skeleton -->
           <div class="w-24 shrink-0 flex items-center justify-end gap-1 px-3">
-            <div class="w-6 h-6 rounded-[var(--ui-border-radius-sm)] apex-dg-skeleton"></div>
-            <div class="w-6 h-6 rounded-[var(--ui-border-radius-sm)] apex-dg-skeleton"></div>
+            <div class="w-6 h-6 rounded-full apex-dg-skeleton"></div>
+            <div class="w-6 h-6 rounded-full apex-dg-skeleton"></div>
           </div>
         </div>
       }

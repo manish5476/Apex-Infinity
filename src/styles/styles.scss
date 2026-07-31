@@ -16,144 +16,6 @@
 @import 'leaflet/dist/leaflet.css';
 
 
-/* ==========================================================================
-   TAILWIND THEME CONFIGURATION
-   ========================================================================== */
-// @theme {
-//   /* Colors */
-//   --color-accent-primary: var(--accent-primary);
-//   --color-accent-secondary: var(--accent-secondary);
-//   --color-accent-tertiary: var(--accent-tertiary);
-//   --color-accent-hover: var(--accent-hover);
-//   --color-success: var(--color-success);
-//   --color-warning: var(--color-warning);
-//   --color-error: var(--color-error);
-//   --color-info: var(--color-info);
-
-//   /* Backgrounds & Text */
-//   --color-surface-primary: var(--bg-primary);
-//   --color-surface-secondary: var(--bg-secondary);
-//   --color-text-primary: var(--text-primary);
-//   --color-text-secondary: var(--text-secondary);
-//   --color-border-primary: var(--border-primary);
-
-//   /* Spacing */
-//   --spacing-xs: var(--spacing-xs);
-//   --spacing-sm: var(--spacing-sm);
-//   --spacing-md: var(--spacing-md);
-//   --spacing-lg: var(--spacing-lg);
-//   --spacing-xl: var(--spacing-xl);
-//   --spacing-2xl: var(--spacing-2xl);
-
-//   /* Border Radius */
-//   --radius-sm: var(--ui-border-radius-sm);
-//   --radius-md: var(--ui-border-radius);
-//   --radius-lg: var(--ui-border-radius-lg);
-//   --radius-xl: var(--ui-border-radius-xl);
-
-//   /* Shadows */
-//   --shadow-xs: var(--shadow-xs);
-//   --shadow-sm: var(--shadow-sm);
-//   --shadow-md: var(--shadow-md);
-//   --shadow-lg: var(--shadow-lg);
-//   --shadow-xl: var(--shadow-xl);
-// }
-
-/* ==========================================================================
-   2. GLOBAL VARIABLES & OVERRIDES
-   ========================================================================== */
-:root {
-  /* ==========================================================================
-     1. TYPOGRAPHY (Fluid Compact Scale)
-     ========================================================================== */
-  --font-body: 'Inter', -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  --font-heading: 'Plus Jakarta Sans', -apple-system, system-ui, sans-serif;
-  --font-mono: 'Fira Code', 'Courier New', monospace;
-
-  --font-size-xs: clamp(0.55rem, 0.2vw + 0.5rem, 0.65rem);
-  --font-size-sm: clamp(0.65rem, 0.2vw + 0.6rem, 0.75rem);
-  --font-size-base: clamp(0.75rem, 0.2vw + 0.7rem, 0.8125rem);
-  --font-size-md: clamp(0.8125rem, 0.2vw + 0.75rem, 0.875rem);
-  --font-size-lg: clamp(0.875rem, 0.2vw + 0.8rem, 0.9375rem);
-  --font-size-xl: clamp(0.9375rem, 0.3vw + 0.85rem, 1rem);
-  --font-size-2xl: clamp(1rem, 0.4vw + 0.9rem, 1.125rem);
-  --font-size-3xl: clamp(1.125rem, 0.8vw + 0.9rem, 1.375rem);
-  --font-size-4xl: clamp(1.375rem, 1.2vw + 1rem, 1.75rem);
-  --font-size-5xl: clamp(1.75rem, 1.5vw + 1.25rem, 2.25rem);
-
-  --line-height-tight: 1.1;
-  --line-height-normal: 1.3;
-  --line-height-relaxed: 1.5;
-
-  --font-weight-light: 300;
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
-
-  /* ==========================================================================
-     2. SPACING (Fluid Compact Grid)
-     ========================================================================== */
-  --spacing-xs: clamp(0.125rem, 0.2vw + 0.1rem, 0.25rem);
-  --spacing-sm: clamp(0.25rem, 0.3vw + 0.15rem, 0.375rem);
-  --spacing-md: clamp(0.375rem, 0.4vw + 0.2rem, 0.5rem);
-  --spacing-lg: clamp(0.5rem, 0.5vw + 0.3rem, 0.75rem);
-  --spacing-xl: clamp(0.75rem, 0.8vw + 0.4rem, 1rem);
-  --spacing-2xl: clamp(1rem, 1.2vw + 0.5rem, 1.5rem);
-  --spacing-3xl: clamp(1.5rem, 1.5vw + 0.75rem, 2rem);
-  --spacing-4xl: clamp(2rem, 2vw + 1rem, 2.75rem);
-  --spacing-5xl: clamp(2.5rem, 3vw + 1.5rem, 3.5rem);
-
-  /* ==========================================================================
-     3. UI CONSTANTS & BASE SHADOWS
-     ========================================================================== */
-  --ui-border-radius-sm: 6px;
-  --ui-border-radius: 10px;
-  --ui-border-radius-lg: clamp(16px, 2vw, 20px);
-  --ui-border-radius-xl: clamp(20px, 3vw, 28px);
-  --ui-border-radius-pill: 9999px;
-
-  --ui-border-width: 1px;
-  --ui-border-width-lg: 2px;
-
-  /* Base shadows (non-themed, use for structural chrome) */
-  --shadow-xs: 0 0.5px 1px rgba(0, 0, 0, 0.04);
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0 8px 24px rgba(0, 0, 0, 0.12);
-  --shadow-2xl: 0 12px 32px rgba(0, 0, 0, 0.15);
-  --shadow-3xl: 0 16px 40px rgba(0, 0, 0, 0.18);
-
-  /* ==========================================================================
-     4. ANIMATIONS & INTERACTION
-     ========================================================================== */
-  --transition-fast: all 0.12s cubic-bezier(0.23, 1, 0.32, 1);
-  --transition-base: all 0.22s cubic-bezier(0.2, 0.9, 0.2, 1);
-  --transition-slow: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-  --p-mask-transition-duration: 0.2s;
-
-  --focus-ring-width: 2px;
-  --focus-ring-offset: 2px;
-  --focus-outline-width: 3px;
-
-  --z-dropdown: 100;
-  --z-sticky: 200;
-  --z-fixed: 300;
-  --z-modal-backdrop: 400;
-  --z-modal: 500;
-  --z-toast: 600;
-  --z-tooltip: 700;
-
-  /* Global Card Tokens (Mapped to Master Theme) */
-  --card-bg: var(--bg-secondary);
-  --card-border: var(--ui-border-width) solid var(--border-primary);
-  --card-shadow: var(--shadow-sm);
-  --card-shadow-hover: var(--elevation-2);
-  --card-radius: var(--ui-border-radius-xl);
-  --card-padding: var(--spacing-xl);
-}
-
 body {
   font-family: var(--font-body);
   background-color: var(--bg-primary);
@@ -1519,1225 +1381,9 @@ app-ag-share-grid {
   min-height: 0 !important;
 }
 
-// /* =============================================================================
-//    APEX CRM — AG Grid Cell Utility Classes
-//    Add this block to apex-ui-classes.scss (or import as a partial)
-//    These classes are used by the invoice-list.columns.ts cell renderers.
-//    All values reference theme tokens from apex-themes-v2.scss.
-//    ============================================================================= */
-
-// /* ── Layout helpers ─────────────────────────────────────────────────────────── */
-// .cell-flex-center {
-//   display: flex;
-//   align-items: center;
-//   height: 100%;
-//   overflow: hidden;
-// }
-
-// .cell-flex-end {
-//   display: flex;
-//   align-items: center;
-//   justify-content: flex-end;
-//   height: 100%;
-//   overflow: hidden;
-// }
-
-// .cell-stack {
-//   display: flex;
-//   flex-direction: column;
-//   justify-content: center;
-//   gap: 2px;
-//   height: 100%;
-//   overflow: hidden;
-// }
-
-// .cell-stack.align-end {
-//   align-items: flex-end;
-// }
-
-// .cell-customer {
-//   display: flex;
-//   align-items: center;
-//   gap: var(--spacing-sm);
-//   height: 100%;
-//   overflow: hidden;
-
-//   .customer-info {
-//     display: flex;
-//     flex-direction: column;
-//     gap: 1px;
-//     min-width: 0;
-//   }
-
-//   .customer-name {
-//     font-size: var(--font-size-sm);
-//     font-weight: var(--font-weight-semibold);
-//     color: var(--theme-text-primary);
-//     white-space: nowrap;
-//     overflow: hidden;
-//     text-overflow: ellipsis;
-//   }
-
-//   .customer-contact {
-//     display: flex;
-//     align-items: center;
-//     gap: 3px;
-//     font-size: var(--font-size-xs);
-//     color: var(--theme-text-tertiary);
-//     white-space: nowrap;
-//     overflow: hidden;
-//     text-overflow: ellipsis;
-//   }
-// }
-
-// /* ── Gap utilities ──────────────────────────────────────────────────────────── */
-// .gap-xs {
-//   gap: var(--spacing-xs, 4px);
-// }
-
-// .gap-sm {
-//   gap: var(--spacing-sm, 6px);
-// }
-
-// /* ── Padding overrides ──────────────────────────────────────────────────────── */
-// .px-sm {
-//   padding-inline: var(--spacing-sm, 6px);
-// }
-
-// /* ── Width ──────────────────────────────────────────────────────────────────── */
-// .w-full {
-//   width: 100%;
-// }
-
-// /* ── Line height helpers ────────────────────────────────────────────────────── */
-// .line-tight {
-//   line-height: var(--line-height-tight, 1.1);
-// }
-
-// /* ── Ellipsis truncation ────────────────────────────────────────────────────── */
-// .ellipsis {
-//   white-space: nowrap;
-//   overflow: hidden;
-//   text-overflow: ellipsis;
-// }
-
-// /* ── Typography helpers ─────────────────────────────────────────────────────── */
-// .font-mono {
-//   font-family: var(--font-mono);
-// }
-
-// .font-bold {
-//   font-weight: var(--font-weight-bold);
-// }
-
-// .font-semibold {
-//   font-weight: var(--font-weight-semibold);
-// }
-
-// .text-xs {
-//   font-size: var(--font-size-xs);
-// }
-
-// .text-sm {
-//   font-size: var(--font-size-sm);
-// }
-
-// .text-primary {
-//   color: var(--theme-text-primary);
-// }
-
-// .text-secondary {
-//   color: var(--theme-text-secondary);
-// }
-
-// .text-tertiary {
-//   color: var(--theme-text-tertiary);
-// }
-
-// .text-accent {
-//   color: var(--theme-accent-primary);
-// }
-
-// .text-info {
-//   color: var(--theme-info);
-// }
-
-// .text-success {
-//   color: var(--theme-success);
-// }
-
-// .text-warning {
-//   color: var(--theme-warning);
-// }
-
-// .text-error {
-//   color: var(--theme-error);
-// }
-
-// .tracking-tight {
-//   letter-spacing: -0.02em;
-// }
-
-// /* ── Cursor / interaction ───────────────────────────────────────────────────── */
-// .cursor-pointer {
-//   cursor: pointer;
-// }
-
-// .hover-underline:hover {
-//   text-decoration: underline;
-// }
-
-// /* ── Avatar tokens ──────────────────────────────────────────────────────────── */
-// /* Used by inline renderers that still build avatars manually (legacy support) */
-// .avatar-xs {
-//   display: inline-flex;
-//   align-items: center;
-//   justify-content: center;
-//   width: 24px;
-//   height: 24px;
-//   border-radius: 50%;
-//   font-size: 9px;
-//   font-weight: var(--font-weight-bold);
-//   flex-shrink: 0;
-//   letter-spacing: 0.02em;
-// }
-
-// .avatar-sm {
-//   display: inline-flex;
-//   align-items: center;
-//   justify-content: center;
-//   width: 32px;
-//   height: 32px;
-//   border-radius: 50%;
-//   font-size: 11px;
-//   font-weight: var(--font-weight-bold);
-//   flex-shrink: 0;
-//   letter-spacing: 0.02em;
-// }
-
-// /* ── Icon size helpers ──────────────────────────────────────────────────────── */
-// /* Works for both Tabler (ti) and PrimeIcons (pi) */
-// .icon-xxs {
-//   font-size: 10px;
-// }
-
-// .icon-xs {
-//   font-size: 13px;
-// }
-
-// .icon-sm {
-//   font-size: 15px;
-// }
-
-// .icon-md {
-//   font-size: 18px;
-// }
-
-// .icon-accent-muted {
-//   color: color-mix(in srgb, var(--theme-accent-primary) 60%, transparent 40%);
-// }
-
-// /* ── Grid badge (pill) ─────────────────────────────────────────────────────── */
-// .grid-badge {
-//   display: inline-flex;
-//   align-items: center;
-//   padding: 3px 10px;
-//   border-radius: var(--ui-border-radius-pill);
-//   font-size: 11px;
-//   font-weight: var(--font-weight-semibold);
-//   letter-spacing: 0.02em;
-//   white-space: nowrap;
-//   line-height: 1.4;
-// }
-
-// /* Semantic variants */
-// .badge-info-soft {
-//   background: var(--color-info-bg);
-//   color: var(--color-info-dark);
-// }
-
-// .badge-warning-soft {
-//   background: var(--color-warning-bg);
-//   color: var(--color-warning-dark);
-// }
-
-// .badge-success-soft {
-//   background: var(--color-success-bg);
-//   color: var(--color-success-dark);
-// }
-
-// .badge-error-soft {
-//   background: var(--color-error-bg);
-//   color: var(--color-error-dark);
-// }
-
-// .badge-neutral-soft {
-//   background: var(--theme-bg-secondary);
-//   color: var(--theme-text-secondary);
-// }
-
-// /* Dynamic badge — colour injected via style attribute from _resolveBadgeTheme() */
-// .badge-dynamic {
-//   /* base styles only; bg & color set inline */
-// }
-
-// /* Solid success (used for "✓ Paid") */
-// .badge-success-solid {
-//   display: inline-flex;
-//   align-items: center;
-//   gap: 4px;
-//   padding: 3px 10px;
-//   border-radius: var(--ui-border-radius-pill);
-//   background: var(--theme-success);
-//   color: #fff;
-//   font-size: 11px;
-//   font-weight: var(--font-weight-bold);
-// }
-
-// /* ── Alert tag (inline overdue / due-soon label) ───────────────────────────── */
-// .tag-alert {
-//   display: inline-flex;
-//   align-items: center;
-//   gap: 3px;
-//   font-size: 10px;
-//   font-weight: var(--font-weight-semibold);
-//   letter-spacing: 0.02em;
-//   line-height: 1;
-// }
-
-// /* ── Progress bar (balance due cell) ──────────────────────────────────────── */
-// .progress-track {
-//   width: 100%;
-//   height: 3px;
-//   background: color-mix(in srgb, var(--theme-border-primary) 60%, transparent 40%);
-//   border-radius: 99px;
-//   overflow: hidden;
-// }
-
-// .progress-fill {
-//   height: 100%;
-//   background: var(--theme-accent-primary);
-//   border-radius: 99px;
-//   transition: width 0.3s ease;
-// }
-
-
-
-
-// // /* ==========================================================================
-// //    APEX INFINITY — GLOBAL STYLESHEET (v3.0)
-// //    Architecture: Enterprise Canonical Token System + Atomic Utilities
-// //    Prefix: ax- (Apex Experience)
-// //    ========================================================================== */
-
-// // /* ==========================================================================
-// //    1. IMPORTS
-// //    ========================================================================== */
-// // @use 'tailwindcss';
-// // @import 'primeicons/primeicons.css';
-// // @import 'leaflet/dist/leaflet.css';
-
-// // /* ==========================================================================
-// //    2. GLOBAL TOKENS (Single Source of Truth)
-// //    ========================================================================== */
-// // :root {
-// //   /* Typography (Fluid Compact Scale) */
-// //   --font-body: 'Inter', -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-// //   --font-heading: 'Plus Jakarta Sans', -apple-system, system-ui, sans-serif;
-// //   --font-mono: 'Fira Code', 'Courier New', monospace;
-
-// //   --font-size-xs: clamp(0.55rem, 0.2vw + 0.5rem, 0.65rem);
-// //   --font-size-sm: clamp(0.65rem, 0.2vw + 0.6rem, 0.75rem);
-// //   --font-size-base: clamp(0.75rem, 0.2vw + 0.7rem, 0.8125rem);
-// //   --font-size-md: clamp(0.8125rem, 0.2vw + 0.75rem, 0.875rem);
-// //   --font-size-lg: clamp(0.875rem, 0.2vw + 0.8rem, 0.9375rem);
-// //   --font-size-xl: clamp(0.9375rem, 0.3vw + 0.85rem, 1rem);
-// //   --font-size-2xl: clamp(1rem, 0.4vw + 0.9rem, 1.125rem);
-// //   --font-size-3xl: clamp(1.125rem, 0.8vw + 0.9rem, 1.375rem);
-// //   --font-size-4xl: clamp(1.375rem, 1.2vw + 1rem, 1.75rem);
-
-// //   --line-height-tight: 1.1;
-// //   --line-height-normal: 1.3;
-// //   --line-height-relaxed: 1.5;
-
-// //   --font-weight-normal: 400;
-// //   --font-weight-medium: 500;
-// //   --font-weight-semibold: 600;
-// //   --font-weight-bold: 700;
-
-// //   /* Spacing (Fluid) */
-// //   --spacing-xs: clamp(0.125rem, 0.2vw + 0.1rem, 0.25rem);
-// //   --spacing-sm: clamp(0.25rem, 0.3vw + 0.15rem, 0.375rem);
-// //   --spacing-md: clamp(0.375rem, 0.4vw + 0.2rem, 0.5rem);
-// //   --spacing-lg: clamp(0.5rem, 0.5vw + 0.3rem, 0.75rem);
-// //   --spacing-xl: clamp(0.75rem, 0.8vw + 0.4rem, 1rem);
-// //   --spacing-2xl: clamp(1rem, 1.2vw + 0.5rem, 1.5rem);
-// //   --spacing-3xl: clamp(1.5rem, 1.5vw + 0.75rem, 2rem);
-// //   --spacing-4xl: clamp(2rem, 2vw + 1rem, 2.75rem);
-
-// //   /* Geometry & Borders */
-// //   --ui-border-radius-sm: 6px;
-// //   --ui-border-radius: 10px;
-// //   --ui-border-radius-lg: clamp(16px, 2vw, 20px);
-// //   --ui-border-radius-xl: clamp(20px, 3vw, 28px);
-// //   --ui-border-radius-pill: 9999px;
-// //   --ui-border-width: 1px;
-
-// //   /* Base Shadows */
-// //   --shadow-xs: 0 0.5px 1px rgba(0, 0, 0, 0.04);
-// //   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-// //   --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.08);
-
-// //   /* Interactions */
-// //   --transition-fast: all 0.12s cubic-bezier(0.23, 1, 0.32, 1);
-// //   --transition-base: all 0.22s cubic-bezier(0.2, 0.9, 0.2, 1);
-// //   --focus-ring-width: 2px;
-// //   --z-sticky: 200;
-// //   --z-modal: 500;
-// // }
-
-// // /* ==========================================================================
-// //    3. CSS RESET & DOCUMENT BASE
-// //    ========================================================================== */
-// // html,
-// // body {
-// //   margin: 0;
-// //   padding: 0;
-// //   width: 100%;
-// //   height: 100%;
-// // }
-
-// // body {
-// //   font-family: var(--font-body);
-// //   background-color: var(--bg-primary);
-// //   color: var(--text-primary);
-// //   -webkit-font-smoothing: antialiased;
-// //   -moz-osx-font-smoothing: grayscale;
-// //   line-height: var(--line-height-normal);
-// // }
-
-// // *,
-// // *::before,
-// // *::after {
-// //   box-sizing: border-box;
-// // }
-
-// // /* Custom Scrollbars */
-// // * {
-// //   scrollbar-width: thin;
-// //   scrollbar-color: var(--scroll-thumb-c, var(--border-primary)) transparent;
-// // }
-
-// // ::-webkit-scrollbar {
-// //   width: 6px;
-// //   height: 6px;
-// // }
-
-// // ::-webkit-scrollbar-track {
-// //   background: transparent;
-// // }
-
-// // ::-webkit-scrollbar-thumb {
-// //   background: var(--scroll-thumb-c, var(--border-primary));
-// //   border-radius: var(--ui-border-radius-pill);
-// // }
-
-// // /* ==========================================================================
-// //    4. ATOMIC UTILITY FRAMEWORK (ax- prefix)
-// //    ========================================================================== */
-
-// // /* ── Display & Position ── */
-// // .ax-flex {
-// //   display: flex;
-// // }
-
-// // .ax-inline-flex {
-// //   display: inline-flex;
-// // }
-
-// // .ax-grid {
-// //   display: grid;
-// // }
-
-// // .ax-block {
-// //   display: block;
-// // }
-
-// // .ax-hidden {
-// //   display: none !important;
-// // }
-
-// // .ax-relative {
-// //   position: relative;
-// // }
-
-// // .ax-absolute {
-// //   position: absolute;
-// // }
-
-// // .ax-fixed {
-// //   position: fixed;
-// // }
-
-// // .ax-sticky {
-// //   position: sticky;
-// //   top: 0;
-// //   z-index: var(--z-sticky);
-// // }
-
-// // .ax-inset-0 {
-// //   position: absolute;
-// //   top: 0;
-// //   right: 0;
-// //   bottom: 0;
-// //   left: 0;
-// // }
-
-// // .ax-w-full {
-// //   width: 100%;
-// // }
-
-// // .ax-h-full {
-// //   height: 100%;
-// // }
-
-// // /* ── Flex Alignment ── */
-// // .ax-flex-col {
-// //   flex-direction: column;
-// // }
-
-// // .ax-flex-row {
-// //   flex-direction: row;
-// // }
-
-// // .ax-wrap {
-// //   flex-wrap: wrap;
-// // }
-
-// // .ax-nowrap {
-// //   flex-wrap: nowrap;
-// // }
-
-// // .ax-items-start {
-// //   align-items: flex-start;
-// // }
-
-// // .ax-items-center {
-// //   align-items: center;
-// // }
-
-// // .ax-items-end {
-// //   align-items: flex-end;
-// // }
-
-// // .ax-items-stretch {
-// //   align-items: stretch;
-// // }
-
-// // .ax-justify-start {
-// //   justify-content: flex-start;
-// // }
-
-// // .ax-justify-center {
-// //   justify-content: center;
-// // }
-
-// // .ax-justify-end {
-// //   justify-content: flex-end;
-// // }
-
-// // .ax-justify-between {
-// //   justify-content: space-between;
-// // }
-
-// // .ax-flex-1 {
-// //   flex: 1;
-// //   min-width: 0;
-// //   min-height: 0;
-// // }
-
-// // .ax-shrink-0 {
-// //   flex-shrink: 0;
-// // }
-
-// // /* ── Spacing (Gap) ── */
-// // .ax-gap-xs {
-// //   gap: var(--spacing-xs);
-// // }
-
-// // .ax-gap-sm {
-// //   gap: var(--spacing-sm);
-// // }
-
-// // .ax-gap-md {
-// //   gap: var(--spacing-md);
-// // }
-
-// // .ax-gap-lg {
-// //   gap: var(--spacing-lg);
-// // }
-
-// // .ax-gap-xl {
-// //   gap: var(--spacing-xl);
-// // }
-
-// // .ax-gap-2xl {
-// //   gap: var(--spacing-2xl);
-// // }
-
-// // /* ── Spacing (Padding) ── */
-// // .ax-p-0 {
-// //   padding: 0;
-// // }
-
-// // .ax-p-xs {
-// //   padding: var(--spacing-xs);
-// // }
-
-// // .ax-p-sm {
-// //   padding: var(--spacing-sm);
-// // }
-
-// // .ax-p-md {
-// //   padding: var(--spacing-md);
-// // }
-
-// // .ax-p-lg {
-// //   padding: var(--spacing-lg);
-// // }
-
-// // .ax-p-xl {
-// //   padding: var(--spacing-xl);
-// // }
-
-// // .ax-p-2xl {
-// //   padding: var(--spacing-2xl);
-// // }
-
-// // .ax-px-sm {
-// //   padding-left: var(--spacing-sm);
-// //   padding-right: var(--spacing-sm);
-// // }
-
-// // .ax-px-md {
-// //   padding-left: var(--spacing-md);
-// //   padding-right: var(--spacing-md);
-// // }
-
-// // .ax-px-lg {
-// //   padding-left: var(--spacing-lg);
-// //   padding-right: var(--spacing-lg);
-// // }
-
-// // .ax-px-xl {
-// //   padding-left: var(--spacing-xl);
-// //   padding-right: var(--spacing-xl);
-// // }
-
-// // .ax-py-sm {
-// //   padding-top: var(--spacing-sm);
-// //   padding-bottom: var(--spacing-sm);
-// // }
-
-// // .apex-py-md {
-// //   padding-top: var(--spacing-md);
-// //   padding-bottom: var(--spacing-md);
-// // }
-
-// // /* Kept legacy apex- temporarily to prevent breaks */
-// // .ax-py-md {
-// //   padding-top: var(--spacing-md);
-// //   padding-bottom: var(--spacing-md);
-// // }
-
-// // /* ── Spacing (Margin) ── */
-// // .ax-m-0 {
-// //   margin: 0;
-// // }
-
-// // .ax-mt-xs {
-// //   margin-top: var(--spacing-xs);
-// // }
-
-// // .ax-mt-sm {
-// //   margin-top: var(--spacing-sm);
-// // }
-
-// // .ax-mt-md {
-// //   margin-top: var(--spacing-md);
-// // }
-
-// // .ax-mb-sm {
-// //   margin-bottom: var(--spacing-sm);
-// // }
-
-// // .ax-mb-md {
-// //   margin-bottom: var(--spacing-md);
-// // }
-
-// // .ax-mb-lg {
-// //   margin-bottom: var(--spacing-lg);
-// // }
-
-// // .ax-ml-auto {
-// //   margin-left: auto;
-// // }
-
-// // .ax-mr-auto {
-// //   margin-right: auto;
-// // }
-
-// // /* ── Typography ── */
-// // .ax-font-heading {
-// //   font-family: var(--font-heading);
-// // }
-
-// // .ax-font-mono {
-// //   font-family: var(--font-mono);
-// // }
-
-// // .ax-text-3xl {
-// //   font-size: var(--font-size-3xl);
-// // }
-
-// // .ax-text-2xl {
-// //   font-size: var(--font-size-2xl);
-// // }
-
-// // .ax-text-xl {
-// //   font-size: var(--font-size-xl);
-// // }
-
-// // .ax-text-lg {
-// //   font-size: var(--font-size-lg);
-// // }
-
-// // .ax-text-base {
-// //   font-size: var(--font-size-base);
-// // }
-
-// // .ax-text-sm {
-// //   font-size: var(--font-size-sm);
-// // }
-
-// // .ax-text-xs {
-// //   font-size: var(--font-size-xs);
-// // }
-
-// // .ax-font-normal {
-// //   font-weight: var(--font-weight-normal);
-// // }
-
-// // .ax-font-medium {
-// //   font-weight: var(--font-weight-medium);
-// // }
-
-// // .ax-font-semibold {
-// //   font-weight: var(--font-weight-semibold);
-// // }
-
-// // .ax-font-bold {
-// //   font-weight: var(--font-weight-bold);
-// // }
-
-// // .ax-text-center {
-// //   text-align: center;
-// // }
-
-// // .ax-text-right {
-// //   text-align: right;
-// // }
-
-// // .ax-uppercase {
-// //   text-transform: uppercase;
-// // }
-
-// // .ax-capitalize {
-// //   text-transform: capitalize;
-// // }
-
-// // .ax-line-tight {
-// //   line-height: 1.1 !important;
-// //   display: block;
-// //   margin: 0;
-// // }
-
-// // .ax-truncate {
-// //   white-space: nowrap;
-// //   overflow: hidden;
-// //   text-overflow: ellipsis;
-// //   display: block;
-// //   max-width: 100%;
-// // }
-
-// // /* Semantic Colors */
-// // .ax-text-primary {
-// //   color: var(--text-primary);
-// // }
-
-// // .ax-text-secondary {
-// //   color: var(--text-secondary);
-// // }
-
-// // .ax-text-tertiary {
-// //   color: var(--text-tertiary);
-// // }
-
-// // .ax-text-accent {
-// //   color: var(--accent-primary);
-// // }
-
-// // .ax-text-success {
-// //   color: var(--color-success);
-// // }
-
-// // .ax-text-warning {
-// //   color: var(--color-warning);
-// // }
-
-// // .ax-text-error {
-// //   color: var(--color-error);
-// // }
-
-// // .ax-text-info {
-// //   color: var(--color-info);
-// // }
-
-// // /* ── Backgrounds & Borders ── */
-// // .ax-bg-primary {
-// //   background-color: var(--bg-primary);
-// // }
-
-// // .ax-bg-secondary {
-// //   background-color: var(--bg-secondary);
-// // }
-
-// // .ax-bg-tertiary {
-// //   background-color: var(--bg-ternary);
-// // }
-
-// // .ax-bg-gradient {
-// //   background: var(--accent-gradient);
-// //   color: #fff;
-// // }
-
-// // .ax-border {
-// //   border: var(--ui-border-width) solid var(--border-primary);
-// // }
-
-// // .ax-border-b {
-// //   border-bottom: var(--ui-border-width) solid var(--component-divider);
-// // }
-
-// // .ax-border-t {
-// //   border-top: var(--ui-border-width) solid var(--component-divider);
-// // }
-
-// // .ax-border-transparent {
-// //   border: var(--ui-border-width) solid transparent;
-// // }
-
-// // /* Semantic Backgrounds */
-// // .ax-bg-success-soft {
-// //   background: var(--color-success-bg);
-// //   color: var(--color-success);
-// //   border: 1px solid var(--color-success-border);
-// // }
-
-// // .ax-bg-warning-soft {
-// //   background: var(--color-warning-bg);
-// //   color: var(--color-warning);
-// //   border: 1px solid var(--color-warning-border);
-// // }
-
-// // .ax-bg-error-soft {
-// //   background: var(--color-error-bg);
-// //   color: var(--color-error);
-// //   border: 1px solid var(--color-error-border);
-// // }
-
-// // .ax-bg-info-soft {
-// //   background: var(--color-info-bg);
-// //   color: var(--color-info);
-// //   border: 1px solid var(--color-info-border);
-// // }
-
-// // /* ── Radius & Elevation ── */
-// // .ax-rounded-sm {
-// //   border-radius: var(--ui-border-radius-sm);
-// // }
-
-// // .ax-rounded {
-// //   border-radius: var(--ui-border-radius);
-// // }
-
-// // .ax-rounded-lg {
-// //   border-radius: var(--ui-border-radius-lg);
-// // }
-
-// // .ax-rounded-xl {
-// //   border-radius: var(--ui-border-radius-xl);
-// // }
-
-// // .ax-rounded-pill {
-// //   border-radius: var(--ui-border-radius-pill);
-// // }
-
-// // .ax-rounded-full {
-// //   border-radius: 50%;
-// // }
-
-// // .ax-shadow-1 {
-// //   box-shadow: var(--elevation-1);
-// // }
-
-// // .ax-shadow-2 {
-// //   box-shadow: var(--elevation-2);
-// // }
-
-// // .ax-shadow-3 {
-// //   box-shadow: var(--elevation-3);
-// // }
-
-// // /* ── Interactive ── */
-// // .ax-cursor-pointer {
-// //   cursor: pointer;
-// // }
-
-// // .ax-hover-bg {
-// //   transition: background-color var(--transition-fast);
-// // }
-
-// // .ax-hover-bg:hover {
-// //   background-color: var(--component-bg-hover);
-// // }
-
-// // /* ==========================================================================
-// //    5. COMPONENT ABSTRACTIONS (Built from Utilities)
-// //    ========================================================================== */
-
-// // /* The Standard Card */
-// // .ax-card {
-// //   background: var(--bg-secondary);
-// //   border: var(--ui-border-width) solid var(--border-primary);
-// //   border-radius: var(--ui-border-radius-lg);
-// //   box-shadow: var(--elevation-1);
-// // }
-
-// // /* The Luxury Glass Card */
-// // .ax-glass-card {
-// //   background: var(--glass-bg-c);
-// //   backdrop-filter: blur(var(--glass-blur-c));
-// //   -webkit-backdrop-filter: blur(var(--glass-blur-c));
-// //   border: 1px solid var(--glass-border-c);
-// //   box-shadow: var(--glass-shadow-c);
-// //   border-radius: var(--ui-border-radius-xl);
-// // }
-
-// // /* Base CRM Badge (Strict Height & Padding fix for grids) */
-// // .ax-badge {
-// //   display: inline-flex;
-// //   align-items: center;
-// //   justify-content: center;
-// //   padding: 0 8px;
-// //   height: 20px;
-// //   border-radius: var(--ui-border-radius-pill);
-// //   font-size: 10px;
-// //   font-weight: var(--font-weight-bold);
-// //   text-transform: uppercase;
-// //   letter-spacing: 0.05em;
-// //   white-space: nowrap;
-// //   line-height: 1 !important;
-// // }
-
-// // /* ==========================================================================
-// //    6. LAYOUT & STRUCTURAL SYSTEMS
-// //    ========================================================================== */
-
-// // /* Page Level Layout */
-// // .ax-page-layout {
-// //   padding: var(--spacing-xl);
-// //   display: flex;
-// //   flex-direction: column;
-// //   gap: var(--spacing-xl);
-// //   height: 100%;
-// //   width: 100%;
-// //   overflow: hidden;
-
-// //   @media (max-width: 768px) {
-// //     padding: var(--spacing-md);
-// //     gap: var(--spacing-md);
-// //   }
-// // }
-
-// // /* Data Density: Compact Header/Filter Overrides */
-// // .ax-compact-header {
-// //   margin-bottom: var(--spacing-sm);
-// //   padding: var(--spacing-sm) var(--spacing-md);
-// //   min-height: 44px;
-// // }
-
-// // /* Unified Filters Area */
-// // .ax-filter-bar {
-// //   display: flex;
-// //   align-items: center;
-// //   gap: var(--spacing-sm);
-// //   padding: var(--spacing-sm) var(--spacing-md);
-// //   background: var(--bg-secondary);
-// //   border: var(--ui-border-width) solid var(--border-primary);
-// //   border-radius: var(--ui-border-radius);
-// //   flex-wrap: wrap;
-// //   min-height: 44px;
-
-// //   .ax-filter-item {
-// //     display: flex;
-// //     flex-direction: column;
-// //     gap: 3px;
-// //     flex: 1 1 170px;
-// //     min-width: 150px;
-// //     max-width: 240px;
-
-// //     label {
-// //       font-size: 10px;
-// //       line-height: 1.1;
-// //       letter-spacing: 0.04em;
-// //       color: var(--text-tertiary);
-// //       text-transform: uppercase;
-// //       font-weight: var(--font-weight-bold);
-// //     }
-// //   }
-
-// //   .ax-filter-actions {
-// //     display: flex;
-// //     align-items: flex-end;
-// //     gap: var(--spacing-xs);
-// //     margin-left: auto;
-// //   }
-// // }
-
-// // /* Bulletproof AG-Grid Wrapper (The Fix) */
-// // .ax-grid-host {
-// //   flex: 1 1 auto;
-// //   position: relative;
-// //   min-height: 350px;
-// //   /* Prevents Zero-Height blowout */
-// //   width: 100%;
-// //   border-radius: var(--ui-border-radius-lg);
-// //   overflow: hidden;
-// // }
-
-// // .ax-grid-fill {
-// //   position: absolute;
-// //   top: 0;
-// //   left: 0;
-// //   right: 0;
-// //   bottom: 0;
-// //   display: flex;
-// //   flex-direction: column;
-// // }
-
-// // /* Container component abstraction (for App/Dashboard) */
-// // .ax-container {
-// //   display: flex;
-// //   flex-direction: column;
-// //   background: var(--bg-primary);
-// //   border-radius: var(--ui-border-radius-lg);
-// //   box-shadow: var(--shadow-sm);
-// //   border: var(--ui-border-width) solid var(--border-primary);
-// //   overflow: hidden;
-
-// //   .ax-container-header {
-// //     padding: var(--spacing-md) var(--spacing-lg);
-// //     border-bottom: var(--ui-border-width) solid var(--border-secondary);
-// //     display: flex;
-// //     justify-content: space-between;
-// //     align-items: center;
-// //   }
-
-// //   .ax-container-body {
-// //     padding: var(--spacing-md);
-// //     flex: 1;
-// //     overflow-y: auto;
-// //   }
-// // }
-
-// // /* ==========================================================================
-// //    7. PRIME-NG OVERRIDES (Mapped to Tokens)
-// //    ========================================================================== */
-
-// // /* Universal Input Bases */
-// // .p-inputtext,
-// // .p-select,
-// // .p-multiselect,
-// // .p-datepicker-input,
-// // .p-inputnumber-input {
-// //   height: 2.25rem !important;
-// //   /* Forces all inputs to uniform height */
-// //   font-family: var(--font-body) !important;
-// //   font-size: var(--font-size-sm) !important;
-// //   border-radius: var(--ui-border-radius-sm) !important;
-// //   border: var(--ui-border-width) solid var(--border-primary) !important;
-// //   background: transparent !important;
-// //   color: var(--text-primary) !important;
-// //   padding: 0 var(--spacing-md) !important;
-// //   transition: var(--transition-base) !important;
-// //   display: inline-flex !important;
-// //   align-items: center !important;
-
-// //   &:hover:not(:disabled) {
-// //     border-color: var(--border-secondary) !important;
-// //     background: var(--component-bg-hover) !important;
-// //   }
-
-// //   &:focus,
-// //   &.p-focus {
-// //     border-color: var(--accent-primary) !important;
-// //     box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus) !important;
-// //     outline: none !important;
-// //   }
-
-// //   &::placeholder {
-// //     color: var(--text-tertiary) !important;
-// //   }
-// // }
-
-// // /* Universal Button Bases */
-// // .p-button {
-// //   display: inline-flex !important;
-// //   align-items: center !important;
-// //   justify-content: center !important;
-// //   height: 2.25rem !important;
-// //   /* Match Input Heights */
-// //   padding: 0 var(--spacing-md) !important;
-// //   font-family: var(--font-body) !important;
-// //   font-size: var(--font-size-sm) !important;
-// //   font-weight: var(--font-weight-semibold) !important;
-// //   border-radius: var(--ui-border-radius-sm) !important;
-// //   white-space: nowrap !important;
-// //   transition: var(--transition-base) !important;
-// //   border: 1px solid transparent !important;
-
-// //   /* Icon logic */
-// //   .p-button-icon {
-// //     font-size: 1rem !important;
-// //     margin-right: 6px !important;
-// //   }
-
-// //   &.p-button-icon-only {
-// //     padding: 0 !important;
-// //     width: 2.25rem !important;
-
-// //     .p-button-icon {
-// //       margin: 0 !important;
-// //     }
-// //   }
-
-// //   /* Button Variants */
-// //   &.p-button-primary {
-// //     background: var(--accent-gradient) !important;
-// //     color: #fff !important;
-// //   }
-
-// //   &.p-button-primary:hover:not(:disabled) {
-// //     filter: brightness(1.1);
-// //     transform: translateY(-1px);
-// //     box-shadow: var(--elevation-2);
-// //   }
-
-// //   &.p-button-outlined {
-// //     background: transparent !important;
-// //     border-color: var(--border-secondary) !important;
-// //     color: var(--text-secondary) !important;
-
-// //     &:hover:not(:disabled) {
-// //       background: var(--component-bg-hover) !important;
-// //       color: var(--text-primary) !important;
-// //     }
-// //   }
-
-// //   &.p-button-text {
-// //     background: transparent !important;
-// //     border: none !important;
-// //     color: var(--text-secondary) !important;
-
-// //     &:hover:not(:disabled) {
-// //       background: var(--component-bg-hover) !important;
-// //       color: var(--text-primary) !important;
-// //     }
-// //   }
-// // }
-
-// // /* Universal Dialog Overrides */
-// // .p-dialog-mask {
-// //   background-color: rgba(0, 0, 0, 0.6) !important;
-// //   backdrop-filter: blur(8px);
-// //   -webkit-backdrop-filter: blur(8px);
-// // }
-
-// // .p-dialog {
-// //   background: var(--component-surface-raised) !important;
-// //   border: 1px solid var(--border-primary) !important;
-// //   border-radius: var(--ui-border-radius-xl) !important;
-// //   box-shadow: var(--elevation-3) !important;
-
-// //   .p-dialog-header {
-// //     background: transparent !important;
-// //     border-bottom: 1px solid var(--component-divider) !important;
-// //     padding: var(--spacing-lg) var(--spacing-xl) !important;
-
-// //     .p-dialog-title {
-// //       font-family: var(--font-heading);
-// //       font-size: var(--font-size-lg);
-// //       font-weight: var(--font-weight-semibold);
-// //     }
-// //   }
-
-// //   .p-dialog-content {
-// //     background: transparent !important;
-// //     color: var(--text-primary) !important;
-// //     padding: var(--spacing-xl) !important;
-// //   }
-
-// //   .p-dialog-footer {
-// //     background: var(--bg-secondary) !important;
-// //     border-top: 1px solid var(--component-divider) !important;
-// //     padding: var(--spacing-lg) var(--spacing-xl) !important;
-// //   }
-// // }
-
-// // /* ==========================================================================
-// //    8. AG-GRID OVERRIDES & INTEGRATION
-// //    ========================================================================== */
-// // app-shared-grid,
-// // app-ag-share-grid {
-// //   display: block !important;
-// //   flex: 1 !important;
-// //   height: 100% !important;
-// //   width: 100% !important;
-// //   min-height: 0 !important;
-// // }
-
-// // /* Removes double borders when grid is inside an ax-card */
-// // .ax-card app-shared-grid .shared-grid-container,
-// // .ax-card app-ag-share-grid .shared-grid-root,
-// // .ax-glass-card app-ag-share-grid .shared-grid-root {
-// //   border: none !important;
-// //   background: transparent !important;
-// //   box-shadow: none !important;
-// //   backdrop-filter: none !important;
-// //   -webkit-backdrop-filter: none !important;
-// //   border-radius: 0 !important;
-// // }
-
-/* ==========================================================================
-   APEX ENTERPRISE DATA GRID  (app-data-grid)
-   All values reference design tokens — zero hardcoded colours.
-   Prefix: .apex-dg-*  (BEM-style, collision-safe)
-   ========================================================================== */
-
 /* ─── Host ─────────────────────────────────────────────────────────────── */
-app-data-grid { 
-  display: block; 
+app-data-grid {
+  display: block;
   width: 100%;
 }
 
@@ -2747,99 +1393,130 @@ app-data-grid {
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
   scrollbar-color: var(--scroll-thumb-c, var(--accent-primary)) transparent;
+  border-radius: var(--ui-border-radius-lg);
 }
-.apex-dg-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
-.apex-dg-scroll::-webkit-scrollbar-track  { background: transparent; }
-.apex-dg-scroll::-webkit-scrollbar-thumb  { background: color-mix(in srgb, var(--accent-primary) 40%, transparent); border-radius: 99px; }
+
+.apex-dg-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.apex-dg-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.apex-dg-scroll::-webkit-scrollbar-thumb {
+  background: var(--accent-primary);
+  border-radius: 99px;
+}
 
 /* ─── Table ─────────────────────────────────────────────────────────────── */
 .apex-dg-table {
   width: 100%;
-  border-collapse: separate; /* Allow rounded row corners & spacing */
-  border-spacing: 0 6px;     /* Gap between rows */
+  border-collapse: separate;
+  border-spacing: 0;
+  /* CRITICAL: Removed the gap to make it look solid */
   table-layout: auto;
+  background: var(--bg-primary);
+  /* Solid white/light background like the reference */
+  border-radius: var(--ui-border-radius-lg);
+  border: 1px solid var(--border-secondary);
+  overflow: hidden;
+  /* Ensures the corners stay rounded */
 }
 
 /* ─── Header ────────────────────────────────────────────────────────────── */
-.apex-dg-thead { 
-  background: transparent;
+.apex-dg-thead {
+  background: var(--bg-secondary);
+  /* Slight contrast for header */
 }
 
 .apex-dg-th {
-  padding: 0 16px;
-  height: 40px;
+  padding: 12px 16px;
+  height: 48px;
   white-space: nowrap;
   text-align: left;
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium); /* Softer font weight */
-  color: var(--text-tertiary);
-  text-transform: capitalize; /* Soft capitalization like reference */
-  letter-spacing: 0;
-  border-bottom: 1px dashed color-mix(in srgb, var(--border-secondary) 50%, transparent);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--border-secondary);
   user-select: none;
-  background: transparent;
 }
-.apex-dg-th--checkbox { width: 48px; min-width: 48px; max-width: 48px; }
-.apex-dg-th--actions  { width: 96px;  min-width: 96px; }
+
+.apex-dg-th--checkbox {
+  width: 40px;
+  min-width: 40px;
+  max-width: 40px;
+  padding: 0 8px;
+}
+
+.apex-dg-th--actions {
+  width: 80px;
+  min-width: 80px;
+  text-align: right;
+}
 
 /* ─── Row States ────────────────────────────────────────────────────────── */
 .apex-dg-row {
-  /* Use a pure white or very light background for individual floating rows */
-  background: var(--bg-primary);
-  transition: all 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
-  box-shadow: var(--shadow-sm); /* Subtle depth for floating rows */
+  background: transparent;
+  transition: background 0.15s ease;
+  border-bottom: 1px solid var(--border-primary);
 }
 
-/* Remove hover bg if it clashes, or make it very subtle */
+/* Last row should not have a bottom border */
+.apex-dg-row:last-child {
+  border-bottom: none;
+}
+
+/* Hover Effect: Pill-Shape Background (Like the reference) */
 .apex-dg-row:hover:not(.apex-dg-row--editing):not(.apex-dg-row--selected) {
   background: var(--component-bg-hover);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
+  box-shadow: none;
+  transform: none;
 }
 
 /* Selected Row (Vibrant like reference) */
 .apex-dg-row--selected {
-  background: var(--accent-primary) !important;
-  color: var(--text-on-accent) !important;
-  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent-primary) 30%, transparent);
-  transform: translateY(-1px);
+  background: var(--accent-focus) !important;
+  color: var(--text-primary) !important;
+  box-shadow: none;
+  transform: none;
 }
 
 /* Editing — only this row gets inputs */
 .apex-dg-row--editing {
-  background: color-mix(in srgb, var(--color-success) 4%, transparent) !important;
-  box-shadow: inset 3px 0 0 var(--color-success), var(--shadow-sm);
+  background: color-mix(in srgb, var(--color-success) 6%, transparent) !important;
+  box-shadow: inset 3px 0 0 var(--color-success);
 }
 
 /* New / unsaved */
 .apex-dg-row--new {
-  background: color-mix(in srgb, var(--accent-primary) 5%, transparent) !important;
-  box-shadow: inset 3px 0 0 var(--accent-primary), var(--shadow-sm);
-  animation: apex-row-pulse 2s ease infinite;
+  background: color-mix(in srgb, var(--accent-primary) 6%, transparent) !important;
+  box-shadow: inset 3px 0 0 var(--accent-primary);
 }
 
-/* Modified (saved locally, not yet sent to server) */
+/* Modified */
 .apex-dg-row--modified {
-  box-shadow: inset 3px 0 0 var(--color-warning), var(--shadow-sm);
+  box-shadow: inset 3px 0 0 var(--color-warning);
 }
 
 /* Error */
 .apex-dg-row--error {
-  background: color-mix(in srgb, var(--color-error) 4%, transparent) !important;
-  box-shadow: inset 3px 0 0 var(--color-error), var(--shadow-sm);
+  background: color-mix(in srgb, var(--color-error) 6%, transparent) !important;
+  box-shadow: inset 3px 0 0 var(--color-error);
 }
 
 /* Saving */
-.apex-dg-row--saving { opacity: 0.6; pointer-events: none; }
-/* Deleted (soft-delete) */
+.apex-dg-row--saving {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
 .apex-dg-row--deleted {
   opacity: 0.4;
   text-decoration: line-through;
-}
-
-@keyframes apex-row-pulse {
-  0%, 100% { box-shadow: inset 3px 0 0 var(--accent-primary), var(--shadow-sm); }
-  50%      { box-shadow: inset 3px 0 0 color-mix(in srgb, var(--accent-primary) 50%, transparent), var(--shadow-sm); }
 }
 
 /* ─── Cells ─────────────────────────────────────────────────────────────── */
@@ -2848,67 +1525,70 @@ app-data-grid {
   border: none;
   background: inherit;
   color: inherit;
-}
-
-/* Apply border radius to the first and last cells to make row pill-shaped */
-.apex-dg-td:first-child {
-  border-top-left-radius: 12px;
-  border-bottom-left-radius: 12px;
-}
-.apex-dg-td:last-child {
-  border-top-right-radius: 12px;
-  border-bottom-right-radius: 12px;
+  padding: 14px 16px;
+  /* Comfortable padding like the reference */
+  font-size: var(--font-size-sm);
 }
 
 .apex-dg-td--checkbox {
-  width: 48px;
-  min-width: 48px;
-  max-width: 48px;
-  padding: 0;
-}
-.apex-dg-td--actions {
-  width: 96px;
-  min-width: 96px;
+  width: 40px;
+  min-width: 40px;
+  max-width: 40px;
   padding: 0 8px;
 }
 
-/* Ensure text inside selected rows turns white (or correct contrasting color) */
+.apex-dg-td--actions {
+  width: 80px;
+  min-width: 80px;
+  text-align: right;
+}
+
+/* Ensure text inside selected rows does NOT turn white unless intended */
 .apex-dg-row--selected .apex-dg-td,
 .apex-dg-row--selected i,
 .apex-dg-row--selected span {
-  color: var(--text-on-accent) !important;
+  color: inherit;
 }
 
 /* ─── Density Variants ──────────────────────────────────────────────────── */
-.apex-dg--compact .apex-dg-td     { height: 44px; padding: 0 16px; font-size: var(--font-size-xs); }
-.apex-dg--compact .apex-dg-th     { height: 36px; }
-.apex-dg--normal .apex-dg-td      { height: 56px; padding: 0 16px; font-size: var(--font-size-sm); }
-.apex-dg--normal .apex-dg-th      { height: 44px; }
-.apex-dg--comfortable .apex-dg-td { height: 72px; padding: 0 20px; font-size: var(--font-size-base); }
-.apex-dg--comfortable .apex-dg-th { height: 52px; }
+.apex-dg--compact .apex-dg-td {
+  padding: 10px 16px;
+  font-size: var(--font-size-xs);
+}
 
-/* Override cells with density-aware padding */
-.apex-dg--compact .apex-dg-td--checkbox,
-.apex-dg--normal .apex-dg-td--checkbox,
-.apex-dg--comfortable .apex-dg-td--checkbox { padding: 0; }
+.apex-dg--compact .apex-dg-th {
+  height: 40px;
+  padding: 8px 16px;
+}
 
-/* ─── Sticky Columns ────────────────────────────────────────────────────── */
-.apex-dg-td--sticky-left,
-.apex-dg-th.sticky { position: sticky; z-index: 4; background: inherit; }
+.apex-dg--compact .apex-dg-td--checkbox {
+  padding: 0 8px;
+}
 
-.apex-dg-td--sticky-left { left: 0; }
-.apex-dg-td--sticky-right { right: 0; }
+.apex-dg--normal .apex-dg-td {
+  height: 52px;
+  padding: 12px 16px;
+}
 
-/* Sticky shadow separators (subtle) */
-.apex-dg-td--sticky-left  { box-shadow: 2px 0 5px -2px color-mix(in srgb, var(--text-primary) 5%, transparent); }
-.apex-dg-td--sticky-right { box-shadow: -2px 0 5px -2px color-mix(in srgb, var(--text-primary) 5%, transparent); }
+.apex-dg--normal .apex-dg-th {
+  height: 48px;
+}
+
+.apex-dg--comfortable .apex-dg-td {
+  height: 64px;
+  padding: 16px 20px;
+}
+
+.apex-dg--comfortable .apex-dg-th {
+  height: 52px;
+}
 
 /* ─── Checkbox ──────────────────────────────────────────────────────────── */
 .apex-dg-checkbox {
   display: block;
   width: 16px;
   height: 16px;
-  margin: 0 auto;
+  margin: 0;
   cursor: pointer;
   accent-color: var(--accent-primary);
   border-radius: 4px;
@@ -2916,11 +1596,12 @@ app-data-grid {
   flex-shrink: 0;
   transition: all 0.2s ease;
 }
+
 .apex-dg-checkbox:focus-visible {
   outline: 2px solid var(--accent-primary);
   outline-offset: 2px;
 }
-/* In selected rows, the checkbox should stand out (e.g. white border/check) */
+
 .apex-dg-row--selected .apex-dg-checkbox {
   accent-color: var(--text-on-accent);
 }
@@ -2930,4 +1611,4 @@ app-data-grid {
 .apex-dg-row.apex-dg-row--editing app-grid-actions .apex-act-btn--reveal {
   opacity: 1 !important;
   transform: scale(1) !important;
-}
+}
