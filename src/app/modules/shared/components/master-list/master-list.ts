@@ -100,7 +100,7 @@ export interface Master {
             (refresh)="loadMasters()">
           </app-data-grid>
 
-          </div> <!-- End Premium Container -->
+          </div> 
 
         </div>
       </app-page-content>
@@ -116,53 +116,53 @@ export class MasterList implements OnInit, OnDestroy {
 
   // Services
   private masterService = inject(MasterService);
-  private appMessage    = inject(AppMessageService);
+  private appMessage = inject(AppMessageService);
   private confirmationService = inject(ConfirmationService);
 
   // State
-  masters      = signal<Master[]>([]);
+  masters = signal<Master[]>([]);
   selectedRows = signal<Master[]>([]);
-  loading      = signal(false);
+  loading = signal(false);
 
   // Master type options (used in 'type' column)
   readonly masterTypes = [
-    { label: 'Department',   value: 'department' },
-    { label: 'Category',     value: 'category' },
+    { label: 'Department', value: 'department' },
+    { label: 'Category', value: 'category' },
     { label: 'Sub Category', value: 'sub_category' },
-    { label: 'Brand',        value: 'brand' },
-    { label: 'Unit',         value: 'unit' },
-    { label: 'Tax Rate',     value: 'tax_rate' },
+    { label: 'Brand', value: 'brand' },
+    { label: 'Unit', value: 'unit' },
+    { label: 'Tax Rate', value: 'tax_rate' },
   ];
 
   // ─── Column Definitions ─────────────────────────────────────────────────
   columns: GridColumn[] = [
     {
-      field:    'type',
-      header:   'Type',
-      type:     'select',
-      options:  this.masterTypes,
+      field: 'type',
+      header: 'Type',
+      type: 'select',
+      options: this.masterTypes,
       editable: true,
-      width:    '160px',
+      width: '160px',
       sortable: true,
       filterable: true,
     },
     {
-      field:    'name',
-      header:   'Master Name',
-      type:     'text',
+      field: 'name',
+      header: 'Master Name',
+      type: 'text',
       editable: true,
-      width:    '240px',
+      width: '240px',
       sortable: true,
       filterable: true,
       searchable: true,
-      required:   true,
+      required: true,
     },
     {
-      field:    'code',
-      header:   'Code',
-      type:     'text',
+      field: 'code',
+      header: 'Code',
+      type: 'text',
       editable: true,
-      width:    '120px',
+      width: '120px',
       sortable: true,
       filterable: true,
     },
@@ -171,29 +171,29 @@ export class MasterList implements OnInit, OnDestroy {
       header: 'Description',
       type: 'textarea',
       editable: true,
-      width:    '80px',
-      align:    'center',
+      width: '80px',
+      align: 'center',
       sortable: true,
       filterable: true,
     },
     {
-      field:    'isFeatured',
-      header:   'Featured',
-      type:     'boolean',
+      field: 'isFeatured',
+      header: 'Featured',
+      type: 'boolean',
       editable: true,
-      width:    '80px',
-      align:    'center',
+      width: '80px',
+      align: 'center',
     },
   ];
 
   // ─── Row Actions ────────────────────────────────────────────────────────
   rowActions: GridRowAction[] = [
     {
-      id:       'archive',
-      icon:     'pi pi-inbox',
-      label:    'Archive',
-      tooltip:  'Archive this record',
-      variant:  'ghost',
+      id: 'archive',
+      icon: 'pi pi-inbox',
+      label: 'Archive',
+      tooltip: 'Archive this record',
+      variant: 'ghost',
       showWhen: 'hover',
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       callback: (row: any) => {
@@ -205,9 +205,9 @@ export class MasterList implements OnInit, OnDestroy {
   // ─── Bulk Actions ────────────────────────────────────────────────────────
   bulkActions: GridBulkAction[] = [
     {
-      id:      'bulk-delete',
-      icon:    'pi pi-trash',
-      label:   'Delete',
+      id: 'bulk-delete',
+      icon: 'pi pi-trash',
+      label: 'Delete',
       variant: 'danger',
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       callback: (rows: any[], _ctx: GridContext) => {
@@ -215,9 +215,9 @@ export class MasterList implements OnInit, OnDestroy {
       },
     },
     {
-      id:      'bulk-activate',
-      icon:    'pi pi-check-circle',
-      label:   'Activate',
+      id: 'bulk-activate',
+      icon: 'pi pi-check-circle',
+      label: 'Activate',
       variant: 'primary',
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       callback: (rows: any[]) => {
@@ -303,10 +303,10 @@ export class MasterList implements OnInit, OnDestroy {
     const master = row as Master;
     this.confirmationService.confirm({
       message: `Delete <b>${master.name}</b>?`,
-      header:  'Confirm Delete',
-      icon:    'pi pi-exclamation-triangle',
+      header: 'Confirm Delete',
+      icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger p-button-text',
-      accept:  () => this.deleteMasters([master]),
+      accept: () => this.deleteMasters([master]),
     });
   }
 
@@ -320,10 +320,10 @@ export class MasterList implements OnInit, OnDestroy {
     if (!rows.length) return;
     this.confirmationService.confirm({
       message: `Delete <b>${rows.length}</b> records?`,
-      header:  'Confirm Bulk Delete',
-      icon:    'pi pi-exclamation-triangle',
+      header: 'Confirm Bulk Delete',
+      icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger p-button-text',
-      accept:  () => this.deleteMasters(rows),
+      accept: () => this.deleteMasters(rows),
     });
   }
 
@@ -348,28 +348,28 @@ export class MasterList implements OnInit, OnDestroy {
 
   private createEmptyMaster(): Master {
     return {
-      _id:         `new_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
-      type:        'category',
-      name:        '',
-      code:        '',
+      _id: `new_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+      type: 'category',
+      name: '',
+      code: '',
       description: '',
-      isActive:    true,
-      isFeatured:  false,
+      isActive: true,
+      isFeatured: false,
     };
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private preparePayload(row: Master): any {
     return {
-      _id:         row._id.startsWith('new_') ? undefined : row._id,
-      type:        row.type,
-      name:        row.name,
-      code:        row.code ? row.code.toUpperCase() : null,
+      _id: row._id.startsWith('new_') ? undefined : row._id,
+      type: row.type,
+      name: row.name,
+      code: row.code ? row.code.toUpperCase() : null,
       description: row.description,
-      isActive:    row.isActive,
-      metadata:    {
+      isActive: row.isActive,
+      metadata: {
         isFeatured: row.isFeatured ?? false,
-        sortOrder:  row.metadata?.sortOrder ?? 0,
+        sortOrder: row.metadata?.sortOrder ?? 0,
       },
     };
   }

@@ -35,7 +35,6 @@
               "src/styles/themes.scss",
               "src/styles/tailwind.css",
               "src/styles/animation.scss",
-              "src/styles/common.scss",
               "src/styles/base-styles.scss",
               "src/styles/primeng-theme.scss",
               "node_modules/primeicons/primeicons.css"
