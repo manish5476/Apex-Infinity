@@ -69,7 +69,8 @@ export interface Master {
       <app-page-content  [density]="'compact'"  [fullWidth]="true">
         <div class="flex flex-col flex-1 min-h-0 w-full px-6 pb-6">
           <!-- Enterprise DataGrid -->
-          <app-data-grid
+       
+<app-data-grid
             gridId="master-data"
             dataKey="_id"
             [data]="masters()"
@@ -82,6 +83,7 @@ export interface Master {
             [rowActions]="rowActions"
             [bulkActions]="bulkActions"
             [enableExport]="true"
+            [viewOnly]="false"
             [enableAdd]="true"
             [enableUndo]="true"
             [enableContextMenu]="true"
@@ -92,6 +94,7 @@ export interface Master {
             (sortChange)="onSortChange($event)"
             (searchChange)="onSearchChange($event)"
             (rowSave)="onRowSave($event)"
+            (bulkSave)="onBulkSave($event)"
             (rowDelete)="onRowDelete($event)"
             (rowDuplicate)="onRowDuplicate($event)"
             (selectionChange)="onSelectionChange($event)"
@@ -224,7 +227,6 @@ export class MasterList implements OnInit, OnDestroy {
       icon: 'pi pi-trash',
       label: 'Delete',
       variant: 'danger',
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       callback: (rows: any[], _ctx: GridContext) => {
         this.confirmBulkDelete(rows as Master[]);
       },
@@ -234,9 +236,7 @@ export class MasterList implements OnInit, OnDestroy {
       icon: 'pi pi-check-circle',
       label: 'Activate',
       variant: 'primary',
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       callback: (rows: any[]) => {
-        // Mark all selected rows as active then save
         rows.forEach(r => (r['isActive'] = true));
         this.appMessage.showSuccess?.(`${rows.length} records activated`);
       },
@@ -287,8 +287,6 @@ export class MasterList implements OnInit, OnDestroy {
       },
     });
   }
-
-  // ─── Server Side Grid Events ──────────────────────────────────────────────
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onPageChange(event: any): void {
@@ -398,6 +396,37 @@ export class MasterList implements OnInit, OnDestroy {
   }
 
   // ─── Helpers ────────────────────────────────────────────────────────────
+  // ─── Bulk Row Save (Multiple Records at Once) ────────────────────────────
+
+  onBulkSave(events: GridRowSaveEvent[]): void {
+    const payloads = events.map(e => {
+      const row = e.row as Master;
+      return this.preparePayload(row);
+    });
+
+    // Validate all rows have required fields
+    const invalid = events.some(e => {
+      const row = e.row as Master;
+      return !row.name?.trim() || !row.type;
+    });
+
+    if (invalid) {
+      this.appMessage.showError?.('All records must have a Name and Type.');
+      return;
+    }
+
+    this.loading.set(true);
+    this.masterService.bulkUpdateMasters(payloads).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (res) => {
+        this.appMessage.showSuccess?.(res.message || `${payloads.length} records saved successfully`);
+        this.loadMasters();
+      },
+      error: (err) => {
+        this.appMessage.handleHttpError(err);
+        this.loadMasters();
+      },
+    });
+  }
 
   private createEmptyMaster(): Master {
     return {

@@ -45,7 +45,7 @@ export class DataGridComponent implements OnDestroy {
 
   data = input.required<any[]>();
   columns = input.required<GridColumn[]>();
-
+viewOnly = input<boolean>(false);
   gridId = input<string>('default');
   dataKey = input<string>('id');
   lazy = input<boolean>(false);
@@ -203,14 +203,26 @@ export class DataGridComponent implements OnDestroy {
     return vis.map(v => all.find(c => c.field === v)).filter(Boolean) as GridColumn[];
   });
 
-  gridTemplateColumns = computed(() => {
-    const cols = this.visibleColumnList();
-    let template = this.rowSelection() ? '48px ' : '';
-    template += '60px '; 
-    template += cols.map(c => `minmax(${c.minWidth ?? '100px'}, ${c.width ?? '1fr'})`).join(' ');
+  // gridTemplateColumns = computed(() => {
+  //   const cols = this.visibleColumnList();
+  //   let template = this.rowSelection() ? '48px ' : '';
+  //   template += '60px '; 
+  //   template += cols.map(c => `minmax(${c.minWidth ?? '100px'}, ${c.width ?? '1fr'})`).join(' ');
+  //   template += ' 80px'; 
+  //   return template;
+  // });
+gridTemplateColumns = computed(() => {
+  const cols = this.visibleColumnList();
+  let template = (this.rowSelection() && !this.viewOnly()) ? '48px ' : '';
+  template += '60px '; // Sr. No.
+  template += cols.map(c => `minmax(${c.minWidth ?? '100px'}, ${c.width ?? '1fr'})`).join(' ');
+  
+  // Omit the actions column width entirely if viewOnly is active
+  if (!this.viewOnly()) {
     template += ' 80px'; 
-    return template;
-  });
+  }
+  return template;
+});
 
   filteredData = computed<any[]>(() => {
     if (this.lazy()) return this.data();
@@ -438,11 +450,20 @@ constructor() {
     else if (this.multipleSelection() && (event.ctrlKey || event.metaKey)) this.toggleSelectRow(row);
     else this.rowClick.emit(row);
   }
-
-  onRowDoubleClick(row: any): void {
-    this.startEditRow(row);
+  
+onRowDoubleClick(row: any): void {
+  if (this.viewOnly()) {
     this.rowDoubleClick.emit(row);
+    return; // Block editing entirely in view-only mode
   }
+  this.startEditRow(row);
+  this.rowDoubleClick.emit(row);
+}
+
+  // onRowDoubleClick(row: any): void {
+  //   this.startEditRow(row);
+  //   this.rowDoubleClick.emit(row);
+  // }
 
   onCheckboxClick(row: any, event: MouseEvent): void {
     event.stopPropagation();
