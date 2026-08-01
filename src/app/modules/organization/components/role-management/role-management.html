@@ -82,7 +82,7 @@
 
           <!-- Permission Cards Grid -->
           <div class="category-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            @for (item of group.items; track item.tag) {
+            @for (item of group.items; track item.tag || $index) {
             <div class="perm-toggle-card p-3 border rounded-lg cursor-pointer transition-colors flex items-start gap-3" 
                  [class.bg-blue-50]="selectedPermissions().includes(item.tag)"
                  [class.border-blue-200]="selectedPermissions().includes(item.tag)"

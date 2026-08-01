@@ -25,10 +25,13 @@
           class="w-[200px]">
         </app-master-dropdown>
 
-        <p-select appendTo="body" (onChange)="applyFilters()" [options]="statusOptions" [(ngModel)]="emiFilter.status"
-          optionLabel="label" optionValue="value" [showClear]="true" placeholder="All statuses"
-          styleClass="w-[200px]" [filter]="true" filterBy="label">
-        </p-select>
+        <app-select-filter
+          [options]="statusOptions" 
+          [value]="emiFilter.status"
+          (valueChange)="emiFilter.status = $event; applyFilters()"
+          placeholder="All statuses"
+          class="w-[200px]">
+        </app-select-filter>
 
         <p-button icon="pi pi-filter-slash" styleClass="p-button-text p-button-rounded p-button-secondary h-10 w-10" 
           (onClick)="resetFilters()" pTooltip="Clear Filters">
@@ -108,7 +111,7 @@
 
 
       <!-- ─────────── GRID ─────────── -->
-      <div class="flex-1 min-h-0 manish-border-1 border-secondary border-round overflow-hidden">
+      <div class="flex-1 min-h-0 border border-[var(--border-secondary)] rounded-[var(--ui-border-radius-lg)] overflow-hidden">
         <app-data-grid 
           [columns]="column" 
           [data]="data" 

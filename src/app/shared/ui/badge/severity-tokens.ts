@@ -70,5 +70,6 @@ const STATUS_KEYWORD_MAP: Record<string, StatusSeverity> = {
 };
 
 export function resolveSeverityFromStatus(status: string): StatusSeverity {
+    if (!status) return 'accent';
     return STATUS_KEYWORD_MAP[status.toLowerCase().trim()] ?? 'accent';
 }

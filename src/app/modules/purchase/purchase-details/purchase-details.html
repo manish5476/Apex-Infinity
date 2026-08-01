@@ -215,8 +215,8 @@
               <p-tabpanel value="0">
                 <div class="tab-content-wrapper">
                   <div class="grid-wrapper" style="height: 400px; width: 100%;">
-                    <app-ag-share-grid [columns]="itemColumns" [data]="itemsData()" [paginationPageSize]="100">
-                    </app-ag-share-grid>
+                    <app-data-grid [columns]="itemColumns" [data]="itemsData()">
+                    </app-data-grid>
                   </div>
 
                   <div class="flex justify-end mt-4 px-2">
@@ -243,8 +243,8 @@
                 <div class="tab-content-wrapper">
                   @if (paymentHistoryData().length > 0) {
                   <div class="grid-wrapper" style="height: 300px; width: 100%;">
-                    <app-ag-share-grid [columns]="paymentColumns" [data]="paymentHistoryData()">
-                    </app-ag-share-grid>
+                    <app-data-grid [columns]="paymentColumns" [data]="paymentHistoryData()">
+                    </app-data-grid>
                   </div>
                   } @else {
                   <div class="empty-tab-state">

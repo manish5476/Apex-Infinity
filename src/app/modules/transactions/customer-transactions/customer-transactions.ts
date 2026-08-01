@@ -15,8 +15,15 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 
 import { DataGridComponent, GridColumn } from '@shared/ui/grid';
+import { PageComponent } from '@shared/ui/layout/page/page.component';
+import { PageContentComponent } from '@shared/ui/layout/page-content/page-content.component';
+import { PageHeaderComponent } from '@shared/ui/layout/page-header/page-header.component';
+import { SearchFilterComponent } from '@shared/ui/filters/search-filter.component';
+import { DateFilterComponent } from '@shared/ui/filters/date-filter.component';
+import { SelectFilterComponent } from '@shared/ui/filters/select-filter.component';
 import { CommonMethodService } from '../../../core/utils/common-method.service';
 import { TransactionService } from '../transaction.service';
+import { ButtonComponent } from '@shared/ui/form/button.component';
 
 @Component({
   selector: 'app-customer-transactions',
@@ -25,79 +32,63 @@ import { TransactionService } from '../transaction.service';
   imports: [
     FormsModule,
     ButtonModule,
-    InputTextModule,
-    SelectModule,
-    DatePickerModule,
     DataGridComponent,
+    PageComponent,
+    PageHeaderComponent,
+    PageContentComponent,
+    SearchFilterComponent,
+    DateFilterComponent,
+    SelectFilterComponent,
   ],
   template: `
-    <!-- Filter Toolbar -->
-    <div class="filter-toolbar">
-      <p-datepicker
-        [(ngModel)]="rangeDates"
-        selectionMode="range"
-        placeholder="Date Range"
-        appendTo="body"
-        (onClose)="applyFilters()">
-      </p-datepicker>
+    <app-page>
+      <app-page-header title="Customer Transactions" subtitle="View and manage transaction history">
+        <div header-right class="flex items-center gap-3">
+          <app-date-filter
+            [value]="rangeDates"
+            (valueChange)="rangeDates = $any($event); applyFilters()">
+          </app-date-filter>
 
-      <p-select
-        [options]="transactionTypes"
-        [(ngModel)]="filterParams.type"
-        [showClear]="true"
-        placeholder="Type"
-        (onChange)="applyFilters()">
-      </p-select>
+          <app-select-filter
+            [options]="transactionTypes"
+            [value]="filterParams.type"
+            placeholder="Type"
+            (valueChange)="filterParams.type = $event; applyFilters()">
+          </app-select-filter>
 
-      <p-select
-        [options]="transactionEffects"
-        [(ngModel)]="filterParams.effect"
-        [showClear]="true"
-        placeholder="Dr / Cr"
-        (onChange)="applyFilters()">
-      </p-select>
+          <app-select-filter
+            [options]="transactionEffects"
+            [value]="filterParams.effect"
+            placeholder="Dr / Cr"
+            (valueChange)="filterParams.effect = $event; applyFilters()">
+          </app-select-filter>
 
-      <input
-        type="text"
-        pInputText
-        [(ngModel)]="filterParams.search"
-        placeholder="Search..."
-        (keydown.enter)="applyFilters()" />
+          <app-search-filter
+            [value]="filterParams.search"
+            (valueChange)="filterParams.search = $event; applyFilters()">
+          </app-search-filter>
 
-      <p-button
-        icon="pi pi-times"
-        [text]="true"
-        severity="secondary"
-        pTooltip="Reset"
-        (onClick)="resetFilters()">
-      </p-button>
-    </div>
+          <p-button
+            icon="pi pi-times"
+            [text]="true"
+            severity="secondary"
+            pTooltip="Reset"
+            (onClick)="resetFilters()">
+          </p-button>
+        </div>
+      </app-page-header>
 
-    <!-- DataGrid -->
-    <app-data-grid
-      [columns]="columns"
-      [data]="data()"
-      [loading]="isLoading()"
-      (gridEvent)="eventFromGrid($event)">
-    </app-data-grid>
+      <app-page-content [padded]="false">
+        <app-data-grid
+          [columns]="columns"
+          [data]="data()"
+          [loading]="isLoading()"
+          (gridEvent)="eventFromGrid($event)">
+        </app-data-grid>
+      </app-page-content>
+    </app-page>
   `,
-  styles: [`
-    :host {
-      display: flex;
-      flex-direction: column;
-      gap: var(--spacing-md);
-      height: 100%;
-      min-height: 0;
-    }
-
-    .filter-toolbar {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-md);
-      flex-wrap: wrap;
-      flex-shrink: 0;
-    }
-  `]
+  styles: []
 })
 export class CustomerTransactions implements OnInit {
   private readonly cdr = inject(ChangeDetectorRef);
@@ -118,7 +109,7 @@ export class CustomerTransactions implements OnInit {
   filterParams: { type: string | null; effect: string | null; search: string } = {
     type: null, effect: null, search: '',
   };
-  rangeDates: Date[] | undefined;
+  rangeDates: Date | Date[] | null = null;
 
   readonly transactionTypes = [
     { label: 'Invoice', value: 'invoice' },
@@ -190,7 +181,7 @@ export class CustomerTransactions implements OnInit {
 
   resetFilters(): void {
     this.filterParams = { type: null, effect: null, search: '' };
-    this.rangeDates = undefined;
+    this.rangeDates = null;
     this.getData(true);
   }
 
@@ -207,9 +198,12 @@ export class CustomerTransactions implements OnInit {
       limit: this.pageSize,
     };
 
-    if (this.rangeDates?.length) {
+    if (Array.isArray(this.rangeDates)) {
       if (this.rangeDates[0]) queryParams['startDate'] = this.formatDateForApi(this.rangeDates[0]);
       if (this.rangeDates[1]) queryParams['endDate'] = this.formatDateForApi(this.rangeDates[1]);
+    } else if (this.rangeDates) {
+      queryParams['startDate'] = this.formatDateForApi(this.rangeDates);
+      queryParams['endDate'] = this.formatDateForApi(this.rangeDates);
     }
 
     this.transactionService.getCustomerTransactions(this.customerId, queryParams).subscribe({

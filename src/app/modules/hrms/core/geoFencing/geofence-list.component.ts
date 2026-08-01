@@ -23,6 +23,8 @@ import { PageHeaderComponent } from '@shared/ui/layout/page-header/page-header.c
 
 import { AppMessageService } from '../../../../core/services/message.service';
 import { HRMSService } from '../../hrms.service';
+import { SearchFilterComponent } from "@shared/ui/filters/search-filter.component";
+import { SelectFilterComponent } from "@shared/ui/filters/select-filter.component";
 
 @Component({
   selector: 'app-geofence-list',
@@ -38,13 +40,41 @@ import { HRMSService } from '../../hrms.service';
     PageComponent,
     PageHeaderComponent,
     PageContentComponent,
-  ],
+    SearchFilterComponent,
+    SelectFilterComponent
+],
   template: `
     <app-page>
       <app-page-header
         title="Geofences"
         subtitle="Manage location-based attendance boundaries">
         <div header-right class="flex items-center gap-3">
+          <app-search-filter
+            [value]="filter.search"
+            (valueChange)="filter.search = $event; applyFilters()"
+            placeholder="Name or Code...">
+          </app-search-filter>
+
+          <app-select-filter
+            [options]="typeOptions"
+            [value]="filter.type"
+            (valueChange)="filter.type = $event; applyFilters()"
+            placeholder="Type">
+          </app-select-filter>
+
+          <app-select-filter
+            [options]="statusOptions"
+            [value]="filter.isActive"
+            (valueChange)="filter.isActive = $event; applyFilters()"
+            placeholder="Status">
+          </app-select-filter>
+
+          <p-button icon="pi pi-times" [text]="true" severity="secondary"
+            pTooltip="Reset" (onClick)="resetFilters()">
+          </p-button>
+
+          <div class="w-px h-8 bg-[var(--border-primary)] mx-1"></div>
+
           <p-button
             icon="pi pi-refresh"
             [text]="true"
@@ -58,27 +88,6 @@ import { HRMSService } from '../../hrms.service';
       </app-page-header>
 
       <app-page-content [padded]="true">
-        <div class="filter-toolbar">
-          <div class="filter-toolbar__search">
-            <input type="text" pInputText
-              [(ngModel)]="filter.search"
-              (keydown.enter)="applyFilters()"
-              (blur)="applyFilters()"
-              placeholder="Name or Code..." />
-          </div>
-          <div class="filter-toolbar__filters">
-            <p-select [options]="typeOptions" [(ngModel)]="filter.type"
-              [showClear]="true" placeholder="Type" (onChange)="applyFilters()">
-            </p-select>
-            <p-select [options]="statusOptions" [(ngModel)]="filter.isActive"
-              [showClear]="true" placeholder="Status" (onChange)="applyFilters()">
-            </p-select>
-            <p-button icon="pi pi-times" [text]="true" severity="secondary"
-              pTooltip="Reset" (onClick)="resetFilters()">
-            </p-button>
-          </div>
-        </div>
-
         <app-data-grid
           [columns]="columns"
           [data]="data()"
@@ -91,9 +100,6 @@ import { HRMSService } from '../../hrms.service';
   `,
   styles: [`
     :host { display: flex; flex-direction: column; flex: 1; min-height: 0; width: 100%; height: 100%; }
-    .filter-toolbar { display: flex; align-items: center; gap: var(--spacing-md); flex-wrap: wrap; margin-bottom: var(--spacing-md); }
-    .filter-toolbar__search { min-width: 200px; max-width: 300px; flex: 1; }
-    .filter-toolbar__filters { display: flex; align-items: center; gap: var(--spacing-md); flex-wrap: wrap; flex: 1; }
   `]
 })
 export class GeofenceListComponent implements OnInit, OnDestroy {

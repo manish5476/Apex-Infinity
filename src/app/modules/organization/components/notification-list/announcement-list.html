@@ -1,116 +1,97 @@
 <p-toast></p-toast>
 <p-confirmDialog appendTo="body" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}"></p-confirmDialog>
 
-<div class="announce-page">
+<app-page>
+  <app-page-header
+    title="Announcements"
+    subtitle="Broadcast messages to staff, customers, or everyone">
+    
+    <div header-right class="flex items-center gap-3">
+      <app-select-filter
+        [options]="typeOptions"
+        [value]="filterType"
+        placeholder="All types"
+        (valueChange)="filterType = $event; applyFilters()">
+      </app-select-filter>
 
-  <!-- ─────────── PAGE HEADER ─────────── -->
-  <div class="page-header">
-    <div class="page-header__left">
-      <div class="page-icon">
-        <i class="pi pi-megaphone"></i>
-      </div>
-      <div>
-        <h2 class="page-title">
-          Announcements
-          @if (totalUnread() > 0) {
-          <span class="unread-pill">
-            {{ totalUnread() }} unread
-          </span>
-          }
-        </h2>
-        <p class="page-subtitle">Broadcast messages to staff, customers, or everyone</p>
-      </div>
-    </div>
-    <div class="page-header__actions">
-      <p-button *hasPermission="PERMISSIONS.ANNOUNCEMENT.MANAGE" label="New Announcement" icon="pi pi-plus"
-        styleClass="p-button-primary" (onClick)="openCreate()">
+      <app-select-filter
+        [options]="audienceOptions"
+        [value]="filterAudience"
+        placeholder="All audiences"
+        (valueChange)="filterAudience = $event; applyFilters()">
+      </app-select-filter>
+
+      <app-select-filter
+        [options]="statusOptions"
+        [value]="filterStatus"
+        placeholder="All statuses"
+        (valueChange)="filterStatus = $event; applyFilters()">
+      </app-select-filter>
+
+      <p-button
+        icon="pi pi-times"
+        [text]="true"
+        severity="secondary"
+        pTooltip="Reset Filters"
+        (onClick)="resetFilters()">
+      </p-button>
+
+      <p-button 
+        *hasPermission="PERMISSIONS.ANNOUNCEMENT.MANAGE" 
+        label="New Announcement" 
+        icon="pi pi-plus"
+        (onClick)="openCreate()">
       </p-button>
     </div>
-  </div>
+  </app-page-header>
 
-  <!-- ─────────── STATS STRIP ─────────── -->
-  @if (stats()) {
-  <div class="stats-strip">
-    <div class="stat-card">
-      <div class="stat-icon stat-icon--primary"><i class="pi pi-megaphone"></i></div>
-      <div class="stat-body">
-        <span class="stat-label">Total</span>
-        <span class="stat-value">{{ stats().total }}</span>
-      </div>
-    </div>
-    <div class="stat-card" [class.stat-card--alert]="totalUnread() > 0">
-      <div class="stat-icon stat-icon--warn"><i class="pi pi-envelope"></i></div>
-      <div class="stat-body">
-        <span class="stat-label">Unread</span>
-        <span class="stat-value">{{ totalUnread() }}</span>
-      </div>
-    </div>
-    <!-- Audience breakdown -->
-    @if (stats().byAudience?.length) {
-    <div class="stat-card stat-card--wide">
-      <div class="stat-icon stat-icon--info"><i class="pi pi-users"></i></div>
-      <div class="stat-body">
-        <span class="stat-label">By Audience</span>
-        <div class="audience-chips">
-          @for (a of stats().byAudience; track a) {
-          <span class="aud-chip">
-            <span class="aud-chip__name" style="text-transform:capitalize">{{ a.audience }}</span>
-            <span class="aud-chip__count">{{ a.count }}</span>
-            @if (a.unread > 0) {
-            <span class="aud-chip__unread">{{ a.unread }} unread</span>
-            }
-          </span>
-          }
+  <app-page-content [padded]="true">
+    @if (stats()) {
+    <div class="stats-strip mb-4 flex gap-4">
+      <div class="stat-card flex-1 bg-white border border-gray-200 rounded-lg p-4 flex items-center gap-4">
+        <div class="stat-icon stat-icon--primary text-blue-500 text-2xl"><i class="pi pi-megaphone"></i></div>
+        <div class="stat-body flex flex-col">
+          <span class="stat-label text-gray-500 text-sm">Total</span>
+          <span class="stat-value text-xl font-bold">{{ stats().total }}</span>
         </div>
       </div>
+      <div class="stat-card flex-1 bg-white border border-gray-200 rounded-lg p-4 flex items-center gap-4" [class.border-orange-500]="totalUnread() > 0">
+        <div class="stat-icon stat-icon--warn text-orange-500 text-2xl"><i class="pi pi-envelope"></i></div>
+        <div class="stat-body flex flex-col">
+          <span class="stat-label text-gray-500 text-sm">Unread</span>
+          <span class="stat-value text-xl font-bold">{{ totalUnread() }}</span>
+        </div>
+      </div>
+      @if (stats().byAudience?.length) {
+      <div class="stat-card stat-card--wide flex-2 bg-white border border-gray-200 rounded-lg p-4 flex items-center gap-4">
+        <div class="stat-icon stat-icon--info text-blue-400 text-2xl"><i class="pi pi-users"></i></div>
+        <div class="stat-body flex flex-col flex-1">
+          <span class="stat-label text-gray-500 text-sm mb-2">By Audience</span>
+          <div class="audience-chips flex flex-wrap gap-2">
+            @for (a of stats().byAudience; track a) {
+            <span class="aud-chip px-3 py-1 bg-gray-100 rounded-full text-xs flex items-center gap-2">
+              <span class="aud-chip__name capitalize font-medium">{{ a.audience }}</span>
+              <span class="aud-chip__count text-gray-500">{{ a.count }}</span>
+              @if (a.unread > 0) {
+              <span class="aud-chip__unread text-orange-500 font-bold ml-1">{{ a.unread }} unread</span>
+              }
+            </span>
+            }
+          </div>
+        </div>
+      </div>
+      }
     </div>
     }
-  </div>
-  }
 
-  <!-- ─────────── FILTER BAR ─────────── -->
-  <div class="filter-bar">
-    <div class="filter-bar__fields">
-
-      <div class="filter-field">
-        <label class="filter-label"><i class="pi pi-tag"></i> Type</label>
-        <p-select appendTo="body" [options]="typeOptions" [(ngModel)]="filterType" optionLabel="label"
-          optionValue="value" [showClear]="true" placeholder="All types" styleClass="w-full"
-          (onChange)="applyFilters()">
-        </p-select>
-      </div>
-
-      <div class="filter-field">
-        <label class="filter-label"><i class="pi pi-users"></i> Audience</label>
-        <p-select appendTo="body" [options]="audienceOptions" [(ngModel)]="filterAudience" optionLabel="label"
-          optionValue="value" [showClear]="true" placeholder="All audiences" styleClass="w-full"
-          (onChange)="applyFilters()">
-        </p-select>
-      </div>
-
-      <div class="filter-field">
-        <label class="filter-label"><i class="pi pi-circle"></i> Status</label>
-        <p-select appendTo="body" [options]="statusOptions" [(ngModel)]="filterStatus" optionLabel="label"
-          optionValue="value" [showClear]="true" placeholder="All statuses" styleClass="w-full"
-          (onChange)="applyFilters()">
-        </p-select>
-      </div>
-
-    </div>
-
-    <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-text p-button-secondary"
-      (onClick)="resetFilters()">
-    </p-button>
-  </div>
-
-  <!-- ─────────── GRID ─────────── -->
-  <div class="grid-wrapper">
-    <app-ag-share-grid [columns]="columns" [data]="data()" [actionColumn]="actionColumn" selectionMode="multiple"
-      (gridEvent)="onGridEvent($event)" style="height: 100%; width: 100%; display: block;">
-    </app-ag-share-grid>
-  </div>
-
-</div>
+    <app-data-grid 
+      [columns]="columns" 
+      [data]="data()" 
+      [rowActions]="rowActions"
+      (gridEvent)="onGridEvent($event)">
+    </app-data-grid>
+  </app-page-content>
+</app-page>
 
 <!-- ═══════════════════════════════════════════════════════
 CREATE / EDIT DIALOG

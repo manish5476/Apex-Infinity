@@ -22,7 +22,7 @@ import { SupplierService } from '../../services/supplier-service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
 import { TransactionService } from '../../../transactions/transaction.service';
-import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
+import { DataGridComponent, GridColumn } from '@shared/ui/grid';
 import { MasterDropdownService } from '../../../../core/services/master-dropdown.service';
 import { DialogService } from 'primeng/dynamicdialog';
 import { DynamicDialogServices } from '../../../../core/services/dynamic-dialog-services';
@@ -34,7 +34,7 @@ import { DynamicDialogServices } from '../../../../core/services/dynamic-dialog-
     CommonModule, RouterModule, FormsModule,
     ButtonModule, TagModule, SkeletonModule, AvatarModule,
     InputTextModule, DatePickerModule, SelectModule,
-    AgShareGrid
+    DataGridComponent
   ],
   templateUrl: './supplier-detail.html',
   styleUrls: ['./supplier-detail.scss'],
@@ -62,7 +62,7 @@ export class SupplierDetailsComponent implements OnInit, OnDestroy {
   // --- Transaction Grid State ---
   gridApi!: GridApi;
   txnData: any[] = [];
-  txnColumns: any[] = [];
+  txnColumns: GridColumn[] = [];
   txnLoading = false;
   txnPage = 1;
   txnTotal = 0;
@@ -136,40 +136,22 @@ export class SupplierDetailsComponent implements OnInit, OnDestroy {
   initGridColumns(): void {
     this.txnColumns = [
       {
-        field: 'date', headerName: 'Date', width: 140, pinned: 'left',
-        valueFormatter: (p: any) => this.common.formatDate(p.value, 'dd MMM yyyy'),
-        cellStyle: { 'display': 'flex', 'align-items': 'center', 'font-weight': '600' }
+        field: 'date', header: 'Date', width: '140px',
+        formatter: (val: any) => this.common.formatDate(val, 'dd MMM yyyy')
       },
       {
-        field: 'type', headerName: 'Type', width: 120,
-        cellRenderer: (p: any) => {
-          const type = p.value?.toLowerCase() || '-';
-          let color = type === 'purchase' ? '#0ea5e9' : (type === 'payment' ? '#22c55e' : '#eab308');
-          return `<span style="color:${color}; font-weight:700; text-transform:uppercase; font-size:11px;">${type}</span>`;
-        }
+        field: 'type', header: 'Type', width: '120px', type: 'badge'
       },
       {
-        field: 'description', headerName: 'Description', minWidth: 200, flex: 1,
-        cellStyle: { 'display': 'flex', 'align-items': 'center' }
+        field: 'description', header: 'Description', minWidth: '200px'
       },
       {
-        field: 'effect', headerName: 'Effect', width: 110,
-        cellRenderer: (p: any) => {
-          const isCredit = p.value?.toLowerCase() === 'credit';
-          const color = isCredit ? '#16a34a' : '#dc2626';
-          const icon = isCredit ? 'pi-arrow-down' : 'pi-arrow-up';
-          return `<span style="color:${color}; font-weight:700; font-size:11px; text-transform:uppercase;">
-                    <i class="pi ${icon}" style="font-size:10px;"></i> ${p.value}
-                  </span>`;
-        }
+        field: 'effect', header: 'Effect', width: '110px',
+        formatter: (val: any) => val ? (val.toLowerCase() === 'credit' ? `↓ ${val}` : `↑ ${val}`) : '-',
+        align: 'left'
       },
       {
-        field: 'amount', headerName: 'Amount', width: 140, type: 'rightAligned',
-        valueFormatter: (p: any) => this.common.formatCurrency(p.value),
-        cellStyle: (p: any) => ({
-          'color': p.data.effect === 'credit' ? '#16a34a' : '#dc2626',
-          'font-weight': '700', 'text-align': 'right', 'display': 'flex', 'justify-content': 'flex-end', 'align-items': 'center'
-        })
+        field: 'amount', header: 'Amount', width: '140px', type: 'currency', align: 'right'
       }
     ];
   }

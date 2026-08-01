@@ -22,6 +22,8 @@ import { PageHeaderComponent } from '@shared/ui/layout/page-header/page-header.c
 import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { HRMSService } from '../../hrms.service';
+import { SearchFilterComponent } from "@shared/ui/filters/search-filter.component";
+import { SelectFilterComponent } from "@shared/ui/filters/select-filter.component";
 
 @Component({
   selector: 'app-designation-list',
@@ -37,13 +39,45 @@ import { HRMSService } from '../../hrms.service';
     PageComponent,
     PageHeaderComponent,
     PageContentComponent,
-  ],
+    SearchFilterComponent,
+    SelectFilterComponent
+],
   template: `
     <app-page>
       <app-page-header
         title="Designations"
         subtitle="Manage job titles, levels, and organizational grades">
         <div header-right class="flex items-center gap-3">
+          <app-search-filter
+            [value]="filters().search"
+            (valueChange)="updateSearch($event)"
+            placeholder="Title or Code...">
+          </app-search-filter>
+
+          <app-select-filter
+            [options]="gradeOptions"
+            [value]="filters().grade"
+            (valueChange)="updateGrade($event)"
+            placeholder="Grade">
+          </app-select-filter>
+
+          <app-select-filter
+            [options]="statusOptions"
+            [value]="filters().isActive"
+            (valueChange)="updateStatus($event)"
+            placeholder="Status">
+          </app-select-filter>
+
+          <p-button
+            icon="pi pi-times"
+            [text]="true"
+            severity="secondary"
+            pTooltip="Reset"
+            (onClick)="resetFilters()">
+          </p-button>
+
+          <div class="w-px h-8 bg-[var(--border-primary)] mx-1"></div>
+
           <span class="total-badge">{{ totalCount() }} Records</span>
           <p-button
             label="Add Designation"
@@ -54,41 +88,6 @@ import { HRMSService } from '../../hrms.service';
       </app-page-header>
 
       <app-page-content [padded]="true">
-        <!-- Filter Toolbar -->
-        <div class="filter-toolbar">
-          <div class="filter-toolbar__search">
-            <input
-              type="text"
-              pInputText
-              [ngModel]="filters().search"
-              (ngModelChange)="updateSearch($event)"
-              placeholder="Title or Code..." />
-          </div>
-          <div class="filter-toolbar__filters">
-            <p-select
-              [options]="gradeOptions"
-              [ngModel]="filters().grade"
-              (ngModelChange)="updateGrade($event)"
-              [showClear]="true"
-              placeholder="Grade">
-            </p-select>
-            <p-select
-              [options]="statusOptions"
-              [ngModel]="filters().isActive"
-              (ngModelChange)="updateStatus($event)"
-              [showClear]="true"
-              placeholder="Status">
-            </p-select>
-            <p-button
-              icon="pi pi-times"
-              [text]="true"
-              severity="secondary"
-              pTooltip="Reset"
-              (onClick)="resetFilters()">
-            </p-button>
-          </div>
-        </div>
-
         <app-data-grid
           [columns]="columns"
           [data]="data()"
@@ -117,28 +116,6 @@ import { HRMSService } from '../../hrms.service';
       border: 1px solid var(--border-primary);
       padding: var(--spacing-xs) var(--spacing-md);
       border-radius: var(--ui-border-radius);
-    }
-
-    .filter-toolbar {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-md);
-      flex-wrap: wrap;
-      margin-bottom: var(--spacing-md);
-
-      &__search {
-        min-width: 220px;
-        max-width: 320px;
-        flex: 1;
-      }
-
-      &__filters {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-md);
-        flex-wrap: wrap;
-        flex: 1;
-      }
     }
   `]
 })

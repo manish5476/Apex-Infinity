@@ -22,7 +22,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { ToastModule } from 'primeng/toast';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ConfirmationService } from 'primeng/api';
+import { SelectFilterComponent } from '@shared/ui/filters/select-filter.component';
 // Services & Shared
 import { AppMessageService } from '../../../../core/services/message.service';
 import { EmiService } from '../../services/emi-service';
@@ -35,6 +35,7 @@ import { GridColumn, GridRowAction } from '@shared/ui/grid';
 import { PageComponent } from '@shared/ui/layout/page/page.component';
 import { PageHeaderComponent } from '@shared/ui/layout/page-header/page-header.component';
 import { PageContentComponent } from '@shared/ui/layout/page-content/page-content.component';
+import { ConfirmationService } from 'primeng/api';
 @Component({
   selector: 'app-emi-list',
   standalone: true,
@@ -53,102 +54,12 @@ import { PageContentComponent } from '@shared/ui/layout/page-content/page-conten
     HasPermissionDirective,
     ConfirmDialogModule,
     MasterDropdownComponent,
-    PageComponent, PageHeaderComponent, PageContentComponent
+    PageComponent, PageHeaderComponent, PageContentComponent,
+    SelectFilterComponent
   ],
   providers: [EmiService, ConfirmationService],
   templateUrl: './emi-list.html',
   styles: [`
-    /* =========================================================
-       EMI LIST - SINGLE FILE COMPONENT STYLES
-       ========================================================= */
-
-    :host {
-      display: block;
-      width: 100%;
-      height: 100%;
-      font-family: var(--font-body);
-    }
-
-    /* Layout Skeleton */
-    .page-layout {
-      height: 100%;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      background: var(--bg-primary);
-      padding: var(--spacing-2xl);
-      gap: var(--spacing-xl);
-      overflow: hidden;
-    }
-
-    /* Shared Card Styles */
-    .elevation-card {
-      background: var(--bg-secondary);
-      border: var(--ui-border-width) solid var(--border-primary);
-      border-radius: var(--ui-border-radius-lg);
-      box-shadow: var(--shadow-sm);
-    }
-
-    /* ── HEADER ── */
-    .list-header {
-      flex-shrink: 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: var(--spacing-lg) var(--spacing-2xl);
-      flex-wrap: wrap;
-      gap: var(--spacing-lg);
-
-      .header-left {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-lg);
-
-        .icon-box {
-          width: 3rem;
-          height: 3rem;
-          background: color-mix(in srgb, var(--accent-primary) 12%, transparent);
-          color: var(--accent-primary);
-          border-radius: var(--ui-border-radius-md);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: var(--font-size-xl);
-        }
-
-        .header-titles {
-          h1 {
-            font-family: var(--font-heading);
-            font-size: var(--font-size-xl);
-            font-weight: var(--font-weight-bold);
-            color: var(--text-primary);
-            margin: 0 0 2px 0;
-          }
-          p {
-            font-size: var(--font-size-sm);
-            color: var(--text-secondary);
-            margin: 0;
-          }
-        }
-      }
-
-      .header-actions {
-        display: flex;
-        gap: var(--spacing-md);
-      }
-    }
-
-    /* ── ANALYTICS STRIP ── */
-    .analytics-strip {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: var(--spacing-xl);
-      flex-shrink: 0;
-
-      @media (max-width: 1100px) { grid-template-columns: repeat(2, 1fr); }
-      @media (max-width: 640px) { grid-template-columns: 1fr; }
-    }
-
     .stat-card {
       display: flex;
       align-items: flex-start;
@@ -196,7 +107,6 @@ import { PageContentComponent } from '@shared/ui/layout/page-content/page-conten
       .stat-sub { font-size: var(--font-size-xs); color: var(--text-tertiary); margin-top: 2px;}
       .stat-pct { font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); color: var(--accent-primary); }
 
-      /* Variants */
       &.outstanding-card .stat-icon { background: var(--color-error-bg); color: var(--color-error-dark); }
       &.plans-card .stat-icon { background: var(--color-info-bg); color: var(--color-info-dark); }
       &.progress-card .stat-icon { background: var(--color-success-bg); color: var(--color-success-dark); }
@@ -228,157 +138,20 @@ import { PageContentComponent } from '@shared/ui/layout/page-content/page-conten
       transition: width 0.4s ease;
     }
 
-    /* ── FILTER PANEL ── */
-    .filter-panel {
-      flex-shrink: 0;
-      padding: var(--spacing-lg) var(--spacing-2xl);
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      gap: var(--spacing-xl);
-      flex-wrap: wrap;
-
-      .filter-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: var(--spacing-lg);
-        flex: 1;
-      }
-
-      .filter-field {
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-xs);
-
-        label {
-          font-size: var(--font-size-xs);
-          font-weight: var(--font-weight-bold);
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-          color: var(--text-tertiary);
-          margin: 0;
-        }
-      }
-
-      .filter-actions {
-        display: flex;
-        align-items: center;
-      }
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 2px 10px; border-radius: var(--ui-border-radius-pill);
+      font-size: var(--font-size-xs); font-weight: var(--font-weight-bold);
+      text-transform: uppercase; letter-spacing: 0.05em;
+      border: var(--ui-border-width) solid transparent;
+      .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
     }
 
-    /* ── AG GRID WRAPPER ── */
-    .grid-wrapper {
-      flex: 1;           /* Take all remaining space */
-      min-height: 0;     /* CRITICAL: Prevent grid blowout */
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-
-      .full-size-grid {
-        flex: 1;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-
-        ::ng-deep ag-grid-angular {
-          width: 100%;
-          height: 100%;
-          flex: 1;
-        }
-
-        ::ng-deep .ag-root-wrapper {
-          border: none !important;
-          border-radius: var(--ui-border-radius-lg);
-        }
-      }
-    }
-
-    /* ==========================================================================
-       GLOBAL INJECTED STYLES FOR CELL RENDERERS
-       ========================================================================== */
-    ::ng-deep {
-      
-      /* Layout & Alignments */
-      .cell-flex-center { display: flex; align-items: center; height: 100%; }
-      .cell-flex-end { display: flex; align-items: center; justify-content: flex-end; height: 100%; }
-      .cell-stack { display: flex; flex-direction: column; justify-content: center; height: 100%; gap: 2px; }
-      
-      /* Spacing & Utilities */
-      .gap-xs { gap: var(--spacing-xs); }
-      .gap-sm { gap: var(--spacing-sm); }
-      .px-sm { padding: 0 var(--spacing-sm) !important; }
-      .w-full { width: 100%; }
-      .flex-1 { flex: 1; }
-      .justify-between { justify-content: space-between; }
-      .items-center { align-items: center; }
-      .items-baseline { align-items: baseline; }
-      .mb-1 { margin-bottom: var(--spacing-xs); }
-      .min-w-0 { min-width: 0; }
-
-      /* Typography */
-      .font-mono { font-family: var(--font-mono); }
-      .font-semibold { font-weight: var(--font-weight-semibold); }
-      .font-bold { font-weight: var(--font-weight-bold); }
-      .text-right { text-align: right; }
-      
-      .text-xs { font-size: var(--font-size-xs); }
-      .text-sm { font-size: var(--font-size-sm); }
-
-      .text-primary { color: var(--text-primary); }
-      .text-secondary { color: var(--text-secondary); }
-      .text-tertiary { color: var(--text-tertiary); }
-      .text-accent { color: var(--accent-primary); }
-      .text-success { color: var(--color-success); }
-      .text-warning { color: var(--color-warning); }
-      .text-error { color: var(--color-error); }
-      .text-info { color: var(--color-info); }
-
-      .ellipsis { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; max-width: 100%; }
-
-      /* Buttons & Utilities */
-      .theme-btn-secondary {
-        color: var(--text-secondary) !important;
-        border-color: var(--border-secondary) !important;
-        &:hover { background: var(--bg-ternary) !important; color: var(--text-primary) !important; }
-      }
-
-      /* Pill / Badges */
-      .grid-badge {
-        padding: 3px 10px;
-        border-radius: var(--ui-border-radius-sm);
-        font-size: var(--font-size-xs);
-        font-weight: var(--font-weight-bold);
-        white-space: nowrap;
-        display: inline-flex;
-        align-items: center;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        border: var(--ui-border-width) solid transparent;
-      }
-      
-      .status-pill {
-        display: inline-flex; align-items: center; gap: 6px;
-        padding: 2px 10px; border-radius: var(--ui-border-radius-pill);
-        font-size: var(--font-size-xs); font-weight: var(--font-weight-bold);
-        text-transform: uppercase; letter-spacing: 0.05em;
-        border: var(--ui-border-width) solid transparent;
-        .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
-      }
-
-      .badge-success-soft { background: var(--color-success-bg); color: var(--color-success-dark); border-color: var(--color-success-border); }
-      .badge-danger-soft { background: var(--color-error-bg); color: var(--color-error-dark); border-color: var(--color-error-border); }
-      .badge-warning-soft { background: var(--color-warning-bg); color: var(--color-warning-dark); border-color: var(--color-warning-border); }
-      .badge-info-soft { background: var(--color-info-bg); color: var(--color-info-dark); border-color: var(--color-info-border); }
-      .badge-neutral-soft { background: var(--bg-ternary); color: var(--text-secondary); border-color: var(--border-primary); }
-
-      .grid-progress-track {
-        height: 4px; border-radius: 99px; background: var(--border-primary); overflow: hidden; width: 100%;
-      }
-      .grid-progress-fill {
-        height: 100%; border-radius: 99px;
-      }
-    }
+    .badge-success-soft { background: var(--color-success-bg); color: var(--color-success-dark); border-color: var(--color-success-border); }
+    .badge-danger-soft { background: var(--color-error-bg); color: var(--color-error-dark); border-color: var(--color-error-border); }
+    .badge-warning-soft { background: var(--color-warning-bg); color: var(--color-warning-dark); border-color: var(--color-warning-border); }
+    .badge-info-soft { background: var(--color-info-bg); color: var(--color-info-dark); border-color: var(--color-info-border); }
+    .badge-neutral-soft { background: var(--bg-ternary); color: var(--text-secondary); border-color: var(--border-primary); }
   `]
 })
 export class EmiList implements OnInit, OnDestroy {

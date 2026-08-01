@@ -101,7 +101,8 @@
     }
 
     @case ('percentage') {
-    <span class="font-mono text-[13px] font-[var(--font-weight-medium)] text-[var(--text-primary)] w-full block truncate tracking-tight">
+    <span
+        class="font-mono text-[13px] font-[var(--font-weight-medium)] text-[var(--text-primary)] w-full block truncate tracking-tight">
         {{ (rowData()[column().field] ?? 0) / 100 | percent:'1.1-2' }}
     </span>
     }
@@ -109,11 +110,13 @@
     @case ('boolean') {
     <div class="flex items-center w-full">
         @if (rowData()[column().field]) {
-        <div class="flex items-center justify-center w-5 h-5 rounded-[var(--ui-border-radius-sm)] bg-[color-mix(in_srgb,var(--color-success)_15%,transparent)] text-[var(--color-success)]">
+        <div
+            class="flex items-center justify-center w-5 h-5 rounded-[var(--ui-border-radius-sm)] bg-[color-mix(in_srgb,var(--color-success)_15%,transparent)] text-[var(--color-success)]">
             <i class="pi pi-check text-[10px] font-bold"></i>
         </div>
         } @else {
-        <div class="flex items-center justify-center w-5 h-5 rounded-[var(--ui-border-radius-sm)] bg-[color-mix(in_srgb,var(--text-tertiary)_15%,transparent)] text-[var(--text-tertiary)]">
+        <div
+            class="flex items-center justify-center w-5 h-5 rounded-[var(--ui-border-radius-sm)] bg-[color-mix(in_srgb,var(--text-tertiary)_15%,transparent)] text-[var(--text-tertiary)]">
             <i class="pi pi-minus text-[10px]"></i>
         </div>
         }
@@ -129,8 +132,10 @@
         </span>
         }
         @if ((rowData()[column().field] ?? []).length > (column().maxTags ?? 2)) {
-        <span class="px-2 py-0.5 rounded-[var(--ui-border-radius-sm)] text-[10px] font-[var(--font-weight-semibold)] bg-[color-mix(in_srgb,var(--accent-primary)_10%,transparent)] text-[var(--accent-primary)] cursor-pointer hover:bg-[color-mix(in_srgb,var(--accent-primary)_15%,transparent)] transition-colors"
-            [pTooltip]="(rowData()[column().field] ?? []).slice(column().maxTags ?? 2).join(', ')" tooltipPosition="top">
+        <span
+            class="px-2 py-0.5 rounded-[var(--ui-border-radius-sm)] text-[10px] font-[var(--font-weight-semibold)] bg-[color-mix(in_srgb,var(--accent-primary)_10%,transparent)] text-[var(--accent-primary)] cursor-pointer hover:bg-[color-mix(in_srgb,var(--accent-primary)_15%,transparent)] transition-colors"
+            [pTooltip]="(rowData()[column().field] ?? []).slice(column().maxTags ?? 2).join(', ')"
+            tooltipPosition="top">
             +{{ (rowData()[column().field]).length - (column().maxTags ?? 2) }}
         </span>
         }
@@ -167,11 +172,94 @@
     @case ('image') {
     @if (rowData()[column().field]) {
     <div class="flex items-center h-full w-full py-1">
-        <img [src]="rowData()[column().field]" class="h-8 w-8 object-cover rounded-[var(--ui-border-radius-sm)] border border-[var(--border-secondary)]" alt="thumbnail" />
+        <img [src]="rowData()[column().field]"
+            class="h-8 w-8 object-cover rounded-[var(--ui-border-radius-sm)] border border-[var(--border-secondary)]"
+            alt="thumbnail" />
     </div>
     } @else {
     <span class="text-[var(--text-tertiary)]">—</span>
     }
+    }
+
+    @case ('number') {
+    <span class="font-mono text-[13px] text-[var(--text-primary)] w-full block truncate tracking-tight">
+        {{ rowData()[column().field] | number:(column().minFractionDigits ?
+        '1.'+column().minFractionDigits+'-'+(column().maxFractionDigits ?? 2) : '1.0-2') }}
+    </span>
+    }
+
+    @case ('date') {
+    <span class="text-[length:var(--font-size-xs)] text-[var(--text-primary)] w-full block truncate">
+        {{ rowData()[column().field] | date:(column().dateFormat ?? 'MMM d, yyyy') }}
+    </span>
+    }
+
+    @case ('datetime') {
+    <span class="text-[length:var(--font-size-xs)] text-[var(--text-primary)] w-full block truncate">
+        {{ rowData()[column().field] | date:(column().dateFormat ?? 'MMM d, yyyy, h:mm a') }}
+    </span>
+    }
+
+    @case ('email') {
+    @if (rowData()[column().field]) {
+    <a [href]="'mailto:' + rowData()[column().field]"
+        class="inline-flex items-center gap-1.5 text-[length:var(--font-size-xs)] text-[var(--accent-primary)] hover:text-[var(--accent-hover)] truncate max-w-full transition-colors"
+        (click)="$event.stopPropagation()">
+        <span class="truncate">{{ rowData()[column().field] }}</span>
+    </a>
+    } @else {
+    <span class="text-[var(--text-tertiary)]">—</span>
+    }
+    }
+
+    @case ('phone') {
+    @if (rowData()[column().field]) {
+    <a [href]="'tel:' + rowData()[column().field]"
+        class="inline-flex items-center gap-1.5 text-[length:var(--font-size-xs)] text-[var(--text-primary)] hover:text-[var(--accent-primary)] truncate max-w-full transition-colors"
+        (click)="$event.stopPropagation()">
+        <span class="truncate">{{ rowData()[column().field] }}</span>
+    </a>
+    } @else {
+    <span class="text-[var(--text-tertiary)]">—</span>
+    }
+    }
+
+    @case ('status') {
+    @if (rowData()[column().field]) {
+    <app-status-badge [status]="rowData()[column().field]" size="sm"></app-status-badge>
+    } @else {
+    <span class="text-[var(--text-tertiary)]">—</span>
+    }
+    }
+
+    @case ('chip') {
+    @if (rowData()[column().field]) {
+    <span
+        class="px-2 py-0.5 rounded-[var(--ui-border-radius-sm)] text-[10px] font-[var(--font-weight-medium)] bg-[var(--bg-secondary)] text-[var(--text-secondary)] border border-[var(--border-secondary)] truncate transition-colors">
+        {{ rowData()[column().field] }}
+    </span>
+    } @else {
+    <span class="text-[var(--text-tertiary)]">—</span>
+    }
+    }
+
+    @case ('avatar') {
+    @if (rowData()[column().field]) {
+    <app-avatar [imageUrl]="rowData()[column().field]" size="sm" [name]="''"></app-avatar>
+    } @else {
+    <app-avatar [name]="'?'" size="sm"></app-avatar>
+    }
+    }
+
+    @case ('progress') {
+    <div class="w-full flex items-center gap-2">
+        <div class="flex-grow h-1.5 bg-[var(--bg-secondary)] rounded-full overflow-hidden">
+            <div class="h-full bg-[var(--accent-primary)] rounded-full"
+                [style.width.%]="rowData()[column().field] || 0"></div>
+        </div>
+        <span class="text-[10px] font-mono text-[var(--text-secondary)] w-8 text-right">{{ rowData()[column().field] ||
+            0 }}%</span>
+    </div>
     }
 
     @default {

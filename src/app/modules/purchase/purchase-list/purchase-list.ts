@@ -24,6 +24,10 @@ import { DataGridComponent, GridColumn, GridRowAction } from '@shared/ui/grid';
 import { PageComponent } from '@shared/ui/layout/page/page.component';
 import { PageContentComponent } from '@shared/ui/layout/page-content/page-content.component';
 import { PageHeaderComponent } from '@shared/ui/layout/page-header/page-header.component';
+import { PageToolbarComponent } from '@shared/ui/layout/page-toolbar/page-toolbar.component';
+import { SearchFilterComponent } from '@shared/ui/filters/search-filter.component';
+import { DateFilterComponent } from '@shared/ui/filters/date-filter.component';
+import { SelectFilterComponent } from '@shared/ui/filters/select-filter.component';
 
 // Core
 import { HasPermissionDirective } from '../../../core/auth/directives/has-permission.directive';
@@ -51,6 +55,10 @@ import { MasterDropdownComponent } from '../../shared/components/masterFilterDro
     PageComponent,
     PageHeaderComponent,
     PageContentComponent,
+    PageToolbarComponent,
+    SearchFilterComponent,
+    DateFilterComponent,
+    SelectFilterComponent
   ],
   template: `
     <p-toast position="bottom-right" appendTo="body"></p-toast>
@@ -79,69 +87,55 @@ import { MasterDropdownComponent } from '../../shared/components/masterFilterDro
         </div>
       </app-page-header>
 
-      <app-page-content [padded]="true">
-        <!-- Filter Toolbar -->
-        <div class="filter-toolbar">
-          <div class="filter-toolbar__search">
-            <input
-              type="text"
-              pInputText
-              [(ngModel)]="purchaseFilter.invoiceNumber"
-              placeholder="Invoice No..."
-              (keydown.enter)="applyFilters()"
-              class="w-full" />
-          </div>
+      <app-page-toolbar>
+        <app-search-filter
+          [value]="purchaseFilter.invoiceNumber"
+          (valueChange)="purchaseFilter.invoiceNumber = $event; applyFilters()">
+        </app-search-filter>
 
-          <div class="filter-toolbar__filters">
-            <app-master-dropdown
-              endpoint="suppliers"
-              [(ngModel)]="purchaseFilter.supplierId"
-              (onChange)="applyFilters()"
-              placeholder="Supplier">
-            </app-master-dropdown>
+        <app-master-dropdown
+          endpoint="suppliers"
+          [(ngModel)]="purchaseFilter.supplierId"
+          (onChange)="applyFilters()"
+          placeholder="Supplier">
+        </app-master-dropdown>
 
-            <app-master-dropdown
-              endpoint="branches"
-              [(ngModel)]="purchaseFilter.branchId"
-              (onChange)="applyFilters()"
-              placeholder="Branch">
-            </app-master-dropdown>
+        <app-master-dropdown
+          endpoint="branches"
+          [(ngModel)]="purchaseFilter.branchId"
+          (onChange)="applyFilters()"
+          placeholder="Branch">
+        </app-master-dropdown>
 
-            <p-select
-              [options]="statusOptions"
-              [(ngModel)]="purchaseFilter.status"
-              [showClear]="true"
-              placeholder="Status"
-              (onChange)="applyFilters()">
-            </p-select>
+        <app-select-filter
+          [options]="statusOptions"
+          [value]="purchaseFilter.status"
+          placeholder="Status"
+          (valueChange)="purchaseFilter.status = $event; applyFilters()">
+        </app-select-filter>
 
-            <p-select
-              [options]="paymentStatusOptions"
-              [(ngModel)]="purchaseFilter.paymentStatus"
-              [showClear]="true"
-              placeholder="Payment"
-              (onChange)="applyFilters()">
-            </p-select>
+        <app-select-filter
+          [options]="paymentStatusOptions"
+          [value]="purchaseFilter.paymentStatus"
+          placeholder="Payment"
+          (valueChange)="purchaseFilter.paymentStatus = $event; applyFilters()">
+        </app-select-filter>
 
-            <p-datepicker
-              [(ngModel)]="purchaseFilter.dateRange"
-              selectionMode="range"
-              placeholder="Date Range"
-              appendTo="body"
-              (onClose)="applyFilters()">
-            </p-datepicker>
+        <app-date-filter
+          [value]="purchaseFilter.dateRange"
+          (valueChange)="purchaseFilter.dateRange = $any($event); applyFilters()">
+        </app-date-filter>
 
-            <p-button
-              icon="pi pi-times"
-              [text]="true"
-              severity="secondary"
-              pTooltip="Reset Filters"
-              (onClick)="resetFilters()">
-            </p-button>
-          </div>
-        </div>
+        <p-button
+          icon="pi pi-times"
+          [text]="true"
+          severity="secondary"
+          pTooltip="Reset Filters"
+          (onClick)="resetFilters()">
+        </p-button>
+      </app-page-toolbar>
 
-        <!-- DataGrid -->
+      <app-page-content [padded]="false">
         <app-data-grid
           [columns]="columns"
           [data]="data()"
@@ -152,38 +146,7 @@ import { MasterDropdownComponent } from '../../shared/components/masterFilterDro
       </app-page-content>
     </app-page>
   `,
-  styles: [`
-    :host {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      min-height: 0;
-      width: 100%;
-      height: 100%;
-    }
-
-    .filter-toolbar {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-md);
-      flex-wrap: wrap;
-      margin-bottom: var(--spacing-md);
-
-      &__search {
-        min-width: 200px;
-        max-width: 260px;
-        flex: 1;
-      }
-
-      &__filters {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-md);
-        flex-wrap: wrap;
-        flex: 2;
-      }
-    }
-  `]
+  styles: []
 })
 export class PurchaseListComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();

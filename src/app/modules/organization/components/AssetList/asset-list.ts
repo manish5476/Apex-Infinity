@@ -23,6 +23,9 @@ import { PageContentComponent } from '../../../../shared/ui/layout/page-content/
 
 // Enterprise DataGrid
 import { DataGridComponent } from '../../../../shared/ui/grid/dataGrid/data-grid.component';
+import { SearchFilterComponent } from '../../../../shared/ui/filters/search-filter.component';
+import { SelectFilterComponent } from '../../../../shared/ui/filters/select-filter.component';
+import { DateFilterComponent } from '../../../../shared/ui/filters/date-filter.component';
 import {
   GridColumn,
   GridRowAction,
@@ -61,6 +64,8 @@ export interface Asset {
     PageHeaderComponent,
     PageContentComponent,
     DataGridComponent,
+    SearchFilterComponent,
+    SelectFilterComponent,
   ],
   providers: [ConfirmationService],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -72,12 +77,46 @@ export interface Asset {
         title="Media Vault"
         subtitle="Manage your organization's digital assets"
         class="!m-0 !mb-6">
-        <p-button 
-          label="Upload File" 
-          icon="pi pi-upload" 
-          (onClick)="triggerUpload()"
-          styleClass="p-button-primary border-round-xl px-4 py-2 font-bold shadow-md">
-        </p-button>
+        <div header-right class="flex items-center gap-3">
+          <app-search-filter
+            [value]="filters().search"
+            (valueChange)="filters().search = $event; onSearchChange($event)">
+          </app-search-filter>
+
+          <app-select-filter
+            [options]="categoryOptions"
+            [value]="filters().category"
+            placeholder="Category"
+            (valueChange)="filters().category = $event; applyFilters()">
+          </app-select-filter>
+
+          <app-select-filter
+            [options]="[{label:'Today', value:'today'}, {label:'Last 7 Days', value:'7d'}]"
+            [value]="null"
+            placeholder="Date">
+          </app-select-filter>
+
+          <app-select-filter
+            [options]="[{label:'Me', value:'me'}, {label:'Anyone', value:'anyone'}]"
+            [value]="null"
+            placeholder="Owner">
+          </app-select-filter>
+
+          <p-button 
+            icon="pi pi-times" 
+            [text]="true"
+            severity="secondary"
+            pTooltip="Reset Filters"
+            (onClick)="resetFilters()">
+          </p-button>
+
+          <p-button 
+            label="Upload File" 
+            icon="pi pi-upload" 
+            (onClick)="triggerUpload()"
+            styleClass="p-button-primary border-round-xl px-4 py-2 font-bold shadow-md">
+          </p-button>
+        </div>
       </app-page-header>
 
       <app-page-content [density]="'compact'" [fullWidth]="true">
@@ -105,61 +144,6 @@ export interface Asset {
           </div>
         </div>
         }
-
-        <!-- Single-line Filter Toolbar -->
-        <div class="flex items-center gap-4 px-6 mb-5">
-          <!-- Search input with shortcut hint -->
-          <div class="relative flex-1 max-w-md">
-            <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-tertiary"></i>
-            <input 
-              id="search" 
-              type="text" 
-              pInputText 
-              placeholder="Search files, tags, uploader..." 
-              [(ngModel)]="filters().search"
-              (keydown.enter)="onSearchChange(filters().search)"
-              class="w-full pl-9 pr-12 py-2 border-round-xl border-1 border-secondary bg-primary m-0">
-            <div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center border-1 border-secondary border-round px-1.5 py-0.5 bg-secondary text-tertiary text-xs font-mono">
-              ⌘K
-            </div>
-          </div>
-
-          <p-select 
-            appendTo="body"
-            [options]="categoryOptions"
-            [(ngModel)]="filters().category"
-            (onChange)="applyFilters()"
-            [showClear]="true" 
-            placeholder="Category" 
-            styleClass="w-[160px] border-round-xl border-1 border-secondary bg-primary"
-            [filter]="true" 
-            filterBy="label">
-          </p-select>
-
-          <!-- Dummy Date Filter just to match the visual requested -->
-          <p-select 
-            appendTo="body"
-            [options]="[{label:'Today', value:'today'}, {label:'Last 7 Days', value:'7d'}]"
-            placeholder="Date" 
-            styleClass="w-[140px] border-round-xl border-1 border-secondary bg-primary"
-            [showClear]="true">
-          </p-select>
-          
-          <!-- Dummy Owner Filter -->
-          <p-select 
-            appendTo="body"
-            [options]="[{label:'Me', value:'me'}, {label:'Anyone', value:'anyone'}]"
-            placeholder="Owner" 
-            styleClass="w-[140px] border-round-xl border-1 border-secondary bg-primary"
-            [showClear]="true">
-          </p-select>
-
-          <p-button 
-            label="Reset" 
-            styleClass="p-button-text p-button-secondary ml-auto border-round-xl font-medium"
-            (onClick)="resetFilters()">
-          </p-button>
-        </div>
 
         <div class="px-6 pb-6 flex-1 flex flex-col min-h-0">
           <!-- Wrapper Card for Datagrid -->

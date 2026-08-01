@@ -22,6 +22,7 @@ import { DataGridComponent, GridColumn, GridRowAction } from '@shared/ui/grid';
 import { PageComponent } from '@shared/ui/layout/page/page.component';
 import { PageContentComponent } from '@shared/ui/layout/page-content/page-content.component';
 import { PageHeaderComponent } from '@shared/ui/layout/page-header/page-header.component';
+import { SearchFilterComponent } from '@shared/ui/filters/search-filter.component';
 
 // Core
 import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
@@ -29,6 +30,7 @@ import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
 import { SupplierService } from '../../services/supplier-service';
+import { ButtonComponent } from '@shared/ui/form/button.component';
 
 @Component({
   selector: 'app-supplier-list',
@@ -45,7 +47,7 @@ import { SupplierService } from '../../services/supplier-service';
     PageComponent,
     PageHeaderComponent,
     PageContentComponent,
-  ],
+    SearchFilterComponent  ],
   template: `
     <p-toast position="bottom-right" appendTo="body"></p-toast>
 
@@ -54,6 +56,25 @@ import { SupplierService } from '../../services/supplier-service';
         title="Suppliers"
         subtitle="Manage supplier profiles, contacts, and financial terms">
         <div header-right class="flex items-center gap-3">
+          <app-search-filter
+            [value]="supplierFilter.phone"
+            placeholder="Phone..."
+            (valueChange)="supplierFilter.phone = $event; applyFilters()">
+          </app-search-filter>
+
+          <app-search-filter
+            [value]="supplierFilter.search"
+            (valueChange)="supplierFilter.search = $event; applyFilters()">
+          </app-search-filter>
+
+          <p-button
+            icon="pi pi-times"
+            [text]="true"
+            severity="secondary"
+            pTooltip="Reset Filters"
+            (onClick)="resetFilters()">
+          </p-button>
+
           <p-button
             icon="pi pi-refresh"
             [text]="true"
@@ -72,36 +93,7 @@ import { SupplierService } from '../../services/supplier-service';
         </div>
       </app-page-header>
 
-      <app-page-content [padded]="true">
-        <!-- Filter Toolbar -->
-        <div class="filter-toolbar">
-          <div class="filter-toolbar__search">
-            <input
-              type="text"
-              pInputText
-              [(ngModel)]="supplierFilter.search"
-              placeholder="Search suppliers..."
-              (keydown.enter)="applyFilters()"
-              (blur)="applyFilters()"
-              class="w-full" />
-          </div>
-          <div class="filter-toolbar__filters">
-            <input
-              type="text"
-              pInputText
-              [(ngModel)]="supplierFilter.phone"
-              placeholder="Phone..."
-              (keydown.enter)="applyFilters()"
-              (blur)="applyFilters()" />
-            <p-button
-              icon="pi pi-times"
-              [text]="true"
-              severity="secondary"
-              pTooltip="Reset Filters"
-              (onClick)="resetFilters()">
-            </p-button>
-          </div>
-        </div>
+      <app-page-content [padded]="false">
 
         <!-- DataGrid -->
         <app-data-grid
@@ -114,38 +106,7 @@ import { SupplierService } from '../../services/supplier-service';
       </app-page-content>
     </app-page>
   `,
-  styles: [`
-    :host {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      min-height: 0;
-      width: 100%;
-      height: 100%;
-    }
-
-    .filter-toolbar {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-md);
-      flex-wrap: wrap;
-      margin-bottom: var(--spacing-md);
-
-      &__search {
-        min-width: 240px;
-        max-width: 340px;
-        flex: 1;
-      }
-
-      &__filters {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-md);
-        flex-wrap: wrap;
-        flex: 1;
-      }
-    }
-  `]
+  styles: []
 })
 export class SupplierListComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();

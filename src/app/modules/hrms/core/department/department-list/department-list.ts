@@ -23,6 +23,8 @@ import { MasterDropdownComponent } from '../../../../shared/components/masterFil
 
 import { AppMessageService } from '../../../../../core/services/message.service';
 import { HRMSService } from '../../../hrms.service';
+import { SearchFilterComponent } from "@shared/ui/filters/search-filter.component";
+import { SelectFilterComponent } from "@shared/ui/filters/select-filter.component";
 
 @Component({
   selector: 'app-department-list',
@@ -39,46 +41,47 @@ import { HRMSService } from '../../../hrms.service';
     PageHeaderComponent,
     PageContentComponent,
     MasterDropdownComponent,
-  ],
+    SearchFilterComponent,
+    SelectFilterComponent
+],
   template: `
     <app-page>
       <app-page-header
         title="Departments"
         subtitle="Manage organizational structure, branches, and leadership">
         <div header-right class="flex items-center gap-3">
+          <app-search-filter
+            [value]="deptFilter().search"
+            (valueChange)="updateSearch($event)"
+            placeholder="Search department or code...">
+          </app-search-filter>
+
+          <app-master-dropdown 
+            endpoint="branches" 
+            [ngModel]="deptFilter().branchId" 
+            (ngModelChange)="updateBranch($event)" 
+            placeholder="All Branches">
+          </app-master-dropdown>
+
+          <app-select-filter
+            [options]="statusOptions"
+            [value]="deptFilter().isActive"
+            (valueChange)="updateStatus($event)"
+            placeholder="Status">
+          </app-select-filter>
+
+          <p-button icon="pi pi-times" [text]="true" severity="secondary"
+            pTooltip="Reset Filters" (onClick)="resetFilters()">
+          </p-button>
+
+          <div class="w-px h-8 bg-[var(--border-primary)] mx-1"></div>
+
           <span class="total-badge">{{ totalCount() }} Records</span>
           <p-button label="Add Department" icon="pi pi-plus" (onClick)="createNew()"></p-button>
         </div>
       </app-page-header>
 
       <app-page-content [padded]="true">
-        <div class="filter-toolbar">
-          <div class="filter-toolbar__search">
-            <input type="text" pInputText
-              [ngModel]="deptFilter().search"
-              (ngModelChange)="updateSearch($event)"
-              placeholder="Search department or code..." />
-          </div>
-          <div class="filter-toolbar__filters">
-            <div class="filter-dropdown">
-              <app-master-dropdown 
-                endpoint="branches" 
-                [ngModel]="deptFilter().branchId" 
-                (ngModelChange)="updateBranch($event)" 
-                placeholder="All Branches">
-              </app-master-dropdown>
-            </div>
-            
-            <p-select [options]="statusOptions" [ngModel]="deptFilter().isActive"
-              (ngModelChange)="updateStatus($event)"
-              [showClear]="true" placeholder="Status">
-            </p-select>
-            <p-button icon="pi pi-times" [text]="true" severity="secondary"
-              pTooltip="Reset Filters" (onClick)="resetFilters()">
-            </p-button>
-          </div>
-        </div>
-
         <app-data-grid
           [columns]="columns"
           [data]="data()"
@@ -92,10 +95,6 @@ import { HRMSService } from '../../../hrms.service';
   styles: [`
     :host { display: flex; flex-direction: column; flex: 1; min-height: 0; width: 100%; height: 100%; }
     .total-badge { font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold); color: var(--text-secondary); background: var(--bg-secondary); border: 1px solid var(--border-primary); padding: var(--spacing-xs) var(--spacing-md); border-radius: var(--ui-border-radius); }
-    .filter-toolbar { display: flex; align-items: center; gap: var(--spacing-md); flex-wrap: wrap; margin-bottom: var(--spacing-md); }
-    .filter-toolbar__search { min-width: 250px; max-width: 350px; flex: 1; }
-    .filter-toolbar__filters { display: flex; align-items: center; gap: var(--spacing-md); flex-wrap: wrap; flex: 1; }
-    .filter-dropdown { min-width: 200px; }
   `]
 })
 export class DepartmentListComponent implements OnInit, OnDestroy {

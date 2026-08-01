@@ -15,7 +15,7 @@ import { DatePicker } from 'primeng/datepicker';
 import { Select } from 'primeng/select';
 import { Toast } from "primeng/toast";
 import { TabsModule } from 'primeng/tabs';
-import { AgShareGrid } from "../../shared/components/ag-shared-grid";
+import { DataGridComponent, GridColumn } from '@shared/ui/grid';
 // Services
 import { AppMessageService } from '../../../core/services/message.service';
 import { PurchaseService } from '../purchase.service';
@@ -29,7 +29,7 @@ import { PERMISSIONS } from '../../../core/auth/permissions.constants';
 @Component({
   selector: 'app-purchase-details',
   standalone: true,
-  imports: [CommonModule, RouterLink, ReactiveFormsModule, CurrencyPipe, TitleCasePipe, TabsModule, ButtonModule, TagModule, DividerModule, DialogModule, InputNumberModule, DatePicker, FormsModule, Select, InputTextModule, Toast, AgShareGrid, FileUpload, ImageViewerDirective, Badge, HasPermissionDirective],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, CurrencyPipe, TitleCasePipe, TabsModule, ButtonModule, TagModule, DividerModule, DialogModule, InputNumberModule, DatePicker, FormsModule, Select, InputTextModule, Toast, DataGridComponent, FileUpload, ImageViewerDirective, Badge, HasPermissionDirective],
   templateUrl: './purchase-details.html',
   styleUrl: './purchase-details.scss',
 })
@@ -80,130 +80,86 @@ export class PurchaseDetailsComponent implements OnInit, OnDestroy {
     const imageFormats = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'svg'];
     return imageFormats.includes(format?.toLowerCase());
   }
-  itemColumns: any = [
+  itemColumns: GridColumn[] = [
     {
-      headerName: 'Product',
+      header: 'Product',
       field: 'name',
-      width: 250,
-      cellRenderer: (params: any) => {
-        const name = params.data.productId?.name || params.value;
-        const sku = params.data.productId?.sku;
-        return `
-           <div>
-             <div style="font-weight:600; color:var(--text-primary)">${name}</div>
-             ${sku ? `<div style="font-size:10px; color:var(--text-secondary)">SKU: ${sku}</div>` : ''}
-           </div>
-         `;
-      }
+      width: '250px',
+      formatter: (val: any, row: any) => row.productId?.sku ? `${row.productId?.name || val} (SKU: ${row.productId?.sku})` : (row.productId?.name || val)
     },
     {
-      headerName: 'Qty',
+      header: 'Qty',
       field: 'quantity',
-      width: 80,
-      type: 'rightAligned',
-      cellStyle: { fontWeight: '700' }
+      width: '80px',
+      align: 'right'
     },
     {
-      headerName: 'Catalog Price',
+      header: 'Catalog Price',
       field: 'productId.purchasePrice',
-      width: 140,
-      type: 'rightAligned',
-      headerTooltip: 'Master purchase price from product catalog',
-      cellRenderer: (params: any) => {
-        const catalogPrice = params.data.productId?.purchasePrice;
-        const invoicePrice = params.data.purchasePrice;
-        if (catalogPrice == null) return `<span style="color:var(--text-tertiary); font-size:11px;">N/A</span>`;
-        const formatted = this.formatCurrency(catalogPrice);
-        let badge = '';
-        if (invoicePrice != null && catalogPrice !== invoicePrice) {
-          const diff = invoicePrice - catalogPrice;
-          const color = diff > 0 ? 'var(--color-error, #ef4444)' : 'var(--color-success, #22c55e)';
-          const arrow = diff > 0 ? '▲' : '▼';
-          badge = `<span style="font-size:9px; color:${color}; margin-left:4px; font-weight:700;">${arrow} ${this.formatCurrency(Math.abs(diff))}</span>`;
-        }
-        return `<span style="color:var(--text-secondary);">${formatted}</span>${badge}`;
-      }
+      width: '140px',
+      type: 'currency',
+      align: 'right'
     },
     {
-      headerName: 'Unit Price',
+      header: 'Unit Price',
       field: 'purchasePrice',
-      width: 120,
-      type: 'rightAligned',
-      headerTooltip: 'Price at which this item was purchased in this invoice',
-      cellStyle: { fontWeight: '600', color: 'var(--text-primary)' },
-      valueFormatter: (p: any) => this.formatCurrency(p.value)
+      width: '120px',
+      type: 'currency',
+      align: 'right'
     },
     {
-      headerName: 'Tax',
+      header: 'Tax',
       field: 'taxRate',
-      width: 80,
-      type: 'rightAligned',
-      valueFormatter: (p: any) => (p.value || 0) + '%'
+      width: '80px',
+      align: 'right',
+      formatter: (val: any) => (val || 0) + '%'
     },
     {
-      headerName: 'Discount',
+      header: 'Discount',
       field: 'discount',
-      width: 100,
-      type: 'rightAligned',
-      cellStyle: { color: 'var(--color-error)' },
-      valueFormatter: (p: any) => p.value ? '-' + this.formatCurrency(p.value) : '-'
+      width: '100px',
+      type: 'currency',
+      align: 'right'
     },
     {
-      headerName: 'Total',
+      header: 'Total',
       field: 'total',
-      width: 130,
-      type: 'rightAligned',
-      cellStyle: { fontWeight: '700', color: 'var(--text-primary)' },
-      valueGetter: (params: any) => {
-        const item = params.data;
-        const total = ((item.purchasePrice * item.quantity) - (item.discount || 0)) * (1 + ((item.taxRate || 0) / 100));
-        return total;
-      },
-      valueFormatter: (p: any) => this.formatCurrency(p.value)
+      width: '130px',
+      type: 'currency',
+      align: 'right',
+      formatter: (val: any, row: any) => {
+        const item = row;
+        return (((item.purchasePrice * item.quantity) - (item.discount || 0)) * (1 + ((item.taxRate || 0) / 100))).toString();
+      }
     }
   ];
 
   // 2. Payment History Columns
-  paymentColumns = [
+  paymentColumns: GridColumn[] = [
     {
-      headerName: 'Date',
+      header: 'Date',
       field: 'paymentDate',
-      width: 120,
-      valueFormatter: (p: any) => p.value ? new Date(p.value).toLocaleDateString('en-IN') : '-'
+      width: '120px',
+      type: 'date',
+      dateFormat: 'dd MMM yyyy'
     },
     {
-      headerName: 'Reference',
+      header: 'Reference',
       field: 'referenceNumber',
-      width: 150,
-      valueFormatter: (p: any) => p.value || '-'
+      width: '150px'
     },
     {
-      headerName: 'Method',
+      header: 'Method',
       field: 'paymentMethod',
-      width: 120,
-      cellRenderer: (params: any) => {
-        return `<span style="text-transform:uppercase; font-size:11px; font-weight:700; color:var(--text-secondary)">${params.value}</span>`;
-      }
+      width: '120px',
+      type: 'chip'
     },
     {
-      headerName: 'Amount',
+      header: 'Amount',
       field: 'amount',
-      width: 130,
-      type: 'rightAligned',
-      cellStyle: { color: 'var(--color-success)', fontWeight: '700' },
-      valueFormatter: (p: any) => this.formatCurrency(p.value)
-    },
-    {
-      headerName: 'Action',
-      field: '_id',
-      width: 80,
-      cellRenderer: (params: any) => {
-        // We use a simple button here or you can use your ActionRenderer if it supports specific actions
-        return `<button class="p-button-danger p-button-text" style="border:none; background:transparent; color:var(--color-error); cursor:pointer;">
-                  <i class="pi pi-trash"></i>
-                 </button>`;
-      },
-      onCellClicked: (params: any) => this.deletePayment(params.value, params.data.amount)
+      width: '130px',
+      type: 'currency',
+      align: 'right'
     }
   ];
 

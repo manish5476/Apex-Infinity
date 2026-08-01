@@ -20,12 +20,18 @@ import { ConfirmationService } from 'primeng/api';
 import { GridApi } from 'ag-grid-community';
 
 import { AppMessageService } from '../../../../core/services/message.service';
-import { AgShareGrid, ActionColumnConfig } from '../../../shared/components/ag-shared-grid';
+
 import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '@core/auth/permissions.constants';
 import { CommonMethodService } from '@core/utils/common-method.service';
 import { AnnouncementService, CreateAnnouncementPayload, UpdateAnnouncementPayload } from '@core/services/announcement.service';
 import { takeUntil } from "rxjs/operators";
+import { SearchFilterComponent } from '@shared/ui/filters/search-filter.component';
+import { SelectFilterComponent } from '@shared/ui/filters/select-filter.component';
+import { DataGridComponent, GridColumn, GridRowAction } from '@shared/ui/grid';
+import { PageContentComponent } from '@shared/ui/layout/page-content/page-content.component';
+import { PageHeaderComponent } from '@shared/ui/layout/page-header/page-header.component';
+import { PageComponent } from '@shared/ui/layout/page/page.component';
 
 // ─── Form Model ───────────────────────────────────────────────
 interface AnnouncementForm {
@@ -47,7 +53,9 @@ interface AnnouncementForm {
     ButtonModule, DialogModule, SelectModule,
     InputTextModule, TextareaModule, ToastModule,
     ToggleSwitchModule, TooltipModule, ConfirmDialogModule,
-    AgShareGrid, HasPermissionDirective,
+    HasPermissionDirective,
+    DataGridComponent, PageComponent, PageHeaderComponent, PageContentComponent,
+     SelectFilterComponent,
   ],
   providers: [AnnouncementService, ConfirmationService],
   templateUrl: './announcement-list.html',
@@ -72,7 +80,7 @@ export class AnnouncementList implements OnInit, OnDestroy {
 
   // ── State ────────────────────────────────────────────────────
   data = signal<any[]>([]);
-  columns: any[] = [];
+  columns: GridColumn[] = [];
   stats = signal<any>(null);
   dialogOpen = signal(false);
   dialogMode = signal<'create' | 'edit'>('create');
@@ -115,13 +123,23 @@ export class AnnouncementList implements OnInit, OnDestroy {
   // ── Computed ─────────────────────────────────────────────────
   totalUnread = computed(() => this.stats()?.totalUnread ?? 0);
 
-  readonly actionColumn: ActionColumnConfig = {
-    showView: false,
-    showEdit: true,
-    showDelete: true,
-    editPermission: PERMISSIONS.ANNOUNCEMENT?.MANAGE,
-    deletePermission: PERMISSIONS.ANNOUNCEMENT?.MANAGE,
-  };
+  readonly rowActions: GridRowAction[] = [
+    {
+      id: 'edit',
+      icon: 'pi pi-pencil',
+      tooltip: 'Edit',
+      permission: PERMISSIONS.ANNOUNCEMENT?.MANAGE,
+      callback: (row) => this.openEdit(row),
+    },
+    {
+      id: 'delete',
+      icon: 'pi pi-trash',
+      tooltip: 'Delete',
+      variant: 'danger',
+      permission: PERMISSIONS.ANNOUNCEMENT?.MANAGE,
+      callback: (row) => this.confirmDelete(row),
+    }
+  ];
 
   // ─────────────────────────────────────────────────────────────
   ngOnInit(): void {
@@ -324,118 +342,58 @@ export class AnnouncementList implements OnInit, OnDestroy {
 
     this.columns = [
       {
-        headerName: '#',
-        valueGetter: 'node.rowIndex + 1',
-        width: 52,
-        sortable: false,
-        filter: false,
-        suppressHeaderMenuButton: true,
-        pinned: 'left',
-        cellStyle: { color: 'var(--text-secondary)', fontSize: '11px', textAlign: 'center' },
-      },
-      {
-        headerName: 'Title',
+        header: 'Title',
+        field: 'title',
         flex: 2,
-        minWidth: 200,
-        sortable: true,
-        filter: true,
-        valueGetter: (p: any) => p.data?.title ?? '',
-        cellRenderer: (p: any) => {
-          const row = p.data;
-          const pinBadge = row.isPinned
-            ? `<span style="font-size:9px;padding:1px 6px;border-radius:99px;background:var(--accent-focus);color:var(--accent-primary);font-weight:700;margin-left:6px">📌 PINNED</span>` : '';
-          const urgentBadge = row.isUrgent
-            ? `<span style="font-size:9px;padding:1px 6px;border-radius:99px;background:var(--color-error-bg);color:var(--color-error-dark);font-weight:700;margin-left:4px">🔴 URGENT</span>` : '';
-          return `
-            <div style="padding:4px 0;line-height:1.35">
-              <div style="display:flex;align-items:center;flex-wrap:wrap;gap:2px">
-                <span style="font-size:13px;font-weight:600;color:var(--text-primary)">${row.title}</span>
-                ${pinBadge}${urgentBadge}
-              </div>
-              <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:340px">${row.message}</div>
-            </div>`;
-        },
+        minWidth: '200px',
+        formatter: (val: any, row: any) => {
+          let extra = '';
+          if (row.isPinned) extra += ' 📌 PINNED';
+          if (row.isUrgent) extra += ' 🔴 URGENT';
+          return extra ? `${val} ${extra}` : val;
+        }
       },
       {
-        headerName: 'Type',
+        header: 'Type',
         field: 'type',
-        width: 110,
-        sortable: true,
-        filter: true,
-        cellRenderer: (p: any) => {
-          const map: Record<string, [string, string, string]> = {
-            info: ['var(--color-info-bg)', 'var(--color-info-dark)', 'ℹ'],
-            warning: ['var(--color-warning-bg)', 'var(--color-warning-dark)', '⚠'],
-            success: ['var(--color-success-bg)', 'var(--color-success-dark)', '✓'],
-            alert: ['var(--color-error-bg)', 'var(--color-error-dark)', '!'],
-          };
-          const [bg, color, icon] = map[p.value] || ['var(--bg-ternary)', 'var(--text-secondary)', '·'];
-          return `<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:99px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;background:${bg};color:${color}">${icon} ${p.value}</span>`;
-        },
+        width: '110px',
+        type: 'badge'
       },
       {
-        headerName: 'Audience',
+        header: 'Audience',
         field: 'targetAudience',
-        width: 120,
-        sortable: true,
-        filter: true,
-        cellRenderer: (p: any) => {
-          const map: Record<string, string> = { all: '🌐', staff: '👥', customers: '🤝' };
-          const icon = map[p.value] ?? '—';
-          return `<span style="font-size:12px;color:var(--text-secondary);display:flex;align-items:center;gap:5px">${icon} <span style="text-transform:capitalize">${p.value}</span></span>`;
-        },
+        width: '120px',
+        formatter: (val: any) => {
+          const map: Record<string, string> = { all: '🌐 All', staff: '👥 Staff', customers: '🤝 Customers' };
+          return map[val] ?? val;
+        }
       },
       {
-        headerName: 'Priority',
+        header: 'Priority',
         field: 'priority',
-        width: 105,
-        sortable: true,
-        cellRenderer: (p: any) => {
-          const map: Record<string, [string, string]> = {
-            high: ['var(--color-error-bg)', 'var(--color-error-dark)'],
-            medium: ['var(--color-warning-bg)', 'var(--color-warning-dark)'],
-            low: ['var(--bg-ternary)', 'var(--text-secondary)'],
-          };
-          const [bg, color] = map[p.value] || ['var(--bg-ternary)', 'var(--text-secondary)'];
-          return `<span style="padding:2px 9px;border-radius:99px;font-size:10px;font-weight:700;text-transform:capitalize;background:${bg};color:${color}">${p.value}</span>`;
-        },
+        width: '105px',
+        type: 'badge'
       },
       {
-        headerName: 'Sender',
+        header: 'Sender',
         field: 'senderId',
-        minWidth: 130,
+        minWidth: '130px',
         flex: 1,
-        valueFormatter: (p: any) => p.value?.name ?? '—',
-        cellRenderer: (p: any) => {
-          const name = p.value?.name ?? '—';
-          const initials = name.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase();
-          return `
-            <div style="display:flex;align-items:center;gap:7px;padding:4px 0">
-              <div style="width:24px;height:24px;border-radius:50%;background:var(--accent-focus);color:var(--accent-primary);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0">${initials}</div>
-              <span style="font-size:12px;color:var(--text-secondary)">${name}</span>
-            </div>`;
-        },
+        formatter: (val: any) => val?.name ?? '—'
       },
       {
-        headerName: 'Status',
+        header: 'Status',
         field: 'isActive',
-        width: 100,
-        cellRenderer: (p: any) => p.value
-          ? `<span style="padding:2px 10px;border-radius:99px;font-size:10px;font-weight:700;background:var(--color-success-bg);color:var(--color-success-dark)">Active</span>`
-          : `<span style="padding:2px 10px;border-radius:99px;font-size:10px;font-weight:700;background:var(--bg-ternary);color:var(--text-secondary)">Inactive</span>`,
+        width: '100px',
+        type: 'status',
+        formatter: (val: any) => val ? 'Active' : 'Inactive'
       },
       {
-        headerName: 'Created',
+        header: 'Created',
         field: 'createdAt',
-        minWidth: 130,
-        sortable: true,
-        valueFormatter: (p: any) => this.common.formatDate(p.value),
-        cellRenderer: (p: any) => `
-          <div style="font-size:11px;color:var(--text-secondary);line-height:1.4">
-            <div>${c.formatDate(p.value)}</div>
-            <div style="font-size:10px;color:var(--text-tertiary)">${c.timeAgoText(p.value)}</div>
-          </div>`,
-      },
+        minWidth: '130px',
+        formatter: (val: any) => this.common.formatDate(val)
+      }
     ];
     this.cdr.detectChanges();
   }

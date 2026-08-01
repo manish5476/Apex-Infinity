@@ -22,6 +22,8 @@ import { PageHeaderComponent } from '@shared/ui/layout/page-header/page-header.c
 
 import { AppMessageService } from '../../../../core/services/message.service';
 import { HRMSService } from '../../hrms.service';
+import { SearchFilterComponent } from "@shared/ui/filters/search-filter.component";
+import { SelectFilterComponent } from "@shared/ui/filters/select-filter.component";
 
 @Component({
   selector: 'app-shift-list',
@@ -36,42 +38,48 @@ import { HRMSService } from '../../hrms.service';
     DataGridComponent,
     PageComponent,
     PageHeaderComponent,
-    PageContentComponent,
-  ],
+    SearchFilterComponent,
+    SelectFilterComponent,
+    PageContentComponent
+],
   template: `
     <app-page>
       <app-page-header
         title="Shift Management"
         subtitle="View, filter, and manage organizational shift configurations">
         <div header-right class="flex items-center gap-3">
+          <app-search-filter
+            [value]="shiftFilter().search"
+            (valueChange)="onSearchChange($event)"
+            placeholder="Search shifts...">
+          </app-search-filter>
+
+          <app-select-filter
+            [options]="typeOptions"
+            [value]="shiftFilter().shiftType"
+            (valueChange)="updateFilter('shiftType', $event)"
+            placeholder="Type">
+          </app-select-filter>
+
+          <app-select-filter
+            [options]="statusOptions"
+            [value]="shiftFilter().isActive"
+            (valueChange)="updateFilter('isActive', $event)"
+            placeholder="Status">
+          </app-select-filter>
+
+          <p-button icon="pi pi-times" [text]="true" severity="secondary"
+            pTooltip="Reset" (onClick)="resetFilters()">
+          </p-button>
+
+          <div class="w-px h-8 bg-[var(--border-primary)] mx-1"></div>
+
           <span class="total-badge">{{ totalCount() }} Shifts</span>
           <p-button label="Add Shift" icon="pi pi-plus" (onClick)="createNew()"></p-button>
         </div>
       </app-page-header>
 
       <app-page-content [padded]="true">
-        <div class="filter-toolbar">
-          <div class="filter-toolbar__search">
-            <input type="text" pInputText
-              [ngModel]="shiftFilter().search"
-              (ngModelChange)="onSearchChange($event)"
-              placeholder="Search shifts..." />
-          </div>
-          <div class="filter-toolbar__filters">
-            <p-select [options]="typeOptions" [ngModel]="shiftFilter().shiftType"
-              (ngModelChange)="updateFilter('shiftType', $event)"
-              [showClear]="true" placeholder="Type">
-            </p-select>
-            <p-select [options]="statusOptions" [ngModel]="shiftFilter().isActive"
-              (ngModelChange)="updateFilter('isActive', $event)"
-              [showClear]="true" placeholder="Status">
-            </p-select>
-            <p-button icon="pi pi-times" [text]="true" severity="secondary"
-              pTooltip="Reset" (onClick)="resetFilters()">
-            </p-button>
-          </div>
-        </div>
-
         <app-data-grid
           [columns]="columns"
           [data]="data()"
@@ -85,9 +93,6 @@ import { HRMSService } from '../../hrms.service';
   styles: [`
     :host { display: flex; flex-direction: column; flex: 1; min-height: 0; width: 100%; height: 100%; }
     .total-badge { font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold); color: var(--text-secondary); background: var(--bg-secondary); border: 1px solid var(--border-primary); padding: var(--spacing-xs) var(--spacing-md); border-radius: var(--ui-border-radius); }
-    .filter-toolbar { display: flex; align-items: center; gap: var(--spacing-md); flex-wrap: wrap; margin-bottom: var(--spacing-md); }
-    .filter-toolbar__search { min-width: 200px; max-width: 300px; flex: 1; }
-    .filter-toolbar__filters { display: flex; align-items: center; gap: var(--spacing-md); flex-wrap: wrap; flex: 1; }
   `]
 })
 export class ShiftListComponent implements OnInit {

@@ -20,9 +20,13 @@ import { DataGridComponent, GridColumn } from '@shared/ui/grid';
 import { PageComponent } from '@shared/ui/layout/page/page.component';
 import { PageContentComponent } from '@shared/ui/layout/page-content/page-content.component';
 import { PageHeaderComponent } from '@shared/ui/layout/page-header/page-header.component';
+import { SearchFilterComponent } from '@shared/ui/filters/search-filter.component';
+import { DateFilterComponent } from '@shared/ui/filters/date-filter.component';
+import { SelectFilterComponent } from '@shared/ui/filters/select-filter.component';
 
 import { CommonMethodService } from '../../../core/utils/common-method.service';
 import { TransactionService } from '../transaction.service';
+import { ButtonComponent } from '@shared/ui/form/button.component';
 
 @Component({
   selector: 'app-logs',
@@ -31,13 +35,13 @@ import { TransactionService } from '../transaction.service';
   imports: [
     FormsModule,
     ButtonModule,
-    InputTextModule,
-    SelectModule,
-    DatePickerModule,
     DataGridComponent,
     PageComponent,
     PageHeaderComponent,
     PageContentComponent,
+    SearchFilterComponent,
+    DateFilterComponent,
+    SelectFilterComponent,
   ],
   template: `
     <app-page>
@@ -45,49 +49,29 @@ import { TransactionService } from '../transaction.service';
         title="System Logs"
         subtitle="Server application logs for debugging and monitoring">
         <div header-right class="flex items-center gap-3">
-          <p-button
-            icon="pi pi-refresh"
-            [text]="true"
-            [rounded]="true"
-            severity="secondary"
-            [loading]="isLoading()"
-            (onClick)="getLogs()"
-            pTooltip="Refresh">
-          </p-button>
-        </div>
-      </app-page-header>
-
-      <app-page-content [padded]="true">
-        <!-- Filter Toolbar -->
-        <div class="filter-toolbar">
-          <p-select
+          <app-select-filter
             [options]="logFiles"
-            [(ngModel)]="filters.file"
+            [value]="filters.file"
             placeholder="Log File"
-            (onChange)="applyFilters()">
-          </p-select>
+            (valueChange)="filters.file = $event; applyFilters()">
+          </app-select-filter>
 
-          <p-datepicker
-            [(ngModel)]="dateRange"
-            selectionMode="range"
-            placeholder="Date Range"
-            appendTo="body"
-            (onClose)="applyFilters()">
-          </p-datepicker>
+          <app-date-filter
+            [value]="dateRange"
+            (valueChange)="dateRange = $event; applyFilters()">
+          </app-date-filter>
 
-          <input
-            type="text"
-            pInputText
-            [(ngModel)]="filters.search"
-            placeholder="Search message..."
-            (keydown.enter)="applyFilters()" />
-
-          <p-select
+          <app-select-filter
             [options]="limitOptions"
-            [(ngModel)]="filters.limit"
+            [value]="filters.limit"
             placeholder="Limit"
-            (onChange)="applyFilters()">
-          </p-select>
+            (valueChange)="filters.limit = $event; applyFilters()">
+          </app-select-filter>
+
+          <app-search-filter
+            [value]="filters.search"
+            (valueChange)="filters.search = $event; applyFilters()">
+          </app-search-filter>
 
           <p-button
             icon="pi pi-times"
@@ -96,7 +80,19 @@ import { TransactionService } from '../transaction.service';
             pTooltip="Reset"
             (onClick)="resetFilters()">
           </p-button>
+
+          <p-button
+            icon="pi pi-refresh"
+            [text]="true"
+            severity="secondary"
+            [loading]="isLoading()"
+            (onClick)="getLogs()"
+            pTooltip="Refresh">
+          </p-button>
         </div>
+      </app-page-header>
+
+      <app-page-content [padded]="false">
 
         <!-- DataGrid -->
         <app-data-grid
@@ -108,24 +104,7 @@ import { TransactionService } from '../transaction.service';
       </app-page-content>
     </app-page>
   `,
-  styles: [`
-    :host {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      min-height: 0;
-      width: 100%;
-      height: 100%;
-    }
-
-    .filter-toolbar {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-md);
-      flex-wrap: wrap;
-      margin-bottom: var(--spacing-md);
-    }
-  `]
+  styles: []
 })
 export class LogsComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
@@ -156,7 +135,7 @@ export class LogsComponent implements OnInit, OnDestroy {
     limit: 200,
   };
 
-  dateRange: Date[] | null = null;
+  dateRange: Date | Date[] | null = null;
 
   readonly columns: GridColumn[] = [
     {
@@ -198,9 +177,12 @@ export class LogsComponent implements OnInit, OnDestroy {
     this.isLoading.set(true);
     const params: Record<string, any> = { ...this.filters };
 
-    if (this.dateRange?.length === 2) {
+    if (Array.isArray(this.dateRange) && this.dateRange.length === 2) {
       if (this.dateRange[0]) params['startDate'] = this.format(this.dateRange[0]);
       if (this.dateRange[1]) params['endDate'] = this.format(this.dateRange[1]);
+    } else if (this.dateRange && !Array.isArray(this.dateRange)) {
+      params['startDate'] = this.format(this.dateRange);
+      params['endDate'] = this.format(this.dateRange);
     }
 
     this.logsService.getLogs(params).pipe(takeUntil(this.destroy$)).subscribe({
