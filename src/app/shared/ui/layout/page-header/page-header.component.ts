@@ -31,11 +31,11 @@ import {
 
   <div
 
-    class="flex flex-wrap items-center justify-between gap-5"
-    [class.px-5]="density() === 'compact'"
+    class="flex flex-wrap items-center justify-between gap-6"
+    [class.px-6]="density() === 'compact'"
     [class.py-3]="density() === 'compact'"
-    [class.px-7]="density() === 'normal'"
-    [class.py-5]="density() === 'normal'"
+    [class.px-8]="density() === 'normal'"
+    [class.py-4]="density() === 'normal'"
     [class.px-10]="density() === 'comfortable'"
     [class.py-6]="density() === 'comfortable'">
 
@@ -55,9 +55,9 @@ import {
                text-[var(--text-primary)]
                leading-tight"
 
-        [class.text-xl]="density() === 'compact'"
-        [class.text-2xl]="density() === 'normal'"
-        [class.text-3xl]="density() === 'comfortable'">
+        [class.text-[32px]]="density() === 'compact'"
+        [class.text-[36px]]="density() === 'normal'"
+        [class.text-[40px]]="density() === 'comfortable'">
 
         {{title()}}
 
@@ -71,7 +71,7 @@ import {
 
         class="m-0
                mt-1
-               text-[13px]
+               text-sm
                leading-5
                text-[var(--text-secondary)]">
 
@@ -89,7 +89,7 @@ import {
       class="flex
              items-center
              justify-end
-             gap-3
+             gap-4
              flex-wrap">
 
       <ng-content></ng-content>
@@ -146,12 +146,8 @@ export class PageHeaderComponent {
 
       'w-full',
 
-      // Much smaller default spacing
-      'mx-6',
-
-      'mt-3',
-
-      'mb-4',
+      // Unified spacing tokens
+      'mb-6',
 
       this.sticky()
         ? 'sticky top-[64px] z-[var(--z-sticky)] backdrop-blur-md'

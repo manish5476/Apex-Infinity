@@ -17,7 +17,7 @@ import { Component, ChangeDetectionStrategy, input, computed } from '@angular/co
     <div [class]="cardClasses()">
       
       @if (title() || subtitle()) {
-        <div class="px-[var(--spacing-2xl)] py-[var(--spacing-xl)] border-b border-[var(--component-divider)] flex flex-col md:flex-row justify-between items-start md:items-center gap-[var(--spacing-md)] bg-[var(--bg-secondary)]">
+        <div class="px-[var(--spacing-2xl)] pt-[var(--spacing-2xl)] pb-0 flex flex-col md:flex-row justify-between items-start md:items-center gap-[var(--spacing-md)]">
           <div class="flex flex-col gap-[var(--spacing-xs)]">
             @if (title()) {
               <h3 class="text-[length:var(--font-size-md)] font-[var(--font-weight-semibold)] text-[var(--text-primary)] m-0 tracking-tight">
@@ -60,7 +60,7 @@ export class CardComponent {
       lg: 'shadow-[var(--elevation-3)]'
     }[this.shadow()];
 
-    return `bg-[var(--component-bg)] rounded-[var(--ui-border-radius)] ${s} border border-[var(--component-border)] overflow-hidden flex flex-col h-full transition-[var(--transition-base)] hover:shadow-[var(--elevation-2)]`;
+    return `bg-[var(--component-bg)] rounded-xl ${s} border border-[var(--border-secondary)] overflow-hidden flex flex-col h-full transition-all duration-200 hover:-translate-y-1 hover:shadow-md`;
   });
 
   protected bodyClasses = computed(() => {

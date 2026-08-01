@@ -21,7 +21,7 @@ export type StatVariant =
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    class: 'block w-full'
+    class: 'block w-full h-full'
   },
   template: `
     <div [class]="cardClasses()">
@@ -32,7 +32,7 @@ export type StatVariant =
       }
 
       <!-- Header -->
-      <div class="flex items-start justify-between gap-4">
+      <div class="flex items-center justify-between gap-4">
 
         <div class="flex items-center gap-3 min-w-0">
 
@@ -116,10 +116,7 @@ export class StatCardComponent {
 
   protected cardClasses = computed(() => {
 
-    const padding =
-      this.density() === 'compact'
-        ? 'p-4'
-        : 'p-6';
+    const padding = 'p-6';
 
     const shadow = {
       none: '',
@@ -131,15 +128,17 @@ export class StatCardComponent {
       'group',
       'relative',
       'overflow-hidden',
-      'rounded-2xl',
+      'rounded-xl',
       'border',
-      'border-[var(--component-border)]',
+      'border-[var(--border-secondary)]',
       'bg-[var(--component-bg)]',
+      'flex',
+      'flex-col',
+      'h-full',
       'transition-all',
-      'duration-300',
+      'duration-200',
       'hover:-translate-y-1',
-      'hover:shadow-lg',
-      'hover:border-[var(--accent-primary)]',
+      'hover:shadow-md',
       padding,
       shadow
     ].join(' ');
