@@ -1,171 +1,140 @@
-import { Component, ChangeDetectionStrategy, input, output, signal, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, signal, HostListener } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { GridBulkAction, GridDensity } from '../grid-types';
 
-/**
- * Component: app-grid-toolbar
- * Integrated smart toolbar with three zones:
- *  LEFT  — search input + filter toggle + record count
- *  CENTER — selection banner (appears when rows selected)
- *  RIGHT  — density • column manager • saved views • export • refresh • add
- *
- * The toolbar automatically adapts its right-side actions to selection context.
- */
 @Component({
   selector: 'app-grid-toolbar',
   standalone: true,
+  imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { class: 'block w-full' },
   template: `
-    <div class="flex flex-col">
-
+    <div class="flex flex-col w-full relative z-50">
+      
       <!-- Main Toolbar Row -->
-      <div class="flex items-center justify-between gap-3 px-4 py-3 border-b border-[var(--border-secondary)] bg-[var(--bg-primary)]">
-
-        <!-- LEFT: Search + Filter toggle + Record count -->
-        <div class="flex items-center gap-2">
-
-          <!-- Search pill -->
-          <div class="flex items-center gap-2 px-3 py-1.5
-                      bg-[color-mix(in_srgb,var(--bg-secondary)_40%,transparent)] border border-transparent
-                      rounded-[var(--ui-border-radius-pill)]
-                      focus-within:bg-[var(--bg-primary)]
-                      focus-within:border-[color-mix(in_srgb,var(--border-secondary)_50%,transparent)]
-                      focus-within:shadow-[0_0_0_2px_color-mix(in_srgb,var(--accent-primary)_15%,transparent)]
-                      transition-[var(--transition-fast)] min-w-[200px]">
-            <i class="pi pi-search text-[10px] text-[var(--text-tertiary)] shrink-0"></i>
+      <div class="flex items-center justify-between gap-4 px-4 py-2.5 border-b border-[var(--border-secondary)] bg-[var(--bg-primary)]">
+        
+        <!-- LEFT: Search + Filter + Count -->
+        <div class="flex items-center gap-3">
+          
+          <!-- Search Input -->
+          <div class="flex items-center gap-2 px-3 py-1.5 min-w-[240px]
+                      bg-[var(--bg-secondary)] border border-[var(--border-secondary)]
+                      rounded-[var(--ui-border-radius-pill)] transition-[var(--transition-fast)]
+                      focus-within:border-[var(--accent-primary)] focus-within:bg-[var(--bg-primary)]
+                      focus-within:shadow-[0_0_0_2px_color-mix(in_srgb,var(--accent-primary)_15%,transparent)]">
+            <i class="pi pi-search text-[11px] text-[var(--text-tertiary)] shrink-0"></i>
             <input
               type="text"
-              placeholder="Search all columns…"
-              class="flex-1 bg-transparent border-none outline-none
-                     text-[length:var(--font-size-xs)] text-[var(--text-primary)]
-                     placeholder:text-[var(--text-tertiary)] min-w-0 w-40"
+              placeholder="Search all columns..."
+              class="flex-1 bg-transparent border-none outline-none text-[length:var(--font-size-xs)] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] w-full"
               [value]="searchQuery()"
               (input)="searchChange.emit($any($event.target).value)"
               (keydown.escape)="searchChange.emit('')">
             @if (searchQuery()) {
-              <button type="button"
-                      class="text-[var(--text-tertiary)] hover:text-[var(--text-primary)] outline-none"
-                      (click)="searchChange.emit('')">
+              <button type="button" class="text-[var(--text-tertiary)] hover:text-[var(--text-primary)] outline-none" (click)="searchChange.emit('')">
                 <i class="pi pi-times text-[10px]"></i>
               </button>
             }
           </div>
 
-          <!-- Filter toggle -->
+          <!-- Filter Toggle -->
           <button type="button"
-                  class="flex items-center gap-1.5 px-3 py-1.5
-                         rounded-[var(--ui-border-radius-pill)] text-[length:var(--font-size-xs)]
-                         font-[var(--font-weight-medium)] border border-transparent transition-[var(--transition-fast)] outline-none"
-                  [class]="filterActive()
-                    ? 'bg-[color-mix(in_srgb,var(--accent-primary)_10%,transparent)] text-[var(--accent-primary)]'
-                    : 'bg-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--component-bg-hover)]'"
+                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--ui-border-radius-pill)] text-[length:var(--font-size-xs)] font-[var(--font-weight-medium)] border transition-[var(--transition-fast)] outline-none"
+                  [class]="filterActive() 
+                    ? 'bg-[color-mix(in_srgb,var(--accent-primary)_10%,transparent)] text-[var(--accent-primary)] border-[color-mix(in_srgb,var(--accent-primary)_30%,transparent)]' 
+                    : 'bg-transparent text-[var(--text-secondary)] border-transparent hover:bg-[var(--component-bg-hover)] hover:text-[var(--text-primary)]'"
                   (click)="filterToggle.emit()">
-            <i class="pi text-[10px]"
-               [class.pi-filter-fill]="filterActive()"
-               [class.pi-filter]="!filterActive()"></i>
+            <i class="pi text-[11px]" [class.pi-filter-fill]="filterActive()" [class.pi-filter]="!filterActive()"></i>
             Filter
             @if (activeFilterCount() > 0) {
-              <span class="min-w-[16px] h-4 px-1 rounded-full text-[9px] font-bold
-                           bg-[var(--accent-primary)] text-[var(--text-on-accent)]
-                           flex items-center justify-center">
+              <span class="min-w-[16px] h-4 px-1 ml-1 rounded-full text-[9px] font-bold bg-[var(--accent-primary)] text-[var(--text-on-accent)] flex items-center justify-center">
                 {{ activeFilterCount() }}
               </span>
             }
           </button>
 
-          <!-- Record count badge -->
-          @if (totalCount() > 0) {
-            <span class="text-[length:var(--font-size-xs)] text-[var(--text-tertiary)]">
-              <span class="font-[var(--font-weight-semibold)] text-[var(--text-primary)]">
-                {{ filteredCount() !== totalCount() ? filteredCount() + ' of ' + totalCount() : totalCount() }}
-              </span>
-              {{ totalCount() === 1 ? 'record' : 'records' }}
+          <!-- Record Count -->
+          <div class="h-4 w-px bg-[var(--border-secondary)] mx-1"></div>
+          <span class="text-[length:var(--font-size-xs)] text-[var(--text-tertiary)]">
+            <span class="font-[var(--font-weight-semibold)] text-[var(--text-primary)]">
+              {{ filteredCount() !== totalCount() ? (filteredCount() | number) + ' of ' + (totalCount() | number) : (totalCount() | number) }}
             </span>
-          }
+            records
+          </span>
         </div>
 
-        <!-- RIGHT: Actions Toolbar -->
-        <div class="flex items-center gap-1">
-
-          <!-- Projected slot for custom actions -->
+        <!-- RIGHT: Tools & Actions -->
+        <div class="flex items-center gap-1.5">
+          <!-- Projected Custom Actions -->
           <ng-content select="[grid-actions]"></ng-content>
 
-          <!-- Divider -->
-          <div class="w-px h-5 bg-[var(--border-secondary)] mx-1"></div>
+          <div class="h-5 w-px bg-[var(--border-secondary)] mx-1"></div>
 
-          <!-- Density picker -->
-          <div class="relative group">
-            <button type="button"
-                    class="apex-tb-btn"
-                    title="Density"
-                    [disabled]="isEditing()"
-                    [class.opacity-50]="isEditing()" [class.cursor-not-allowed]="isEditing()"
-                    (click)="showDensityMenu.set(!showDensityMenu())">
-              <i class="pi pi-bars text-xs"></i>
+          <!-- Density Picker -->
+          <div class="relative">
+            <button type="button" class="apex-tb-btn" title="Density" [disabled]="isEditing()" (click)="toggleMenu('density', $event)">
+              <i class="pi pi-bars text-[13px]"></i>
             </button>
-            @if (showDensityMenu()) {
-              <div class="absolute right-0 top-9 z-50 w-36 py-1
-                          bg-[var(--bg-primary)] border border-[var(--border-secondary)]
-                          rounded-[var(--ui-border-radius)] shadow-[var(--elevation-2)]"
-                   (click)="$event.stopPropagation()">
+            @if (activeMenu() === 'density') {
+              <div class="apex-tb-dropdown">
                 @for (d of densityOptions; track d.value) {
-                  <button type="button"
-                          class="flex items-center gap-2 w-full px-3 py-1.5 text-[length:var(--font-size-xs)]
-                                 font-[var(--font-weight-medium)] text-[var(--text-primary)]
-                                 hover:bg-[var(--component-bg-hover)] transition-[var(--transition-fast)] outline-none"
-                          [class.text-[var(--accent-primary)]]="density() === d.value"
-                          (click)="densityChange.emit(d.value); showDensityMenu.set(false)">
-                    <i [class]="d.icon + ' text-xs'"></i>
-                    {{ d.label }}
-                    @if (density() === d.value) {
-                      <i class="pi pi-check text-[10px] ml-auto text-[var(--accent-primary)]"></i>
-                    }
+                  <button type="button" class="apex-tb-dropdown-item" [class.text-[var(--accent-primary)]]="density() === d.value" (click)="densityChange.emit(d.value); activeMenu.set(null)">
+                    <i [class]="d.icon + ' text-[11px] w-4'"></i> {{ d.label }}
+                    @if (density() === d.value) { <i class="pi pi-check text-[10px] ml-auto"></i> }
                   </button>
                 }
               </div>
             }
           </div>
 
-          <!-- Column Manager toggle -->
-          <button type="button" class="apex-tb-btn" title="Manage Columns"
-                  [disabled]="isEditing()"
-                  [class.opacity-50]="isEditing()" [class.cursor-not-allowed]="isEditing()"
-                  (click)="columnManagerToggle.emit()">
-            <i class="pi pi-table text-xs"></i>
+          <!-- Column Manager Toggle -->
+          <button type="button" class="apex-tb-btn" title="Manage Columns" [disabled]="isEditing()" (click)="columnManagerToggle.emit()">
+            <i class="pi pi-table text-[13px]"></i>
           </button>
 
-          <!-- Saved Views toggle -->
-          <button type="button" class="apex-tb-btn" title="Saved Views"
-                  [disabled]="isEditing()"
-                  [class.opacity-50]="isEditing()" [class.cursor-not-allowed]="isEditing()"
-                  (click)="savedViewsToggle.emit()">
-            <i class="pi pi-bookmark text-xs"></i>
+          <!-- Saved Views Toggle -->
+          <button type="button" class="apex-tb-btn" title="Saved Views" [disabled]="isEditing()" (click)="savedViewsToggle.emit()">
+            <i class="pi pi-bookmark text-[13px]"></i>
           </button>
 
-          <!-- Divider -->
-          <div class="w-px h-5 bg-[var(--border-secondary)] mx-1"></div>
+          <div class="h-5 w-px bg-[var(--border-secondary)] mx-1"></div>
+
+          <!-- Pagination Mode Toggle -->
+          <div class="relative">
+            <button type="button" class="apex-tb-btn" title="Pagination Mode" [disabled]="isEditing()" (click)="toggleMenu('pagination', $event)">
+              <i class="pi pi-list text-[13px]"></i>
+            </button>
+            @if (activeMenu() === 'pagination') {
+              <div class="apex-tb-dropdown">
+                <button type="button" class="apex-tb-dropdown-item" [class.text-[var(--accent-primary)]]="paginationMode() === 'pages'" (click)="paginationModeChange.emit('pages'); activeMenu.set(null)">
+                  <i class="pi pi-file text-[11px] w-4"></i> Pages
+                  @if (paginationMode() === 'pages') { <i class="pi pi-check text-[10px] ml-auto"></i> }
+                </button>
+                <button type="button" class="apex-tb-dropdown-item" [class.text-[var(--accent-primary)]]="paginationMode() === 'infinite'" (click)="paginationModeChange.emit('infinite'); activeMenu.set(null)">
+                  <i class="pi pi-sort-amount-down text-[11px] w-4"></i> Infinite Scroll
+                  @if (paginationMode() === 'infinite') { <i class="pi pi-check text-[10px] ml-auto"></i> }
+                </button>
+              </div>
+            }
+          </div>
 
           <!-- Export -->
           @if (enableExport()) {
             <div class="relative">
-              <button type="button" class="apex-tb-btn" title="Export"
-                      [disabled]="isEditing()"
-                      [class.opacity-50]="isEditing()" [class.cursor-not-allowed]="isEditing()"
-                      (click)="showExportMenu.set(!showExportMenu())">
-                <i class="pi pi-download text-xs"></i>
+              <button type="button" class="apex-tb-btn" title="Export" [disabled]="isEditing()" (click)="toggleMenu('export', $event)">
+                <i class="pi pi-download text-[13px]"></i>
               </button>
-              @if (showExportMenu()) {
-                <div class="absolute right-0 top-9 z-50 w-40 py-1
-                            bg-[var(--bg-primary)] border border-[var(--border-secondary)]
-                            rounded-[var(--ui-border-radius)] shadow-[var(--elevation-2)]"
-                     (click)="$event.stopPropagation()">
-                  <button class="apex-export-item" (click)="exportAs.emit('csv'); showExportMenu.set(false)">
-                    <i class="pi pi-file-excel text-xs text-[var(--color-success)]"></i> Export CSV
+              @if (activeMenu() === 'export') {
+                <div class="apex-tb-dropdown">
+                  <button class="apex-tb-dropdown-item" (click)="exportAs.emit('csv'); activeMenu.set(null)">
+                    <i class="pi pi-file-excel text-[var(--color-success)] w-4"></i> Export CSV
                   </button>
-                  <button class="apex-export-item" (click)="exportAs.emit('json'); showExportMenu.set(false)">
-                    <i class="pi pi-code text-xs text-[var(--color-info)]"></i> Export JSON
+                  <button class="apex-tb-dropdown-item" (click)="exportAs.emit('json'); activeMenu.set(null)">
+                    <i class="pi pi-code text-[var(--color-info)] w-4"></i> Export JSON
                   </button>
-                  <button class="apex-export-item" (click)="exportAs.emit('xlsx'); showExportMenu.set(false)">
-                    <i class="pi pi-file text-xs text-[var(--accent-primary)]"></i> Export Excel
+                  <button class="apex-tb-dropdown-item" (click)="exportAs.emit('xlsx'); activeMenu.set(null)">
+                    <i class="pi pi-file text-[var(--accent-primary)] w-4"></i> Export Excel
                   </button>
                 </div>
               }
@@ -173,73 +142,44 @@ import { GridBulkAction, GridDensity } from '../grid-types';
           }
 
           <!-- Refresh -->
-          <button type="button" class="apex-tb-btn" title="Refresh"
-                  [disabled]="isEditing()"
-                  [class.opacity-50]="isEditing()" [class.cursor-not-allowed]="isEditing()"
-                  [class.animate-spin]="loading()"
-                  (click)="refresh.emit()">
-            <i class="pi pi-refresh text-xs"></i>
+          <button type="button" class="apex-tb-btn" title="Refresh" [disabled]="isEditing()" (click)="refresh.emit()">
+            <i class="pi pi-refresh text-[13px]" [class.animate-spin]="loading()"></i>
           </button>
 
-          <!-- Add New -->
+          <!-- Add Record -->
           @if (enableAdd()) {
+            <div class="h-5 w-px bg-[var(--border-secondary)] mx-1"></div>
             <button type="button"
+                    class="flex items-center gap-1.5 px-4 py-1.5 bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-[var(--text-on-accent)] text-[length:var(--font-size-xs)] font-[var(--font-weight-semibold)] rounded-[var(--ui-border-radius-sm)] shadow-[var(--shadow-sm)] transition-[var(--transition-fast)] disabled:opacity-50 disabled:cursor-not-allowed outline-none"
                     [disabled]="isEditing()"
-                    class="flex items-center gap-1.5 px-3 py-1.5
-                           bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)]
-                           text-[var(--text-on-accent)] text-[length:var(--font-size-xs)]
-                           font-[var(--font-weight-semibold)] rounded-[var(--ui-border-radius-pill)]
-                           shadow-[var(--shadow-sm)] transition-[var(--transition-fast)] outline-none
-                           disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[var(--accent-primary)]"
                     (click)="addRow.emit()">
-              <i class="pi pi-plus text-[10px]"></i>
-              Add
+              <i class="pi pi-plus text-[10px]"></i> Add
             </button>
           }
         </div>
       </div>
 
-      <!-- SELECTION BANNER (slides in when rows are selected) -->
+      <!-- SELECTION BANNER (Absolute positioned to slide over toolbar) -->
       @if (selectedCount() > 0) {
-        <div class="flex items-center justify-between gap-3 px-4 py-2 mt-2
-                    bg-[var(--bg-primary)]
-                    border border-[color-mix(in_srgb,var(--accent-primary)_25%,transparent)]
-                    rounded-[var(--ui-border-radius-pill)] shadow-[var(--shadow-md)]
-                    animate-[apex-slide-down_0.15s_ease] relative z-10">
-
-          <!-- Count chip + deselect -->
-          <div class="flex items-center gap-2">
-            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full
-                        bg-[var(--accent-primary)] text-[var(--text-on-accent)]
-                        text-[10px] font-bold">
-              <i class="pi pi-check text-[9px]"></i>
-              {{ selectedCount() }} selected
+        <div class="absolute inset-0 z-30 flex items-center justify-between px-5 bg-[var(--selection-bg)] backdrop-blur-md border-b border-[color-mix(in_srgb,var(--accent-primary)_30%,transparent)] animate-[apex-slide-down_0.2s_ease-out]">
+          <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 px-3 py-1 bg-[var(--accent-primary)] text-[var(--text-on-accent)] rounded-[var(--ui-border-radius-pill)] text-[length:var(--font-size-xs)] font-[var(--font-weight-bold)] shadow-sm">
+              <i class="pi pi-check-circle text-[11px]"></i>
+              {{ selectedCount() }} Selected
             </div>
-            <button type="button"
-                    class="text-[length:var(--font-size-xs)] text-[var(--text-tertiary)]
-                           hover:text-[var(--text-primary)] underline outline-none"
-                    (click)="clearSelection.emit()">
-              Clear
+            <button type="button" class="text-[length:var(--font-size-xs)] font-[var(--font-weight-medium)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] underline-offset-2 hover:underline outline-none" (click)="clearSelection.emit()">
+              Clear Selection
             </button>
           </div>
 
-          <!-- Bulk actions -->
-          <div class="flex items-center gap-1">
+          <div class="flex items-center gap-2">
             @for (action of bulkActions(); track action.id) {
               <button type="button"
                       [disabled]="isEditing()"
-                      class="flex items-center gap-1.5 px-3 py-1.5
-                             text-[length:var(--font-size-xs)] font-[var(--font-weight-medium)]
-                             rounded-[var(--ui-border-radius-sm)] border transition-[var(--transition-fast)] outline-none
-                             disabled:opacity-50 disabled:cursor-not-allowed"
-                      [class]="action.variant === 'danger'
-                        ? 'text-[var(--color-error)] border-[var(--color-error)] hover:bg-[color-mix(in_srgb,var(--color-error)_8%,transparent)] disabled:hover:bg-transparent'
-                        : action.variant === 'primary'
-                          ? 'text-[var(--text-on-accent)] bg-[var(--accent-primary)] border-[var(--accent-primary)] hover:bg-[var(--accent-hover)] disabled:hover:bg-[var(--accent-primary)]'
-                          : 'text-[var(--text-secondary)] border-[var(--border-secondary)] hover:bg-[var(--component-bg-hover)] disabled:hover:bg-transparent'"
+                      class="flex items-center gap-1.5 px-3 py-1.5 text-[length:var(--font-size-xs)] font-[var(--font-weight-medium)] rounded-[var(--ui-border-radius-sm)] border transition-[var(--transition-fast)] outline-none disabled:opacity-50 disabled:cursor-not-allowed shadow-sm bg-[var(--bg-primary)]"
+                      [class]="action.variant === 'danger' ? 'text-[var(--color-error)] border-[var(--color-error)] hover:bg-[color-mix(in_srgb,var(--color-error)_10%,transparent)]' : 'text-[var(--text-primary)] border-[var(--border-secondary)] hover:bg-[var(--component-bg-hover)] hover:border-[var(--border-primary)]'"
                       (click)="bulkAction.emit(action.id)">
-                <i [class]="action.icon + ' text-xs'"></i>
-                {{ action.label }}
+                <i [class]="action.icon + ' text-[11px]'"></i> {{ action.label }}
               </button>
             }
           </div>
@@ -249,76 +189,118 @@ import { GridBulkAction, GridDensity } from '../grid-types';
   `,
   styles: [`
     .apex-tb-btn {
-      width: 28px;
-      height: 28px;
+      width: 30px;
+      height: 30px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      border-radius: 50%;
+      border-radius: var(--ui-border-radius-sm);
       color: var(--text-secondary);
       background: transparent;
-      border: none;
+      border: 1px solid transparent;
       cursor: pointer;
       transition: var(--transition-fast);
       outline: none;
+      
+      &:hover:not(:disabled) {
+        background: var(--component-bg-hover);
+        color: var(--text-primary);
+        border-color: var(--border-secondary);
+      }
+      
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
     }
-    .apex-tb-btn:hover {
-      background: var(--component-bg-hover);
-      color: var(--text-primary);
+
+    .apex-tb-dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      right: 0;
+      width: 160px;
+      padding: 4px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-secondary);
+      border-radius: var(--ui-border-radius);
+      box-shadow: var(--elevation-2);
+      z-index: 100;
+      animation: apex-pop-in 0.15s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .apex-export-item {
+
+    .apex-tb-dropdown-item {
       display: flex;
       align-items: center;
       gap: 8px;
       width: 100%;
-      padding: 6px 12px;
+      padding: 8px 12px;
       font-size: var(--font-size-xs);
       font-weight: var(--font-weight-medium);
       color: var(--text-primary);
-      background: none;
+      background: transparent;
       border: none;
+      border-radius: var(--ui-border-radius-sm);
       cursor: pointer;
-      outline: none;
+      text-align: left;
       transition: var(--transition-fast);
+      
+      &:hover {
+        background: var(--component-bg-hover);
+      }
     }
-    .apex-export-item:hover { background: var(--component-bg-hover); }
+
     @keyframes apex-slide-down {
-      from { opacity: 0; transform: translateY(-6px); }
+      from { opacity: 0; transform: translateY(-10px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-  `],
+    @keyframes apex-pop-in {
+      from { opacity: 0; transform: scale(0.96) translateY(-4px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+  `]
 })
 export class GridToolbarComponent {
-  searchQuery      = input<string>('');
-  selectedCount    = input<number>(0);
-  totalCount       = input<number>(0);
-  filteredCount    = input<number>(0);
-  loading          = input<boolean>(false);
-  filterActive     = input<boolean>(false);
+  searchQuery = input<string>('');
+  selectedCount = input<number>(0);
+  totalCount = input<number>(0);
+  filteredCount = input<number>(0);
+  loading = input<boolean>(false);
+  filterActive = input<boolean>(false);
   activeFilterCount = input<number>(0);
-  density          = input<GridDensity>('compact');
-  enableAdd        = input<boolean>(true);
-  enableExport     = input<boolean>(true);
-  bulkActions      = input<GridBulkAction[]>([]);
-  isEditing        = input<boolean>(false);
+  density = input<GridDensity>('compact');
+  enableAdd = input<boolean>(true);
+  enableExport = input<boolean>(true);
+  bulkActions = input<GridBulkAction[]>([]);
+  isEditing = input<boolean>(false);
+  paginationMode = input<'pages' | 'infinite'>('pages');
 
-  searchChange        = output<string>();
-  filterToggle        = output<void>();
-  refresh             = output<void>();
-  addRow              = output<void>();
-  densityChange       = output<GridDensity>();
-  exportAs            = output<'csv' | 'json' | 'xlsx'>();
+  searchChange = output<string>();
+  filterToggle = output<void>();
+  refresh = output<void>();
+  addRow = output<void>();
+  densityChange = output<GridDensity>();
+  exportAs = output<'csv' | 'json' | 'xlsx'>();
   columnManagerToggle = output<void>();
-  savedViewsToggle    = output<void>();
-  clearSelection      = output<void>();
-  bulkAction          = output<string>();
+  savedViewsToggle = output<void>();
+  clearSelection = output<void>();
+  bulkAction = output<string>();
+  paginationModeChange = output<'pages' | 'infinite'>();
 
-  protected showDensityMenu = signal(false);
-  protected showExportMenu  = signal(false);
+  activeMenu = signal<'density' | 'export' | 'pagination' | null>(null);
 
-  protected densityOptions: { value: GridDensity; label: string; icon: string }[] = [
-    { value: 'compact',     label: 'Compact',     icon: 'pi pi-minus' },
-    { value: 'normal',      label: 'Normal',       icon: 'pi pi-bars' },
-    { value: 'comfortable', label: 'Comfortable',  icon: 'pi pi-align-justify' },
+  densityOptions: { value: GridDensity; label: string; icon: string }[] = [
+    { value: 'compact', label: 'Compact', icon: 'pi pi-list' },
+    { value: 'normal', label: 'Normal', icon: 'pi pi-bars' },
+    { value: 'comfortable', label: 'Comfortable', icon: 'pi pi-align-justify' },
   ];
+
+  toggleMenu(menu: 'density' | 'export' | 'pagination', event: MouseEvent) {
+    event.stopPropagation();
+    this.activeMenu.set(this.activeMenu() === menu ? null : menu);
+  }
+
+  @HostListener('document:click')
+  closeMenus() {
+    this.activeMenu.set(null);
+  }
 }

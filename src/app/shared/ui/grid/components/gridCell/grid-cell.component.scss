@@ -1,0 +1,795 @@
+:host {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    align-items: center;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+   CELL CONTAINER
+   ========================================================================== */
+
+:host>div {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+    /* Let the parent virtual scroller dictate the height, but ensure a minimum */
+    min-height: 100%;
+}
+
+span,
+a {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ==========================================================================
+   EDITOR WIDTH (PrimeNG Overrides)
+   ========================================================================== */
+
+:host ::ng-deep .p-inputtext,
+:host ::ng-deep .p-inputnumber,
+:host ::ng-deep .p-datepicker,
+:host ::ng-deep .p-select,
+:host ::ng-deep .p-autocomplete,
+:host ::ng-deep .p-inputmask,
+:host ::ng-deep .p-textarea,
+:host ::ng-deep .p-rating,
+:host ::ng-deep .p-slider,
+:host ::ng-deep .p-colorpicker,
+:host ::ng-deep .p-toggleswitch,
+:host ::ng-deep .p-togglebutton {
+    width: 100%;
+}
+
+/* ==========================================================================
+   INPUT STYLE (Transparent by default)
+   ========================================================================== */
+
+.apex-grid-input,
+:host ::ng-deep .p-inputtext,
+:host ::ng-deep .p-inputnumber-input,
+:host ::ng-deep .p-inputmask,
+:host ::ng-deep textarea {
+    width: 100%;
+    /* Use 100% height to fill the virtual scroll row perfectly, less 2px for focus rings */
+    height: calc(100% - 2px);
+    min-height: 28px;
+
+    border: 1px solid transparent;
+    border-radius: var(--ui-border-radius-sm);
+    background: transparent;
+    color: var(--text-primary);
+    font-size: var(--font-size-xs);
+    padding: 0 8px;
+
+    transition: all .18s ease;
+    box-shadow: none;
+    outline: none;
+}
+
+textarea.apex-grid-input,
+:host ::ng-deep textarea {
+    min-height: 34px;
+    height: auto;
+    resize: vertical;
+    padding-top: 8px;
+}
+
+/* ==========================================================================
+   INPUT HOVER
+   ========================================================================== */
+
+.apex-grid-input:hover,
+:host ::ng-deep .p-inputtext:hover,
+:host ::ng-deep .p-inputnumber-input:hover,
+:host ::ng-deep textarea:hover {
+    background: var(--component-bg-hover);
+}
+
+/* ==========================================================================
+   INPUT FOCUS
+   ========================================================================== */
+
+.apex-grid-input:focus,
+:host ::ng-deep .p-inputtext:focus,
+:host ::ng-deep .p-inputnumber-input:focus,
+:host ::ng-deep textarea:focus {
+    border-color: var(--accent-primary);
+    background: var(--bg-primary);
+    box-shadow: 0 0 0 3px var(--accent-focus);
+}
+
+/* ==========================================================================
+   NUMBER
+   ========================================================================== */
+
+:host ::ng-deep .p-inputnumber-input {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   SELECT / DROPDOWN
+   ========================================================================== */
+
+:host ::ng-deep .p-select {
+    height: calc(100% - 2px);
+    min-height: 28px;
+    border-radius: var(--ui-border-radius-sm);
+    border: 1px solid transparent;
+    background: transparent;
+    transition: all .18s ease;
+}
+
+:host ::ng-deep .p-select:hover {
+    background: var(--component-bg-hover);
+}
+
+:host ::ng-deep .p-select.p-focus {
+    border-color: var(--accent-primary);
+    background: var(--bg-primary);
+    box-shadow: 0 0 0 3px var(--accent-focus);
+}
+
+:host ::ng-deep .p-select-label {
+    padding-inline: 8px;
+    display: flex;
+    align-items: center;
+    font-size: var(--font-size-xs);
+}
+
+:host ::ng-deep .p-select-dropdown {
+    width: 28px;
+}
+
+/* ==========================================================================
+   AUTOCOMPLETE
+   ========================================================================== */
+
+:host ::ng-deep .p-autocomplete-input {
+    width: 100%;
+}
+
+:host ::ng-deep .p-autocomplete-multiple-container {
+    padding: 2px 8px;
+    border: 1px solid transparent;
+    border-radius: var(--ui-border-radius-sm);
+    background: transparent;
+    transition: all 0.18s ease;
+
+    &:hover {
+        background: var(--component-bg-hover);
+    }
+
+    &.p-focus {
+        border-color: var(--accent-primary);
+        background: var(--bg-primary);
+        box-shadow: 0 0 0 3px var(--accent-focus);
+    }
+
+    .p-autocomplete-token {
+        padding: 0 6px;
+        font-size: 10px;
+        background: var(--bg-secondary);
+    }
+}
+
+/* ==========================================================================
+   DATEPICKER
+   ========================================================================== */
+
+:host ::ng-deep .p-datepicker-input {
+    width: 100%;
+}
+
+:host ::ng-deep .p-datepicker-dropdown {
+    width: 28px;
+}
+
+/* ==========================================================================
+   CHECKBOX
+   ========================================================================== */
+
+:host ::ng-deep .p-checkbox {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+:host ::ng-deep .p-checkbox-box {
+    transition: all .18s ease;
+}
+
+:host ::ng-deep .p-checkbox-box:hover {
+    transform: scale(1.04);
+}
+
+/* ==========================================================================
+   TOGGLE
+   ========================================================================== */
+
+:host ::ng-deep .p-toggleswitch {
+    transform: scale(.88);
+}
+
+/* ==========================================================================
+   RATING & SLIDER & COLOR PICKER
+   ========================================================================== */
+
+:host ::ng-deep .p-rating {
+    gap: 2px;
+}
+
+:host ::ng-deep .p-slider {
+    height: 4px;
+    margin-inline: 4px;
+}
+
+:host ::ng-deep .p-colorpicker-preview {
+    border-radius: 50%;
+    border: 1px solid var(--border-secondary);
+}
+
+/* ==========================================================================
+   LINKS & ICONS
+   ========================================================================== */
+
+a {
+    color: var(--link-color);
+    text-decoration: none;
+    transition: color .18s ease;
+}
+
+a:hover {
+    color: var(--accent-primary);
+}
+
+.pi {
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+   STATUS & AVATAR
+   ========================================================================== */
+
+app-status-badge {
+    display: inline-flex;
+    align-items: center;
+}
+
+app-avatar {
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+   VIEW MODE
+   ========================================================================== */
+
+:host:not(.editing) {
+    cursor: default;
+}
+
+/* ==========================================================================
+   ANIMATION (HARDWARE ACCELERATED)
+   ========================================================================== */
+
+.apex-grid-input,
+:host ::ng-deep .p-select,
+:host ::ng-deep .p-checkbox-box,
+:host ::ng-deep .p-datepicker,
+:host ::ng-deep .p-inputnumber-input,
+:host ::ng-deep .p-autocomplete-multiple-container {
+    transition:
+        background .18s ease,
+        border-color .18s ease,
+        box-shadow .18s ease,
+        color .18s ease,
+        transform .18s ease;
+}
+
+/* ==========================================================================
+   INPUT STYLE (Text, Numbers, Dates)
+   ========================================================================== */
+
+.apex-grid-input,
+:host ::ng-deep .p-inputtext,
+:host ::ng-deep .p-inputnumber-input,
+:host ::ng-deep .p-inputmask,
+:host ::ng-deep textarea {
+    width: 100%;
+    /* Leave a 2px gap so focus rings don't get clipped by the cell overflow */
+    height: calc(100% - 4px);
+    min-height: 28px;
+
+    /* Subtle border for edit mode to clearly show it's an input */
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--ui-border-radius-sm);
+    background: var(--bg-primary);
+
+    color: var(--text-primary);
+    font-size: var(--font-size-xs);
+
+    /* REMOVE vertical padding, rely purely on line-height/flex for centering */
+    padding: 0 8px;
+
+    transition: all .18s ease;
+    box-shadow: none;
+    outline: none;
+
+    /* Ensure text vertically centers in standard inputs */
+    display: flex;
+    align-items: center;
+}
+
+textarea.apex-grid-input,
+:host ::ng-deep textarea {
+    height: auto;
+    min-height: 34px;
+    resize: vertical;
+    padding-top: 6px;
+    align-items: flex-start;
+    /* Textareas should start at top */
+}
+
+/* ==========================================================================
+   SELECT / DROPDOWN (Fix for the misaligned "Brand" text)
+   ========================================================================== */
+
+:host ::ng-deep .p-select {
+    width: 100%;
+    height: calc(100% - 4px);
+    min-height: 28px;
+
+    border-radius: var(--ui-border-radius-sm);
+    border: 1px solid var(--border-secondary);
+    background: var(--bg-primary);
+
+    /* 1. Make the outer wrapper a flex container */
+    display: flex;
+    align-items: center;
+    padding: 0;
+    /* Strip PrimeNG default padding */
+
+    transition: all .18s ease;
+}
+
+:host ::ng-deep .p-select:hover {
+    background: var(--component-bg-hover);
+    border-color: color-mix(in srgb, var(--border-secondary) 50%, var(--accent-primary));
+}
+
+:host ::ng-deep .p-select.p-focus {
+    border-color: var(--accent-primary);
+    background: var(--bg-primary);
+    box-shadow: 0 0 0 3px var(--accent-focus);
+}
+
+/* 2. Target the inner text label */
+:host ::ng-deep .p-select-label {
+    /* Force the label to take full height and center the text */
+    display: flex;
+    align-items: center;
+    height: 100%;
+    flex: 1 1 auto;
+
+    padding: 0 8px;
+    /* Horizontal padding only */
+
+    font-family: inherit;
+    font-size: var(--font-size-xs);
+    color: var(--text-primary);
+    line-height: 1;
+    /* Prevent line-height from pushing text down/up */
+}
+
+/* 3. Target the dropdown arrow container */
+:host ::ng-deep .p-select-trigger {
+    width: 28px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-tertiary);
+}
+
+// :host {
+//     display: flex;
+//     width: 100%;
+//     height: 100%;
+//     min-width: 0;
+//     align-items: center;
+// }
+
+// *,
+// *::before,
+// *::after {
+//     box-sizing: border-box;
+// }
+
+// /* ==========================================================================
+//    CELL CONTAINER
+//    ========================================================================== */
+
+// :host>div {
+//     display: flex;
+//     align-items: center;
+//     width: 100%;
+//     min-width: 0;
+//     min-height: 38px;
+// }
+
+// span,
+// a {
+//     overflow: hidden;
+//     text-overflow: ellipsis;
+//     white-space: nowrap;
+// }
+
+// /* ==========================================================================
+//    EDITOR WIDTH
+//    ========================================================================== */
+
+// .p-inputtext,
+// .p-inputnumber,
+// .p-datepicker,
+// .p-select,
+// .p-autocomplete,
+// .p-inputmask,
+// .p-textarea,
+// .p-rating,
+// .p-slider,
+// .p-colorpicker,
+// .p-toggleswitch,
+// .p-togglebutton {
+//     width: 100%;
+// }
+
+// /* ==========================================================================
+//    INPUT STYLE
+//    ========================================================================== */
+
+// .apex-ie,
+// :host ::ng-deep .apex-ie,
+// :host ::ng-deep .p-inputtext,
+// :host ::ng-deep .p-inputnumber-input,
+// :host ::ng-deep .p-inputmask,
+// :host ::ng-deep textarea {
+
+//     width: 100%;
+//     height: 34px;
+
+//     border: 1px solid transparent;
+//     border-radius: var(--ui-border-radius);
+
+//     background: transparent;
+
+//     color: var(--text-primary);
+
+//     font-size: var(--font-size-sm);
+
+//     padding: 0 10px;
+
+//     transition: all .18s ease;
+
+//     box-shadow: none;
+// }
+
+// textarea.apex-ie,
+// :host ::ng-deep textarea {
+
+//     min-height: 34px;
+//     height: auto;
+
+//     resize: vertical;
+
+//     padding-top: 8px;
+// }
+
+// /* ==========================================================================
+//    INPUT HOVER
+//    ========================================================================== */
+
+// .apex-ie:hover,
+// :host ::ng-deep .p-inputtext:hover,
+// :host ::ng-deep .p-inputnumber-input:hover,
+// :host ::ng-deep textarea:hover {
+
+//     background: var(--component-bg-hover);
+// }
+
+// /* ==========================================================================
+//    INPUT FOCUS
+//    ========================================================================== */
+
+// .apex-ie:focus,
+// :host ::ng-deep .p-inputtext:focus,
+// :host ::ng-deep .p-inputnumber-input:focus,
+// :host ::ng-deep textarea:focus {
+
+//     border-color: var(--accent-primary);
+
+//     background: var(--bg-primary);
+
+//     box-shadow:
+//         0 0 0 3px var(--accent-focus);
+// }
+
+// /* ==========================================================================
+//    NUMBER
+//    ========================================================================== */
+
+// :host ::ng-deep .p-inputnumber {
+//     width: 100%;
+// }
+
+// :host ::ng-deep .p-inputnumber-input {
+//     text-align: right;
+//     font-variant-numeric: tabular-nums;
+// }
+
+// /* ==========================================================================
+//    SELECT
+//    ========================================================================== */
+
+// :host ::ng-deep .p-select {
+
+//     height: 34px;
+
+//     border-radius: var(--ui-border-radius);
+
+//     border: 1px solid transparent;
+
+//     background: transparent;
+
+//     transition: all .18s ease;
+// }
+
+// :host ::ng-deep .p-select:hover {
+
+//     background: var(--component-bg-hover);
+// }
+
+// :host ::ng-deep .p-select.p-focus {
+
+//     border-color: var(--accent-primary);
+
+//     box-shadow: 0 0 0 3px var(--accent-focus);
+// }
+
+// :host ::ng-deep .p-select-label {
+
+//     padding-inline: 10px;
+
+//     display: flex;
+
+//     align-items: center;
+
+//     font-size: var(--font-size-sm);
+// }
+
+// :host ::ng-deep .p-select-dropdown {
+
+//     width: 34px;
+// }
+
+// /* ==========================================================================
+//    AUTOCOMPLETE
+//    ========================================================================== */
+
+// :host ::ng-deep .p-autocomplete {
+//     width: 100%;
+// }
+
+// :host ::ng-deep .p-autocomplete-input {
+//     width: 100%;
+// }
+
+// /* ==========================================================================
+//    DATEPICKER
+//    ========================================================================== */
+
+// :host ::ng-deep .p-datepicker {
+//     width: 100%;
+// }
+
+// :host ::ng-deep .p-datepicker-input {
+//     width: 100%;
+// }
+
+// :host ::ng-deep .p-datepicker-dropdown {
+//     width: 34px;
+// }
+
+// /* ==========================================================================
+//    CHECKBOX
+//    ========================================================================== */
+
+// :host ::ng-deep .p-checkbox {
+
+//     display: flex;
+
+//     justify-content: center;
+
+//     align-items: center;
+// }
+
+// :host ::ng-deep .p-checkbox-box {
+
+//     transition: all .18s ease;
+// }
+
+// :host ::ng-deep .p-checkbox-box:hover {
+
+//     transform: scale(1.04);
+// }
+
+// /* ==========================================================================
+//    TOGGLE
+//    ========================================================================== */
+
+// :host ::ng-deep .p-toggleswitch {
+
+//     transform: scale(.88);
+// }
+
+// /* ==========================================================================
+//    RATING
+//    ========================================================================== */
+
+// :host ::ng-deep .p-rating {
+
+//     gap: 2px;
+// }
+
+// /* ==========================================================================
+//    SLIDER
+//    ========================================================================== */
+
+// :host ::ng-deep .p-slider {
+
+//     height: 4px;
+
+//     margin-inline: 4px;
+// }
+
+// /* ==========================================================================
+//    COLOR PICKER
+//    ========================================================================== */
+
+// :host ::ng-deep .p-colorpicker-preview {
+
+//     border-radius: 50%;
+
+//     border: 1px solid var(--border-secondary);
+// }
+
+// /* ==========================================================================
+//    TAGS
+//    ========================================================================== */
+
+// .tag {
+
+//     display: inline-flex;
+
+//     align-items: center;
+
+//     height: 22px;
+
+//     padding-inline: 8px;
+
+//     border-radius: 999px;
+
+//     background: var(--bg-secondary);
+
+//     border: 1px solid var(--border-secondary);
+
+//     font-size: 11px;
+// }
+
+// /* ==========================================================================
+//    LINKS
+//    ========================================================================== */
+
+// a {
+
+//     color: var(--link-color);
+
+//     text-decoration: none;
+
+//     transition: color .18s ease;
+// }
+
+// a:hover {
+
+//     color: var(--accent-primary);
+// }
+
+// /* ==========================================================================
+//    ICONS
+//    ========================================================================== */
+
+// .pi {
+
+//     font-size: 13px;
+
+//     flex-shrink: 0;
+// }
+
+// /* ==========================================================================
+//    STATUS
+//    ========================================================================== */
+
+// app-status-badge {
+
+//     display: inline-flex;
+
+//     align-items: center;
+// }
+
+// /* ==========================================================================
+//    AVATAR
+//    ========================================================================== */
+
+// app-avatar {
+
+//     flex-shrink: 0;
+// }
+
+// /* ==========================================================================
+//    COMPACT GRID MODE
+//    ========================================================================== */
+
+// :host-context(.compact-grid) {
+
+//     .apex-ie,
+//     ::ng-deep .p-inputtext,
+//     ::ng-deep .p-inputnumber-input {
+
+//         height: 30px;
+
+//         font-size: 12px;
+//     }
+// }
+
+// /* ==========================================================================
+//    VIEW MODE
+//    ========================================================================== */
+
+// :host:not(.editing) {
+
+//     cursor: default;
+// }
+
+// /* ==========================================================================
+//    ANIMATION
+//    ========================================================================== */
+
+// .apex-ie,
+// :host ::ng-deep .p-select,
+// :host ::ng-deep .p-checkbox-box,
+// :host ::ng-deep .p-datepicker,
+// :host ::ng-deep .p-inputnumber-input {
+
+//     transition:
+
+//         background .18s,
+
+//         border-color .18s,
+
+//         box-shadow .18s,
+
+//         color .18s,
+
+//         transform .18s;
+// }

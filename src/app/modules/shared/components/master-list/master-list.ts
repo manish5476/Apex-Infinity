@@ -18,7 +18,7 @@ import { PageHeaderComponent } from '../../../../shared/ui/layout/page-header/pa
 import { PageContentComponent } from '../../../../shared/ui/layout/page-content/page-content.component';
 
 // Enterprise DataGrid
-import { DataGridComponent } from '../../../../shared/ui/grid/data-grid.component';
+import { DataGridComponent } from '../../../../shared/ui/grid/dataGrid/data-grid.component';
 import {
   GridColumn,
   GridRowAction,
@@ -77,7 +77,7 @@ export interface Master {
             [rowSelection]="true"
             [multipleSelection]="true"
             [pagination]="true"
-            [pageSize]="15"
+            [pageSize]="gridState().pageSize"
             [loading]="loading()"
             [rowActions]="rowActions"
             [bulkActions]="bulkActions"
@@ -88,6 +88,7 @@ export interface Master {
             [lazy]="true"
             [totalRecords]="totalRecords()"
             (pageChange)="onPageChange($event)"
+            (pageSizeChange)="onPageSizeChange($event)"
             (sortChange)="onSortChange($event)"
             (searchChange)="onSearchChange($event)"
             (rowSave)="onRowSave($event)"
@@ -137,6 +138,7 @@ export class MasterList implements OnInit, OnDestroy {
     { label: 'Brand', value: 'brand' },
     { label: 'Unit', value: 'unit' },
     { label: 'Tax Rate', value: 'tax_rate' },
+    { label: 'Product Condition', value: 'product_condition' },
   ];
 
   // ─── Column Definitions ─────────────────────────────────────────────────
@@ -184,6 +186,14 @@ export class MasterList implements OnInit, OnDestroy {
     {
       field: 'isFeatured',
       header: 'Featured',
+      type: 'boolean',
+      editable: true,
+      width: '80px',
+      align: 'center',
+    },
+    {
+      field: 'isActive',
+      header: 'Active',
       type: 'boolean',
       editable: true,
       width: '80px',
@@ -260,12 +270,12 @@ export class MasterList implements OnInit, OnDestroy {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const data = res.data?.masters || res.data?.items || res.data || [];
         const total = res.data?.totalRecords ?? res.data?.total ?? data.length;
-        
+
         const mapped = data.map((d: Master) => ({
           ...d,
           isFeatured: d.metadata?.isFeatured ?? false,
         }));
-        
+
         this.masters.set(mapped);
         this.totalRecords.set(total);
         this.selectedRows.set([]);
@@ -282,7 +292,12 @@ export class MasterList implements OnInit, OnDestroy {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onPageChange(event: any): void {
-    this.gridState.update(s => ({ ...s, page: event.pageIndex + 1, pageSize: event.pageSize }));
+    this.gridState.update(s => ({ ...s, page: (event.page ?? 0) + 1, pageSize: event.pageSize }));
+    this.loadMasters();
+  }
+
+  onPageSizeChange(pageSize: number): void {
+    this.gridState.update(s => ({ ...s, page: 1, pageSize }));
     this.loadMasters();
   }
 

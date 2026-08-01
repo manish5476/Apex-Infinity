@@ -95,6 +95,7 @@ app-data-grid {
 .apex-dg-row {
     background: var(--bg-primary);
     transition: background var(--transition-fast);
+    height: 44px;
 
     /* Use cell borders instead of row borders to prevent table reflow jitter */
     .apex-dg-td {
@@ -130,6 +131,7 @@ app-data-grid {
         background: var(--bg-primary);
         position: relative;
         z-index: 5;
+        height: 48px;
 
         .apex-dg-td {
             border-bottom: 1px solid var(--border-secondary);
@@ -179,9 +181,15 @@ app-data-grid {
 /* ─── Cell Geometry ─── */
 .apex-dg-td {
     vertical-align: middle;
-    padding: 12px 16px;
+    padding: 0 16px; /* Let height govern the sizing instead of vertical padding */
     font-size: var(--font-size-sm);
     color: var(--text-secondary);
+}
+
+.apex-dg-table--striped {
+    .apex-dg-row:nth-child(even):not(.apex-dg-row--editing):not(.apex-dg-row--selected):not(:hover) {
+        background: color-mix(in srgb, var(--bg-secondary) 40%, transparent);
+    }
 }
 
 /* ─── Inputs in Cells (Jump-free Layout) ─── */

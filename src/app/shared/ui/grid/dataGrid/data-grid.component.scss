@@ -1,0 +1,157 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+}
+
+.apex-dg {
+
+    // Density typography scaling mapping to your tokens
+    &[data-density='compact'] {
+        --dg-font-size: var(--font-size-xs);
+        --dg-cell-pad: var(--spacing-sm) var(--spacing-md);
+    }
+
+    &[data-density='normal'] {
+        --dg-font-size: var(--font-size-sm);
+        --dg-cell-pad: var(--spacing-md) var(--spacing-lg);
+    }
+
+    &[data-density='comfortable'] {
+        --dg-font-size: var(--font-size-base);
+        --dg-cell-pad: var(--spacing-lg) var(--spacing-xl);
+    }
+
+    // Reusable strict focus rings for accessibility
+    .apex-dg-cell:focus-visible {
+        outline: none;
+        box-shadow: inset 0 0 0 2px var(--accent-focus);
+        background: var(--component-bg-hover);
+        border-radius: var(--ui-border-radius-sm);
+    }
+}
+
+// ─── CSS GRID ROW ENGINE ──────────────────────────────────────────────────
+.apex-dg-header,
+.apex-dg-row {
+    display: grid;
+    width: 100%;
+    // Grid Template Columns is applied dynamically via inline styles in the template
+    align-items: center;
+}
+
+// Ensure inherited backgrounds support sticky shadows cleanly
+.apex-dg-row {
+    background-color: var(--bg-primary);
+
+    &[aria-selected='true'] {
+        background-color: var(--selection-bg);
+    }
+}
+
+// ─── STICKY COLUMNS WITH INTELLIGENT SHADOWS ──────────────────────────────
+.sticky-left,
+.sticky-right {
+    position: sticky;
+    z-index: 10;
+    background-color: inherit; // Perfectly matches parent row hover/selected state
+}
+
+.sticky-left {
+    left: var(--sticky-left-offset, 0); // Calculated dynamically if multiple sticky lefts
+    // Intelligent shadow: Only visible when content scrolls under it
+    box-shadow: inset -4px 0 6px -4px color-mix(in srgb, var(--text-primary) 8%, transparent);
+}
+
+.sticky-right {
+    right: var(--sticky-right-offset, 0);
+    box-shadow: inset 4px 0 6px -4px color-mix(in srgb, var(--text-primary) 8%, transparent);
+}
+
+// Base Cell styling
+.apex-dg-hcell,
+.apex-dg-cell {
+    padding: var(--dg-cell-pad);
+    font-size: var(--dg-font-size);
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+// Header specific overrides
+.apex-dg-hcell {
+    background-color: var(--bg-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-right: 1px solid transparent; // Prevents pixel shifting on resize
+
+    &:hover {
+        background-color: var(--component-bg-hover);
+    }
+}
+
+// ─── ENTERPRISE CHECKBOXES ───────────────────────────────────────────────
+.apex-checkbox {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--border-secondary);
+    border-radius: 4px;
+    background-color: var(--bg-primary);
+    cursor: pointer;
+    position: relative;
+    transition: var(--transition-fast);
+
+    &:checked,
+    &:indeterminate {
+        background-color: var(--accent-primary);
+        border-color: var(--accent-primary);
+    }
+
+    &:checked::after {
+        content: '';
+        position: absolute;
+        left: 4px;
+        top: 1px;
+        width: 5px;
+        height: 10px;
+        border: solid var(--text-on-accent);
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+
+    &:indeterminate::after {
+        content: '';
+        position: absolute;
+        left: 3px;
+        top: 7px;
+        width: 8px;
+        height: 2px;
+        background-color: var(--text-on-accent);
+    }
+
+    &:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 var(--focus-ring-width) var(--bg-primary), 0 0 0 calc(var(--focus-ring-width) + 2px) var(--accent-focus);
+    }
+}
+
+// Scrollbar formatting for WebKit (to match standard Enterprise sleekness)
+.custom-scrollbar {
+    &::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: var(--scroll-track);
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--scroll-thumb);
+        border-radius: 4px;
+    }
+}

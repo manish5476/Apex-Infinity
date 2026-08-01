@@ -6,7 +6,7 @@
  */
 
 // ─── Main Component ───────────────────────────────────────────────────────────
-export { DataGridComponent } from './data-grid.component';
+export { DataGridComponent } from './dataGrid/data-grid.component';
 
 // ─── Type System ──────────────────────────────────────────────────────────────
 export type {
@@ -39,7 +39,7 @@ export { GridStateService } from './grid-state.service';
 
 // ─── Sub-Components (for advanced usage / extension) ─────────────────────────
 export { GridToolbarComponent } from './components/grid-toolbar.component';
-export { GridCellComponent } from './components/grid-cell.component';
+export { GridCellComponent } from './components/gridCell/grid-cell.component';
 export { GridActionsComponent } from './components/grid-actions.component';
 export { GridPaginationComponent } from './components/grid-pagination.component';
 export { GridEmptyStateComponent } from './components/grid-empty-state.component';

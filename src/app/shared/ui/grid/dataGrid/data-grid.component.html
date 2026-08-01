@@ -1,0 +1,187 @@
+<div class="apex-dg flex flex-col w-full h-full min-h-0 bg-[var(--bg-primary)] 
+            border border-[var(--border-secondary)] rounded-[var(--ui-border-radius-lg)] 
+            shadow-[var(--elevation-1)] overflow-hidden relative" [attr.data-density]="densitySignal()">
+
+    <!-- ───────────── TOOLBAR ───────────── -->
+    @if (toolbar()) {
+    <app-grid-toolbar [searchQuery]="searchQuery()" [selectedCount]="selectedRowIds().size"
+        [totalCount]="lazy() ? totalRecords() : data().length"
+        [filteredCount]="lazy() ? totalRecords() : filteredData().length" [loading]="loading()"
+        [filterActive]="filterState().length > 0" [activeFilterCount]="filterState().length" [density]="densitySignal()"
+        [enableAdd]="enableAdd()" [enableExport]="enableExport()" [bulkActions]="bulkActions()"
+        [isEditing]="!!editingRowId()" [paginationMode]="paginationMode()" (searchChange)="searchQuery.set($event)"
+        (filterToggle)="showFilterBar.set(!showFilterBar())" (densityChange)="onDensityChange($event)"
+        (addRow)="onAddRow()" (clearSelection)="clearSelection()"
+        (columnManagerToggle)="showColumnManager.set(!showColumnManager())"
+        (savedViewsToggle)="showSavedViews.set(!showSavedViews())" (exportAs)="onExport($event)"
+        (bulkAction)="onBulkActionById($event)" (refresh)="refresh.emit()"
+        (paginationModeChange)="onPaginationModeChange($event)">
+        <ng-content select="[grid-actions]" ngProjectAs="[grid-actions]"></ng-content>
+    </app-grid-toolbar>
+    }
+
+    <!-- ───────────── FILTER BAR ───────────── -->
+    @if (showFilterBar()) {
+    <app-grid-filter-bar [columns]="visibleColumnList()" [activeFilters]="filterState()"
+        (filterChange)="onFilterChange($event)">
+    </app-grid-filter-bar>
+    }
+
+    <!-- ───────────── DATA VIEWPORT ───────────── -->
+    <div class="flex-1 relative overflow-hidden bg-[var(--bg-primary)]">
+
+        <!-- CSS Grid Header -->
+        <div class="apex-dg-header sticky top-0 z-30 border-b border-[var(--border-secondary)] bg-[var(--bg-secondary)]"
+            role="row" [style.grid-template-columns]="gridTemplateColumns()">
+
+            @if (rowSelection()) {
+            <div class="apex-dg-hcell flex items-center justify-center sticky left-0 bg-[var(--bg-secondary)] z-40"
+                role="columnheader">
+                <input type="checkbox" class="apex-checkbox" [checked]="allSelected()" [indeterminate]="indeterminate()"
+                    (change)="onSelectAll($any($event.target).checked)">
+            </div>
+            }
+
+            <div class="apex-dg-hcell text-center text-[var(--text-tertiary)] font-semibold text-[11px]"
+                role="columnheader">Sr.</div>
+
+            @for (col of visibleColumnList(); track col.field) {
+            <div class="apex-dg-hcell flex items-center gap-2 text-[var(--text-secondary)] font-semibold text-xs cursor-pointer select-none"
+                role="columnheader" [attr.aria-sort]="'none'" [class.sticky-left]="col.sticky === 'left'"
+                [class.sticky-right]="col.sticky === 'right'" (click)="col.sortable !== false && onSort(col.field)">
+                <span class="truncate">{{ col.header }}</span>
+                @if (col.sortable !== false) {
+                <i class="pi text-[10px] opacity-40 transition-[var(--transition-fast)]" [class.pi-sort-alt]="true"
+                    [class.text-[var(--accent-primary)]]="false" [class.opacity-100]="false"></i>
+                }
+            </div>
+            }
+
+            <div class="apex-dg-hcell sticky right-0 bg-[var(--bg-secondary)] z-40" role="columnheader"></div>
+        </div>
+
+        <!-- Loading Skeleton Overlay (Used on initial load or pages mode) -->
+        @if (loading() && (paginationMode() === 'pages' || accumulatedData().length === 0)) {
+        <div class="absolute inset-0 z-20 bg-[var(--bg-primary)] overflow-hidden">
+            <app-grid-loading [rowCount]="pageSizeSignal()" [density]="densitySignal()"
+                [colWidths]="visibleColumnList().map(c => c.width ?? '150px')">
+            </app-grid-loading>
+        </div>
+        }
+
+        <!-- Virtual Scroller Body -->
+        <cdk-virtual-scroll-viewport #viewport [itemSize]="rowHeight()" class="h-full w-full custom-scrollbar"
+            (scroll)="showContextMenu.set(false); onGridScroll($event)">
+
+            <div #gridBody role="rowgroup">
+                <div *cdkVirtualFor="let row of displayData(); let i = index; trackBy: trackByRowId"
+                    class="apex-dg-row group border-b border-[var(--border-secondary)] transition-colors duration-150"
+                    role="row" [attr.aria-selected]="selectedRowIds().has(getRowId(row))"
+                    [style.height.px]="rowHeight()" [style.grid-template-columns]="gridTemplateColumns()"
+                    [class.bg-[var(--selection-bg)]]="selectedRowIds().has(getRowId(row))"
+                    [class.hover:bg-[var(--component-bg-hover)]]="!editingRowId()" (click)="onRowClick(row, $event)"
+                    (dblclick)="onRowDoubleClick(row)" (contextmenu)="onContextMenu($event, row)">
+
+                    <!-- Checkbox -->
+                    @if (rowSelection()) {
+                    <div class="apex-dg-cell flex items-center justify-center sticky left-0 z-20 transition-colors"
+                        role="gridcell" (click)="$event.stopPropagation()">
+                        <input type="checkbox" class="apex-checkbox" [checked]="selectedRowIds().has(getRowId(row))"
+                            (click)="onCheckboxClick(row, $event)">
+                    </div>
+                    }
+
+                    <!-- Sr No -->
+                    <div class="apex-dg-cell flex items-center justify-center text-[var(--text-tertiary)] font-mono text-[10px]"
+                        role="gridcell">
+                        {{ paginationMode() === 'infinite' ? i + 1 : i + 1 + (currentPage() * pageSizeSignal()) }}
+                    </div>
+
+                    <!-- Data Cells -->
+                    @for (col of visibleColumnList(); track col.field) {
+                    <div class="apex-dg-cell flex items-center truncate px-3" role="gridcell" tabindex="0"
+                        [class.sticky-left]="col.sticky === 'left'" [class.sticky-right]="col.sticky === 'right'">
+                        <app-grid-cell class="w-full truncate" [column]="col"
+                            [rowData]="editingRowId() === getRowId(row) ? editDraft() : row"
+                            [isEditing]="editingRowId() === getRowId(row)"
+                            (cellChange)="onCellChange($event, getRowId(row))">
+                        </app-grid-cell>
+                    </div>
+                    }
+
+                    <!-- Actions -->
+                    <div class="apex-dg-cell flex items-center justify-end sticky right-0 z-20 px-2 transition-colors"
+                        role="gridcell" (click)="$event.stopPropagation()">
+                        <app-grid-actions [row]="row" [rowActions]="rowActions()"
+                            [isEditing]="editingRowId() === getRowId(row)" [isEditingAnyRow]="!!editingRowId()"
+                            (edit)="startEditRow(row)" (save)="saveEditRow()" (cancel)="cancelEditRow()"
+                            (delete)="onDeleteRow(row)" (duplicate)="onDuplicateRow(row)"
+                            (customAction)="onCustomRowAction($event, row)">
+                        </app-grid-actions>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ───────────── INFINITE SCROLL BOTTOM SPACER ───────────── -->
+            @if (paginationMode() === 'infinite') {
+            <div class="w-full h-20 flex items-center justify-center text-[length:var(--font-size-xs)]">
+                @if (loading() && accumulatedData().length > 0) {
+                <div
+                    class="flex items-center gap-2 px-4 py-1.5 rounded-full bg-[var(--bg-secondary)] border border-[var(--border-secondary)] shadow-sm animate-pulse">
+                    <i class="pi pi-spinner animate-spin text-[var(--accent-primary)]"></i>
+                    <span class="font-medium text-[var(--text-secondary)]">Loading more records...</span>
+                </div>
+                } @else if (accumulatedData().length >= totalRecords() && totalRecords() > 0) {
+                <div
+                    class="flex items-center gap-2 px-4 py-1.5 rounded-full bg-[var(--bg-secondary)] border border-[var(--border-secondary)] opacity-70">
+                    <i class="pi pi-check text-[var(--color-success)] text-[10px]"></i>
+                    <span class="font-medium text-[var(--text-tertiary)]">End of results</span>
+                </div>
+                }
+            </div>
+            }
+
+        </cdk-virtual-scroll-viewport>
+
+        <!-- Empty State -->
+        @if (!loading() && displayData().length === 0) {
+        <div class="absolute inset-0 flex items-center justify-center bg-[var(--bg-primary)] z-10">
+            <app-grid-empty-state [title]="emptyMessage()" (action)="onAddRow()"></app-grid-empty-state>
+        </div>
+        }
+    </div>
+
+    <!-- ───────────── PAGINATION ───────────── -->
+    @if (pagination() && paginationMode() === 'pages') {
+    <app-grid-pagination class="border-t border-[var(--border-secondary)] bg-[var(--bg-primary)] z-30 relative"
+        [total]="lazy() ? totalRecords() : filteredData().length" [pageSize]="pageSizeSignal()" [page]="currentPage()"
+        (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)">
+    </app-grid-pagination>
+    }
+
+    <!-- ───────────── OVERLAYS ───────────── -->
+
+    <!-- Column Manager -->
+    @if (showColumnManager()) {
+    <app-grid-column-manager [columns]="columnsWithOverrides()" [visibleColumns]="visibleColumnsSignal()"
+        (visibilityChange)="onVisibilityChange($event)" (pinChange)="onPinChange($event)"
+        (close)="showColumnManager.set(false)">
+    </app-grid-column-manager>
+    }
+
+    <!-- Saved Views -->
+    @if (showSavedViews()) {
+    <app-grid-saved-views [views]="savedViews()" [activeViewId]="activeViewId()" (applyView)="onApplyView($event)"
+        (saveView)="onSaveCurrentView($event)" (deleteView)="onDeleteView($event)" (close)="showSavedViews.set(false)">
+    </app-grid-saved-views>
+    }
+
+    <!-- Context Menu -->
+    @if (showContextMenu() && enableContextMenu()) {
+    <app-grid-context-menu [position]="contextMenuPos()" [row]="contextMenuRow()"
+        [isEditing]="editingRowId() === getRowId(contextMenuRow())" [rowActions]="rowActions()"
+        [enableExport]="enableExport()" [canUndo]="gridService.canUndo()" [canRedo]="gridService.canRedo()"
+        (action)="onContextMenuAction($event)" (close)="showContextMenu.set(false)">
+    </app-grid-context-menu>
+    }
+</div>

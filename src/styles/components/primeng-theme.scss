@@ -351,39 +351,70 @@
 
     /* ==========================================================================
      CHECKBOX
-     ========================================================================== */
-    --p-checkbox-border-radius: var(--ui-border-radius-sm);
+
+  /* Size */
     --p-checkbox-width: 1.125rem;
     --p-checkbox-height: 1.125rem;
-    --p-checkbox-background: var(--bg-secondary);
-    --p-checkbox-checked-background: var(--accent-primary);
-    // --p-checkbox-checked-hover-background: var(--accent-hover);
-    // --p-checkbox-disabled-background: var(--color-disabled);
-    // --p-checkbox-filled-background: var(--bg-ternary);
-    --p-checkbox-border-color: var(--border-secondary);
-    --p-checkbox-hover-border-color: var(--border-secondary);
+
+    --p-checkbox-sm-width: 0.9rem;
+    --p-checkbox-sm-height: 0.9rem;
+
+    --p-checkbox-lg-width: 1.35rem;
+    --p-checkbox-lg-height: 1.35rem;
+
+    /* Radius */
+    --p-checkbox-border-radius: var(--ui-border-radius-sm);
+
+    /* Border */
+    --p-checkbox-border-width: 1px;
+    --p-checkbox-border-color: var(--border-primary);
+    --p-checkbox-hover-border-color: var(--accent-primary);
     --p-checkbox-focus-border-color: var(--accent-primary);
+
+    /* Background */
+    --p-checkbox-background: var(--bg-secondary);
+    --p-checkbox-hover-background: var(--bg-secondary);
+
+    /* Checked */
+    --p-checkbox-checked-background: var(--accent-primary);
+    --p-checkbox-checked-hover-background: var(--accent-hover);
+
     --p-checkbox-checked-border-color: var(--accent-primary);
     --p-checkbox-checked-hover-border-color: var(--accent-hover);
-    // --p-checkbox-checked-focus-border-color: var(--accent-primary);
-    // --p-checkbox-checked-disabled-border-color: var(--color-disabled);
-    // --p-checkbox-invalid-border-color: var(--color-error);
+
+    /* Disabled */
+    --p-checkbox-disabled-background: var(--bg-ternary);
+    --p-checkbox-disabled-border-color: var(--border-primary);
+
+    --p-checkbox-checked-disabled-background: var(--color-disabled);
+    --p-checkbox-checked-disabled-border-color: var(--color-disabled);
+
+    /* Invalid */
+    --p-checkbox-invalid-border-color: var(--color-error);
+
+    /* Icon */
+    --p-checkbox-icon-size: .72rem;
+
+    --p-checkbox-icon-color: var(--text-on-accent);
+    --p-checkbox-icon-hover-color: var(--text-on-accent);
+
+    --p-checkbox-icon-checked-color: var(--text-on-accent);
+    --p-checkbox-icon-checked-hover-color: var(--text-on-accent);
+
+    --p-checkbox-icon-disabled-color: var(--color-disabled-text);
+
+    /* Shadow */
     --p-checkbox-shadow: none;
+
+    /* Focus Ring */
     --p-checkbox-focus-ring-width: 2px;
     --p-checkbox-focus-ring-style: solid;
     --p-checkbox-focus-ring-color: var(--accent-primary);
     --p-checkbox-focus-ring-offset: 2px;
     --p-checkbox-focus-ring-shadow: 0 0 0 4px var(--accent-focus);
-    --p-checkbox-transition-duration: 0.18s;
-    --p-checkbox-icon-size: 0.75rem;
-    --p-checkbox-icon-color: #ffffff;
-    --p-checkbox-icon-checked-color: #ffffff;
-    --p-checkbox-icon-checked-hover-color: #ffffff;
-    --p-checkbox-icon-disabled-color: var(--color-disabled-text);
-    --p-checkbox-sm-width: 0.875rem;
-    --p-checkbox-sm-height: 0.875rem;
-    --p-checkbox-lg-width: 1.375rem;
-    --p-checkbox-lg-height: 1.375rem;
+
+    /* Animation */
+    --p-checkbox-transition-duration: .18s;
 
 
     /* ==========================================================================
@@ -3482,7 +3513,7 @@
   }
 
   // 3. Table Header Cells (Thead)
-  .p-datatable-thead > tr > th,
+  .p-datatable-thead>tr>th,
   .p-datatable-header-cell {
     text-transform: uppercase !important;
     letter-spacing: 0.05em !important;
@@ -3492,18 +3523,18 @@
     border-bottom: 2px solid var(--border-secondary) !important;
     transition: background-color var(--transition-fast), color var(--transition-fast);
     padding: 0.75rem 1.25rem;
-    
+
     &:hover {
       color: var(--text-primary);
     }
   }
 
   // 4. Body Cells (Tbody)
-  .p-datatable-tbody > tr {
+  .p-datatable-tbody>tr {
     background: transparent;
     transition: background-color var(--transition-base), box-shadow var(--transition-base);
-    
-    > td {
+
+    >td {
       border-bottom: 1px solid var(--border-primary) !important;
       color: var(--text-secondary);
       font-size: var(--font-size-sm);
@@ -3512,19 +3543,22 @@
 
     &:hover {
       background: var(--component-bg-hover);
-      > td {
+
+      >td {
         color: var(--text-primary);
       }
     }
-    
+
     // Highlight selected row with accent styling
     &.p-highlight {
       position: relative;
       background: var(--accent-focus);
-      > td {
+
+      >td {
         color: var(--accent-primary);
         font-weight: 500;
       }
+
       &::after {
         content: '';
         position: absolute;
@@ -3544,12 +3578,71 @@
     padding: 1rem;
     border-radius: 0 0 var(--ui-border-radius-lg) var(--ui-border-radius-lg);
   }
-  
+
   // 6. Loading state overlay
   .p-datatable-loading-overlay {
     background-color: color-mix(in srgb, var(--bg-secondary) 70%, transparent);
     backdrop-filter: blur(4px);
   }
+}
+
+/* ==========================================================================
+   FORCE CHECKBOX ICON COLORS
+   ========================================================================== */
+
+.p-checkbox {
+
+  .p-checkbox-box {
+
+    transition: all var(--transition-fast);
+
+    svg {
+      color: var(--text-on-accent);
+      fill: currentColor;
+      stroke: currentColor;
+    }
+
+    .p-checkbox-icon {
+      color: var(--text-on-accent);
+      fill: currentColor;
+      stroke: currentColor;
+    }
+  }
+
+  .p-checkbox-box.p-highlight {
+
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+
+    svg,
+    .p-checkbox-icon {
+
+      color: var(--text-on-accent);
+      fill: currentColor;
+      stroke: currentColor;
+
+    }
+  }
+
+  .p-checkbox-box:hover {
+
+    border-color: var(--accent-hover);
+
+  }
+
+  .p-checkbox-box.p-highlight:hover {
+
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+
+  }
+
+  .p-checkbox-box.p-focus {
+
+    box-shadow: 0 0 0 4px var(--accent-focus);
+
+  }
+
 }
 
 /* ==========================================================================
@@ -3562,4 +3655,3 @@
 @import './layout-cards.scss';
 @import './data-grid.scss';
 @import './primeng-overrides.scss';
-

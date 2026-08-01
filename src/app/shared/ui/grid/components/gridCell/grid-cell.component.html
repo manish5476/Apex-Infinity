@@ -1,0 +1,176 @@
+<div class="flex items-center w-full h-full min-w-0">
+
+    <!-- ======================= EDIT MODE ======================= -->
+    @if (isEditing() && column().editable !== false && !column().readOnly) {
+    @switch (column().type) {
+
+    @case ('number') {
+    <p-inputNumber [ngModel]="editValue()" [minFractionDigits]="column().minFractionDigits ?? 0"
+        [maxFractionDigits]="column().maxFractionDigits ?? 2" [min]="column().min ?? null" [max]="column().max ?? null"
+        inputStyleClass="apex-grid-input" class="w-full" (ngModelChange)="onValueChange($event)">
+    </p-inputNumber>
+    }
+
+    @case ('currency') {
+    <p-inputNumber [ngModel]="editValue()" mode="currency" [currency]="column().currencyCode ?? 'USD'"
+        inputStyleClass="apex-grid-input" class="w-full" (ngModelChange)="onValueChange($event)">
+    </p-inputNumber>
+    }
+
+    @case ('percentage') {
+    <p-inputNumber [ngModel]="editValue()" suffix="%" [min]="column().min ?? 0" [max]="column().max ?? 100"
+        inputStyleClass="apex-grid-input" class="w-full" (ngModelChange)="onValueChange($event)">
+    </p-inputNumber>
+    }
+
+    @case ('select') {
+    <p-select [ngModel]="editValue()" [options]="column().options ?? []" optionLabel="label" optionValue="value"
+        appendTo="body" [placeholder]="column().placeholder ?? 'Select…'" styleClass="apex-grid-dropdown" class="w-full"
+        (ngModelChange)="onValueChange($event)">
+    </p-select>
+    }
+
+    @case ('date') {
+    <p-datepicker [ngModel]="editValue()" appendTo="body" [dateFormat]="column().dateFormat ?? 'yy-mm-dd'"
+        [timeOnly]="column().timeOnly ?? false" [showTime]="column().showTime ?? false"
+        [selectionMode]="column().selectionMode ?? 'single'" inputStyleClass="apex-grid-input" class="w-full"
+        (ngModelChange)="onValueChange($event)">
+    </p-datepicker>
+    }
+
+    @case ('boolean') {
+    <div class="flex items-center w-full px-2">
+        <p-checkbox [ngModel]="editValue()" [binary]="true" (ngModelChange)="onValueChange($event)">
+        </p-checkbox>
+    </div>
+    }
+
+    @case ('color') {
+    <div class="flex items-center gap-2.5 w-full px-2">
+        <p-colorPicker [ngModel]="editValue()" [format]="column().colorFormat ?? 'hex'" appendTo="body"
+            (ngModelChange)="onValueChange($event)">
+        </p-colorPicker>
+        <span class="text-[11px] font-mono text-[var(--text-secondary)] uppercase tracking-wider">
+            {{ editValue() || '—' }}
+        </span>
+    </div>
+    }
+
+    @case ('tags') {
+    <p-autoComplete [ngModel]="editValue()" [multiple]="true" [placeholder]="column().placeholder ?? 'Add tags…'"
+        appendTo="body" styleClass="apex-grid-autocomplete" class="w-full" (ngModelChange)="onValueChange($event)">
+    </p-autoComplete>
+    }
+
+    @default {
+    <input type="text" class="apex-grid-input w-full" [ngModel]="editValue()" [placeholder]="column().placeholder ?? ''"
+        (ngModelChange)="onValueChange($event)">
+    }
+    }
+
+    <!-- ======================= VIEW MODE ======================= -->
+    } @else {
+    @switch (column().type) {
+
+    @case ('user') {
+    <div class="flex items-center gap-2.5 min-w-0 w-full group">
+        <app-avatar [imageUrl]="rowData()[column().field + 'Avatar']" [name]="rowData()[column().field] || 'Unknown'"
+            size="sm" class="transition-transform group-hover:scale-105">
+        </app-avatar>
+        <span
+            class="truncate text-[length:var(--font-size-xs)] font-[var(--font-weight-medium)] text-[var(--text-primary)] group-hover:text-[var(--accent-primary)] transition-colors">
+            {{ rowData()[column().field] }}
+        </span>
+    </div>
+    }
+
+    @case ('badge') {
+    @if (rowData()[column().field]) {
+    <app-status-badge [status]="rowData()[column().field]" variant="subtle" size="sm"></app-status-badge>
+    } @else {
+    <span class="text-[var(--text-tertiary)]">—</span>
+    }
+    }
+
+    @case ('currency') {
+    <span class="font-mono text-[13px] font-[var(--font-weight-medium)] w-full block truncate tracking-tight"
+        [class.text-[var(--color-error)]]="rowData()[column().field] < 0"
+        [class.text-[var(--text-primary)]]="rowData()[column().field] >= 0">
+        {{ rowData()[column().field] | currency:(column().currencyCode ?? 'USD'):'symbol':'1.2-2' }}
+    </span>
+    }
+
+    @case ('percentage') {
+    <span class="font-mono text-[13px] font-[var(--font-weight-medium)] text-[var(--text-primary)] w-full block truncate tracking-tight">
+        {{ (rowData()[column().field] ?? 0) / 100 | percent:'1.1-2' }}
+    </span>
+    }
+
+    @case ('boolean') {
+    <div class="flex items-center w-full">
+        @if (rowData()[column().field]) {
+        <div class="flex items-center justify-center w-5 h-5 rounded-[var(--ui-border-radius-sm)] bg-[color-mix(in_srgb,var(--color-success)_15%,transparent)] text-[var(--color-success)]">
+            <i class="pi pi-check text-[10px] font-bold"></i>
+        </div>
+        } @else {
+        <div class="flex items-center justify-center w-5 h-5 rounded-[var(--ui-border-radius-sm)] bg-[color-mix(in_srgb,var(--text-tertiary)_15%,transparent)] text-[var(--text-tertiary)]">
+            <i class="pi pi-minus text-[10px]"></i>
+        </div>
+        }
+    </div>
+    }
+
+    @case ('tags') {
+    <div class="flex flex-wrap items-center gap-1.5 min-w-0">
+        @for (tag of (rowData()[column().field] ?? []).slice(0, column().maxTags ?? 2); track tag) {
+        <span
+            class="px-2 py-0.5 rounded-[var(--ui-border-radius-sm)] text-[10px] font-[var(--font-weight-medium)] bg-[var(--bg-secondary)] text-[var(--text-secondary)] border border-[var(--border-secondary)] truncate max-w-[90px] transition-colors hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)]">
+            {{ tag }}
+        </span>
+        }
+        @if ((rowData()[column().field] ?? []).length > (column().maxTags ?? 2)) {
+        <span class="px-2 py-0.5 rounded-[var(--ui-border-radius-sm)] text-[10px] font-[var(--font-weight-semibold)] bg-[color-mix(in_srgb,var(--accent-primary)_10%,transparent)] text-[var(--accent-primary)] cursor-pointer hover:bg-[color-mix(in_srgb,var(--accent-primary)_15%,transparent)] transition-colors"
+            [pTooltip]="(rowData()[column().field] ?? []).slice(column().maxTags ?? 2).join(', ')" tooltipPosition="top">
+            +{{ (rowData()[column().field]).length - (column().maxTags ?? 2) }}
+        </span>
+        }
+    </div>
+    }
+
+    @case ('color') {
+    <div class="flex items-center gap-2.5 min-w-0 w-full group">
+        @if (rowData()[column().field]) {
+        <div class="w-4 h-4 rounded-full border border-[var(--border-secondary)] shadow-sm shrink-0 transition-transform group-hover:scale-110"
+            [style.background-color]="rowData()[column().field]"></div>
+        <span class="font-mono text-[11px] text-[var(--text-secondary)] uppercase tracking-wider truncate">
+            {{ rowData()[column().field] }}
+        </span>
+        } @else {
+        <span class="text-[var(--text-tertiary)]">—</span>
+        }
+    </div>
+    }
+
+    @case ('url') {
+    @if (rowData()[column().field]) {
+    <a [href]="rowData()[column().field]" target="_blank" rel="noopener"
+        class="inline-flex items-center gap-1.5 text-[length:var(--font-size-xs)] text-[var(--accent-primary)] hover:text-[var(--accent-hover)] truncate max-w-full group transition-colors"
+        (click)="$event.stopPropagation()">
+        <span class="truncate">{{ rowData()[column().field] }}</span>
+        <i class="pi pi-external-link text-[10px] opacity-0 group-hover:opacity-100 transition-opacity shrink-0"></i>
+    </a>
+    } @else {
+    <span class="text-[var(--text-tertiary)]">—</span>
+    }
+    }
+
+    @default {
+    <span class="truncate block w-full text-[length:var(--font-size-xs)] text-[var(--text-primary)]"
+        [pTooltip]="rowData()[column().field]" tooltipPosition="top" [tooltipDisabled]="!rowData()[column().field]">
+        {{ (column().formatter ? column().formatter!(rowData()[column().field], rowData()) : rowData()[column().field])
+        ?? '—' }}
+    </span>
+    }
+    }
+    }
+</div>
