@@ -78,7 +78,7 @@ export interface GridColumn {
 
   // Formatting
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  formatter?: (value: any, row: any) => string;
+  formatter?: (value: any, row: any, isPinned?: boolean) => string;
 
   // Standard configs
   placeholder?: string;

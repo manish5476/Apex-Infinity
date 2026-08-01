@@ -11,7 +11,10 @@ import { InputTextModule } from 'primeng/inputtext';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { BranchService } from '../../services/branch-service';
 import { Toast } from "primeng/toast";
-import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
+import { DataGridComponent, GridColumn } from '../../../../shared/ui/grid';
+import { PageComponent } from '../../../../shared/ui/layout/page/page.component';
+import { PageHeaderComponent } from '../../../../shared/ui/layout/page-header/page-header.component';
+import { PageContentComponent } from '../../../../shared/ui/layout/page-content/page-content.component';
 import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '@core/auth/permissions.constants';
 import { Subject } from "rxjs";
@@ -27,7 +30,10 @@ import { takeUntil } from "rxjs/operators";
     InputTextModule,
     RouterModule,
     Toast,
-    AgShareGrid,
+    DataGridComponent,
+    PageComponent,
+    PageHeaderComponent,
+    PageContentComponent,
     HasPermissionDirective
 ],
   templateUrl: './branch-list.html',
@@ -42,14 +48,13 @@ export class BranchListComponent implements OnInit, OnDestroy {
   private messageService = inject(AppMessageService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-  private gridApi!: GridApi;
-  private currentPage = 1;
-  private isLoading = false;
-  private totalCount = 0;
+  currentPage = 1;
+  isLoading = false;
+  totalCount = 0;
   private pageSize = 50;
 
   data: any[] = [];
-  column: any = [];
+  column: GridColumn[] = [];
   branchFilter = { name: '' };
 
   ngOnInit(): void {
@@ -110,26 +115,16 @@ export class BranchListComponent implements OnInit, OnDestroy {
     });
   }
 
+  onRowClick(row: any) {
+    const branchId = row._id;
+    if (branchId) {
+      this.router.navigate([branchId], { relativeTo: this.route });
+    }
+  }
+
   onScrolledToBottom() {
     if (!this.isLoading && this.data.length < this.totalCount) {
       this.getData(false);
-    }
-  }
-
-  onGridReady(params: GridReadyEvent) {
-    this.gridApi = params.api;
-  }
-
-  eventFromGrid(event: any) {
-    console.log(event);
-    if (event.type === 'cellClicked' && event.field === 'name') {
-      const branchId = event.row._id;
-      if (branchId) {
-        this.router.navigate([branchId], { relativeTo: this.route });
-      }
-    }
-    if (event.type === 'reachedBottom') {
-      this.onScrolledToBottom();
     }
   }
 
@@ -137,37 +132,28 @@ export class BranchListComponent implements OnInit, OnDestroy {
     this.column = [
       {
         field: 'name',
-        headerName: 'Branch Name',
-        flex: 1,
-        minWidth: 200,
-        cellStyle: {
-          'color': 'var(--accent-primary)',
-          'font-weight': '600',
-          'cursor': 'pointer'
-        }
+        header: 'Branch Name',
+        width: '1fr',
+        minWidth: '200px'
       },
-      { field: 'branchCode', headerName: 'Code', width: 120 },
+      { field: 'branchCode', header: 'Code', width: '120px' },
       {
-        headerName: 'City',
-        valueGetter: (p: any) => p.data.address?.city || '-'
+        field: 'address',
+        header: 'City',
+        width: '150px',
+        formatter: (val, row) => row.address?.city || '-'
       },
       {
         field: 'phoneNumber',
-        headerName: 'Phone',
-        width: 150
+        header: 'Phone',
+        width: '150px'
       },
       {
-        headerName: 'Status',
+        header: 'Status',
         field: 'isActive',
-        width: 120,
-        cellRenderer: (params: any) => {
-          const status = params.value ? 'active' : 'inactive';
-          const badgeClass = params.value ? 'badge-brand' : 'badge-unit';
-          return `
-            <div class="badge-wrapper">
-              <span class="pill-badge ${badgeClass}">${status}</span>
-            </div>`;
-        }
+        width: '120px',
+        type: 'status',
+        formatter: (val) => val ? 'active' : 'inactive'
       }
     ];
     this.cdr.detectChanges();

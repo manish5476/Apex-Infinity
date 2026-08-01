@@ -12,9 +12,9 @@ import { Component, ChangeDetectionStrategy, input } from '@angular/core';
     <main 
       class="flex flex-col flex-1 w-full mx-auto" 
       [class.max-w-[1600px]]="!fullWidth()"
-      [class.p-[var(--spacing-xl)]]="padded() && density() === 'compact'"
-      [class.p-[var(--spacing-3xl)]]="padded() && density() === 'normal'"
-      [class.p-[var(--spacing-4xl)]]="padded() && density() === 'comfortable'">
+      [class.p-4]="padded() && density() === 'compact'"
+      [class.p-6]="padded() && density() === 'normal'"
+      [class.p-8]="padded() && density() === 'comfortable'">
       <ng-content></ng-content>
     </main>
   `

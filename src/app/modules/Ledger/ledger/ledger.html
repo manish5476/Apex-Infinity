@@ -1,109 +1,100 @@
 <p-toast></p-toast>
 
-<div class="app-container h-full">
-
-  <!-- Standard Header -->
-  <div class="container-header">
-    <div class="flex align-center gap-3">
-      <div class="icon-box bg-primary-light text-primary border-round p-2 flex align-center justify-center">
-        <i class="pi pi-book text-xl"></i>
+<app-page>
+  <app-page-header [showToolbar]="true">
+    <ng-container header-left>
+      <div class="flex flex-row items-center gap-4">
+        <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-[var(--bg-secondary)] text-[var(--accent-primary)] border border-[var(--border-primary)] shadow-sm">
+          <i class="pi pi-book text-xl"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-[var(--text-primary)] m-0">Financial Ledger</h2>
+          <p class="text-sm text-[var(--text-secondary)] m-0 mt-1">Track transactions, reports, and balances across the organization.</p>
+        </div>
       </div>
-      <div class="header-titles">
-        <h2 class="container-title">Financial Ledger</h2>
-        <p class="container-subtitle">Track transactions, reports, and balances across the organization.</p>
-      </div>
-    </div>
+    </ng-container>
 
-    <div class="header-actions">
+    <div class="flex items-center gap-2">
       <p-button label="Export" icon="pi pi-download" styleClass="p-button-outlined p-button-secondary"
         [loading]="isExporting()" (onClick)="handleExportClick()">
       </p-button>
     </div>
-  </div>
 
-  <div class="container-body flex flex-col h-full gap-4">
+    <!-- Filter Panel inside Toolbar -->
+    <ng-container toolbar>
+      <div class="flex flex-wrap gap-4 items-end" [formGroup]="filterForm">
+        <div class="flex flex-col gap-1">
+          <label class="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">Branch</label>
+          <app-master-dropdown endpoint="branches" formControlName="branchId" (onSelect)="applyFilters()"
+            placeholder="All Branches" class="w-56">
+          </app-master-dropdown>
+        </div>
 
-    <!-- Filter Panel -->
-    <div class="app-filter-panel" [formGroup]="filterForm">
+        <div class="flex flex-col gap-1">
+          <label class="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">Date Period</label>
+          <p-datepicker formControlName="dateRange" selectionMode="range" [readonlyInput]="true"
+            placeholder="Select Period" [showIcon]="true" [showClear]="true" [showButtonBar]="true" appendTo="body"
+            styleClass="w-60 h-[42px]" (onClose)="applyFilters()" (onClear)="onDateClear()" (onClearClick)="onDateClear()">
+          </p-datepicker>
+        </div>
 
-      <div class="filter-field">
-        <label>Branch</label>
-        <app-master-dropdown endpoint="branches" formControlName="branchId" (onSelect)="applyFilters()"
-          placeholder="All Branches">
-        </app-master-dropdown>
-      </div>
+        @if (!isReportView) {
+        @if (currentTab() === 'all') {
+        <div class="flex flex-col gap-1 flex-1 min-w-[200px]">
+          <label class="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">Search</label>
+          <input pInputText formControlName="search" placeholder="Ref #, Detail..." (keyup.enter)="applyFilters()"
+            class="w-full h-[42px]" />
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">Account</label>
+          <app-master-dropdown endpoint="accounts" formControlName="accountId" (onSelect)="applyFilters()"
+            placeholder="Select Account" class="w-48">
+          </app-master-dropdown>
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">Type</label>
+          <p-select appendTo="body" formControlName="txnType"
+            [options]="[{label:'Debit', value:'debit'}, {label:'Credit', value:'credit'}]" placeholder="All Types"
+            [showClear]="true" styleClass="w-36 h-[42px] flex items-center" (onChange)="applyFilters()" [filter]="true"
+            filterBy="label"></p-select>
+        </div>
+        }
 
-      <div class="filter-field">
-        <label>Date Period</label>
-        <p-datepicker formControlName="dateRange" selectionMode="range" [readonlyInput]="true"
-          placeholder="Select Period" [showIcon]="true" [showClear]="true" appendTo="body" styleClass="w-full"
-          (onClose)="applyFilters()" (onClear)="applyFilters()">
-        </p-datepicker>
-      </div>
+        @if (currentTab() === 'customer') {
+        <div class="flex flex-col gap-1 flex-1">
+          <label class="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">Customer</label>
+          <app-master-dropdown endpoint="customers" formControlName="customerId" (onSelect)="applyFilters()"
+            placeholder="Select Customer">
+          </app-master-dropdown>
+        </div>
+        }
+        @if (currentTab() === 'supplier') {
+        <div class="flex flex-col gap-1 flex-1">
+          <label class="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">Supplier</label>
+          <app-master-dropdown endpoint="suppliers" formControlName="supplierId" (onSelect)="applyFilters()"
+            placeholder="Select Supplier">
+          </app-master-dropdown>
+        </div>
+        }
+        }
 
-      @if (!isReportView) {
-      @if (currentTab() === 'all') {
-      <div class="filter-field search-field" style="flex: 1.5">
-        <label>Search</label>
-        <input pInputText formControlName="search" placeholder="Ref #, Detail..." (keyup.enter)="applyFilters()"
-          class="w-full" />
+        <div class="flex items-center pb-[3px]">
+          <p-button icon="pi pi-refresh" styleClass="p-button-text p-button-secondary w-10 h-10" (onClick)="resetFilters()"
+            pTooltip="Reset Filters"></p-button>
+        </div>
       </div>
-      <div class="filter-field">
-        <label>Account</label>
-        <app-master-dropdown endpoint="accounts" formControlName="accountId" (onSelect)="applyFilters()"
-          placeholder="Select Account">
-        </app-master-dropdown>
-      </div>
-      <div class="filter-field">
-        <label>Type</label>
-        <p-select appendTo="body" formControlName="txnType"
-          [options]="[{label:'Debit', value:'debit'}, {label:'Credit', value:'credit'}]" placeholder="All Types"
-          [showClear]="true" styleClass="w-full" (onChange)="applyFilters()" [filter]="true"
-          filterBy="label"></p-select>
-      </div>
-      }
+    </ng-container>
+  </app-page-header>
 
-      @if (currentTab() === 'customer') {
-      <div class="filter-field" style="flex: 2">
-        <label>Customer</label>
-        <app-master-dropdown endpoint="customers" formControlName="customerId" (onSelect)="applyFilters()"
-          placeholder="Select Customer">
-        </app-master-dropdown>
-      </div>
-      }
-      @if (currentTab() === 'supplier') {
-      <div class="filter-field" style="flex: 2">
-        <label>Supplier</label>
-        <app-master-dropdown endpoint="suppliers" formControlName="supplierId" (onSelect)="applyFilters()"
-          placeholder="Select Supplier">
-        </app-master-dropdown>
-      </div>
-      }
-      }
-
-      <div class="filter-actions">
-        <p-button icon="pi pi-refresh" styleClass="p-button-outlined p-button-secondary" (onClick)="resetFilters()"
-          pTooltip="Reset Filters"></p-button>
-      </div>
-    </div>
+  <app-page-content>
 
     <!-- Tabs Navigation -->
-    <div class="tabs-navigation-area border-bottom-1 border-secondary">
-      <p-tabs [value]="tabIndex()" (valueChange)="onTabChange($event)" styleClass="app-tabs">
-        <p-tablist>
-          <p-tab [value]="0">Transactions</p-tab>
-          <p-tab [value]="1">Customer</p-tab>
-          <p-tab [value]="2">Supplier</p-tab>
-          <p-tab [value]="3">Summary</p-tab>
-          <p-tab [value]="4">P & L</p-tab>
-          <p-tab [value]="5">Balance Sheet</p-tab>
-          <p-tab [value]="6">Trial Balance</p-tab>
-        </p-tablist>
-      </p-tabs>
+    <div class="border-b border-[var(--border-secondary)] mb-4 pb-2">
+      <app-tab-bar [tabs]="ledgerTabs" [activeTabId]="activeTabId()" (activeTabIdChange)="onTabChange($event)"></app-tab-bar>
     </div>
 
     <!-- Main Content Area -->
-    <div class="flex-1 min-h-0 overflow-auto">
+    <div class="flex-1 flex flex-col min-h-[500px]">
 
       @if (isLoading() && !gridData().length && !reportData()) {
       <div class="p-4 flex flex-col gap-3">
@@ -156,8 +147,8 @@
         </div>
       </div>
       }
-      <div class="grid-container h-full flex flex-col">
-        <div class="flex-1 min-h-0 manish-border-1 border-secondary border-round overflow-hidden">
+      <div class="h-full flex flex-col flex-1">
+        <div class="flex-1 min-h-[400px]">
           @if ( (currentTab() === 'customer' && !filterForm.value.customerId) || (currentTab() === 'supplier' &&
           !filterForm.value.supplierId) ) {
           <div
@@ -174,9 +165,15 @@
           </div>
           }
           @else {
-          <app-ag-share-grid [columns]="gridColumns()" [data]="gridData()" [pinnedBottomRowData]="pinnedBottomRowData()"
-            style="height: 100%; width: 100%; display: block;" (gridEvent)="eventFromGrid($event)">
-          </app-ag-share-grid>
+          <app-data-grid 
+            [columns]="gridColumns()" 
+            [data]="gridData()" 
+            [loading]="isLoading()"
+            [lazy]="true"
+            [totalRecords]="gridData().length"
+            (pageChange)="onPageChange()"
+            (rowClick)="onRowClick($event)">
+          </app-data-grid>
           }
         </div>
 
@@ -333,9 +330,8 @@
       </div>
       }
     </div>
-
-  </div>
-</div>
+  </app-page-content>
+</app-page>
 
 <!-- Export Dialog -->
 <p-dialog [modal]="true" appendTo="body" header="Export Financial Data" [(visible)]="showExportDialog" [modal]="true"

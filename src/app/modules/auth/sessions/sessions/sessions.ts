@@ -17,10 +17,16 @@ import { InputTextModule } from 'primeng/inputtext';
 // Shared
 import { SessionService } from '../../services/session.service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
-import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
-import { AppMessageService } from '@core/services/message.service';
+import { AppMessageService } from '../../../../core/services/message.service';
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
+
+// --- Shared UI ---
+import { PageComponent } from '../../../../shared/ui/layout/page/page.component';
+import { PageHeaderComponent } from '../../../../shared/ui/layout/page-header/page-header.component';
+import { PageContentComponent } from '../../../../shared/ui/layout/page-content/page-content.component';
+import { DataGridComponent, GridColumn, GridRowAction } from '../../../../shared/ui/grid';
+import { DialogComponent } from '../../../../shared/ui/dialog/dialog.component';
 
 @Component({
   selector: 'app-sessions',
@@ -28,13 +34,16 @@ import { takeUntil } from "rxjs/operators";
   imports: [
     FormsModule,
     ButtonModule,
-    DialogModule,
+    DialogComponent,
     TagModule,
     ToastModule,
     ConfirmDialogModule,
-    AgShareGrid,
     SelectModule,
-    InputTextModule
+    InputTextModule,
+    PageComponent,
+    PageHeaderComponent,
+    PageContentComponent,
+    DataGridComponent
 ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './sessions.html',
@@ -50,11 +59,10 @@ export class Sessions implements OnInit, OnDestroy {
   public common = inject(CommonMethodService);
   selectedIds: any[]=[]
   // --- Grid State ---
-  private gridApi!: GridApi;
   data: any[] = [];
-  column: any = [];
+  column: GridColumn[] = [];
+  rowActions: GridRowAction[] = [];
   isLoading = signal(false);
-  rowSelectionMode: any = 'single';
 
   // --- View State ---
   viewMode = signal<'all' | 'mine'>('all');
@@ -148,68 +156,77 @@ export class Sessions implements OnInit, OnDestroy {
     this.column = [
       {
         field: 'isValid',
-        headerName: 'Status',
-        width: 130,
-        cellRenderer: (params: any) => {
-          // Determine status string
-          const status = params.value ? 'active' : 'revoked';
-          const label = params.value ? 'Active' : 'Revoked';
-          return `<span class="status-badge status-${status}">${label}</span>`;
-        }
+        header: 'Status',
+        width: '110px',
+        type: 'status',
+        formatter: (value: any) => value ? 'Active' : 'Revoked'
       },
       ...(this.viewMode() === 'all' ? [{
-        field: 'userId.name', // Access nested property directly for sorting/filtering
-        headerName: 'User',
+        field: 'userId.name', 
+        header: 'User',
         sortable: true,
-        filter: true,
-        width: 180,
-        cellStyle: { fontWeight: '600', color: 'var(--text-primary)' },
-        valueGetter: (params: any) => {
-          // Handle case where population might fail or user is deleted
-          return params.data.userId?.name || 'Unknown User';
-        }
+        filterable: true,
+        width: '180px',
+        formatter: (value: any, row: any) => row.userId?.name || 'Unknown User'
       }] : []),
       {
         field: 'ipAddress',
-        headerName: 'IP Address',
+        header: 'IP Address',
         sortable: true,
-        filter: true,
-        width: 160,
-        cellStyle: { fontFamily: 'monospace' }
+        filterable: true,
+        width: '140px'
       },
       {
-        field: 'browser', // Backend splits this now usually, or use device string
-        headerName: 'Browser',
-        width: 150
+        field: 'browser', 
+        header: 'Browser',
+        width: '130px',
+        filterable: true
       },
       {
         field: 'os',
-        headerName: 'OS',
-        width: 150
+        header: 'OS',
+        width: '130px',
+        filterable: true
       },
       {
         field: 'lastActivityAt',
-        headerName: 'Last Active',
+        header: 'Last Active',
         sortable: true,
-        width: 200,
-        valueFormatter: (params: any) => this.common.formatDate(params.value, 'medium')
+        width: '160px',
+        formatter: (value: any) => this.common.formatDate(value, 'medium')
+      }
+    ];
+
+    this.rowActions = [
+      {
+        id: 'view',
+        icon: 'pi pi-eye',
+        label: 'View Details',
+        callback: (row: any) => this.openSessionDetails(row)
+      },
+      {
+        id: 'revoke',
+        icon: 'pi pi-power-off',
+        label: 'Revoke Access',
+        variant: 'danger',
+        callback: (row: any) => { 
+          this.selectedSession = row; 
+          if(row.isValid) this.revokeSession(); 
+        }
+      },
+      {
+        id: 'delete',
+        icon: 'pi pi-trash',
+        label: 'Delete Record',
+        variant: 'danger',
+        callback: (row: any) => { this.selectedSession = row; this.deleteSession(); }
       }
     ];
     this.cdr.detectChanges();
   }
 
-  onGridReady(params: GridReadyEvent) {
-    this.gridApi = params.api;
-  }
-
-  eventFromGrid(event: any) {
-    if (event.type === 'cellClicked') {
-      this.openSessionDetails(event.row);
-    }
-    if (event.type === 'selectionChanged') {
-      this.selectedIds = event.rows.map((item: any) => item._id)
-      console.log(this.selectedIds);
-    }
+  onSelectionChange(selected: any[]) {
+    this.selectedIds = selected.map((item: any) => item._id);
   }
 
   // --- Actions ---

@@ -1,99 +1,71 @@
-<div class="page-container glass-panel animate-fadeIn">
-  <header class="page-header border-b border-white/10 pb-6 mb-6">
-    <div class="header-left flex-1 items-center gap-4">
-      <div class="icon-box-xl accent-glow">
-        <i class="pi pi-replay text-2xl text-accent-primary"></i>
-      </div>
-      <div>
-        <h1 class="text-2xl font-bold tracking-tight">Sales Returns</h1>
-        <p class="text-sm text-secondary font-medium mt-0.5">Track and manage credit notes & product returns</p>
-      </div>
-    </div>
-
-    <div class="header-right flex items-center gap-3">
-      <button pButton icon="pi pi-refresh" class="p-button-text p-button-secondary p-button-rounded"
-        [loading]="isLoading()" (click)="getData(true)" pTooltip="Refresh List"></button>
-
-      <button *hasPermission="PERMISSIONS.SALES.MANAGE" pButton label="New Sales Return" icon="pi pi-plus"
-        class="p-button-primary shadow-lg" routerLink="/invoices"></button>
-    </div>
-  </header>
-
-  <!-- Filter Bar -->
-  <section class="filter-bar grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-    <div class="filter-group">
-      <label class="filter-label">Search</label>
-      <span class="p-input-icon-left w-full">
-        <!-- <i class="pi pi-search"></i> -->
-        <input type="text" pInputText [formControl]="searchControl" placeholder="Return #, Invoice #..."
-          class="w-full" />
-      </span>
-    </div>
-
-    <div class="filter-group">
-      <label class="filter-label">Status</label>
-      <p-select [options]="statusOptions" [(ngModel)]="filter.status" (onChange)="applyFilters()"
-        placeholder="Select Status" class="w-full" [showClear]="true"></p-select>
-    </div>
-
-    <div class="filter-group">
-      <label class="filter-label">Branch</label>
-      <app-master-dropdown endpoint="branches" [(ngModel)]="filter.branchId" (onChange)="applyFilters()"
-        placeholder="Select Branch">
-      </app-master-dropdown>
-    </div>
-
-    <div class="filter-group">
-      <div class="flex items-center justify-between mb-1.5">
-        <label class="filter-label !mb-0">Date Range</label>
-        @if (filter.dateRange) {
-        <button class="text-xs text-accent-primary hover:underline" (click)="resetFilters()">Clear</button>
-        }
-      </div>
-      <p-datepicker [(ngModel)]="filter.dateRange" selectionMode="range" (onSelect)="applyFilters()"
-        placeholder="Start - End" class="w-full" appendTo="body"></p-datepicker>
-    </div>
-  </section>
-
-  <!-- Grid Section -->
-  <main class="grid-layout relative min-h-[400px]">
-    <app-ag-share-grid [columns]="column" [data]="data()" (gridEvent)="eventFromGrid($event)" class="full-size-grid">
-    </app-ag-share-grid>
-
-    @if (isLoading() && data().length === 0) {
-    <div class="absolute inset-0 flex items-center justify-center bg-white/5 backdrop-blur-[2px] z-10 rounded-xl">
-      <div class="flex flex-col items-center gap-3">
-        <i class="pi pi-spin pi-spinner text-3xl text-accent-primary"></i>
-        <p class="text-sm font-semibold tracking-wider text-secondary">FETCHING RETURNS...</p>
-      </div>
-    </div>
-    }
-
-    @if (!isLoading() && data().length === 0) {
-    <div class="absolute inset-0 flex flex-col items-center justify-center gap-4 text-center p-8 z-10">
-      <div class="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mb-2">
-        <i class="pi pi-inbox text-4xl text-secondary/30"></i>
-      </div>
-      <div>
-        <h3 class="text-lg font-bold">No Returns Found</h3>
-        <p class="text-sm text-secondary max-w-xs mx-auto">Try adjusting your filters or search terms to find what
-          you're looking for.</p>
-      </div>
-      <button pButton label="Clear All Filters" class="p-button-text p-button-sm" (click)="resetFilters()"></button>
-    </div>
-    }
-  </main>
-
-  <footer class="mt-4 flex items-center justify-between px-2">
-    <p class="text-xs font-medium text-secondary">
-      Showing <span class="text-primary font-bold">{{ data().length }}</span> of <span class="text-primary font-bold">{{
-        data().length }}</span> results
-    </p>
-    <div class="flex items-center gap-1.5 grayscale opacity-50">
-      <i class="pi pi-info-circle text-[10px]"></i>
-      <span class="text-[10px] uppercase font-bold tracking-widest leading-none">Press Space to select row</span>
-    </div>
-  </footer>
-</div>
-
 <p-toast position="bottom-right" appendTo="body"></p-toast>
+
+<app-page>
+  <app-page-header [showToolbar]="false">
+    <ng-container header-left>
+      <div class="flex flex-row items-center gap-4">
+        <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-[var(--bg-secondary)] text-[var(--accent-primary)] border border-[var(--border-primary)] shadow-sm">
+          <i class="pi pi-replay text-xl"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-[var(--text-primary)] m-0">Sales Returns</h2>
+          <p class="text-sm text-[var(--text-secondary)] m-0 mt-1">Track and manage credit notes &amp; product returns</p>
+        </div>
+      </div>
+    </ng-container>
+
+    <div class="flex items-center gap-2">
+      <p-button icon="pi pi-refresh" styleClass="p-button-text p-button-secondary p-button-rounded"
+        [loading]="isLoading()" (onClick)="getData(true)" pTooltip="Refresh List"></p-button>
+
+      <p-button *hasPermission="PERMISSIONS.SALES.MANAGE" label="New Sales Return" icon="pi pi-plus"
+        styleClass="p-button-primary" routerLink="/invoices"></p-button>
+    </div>
+  </app-page-header>
+
+  <app-page-content density="compact">
+    <div class="flex flex-col h-full gap-4">
+
+      <div class="flex flex-row flex-wrap items-end gap-4 bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl p-4 shadow-sm w-full">
+        
+        <div class="flex flex-col gap-1 flex-[2] min-w-[300px]">
+          <label class="text-xs font-semibold text-[var(--text-label)] uppercase tracking-wider">Search</label>
+          <input type="text" pInputText [formControl]="searchControl" placeholder="Return #, Invoice #..."
+            class="w-full" />
+        </div>
+
+        <div class="flex flex-col gap-1 flex-1 min-w-[200px]">
+          <label class="text-xs font-semibold text-[var(--text-label)] uppercase tracking-wider">Status</label>
+          <p-select appendTo="body" [options]="statusOptions" [(ngModel)]="filter.status" (onChange)="applyFilters()"
+            placeholder="Select Status" styleClass="w-full" [showClear]="true"></p-select>
+        </div>
+
+        <div class="flex flex-col gap-1 flex-1 min-w-[200px]">
+          <label class="text-xs font-semibold text-[var(--text-label)] uppercase tracking-wider">Branch</label>
+          <app-master-dropdown endpoint="branches" [(ngModel)]="filter.branchId" (onChange)="applyFilters()"
+            placeholder="Select Branch">
+          </app-master-dropdown>
+        </div>
+
+        <div class="flex flex-col gap-1 flex-1 min-w-[200px]">
+          <label class="text-xs font-semibold text-[var(--text-label)] uppercase tracking-wider">Date Range</label>
+          <p-datepicker [(ngModel)]="filter.dateRange" selectionMode="range" (onSelect)="applyFilters()"
+            placeholder="Start - End" styleClass="w-full" inputStyleClass="w-full" appendTo="body" [showIcon]="true"></p-datepicker>
+        </div>
+
+        <div class="flex gap-3 ml-auto">
+          <p-button icon="pi pi-filter-slash" styleClass="p-button-text p-button-rounded p-button-secondary" 
+            (onClick)="resetFilters()" pTooltip="Clear Filters">
+          </p-button>
+        </div>
+
+      </div>
+
+      <div class="flex-1 min-h-0 manish-border-1 border-secondary border-round overflow-hidden">
+        <app-data-grid [columns]="column" [data]="data()" (gridEvent)="eventFromGrid($event)" class="full-size-grid" style="height: 100%; width: 100%; display: block;">
+        </app-data-grid>
+      </div>
+
+    </div>
+  </app-page-content>
+</app-page>

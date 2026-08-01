@@ -23,15 +23,17 @@ import { ToastModule } from 'primeng/toast';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
-
 // Services & Shared
 import { AppMessageService } from '../../../../core/services/message.service';
 import { EmiService } from '../../services/emi-service';
-import { AgShareGrid, ActionColumnConfig } from '../../../shared/components/ag-shared-grid';
 import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '@core/auth/permissions.constants';
 import { CommonMethodService } from '@core/utils/common-method.service';
 import { MasterDropdownComponent } from '../../../shared/components/masterFilterDropdown/master-dropdown.component';
+import { DataGridComponent } from '@shared/ui/grid';
+import { PageContentComponent } from '@shared/ui/layout/page-content/page-content.component';
+import { PageHeaderComponent } from '@shared/ui/layout/page-header/page-header.component';
+import { ActionColumnConfig, AgShareGrid } from '../../../shared/components/ag-shared-grid';
 
 @Component({
   selector: 'app-emi-list',
@@ -47,10 +49,13 @@ import { MasterDropdownComponent } from '../../../shared/components/masterFilter
     ButtonModule,
     InputTextModule,
     ToastModule,
-    AgShareGrid,
+    DataGridComponent,
     HasPermissionDirective,
     ConfirmDialogModule,
-    MasterDropdownComponent
+    MasterDropdownComponent,
+    PageHeaderComponent,
+    PageContentComponent,
+    AgShareGrid
   ],
   providers: [EmiService, ConfirmationService],
   template: `
@@ -758,7 +763,7 @@ export class EmiList implements OnInit, OnDestroy {
               const location = [city, state].filter(Boolean).join(', ');
               const avatar = this.common.getAvatarStyle(cust);
               const initials = this.common.getInitials(cust);
-              
+
               return `
                 <div style="display:flex;align-items:center;gap:12px;width:100%;overflow:hidden;">
                   <span style="width:32px;height:32px;border-radius:50%;flex-shrink:0;background:${avatar.background};color:${avatar.color};display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:var(--font-weight-bold);border:1px solid rgba(0,0,0,0.05);">${initials}</span>
@@ -845,8 +850,8 @@ export class EmiList implements OnInit, OnDestroy {
             cellRenderer: (p: any) => {
               if (p.node?.rowPinned) return '';
               const rate = p.value ?? 0;
-              return rate > 0 
-                ? `<span class="text-sm text-warning font-bold">${rate}%</span>` 
+              return rate > 0
+                ? `<span class="text-sm text-warning font-bold">${rate}%</span>`
                 : `<span class="text-xs text-success font-bold">0% · Free</span>`;
             },
           },

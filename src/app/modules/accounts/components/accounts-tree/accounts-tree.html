@@ -1,6 +1,26 @@
-<p-tree
-  [value]="treeNodes"
-  [loading]="loading"
-  selectionMode="single"
->
-</p-tree>
+<app-page>
+  <app-page-header [showToolbar]="false">
+    <ng-container header-left>
+      <div class="flex flex-row items-center gap-4">
+        <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-[var(--bg-secondary)] text-[var(--accent-primary)] border border-[var(--border-primary)] shadow-sm">
+          <i class="pi pi-sitemap text-xl"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-[var(--text-primary)] m-0">Accounts Hierarchy</h2>
+          <p class="text-sm text-[var(--text-secondary)] m-0 mt-1">View financial ledger chart in a tree structure.</p>
+        </div>
+      </div>
+    </ng-container>
+  </app-page-header>
+
+  <app-page-content>
+    <div class="bg-white rounded-xl shadow-sm border border-[var(--border-primary)] p-4 h-full overflow-auto">
+      <p-tree
+        [value]="treeNodes"
+        [loading]="loading"
+        selectionMode="single"
+      >
+      </p-tree>
+    </div>
+  </app-page-content>
+</app-page>

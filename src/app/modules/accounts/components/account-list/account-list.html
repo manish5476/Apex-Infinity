@@ -1,21 +1,23 @@
-<div class="list-page-container">
-  <div class="themed-card list-content-area">
-    
-    <div class="flex justify-between items-center mb-2 px-3 py-2 border-b border-gray-100">
-      <div>
-        <h2 class="text-xl font-bold text-gray-800">Chart of Accounts</h2>
-        <p class="text-sm text-gray-500">Manage financial ledgers and balances</p>
+<app-page>
+  <app-page-header [showToolbar]="false">
+    <ng-container header-left>
+      <div class="flex flex-row items-center gap-4">
+        <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-[var(--bg-secondary)] text-[var(--accent-primary)] border border-[var(--border-primary)] shadow-sm">
+          <i class="pi pi-th-large text-xl"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-[var(--text-primary)] m-0">Chart of Accounts</h2>
+          <p class="text-sm text-[var(--text-secondary)] m-0 mt-1">Manage financial ledgers and balances</p>
+        </div>
       </div>
-      </div>
+    </ng-container>
+  </app-page-header>
 
-    <div class="list-grid-wrapper">
-      <app-ag-share-grid 
-        [columns]="column" 
-        [data]="data"
-        [actionColumn]="accountActionColumn"
-        (gridEvent)="handleGridEvent($event)">
-      </app-ag-share-grid>
-    </div>
-
-  </div>
-</div>
+  <app-page-content>
+    <app-data-grid 
+      [columns]="column" 
+      [data]="data"
+      [loading]="isLoading">
+    </app-data-grid>
+  </app-page-content>
+</app-page>

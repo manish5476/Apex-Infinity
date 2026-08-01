@@ -12,7 +12,11 @@ import { CommonMethodService } from '../../../core/utils/common-method.service';
 import { MasterDropdownComponent } from '../../shared/components/masterFilterDropdown/master-dropdown.component';
 
 // Shared Components
-import { AgShareGrid } from "../../shared/components/ag-shared-grid";
+import { DataGridComponent, GridColumn } from '../../../shared/ui/grid';
+import { PageComponent } from '../../../shared/ui/layout/page/page.component';
+import { PageHeaderComponent } from '../../../shared/ui/layout/page-header/page-header.component';
+import { PageContentComponent } from '../../../shared/ui/layout/page-content/page-content.component';
+import { TabBarComponent, TabItem } from '../../../shared/ui/tabs/tab-bar.component';
 
 // PrimeNG Imports
 import { ButtonModule } from 'primeng/button';
@@ -23,7 +27,6 @@ import { InputTextModule } from 'primeng/inputtext';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { SelectModule } from 'primeng/select';
 import { SkeletonModule } from 'primeng/skeleton';
-import { TabsModule } from 'primeng/tabs';
 import { TooltipModule } from 'primeng/tooltip';
 import { TagModule } from 'primeng/tag';
 import { CardModule } from 'primeng/card';
@@ -44,12 +47,16 @@ type LedgerTab =
   standalone: true,
   imports: [
     CommonModule, FormsModule, ReactiveFormsModule,
-    TabsModule, ButtonModule, SelectModule, IconFieldModule,
+    ButtonModule, SelectModule, IconFieldModule,
     InputTextModule, TooltipModule, SkeletonModule,
     DatePickerModule, DialogModule, RadioButtonModule,
     TagModule, CardModule, ToastModule,
-    AgShareGrid,
-    MasterDropdownComponent
+    DataGridComponent,
+    PageComponent,
+    PageHeaderComponent,
+    PageContentComponent,
+    MasterDropdownComponent,
+    TabBarComponent
   ],
   templateUrl: './ledger.html',
   styleUrls: ['./ledger.scss']
@@ -62,13 +69,23 @@ export class LedgerComponent implements OnInit, OnDestroy {
   private financial = inject(FinancialService);
   private router = inject(Router);
   public common = inject(CommonMethodService);
-  
-  tabIndex = signal(0);
-  currentTab = computed<LedgerTab>(() => this.resolveTab(this.tabIndex()));
+
+  ledgerTabs: TabItem[] = [
+    { id: 'all', label: 'Transactions', icon: 'pi pi-list' },
+    { id: 'customer', label: 'Customer', icon: 'pi pi-users' },
+    { id: 'supplier', label: 'Supplier', icon: 'pi pi-truck' },
+    { id: 'orgSummary', label: 'Summary', icon: 'pi pi-chart-pie' },
+    { id: 'pnl', label: 'P & L', icon: 'pi pi-chart-line' },
+    { id: 'balanceSheet', label: 'Balance Sheet', icon: 'pi pi-book' },
+    { id: 'trialBalance', label: 'Trial Balance', icon: 'pi pi-balance-scale' }
+  ];
+
+  activeTabId = signal<string>('all');
+  currentTab = computed<LedgerTab>(() => this.activeTabId() as LedgerTab);
   gridData = signal<any[]>([]);
   reportData = signal<any>(null);
   entityDetails = signal<any>(null);
-  gridColumns = signal<any[]>([]);
+  gridColumns = signal<GridColumn[]>([]);
   isLoading = signal(false);
   nextCursor: { lastDate: string | null; lastId: string | null } | null = null;
   hasMore = true;
@@ -76,13 +93,18 @@ export class LedgerComponent implements OnInit, OnDestroy {
   isExporting = signal(false);
   filterForm!: FormGroup;
   exportForm!: FormGroup;
-  
+
   pinnedBottomRowData = signal<any>(null);
 
   constructor() {
     effect(() => {
       this.initColumns(this.currentTab());
     });
+  }
+
+  onTabChange(tabId: any) {
+    this.activeTabId.set(tabId);
+    this.loadData(tabId as LedgerTab, true);
   }
 
   ngOnInit(): void {
@@ -114,16 +136,13 @@ export class LedgerComponent implements OnInit, OnDestroy {
     });
   }
 
-  private resolveTab(i: number): LedgerTab {
-    const map: LedgerTab[] = [
-      'all', 'customer', 'supplier', 'orgSummary',
-      'pnl', 'balanceSheet', 'trialBalance'
-    ];
-    return map[i] || 'all';
-  }
-
   applyFilters() {
     this.loadData(this.currentTab(), true);
+  }
+
+  onDateClear() {
+    this.filterForm.patchValue({ dateRange: null });
+    this.applyFilters();
   }
 
   resetFilters() {
@@ -252,61 +271,53 @@ export class LedgerComponent implements OnInit, OnDestroy {
   }
 
   private initColumns(tab: LedgerTab) {
-    let cols: any[] = [];
+    let cols: GridColumn[] = [];
 
     switch (tab) {
       case 'all':
         cols = [
           {
             field: 'date',
-            headerName: 'Date',
+            header: 'Date',
             sortable: true,
-            width: 140,
-            valueFormatter: (params: any) =>
-              params.node?.rowPinned ? 'TOTALS' : this.common.formatDate(params.value, 'dd MMM yyyy'),
-            cellClass: 'text-secondary font-medium cell-flex-center'
+            width: '140px',
+            formatter: (val: any, row: any) =>
+              row.date === null ? 'TOTALS' : this.common.formatDate(val, 'dd MMM yyyy')
           },
           {
             field: 'referenceNumber',
-            headerName: 'Ref #',
+            header: 'Ref #',
             sortable: true,
-            width: 160,
-            cellClass: 'text-accent font-bold cursor-pointer hover-underline cell-flex-center'
+            width: '160px'
           },
           {
             field: 'accountName',
-            headerName: 'Account',
+            header: 'Account',
             sortable: true,
-            flex: 1,
-            minWidth: 150,
-            cellClass: 'text-primary font-semibold cell-flex-center'
+            width: '1fr',
+            minWidth: '150px'
           },
           {
             field: 'description',
-            headerName: 'Description',
-            flex: 2,
-            minWidth: 250,
-            cellClass: 'text-secondary ellipsis cell-flex-center'
+            header: 'Description',
+            width: '2fr',
+            minWidth: '250px'
           },
           {
             field: 'debit',
-            headerName: 'Debit',
+            header: 'Debit',
             sortable: true,
-            width: 140,
-            type: 'rightAligned',
-            valueFormatter: (params: any) =>
-              params.value ? this.common.formatCurrency(params.value) : '—',
-            cellClass: 'text-error font-mono font-semibold cell-flex-end'
+            width: '140px',
+            type: 'number',
+            formatter: (val) => val ? this.common.formatCurrency(val) : '—'
           },
           {
             field: 'credit',
-            headerName: 'Credit',
+            header: 'Credit',
             sortable: true,
-            width: 140,
-            type: 'rightAligned',
-            valueFormatter: (params: any) =>
-              params.value ? this.common.formatCurrency(params.value) : '—',
-            cellClass: 'text-success font-mono font-semibold cell-flex-end'
+            width: '140px',
+            type: 'number',
+            formatter: (val) => val ? this.common.formatCurrency(val) : '—'
           }
         ];
         break;
@@ -316,52 +327,44 @@ export class LedgerComponent implements OnInit, OnDestroy {
         cols = [
           {
             field: 'date',
-            headerName: 'Date',
+            header: 'Date',
             sortable: true,
-            width: 140,
-            valueFormatter: (params: any) =>
-              params.node?.rowPinned ? 'TOTALS' : this.common.formatDate(params.value, 'dd MMM yyyy'),
-            cellClass: 'text-secondary font-medium cell-flex-center'
+            width: '140px',
+            formatter: (val: any, row: any) =>
+              row.date === null ? 'TOTALS' : this.common.formatDate(val, 'dd MMM yyyy')
           },
           {
             field: 'referenceNumber',
-            headerName: 'Ref #',
-            width: 160,
-            cellClass: 'text-primary font-bold cell-flex-center'
+            header: 'Ref #',
+            width: '160px'
           },
           {
             field: 'description',
-            headerName: 'Description',
-            flex: 2,
-            minWidth: 250,
-            cellClass: 'text-secondary ellipsis cell-flex-center'
+            header: 'Description',
+            width: '2fr',
+            minWidth: '250px'
           },
           {
             field: 'debit',
-            headerName: 'Debit',
-            width: 140,
-            type: 'rightAligned',
-            valueFormatter: (params: any) =>
-              params.value ? this.common.formatCurrency(params.value) : '—',
-            cellClass: 'text-error font-mono font-semibold cell-flex-end'
+            header: 'Debit',
+            width: '140px',
+            type: 'number',
+            formatter: (val) => val ? this.common.formatCurrency(val) : '—'
           },
           {
             field: 'credit',
-            headerName: 'Credit',
-            width: 140,
-            type: 'rightAligned',
-            valueFormatter: (params: any) =>
-              params.value ? this.common.formatCurrency(params.value) : '—',
-            cellClass: 'text-success font-mono font-semibold cell-flex-end'
+            header: 'Credit',
+            width: '140px',
+            type: 'number',
+            formatter: (val) => val ? this.common.formatCurrency(val) : '—'
           },
           {
             field: 'balance',
-            headerName: 'Balance',
-            width: 150,
-            type: 'rightAligned',
-            valueFormatter: (params: any) =>
-              params.node?.rowPinned && !params.value ? '' : this.common.formatCurrency(params.value),
-            cellClass: 'text-primary font-mono font-bold cell-flex-end'
+            header: 'Balance',
+            width: '150px',
+            type: 'number',
+            formatter: (val: any, row: any) =>
+              (row.balance === null && !val) ? '' : String(this.common.formatCurrency(val))
           }
         ];
         break;
@@ -370,54 +373,40 @@ export class LedgerComponent implements OnInit, OnDestroy {
         cols = [
           {
             field: 'accountCode',
-            headerName: 'Code',
-            width: 100,
-            valueFormatter: (params: any) =>
-              params.node?.rowPinned ? '' : params.value,
-            cellClass: 'text-tertiary font-mono font-medium cell-flex-center'
+            header: 'Code',
+            width: '100px',
+            formatter: (val: any, row: any) => row.accountCode === '' ? '' : String(val)
           },
           {
             field: 'accountName',
-            headerName: 'Account Name',
-            flex: 2,
-            sortable: true,
-            cellClass: 'text-primary font-semibold cell-flex-center'
+            header: 'Account Name',
+            width: '2fr',
+            sortable: true
           },
           {
             field: 'type',
-            headerName: 'Type',
-            width: 140,
-            cellClass: 'cell-flex-center',
-            cellRenderer: (params: any) => {
-              if (params.node?.rowPinned) return '';
-              if (!params.value) return '—';
-              const type = params.value.toLowerCase();
-              let badgeClass = 'badge-neutral';
-              if (type.includes('asset')) badgeClass = 'badge-info-soft';
-              if (type.includes('liability')) badgeClass = 'badge-warning-soft';
-              if (type.includes('equity')) badgeClass = 'badge-success-soft';
-              if (type.includes('revenue') || type.includes('income')) badgeClass = 'badge-success-solid';
-              if (type.includes('expense')) badgeClass = 'badge-error-soft';
-              return `<span class="grid-badge ${badgeClass}">${params.value}</span>`;
+            header: 'Type',
+            width: '140px',
+            type: 'status',
+            formatter: (val: any, row: any) => {
+              if (row.accountCode === '') return '';
+              if (!val) return '—';
+              return String(val);
             }
           },
           {
             field: 'debit',
-            headerName: 'Debit',
-            width: 160,
-            type: 'rightAligned',
-            valueFormatter: (params: any) =>
-              params.value ? this.common.formatCurrency(params.value) : '—',
-            cellClass: 'text-primary font-mono font-medium cell-flex-end'
+            header: 'Debit',
+            width: '160px',
+            type: 'number',
+            formatter: (val) => val ? this.common.formatCurrency(val) : '—'
           },
           {
             field: 'credit',
-            headerName: 'Credit',
-            width: 160,
-            type: 'rightAligned',
-            valueFormatter: (params: any) =>
-              params.value ? this.common.formatCurrency(params.value) : '—',
-            cellClass: 'text-primary font-mono font-medium cell-flex-end'
+            header: 'Credit',
+            width: '160px',
+            type: 'number',
+            formatter: (val) => val ? this.common.formatCurrency(val) : '—'
           }
         ];
         break;
@@ -450,22 +439,20 @@ export class LedgerComponent implements OnInit, OnDestroy {
     return [];
   }
 
-  eventFromGrid(ev: any) {
-    if (ev.type === 'reachedBottom' && this.currentTab() === 'all' && this.hasMore) {
+  onPageChange() {
+    if (this.currentTab() === 'all' && this.hasMore) {
       this.loadData('all', false);
     }
-    if (ev.type === 'cellClicked' && this.currentTab() === 'all') {
-      const r = ev.row;
-      if (ev.field === "referenceNumber") {
-        this.router.navigate(['/invoices', r.invoiceId]);
+  }
+
+  onRowClick(row: any) {
+    if (this.currentTab() === 'all') {
+      if (row.invoiceId) {
+        this.router.navigate(['/invoices', row.invoiceId]);
       }
     }
   }
 
-  onTabChange(index: any) {
-    this.tabIndex.set(index);
-    this.loadData(this.resolveTab(index), true);
-  }
 
   handleExportClick() {
     const tab = this.currentTab();

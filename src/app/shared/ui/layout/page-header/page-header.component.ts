@@ -147,7 +147,7 @@ export class PageHeaderComponent {
       'w-full',
 
       // Unified spacing tokens
-      'mb-6',
+      '',
 
       this.sticky()
         ? 'sticky top-[64px] z-[var(--z-sticky)] backdrop-blur-md'

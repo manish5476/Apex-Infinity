@@ -1,37 +1,31 @@
 <p-toast></p-toast>
 
-<div class="list-page-container">
-  <!-- HEADER -->
-  <div class="list-header">
-    <h2 class="list-title">
-      <i class="pi pi-building text-[var(--accent-primary)]"></i>
-      Branch Management
-    </h2>
-    <p-button *hasPermission="PERMISSIONS.BRANCH.MANAGE" label="New Branch" icon="pi pi-plus" routerLink="create">
-    </p-button>
-  </div>
-  <div class="themed-card">
-    <div class="se-filter-bar">
-
-      <!-- Name -->
-      <div class="se-filter-field">
-        <label for="name">Branch Name</label>
-        <input id="name" type="text" pInputText [(ngModel)]="branchFilter.name" placeholder="Search by name" />
+<app-page>
+  <app-page-header title="Branch Management" subtitle="View and manage all branch locations.">
+    <ng-container header-left>
+      <div class="flex items-center justify-center p-2 rounded-md bg-[var(--color-primary-bg)] text-[var(--accent-primary)]">
+        <i class="pi pi-building text-xl"></i>
       </div>
+    </ng-container>
 
-      <!-- Actions -->
-      <div class="se-filter-actions">
-        <p-button label="Apply" icon="pi pi-check" (onClick)="applyFilters()">
-        </p-button>
-        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined" (onClick)="resetFilters()">
-        </p-button>
-      </div>
+    <div class="flex items-center gap-2">
+      <span class="p-input-icon-left">
+        <i class="pi pi-search"></i>
+        <input type="text" pInputText [(ngModel)]="branchFilter.name" (keydown.enter)="applyFilters()" placeholder="Search by name..." class="w-64" />
+      </span>
+      <p-button *hasPermission="PERMISSIONS.BRANCH.MANAGE" label="New Branch" icon="pi pi-plus" routerLink="create"></p-button>
     </div>
-  </div>
-  <div class="themed-card list-grid-area">
-    <app-ag-share-grid [columns]="column" [data]="data" selectionMode="multiple"
-      (gridEvent)="eventFromGrid($event)" style="height: 210px; width: 100%; display: block;">
-    </app-ag-share-grid>
+  </app-page-header>
 
-  </div>
-</div>
+  <app-page-content>
+    <app-data-grid 
+      [columns]="column" 
+      [data]="data" 
+      [loading]="isLoading"
+      [lazy]="true"
+      [totalRecords]="totalCount"
+      (pageChange)="onScrolledToBottom()"
+      (rowClick)="onRowClick($event)">
+    </app-data-grid>
+  </app-page-content>
+</app-page>

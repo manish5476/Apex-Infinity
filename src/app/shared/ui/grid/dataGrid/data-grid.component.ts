@@ -219,7 +219,7 @@ gridTemplateColumns = computed(() => {
   
   // Omit the actions column width entirely if viewOnly is active
   if (!this.viewOnly()) {
-    template += ' 80px'; 
+    template += ' max-content'; 
   }
   return template;
 });

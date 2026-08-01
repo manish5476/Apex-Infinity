@@ -5,10 +5,14 @@ import { TreeModule } from 'primeng/tree';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
+import { PageContentComponent } from '@shared/ui/layout/page-content/page-content.component';
+import { PageHeaderComponent } from '@shared/ui/layout/page-header/page-header.component';
+import { PageComponent } from '@shared/ui/layout/page/page.component';
+
 
 @Component({
   selector: 'app-account-tree',
-  imports: [TreeModule],
+  imports: [TreeModule, PageComponent, PageHeaderComponent, PageContentComponent],
   templateUrl: './accounts-tree.html',
   styleUrl: './accounts-tree.scss',
 })

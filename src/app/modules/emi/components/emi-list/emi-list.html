@@ -1,141 +1,126 @@
-<p-toast></p-toast>
-<p-confirmDialog appendTo="body" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}"></p-confirmDialog>
+<p-toast position="bottom-right"></p-toast>
+<p-confirmDialog [style]="{width: '450px'}" appendTo="body" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}"></p-confirmDialog>
 
-<div class="emi-page">
-
-  <!-- ─────────── PAGE HEADER ─────────── -->
-  <div class="page-header">
-    <div class="page-header__left">
-      <div class="page-icon">
-        <i class="pi pi-calendar-clock"></i>
+<app-page>
+  <app-page-header [showToolbar]="false">
+    <ng-container header-left>
+      <div class="flex flex-row items-center gap-4">
+        <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-[color-mix(in_srgb,var(--accent-primary)_12%,transparent)] text-[var(--accent-primary)] border border-[var(--border-primary)] shadow-sm">
+          <i class="pi pi-calendar-clock text-xl"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-[var(--text-primary)] m-0">EMI Schedules</h2>
+          <p class="text-sm text-[var(--text-secondary)] m-0 mt-1">Track installment payments &amp; recovery</p>
+        </div>
       </div>
-      <div>
-        <h2 class="page-title">EMI Schedules</h2>
-        <p class="page-subtitle">Track installment payments &amp; recovery</p>
-      </div>
-    </div>
+    </ng-container>
 
-    <div class="page-header__actions">
+    <div class="flex items-center gap-2">
       <p-button *hasPermission="PERMISSIONS.EMI.CREATE" label="New EMI Plan" icon="pi pi-plus" routerLink="create"
-        styleClass="p-button-primary btn-create">
+        styleClass="p-button-primary">
       </p-button>
     </div>
-  </div>
+  </app-page-header>
 
-  <!-- ─────────── ANALYTICS STRIP ─────────── -->
-  @if (emiAnalytics()) {
-    <div class="analytics-strip">
-      <!-- Outstanding -->
-      <div class="stat-card stat-card--primary">
-        <div class="stat-card__icon">
-          <i class="pi pi-indian-rupee"></i>
-        </div>
-        <div class="stat-card__body">
-          <span class="stat-card__label">Total Outstanding</span>
-          <span class="stat-card__value">{{ common.formatCurrency(emiAnalytics().totalOutstanding) }}</span>
-        </div>
-      </div>
-      <!-- Plan Overview -->
-      <div class="stat-card stat-card--plans">
-        <div class="stat-card__icon">
-          <i class="pi pi-list-check"></i>
-        </div>
-        <div class="stat-card__body">
-          <span class="stat-card__label">EMI Plans</span>
-          <div class="plan-badges">
-            <span class="badge badge--active">
-              <span class="badge__dot"></span>
-              {{ emiAnalytics().active }} Active
-            </span>
-            <span class="badge badge--done">
-              <span class="badge__dot"></span>
-              {{ emiAnalytics().completed }} Done
-            </span>
-            <span class="badge badge--late" [class.badge--late-alert]="emiAnalytics().defaulted > 0">
-              <span class="badge__dot"></span>
-              {{ emiAnalytics().defaulted }} Late
-            </span>
+  <app-page-content density="compact">
+    <div class="flex flex-col h-full gap-4">
+
+      <!-- ─────────── ANALYTICS STRIP ─────────── -->
+      @if (emiAnalytics()) {
+        <div class="analytics-strip">
+          <!-- Outstanding -->
+          <div class="stat-card stat-card--primary elevation-card outstanding-card">
+            <div class="stat-icon"><i class="pi pi-indian-rupee"></i></div>
+            <div class="stat-body">
+              <span class="stat-label">Total Outstanding</span>
+              <span class="stat-value text-error">{{ common.formatCurrency(emiAnalytics().totalOutstanding) }}</span>
+            </div>
           </div>
-        </div>
-      </div>
-      <!-- Installment Progress -->
-      <div class="stat-card stat-card--progress">
-        <div class="stat-card__icon">
-          <i class="pi pi-chart-pie"></i>
-        </div>
-        <div class="stat-card__body" style="flex:1;min-width:0">
-          <div class="stat-card__label-row">
-            <span class="stat-card__label">Installments Paid</span>
-            <span class="stat-card__pct">{{ installmentPct(emiAnalytics()).toFixed(1) }}%</span>
+          <!-- Plan Overview -->
+          <div class="stat-card stat-card--plans elevation-card plans-card">
+            <div class="stat-icon"><i class="pi pi-list-check"></i></div>
+            <div class="stat-body">
+              <span class="stat-label">EMI Plans</span>
+              <div class="plan-badges">
+                <span class="status-pill badge-success-soft">
+                  <span class="dot"></span>{{ emiAnalytics().active }} Active
+                </span>
+                <span class="status-pill badge-info-soft">
+                  <span class="dot"></span>{{ emiAnalytics().completed }} Done
+                </span>
+                <span class="status-pill" [ngClass]="emiAnalytics().defaulted > 0 ? 'badge-danger-soft' : 'badge-neutral-soft'">
+                  <span class="dot"></span>{{ emiAnalytics().defaulted }} Late
+                </span>
+              </div>
+            </div>
           </div>
-          <span class="stat-card__value stat-card__value--sm">
-            {{ emiAnalytics().installments.paid }}
-            <span class="stat-card__value-total">/ {{ installmentTotal(emiAnalytics()) }}</span>
-          </span>
-          <div class="progress-track">
-            <div class="progress-fill" [style.width.%]="installmentPct(emiAnalytics())">
+          <!-- Installment Progress -->
+          <div class="stat-card stat-card--progress elevation-card progress-card">
+            <div class="stat-icon"><i class="pi pi-chart-pie"></i></div>
+            <div class="stat-body flex-1 min-w-0">
+              <div class="flex justify-between items-center mb-1">
+                <span class="stat-label">Installments Paid</span>
+                <span class="stat-pct">{{ installmentPct(emiAnalytics()).toFixed(1) }}%</span>
+              </div>
+              <div class="flex items-baseline gap-1">
+                <span class="stat-value-sm">{{ emiAnalytics().installments.paid }}</span>
+                <span class="stat-total">/ {{ installmentTotal(emiAnalytics()) }}</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" [style.width.%]="installmentPct(emiAnalytics())"></div>
+              </div>
+            </div>
+          </div>
+          <!-- Overdue -->
+          <div class="stat-card stat-card--overdue elevation-card overdue-card" [class.alert-state]="emiAnalytics().installments.overdue > 0">
+            <div class="stat-icon"><i class="pi pi-exclamation-triangle"></i></div>
+            <div class="stat-body">
+              <span class="stat-label">Overdue</span>
+              <span class="stat-value">{{ emiAnalytics().installments.overdue }}</span>
+              @if (emiAnalytics().installments.overdue > 0) {
+                <span class="stat-sub">installments pending</span>
+              }
             </div>
           </div>
         </div>
-      </div>
-      <!-- Overdue -->
-      <div class="stat-card stat-card--overdue" [class.stat-card--alert]="emiAnalytics().installments.overdue > 0">
-        <div class="stat-card__icon">
-          <i class="pi pi-exclamation-triangle"></i>
+      }
+
+      <!-- ─────────── FILTER BAR ─────────── -->
+      <div class="flex flex-row flex-wrap items-end gap-4 bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl p-4 shadow-sm w-full">
+
+        <div class="flex flex-col gap-1 flex-1 min-w-[200px]">
+          <label class="text-xs font-semibold text-[var(--text-label)] uppercase tracking-wider">Customer</label>
+          <app-master-dropdown 
+            endpoint="customers" 
+            [(ngModel)]="emiFilter.customerId" 
+            (ngModelChange)="applyFilters()" 
+            placeholder="All customers">
+          </app-master-dropdown>
         </div>
-        <div class="stat-card__body">
-          <span class="stat-card__label">Overdue</span>
-          <span class="stat-card__value">{{ emiAnalytics().installments.overdue }}</span>
-          @if (emiAnalytics().installments.overdue > 0) {
-            <span class="stat-card__sub">
-              installments pending
-            </span>
-          }
+
+        <div class="flex flex-col gap-1 flex-1 min-w-[200px]">
+          <label class="text-xs font-semibold text-[var(--text-label)] uppercase tracking-wider">Status</label>
+          <p-select appendTo="body" (onChange)="applyFilters()" [options]="statusOptions" [(ngModel)]="emiFilter.status"
+            optionLabel="label" optionValue="value" [showClear]="true" placeholder="All statuses"
+            styleClass="w-full" [filter]="true" filterBy="label">
+          </p-select>
         </div>
-      </div>
-    </div>
-  }
 
-  <!-- ─────────── FILTER BAR ─────────── -->
-  <div class="filter-bar">
-    <div class="filter-bar__fields">
+        <div class="flex gap-3 ml-auto">
+          <p-button icon="pi pi-filter-slash" styleClass="p-button-text p-button-rounded p-button-secondary" 
+            (onClick)="resetFilters()" pTooltip="Clear Filters">
+          </p-button>
+        </div>
 
-      <div class="filter-field">
-        <label class="filter-label">
-          <i class="pi pi-user"></i>
-          Customer
-        </label>
-        <app-master-dropdown 
-          endpoint="customers" 
-          [(ngModel)]="emiFilter.customerId" 
-          (ngModelChange)="applyFilters()" 
-          placeholder="All customers">
-        </app-master-dropdown>
       </div>
 
-      <div class="filter-field">
-        <label class="filter-label">
-          <i class="pi pi-tag"></i>
-          Status
-        </label>
-        <p-select appendTo="body" (onChange)="applyFilters()" [options]="statusOptions" [(ngModel)]="emiFilter.status"
-          optionLabel="label" optionValue="value" [showClear]="true" placeholder="All statuses"
-          styleClass="w-full filter-select" [filter]="true" filterBy="label">
-        </p-select>
+      <!-- ─────────── GRID ─────────── -->
+      <div class="flex-1 min-h-0 manish-border-1 border-secondary border-round overflow-hidden">
+        <app-data-grid [columns]="column" [data]="data" [actionColumn]="emiActionColumn" selectionMode="multiple"
+          (gridEvent)="eventFromGrid($event)" class="full-size-grid" style="height: 100%; width: 100%; display: block;">
+        </app-data-grid>
       </div>
 
     </div>
-
-    <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-text p-button-secondary btn-reset"
-      (onClick)="resetFilters()">
-    </p-button>
-  </div>
-
-  <!-- ─────────── GRID ─────────── -->
-  <div class="grid-wrapper">
-    <app-ag-share-grid [columns]="column" [data]="data" [actionColumn]="emiActionColumn" selectionMode="multiple"
-      (gridEvent)="eventFromGrid($event)" style="height: 100%; width: 100%; display: block;">
-    </app-ag-share-grid>
-  </div>
-
-</div>
+  </app-page-content>
+</app-page>

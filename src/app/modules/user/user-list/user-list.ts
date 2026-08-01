@@ -1,29 +1,26 @@
-
-import { ChangeDetectorRef, Component, OnInit, effect, inject, signal, OnDestroy } from '@angular/core';
-
+import { ChangeDetectorRef, Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 
 // --- PrimeNG ---
 import { ButtonModule } from 'primeng/button';
-import { SelectModule } from 'primeng/select';
-import { InputTextModule } from 'primeng/inputtext';
 import { ToastModule } from 'primeng/toast';
-// 👇 Import Confirmation Service and Module
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 
-// import { MasterListService } from '../../../core/services/master-list.service';
 import { AppMessageService } from '../../../core/services/message.service';
-import { ImageCellRendererComponent } from '../../shared/AgGrid/AgGridcomponents/image-cell-renderer/image-cell-renderer.component';
-import { AgShareGrid, ActionColumnConfig } from '../../shared/components/ag-shared-grid';
 import { UserManagementService } from '../user-management.service';
 import { finalize, Subject } from 'rxjs';
 import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '@core/auth/permissions.constants';
 import { DynamicDialogServices } from '../../../core/services/dynamic-dialog-services';
 import { takeUntil } from "rxjs/operators";
-import { MasterDropdownComponent } from '../../shared/components/masterFilterDropdown/master-dropdown.component';
+
+// --- Shared UI ---
+import { PageComponent } from '../../../shared/ui/layout/page/page.component';
+import { PageHeaderComponent } from '../../../shared/ui/layout/page-header/page-header.component';
+import { PageContentComponent } from '../../../shared/ui/layout/page-content/page-content.component';
+import { DataGridComponent, GridColumn, GridRowAction, GridPageState, GridFilterState, GridSortState } from '../../../shared/ui/grid';
 
 @Component({
   selector: 'app-user-list',
@@ -31,14 +28,14 @@ import { MasterDropdownComponent } from '../../shared/components/masterFilterDro
   imports: [
     FormsModule,
     RouterModule,
-    SelectModule,
     ButtonModule,
-    InputTextModule,
     ToastModule,
     ConfirmDialogModule,
-    AgShareGrid,
     HasPermissionDirective,
-    MasterDropdownComponent
+    PageComponent,
+    PageHeaderComponent,
+    PageContentComponent,
+    DataGridComponent
   ],
   providers: [UserManagementService, ConfirmationService],
   templateUrl: './user-list.html',
@@ -48,54 +45,33 @@ export class UserListComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
   readonly PERMISSIONS = PERMISSIONS;
 
-  readonly userActionColumn: ActionColumnConfig = {
-    showView: true,
-    showEdit: true,
-    showDelete: true,
-    viewPermission: PERMISSIONS.USER.READ,
-    editPermission: PERMISSIONS.USER.MANAGE,
-    deletePermission: PERMISSIONS.USER.MANAGE,
-  };
-
   private cdr = inject(ChangeDetectorRef);
   private userService = inject(UserManagementService);
   private messageService = inject(AppMessageService);
   private confirmationService = inject(ConfirmationService);
-  // public masterList = inject(MasterListService);
   private router = inject(Router);
   private dynamicDialog = inject(DynamicDialogServices);
 
-  private currentPage = 1;
-  private isLoading = false;
-  private totalCount = 0;
-  private pageSize = 50;
+  // Pagination & Data state
+  currentPage = 1;
+  isLoading = false;
+  totalCount = 0;
+  pageSize = 50;
   data: any[] = [];
-  column: any[] = [];
-  roleOptions = signal<any[]>([]);
-  branchOptions = signal<any[]>([]);
+  column: GridColumn[] = [];
+  rowActions: GridRowAction[] = [];
+
   userFilter = {
     role: null,
     branchId: null,
-    search: ''
+    search: '',
+    sortField: '',
+    sortOrder: 1
   };
-  constructor() {
-    // effect(() => {
-    // this.roleOptions.set(this.masterList.roles());
-    // this.branchOptions.set(this.masterList.branches());
-    // });
-  }
 
   ngOnInit(): void {
     this.setupColumns();
-    this.getData(true);
-  }
-
-  applyFilters() {
-    this.getData(true);
-  }
-
-  resetFilters() {
-    this.userFilter = { role: null, branchId: null, search: '' };
+    this.setupActions();
     this.getData(true);
   }
 
@@ -107,61 +83,42 @@ export class UserListComponent implements OnInit, OnDestroy {
     this.dynamicDialog.openUserExport();
   }
 
-
-  onScrolledToBottom() {
-    if (!this.isLoading && this.data.length < this.totalCount) {
-      this.getData(false);
-    }
+  // Grid Event Handlers
+  onPageChange(event: GridPageState) {
+    this.currentPage = event.page;
+    this.pageSize = event.pageSize;
+    this.getData(false);
   }
 
-  eventFromGrid(event: any) {
-    if (event.type === 'cellClicked') {
-      const userId = event.row._id;
+  onFilterChange(filters: GridFilterState[]) {
+    // Map grid filters to our API fields if necessary
+    this.userFilter.role = filters.find(f => f.field === 'role.name')?.value || null;
+    this.userFilter.branchId = filters.find(f => f.field === 'branchId.name')?.value || null;
+    this.getData(true);
+  }
 
-      // Handle direct dialog triggers on specific columns
-      if (event.field === 'security') {
-        this.dynamicDialog.openUserStatus(event.row)?.onClose.pipe(takeUntil(this.destroy$)).subscribe(result => {
-          if (result) this.getData(false); // Refresh row data
-        });
-        return;
-      }
-
-      // Navigate to details if clicking the name column
-      if (event.field === 'name') {
-        this.router.navigate(['/user/details', userId]);
-      }
+  onSortChange(sort: GridSortState[]) {
+    if (sort.length > 0) {
+      this.userFilter.sortField = sort[0].field;
+      this.userFilter.sortOrder = sort[0].direction === 'asc' ? 1 : -1;
+    } else {
+      this.userFilter.sortField = '';
+      this.userFilter.sortOrder = 1;
     }
+    this.getData(true);
+  }
 
-    if (event.type === 'view') {
-      const userId = event.row._id;
-      this.router.navigate(['/user/details', userId]);
-    }
+  onSearchChange(query: string) {
+    this.userFilter.search = query;
+    this.getData(true);
+  }
 
-    if (event.type === 'editStart') {
-      const userId = event.row._id;
-      this.router.navigate(['/user/edit', userId]);
-    }
+  onRowClick(row: any) {
+    this.router.navigate(['/user/details', row._id]);
+  }
 
-    if (event.type === 'delete') {
-      const userId = event.row._id;
-      const userName = event.row.name;
-
-
-      this.confirmationService.confirm({
-        message: `Are you sure you want to permanently delete user <b>${userName}</b>?`,
-        header: 'Confirm Delete',
-        icon: 'pi pi-exclamation-triangle',
-        acceptButtonStyleClass: 'p-button-danger p-button-text',
-        rejectButtonStyleClass: 'p-button-secondary p-button-text',
-        accept: () => {
-          this.deleteUser(userId);
-        }
-      });
-    }
-
-    if (event.type === 'reachedBottom') {
-      this.onScrolledToBottom();
-    }
+  onRefresh() {
+    this.getData(true);
   }
 
   getData(isReset: boolean = false) {
@@ -174,11 +131,18 @@ export class UserListComponent implements OnInit, OnDestroy {
       this.totalCount = 0;
     }
 
-    const params = {
-      ...this.userFilter,
+    const params: any = {
       page: this.currentPage,
       limit: this.pageSize
     };
+
+    if (this.userFilter.role) params.role = this.userFilter.role;
+    if (this.userFilter.branchId) params.branchId = this.userFilter.branchId;
+    if (this.userFilter.search) params.search = this.userFilter.search;
+    if (this.userFilter.sortField) {
+      params.sortField = this.userFilter.sortField;
+      params.sortOrder = this.userFilter.sortOrder;
+    }
 
     this.userService.getAllUsers(params)
       .pipe(
@@ -198,11 +162,7 @@ export class UserListComponent implements OnInit, OnDestroy {
             this.totalCount = res.results || this.totalCount;
           }
 
-          this.data = isReset ? newData : [...this.data, ...newData];
-
-          if (newData.length > 0) {
-            this.currentPage++;
-          }
+          this.data = newData;
         },
         error: (err) => {
           this.messageService.handleHttpError(err);
@@ -210,202 +170,139 @@ export class UserListComponent implements OnInit, OnDestroy {
       });
   }
 
-  private deleteUser(id: string) {
-    // Note: Usually, you'd wrap this in a ConfirmationService call first
-    this.userService.deleteUser(id).pipe(takeUntil(this.destroy$)).subscribe({
-      next: () => {
-        this.messageService.showSuccess('User removed successfully.');
-        // Refresh the list from page 1
-        this.getData(true);
-      },
-      error: (err) => {
-        this.messageService.handleHttpError(err);
+  private deleteUser(id: string, userName: string) {
+    this.confirmationService.confirm({
+      message: `Are you sure you want to permanently delete user <b>${userName}</b>?`,
+      header: 'Confirm Delete',
+      icon: 'pi pi-exclamation-triangle',
+      acceptButtonStyleClass: 'p-button-danger p-button-text',
+      rejectButtonStyleClass: 'p-button-secondary p-button-text',
+      accept: () => {
+        this.userService.deleteUser(id).pipe(takeUntil(this.destroy$)).subscribe({
+          next: () => {
+            this.messageService.showSuccess('User removed successfully.');
+            this.getData(true);
+          },
+          error: (err) => {
+            this.messageService.handleHttpError(err);
+          }
+        });
       }
     });
   }
+
+  setupActions(): void {
+    this.rowActions = [
+      {
+        id: 'view',
+        icon: 'pi pi-eye',
+        label: 'View Profile',
+        permission: this.PERMISSIONS.USER.READ,
+        callback: (row: any) => this.router.navigate(['/user/details', row._id])
+      },
+      {
+        id: 'edit',
+        icon: 'pi pi-pencil',
+        label: 'Edit User',
+        permission: this.PERMISSIONS.USER.MANAGE,
+        callback: (row: any) => this.router.navigate(['/user/edit', row._id])
+      },
+      {
+        id: 'security',
+        icon: 'pi pi-shield',
+        label: 'Security Settings',
+        permission: this.PERMISSIONS.USER.MANAGE,
+        callback: (row: any) => {
+          this.dynamicDialog.openUserStatus(row)?.onClose.pipe(takeUntil(this.destroy$)).subscribe(result => {
+            if (result) this.getData(true);
+          });
+        }
+      },
+      {
+        id: 'delete',
+        icon: 'pi pi-trash',
+        label: 'Delete User',
+        variant: 'danger',
+        permission: this.PERMISSIONS.USER.MANAGE,
+        callback: (row: any) => this.deleteUser(row._id, row.name)
+      }
+    ];
+  }
+
   setupColumns(): void {
     this.column = [
-
       {
         field: 'avatar',
-        headerName: '',
-        cellRenderer: ImageCellRendererComponent,
-        width: 60,
+        header: 'Avatar',
+        type: 'avatar',
+        width: '60px',
         pinned: 'left',
         sortable: false,
-        filter: false,
-        suppressMenu: true,
-        cellStyle: { 'display': 'flex', 'align-items': 'center', 'justify-content': 'center' }
+        filterable: false,
+        searchable: false,
       },
-
-
       {
         field: 'name',
-        headerName: 'Employee Name',
-        width: 180,
+        header: 'Employee Name',
+        type: 'text',
+        width: '180px',
         pinned: 'left',
         sortable: true,
-        filter: true,
-        cellStyle: {
-          'display': 'flex',
-          'align-items': 'center',
-          'font-weight': '600',
-          'color': 'var(--text-primary)',
-          'font-size': '13px'
-        }
+        filterable: true,
+        searchable: true,
+        cellClass: 'font-semibold text-[var(--text-primary)]'
       },
-
-
       {
-        headerName: 'Role',
         field: 'role.name',
-        width: 140,
-        filter: true,
-        cellRenderer: (params: any) => {
-          const role = params.value || 'N/A';
-
-          return `
-            <div style="display:flex; align-items:center; height:100%;">
-              <span style="
-                background-color: var(--bg-secondary); 
-                color: var(--accent-primary); 
-                padding: 1px 8px; 
-                border-radius: 4px; 
-                font-weight: 600; 
-                font-size: 10px; 
-                text-transform: uppercase; 
-                border: 1px solid var(--border-secondary);
-                line-height: 1.2;
-                letter-spacing: 0.5px;
-                white-space: nowrap;
-              ">
-                ${role}
-              </span>
-            </div>`;
+        header: 'Role',
+        type: 'badge',
+        width: '140px',
+        filterable: true,
+        searchable: true,
+      },
+      {
+        field: 'email',
+        header: 'Email',
+        type: 'email',
+        width: '220px',
+        filterable: true,
+        searchable: true,
+      },
+      {
+        field: 'phone',
+        header: 'Phone',
+        type: 'phone',
+        width: '140px',
+        filterable: true,
+        searchable: true,
+      },
+      {
+        field: 'attendanceConfig.shiftId.name',
+        header: 'Shift Name',
+        type: 'text',
+        width: '160px',
+        filterable: false,
+        formatter: (value: any, row: any) => {
+          if (!row.attendanceConfig?.isAttendanceEnabled) return 'Disabled';
+          return value || 'Assign Shift';
         }
       },
-
-
       {
-        headerName: 'Contact Info',
-        width: 220,
-        cellRenderer: (params: any) => {
-          const email = params.data.email;
-          const phone = params.data.phone ? `<span style="color:var(--text-tertiary);"> • ${params.data.phone}</span>` : '';
-
-          return `
-            <div style="display:flex; flex-direction:column; justify-content:center; height:100%; line-height:1.2;">
-              <span style="color:var(--text-secondary); font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${email}</span>
-              <span style="font-size:10px; color:var(--text-tertiary);">${params.data.phone || ''}</span>
-            </div>
-          `;
-        }
-      },
-
-
-      {
-        headerName: 'Shift Name',
-        width: 160,
-        cellRenderer: (params: any) => {
-          const config = params.data.attendanceConfig;
-
-          if (!config?.isAttendanceEnabled) {
-            return `<div style="display:flex; align-items:center; height:100%; color:#94a3b8; font-style:italic; font-size:12px;">Disabled</div>`;
-          }
-
-          if (config.shiftId && config.shiftId.name) {
-            return `<div style="display:flex; align-items:center; height:100%; font-weight:600; color:var(--text-primary); font-size:12px; text-transform:capitalize;">
-                      ${config.shiftId.name}
-                    </div>`;
-          }
-
-          return `<div style="display:flex; align-items:center; height:100%; color:#ef4444; font-weight:600; font-size:12px;">
-                    <i class="pi pi-exclamation-circle" style="margin-right:4px; font-size:10px;"></i> Assign Shift
-                  </div>`;
-        }
-      },
-
-
-      {
-        headerName: 'Timing',
-        width: 140,
-        cellRenderer: (params: any) => {
-          const shift = params.data.attendanceConfig?.shiftId;
-
-          if (shift && shift.startTime && shift.endTime) {
-            return `
-              <div style="display:flex; align-items:center; height:100%; color:var(--text-secondary); font-size:12px; font-family:var(--font-mono, monospace);">
-                ${shift.startTime} - ${shift.endTime}
-              </div>
-            `;
-          }
-          return `<div style="display:flex; align-items:center; height:100%; color:var(--text-tertiary);">-</div>`;
-        }
-      },
-
-
-      {
-        headerName: 'Config',
-        width: 150,
-        cellRenderer: (params: any) => {
-          const config = params.data.attendanceConfig || {};
-          const machineId = config.machineUserId;
-
-          if (machineId) {
-
-            return `
-              <div style="display:flex; align-items:center; height:100%;">
-                <span style="
-                  background:var(--bg-secondary); 
-                  border:1px solid var(--border-secondary); 
-                  color:var(--text-secondary); 
-                  padding: 0px 6px; 
-                  border-radius:4px; 
-                  font-family:monospace; 
-                  font-size:10px; 
-                  line-height: 1.4;
-                ">
-                  ID: ${machineId}
-                </span>
-              </div>`;
-          }
-
-          const methods = [];
-          if (config.allowWebPunch) methods.push('Web');
-          if (config.allowMobilePunch) methods.push('App');
-
-          return methods.length > 0
-            ? `<div style="display:flex; align-items:center; height:100%; font-size:11px; color:var(--text-tertiary);">${methods.join(', ')}</div>`
-            : `<div style="display:flex; align-items:center; height:100%; color:var(--text-tertiary); font-size:11px;">-</div>`;
-        }
-      },
-
-
-      {
-        headerName: 'Branch',
         field: 'branchId.name',
-        width: 130,
-        valueFormatter: (p: any) => p.value || 'Global',
-        cellStyle: { 'display': 'flex', 'align-items': 'center', 'color': 'var(--text-secondary)', 'font-size': '12px' }
+        header: 'Branch',
+        type: 'text',
+        width: '130px',
+        filterable: true,
+        formatter: (value: any) => value || 'Global'
       },
-
       {
-        headerName: 'Safety',
-        field: 'security',
-        width: 80,
+        field: 'isLoginBlocked',
+        header: 'Security',
+        type: 'status',
+        width: '100px',
         sortable: false,
-        filter: false,
-        cellRenderer: (params: any) => {
-          const isBlocked = params.data.isLoginBlocked;
-          const icon = isBlocked ? 'pi-lock text-error' : 'pi-shield text-primary';
-          const tooltip = isBlocked ? 'Login Blocked' : 'Account Secure';
-
-          return `
-            <div style="display:flex; align-items:center; justify-content:center; height:100%; cursor:pointer;">
-              <i class="pi ${icon}" style="font-size: 1.2rem;" title="${tooltip}"></i>
-            </div>
-          `;
-        }
+        filterable: true,
+        formatter: (value: any) => value ? 'Blocked' : 'Active'
       }
     ];
     this.cdr.detectChanges();

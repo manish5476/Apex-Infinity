@@ -20,11 +20,13 @@ import { DialogService, DynamicDialogModule } from 'primeng/dynamicdialog';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
 import { SalesReturnService, GetSalesReturnsQuery } from '../../../../core/services/sales.return.service';
-import { AgShareGrid, ActionColumnConfig } from '../../../shared/components/ag-shared-grid';
 import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
 import { MasterDropdownComponent } from '../../../shared/components/masterFilterDropdown/master-dropdown.component';
 import { SalesReturnActionDialogComponent } from '../sales-return-action-dialog/sales-return-action-dialog';
+import { DataGridComponent } from '@shared/ui/grid';
+import { PageContentComponent } from '@shared/ui/layout/page-content/page-content.component';
+import { PageHeaderComponent } from '@shared/ui/layout/page-header/page-header.component';
 
 // ============================================================================
 // Custom Cell Renderer for Action Buttons
@@ -83,13 +85,15 @@ export class ActionButtonsRenderer {
     InputTextModule,
     RouterModule,
     TooltipModule,
-    AgShareGrid,
+    DataGridComponent,
     ToastModule,
     DatePickerModule,
     HasPermissionDirective,
     DynamicDialogModule,
-    MasterDropdownComponent
-],
+    MasterDropdownComponent,
+    PageHeaderComponent,
+    PageContentComponent
+  ],
   providers: [DialogService],
   template: `
     <p-toast position="bottom-right" appendTo="body"></p-toast>

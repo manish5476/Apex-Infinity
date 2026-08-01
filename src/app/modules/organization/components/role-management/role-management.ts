@@ -19,8 +19,11 @@ import { DividerModule } from 'primeng/divider';
 import { CheckboxModule } from 'primeng/checkbox';
 
 // --- Shared Components & Grid ---
-import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
-import { GridApi, ICellRendererParams, GridReadyEvent } from 'ag-grid-community';
+import { PageComponent } from '../../../../shared/ui/layout/page/page.component';
+import { PageHeaderComponent } from '../../../../shared/ui/layout/page-header/page-header.component';
+import { PageContentComponent } from '../../../../shared/ui/layout/page-content/page-content.component';
+import { DataGridComponent, GridColumn, GridRowAction } from '../../../../shared/ui/grid';
+import { DialogComponent } from '../../../../shared/ui/dialog/dialog.component';
 import { finalize, Subject } from 'rxjs';
 import { takeUntil } from "rxjs/operators";
 
@@ -45,7 +48,7 @@ export interface Permission {
   imports: [
     FormsModule,
     ButtonModule,
-    DialogModule,
+    DialogComponent,
     InputTextModule,
     ToastModule,
     ConfirmDialogModule,
@@ -53,7 +56,10 @@ export interface Permission {
     TagModule,
     DividerModule,
     CheckboxModule,
-    AgShareGrid
+    PageComponent,
+    PageHeaderComponent,
+    PageContentComponent,
+    DataGridComponent
   ],
   providers: [ConfirmationService],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -95,8 +101,8 @@ export class RoleManagementComponent implements OnInit, OnDestroy {
     return Object.keys(groups).sort().map(name => ({ name, items: groups[name] }));
   });
 
-  private gridApi!: GridApi;
-  columns: any[] = [];
+  columns: GridColumn[] = [];
+  rowActions: GridRowAction[] = [];
 
   ngOnInit(): void {
     this.setupColumns();
@@ -114,57 +120,41 @@ export class RoleManagementComponent implements OnInit, OnDestroy {
 
   setupColumns(): void {
     this.columns = [
-      { field: 'name', headerName: 'Role Name', flex: 1, cellClass: 'font-semibold text-primary' },
+      { field: 'name', header: 'Role Name', width: '200px' },
       {
-        headerName: 'Type', width: 130,
-        cellRenderer: (params: ICellRendererParams) => {
-          if (params.data.isSuperAdmin) return `<span class="ag-badge badge-danger">Super Admin</span>`;
-          if (params.data.isDefault) return `<span class="ag-badge badge-contrast">Default</span>`;
-          return `<span class="ag-badge badge-info">Custom</span>`;
-        }
+        field: 'isSuperAdmin',
+        header: 'Type', 
+        width: '130px',
+        type: 'status',
+        formatter: (value: any, row: any) => row.isSuperAdmin ? 'Super Admin' : (row.isDefault ? 'Default' : 'Custom')
       },
       {
-        field: 'permissions', headerName: 'Access Scope', flex: 2,
-        valueFormatter: (params: ICellRendererParams) => {
-          if (params.data?.isSuperAdmin) return 'Full System Access';
-          const count = params.value?.length || 0;
+        field: 'permissions', 
+        header: 'Access Scope', 
+        width: '250px',
+        formatter: (value: any, row: any) => {
+          if (row.isSuperAdmin) return 'Full System Access';
+          const count = value?.length || 0;
           return `${count} permission${count !== 1 ? 's' : ''}`;
-        },
-        cellRenderer: (params: ICellRendererParams) => {
-          if (params.data?.isSuperAdmin) return `<span class="text-tertiary italic">Full System Access</span>`;
-          const count = params.value?.length || 0;
-          return `<span class="ag-tag">${count} permission${count !== 1 ? 's' : ''}</span>`;
-        }
-      },
-      {
-        headerName: 'Actions', colId: 'actions', width: 120, pinned: 'right',
-        cellRenderer: (params: ICellRendererParams) => {
-          const disabled = params.data.isSuperAdmin ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : '';
-          return `
-             <div class="flex justify-center py-1">
-               <button class="action-btn action-edit" ${disabled} title="Edit Role">
-                  <i class="pi pi-pencil"></i>
-               </button>
-               <button class="action-btn action-delete" ${disabled} title="Delete Role">
-                  <i class="pi pi-trash"></i>
-               </button>
-             </div>`;
         }
       }
     ];
-  }
 
-  onGridReady(params: GridReadyEvent) { this.gridApi = params.api; }
-
-  eventFromGrid(event: any) {
-    if (event.type === 'cellClicked') {
-      const rowData = event.row as Role;
-      const target = event.event?.event?.target as HTMLElement;
-      if (!rowData) return;
-      if (target?.closest('.action-edit')) { this.openEditRoleDialog(rowData); return; }
-      if (target?.closest('.action-delete')) { this.deleteRole(rowData); return; }
-      if (event.column?.getColId() !== 'actions') { this.openEditRoleDialog(rowData); }
-    }
+    this.rowActions = [
+      {
+        id: 'edit',
+        icon: 'pi pi-pencil',
+        label: 'Edit Role',
+        callback: (row: Role) => this.openEditRoleDialog(row)
+      },
+      {
+        id: 'delete',
+        icon: 'pi pi-trash',
+        label: 'Delete Role',
+        variant: 'danger',
+        callback: (row: Role) => this.deleteRole(row)
+      }
+    ];
   }
 
   applyFilters() { this.cdr.markForCheck(); }

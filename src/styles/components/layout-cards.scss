@@ -41,6 +41,7 @@
 /* ─── Filter Panel ─── */
 .app-filter-panel {
     display: flex;
+    flex-wrap: wrap;
     align-items: flex-end;
     gap: var(--spacing-lg);
     background: var(--bg-secondary);
