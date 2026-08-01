@@ -17,7 +17,6 @@ import { GridBulkAction, GridDensity } from '../grid-types';
         <!-- LEFT: Search + Filter + Count -->
         <div class="flex items-center gap-3">
           
-          <!-- Search Input -->
           <div class="flex items-center gap-2 px-3 py-1.5 min-w-[240px]
                       bg-[var(--bg-secondary)] border border-[var(--border-secondary)]
                       rounded-[var(--ui-border-radius-pill)] transition-[var(--transition-fast)]
@@ -38,7 +37,6 @@ import { GridBulkAction, GridDensity } from '../grid-types';
             }
           </div>
 
-          <!-- Filter Toggle -->
           <button type="button"
                   class="flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--ui-border-radius-pill)] text-[length:var(--font-size-xs)] font-[var(--font-weight-medium)] border transition-[var(--transition-fast)] outline-none"
                   [class]="filterActive() 
@@ -54,7 +52,6 @@ import { GridBulkAction, GridDensity } from '../grid-types';
             }
           </button>
 
-          <!-- Record Count -->
           <div class="h-4 w-px bg-[var(--border-secondary)] mx-1"></div>
           <span class="text-[length:var(--font-size-xs)] text-[var(--text-tertiary)]">
             <span class="font-[var(--font-weight-semibold)] text-[var(--text-primary)]">
@@ -66,7 +63,6 @@ import { GridBulkAction, GridDensity } from '../grid-types';
 
         <!-- RIGHT: Tools & Actions -->
         <div class="flex items-center gap-1.5">
-          <!-- Projected Custom Actions -->
           <ng-content select="[grid-actions]"></ng-content>
 
           <div class="h-5 w-px bg-[var(--border-secondary)] mx-1"></div>
@@ -88,19 +84,12 @@ import { GridBulkAction, GridDensity } from '../grid-types';
             }
           </div>
 
-          <!-- Column Manager Toggle -->
-          <button type="button" class="apex-tb-btn" title="Manage Columns" [disabled]="isEditing()" (click)="columnManagerToggle.emit()">
-            <i class="pi pi-table text-[13px]"></i>
-          </button>
-
-          <!-- Saved Views Toggle -->
-          <button type="button" class="apex-tb-btn" title="Saved Views" [disabled]="isEditing()" (click)="savedViewsToggle.emit()">
-            <i class="pi pi-bookmark text-[13px]"></i>
-          </button>
+          <button type="button" class="apex-tb-btn" title="Manage Columns" [disabled]="isEditing()" (click)="columnManagerToggle.emit()"><i class="pi pi-table text-[13px]"></i></button>
+          <button type="button" class="apex-tb-btn" title="Saved Views" [disabled]="isEditing()" (click)="savedViewsToggle.emit()"><i class="pi pi-bookmark text-[13px]"></i></button>
 
           <div class="h-5 w-px bg-[var(--border-secondary)] mx-1"></div>
 
-          <!-- Pagination Mode Toggle -->
+          <!-- Pagination Mode -->
           <div class="relative">
             <button type="button" class="apex-tb-btn" title="Pagination Mode" [disabled]="isEditing()" (click)="toggleMenu('pagination', $event)">
               <i class="pi pi-list text-[13px]"></i>
@@ -127,26 +116,18 @@ import { GridBulkAction, GridDensity } from '../grid-types';
               </button>
               @if (activeMenu() === 'export') {
                 <div class="apex-tb-dropdown">
-                  <button class="apex-tb-dropdown-item" (click)="exportAs.emit('csv'); activeMenu.set(null)">
-                    <i class="pi pi-file-excel text-[var(--color-success)] w-4"></i> Export CSV
-                  </button>
-                  <button class="apex-tb-dropdown-item" (click)="exportAs.emit('json'); activeMenu.set(null)">
-                    <i class="pi pi-code text-[var(--color-info)] w-4"></i> Export JSON
-                  </button>
-                  <button class="apex-tb-dropdown-item" (click)="exportAs.emit('xlsx'); activeMenu.set(null)">
-                    <i class="pi pi-file text-[var(--accent-primary)] w-4"></i> Export Excel
-                  </button>
+                  <button class="apex-tb-dropdown-item" (click)="exportAs.emit('csv'); activeMenu.set(null)"><i class="pi pi-file-excel text-[var(--color-success)] w-4"></i> Export CSV</button>
+                  <button class="apex-tb-dropdown-item" (click)="exportAs.emit('json'); activeMenu.set(null)"><i class="pi pi-code text-[var(--color-info)] w-4"></i> Export JSON</button>
+                  <button class="apex-tb-dropdown-item" (click)="exportAs.emit('xlsx'); activeMenu.set(null)"><i class="pi pi-file text-[var(--accent-primary)] w-4"></i> Export Excel</button>
                 </div>
               }
             </div>
           }
 
-          <!-- Refresh -->
           <button type="button" class="apex-tb-btn" title="Refresh" [disabled]="isEditing()" (click)="refresh.emit()">
             <i class="pi pi-refresh text-[13px]" [class.animate-spin]="loading()"></i>
           </button>
 
-          <!-- Add Record -->
           @if (enableAdd()) {
             <div class="h-5 w-px bg-[var(--border-secondary)] mx-1"></div>
             <button type="button"
@@ -159,8 +140,25 @@ import { GridBulkAction, GridDensity } from '../grid-types';
         </div>
       </div>
 
-      <!-- SELECTION BANNER (Absolute positioned to slide over toolbar) -->
-      @if (selectedCount() > 0) {
+      <!-- OVERLAYS: BULK EDIT & SELECTION BANNER -->
+      @if (editingCount() > 0) {
+        <div class="absolute inset-0 z-30 flex items-center justify-between px-5 bg-[var(--bg-secondary)] backdrop-blur-md border-b border-[color-mix(in_srgb,var(--accent-primary)_30%,transparent)] animate-[apex-slide-down_0.2s_ease-out]">
+          <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 px-3 py-1 bg-[var(--color-warning)] text-[var(--text-on-warning)] rounded-[var(--ui-border-radius-pill)] text-[length:var(--font-size-xs)] font-[var(--font-weight-bold)] shadow-sm">
+              <i class="pi pi-pencil text-[11px]"></i>
+              Editing {{ editingCount() }} records
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <button type="button" class="text-[length:var(--font-size-xs)] font-[var(--font-weight-medium)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] underline-offset-2 hover:underline outline-none" (click)="cancelEdits.emit()">
+              Cancel Edits
+            </button>
+            <button type="button" class="flex items-center gap-1.5 px-4 py-1.5 bg-[var(--color-success)] hover:opacity-90 text-[var(--text-on-success)] text-[length:var(--font-size-xs)] font-[var(--font-weight-semibold)] rounded-[var(--ui-border-radius-sm)] shadow-[var(--shadow-sm)] transition-[var(--transition-fast)] outline-none" (click)="saveEdits.emit()">
+              <i class="pi pi-check text-[10px]"></i> Save All
+            </button>
+          </div>
+        </div>
+      } @else if (selectedCount() > 0) {
         <div class="absolute inset-0 z-30 flex items-center justify-between px-5 bg-[var(--selection-bg)] backdrop-blur-md border-b border-[color-mix(in_srgb,var(--accent-primary)_30%,transparent)] animate-[apex-slide-down_0.2s_ease-out]">
           <div class="flex items-center gap-4">
             <div class="flex items-center gap-2 px-3 py-1 bg-[var(--accent-primary)] text-[var(--text-on-accent)] rounded-[var(--ui-border-radius-pill)] text-[length:var(--font-size-xs)] font-[var(--font-weight-bold)] shadow-sm">
@@ -171,8 +169,14 @@ import { GridBulkAction, GridDensity } from '../grid-types';
               Clear Selection
             </button>
           </div>
-
           <div class="flex items-center gap-2">
+            <!-- Edit Multiple Button -->
+            <button type="button"
+                    class="flex items-center gap-1.5 px-3 py-1.5 text-[length:var(--font-size-xs)] font-[var(--font-weight-medium)] rounded-[var(--ui-border-radius-sm)] border border-[var(--border-secondary)] text-[var(--text-primary)] hover:bg-[var(--component-bg-hover)] hover:border-[var(--border-primary)] transition-[var(--transition-fast)] outline-none shadow-sm bg-[var(--bg-primary)]"
+                    (click)="startBulkEdit.emit()">
+              <i class="pi pi-pencil text-[11px]"></i> Edit Selected
+            </button>
+            
             @for (action of bulkActions(); track action.id) {
               <button type="button"
                       [disabled]="isEditing()"
@@ -208,10 +212,7 @@ import { GridBulkAction, GridDensity } from '../grid-types';
         border-color: var(--border-secondary);
       }
       
-      &:disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
-      }
+      &:disabled { opacity: 0.4; cursor: not-allowed; }
     }
 
     .apex-tb-dropdown {
@@ -244,9 +245,7 @@ import { GridBulkAction, GridDensity } from '../grid-types';
       text-align: left;
       transition: var(--transition-fast);
       
-      &:hover {
-        background: var(--component-bg-hover);
-      }
+      &:hover { background: var(--component-bg-hover); }
     }
 
     @keyframes apex-slide-down {
@@ -272,6 +271,7 @@ export class GridToolbarComponent {
   enableExport = input<boolean>(true);
   bulkActions = input<GridBulkAction[]>([]);
   isEditing = input<boolean>(false);
+  editingCount = input<number>(0); // NEW: To toggle Bulk Edit Banner
   paginationMode = input<'pages' | 'infinite'>('pages');
 
   searchChange = output<string>();
@@ -285,6 +285,10 @@ export class GridToolbarComponent {
   clearSelection = output<void>();
   bulkAction = output<string>();
   paginationModeChange = output<'pages' | 'infinite'>();
+
+  startBulkEdit = output<void>(); // NEW
+  saveEdits = output<void>(); // NEW
+  cancelEdits = output<void>(); // NEW
 
   activeMenu = signal<'density' | 'export' | 'pagination' | null>(null);
 
@@ -304,3 +308,5 @@ export class GridToolbarComponent {
     this.activeMenu.set(null);
   }
 }
+
+
