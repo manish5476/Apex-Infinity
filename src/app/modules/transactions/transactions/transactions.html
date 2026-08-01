@@ -5,7 +5,8 @@
   <app-page-header [showToolbar]="false">
     <ng-container header-left>
       <div class="flex flex-row items-center gap-4">
-        <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-[var(--bg-secondary)] text-[var(--accent-primary)] border border-[var(--border-primary)] shadow-sm">
+        <div
+          class="flex items-center justify-center w-12 h-12 rounded-xl bg-[var(--bg-secondary)] text-[var(--accent-primary)] border border-[var(--border-primary)] shadow-sm">
           <i class="pi pi-arrow-right-arrow-left text-xl"></i>
         </div>
         <div>
@@ -17,14 +18,14 @@
 
     <div class="flex items-center gap-2">
       <div class="p-buttongroup mode-toggle">
-        <button pButton label="All" 
+        <button pButton label="All"
           [ngClass]="viewMode() === 'all' ? 'p-button-primary' : 'p-button-outlined p-button-secondary'"
           (click)="toggleViewMode('all')"></button>
-        <button pButton label="My Entries" 
+        <button pButton label="My Entries"
           [ngClass]="viewMode() === 'mine' ? 'p-button-primary' : 'p-button-outlined p-button-secondary'"
           (click)="toggleViewMode('mine')"></button>
       </div>
-      <p-button label="Export" icon="pi pi-download" styleClass="p-button-outlined p-button-secondary" 
+      <p-button label="Export" icon="pi pi-download" styleClass="p-button-outlined p-button-secondary"
         (onClick)="downloadCsv()">
       </p-button>
     </div>
@@ -33,7 +34,8 @@
   <app-page-content density="compact">
     <div class="flex flex-col h-full gap-4">
 
-      <div class="flex flex-row flex-wrap items-end gap-4 bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl p-4 shadow-sm w-full">
+      <div
+        class="flex flex-row flex-wrap items-end gap-4 bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl p-4 shadow-sm w-full">
 
         <div class="flex flex-col gap-1 flex-1 min-w-[200px]">
           <label class="text-xs font-semibold text-[var(--text-label)] uppercase tracking-wider">Date Period</label>
@@ -43,10 +45,10 @@
         </div>
 
         <div class="flex flex-col gap-1 flex-1 min-w-[200px]">
-          <label class="text-xs font-semibold text-[var(--text-label)] uppercase tracking-wider">Transaction Type</label>
+          <label class="text-xs font-semibold text-[var(--text-label)] uppercase tracking-wider">Transaction
+            Type</label>
           <p-select appendTo="body" [(ngModel)]="filterParams.type" [options]="transactionTypes" [showClear]="true"
-            placeholder="All Types" styleClass="w-full" (onChange)="applyFilters()"
-            [filter]="true" filterBy="label">
+            placeholder="All Types" styleClass="w-full" (onChange)="applyFilters()" [filter]="true" filterBy="label">
           </p-select>
         </div>
 
@@ -57,7 +59,7 @@
         </div>
 
         <div class="flex gap-3 ml-auto">
-          <p-button icon="pi pi-filter-slash" styleClass="p-button-text p-button-rounded p-button-secondary" 
+          <p-button icon="pi pi-filter-slash" styleClass="p-button-text p-button-rounded p-button-secondary"
             (onClick)="resetFilters()" pTooltip="Clear Filters">
           </p-button>
         </div>
@@ -65,10 +67,7 @@
       </div>
 
       <div class="flex-1 min-h-0 manish-border-1 border-secondary border-round overflow-hidden">
-        <app-data-grid 
-          [columns]="column" 
-          [data]="data" 
-          (gridEvent)="eventFromGrid($event)" 
+        <app-data-grid [columns]="column" [data]="data()" [loading]="loading()" (gridEvent)="eventFromGrid($event)"
           style="height: 100%; width: 100%; display: block;">
         </app-data-grid>
       </div>
@@ -76,87 +75,3 @@
     </div>
   </app-page-content>
 </app-page>
-
-<!-- <p-toast></p-toast>
-
-<div class="txn-container">
-
-  <div class="txn-header">
-    <div class="title-section">
-      <div class="icon-box">
-        <i class="pi pi-receipt"></i>
-      </div>
-      <div class="text-content">
-        <h2>Transactions</h2>
-        <p>Monitor financial movements across invoices, payments, and ledgers.</p>
-      </div>
-    </div>
-
-    <div class="actions-section">
-      <div class="p-buttongroup mode-toggle">
-        <button pButton label="All Transactions" 
-          [ngClass]="viewMode() === 'all' ? 'active-mode' : 'p-button-text'"
-          (click)="toggleViewMode('all')"></button>
-        <button pButton label="My Transactions" 
-          [ngClass]="viewMode() === 'mine' ? 'active-mode' : 'p-button-text'"
-          (click)="toggleViewMode('mine')"></button>
-      </div>
-
-      <button pButton label="Export CSV" icon="pi pi-download" class="p-button-outlined p-button-secondary" 
-        (click)="downloadCsv()">
-      </button>
-    </div>
-  </div>
-
-  <div class="txn-card">
-
-    <div class="filter-bar">
-
-      <div class="filter-field">
-        <label>Date Range</label>
-        <p-datepicker [(ngModel)]="rangeDates" selectionMode="range" [readonlyInput]="true" placeholder="Start - End"
-          [showIcon]="true" appendTo="body" styleClass="w-full" inputStyleClass="w-full" (onClose)="applyFilters()">
-        </p-datepicker>
-      </div>
-
-      <div class="filter-field">
-        <label>Type</label>
-        <p-select appendTo="body" appendTo="body" [(ngModel)]="filterParams.type" [options]="transactionTypes" [showClear]="true"
-          placeholder="Select type" appendTo="body" styleClass="w-full" (onChange)="applyFilters()">
-        </p-select>
-      </div>
-
-      <div class="filter-field">
-        <label>Effect</label>
-        <p-select appendTo="body" appendTo="body" [(ngModel)]="filterParams.effect" [options]="transactionEffects" [showClear]="true"
-          placeholder="Credit / Debit" appendTo="body" styleClass="w-full" (onChange)="applyFilters()">
-        </p-select>
-      </div>
-
-      <div class="filter-field search-field">
-        <label>Search</label>
-        <span class="p-input-icon-left w-full">
-          <i class="pi pi-search"></i>
-          <input type="text" placeholder="Desc or Ref No..." [(ngModel)]="filterParams.search"
-            (keydown.enter)="applyFilters()" pInputText class="w-full" />
-        </span>
-      </div>
-
-      <div class="filter-actions">
-        <p-button icon="pi pi-refresh" label="Reset" styleClass="p-button-outlined p-button-secondary" (onClick)="resetFilters()">
-        </p-button>
-      </div>
-    </div>
-
-    <div class="grid-wrapper">
-      <app-ag-share-grid 
-        [columns]="column" 
-        [data]="data" 
-        selectionMode="multiple"
-        (gridEvent)="eventFromGrid($event)" 
-        style="height: 100%; width: 100%; display: block;">
-      </app-ag-share-grid>
-    </div>
-
-  </div>
-</div> -->

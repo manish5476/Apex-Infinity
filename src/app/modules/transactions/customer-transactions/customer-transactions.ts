@@ -1,161 +1,236 @@
-import { ChangeDetectorRef, Component, OnInit, inject, Input } from '@angular/core';
-
-import { ActivatedRoute } from '@angular/router'; // Import ActivatedRoute
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  Input,
+  OnInit,
+  inject,
+  signal,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
-import { SelectModule } from 'primeng/select';
-import { InputTextModule } from 'primeng/inputtext';
 import { DatePickerModule } from 'primeng/datepicker';
-import { Toast } from "primeng/toast";
+import { InputTextModule } from 'primeng/inputtext';
+import { SelectModule } from 'primeng/select';
+
+import { DataGridComponent, GridColumn } from '@shared/ui/grid';
 import { CommonMethodService } from '../../../core/utils/common-method.service';
 import { TransactionService } from '../transaction.service';
-import { AgShareGrid } from '../../shared/components/ag-shared-grid';
 
 @Component({
   selector: 'app-customer-transactions',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    SelectModule,
     FormsModule,
     ButtonModule,
     InputTextModule,
-    Toast,
+    SelectModule,
     DatePickerModule,
-    AgShareGrid
-],
-  templateUrl: './customer-transactions.html',
-  styleUrl: './customer-transactions.scss',
-})
-export class CustomerTransactions implements OnInit {
+    DataGridComponent,
+  ],
+  template: `
+    <!-- Filter Toolbar -->
+    <div class="filter-toolbar">
+      <p-datepicker
+        [(ngModel)]="rangeDates"
+        selectionMode="range"
+        placeholder="Date Range"
+        appendTo="body"
+        (onClose)="applyFilters()">
+      </p-datepicker>
 
-  private cdr = inject(ChangeDetectorRef);
-  private route = inject(ActivatedRoute); // Inject Route
-  private transactionService = inject(TransactionService);
-  public common = inject(CommonMethodService);
+      <p-select
+        [options]="transactionTypes"
+        [(ngModel)]="filterParams.type"
+        [showClear]="true"
+        placeholder="Type"
+        (onChange)="applyFilters()">
+      </p-select>
 
-  // 1. Allow Parent to pass ID directly (Critical for Dialog)
-  @Input() inputCustomerId: string | undefined;
+      <p-select
+        [options]="transactionEffects"
+        [(ngModel)]="filterParams.effect"
+        [showClear]="true"
+        placeholder="Dr / Cr"
+        (onChange)="applyFilters()">
+      </p-select>
 
-  customerId: string = ''; // To store the ID
-  gridApi!: GridApi;
-  currentPage = 1;
-  totalCount = 0;
-  pageSize = 100;
-  data: any[] = [];
-  column: any = [];
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="filterParams.search"
+        placeholder="Search..."
+        (keydown.enter)="applyFilters()" />
 
-  // Filters
-  rangeDates: Date[] | undefined;
-  filterParams: any = { type: null, effect: null, search: '' };
+      <p-button
+        icon="pi pi-times"
+        [text]="true"
+        severity="secondary"
+        pTooltip="Reset"
+        (onClick)="resetFilters()">
+      </p-button>
+    </div>
 
-  transactionTypes = [
-    { label: 'Invoice', value: 'invoice' },
-    { label: 'Payment', value: 'payment' },
-    { label: 'Ledger', value: 'ledger' }
-  ];
-  transactionEffects = [{ label: 'Credit', value: 'credit' }, { label: 'Debit', value: 'debit' }];
-
-  ngOnInit(): void {
-    if (this.inputCustomerId) {
-      this.customerId = this.inputCustomerId;
-    } else {
-      this.customerId = this.route.snapshot.paramMap.get('id') ||
-        this.route.parent?.snapshot.paramMap.get('id') || '';
+    <!-- DataGrid -->
+    <app-data-grid
+      [columns]="columns"
+      [data]="data()"
+      [loading]="isLoading()"
+      (gridEvent)="eventFromGrid($event)">
+    </app-data-grid>
+  `,
+  styles: [`
+    :host {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-md);
+      height: 100%;
+      min-height: 0;
     }
 
-    this.getColumn();
+    .filter-toolbar {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      flex-wrap: wrap;
+      flex-shrink: 0;
+    }
+  `]
+})
+export class CustomerTransactions implements OnInit {
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly route = inject(ActivatedRoute);
+  private readonly transactionService = inject(TransactionService);
+  private readonly common = inject(CommonMethodService);
+
+  @Input() inputCustomerId: string | undefined;
+
+  private customerId = '';
+  private currentPage = 1;
+  private totalCount = 0;
+  private readonly pageSize = 100;
+
+  readonly isLoading = signal(false);
+  readonly data = signal<any[]>([]);
+
+  filterParams: { type: string | null; effect: string | null; search: string } = {
+    type: null, effect: null, search: '',
+  };
+  rangeDates: Date[] | undefined;
+
+  readonly transactionTypes = [
+    { label: 'Invoice', value: 'invoice' },
+    { label: 'Payment', value: 'payment' },
+    { label: 'Ledger', value: 'ledger' },
+  ];
+  readonly transactionEffects = [
+    { label: 'Credit', value: 'credit' },
+    { label: 'Debit', value: 'debit' },
+  ];
+
+  readonly columns: GridColumn[] = [
+    {
+      field: 'date',
+      header: 'Date',
+      width: '180px',
+      sortable: true,
+      formatter: (val: any) => val ? this.common.formatDate(val, 'dd MMM yyyy, hh:mm a') : '—',
+    },
+    { field: 'type', header: 'Type', type: 'badge', width: '120px', sortable: true },
+    {
+      field: 'description',
+      header: 'Description',
+      minWidth: '200px',
+      formatter: (val: any) => val || 'System Entry',
+    },
+    {
+      field: 'refNumber',
+      header: 'Ref #',
+      width: '150px',
+      formatter: (_val: any, row: any) => row?.refNumber || row?.refId || '—',
+    },
+    {
+      field: 'amount',
+      header: 'Amount',
+      width: '140px',
+      type: 'currency',
+      align: 'right',
+      sortable: true,
+    },
+    {
+      field: 'effect',
+      header: 'Dr / Cr',
+      type: 'badge',
+      width: '100px',
+      formatter: (val: any) => val?.toUpperCase() || '—',
+    },
+    {
+      field: 'meta.status',
+      header: 'Status',
+      width: '130px',
+      type: 'badge',
+      formatter: (_val: any, row: any) => row?.meta?.status || '—',
+    },
+  ];
+
+  ngOnInit(): void {
+    this.customerId = this.inputCustomerId
+      || this.route.snapshot.paramMap.get('id')
+      || this.route.parent?.snapshot.paramMap.get('id')
+      || '';
 
     if (this.customerId) {
       this.getData(true);
-    } else {
-      console.error("Customer Transactions: No Customer ID provided via Input or Route.");
     }
   }
-  applyFilters() { this.getData(true); }
-  resetFilters() {
+
+  applyFilters(): void { this.getData(true); }
+
+  resetFilters(): void {
     this.filterParams = { type: null, effect: null, search: '' };
     this.rangeDates = undefined;
     this.getData(true);
   }
 
-  getData(isReset: boolean = false) {
+  getData(isReset = false): void {
     if (isReset) {
       this.currentPage = 1;
-      this.data = [];
+      this.data.set([]);
       this.totalCount = 0;
     }
 
-    const queryParams: any = {
+    const queryParams: Record<string, any> = {
       ...this.filterParams,
       page: this.currentPage,
       limit: this.pageSize,
     };
 
-    if (this.rangeDates && this.rangeDates.length > 0) {
-      if (this.rangeDates[0]) queryParams.startDate = this.formatDateForApi(this.rangeDates[0]);
-      if (this.rangeDates[1]) queryParams.endDate = this.formatDateForApi(this.rangeDates[1]);
+    if (this.rangeDates?.length) {
+      if (this.rangeDates[0]) queryParams['startDate'] = this.formatDateForApi(this.rangeDates[0]);
+      if (this.rangeDates[1]) queryParams['endDate'] = this.formatDateForApi(this.rangeDates[1]);
     }
 
-    // Call CUSTOMER specific service
-    this.common.apiCall(
-      this.transactionService.getCustomerTransactions(this.customerId, queryParams),
-      (res: any) => {
-        let newData: any[] = [];
-        if (res.results && Array.isArray(res.results)) {
-          newData = res.results;
-        }
-
-        this.totalCount = res.total || this.totalCount;
-        this.data = [...this.data, ...newData];
+    this.transactionService.getCustomerTransactions(this.customerId, queryParams).subscribe({
+      next: (res: any) => {
+        const newData: any[] = Array.isArray(res.results) ? res.results : [];
+        this.totalCount = res.total ?? this.totalCount;
+        this.data.update(prev => [...prev, ...newData]);
         this.currentPage++;
         this.cdr.markForCheck();
-      }
-    );
+      },
+    });
+  }
+
+  eventFromGrid(event: any): void {
+    if (event.type === 'reachedBottom' && this.data().length < this.totalCount) {
+      this.getData(false);
+    }
   }
 
   private formatDateForApi(date: Date): string {
     const offset = date.getTimezoneOffset();
-    const localDate = new Date(date.getTime() - (offset * 60 * 1000));
-    return localDate.toISOString().split('T')[0];
-  }
-
-  eventFromGrid(event: any) {
-    // if (event.type === 'cellClicked') {
-    //   const customerId = event.row._id;
-    //   if (customerId) {
-    //     this.router.navigate(['/customer', customerId]);
-    //   }
-    // }
-    if (event.type === 'reachedBottom') {
-      this.onScrolledToBottom()
-    }
-  }
-
-
-  onScrolledToBottom(_?: any) {
-    if (this.data.length < this.totalCount) this.getData(false);
-  }
-
-  onGridReady(params: GridReadyEvent) { this.gridApi = params.api; }
-
-  getColumn(): void {
-    this.column = [
-      { field: 'date', headerName: 'Date', sortable: true, width: 180, valueFormatter: (params: any) => this.common.formatDate(params.value, 'dd MMM yyyy, hh:mm a') },
-      { field: 'type', headerName: 'Type', sortable: true, width: 120, cellStyle: { 'text-transform': 'capitalize', 'font-weight': '600' } },
-      { field: 'description', headerName: 'Description', sortable: true, flex: 1 },
-      { field: 'refNumber', headerName: 'Ref #', sortable: true, width: 150, valueGetter: (params: any) => params.data.refNumber || params.data.refId || '-' },
-      {
-        field: 'amount', headerName: 'Amount', sortable: true, width: 140, valueFormatter: (params: any) => this.common.formatCurrency(params.value),
-        cellStyle: (params: any) => {
-          const color = params.data.effect === 'credit' ? '#006400' : '#8b0000';
-          const bg = params.data.effect === 'credit' ? '#ccffcc' : '#ffcccc';
-          return { color: color, fontWeight: 'bold', backgroundColor: bg };
-        }
-      },
-      { field: 'effect', headerName: 'Effect', sortable: true, width: 100, valueFormatter: (params: any) => params.value ? params.value.toUpperCase() : '' },
-      { field: 'meta.status', headerName: 'Status', sortable: true, width: 130, valueGetter: (params: any) => params.data.meta?.status || '-' }
-    ];
-    this.cdr.detectChanges();
+    return new Date(date.getTime() - offset * 60000).toISOString().split('T')[0];
   }
 }

@@ -94,10 +94,12 @@ export class RoleManagementComponent implements OnInit, OnDestroy {
   groupedPermissions = computed(() => {
     const perms = this.permissionsList();
     const groups: Record<string, Permission[]> = {};
-    perms.forEach(p => {
-      if (!groups[p.group]) groups[p.group] = [];
-      groups[p.group].push(p);
-    });
+    if (Array.isArray(perms)) {
+      perms.forEach(p => {
+        if (!groups[p.group]) groups[p.group] = [];
+        groups[p.group].push(p);
+      });
+    }
     return Object.keys(groups).sort().map(name => ({ name, items: groups[name] }));
   });
 
@@ -113,7 +115,10 @@ export class RoleManagementComponent implements OnInit, OnDestroy {
 
   loadPermissions(): void {
     this.apiService.permissions().pipe(takeUntil(this.destroy$)).subscribe({
-      next: (res: any) => this.permissionsList.set(res.data || []),
+      next: (res: any) => {
+        const perms = Array.isArray(res.data) ? res.data : (res.data?.permissions || Object.values(res.data || {}).flat() || []);
+        this.permissionsList.set(perms);
+      },
       error: (err) => console.warn('Permissions load failed', err)
     });
   }
@@ -203,7 +208,8 @@ export class RoleManagementComponent implements OnInit, OnDestroy {
     this.isLoading.set(true);
     this.apiService.getRoles().pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
-        this.roles.set(res.data?.roles || []);
+        const rolesData = Array.isArray(res.data) ? res.data : (res.data?.roles || []);
+        this.roles.set(rolesData);
         this.isLoading.set(false);
         this.cdr.markForCheck();
       },

@@ -2,10 +2,16 @@
 <p-confirmDialog appendTo="body" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}"></p-confirmDialog>
 
 <app-page>
-  <app-page-header title="Role Management" subtitle="Manage user roles and configure access permissions across the system.">
+  <app-page-header>
     <ng-container header-left>
-      <div class="flex items-center justify-center p-2 rounded-md bg-[var(--color-primary-bg)] text-[var(--accent-primary)]">
-        <i class="pi pi-id-card text-xl"></i>
+      <div class="flex flex-row items-center gap-4">
+        <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-[color-mix(in_srgb,var(--accent-primary)_12%,transparent)] text-[var(--accent-primary)] border border-[var(--border-primary)] shadow-sm">
+          <i class="pi pi-id-card text-xl"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-[var(--text-primary)] m-0">Role Management</h2>
+          <p class="text-sm text-[var(--text-secondary)] m-0 mt-1">Manage user roles and configure access permissions across the system.</p>
+        </div>
       </div>
     </ng-container>
     

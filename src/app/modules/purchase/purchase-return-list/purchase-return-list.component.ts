@@ -1,117 +1,163 @@
-import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
-
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnDestroy,
+  OnInit,
+  inject,
+  signal,
+} from '@angular/core';
 import { Router } from '@angular/router';
+import { Subject, finalize } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
-// Components
-import { AgShareGrid } from "../../shared/components/ag-shared-grid";
-import { PurchaseService } from '../purchase.service';
+// Shared UI
+import { DataGridComponent, GridColumn, GridRowAction } from '@shared/ui/grid';
+import { PageComponent } from '@shared/ui/layout/page/page.component';
+import { PageContentComponent } from '@shared/ui/layout/page-content/page-content.component';
+import { PageHeaderComponent } from '@shared/ui/layout/page-header/page-header.component';
+
+// Core
 import { AppMessageService } from '../../../core/services/message.service';
-import { finalize, Subject } from 'rxjs';
-import { takeUntil } from "rxjs/operators";
+import { CommonMethodService } from '../../../core/utils/common-method.service';
+import { PurchaseService } from '../purchase.service';
+import { Button } from "primeng/button";
 
 @Component({
   selector: 'app-purchase-return-list',
   standalone: true,
-  imports: [AgShareGrid],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    DataGridComponent,
+    PageComponent,
+    PageHeaderComponent,
+    PageContentComponent,
+    Button
+],
   template: `
-    <div class="list-page-container">
-      <div class="themed-card mb-4 p-4 flex justify-between items-center">
-        <div>
-          <h2 class="text-xl font-bold text-[var(--text-primary)]">Debit Notes (Purchase Returns)</h2>
-          <p class="text-sm text-[var(--text-secondary)]">History of items returned to suppliers</p>
+    <app-page>
+      <app-page-header
+        title="Debit Notes"
+        subtitle="History of items returned to suppliers">
+        <div header-right class="flex items-center gap-3">
+          <p-button
+            icon="pi pi-refresh"
+            [text]="true"
+            [rounded]="true"
+            severity="secondary"
+            [loading]="isLoading()"
+            (onClick)="loadData()">
+          </p-button>
         </div>
-      </div>
+      </app-page-header>
 
-      <div class="list-grid-area themed-card grow-grid">
-        <app-ag-share-grid 
-          [columns]="columns" 
+      <app-page-content [padded]="true">
+        <app-data-grid
+          [columns]="columns"
           [data]="data()"
+          [loading]="isLoading()"
+          [rowActions]="rowActions"
           (gridEvent)="onGridEvent($event)">
-        </app-ag-share-grid>
-      </div>
-    </div>
+        </app-data-grid>
+      </app-page-content>
+    </app-page>
   `,
   styles: [`
-    :host { display: block; height: 100%; }
-    .list-page-container { height: 100%; display: flex; flex-direction: column; background: var(--bg-primary); padding: var(--spacing-lg); }
-    .grow-grid { flex: 1; min-height: 0; border: 1px solid var(--border-primary); border-radius: 12px; overflow: hidden; }
-    .themed-card { background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: 12px; }
+    :host {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+      width: 100%;
+      height: 100%;
+    }
   `]
 })
 export class PurchaseReturnListComponent implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
-  private purchaseService = inject(PurchaseService);
-  private router = inject(Router);
-  private messageService = inject(AppMessageService);
-  
-  data = signal<any[]>([]);
+  private readonly destroy$ = new Subject<void>();
 
-  columns:any = [
-    { 
-      headerName: 'Date', 
-      field: 'returnDate', 
-      width: 120,
-      valueFormatter: (p: any) => new Date(p.value).toLocaleDateString('en-IN')
-    },
-    { 
-      headerName: 'Ref Invoice', 
-      field: 'purchaseId.invoiceNumber', 
-      width: 150,
-      cellRenderer: (p: any) => `<span style="font-weight:700; color:var(--accent-primary); cursor:pointer;">${p.value || 'N/A'}</span>`,
-      onCellClicked: (p: any) => this.router.navigate(['/purchase', p.data.purchaseId._id])
-    },
-    { 
-      headerName: 'Supplier', 
-      field: 'supplierId.companyName', 
-      width: 220,
-      cellRenderer: (p: any) => `<span style="font-weight:600; color:var(--text-primary)">${p.value}</span>`
-    },
-    { 
-      headerName: 'Reason', 
-      field: 'reason', 
-      flex: 1,
-      cellStyle: { color: 'var(--text-secondary)', fontStyle: 'italic' }
-    },
-    { 
-      headerName: 'Refund Amount', 
-      field: 'totalAmount', 
-      width: 150, 
-      type: 'rightAligned',
-      cellStyle: { color: 'var(--color-error)', fontWeight: 'bold' },
-      valueFormatter: (p: any) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(p.value)
+  private readonly purchaseService = inject(PurchaseService);
+  private readonly messageService = inject(AppMessageService);
+  private readonly router = inject(Router);
+  private readonly common = inject(CommonMethodService);
+  private readonly cdr = inject(ChangeDetectorRef);
+
+  readonly isLoading = signal(false);
+  readonly data = signal<any[]>([]);
+
+  readonly columns: GridColumn[] = [
+    {
+      field: 'returnDate',
+      header: 'Date',
+      width: '120px',
+      sortable: true,
+      formatter: (val: any) => val ? this.common.formatDate(val) : '—',
     },
     {
-      headerName: 'View',
-      width: 80,
-      cellRenderer: () => `<i class="pi pi-eye" style="color:var(--text-secondary); cursor:pointer;"></i>`,
-      onCellClicked: (p: any) => this.router.navigate(['/purchase/returns', p.data._id])
-    }
+      field: 'purchaseId.invoiceNumber',
+      header: 'Ref Invoice',
+      width: '150px',
+      formatter: (_val: any, row: any) => row?.purchaseId?.invoiceNumber || '—',
+    },
+    {
+      field: 'supplierId.companyName',
+      header: 'Supplier',
+      minWidth: '200px',
+      formatter: (_val: any, row: any) => row?.supplierId?.companyName || '—',
+    },
+    {
+      field: 'reason',
+      header: 'Reason',
+      minWidth: '160px',
+      formatter: (val: any) => val || '—',
+    },
+    {
+      field: 'totalAmount',
+      header: 'Refund Amount',
+      width: '150px',
+      type: 'currency',
+      align: 'right',
+      sortable: true,
+    },
   ];
-  isLoading: any;
 
-ngOnInit() {
+  readonly rowActions: GridRowAction[] = [
+    {
+      id: 'view',
+      icon: 'pi pi-eye',
+      tooltip: 'View Return',
+      variant: 'primary',
+      callback: (row) => this.router.navigate(['/purchase/returns', row._id]),
+    },
+  ];
+
+  ngOnInit(): void {
+    this.loadData();
+  }
+
+  loadData(): void {
     this.isLoading.set(true);
-
-    this.purchaseService.getAllReturns()
-      .pipe(finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$))
-      .subscribe({
-        next: (res: any) => {
-          // Safely extract the returns payload
-          this.data.set(res.data?.returns || []);
-        },
-        error: (err) => {
-          // Routed to your global HTTP error parser
-          this.messageService.handleHttpError(err);
-        }
-      });
+    this.purchaseService.getAllReturns().pipe(
+      finalize(() => {
+        this.isLoading.set(false);
+        this.cdr.markForCheck();
+      }),
+      takeUntil(this.destroy$),
+    ).subscribe({
+      next: (res: any) => this.data.set(res.data?.returns ?? []),
+      error: (err: any) => this.messageService.handleHttpError(err),
+    });
   }
 
-  onGridEvent(event: any) {
-    // Handle row clicks if not using specific column click handlers
-  }
-
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
+  onGridEvent(event: any): void {
+    if (event.type === 'cellClicked') {
+      const id = event.row?.purchaseId?._id;
+      if (id) this.router.navigate(['/purchase', id]);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

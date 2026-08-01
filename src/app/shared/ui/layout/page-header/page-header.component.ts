@@ -55,9 +55,9 @@ import {
                text-[var(--text-primary)]
                leading-tight"
 
-        [class.text-[32px]]="density() === 'compact'"
-        [class.text-[36px]]="density() === 'normal'"
-        [class.text-[40px]]="density() === 'comfortable'">
+        [class.text-[18px]]="density() === 'compact'"
+        [class.text-[22px]]="density() === 'normal'"
+        [class.text-[26px]]="density() === 'comfortable'">
 
         {{title()}}
 

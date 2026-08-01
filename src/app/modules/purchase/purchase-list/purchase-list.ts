@@ -1,380 +1,436 @@
-import { ChangeDetectorRef, Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
-
-import { GridApi } from 'ag-grid-community';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnDestroy,
+  OnInit,
+  inject,
+  signal,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Subject, finalize } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
-import { SelectModule } from 'primeng/select';
-import { InputTextModule } from 'primeng/inputtext';
 import { DatePickerModule } from 'primeng/datepicker';
+import { InputTextModule } from 'primeng/inputtext';
+import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
-import { PurchaseService } from '../purchase.service';
-import { AgShareGrid, ActionColumnConfig } from "../../shared/components/ag-shared-grid";
-import { MasterDropdownComponent } from '../../shared/components/masterFilterDropdown/master-dropdown.component';
-import { AppMessageService } from '../../../core/services/message.service';
-import { CommonMethodService } from '../../../core/utils/common-method.service';
-import { finalize, Subject } from 'rxjs';
+
+// Shared UI
+import { DataGridComponent, GridColumn, GridRowAction } from '@shared/ui/grid';
+import { PageComponent } from '@shared/ui/layout/page/page.component';
+import { PageContentComponent } from '@shared/ui/layout/page-content/page-content.component';
+import { PageHeaderComponent } from '@shared/ui/layout/page-header/page-header.component';
+
+// Core
 import { HasPermissionDirective } from '../../../core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '../../../core/auth/permissions.constants';
-import { takeUntil } from "rxjs/operators";
+import { AppMessageService } from '../../../core/services/message.service';
+import { CommonMethodService } from '../../../core/utils/common-method.service';
+import { PurchaseService } from '../purchase.service';
+import { MasterDropdownComponent } from '../../shared/components/masterFilterDropdown/master-dropdown.component';
 
 @Component({
   selector: 'app-purchase-list',
   standalone: true,
-  imports: [SelectModule, FormsModule, ButtonModule, InputTextModule, DatePickerModule, RouterModule, AgShareGrid, HasPermissionDirective, ToastModule, MasterDropdownComponent],
-  templateUrl: './purchase-list.html',
-  styleUrl: './purchase-list.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    FormsModule,
+    RouterModule,
+    ButtonModule,
+    InputTextModule,
+    SelectModule,
+    DatePickerModule,
+    ToastModule,
+    HasPermissionDirective,
+    MasterDropdownComponent,
+    DataGridComponent,
+    PageComponent,
+    PageHeaderComponent,
+    PageContentComponent,
+  ],
+  template: `
+    <p-toast position="bottom-right" appendTo="body"></p-toast>
+
+    <app-page>
+      <app-page-header
+        title="Purchase Orders"
+        subtitle="Manage supplier purchases, track deliveries, and monitor payments">
+        <div header-right class="flex items-center gap-3">
+          <p-button
+            icon="pi pi-refresh"
+            [text]="true"
+            [rounded]="true"
+            severity="secondary"
+            [loading]="isLoading()"
+            (onClick)="getData(true)"
+            pTooltip="Refresh"
+            tooltipPosition="bottom">
+          </p-button>
+          <p-button
+            *hasPermission="PERMISSIONS.PURCHASE.CREATE"
+            label="New Purchase"
+            icon="pi pi-plus"
+            routerLink="create">
+          </p-button>
+        </div>
+      </app-page-header>
+
+      <app-page-content [padded]="true">
+        <!-- Filter Toolbar -->
+        <div class="filter-toolbar">
+          <div class="filter-toolbar__search">
+            <input
+              type="text"
+              pInputText
+              [(ngModel)]="purchaseFilter.invoiceNumber"
+              placeholder="Invoice No..."
+              (keydown.enter)="applyFilters()"
+              class="w-full" />
+          </div>
+
+          <div class="filter-toolbar__filters">
+            <app-master-dropdown
+              endpoint="suppliers"
+              [(ngModel)]="purchaseFilter.supplierId"
+              (onChange)="applyFilters()"
+              placeholder="Supplier">
+            </app-master-dropdown>
+
+            <app-master-dropdown
+              endpoint="branches"
+              [(ngModel)]="purchaseFilter.branchId"
+              (onChange)="applyFilters()"
+              placeholder="Branch">
+            </app-master-dropdown>
+
+            <p-select
+              [options]="statusOptions"
+              [(ngModel)]="purchaseFilter.status"
+              [showClear]="true"
+              placeholder="Status"
+              (onChange)="applyFilters()">
+            </p-select>
+
+            <p-select
+              [options]="paymentStatusOptions"
+              [(ngModel)]="purchaseFilter.paymentStatus"
+              [showClear]="true"
+              placeholder="Payment"
+              (onChange)="applyFilters()">
+            </p-select>
+
+            <p-datepicker
+              [(ngModel)]="purchaseFilter.dateRange"
+              selectionMode="range"
+              placeholder="Date Range"
+              appendTo="body"
+              (onClose)="applyFilters()">
+            </p-datepicker>
+
+            <p-button
+              icon="pi pi-times"
+              [text]="true"
+              severity="secondary"
+              pTooltip="Reset Filters"
+              (onClick)="resetFilters()">
+            </p-button>
+          </div>
+        </div>
+
+        <!-- DataGrid -->
+        <app-data-grid
+          [columns]="columns"
+          [data]="data()"
+          [loading]="isLoading()"
+          [rowActions]="rowActions"
+          (gridEvent)="eventFromGrid($event)">
+        </app-data-grid>
+      </app-page-content>
+    </app-page>
+  `,
+  styles: [`
+    :host {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .filter-toolbar {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      flex-wrap: wrap;
+      margin-bottom: var(--spacing-md);
+
+      &__search {
+        min-width: 200px;
+        max-width: 260px;
+        flex: 1;
+      }
+
+      &__filters {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+        flex-wrap: wrap;
+        flex: 2;
+      }
+    }
+  `]
 })
 export class PurchaseListComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
-  private cdr = inject(ChangeDetectorRef);
-  private purchaseService = inject(PurchaseService);
-  private messageService = inject(AppMessageService);
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
-  private common = inject(CommonMethodService);
+  readonly PERMISSIONS = PERMISSIONS;
 
-  PERMISSIONS = PERMISSIONS;
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly purchaseService = inject(PurchaseService);
+  private readonly messageService = inject(AppMessageService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly common = inject(CommonMethodService);
 
-  readonly purchaseActionColumn: ActionColumnConfig = {
-    showView: true,
-    showEdit: false,
-    showDelete: false,
-    viewPermission: PERMISSIONS.PURCHASE.READ,
-  };
-
-  private gridApi!: GridApi;
   private currentPage = 1;
-  private isLoading = false;
+  private readonly pageSize = 50;
   private totalCount = 0;
-  private pageSize = 50;
 
-  data: any[] = [];
-  column: any = [];
-  rowSelectionMode: any = 'single';
+  readonly isLoading = signal(false);
+  readonly data = signal<any[]>([]);
 
-  statusOptions = [
-    { label: 'Draft', value: 'draft' },
-    { label: 'Received', value: 'received' },
-    { label: 'Cancelled', value: 'cancelled' }
-  ];
-
-  paymentStatusOptions = [
-    { label: 'Paid', value: 'paid' },
-    { label: 'Partial', value: 'partial' },
-    { label: 'Unpaid', value: 'unpaid' }
-  ];
-
-  purchaseFilter = {
+  purchaseFilter: {
+    invoiceNumber: string | null;
+    supplierId: string | null;
+    branchId: string | null;
+    status: string | null;
+    paymentStatus: string | null;
+    dateRange: Date[] | null;
+  } = {
     invoiceNumber: null,
     supplierId: null,
     branchId: null,
     status: null,
     paymentStatus: null,
-    dateRange: null
+    dateRange: null,
   };
 
-  constructor() {}
+  readonly statusOptions = [
+    { label: 'Draft', value: 'draft' },
+    { label: 'Received', value: 'received' },
+    { label: 'Cancelled', value: 'cancelled' },
+  ];
+
+  readonly paymentStatusOptions = [
+    { label: 'Paid', value: 'paid' },
+    { label: 'Partial', value: 'partial' },
+    { label: 'Unpaid', value: 'unpaid' },
+  ];
+
+  readonly columns: GridColumn[] = [
+    {
+      field: 'invoiceNumber',
+      header: 'Invoice #',
+      width: '140px',
+      sticky: 'left',
+      sortable: true,
+    },
+    {
+      field: 'purchaseDate',
+      header: 'Date',
+      width: '120px',
+      sortable: true,
+      formatter: (val: any) => val ? this.common.formatDate(val) : '—',
+    },
+    {
+      field: 'supplierId.companyName',
+      header: 'Supplier',
+      minWidth: '200px',
+      type: 'user',
+      formatter: (_val: any, row: any) => row?.supplierId?.companyName || '—',
+    },
+    {
+      field: 'supplierId.contactPerson',
+      header: 'Contact',
+      width: '150px',
+      formatter: (_val: any, row: any) => row?.supplierId?.contactPerson || '—',
+    },
+    {
+      field: 'supplierId.email',
+      header: 'Email',
+      width: '200px',
+      type: 'email',
+      formatter: (_val: any, row: any) => row?.supplierId?.email || '—',
+    },
+    {
+      field: 'supplierId.phone',
+      header: 'Phone',
+      width: '130px',
+      type: 'phone',
+      formatter: (_val: any, row: any) => row?.supplierId?.phone || '—',
+    },
+    {
+      field: 'branchId.name',
+      header: 'Branch',
+      width: '130px',
+      formatter: (_val: any, row: any) => row?.branchId?.name || '—',
+    },
+    {
+      field: 'items',
+      header: 'Items',
+      width: '80px',
+      align: 'right',
+      formatter: (_val: any, row: any) => String(row?.items?.length ?? 0),
+    },
+    {
+      field: 'subTotal',
+      header: 'Sub Total',
+      width: '120px',
+      type: 'currency',
+      align: 'right',
+    },
+    {
+      field: 'totalTax',
+      header: 'Tax',
+      width: '100px',
+      type: 'currency',
+      align: 'right',
+    },
+    {
+      field: 'grandTotal',
+      header: 'Grand Total',
+      width: '130px',
+      type: 'currency',
+      align: 'right',
+      sortable: true,
+    },
+    {
+      field: 'paidAmount',
+      header: 'Paid',
+      width: '120px',
+      type: 'currency',
+      align: 'right',
+    },
+    {
+      field: 'balanceAmount',
+      header: 'Balance',
+      width: '120px',
+      type: 'currency',
+      align: 'right',
+      sortable: true,
+    },
+    {
+      field: 'status',
+      header: 'Status',
+      width: '120px',
+      type: 'badge',
+    },
+    {
+      field: 'paymentStatus',
+      header: 'Payment',
+      width: '130px',
+      type: 'badge',
+    },
+    {
+      field: 'paymentMethod',
+      header: 'Method',
+      width: '110px',
+      formatter: (val: any) => val ? val.toUpperCase() : '—',
+    },
+    {
+      field: 'createdBy.name',
+      header: 'Created By',
+      width: '140px',
+      formatter: (_val: any, row: any) => row?.createdBy?.name || 'System',
+    },
+  ];
+
+  readonly rowActions: GridRowAction[] = [
+    {
+      id: 'view',
+      icon: 'pi pi-eye',
+      tooltip: 'View Purchase',
+      variant: 'primary',
+      callback: (row) => {
+        this.router.navigate([row._id], { relativeTo: this.route });
+      },
+    },
+  ];
 
   ngOnInit(): void {
-    this.getColumn();
     this.getData(true);
   }
 
-  applyFilters() {
+  applyFilters(): void {
     this.getData(true);
   }
 
-  resetFilters() {
+  resetFilters(): void {
     this.purchaseFilter = {
-      invoiceNumber: null,
-      supplierId: null,
-      branchId: null,
-      status: null,
-      paymentStatus: null,
-      dateRange: null
+      invoiceNumber: null, supplierId: null, branchId: null,
+      status: null, paymentStatus: null, dateRange: null,
     };
     this.getData(true);
   }
 
-  getData(isReset: boolean = false) {
-    if (this.isLoading) return;
-    this.isLoading = true;
+  getData(isReset = false): void {
+    if (this.isLoading()) return;
+    this.isLoading.set(true);
 
     if (isReset) {
       this.currentPage = 1;
-      this.data = [];
+      this.data.set([]);
       this.totalCount = 0;
-      if (this.gridApi) {
-        this.gridApi.setGridOption('rowData', []);
-      }
     }
 
     const { dateRange, ...baseFilters } = this.purchaseFilter;
-
-    let startDate, endDate;
-    if (dateRange && Array.isArray(dateRange)) {
+    let startDate: string | undefined;
+    let endDate: string | undefined;
+    if (Array.isArray(dateRange)) {
       if (dateRange[0]) startDate = (dateRange[0] as Date).toISOString();
       if (dateRange[1]) endDate = (dateRange[1] as Date).toISOString();
     }
 
-    const filterParams = {
-      ...baseFilters,
-      startDate,
-      endDate,
-      page: this.currentPage,
-      limit: this.pageSize
-    };
-
-    this.purchaseService.getAllPurchases(filterParams)
-      .pipe(
-        finalize(() => {
-          this.isLoading = false;
-          this.cdr.markForCheck();
-        }), takeUntil(this.destroy$)
-      )
-      .subscribe({
-        next: (res: any) => {
-          let newData: any[] = [];
-
-          if (res.data && Array.isArray(res.data.data)) {
-            newData = res.data.data;
-          }
-
-          if (res.pagination) {
-            this.totalCount = res.pagination.totalResults;
-          } else {
-            this.totalCount = 0;
-          }
-
-          this.data = [...this.data, ...newData];
-
-          if (this.gridApi) {
-            if (isReset) {
-              this.gridApi.setGridOption('rowData', this.data);
-            } else {
-              this.gridApi.applyTransaction({ add: newData });
-            }
-          }
-
-          this.currentPage++;
-        },
-        error: (err: any) => {
-          this.messageService.handleHttpError(err);
+    this.purchaseService.getAllPurchases({
+      ...baseFilters, startDate, endDate,
+      page: this.currentPage, limit: this.pageSize,
+    }).pipe(
+      finalize(() => {
+        this.isLoading.set(false);
+        this.cdr.markForCheck();
+      }),
+      takeUntil(this.destroy$),
+    ).subscribe({
+      next: (res: any) => {
+        const newData: any[] = res.data?.data ?? [];
+        if (res.pagination) {
+          this.totalCount = res.pagination.totalResults;
         }
-      });
+        if (isReset) {
+          this.data.set(newData);
+        } else {
+          this.data.update(prev => [...prev, ...newData]);
+        }
+        this.currentPage++;
+      },
+      error: (err: any) => this.messageService.handleHttpError(err),
+    });
   }
 
-  onScrolledToBottom(_: any) {
-    if (!this.isLoading && this.data.length < this.totalCount) {
-      this.getData(false);
-    }
-  }
-
-  eventFromGrid(event: any) {
-    if (event.type === 'init') {
-      this.gridApi = event.api;
-      return;
-    }
+  eventFromGrid(event: any): void {
     if (event.type === 'cellClicked') {
-      const purchaseId = event.row._id;
-      if (purchaseId) {
-        this.router.navigate([purchaseId], { relativeTo: this.route });
-      }
+      const id = event.row?._id;
+      if (id) this.router.navigate([id], { relativeTo: this.route });
     }
     if (event.type === 'reachedBottom') {
-      this.onScrolledToBottom(event)
-    }
-  }
-
-  getColumn(): void {
-    this.column = [
-      {
-        field: 'invoiceNumber',
-        headerName: 'Invoice #',
-        width: 140,
-        pinned: 'left',
-        filter: 'agTextColumnFilter',
-        cellRenderer: (params: any) => {
-          const val = params.value || 'N/A';
-          return `<span style="font-weight: 700; color: var(--color-primary); cursor: pointer; letter-spacing: 0.5px;">${val}</span>`;
-        }
-      },
-      {
-        field: 'purchaseDate',
-        headerName: 'Date',
-        width: 120,
-        filter: 'agDateColumnFilter',
-        valueFormatter: (params: any) => params.value ? new Date(params.value).toLocaleDateString() : '-',
-        cellStyle: { color: 'var(--text-secondary)' }
-      },
-      {
-        field: 'supplierId.companyName',
-        headerName: 'Supplier Name',
-        width: 200,
-        filter: 'agTextColumnFilter',
-        cellRenderer: (params: any) => {
-          const name = params.value || 'Unknown';
-          const char = name.charAt(0).toUpperCase();
-          return `
-            <div style="display:flex; align-items:center; gap:8px; height:100%;">
-              <div style="width:24px; height:24px; border-radius:4px; background:var(--bg-ternary); color:var(--text-secondary); display:grid; place-items:center; font-size:10px; font-weight:700; border:1px solid var(--border-secondary);">${char}</div>
-              <span style="font-weight:600; color:var(--text-primary); text-overflow:ellipsis; overflow:hidden;">${name}</span>
-            </div>
-          `;
-        }
-      },
-      {
-        field: 'supplierId.contactPerson',
-        headerName: 'Contact Person',
-        width: 150,
-        valueGetter: (p: any) => p.data.supplierId?.contactPerson || '-',
-        cellStyle: { color: 'var(--text-secondary)' }
-      },
-      {
-        field: 'supplierId.email',
-        headerName: 'Email',
-        width: 200,
-        cellRenderer: (params: any) => {
-          const email = params.data.supplierId?.email;
-          if (!email) return '-';
-          return `<a href="mailto:${email}" style="color:var(--text-secondary); text-decoration:none; display:flex; align-items:center; gap:6px;"><i class="pi pi-envelope" style="font-size:10px"></i> ${email}</a>`;
-        }
-      },
-      {
-        field: 'supplierId.phone',
-        headerName: 'Phone',
-        width: 130,
-        cellRenderer: (params: any) => {
-          const phone = params.data.supplierId?.phone;
-          if (!phone) return '-';
-          return `<a href="tel:${phone}" style="color:var(--text-secondary); text-decoration:none; display:flex; align-items:center; gap:6px;"><i class="pi pi-phone" style="font-size:10px"></i> ${phone}</a>`;
-        }
-      },
-      {
-        field: 'branchId.name',
-        headerName: 'Branch',
-        width: 130,
-        filter: true,
-        cellRenderer: (params: any) => {
-          const branch = params.data.branchId?.name || 'Main';
-          return `<span style="background:var(--bg-ternary); padding:2px 8px; border-radius:4px; font-size:11px; color:var(--text-secondary); border:1px solid var(--border-secondary);">${branch}</span>`;
-        }
-      },
-      {
-        headerName: 'Items',
-        field: 'items',
-        width: 100,
-        cellRenderer: (params: any) => {
-          const count = params.data.items?.length || 0;
-          return `<span style="font-weight:600; color:var(--text-primary);"><i class="pi pi-box" style="font-size:10px; color:var(--text-tertiary); margin-right:4px;"></i> ${count}</span>`;
-        }
-      },
-      {
-        field: 'subTotal',
-        headerName: 'Sub Total',
-        width: 120,
-        type: 'rightAligned',
-        valueFormatter: (p: any) => this.formatCurrency(p.value),
-        cellStyle: { color: 'var(--text-tertiary)' }
-      },
-      {
-        field: 'totalTax',
-        headerName: 'Tax',
-        width: 100,
-        type: 'rightAligned',
-        valueFormatter: (p: any) => this.formatCurrency(p.value),
-        cellStyle: { color: 'var(--text-tertiary)' }
-      },
-      {
-        field: 'grandTotal',
-        headerName: 'Grand Total',
-        width: 130,
-        type: 'rightAligned',
-        cellStyle: { fontWeight: '700', color: 'var(--text-primary)' },
-        valueFormatter: (p: any) => this.formatCurrency(p.value)
-      },
-      {
-        field: 'paidAmount',
-        headerName: 'Paid',
-        width: 120,
-        type: 'rightAligned',
-        valueFormatter: (p: any) => this.formatCurrency(p.value),
-        cellStyle: { color: 'var(--color-success)' }
-      },
-      {
-        field: 'balanceAmount',
-        headerName: 'Balance',
-        width: 120,
-        type: 'rightAligned',
-        valueFormatter: (p: any) => this.formatCurrency(p.value),
-        cellStyle: (params: any) => {
-          return params.value > 0 
-            ? { color: 'var(--color-error)', fontWeight: '700' }
-            : { color: 'var(--text-tertiary)', opacity: 0.7 };
-        }
-      },
-      {
-        field: 'status',
-        headerName: 'Order Status',
-        width: 130,
-        cellRenderer: (params: any) => {
-          const status = params.value || 'draft';
-          const colors: any = {
-            received: { bg: '#ecfdf5', text: '#059669' },
-            draft: { bg: '#f3f4f6', text: '#4b5563' },
-            cancelled: { bg: '#fef2f2', text: '#dc2626' }
-          };
-          const c = colors[status] || colors.draft;
-          return `<span style="background:${c.bg}; color:${c.text}; padding:4px 10px; border-radius:12px; font-size:10px; font-weight:700; text-transform:uppercase;">${status}</span>`;
-        }
-      },
-      {
-        field: 'paymentStatus',
-        headerName: 'Payment Status',
-        width: 140,
-        cellRenderer: (params: any) => {
-          const status = params.value || 'unpaid';
-          const icons: any = { paid: 'pi-check-circle', unpaid: 'pi-times-circle', partial: 'pi-exclamation-circle' };
-          const colors: any = {
-            paid: { color: '#10b981' },
-            unpaid: { color: '#ef4444' },
-            partial: { color: '#f59e0b' }
-          };
-          const c = colors[status] || colors.unpaid;
-          return `
-            <div style="display:flex; align-items:center; gap:6px; color:${c.color}; font-weight:600; font-size:11px; text-transform:uppercase;">
-              <i class="pi ${icons[status] || 'pi-info-circle'}"></i> ${status}
-            </div>
-          `;
-        }
-      },
-      {
-        field: 'paymentMethod',
-        headerName: 'Method',
-        width: 110,
-        valueFormatter: (p: any) => p.value ? p.value.toUpperCase() : '-',
-        cellStyle: { color: 'var(--text-secondary)', fontSize: '11px' }
-      },
-      {
-        field: 'createdBy.name',
-        headerName: 'Created By',
-        width: 140,
-        cellRenderer: (params: any) => {
-          const name = params.data.createdBy?.name || 'System';
-          return `<span style="font-size:11px; color:var(--text-secondary);"><i class="pi pi-user" style="font-size:9px; margin-right:4px;"></i>${name}</span>`;
-        }
+      if (!this.isLoading() && this.data().length < this.totalCount) {
+        this.getData(false);
       }
-    ];
-    this.cdr.detectChanges();
-  }
-
-  private formatCurrency(value: number): string {
-    return value !== undefined && value !== null
-      ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 2 }).format(value)
-      : '₹ 0.00';
+    }
   }
 
   ngOnDestroy(): void {

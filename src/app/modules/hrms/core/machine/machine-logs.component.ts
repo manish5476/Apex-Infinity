@@ -1,162 +1,183 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnDestroy,
+  OnInit,
+  inject,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { GridApi } from 'ag-grid-community';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+
+import { ButtonModule } from 'primeng/button';
+import { TooltipModule } from 'primeng/tooltip';
+
+import { DataGridComponent, GridColumn } from '@shared/ui/grid';
+import { PageComponent } from '@shared/ui/layout/page/page.component';
+import { PageContentComponent } from '@shared/ui/layout/page-content/page-content.component';
+import { PageHeaderComponent } from '@shared/ui/layout/page-header/page-header.component';
+
 import { AppMessageService } from '../../../../core/services/message.service';
-import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
 import { HRMSService } from '../../hrms.service';
-import { Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-machine-logs',
   standalone: true,
-  imports: [CommonModule, AgShareGrid],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    CommonModule,
+    ButtonModule,
+    TooltipModule,
+    DataGridComponent,
+    PageComponent,
+    PageHeaderComponent,
+    PageContentComponent,
+  ],
   template: `
-    <div class="list-page-container fade-in">
-      <div class="themed-card list-content-area" style="padding: 0;">
-        
-        <div class="log-header" style="padding: var(--spacing-xl); border-bottom: 1px solid var(--border-primary); display: flex; justify-content: space-between; align-items: center; background: var(--component-surface-raised);">
-          <div style="display: flex; gap: 16px; align-items: center;">
-            <button class="icon-btn" (click)="goBack()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
-            <div>
-              <h2 style="margin: 0; font-size: 1.2rem; color: var(--text-primary);">Device Transaction Logs</h2>
-              <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
-                <span style="font-size: 0.75rem; color: var(--text-secondary); font-family: monospace;">ID: {{ machineId }}</span>
-                @if (machineStatus) {
-                  <span class="status-indicator" [class.online]="machineStatus.connectionStatus === 'online'">
-                    {{ machineStatus.connectionStatus | titlecase }}
-                  </span>
-                }
-              </div>
-            </div>
-          </div>
-          <button class="icon-btn" (click)="getData()" title="Refresh Logs">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-          </button>
+    <app-page>
+      <app-page-header
+        title="Device Transaction Logs"
+        [subtitle]="subtitle()">
+        <div header-left class="mr-3">
+          <p-button
+            icon="pi pi-arrow-left"
+            [text]="true"
+            severity="secondary"
+            pTooltip="Back to Machines"
+            (onClick)="goBack()">
+          </p-button>
         </div>
-
-        <div class="list-grid-wrapper" style="padding: var(--spacing-lg); height: calc(100% - 85px);">
-          <app-ag-share-grid 
-            [columns]="column" 
-            [data]="data" 
-            selectionMode="single">
-          </app-ag-share-grid>
+        <div header-right class="flex items-center gap-3">
+          @if (machineStatus()) {
+            <span class="status-indicator" [class.online]="machineStatus().connectionStatus === 'online'">
+              {{ machineStatus().connectionStatus | titlecase }}
+            </span>
+          }
+          <p-button
+            icon="pi pi-refresh"
+            [text]="true"
+            severity="secondary"
+            pTooltip="Refresh Logs"
+            [loading]="isLoading()"
+            (onClick)="getData()">
+          </p-button>
         </div>
+      </app-page-header>
 
-      </div>
-    </div>
+      <app-page-content [padded]="true">
+        <app-data-grid
+          [columns]="columns"
+          [data]="data()"
+          [loading]="isLoading()">
+        </app-data-grid>
+      </app-page-content>
+    </app-page>
   `,
   styles: [`
-    :host { display: block; min-height: 100vh; background-color: var(--bg-secondary); font-family: var(--font-body); }
-    .list-page-container { padding: var(--spacing-2xl) var(--spacing-3xl); max-width: 1400px; margin: 0 auto; height: calc(100vh - 80px); display: flex; flex-direction: column; }
-    .themed-card { background: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: var(--ui-border-radius-lg); box-shadow: var(--shadow-sm); display: flex; flex-direction: column; height: 100%; overflow: hidden; }
-    .icon-btn { background: var(--bg-primary); border: 1px solid var(--border-secondary); color: var(--text-secondary); width: 36px; height: 36px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
-    .icon-btn:hover { border-color: var(--color-primary); color: var(--color-primary); }
-    
-    .status-indicator { padding: 2px 8px; border-radius: 999px; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
-    .status-indicator.online { background: #ecfdf5; color: #15803d; border-color: #bbf7d0; }
-
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    .fade-in { animation: fadeIn 0.3s ease-out; }
+    :host { display: flex; flex-direction: column; flex: 1; min-height: 0; width: 100%; height: 100%; }
+    .status-indicator {
+      padding: 4px 12px;
+      border-radius: var(--ui-border-radius-pill);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-bold);
+      text-transform: uppercase;
+      background: var(--color-error-bg);
+      color: var(--color-error-text);
+      border: 1px solid var(--color-error-border);
+    }
+    .status-indicator.online {
+      background: var(--color-success-bg);
+      color: var(--color-success-text);
+      border-color: var(--color-success-border);
+    }
   `]
 })
 export class MachineLogsComponent implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
-  private cdr = inject(ChangeDetectorRef);
-  private hrmsService = inject(HRMSService);
-  private messageService = inject(AppMessageService);
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
+  private readonly destroy$ = new Subject<void>();
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly hrmsService = inject(HRMSService);
+  private readonly messageService = inject(AppMessageService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
-  machineId: string | null = null;
-  machineStatus: any = null;
-  data: any[] = [];
-  column: any[] = [];
+  private machineId: string | null = null;
+  
+  readonly machineStatus = signal<any>(null);
+  readonly subtitle = signal<string>('Loading...');
+  readonly data = signal<any[]>([]);
+  readonly isLoading = signal(false);
 
-  ngOnInit() {
-    this.setupColumns();
+  readonly columns: GridColumn[] = [
+    {
+      field: 'timestamp', header: 'Timestamp', width: '220px', sortable: true,
+      formatter: (v: any) => v ? new Date(v).toLocaleString() : '—',
+    },
+    {
+      field: 'user.name', header: 'User Details', width: '250px',
+      formatter: (_v: any, row: any) => {
+        const name = row?.user?.name || 'Unmapped User';
+        const empId = row?.user?.employeeProfile?.employeeId || '—';
+        return `${name} (EMP ID: ${empId})`;
+      },
+    },
+    {
+      field: 'biometricData.method', header: 'Verification Mode', width: '160px',
+      formatter: (v: any, row: any) => (v || row?.source || 'unknown').toUpperCase(),
+    },
+    {
+      field: 'type', header: 'Punch Type', width: '140px', type: 'badge',
+      formatter: (v: any) => (v || 'in').toUpperCase(),
+    },
+    {
+      field: 'processingStatus', header: 'Status', width: '120px', type: 'badge',
+      formatter: (v: any) => (v || 'unknown').toUpperCase(),
+    },
+  ];
+
+  ngOnInit(): void {
     this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       this.machineId = params.get('id');
       if (this.machineId) {
+        this.subtitle.set(`ID: ${this.machineId}`);
         this.getStatus();
         this.getData();
       }
     });
   }
 
-  getStatus() {
-    this.hrmsService.getMachineStatus(this.machineId!).pipe(takeUntil(this.destroy$)).subscribe(res => {
-      this.machineStatus = res.data?.machine || null;
+  getStatus(): void {
+    if (!this.machineId) return;
+    this.hrmsService.getMachineStatus(this.machineId).pipe(takeUntil(this.destroy$)).subscribe(res => {
+      this.machineStatus.set(res.data?.machine ?? null);
       this.cdr.markForCheck();
     });
   }
 
-  getData() {
-    this.hrmsService.getMachineLogs(this.machineId!).pipe(takeUntil(this.destroy$)).subscribe({
+  getData(): void {
+    if (!this.machineId) return;
+    this.isLoading.set(true);
+    this.hrmsService.getMachineLogs(this.machineId).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
-        this.data = res.data?.logs || res.data || [];
+        this.data.set(res.data?.logs ?? res.data ?? []);
+        this.isLoading.set(false);
         this.cdr.markForCheck();
       },
-      error: (err) => this.messageService.handleHttpError(err)
+      error: (err: any) => {
+        this.messageService.handleHttpError(err);
+        this.isLoading.set(false);
+      }
     });
   }
 
-  goBack() { this.router.navigate(['/hrms/attendance/machines']); }
-
-  setupColumns() {
-    this.column = [
-      {
-        headerName: 'Timestamp', field: 'timestamp', width: 220, sortable: true, sort: 'desc',
-        valueFormatter: (p: any) => p.value ? new Date(p.value).toLocaleString() : '-'
-      },
-      {
-        headerName: 'User Details', field: 'user.name', width: 220,
-        cellRenderer: (p: any) => {
-          const name = p.data?.user?.name || 'Unmapped User';
-          const hardwareId = p.data?.user?.employeeProfile?.employeeId || '-';
-          return `<div style="line-height:1.2; padding-top:6px;">
-                    <div style="font-weight:600; color:var(--text-primary);">${name}</div>
-                    <div style="font-size:11px; color:var(--text-tertiary); font-family:monospace;">EMP ID: ${hardwareId}</div>
-                  </div>`;
-        }
-      },
-      {
-        headerName: 'Verification Mode', field: 'biometricData.method', width: 160,
-        cellRenderer: (p: any) => {
-          const mode = (p.value || p.data?.source || 'unknown').toLowerCase();
-          let icon = '<circle cx="12" cy="12" r="10"></circle>';
-          if(mode.includes('face')) icon = '<circle cx="12" cy="12" r="10"></circle><line x1="8" y1="15" x2="16" y2="15"></line>';
-          if(mode.includes('finger')) icon = '<path d="M2 12C2 6.48 6.48 2 12 2s10 4.48 10 10-4.48 10-10 10S2 17.52 2 12z"></path>';
-          return `<div style="display:flex; align-items:center; gap:6px; color:var(--text-secondary); text-transform:capitalize;">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${icon}</svg>
-                    <span>${mode}</span>
-                  </div>`;
-        }
-      },
-      {
-        headerName: 'Punch Type', field: 'type', width: 140,
-        cellRenderer: (p: any) => {
-          const t = p.value || 'in';
-          const color = t.toLowerCase().includes('in') ? '#15803d' : '#b91c1c';
-          return `<span style="font-weight:600; font-size:12px; color:${color};">${t}</span>`;
-        }
-      },
-      {
-        headerName: 'Status', field: 'processingStatus', width: 120,
-        cellRenderer: (p: any) => {
-          const isSuccess = p.value !== 'rejected' && p.value !== 'flagged';
-          const bg = isSuccess ? '#ecfdf5' : '#fef2f2';
-          const color = isSuccess ? '#15803d' : '#b91c1c';
-          return `<span style="background:${bg}; color:${color}; padding:2px 8px; border-radius:4px; font-size:10px; font-weight:bold; text-transform:uppercase;">${p.value || 'unknown'}</span>`;
-        }
-      }
-    ];
+  goBack(): void {
+    this.router.navigate(['/hrms/attendance/machines']);
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

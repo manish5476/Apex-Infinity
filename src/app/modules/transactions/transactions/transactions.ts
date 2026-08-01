@@ -1,6 +1,5 @@
-import { ChangeDetectorRef, Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
@@ -17,6 +16,7 @@ import { PageContentComponent } from '@shared/ui/layout/page-content/page-conten
 @Component({
   selector: 'app-transactions',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     SelectModule,
@@ -28,24 +28,22 @@ import { PageContentComponent } from '@shared/ui/layout/page-content/page-conten
     DataGridComponent,
     PageComponent,
     PageHeaderComponent,
-    PageContentComponent
-],
+    PageContentComponent,
+  ],
   providers: [TransactionService],
   templateUrl: './transactions.html',
   styleUrl: './transactions.scss',
 })
 export class Transactions implements OnInit {
-  private cdr = inject(ChangeDetectorRef);
-  private transactionService = inject(TransactionService);
-  public common = inject(CommonMethodService);
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly transactionService = inject(TransactionService);
+  readonly common = inject(CommonMethodService);
 
-  // --- Grid & Data ---
-  private gridApi!: GridApi;
   private currentPage = 1;
   private totalCount = 0;
-  private pageSize = 50;
+  private readonly pageSize = 50;
 
-  data: any[] = [];
+  readonly data = signal<any[]>([]);
   column: GridColumn[] = [];
 
   // --- State ---
@@ -96,7 +94,7 @@ export class Transactions implements OnInit {
 
     if (isReset) {
       this.currentPage = 1;
-      this.data = [];
+      this.data.set([]);
       this.totalCount = 0;
     }
 
@@ -115,19 +113,17 @@ export class Transactions implements OnInit {
       if (end) queryParams.endDate = this.formatDateForApi(end);
     }
 
-    this.common.apiCall(
-      this.transactionService.getAllTransactions(queryParams),
-      (res: any) => {
+    this.transactionService.getAllTransactions(queryParams).subscribe({
+      next: (res: any) => {
         this.loading.set(false);
-        // API shape: { status, total, page, limit, results, data: { data: [...] } }
         const newData: any[] = res.data?.data ?? [];
         this.totalCount = res.total ?? this.totalCount;
-        this.data = [...this.data, ...newData];
+        this.data.update(prev => [...prev, ...newData]);
         if (newData.length > 0) this.currentPage++;
         this.cdr.markForCheck();
       },
-      'Fetch Transactions'
-    );
+      error: () => this.loading.set(false),
+    });
   }
 
   private formatDateForApi(date: Date): string {
@@ -143,14 +139,10 @@ export class Transactions implements OnInit {
   }
 
   // Grid Events
-  eventFromGrid(event: any) {
-    if (event.type === 'reachedBottom' && this.data.length < this.totalCount) {
+  eventFromGrid(event: any): void {
+    if (event.type === 'reachedBottom' && this.data().length < this.totalCount) {
       this.getData(false);
     }
-  }
-
-  onGridReady(params: GridReadyEvent) {
-    this.gridApi = params.api;
   }
   getColumn(): void {
     this.column = [

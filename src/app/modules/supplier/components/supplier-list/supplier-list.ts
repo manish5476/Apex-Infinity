@@ -1,363 +1,331 @@
-import { ChangeDetectorRef, Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
-
-import { GridApi } from 'ag-grid-community';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnDestroy,
+  OnInit,
+  inject,
+  signal,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
-import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
-import { AppMessageService } from '../../../../core/services/message.service';
-import { SupplierService } from '../../services/supplier-service';
-import { Toast } from "primeng/toast";
-import { AgShareGrid, ActionColumnConfig } from "../../../shared/components/ag-shared-grid";
-import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
-import { PERMISSIONS } from '@core/auth/permissions.constants';
-import { Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
+import { ToastModule } from 'primeng/toast';
 
+// Shared UI
+import { DataGridComponent, GridColumn, GridRowAction } from '@shared/ui/grid';
 import { PageComponent } from '@shared/ui/layout/page/page.component';
-import { PageHeaderComponent } from '@shared/ui/layout/page-header/page-header.component';
 import { PageContentComponent } from '@shared/ui/layout/page-content/page-content.component';
-import { PageActionsComponent } from '@shared/ui/layout/page-actions/page-actions.component';
-import { PageToolbarComponent } from '@shared/ui/layout/page-toolbar/page-toolbar.component';
-import { CardComponent } from '@shared/ui/data/card/card.component';
+import { PageHeaderComponent } from '@shared/ui/layout/page-header/page-header.component';
+
+// Core
+import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
+import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
+import { AppMessageService } from '../../../../core/services/message.service';
+import { CommonMethodService } from '../../../../core/utils/common-method.service';
+import { SupplierService } from '../../services/supplier-service';
 
 @Component({
   selector: 'app-supplier-list',
   standalone: true,
-  imports: [SelectModule, FormsModule, ButtonModule, InputTextModule, RouterModule, Toast, AgShareGrid, HasPermissionDirective, PageComponent, PageHeaderComponent, PageContentComponent, PageActionsComponent, PageToolbarComponent, CardComponent],
-  templateUrl: './supplier-list.html',
-  styleUrl: './supplier-list.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    FormsModule,
+    RouterModule,
+    ButtonModule,
+    InputTextModule,
+    ToastModule,
+    HasPermissionDirective,
+    DataGridComponent,
+    PageComponent,
+    PageHeaderComponent,
+    PageContentComponent,
+  ],
+  template: `
+    <p-toast position="bottom-right" appendTo="body"></p-toast>
+
+    <app-page>
+      <app-page-header
+        title="Suppliers"
+        subtitle="Manage supplier profiles, contacts, and financial terms">
+        <div header-right class="flex items-center gap-3">
+          <p-button
+            icon="pi pi-refresh"
+            [text]="true"
+            [rounded]="true"
+            severity="secondary"
+            [loading]="isLoading()"
+            (onClick)="getData(true)"
+            pTooltip="Refresh">
+          </p-button>
+          <p-button
+            *hasPermission="PERMISSIONS.SUPPLIER.CREATE"
+            label="New Supplier"
+            icon="pi pi-plus"
+            routerLink="create">
+          </p-button>
+        </div>
+      </app-page-header>
+
+      <app-page-content [padded]="true">
+        <!-- Filter Toolbar -->
+        <div class="filter-toolbar">
+          <div class="filter-toolbar__search">
+            <input
+              type="text"
+              pInputText
+              [(ngModel)]="supplierFilter.search"
+              placeholder="Search suppliers..."
+              (keydown.enter)="applyFilters()"
+              (blur)="applyFilters()"
+              class="w-full" />
+          </div>
+          <div class="filter-toolbar__filters">
+            <input
+              type="text"
+              pInputText
+              [(ngModel)]="supplierFilter.phone"
+              placeholder="Phone..."
+              (keydown.enter)="applyFilters()"
+              (blur)="applyFilters()" />
+            <p-button
+              icon="pi pi-times"
+              [text]="true"
+              severity="secondary"
+              pTooltip="Reset Filters"
+              (onClick)="resetFilters()">
+            </p-button>
+          </div>
+        </div>
+
+        <!-- DataGrid -->
+        <app-data-grid
+          [columns]="columns"
+          [data]="data()"
+          [loading]="isLoading()"
+          [rowActions]="rowActions"
+          (gridEvent)="eventFromGrid($event)">
+        </app-data-grid>
+      </app-page-content>
+    </app-page>
+  `,
+  styles: [`
+    :host {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .filter-toolbar {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      flex-wrap: wrap;
+      margin-bottom: var(--spacing-md);
+
+      &__search {
+        min-width: 240px;
+        max-width: 340px;
+        flex: 1;
+      }
+
+      &__filters {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+        flex-wrap: wrap;
+        flex: 1;
+      }
+    }
+  `]
 })
 export class SupplierListComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
   readonly PERMISSIONS = PERMISSIONS;
 
-  readonly supplierActionColumn: ActionColumnConfig = {
-    showView: true,
-    showEdit: false,
-    showDelete: false,
-    viewPermission: PERMISSIONS.SUPPLIER.READ,
-  };
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly supplierService = inject(SupplierService);
+  private readonly messageService = inject(AppMessageService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly common = inject(CommonMethodService);
 
-  // --- Injected Services ---
-  private cdr = inject(ChangeDetectorRef);
-  private supplierService = inject(SupplierService);
-  private messageService = inject(AppMessageService);
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
-
-  // --- Grid & Data ---
-  private gridApi!: GridApi;
   private currentPage = 1;
-  private isLoading = false;
+  private readonly pageSize = 50;
   private totalCount = 0;
-  private pageSize = 50;
-  data: any[] = [];
-  column: any = [];
-  rowSelectionMode: any = 'single';
 
-  // --- Filters ---
+  readonly isLoading = signal(false);
+  readonly data = signal<any[]>([]);
+
   supplierFilter = {
-    companyName: null,
-    phone: null,
-    search: null,
+    companyName: null as string | null,
+    phone: null as string | null,
+    search: null as string | null,
   };
 
-  constructor() { }
+  readonly columns: GridColumn[] = [
+    {
+      field: 'companyName',
+      header: 'Company',
+      minWidth: '220px',
+      sticky: 'left',
+      sortable: true,
+      type: 'user',
+      formatter: (val: any) => val || '—',
+    },
+    {
+      field: 'contacts',
+      header: 'Primary Contact',
+      minWidth: '180px',
+      formatter: (val: any) => {
+        const primary = val?.find((c: any) => c.isPrimary) || val?.[0];
+        return primary ? `${primary.name} — ${primary.email || ''}` : '—';
+      },
+    },
+    {
+      field: 'phone',
+      header: 'Phone',
+      width: '140px',
+      type: 'phone',
+      formatter: (val: any) => val || '—',
+    },
+    {
+      field: 'outstandingBalance',
+      header: 'Outstanding',
+      width: '140px',
+      type: 'currency',
+      align: 'right',
+      sortable: true,
+    },
+    {
+      field: 'paymentTerms',
+      header: 'Terms',
+      width: '100px',
+      formatter: (val: any) => val || 'Net 0',
+    },
+    {
+      field: 'gstNumber',
+      header: 'GST / PAN',
+      width: '160px',
+      formatter: (val: any, row: any) => {
+        const parts: string[] = [];
+        if (val) parts.push(`GST: ${val}`);
+        if (row?.panNumber) parts.push(`PAN: ${row.panNumber}`);
+        return parts.join(' | ') || '—';
+      },
+    },
+    {
+      field: 'address',
+      header: 'Location',
+      width: '160px',
+      formatter: (val: any) => {
+        if (!val) return '—';
+        const { city, state } = val;
+        return city ? `${city}, ${state || ''}` : '—';
+      },
+    },
+    {
+      field: 'bankDetails',
+      header: 'Bank',
+      width: '150px',
+      formatter: (val: any) =>
+        val ? `${val.bankName} | ${val.ifscCode || ''}` : '—',
+    },
+    {
+      field: 'isActive',
+      header: 'Status',
+      width: '100px',
+      type: 'badge',
+      formatter: (val: any) => (val ? 'Active' : 'Inactive'),
+    },
+    {
+      field: 'updatedAt',
+      header: 'Updated',
+      width: '110px',
+      formatter: (val: any) => val ? this.common.formatDate(val) : '—',
+    },
+  ];
+
+  readonly rowActions: GridRowAction[] = [
+    {
+      id: 'view',
+      icon: 'pi pi-eye',
+      tooltip: 'View Supplier',
+      variant: 'primary',
+      callback: (row) => {
+        this.router.navigate([row._id], { relativeTo: this.route });
+      },
+    },
+  ];
 
   ngOnInit(): void {
-    this.getColumn();
     this.getData(true);
   }
 
-  applyFilters() {
+  applyFilters(): void {
     this.getData(true);
   }
 
-  resetFilters() {
-    this.supplierFilter = {
-      companyName: null,
-      phone: null,
-      search: null,
-    };
+  resetFilters(): void {
+    this.supplierFilter = { companyName: null, phone: null, search: null };
     this.getData(true);
   }
 
-  getData(isReset: boolean = false) {
-    if (this.isLoading) return;
-    this.isLoading = true;
+  getData(isReset = false): void {
+    if (this.isLoading()) return;
+    this.isLoading.set(true);
 
     if (isReset) {
       this.currentPage = 1;
-      this.data = [];
+      this.data.set([]);
       this.totalCount = 0;
-      // Clear grid to avoid stale data
-      if (this.gridApi) {
-        this.gridApi.setGridOption('rowData', []);
-      }
     }
 
-    const filterParams = {
+    this.supplierService.getAllSuppliers({
       ...this.supplierFilter,
       page: this.currentPage,
       limit: this.pageSize,
-    };
-
-    this.supplierService.getAllSuppliers(filterParams).pipe(takeUntil(this.destroy$)).subscribe({
+    }).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
-        let newData: any[] = [];
-
-        // 1. EXTRACT DATA (Nested: res.data.data)
-        if (res.data && Array.isArray(res.data.data)) {
-          newData = res.data.data;
-        }
-
-        // 2. EXTRACT PAGINATION (Sibling: res.pagination)
+        const newData: any[] = res.data?.data ?? [];
         if (res.pagination) {
           this.totalCount = res.pagination.totalResults;
+        }
+        if (isReset) {
+          this.data.set(newData);
         } else {
-          this.totalCount = 0;
+          this.data.update(prev => [...prev, ...newData]);
         }
-
-        // 3. UPDATE LOCAL STATE
-        this.data = [...this.data, ...newData];
-
-        // 4. UPDATE GRID
-        if (this.gridApi) {
-          if (isReset) {
-            this.gridApi.setGridOption('rowData', newData);
-          } else {
-            this.gridApi.applyTransaction({ add: newData });
-          }
-        }
-
-        this.currentPage++;
-        this.isLoading = false;
+        if (newData.length > 0) this.currentPage++;
+        this.isLoading.set(false);
         this.cdr.markForCheck();
       },
       error: (err: any) => {
-        this.isLoading = false;
-
-        // I kept your console.error for debugging!
-        console.error('Failed to fetch suppliers', err);
-
-        // Handed off the error formatting to the global HTTP error handler
+        this.isLoading.set(false);
         this.messageService.handleHttpError(err);
-
-        // Added markForCheck so your UI loading spinner correctly disappears on failure
         this.cdr.markForCheck();
-      }
+      },
     });
   }
-  onScrolledToBottom(_?: any) {
-    if (!this.isLoading && this.data.length < this.totalCount) {
-      this.getData(false);
-    }
-  }
 
-  eventFromGrid(event: any) {
-    if (event.type === 'init') {
-      this.gridApi = event.api;
-      return;
-    }
+  eventFromGrid(event: any): void {
     if (event.type === 'cellClicked') {
-      const supplierId = event.row._id;
-      if (supplierId) {
-        this.router.navigate([supplierId], { relativeTo: this.route });
-      }
+      const id = event.row?._id;
+      if (id) this.router.navigate([id], { relativeTo: this.route });
     }
     if (event.type === 'reachedBottom') {
-      this.onScrolledToBottom()
-    }
-  }
-
-
-  getColumn(): void {
-    const compactCell = {
-      fontSize: 'var(--font-size-sm)',
-      padding: '0 var(--spacing-md)',
-      display: 'flex',
-      alignItems: 'center'
-    };
-
-    this.column = [
-      // ========================
-      // 1. COMPANY IDENTITY
-      // ========================
-      {
-        headerName: 'Company',
-        field: 'companyName',
-        flex: 2,
-        minWidth: 220,
-        pinned: 'left',
-        cellRenderer: (p: any) => {
-          const category = p.data.categoryId?.name || p.data.category || 'General';
-          const avatar = p.data.avatar ? `<img src="${p.data.avatar}" style="width:20px; height:20px; border-radius:50%; margin-right:8px;">` : '';
-
-          return `
-          <div style="display: flex; align-items: center; line-height: var(--line-height-tight); padding: var(--spacing-xs) 0;">
-            ${avatar}
-            <div>
-              <div style="color: var(--accent-primary); font-weight: var(--font-weight-semibold); font-size: var(--font-size-md);">
-                ${p.value}
-              </div>
-              <div style="color: var(--text-tertiary); font-size: var(--font-size-xs);">
-                ${category} • ${p.data.phone || 'No Phone'}
-              </div>
-            </div>
-          </div>
-        `;
-        }
-      },
-
-      // ========================
-      // 2. PRIMARY CONTACT (Array Extraction)
-      // ========================
-      {
-        headerName: 'Primary Contact',
-        field: 'contacts',
-        flex: 1.5,
-        cellRenderer: (p: any) => {
-          // Find the primary contact object from the array
-          const primary = p.value?.find((c: any) => c.isPrimary) || (p.value ? p.value[0] : null);
-          if (!primary) return '<span style="color:var(--text-tertiary)">—</span>';
-
-          return `
-          <div style="line-height: var(--line-height-tight)">
-            <div style="font-size: var(--font-size-sm); color: var(--text-primary); font-weight: var(--font-weight-medium);">
-              ${primary.name}
-            </div>
-            <div style="font-size: var(--font-size-xs); color: var(--accent-secondary);">
-              ${primary.email}
-            </div>
-          </div>
-        `;
-        }
-      },
-
-      // ========================
-      // 3. FINANCIALS (Outstanding & Terms)
-      // ========================
-      {
-        headerName: 'Outstanding',
-        field: 'outstandingBalance',
-        width: 140,
-        sortable: true,
-        filter: 'agNumberColumnFilter',
-        headerClass: 'ag-right-aligned-header',
-        cellStyle: (p: any) => ({
-          ...compactCell,
-          justifyContent: 'flex-end',
-          fontWeight: 'var(--font-weight-bold)',
-          color: p.value > 0 ? 'var(--color-error)' : 'var(--color-success)'
-        }),
-        valueFormatter: (p: any) => p.value ? `₹${p.value.toLocaleString('en-IN')}` : '₹0'
-      },
-      {
-        headerName: 'Terms',
-        field: 'paymentTerms',
-        width: 100,
-        cellRenderer: (p: any) => `
-        <span style="
-          background: var(--color-info-bg);
-          color: var(--color-info-dark);
-          border: 1px solid var(--color-info-border);
-          padding: 1px 6px;
-          border-radius: var(--ui-border-radius-sm);
-          font-size: var(--font-size-xs);
-        ">
-          ${p.value || 'Net 0'}
-        </span>
-      `
-      },
-
-      // ========================
-      // 4. TAX & COMPLIANCE
-      // ========================
-      {
-        headerName: 'Tax Details',
-        width: 160,
-        cellRenderer: (p: any) => {
-          const gst = p.data.gstNumber || 'N/A';
-          const pan = p.data.panNumber || 'N/A';
-          return `
-          <div style="font-family: var(--font-mono); font-size: var(--font-size-xs); line-height: 1.1">
-            <div style="color: var(--text-secondary)">GST: <span style="color:var(--text-primary)">${gst}</span></div>
-            <div style="color: var(--text-tertiary)">PAN: ${pan}</div>
-          </div>
-        `;
-        }
-      },
-
-      // ========================
-      // 5. LOCATION (Nested Object)
-      // ========================
-      {
-        headerName: 'Location',
-        field: 'address',
-        flex: 1.2,
-        valueGetter: (p: any) => {
-          if (!p.data.address) return '—';
-          const { city, state } = p.data.address;
-          return city ? `${city}, ${state || ''}` : '—';
-        },
-        cellStyle: { ...compactCell, color: 'var(--text-tertiary)' }
-      },
-
-      // ========================
-      // 6. BANK INFO
-      // ========================
-      {
-        headerName: 'Bank',
-        field: 'bankDetails',
-        width: 150,
-        cellRenderer: (p: any) => {
-          if (!p.value) return '—';
-          return `
-          <div style="line-height: 1.1; font-size: var(--font-size-xs);">
-            <div style="color:var(--text-secondary); overflow:hidden; text-overflow:ellipsis;">${p.value.bankName}</div>
-            <div style="color:var(--text-tertiary); font-family:var(--font-mono)">${p.value.ifscCode}</div>
-          </div>
-        `;
-        }
-      },
-
-      // ========================
-      // 7. STATUS & CREATION
-      // ========================
-      {
-        headerName: 'Status',
-        field: 'isActive',
-        width: 100,
-        cellRenderer: (p: any) => {
-          const active = p.value;
-          return `
-          <span style="
-            background: ${active ? 'var(--color-success-bg)' : 'var(--color-error-bg)'};
-            color: ${active ? 'var(--color-success-dark)' : 'var(--color-error-dark)'};
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: var(--font-size-xs);
-            font-weight: var(--font-weight-semibold);
-          ">
-            ${active ? 'ACTIVE' : 'INACTIVE'}
-          </span>
-        `;
-        }
-      },
-      {
-        headerName: 'Updated',
-        field: 'updatedAt',
-        width: 110,
-        valueFormatter: (p: any) => p.value ? new Date(p.value).toLocaleDateString() : '—',
-        cellStyle: { ...compactCell, color: 'var(--text-label)' }
+      if (!this.isLoading() && this.data().length < this.totalCount) {
+        this.getData(false);
       }
-    ];
-
-    this.cdr.detectChanges();
+    }
   }
 
   ngOnDestroy(): void {

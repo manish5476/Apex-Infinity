@@ -2,28 +2,37 @@
 <p-confirmDialog appendTo="body" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}"></p-confirmDialog>
 
 <app-page>
-  <app-page-header title="Session Management" subtitle="Monitor and control active sessions across all devices.">
-    <!-- Header Left Content: View Toggles -->
+  <app-page-header>
+    <!-- Header Left Content: Titles and View Toggles -->
     <ng-container header-left>
-      <div class="flex items-center bg-[var(--bg-tertiary)] p-1 rounded-md border border-[var(--border-secondary)]">
-        <button type="button" 
-                class="px-3 py-1.5 text-sm font-medium rounded transition-colors"
-                [class.bg-white]="viewMode() === 'all'"
-                [class.shadow-sm]="viewMode() === 'all'"
-                [class.text-gray-900]="viewMode() === 'all'"
-                [class.text-gray-500]="viewMode() !== 'all'"
-                (click)="toggleViewMode('all')">
-          All Sessions
-        </button>
-        <button type="button" 
-                class="px-3 py-1.5 text-sm font-medium rounded transition-colors"
-                [class.bg-white]="viewMode() === 'mine'"
-                [class.shadow-sm]="viewMode() === 'mine'"
-                [class.text-gray-900]="viewMode() === 'mine'"
-                [class.text-gray-500]="viewMode() !== 'mine'"
-                (click)="toggleViewMode('mine')">
-          My Sessions
-        </button>
+      <div class="flex flex-row items-center gap-6">
+        <div>
+          <h2 class="text-2xl font-bold text-[var(--text-primary)] m-0">Session Management</h2>
+          <p class="text-sm text-[var(--text-secondary)] m-0 mt-1">Monitor and control active sessions across all devices.</p>
+        </div>
+
+        <div class="flex items-center bg-[var(--bg-secondary)] p-1 rounded-lg border border-[var(--border-primary)] shadow-sm">
+          <button type="button" 
+                  class="px-4 py-1.5 text-sm font-bold rounded-md transition-all duration-200"
+                  [class.bg-[var(--bg-primary)]]="viewMode() === 'all'"
+                  [class.shadow]="viewMode() === 'all'"
+                  [class.text-[var(--text-primary)]]="viewMode() === 'all'"
+                  [class.text-[var(--text-secondary)]]="viewMode() !== 'all'"
+                  [class.hover:text-[var(--text-primary)]]="viewMode() !== 'all'"
+                  (click)="toggleViewMode('all')">
+            All Sessions
+          </button>
+          <button type="button" 
+                  class="px-4 py-1.5 text-sm font-bold rounded-md transition-all duration-200"
+                  [class.bg-[var(--bg-primary)]]="viewMode() === 'mine'"
+                  [class.shadow]="viewMode() === 'mine'"
+                  [class.text-[var(--text-primary)]]="viewMode() === 'mine'"
+                  [class.text-[var(--text-secondary)]]="viewMode() !== 'mine'"
+                  [class.hover:text-[var(--text-primary)]]="viewMode() !== 'mine'"
+                  (click)="toggleViewMode('mine')">
+            My Sessions
+          </button>
+        </div>
       </div>
     </ng-container>
 

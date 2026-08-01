@@ -1,10 +1,16 @@
 <p-toast></p-toast>
 
 <app-page>
-  <app-page-header title="Branch Management" subtitle="View and manage all branch locations.">
+  <app-page-header>
     <ng-container header-left>
-      <div class="flex items-center justify-center p-2 rounded-md bg-[var(--color-primary-bg)] text-[var(--accent-primary)]">
-        <i class="pi pi-building text-xl"></i>
+      <div class="flex flex-row items-center gap-4">
+        <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-[color-mix(in_srgb,var(--accent-primary)_12%,transparent)] text-[var(--accent-primary)] border border-[var(--border-primary)] shadow-sm">
+          <i class="pi pi-building text-xl"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-[var(--text-primary)] m-0">Branch Management</h2>
+          <p class="text-sm text-[var(--text-secondary)] m-0 mt-1">View and manage all branch locations.</p>
+        </div>
       </div>
     </ng-container>
 

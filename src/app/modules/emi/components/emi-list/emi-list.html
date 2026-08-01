@@ -15,7 +15,28 @@
       </div>
     </ng-container>
 
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2">
+        <app-master-dropdown 
+          endpoint="customers" 
+          [(ngModel)]="emiFilter.customerId" 
+          (ngModelChange)="applyFilters()" 
+          placeholder="All customers"
+          class="w-[200px]">
+        </app-master-dropdown>
+
+        <p-select appendTo="body" (onChange)="applyFilters()" [options]="statusOptions" [(ngModel)]="emiFilter.status"
+          optionLabel="label" optionValue="value" [showClear]="true" placeholder="All statuses"
+          styleClass="w-[200px]" [filter]="true" filterBy="label">
+        </p-select>
+
+        <p-button icon="pi pi-filter-slash" styleClass="p-button-text p-button-rounded p-button-secondary h-10 w-10" 
+          (onClick)="resetFilters()" pTooltip="Clear Filters">
+        </p-button>
+      </div>
+
+      <div class="w-px h-8 bg-[var(--border-primary)] mx-1"></div>
+
       <p-button *hasPermission="PERMISSIONS.EMI.CREATE" label="New EMI Plan" icon="pi pi-plus" routerLink="create"
         styleClass="p-button-primary">
       </p-button>
@@ -85,39 +106,19 @@
         </div>
       }
 
-      <!-- ─────────── FILTER BAR ─────────── -->
-      <div class="flex flex-row flex-wrap items-end gap-4 bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl p-4 shadow-sm w-full">
-
-        <div class="flex flex-col gap-1 flex-1 min-w-[200px]">
-          <label class="text-xs font-semibold text-[var(--text-label)] uppercase tracking-wider">Customer</label>
-          <app-master-dropdown 
-            endpoint="customers" 
-            [(ngModel)]="emiFilter.customerId" 
-            (ngModelChange)="applyFilters()" 
-            placeholder="All customers">
-          </app-master-dropdown>
-        </div>
-
-        <div class="flex flex-col gap-1 flex-1 min-w-[200px]">
-          <label class="text-xs font-semibold text-[var(--text-label)] uppercase tracking-wider">Status</label>
-          <p-select appendTo="body" (onChange)="applyFilters()" [options]="statusOptions" [(ngModel)]="emiFilter.status"
-            optionLabel="label" optionValue="value" [showClear]="true" placeholder="All statuses"
-            styleClass="w-full" [filter]="true" filterBy="label">
-          </p-select>
-        </div>
-
-        <div class="flex gap-3 ml-auto">
-          <p-button icon="pi pi-filter-slash" styleClass="p-button-text p-button-rounded p-button-secondary" 
-            (onClick)="resetFilters()" pTooltip="Clear Filters">
-          </p-button>
-        </div>
-
-      </div>
 
       <!-- ─────────── GRID ─────────── -->
       <div class="flex-1 min-h-0 manish-border-1 border-secondary border-round overflow-hidden">
-        <app-data-grid [columns]="column" [data]="data" [actionColumn]="emiActionColumn" selectionMode="multiple"
-          (gridEvent)="eventFromGrid($event)" class="full-size-grid" style="height: 100%; width: 100%; display: block;">
+        <app-data-grid 
+          [columns]="column" 
+          [data]="data" 
+          [rowActions]="rowActions"
+          [loading]="isLoading"
+          [lazy]="true"
+          [totalRecords]="totalCount"
+          (pageChange)="onPageChange($event)"
+          (rowDoubleClick)="onRowDoubleClick($event)"
+          class="full-size-grid" style="height: 100%; width: 100%; display: block;">
         </app-data-grid>
       </div>
 
