@@ -1,143 +1,80 @@
-<aside class="sidebar-shell">
-  <div class="sidebar-panel">
+<!-- ═══════════════════════════════════════════════════════════════════════
+     APEX Sidebar — Orchestrator Template
+     Visual markup lives in sub-components and SCSS.
+     This template only wires inputs/outputs.
+     ═══════════════════════════════════════════════════════════════════════ -->
 
-    <div class="sidebar-head">
-      <div class="brand-mark">
-        <div class="brand-icon">
-          <svg viewBox="0 0 32 32" fill="none">
-            <path d="M4 28L16 4L28 28" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-              stroke-linejoin="round" />
-            <path d="M8.5 20L23.5 20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
-          </svg>
-        </div>
-        <span class="brand-name">Apex</span>
-      </div>
+<aside class="sidebar-panel" role="navigation" aria-label="Main navigation">
 
-      <div class="head-actions">
-        @if (!layout.isMobile()) {
-        <button class="head-btn" (click)="openSearch()" title="Search (Ctrl+K)" pTooltip="Search"
-          tooltipPosition="right">
-          <i class="pi pi-search"></i>
-        </button>
-        <button class="head-btn" [class.is-active]="layout.isPinned()" (click)="togglePin()" title="Pin Sidebar"
-          pTooltip="Pin sidebar" tooltipPosition="right">
-          <i class="pi pi-thumbtack"></i>
-        </button>
-        }
-        @if (layout.isMobile()) {
-        <button class="head-btn" (click)="layout.closeMobile()">
-          <i class="pi pi-times"></i>
-        </button>
-        }
-      </div>
-    </div>
+  <!-- ── Header ─────────────────────────────────────────────────────────── -->
+  <app-sidebar-header [isMini]="layout.isMiniMode()" [isPinned]="layout.isPinned()" [isMobile]="layout.isMobile()"
+    (searchOpen)="openSearch()" (togglePin)="layout.togglePin()" (toggleMini)="layout.toggleMiniMode()"
+    (closeMobile)="layout.closeMobile()" />
 
-    <nav class="nav-scroll" role="navigation" aria-label="Main navigation">
-      @for (item of menuItems(); track item.label) {
-      <div class="nav-group">
+  <!-- ── Navigation scroll area ─────────────────────────────────────────── -->
+  <nav class="nav-scroll" aria-label="Site navigation">
+    @for (group of menuBuilder.navigationGroups(); track group.groupLabel) {
+    <app-sidebar-nav-section [group]="group" [isMini]="layout.isMiniMode()" [expandedKeys]="expandedKeys()"
+      [activeParentLabels]="activeParentLabels()" (toggle)="handleToggle($event)" />
+    }
+  </nav>
 
-        <div class="nav-item lv1" [class.is-parent-active]="hasActiveChild(item)" (click)="handleItemClick(item)"
-          [attr.aria-expanded]="item.items ? expandedState()[item.label] : null">
-          <span class="nav-icon"><i [class]="item.icon"></i></span>
-          <span class="nav-label">{{ item.label }}</span>
-          @if (item.items) {
-          <i class="nav-arrow pi pi-chevron-down" [class.is-open]="expandedState()[item.label]"></i>
-          }
-        </div>
+  <!-- ── User profile footer ────────────────────────────────────────────── -->
+  <app-sidebar-profile [user]="authService.currentUser()" [isMini]="layout.isMiniMode()" (signOut)="logout()" />
 
-        @if (item.items) {
-        <div class="nav-accordion" [class.is-expanded]="expandedState()[item.label]">
-          <div class="nav-accordion-inner">
-            @for (sub of item.items; track sub.label) {
-            <div class="nav-sub-group">
-
-              <div class="nav-item lv2" [class.is-active]="isActiveLink(sub)"
-                (click)="handleItemClick(sub); $event.stopPropagation()">
-                <span class="nav-label">{{ sub.label }}</span>
-                @if (sub.items) {
-                <i class="nav-arrow pi pi-chevron-down sm" [class.is-open]="expandedState()[sub.label]"></i>
-                }
-              </div>
-
-              @if (sub.items) {
-              <div class="nav-accordion" [class.is-expanded]="expandedState()[sub.label]">
-                <div class="nav-accordion-inner lv3-wrap">
-                  @for (deep of sub.items; track deep.label) {
-                  <div class="nav-item lv3" [class.is-active]="isActiveLink(deep)"
-                    (click)="handleItemClick(deep); $event.stopPropagation()">
-                    <span class="nav-label">{{ deep.label }}</span>
-                  </div>
-                  }
-                </div>
-              </div>
-              }
-
-            </div>
-            }
-          </div>
-        </div>
-        }
-
-      </div>
-      }
-    </nav>
-
-    <footer class="sidebar-foot">
-      <button class="signout-btn" (click)="logout()" pTooltip="Sign out" tooltipPosition="top">
-        <i class="pi pi-power-off"></i>
-        <span>Sign Out</span>
-      </button>
-    </footer>
-
-  </div>
 </aside>
 
-<p-dialog [modal]="true" [(visible)]="isSearchVisible" [modal]="true" [closable]="false" [dismissableMask]="true"
-  [showHeader]="false" [appendTo]="'body'" (onHide)="closeSearch()" appendTo="body" [blockScroll]="true"
-  [breakpoints]="{'1199px': '75vw', '575px': '90vw'}">
-
+<!-- ══════════════════════════════════════════════════════════════════════════
+     Spotlight Search Dialog (appended to body — escapes stacking context)
+     ══════════════════════════════════════════════════════════════════════════ -->
+<p-dialog [(visible)]="isSearchVisible" [modal]="true" [closable]="false" [dismissableMask]="true" [showHeader]="false"
+  appendTo="body" [style]="{ padding: 0, overflow: 'hidden' }" [contentStyle]="{ padding: 0 }"
+  [breakpoints]="{ '1199px': '65vw', '767px': '90vw' }" (onHide)="closeSearch()" [blockScroll]="true">
   <div class="spotlight-box">
 
+    <!-- Search input row -->
     <div class="spotlight-input-row">
-      <i class="pi pi-search spotlight-search-icon"></i>
+      <i class="pi pi-search spotlight-search-icon" aria-hidden="true"></i>
       <input #searchInput type="text" class="spotlight-input" placeholder="Search navigation…" [value]="searchQuery"
-        (input)="onSearchInput($event)" autocomplete="off" spellcheck="false" />
+        (input)="onSearchInput($event)" autocomplete="off" spellcheck="false" role="combobox"
+        aria-label="Search navigation" aria-autocomplete="list" aria-expanded="true" aria-haspopup="listbox"
+        [attr.aria-activedescendant]="filteredResults.length ? 'sr-' + focusedIndex : null" />
       <kbd class="esc-key">ESC</kbd>
     </div>
 
-    <div class="spotlight-results" role="listbox">
+    <!-- Results list -->
+    <div class="spotlight-results" role="listbox" aria-label="Navigation search results">
       @if (filteredResults.length > 0) {
-      @for (result of filteredResults; track $index; let i = $index) {
-      <div class="spotlight-result" role="option" [id]="'result-' + i" [class.is-focused]="i === focusedIndex"
-        (click)="navigateToResult(result)" (mouseenter)="focusedIndex = i">
-        <span class="result-icon">
+      @for (result of filteredResults; track result.label; let i = $index) {
+      <div class="spotlight-result" role="option" [id]="'sr-' + i" [class.is-focused]="i === focusedIndex"
+        [attr.aria-selected]="i === focusedIndex" (click)="navigateToResult(result)" (mouseenter)="focusedIndex = i"
+        tabindex="-1">
+        <span class="result-icon" aria-hidden="true">
           <i [class]="result.icon"></i>
         </span>
-
         <span class="result-body">
           <span class="result-label">{{ result.label }}</span>
           @if (result.breadcrumb) {
           <span class="result-crumb">{{ result.breadcrumb }}</span>
           }
         </span>
-
-        <i class="pi pi-arrow-return-left result-enter"></i>
+        <i class="pi pi-arrow-return-left result-enter" aria-hidden="true"></i>
       </div>
       }
       } @else {
-      <div class="spotlight-empty">
-        <i class="pi pi-inbox"></i>
+      <div class="spotlight-empty" role="status" aria-live="polite">
+        <i class="pi pi-inbox" aria-hidden="true"></i>
         <span>No results for "{{ searchQuery }}"</span>
       </div>
       }
     </div>
 
-    <div class="spotlight-hints">
-      <span class="hint"><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
-      <span class="hint"><kbd>↵</kbd> select</span>
-      <span class="hint"><kbd>ESC</kbd> close</span>
+    <!-- Keyboard hints -->
+    <div class="spotlight-hints" aria-hidden="true">
+      <span class="hint"><kbd>↑</kbd><kbd>↓</kbd> Navigate</span>
+      <span class="hint"><kbd>↵</kbd> Select</span>
+      <span class="hint"><kbd>ESC</kbd> Close</span>
     </div>
 
   </div>
-
 </p-dialog>

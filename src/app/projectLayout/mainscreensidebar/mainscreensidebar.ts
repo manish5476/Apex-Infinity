@@ -1,246 +1,212 @@
-import { Component, inject, HostBinding, OnInit, HostListener, ViewChild, ElementRef, effect, signal, computed, untracked, DestroyRef } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  HostBinding,
+  HostListener,
+  ViewChild,
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+} from '@angular/core';
+import { Router, NavigationEnd } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { filter, map } from 'rxjs/operators';
+import { DialogModule } from 'primeng/dialog';
 
-import { RouterModule, Router, NavigationEnd } from '@angular/router';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { LayoutService } from '../layout.service';
-import { AuthService } from './../../modules/auth/services/auth-service';
-import { PermissionService } from '@core/auth/services/permission.service';
-import { SIDEBAR_MENU, MenuItem } from './menu-items.constants';
-import { filter } from 'rxjs/operators';
-import { DialogModule } from 'primeng/dialog'; // ✅ FIX 1: Import DialogModule instead of Dialog
+import { AuthService } from '../../modules/auth/services/auth-service';
+import { MenuBuilderService, NavSearchResult } from './menu-builder.service';
+import { NavItem } from './navigation-model';
 
-interface FlatMenuItem {
-  label: string;
-  routerLink: string[];
-  icon: string;
-  breadcrumb: string;
-}
+import { SidebarHeaderComponent } from './components/sidebar-header/sidebar-header.component';
+import { SidebarNavSectionComponent } from './components/sidebar-nav-section/sidebar-nav-section.component';
+import { SidebarProfileComponent } from './components/sidebar-profile/sidebar-profile.component';
 
 @Component({
   selector: 'app-mainscreen-sidebar',
   standalone: true,
-  imports: [RouterModule, DialogModule], // ✅ FIX 1 Applied
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    DialogModule,
+    SidebarHeaderComponent,
+    SidebarNavSectionComponent,
+    SidebarProfileComponent,
+  ],
   templateUrl: './mainscreensidebar.html',
-  styleUrl: './mainscreensidebar.scss'
+  styleUrl: './mainscreensidebar.scss',
 })
-export class Mainscreensidebar implements OnInit {
-  layout = inject(LayoutService);
-  authService = inject(AuthService);
-  permService = inject(PermissionService);
-  router = inject(Router);
-  destroyRef = inject(DestroyRef); // ✅ FIX 3: Inject DestroyRef for memory management
+export class Mainscreensidebar {
+  // ── Services ──────────────────────────────────────────────────────────────
+  protected readonly layout = inject(LayoutService);
+  protected readonly authService = inject(AuthService);
+  protected readonly menuBuilder = inject(MenuBuilderService);
+  private readonly router = inject(Router);
 
-  menuItems = computed(() => {
-    this.permService.permissions(); // Just accessing the signal registers the dependency
-    const filterRecursive = (items: MenuItem[]): MenuItem[] => {
-      return items.filter(item => {
-        // Drop node if user fails the permission check
-        if (item.permissions && !this.permService.check(item.permissions)) {
-          return false;
-        }
+  // ── Host class bindings (drives SCSS modifiers) ───────────────────────────
+  @HostBinding('class.is-pinned') get _pinned() { return this.layout.isPinned(); }
+  @HostBinding('class.is-mini') get _mini() { return this.layout.isMiniMode(); }
+  @HostBinding('class.is-mobile') get _mobile() { return this.layout.isMobile(); }
+  @HostBinding('class.is-mobile-open') get _mobileOpen() { return this.layout.isMobileMenuOpen(); }
 
-        // If it's a parent with children, filter its children
-        if (item.items) {
-          item.items = filterRecursive(item.items);
-          // If all children were pruned and it's strictly a category node without a route, drop the parent
-          if (item.items.length === 0 && !item.routerLink) {
-            return false;
+  // ── Current URL as signal (reactive to NavigationEnd events) ─────────────
+  private readonly currentUrl = toSignal(
+    this.router.events.pipe(
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+      map(e => e.urlAfterRedirects),
+    ),
+    { initialValue: this.router.url },
+  );
+
+  // ── Accordion state ────────────────────────────────────────────────────────
+  readonly expandedKeys = signal<Set<string>>(new Set<string>());
+
+  // ── Memoized: labels of all parents with an active descendant ────────────
+  //
+  // Uses currentUrl() to register a reactive dependency on route changes.
+  // router.isActive() is a synchronous check against the router's current
+  // state — it's safe to call inside computed() because currentUrl() already
+  // guarantees a recompute AFTER NavigationEnd (when router state is updated).
+  readonly activeParentLabels = computed((): Set<string> => {
+    void this.currentUrl(); // reactive dependency on route change
+
+    const active = new Set<string>();
+    const traverse = (items: readonly NavItem[], ancestors: string[]): void => {
+      for (const item of items) {
+        if (item.routerLink) {
+          const urlTree = this.router.createUrlTree(item.routerLink as string[]);
+          if (this.router.isActive(urlTree, {
+            paths: 'subset',
+            queryParams: 'ignored',
+            fragment: 'ignored',
+            matrixParams: 'ignored',
+          })) {
+            ancestors.forEach(label => active.add(label));
           }
         }
-        return true;
-      });
+        if (item.items?.length) {
+          traverse(item.items, [...ancestors, item.label]);
+        }
+      }
     };
 
-    // Deep clone raw constants so filtering doesn't mutate original objects
-    const clonedMenu = JSON.parse(JSON.stringify(SIDEBAR_MENU));
-    return filterRecursive(clonedMenu);
+    this.menuBuilder.navigationGroups().forEach(group => traverse(group.items, []));
+    return active;
   });
-
-  expandedState = signal<Record<string, boolean>>({});
 
   constructor() {
-    // Re-evaluate expanded state when menu items change
+    // Auto-expand accordion parents when navigating to a deep route.
+    // untracked() prevents expandedKeys writes from triggering this effect again.
     effect(() => {
-      const items = this.menuItems(); // register dependency
-      untracked(() => this.checkActiveRoutes(items));
-    }); // ✅ FIX 2: Explicitly allow signal writes inside this effect
-  }
-
-  // --- SEARCH STATE ---
-  isSearchVisible = false;
-  searchQuery = '';
-
-  searchIndex = computed(() => {
-    const index: FlatMenuItem[] = [];
-    const flatten = (items: MenuItem[], parentLabel = ''): void => {
-      for (const item of items) {
-        const currentBreadcrumb = parentLabel ? `${parentLabel} > ${item.label}` : item.label;
-        if (item.routerLink) {
-          index.push({
-            label: item.label,
-            routerLink: item.routerLink,
-            icon: item.icon,
-            breadcrumb: parentLabel
-          });
-        }
-        if (item.items) {
-          flatten(item.items, currentBreadcrumb);
-        }
-      }
-    };
-    flatten(this.menuItems());
-    return index;
-  });
-  filteredResults: FlatMenuItem[] = [];
-  focusedIndex = 0;
-
-  @ViewChild('searchInput') searchInput!: ElementRef;
-
-  // --- HOST BINDINGS ---
-  @HostBinding('class.mobile-host')
-  get isMobile() { return this.layout.isMobile(); }
-
-  @HostBinding('class.mobile-open')
-  get isMobileOpen() { return this.layout.isMobileMenuOpen(); }
-
-  @HostBinding('class.pinned')
-  get isPinned() { return this.layout.isPinned(); }
-
-  @HostBinding('class.search-mode')
-  get isSearchActive() { return this.isSearchVisible; }
-
-  // --- KEYBOARD LISTENERS ---
-  @HostListener('window:keydown', ['$event'])
-  handleKeyboardEvent(event: KeyboardEvent) {
-    if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
-      event.preventDefault();
-      this.openSearch();
-    }
-
-    if (this.isSearchVisible) {
-      if (event.key === 'Escape') {
-        this.closeSearch();
-      } else if (event.key === 'ArrowDown') {
-        event.preventDefault();
-        this.focusedIndex = (this.focusedIndex + 1) % (this.filteredResults.length || 1);
-        this.scrollToFocused();
-      } else if (event.key === 'ArrowUp') {
-        event.preventDefault();
-        this.focusedIndex = (this.focusedIndex - 1 + this.filteredResults.length) % (this.filteredResults.length || 1);
-        this.scrollToFocused();
-      } else if (event.key === 'Enter') {
-        event.preventDefault();
-        if (this.filteredResults.length > 0) {
-          this.navigateToResult(this.filteredResults[this.focusedIndex]);
-        }
-      }
-    }
-  }
-
-  ngOnInit() {
-    this.router.events.pipe(
-      filter(e => e instanceof NavigationEnd),
-      takeUntilDestroyed(this.destroyRef) // ✅ FIX 3: Automatically unsubscribe when component is destroyed
-    ).subscribe(() => {
-      this.checkActiveRoutes();
+      const parents = this.activeParentLabels();
+      untracked(() => {
+        this.expandedKeys.update(keys => {
+          const next = new Set(keys);
+          parents.forEach(label => next.add(label));
+          return next;
+        });
+      });
     });
   }
 
-  // --- SEARCH LOGIC ---
-
-  openSearch() {
-    this.isSearchVisible = true;
-    this.searchQuery = '';
-    this.filteredResults = this.searchIndex();
-    this.focusedIndex = 0;
-    setTimeout(() => this.searchInput?.nativeElement?.focus(), 50);
+  // ── Accordion handler ─────────────────────────────────────────────────────
+  handleToggle(label: string): void {
+    this.expandedKeys.update(keys => {
+      const next = new Set(keys);
+      next.has(label) ? next.delete(label) : next.add(label);
+      return next;
+    });
   }
 
-  closeSearch() {
-    this.isSearchVisible = false;
-  }
+  // ── Spotlight search ──────────────────────────────────────────────────────
+  isSearchVisible = false;
+  searchQuery = '';
+  filteredResults: NavSearchResult[] = [];
+  focusedIndex = 0;
 
-  onSearchInput(event: any) {
-    const query = event.target.value.toLowerCase();
-    this.searchQuery = query;
-    this.focusedIndex = 0;
+  @ViewChild('searchInput') searchInputRef!: ElementRef<HTMLInputElement>;
 
-    if (!query) {
-      this.filteredResults = this.searchIndex();
+  @HostListener('window:keydown', ['$event'])
+  handleGlobalKeydown(event: KeyboardEvent): void {
+    if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
+      event.preventDefault();
+      this.openSearch();
       return;
     }
+    if (!this.isSearchVisible) return;
 
-    this.filteredResults = this.searchIndex().filter(item =>
-      item.label.toLowerCase().includes(query) ||
-      (item.breadcrumb && item.breadcrumb.toLowerCase().includes(query))
-    );
+    switch (event.key) {
+      case 'Escape':
+        this.closeSearch();
+        break;
+      case 'ArrowDown':
+        event.preventDefault();
+        if (this.filteredResults.length) {
+          this.focusedIndex = (this.focusedIndex + 1) % this.filteredResults.length;
+          this.scrollFocusedIntoView();
+        }
+        break;
+      case 'ArrowUp':
+        event.preventDefault();
+        if (this.filteredResults.length) {
+          this.focusedIndex =
+            (this.focusedIndex - 1 + this.filteredResults.length) % this.filteredResults.length;
+          this.scrollFocusedIntoView();
+        }
+        break;
+      case 'Enter':
+        event.preventDefault();
+        if (this.filteredResults.length) {
+          this.navigateToResult(this.filteredResults[this.focusedIndex]);
+        }
+        break;
+    }
   }
 
-  navigateToResult(item: FlatMenuItem) {
-    if (!item) return;
-    this.router.navigate(item.routerLink);
+  openSearch(): void {
+    this.isSearchVisible = true;
+    this.searchQuery = '';
+    this.filteredResults = [...this.menuBuilder.searchIndex()];
+    this.focusedIndex = 0;
+    setTimeout(() => this.searchInputRef?.nativeElement.focus(), 60);
+  }
+
+  closeSearch(): void {
+    this.isSearchVisible = false;
+    this.searchQuery = '';
+  }
+
+  onSearchInput(event: Event): void {
+    const query = (event.target as HTMLInputElement).value.toLowerCase().trim();
+    this.searchQuery = query;
+    this.focusedIndex = 0;
+    const all = this.menuBuilder.searchIndex();
+    this.filteredResults = query
+      ? all.filter(
+        r => r.label.toLowerCase().includes(query) ||
+          r.breadcrumb.toLowerCase().includes(query),
+      )
+      : [...all];
+  }
+
+  navigateToResult(result: NavSearchResult): void {
+    if (!result) return;
+    this.router.navigate(result.routerLink as string[]);
     this.closeSearch();
     if (this.layout.isMobile()) this.layout.closeMobile();
   }
 
-  scrollToFocused() {
-    const element = document.getElementById(`result-${this.focusedIndex}`);
-    element?.scrollIntoView({ block: 'nearest' });
-  }
-
-  // --- MENU ACTIONS ---
-
-  togglePin() {
-    this.layout.togglePin();
-  }
-
-  handleItemClick(item: MenuItem) {
-    if (item.items) {
-      this.expandedState.update((prev: Record<string, boolean>) => ({
-        ...prev,
-        [item.label]: !prev[item.label]
-      }));
-    } else {
-      if (item.routerLink) this.router.navigate(item.routerLink);
-      if (this.layout.isMobile()) this.layout.closeMobile();
-    }
-  }
-
-  hasActiveChild(item: MenuItem, depth = 0): boolean {
-    if (depth > 5) return false;
-
-    if (item.routerLink && this.router.isActive(this.router.createUrlTree(item.routerLink), {
-      paths: 'subset', queryParams: 'ignored', fragment: 'ignored', matrixParams: 'ignored'
-    })) return true;
-
-    return !!item.items?.some(child => this.hasActiveChild(child, depth + 1));
-  }
-
-  isActiveLink(item: MenuItem): boolean {
-    if (!item.routerLink) return false;
-    return this.router.isActive(this.router.createUrlTree(item.routerLink), {
-      paths: 'exact', queryParams: 'ignored', fragment: 'ignored', matrixParams: 'ignored'
-    });
-  }
-
-  private checkActiveRoutes(items?: MenuItem[]) {
-    const newState: Record<string, boolean> = { ...this.expandedState() };
-    const menu = items || this.menuItems();
-
-    const expandRecursive = (menuGrp: MenuItem[]) => {
-      for (const item of menuGrp) {
-        if (item.items && this.hasActiveChild(item)) {
-          newState[item.label] = true;
-          expandRecursive(item.items);
-        }
-      }
-    };
-
-    expandRecursive(menu);
-    this.expandedState.set(newState);
-  }
-
-  logout() {
+  // ── Auth ──────────────────────────────────────────────────────────────────
+  logout(): void {
     this.authService.logout();
+  }
+
+  // ── Private ───────────────────────────────────────────────────────────────
+  private scrollFocusedIntoView(): void {
+    document
+      .getElementById(`sr-${this.focusedIndex}`)
+      ?.scrollIntoView({ block: 'nearest' });
   }
 }

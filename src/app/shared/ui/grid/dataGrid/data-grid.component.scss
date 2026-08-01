@@ -99,7 +99,7 @@
     width: 16px;
     height: 16px;
     border: 1px solid var(--border-secondary);
-    border-radius: 4px;
+    border-radius: var(--ui-border-radius-sm);
     background-color: var(--bg-primary);
     cursor: pointer;
     position: relative;
@@ -152,6 +152,6 @@
 
     &::-webkit-scrollbar-thumb {
         background: var(--scroll-thumb);
-        border-radius: 4px;
+        border-radius: var(--ui-border-radius-sm);
     }
 }

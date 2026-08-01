@@ -4,9 +4,7 @@
    ========================================================================== */
 
 // ── Structural constants ─────────────────────────────────────────────────────
-$sidebar-width: 260px;
 $header-height: 64px; // Slightly taller for modern breathing room
-$sidebar-peek: 6px;
 
 // ── 1. Host ──────────────────────────────────────────────────────────────────
 :host {
@@ -16,11 +14,10 @@ $sidebar-peek: 6px;
 
 // ── 2. Root shell ────────────────────────────────────────────────────────────
 .layout-root {
-  height: 100vh;
+  min-height: 100vh;
   width: 100vw;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
   position: relative;
   /* Shell background: creates contrast against the main canvas */
   background: var(--bg-secondary);
@@ -30,7 +27,8 @@ $sidebar-peek: 6px;
 app-mainscreen-header {
   height: $header-height;
   flex-shrink: 0;
-  position: relative;
+  position: sticky;
+  top: 0;
   z-index: var(--z-fixed);
 
   /* Visual distinction */
@@ -41,20 +39,15 @@ app-mainscreen-header {
 // ── 4. Body row (sidebar + content column) ───────────────────────────────────
 .layout-body {
   flex: 1;
-  min-height: 0;
   display: flex;
   flex-direction: row;
   position: relative;
-  overflow: hidden;
 }
 
 // ── 5. Sidebar ───────────────────────────────────────────────────────────────
 app-mainscreen-sidebar {
   flex-shrink: 0;
   z-index: var(--z-sticky);
-  background: var(--bg-secondary);
-  /* Subtle separator from the canvas */
-  border-right: var(--ui-border-width) solid var(--border-tertiary, var(--border-primary));
 }
 
 // ── 6. Content Column (Tab shell + Main scroll) ──────────────────────────────
@@ -63,7 +56,6 @@ app-mainscreen-sidebar {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  height: 100%;
   transition: margin-left var(--transition-slow);
 
   /* THE CANVAS: 
@@ -76,10 +68,6 @@ app-mainscreen-sidebar {
   // sitting on top of the background (popular in modern SaaS apps).
   border-top-left-radius: var(--ui-border-radius-lg);
   box-shadow: -4px 4px 12px rgba(0, 0, 0, 0.02); // Extremely subtle depth inset
-
-  .is-pinned:not(.is-mobile) & {
-    margin-left: $sidebar-width;
-  }
 }
 
 // ── 7. Tab Strip Fixed Shell ─────────────────────────────────────────────────
@@ -97,8 +85,6 @@ app-mainscreen-sidebar {
 // ── 8. Main Scrollable Content ───────────────────────────────────────────────
 .main-content {
   flex: 1;
-  min-height: 0;
-  overflow: hidden;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -156,21 +142,16 @@ app-mainscreen-sidebar {
 // ── 11. Tab Content Area & Empty State ───────────────────────────────────────
 .tab-outlet-wrapper {
   flex: 1;
-  min-height: 0;
   display: flex;
   flex-direction: column;
   position: relative;
   width: 100%;
-  overflow: hidden !important;
-  scrollbar-gutter: stable;
 
   ::ng-deep router-outlet+* {
     display: flex;
     flex-direction: column;
     width: 100%;
-    height: 100% !important;
-    min-height: 0 !important;
-    overflow: hidden !important;
+    flex: 1;
     animation: tabFadeIn 0.3s cubic-bezier(0.2, 0.9, 0.2, 1); // Smoother, non-linear fade
   }
 }

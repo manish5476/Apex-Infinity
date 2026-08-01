@@ -10,7 +10,7 @@ export type GridColumnType =
   // Selections
   | 'select' | 'selectbutton' | 'autocomplete' | 'tags'
   // Visuals
-  | 'badge' | 'status' | 'user' | 'avatar' | 'initials' | 'color'
+  | 'badge' | 'status' | 'user' | 'avatar' | 'initials' | 'color' | 'image'
   // Interactive
   | 'rating' | 'slider' | 'knob'
   // Links & Actions
@@ -41,6 +41,7 @@ export interface GridColumn {
   maxWidth?: string;
   align?: 'left' | 'center' | 'right';
   sticky?: 'left' | 'right' | false;
+  pinned?: 'left' | 'right' | boolean | null;
   stickyOffset?: string;
 
   // Visibility & Search

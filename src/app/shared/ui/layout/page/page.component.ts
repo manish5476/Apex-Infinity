@@ -10,10 +10,10 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    class: 'flex flex-col w-full h-full min-h-0 overflow-hidden bg-[var(--bg-secondary)] text-[var(--text-primary)]'
+    class: 'flex flex-col flex-1 min-h-[100%] bg-[var(--bg-secondary)] text-[var(--text-primary)]'
   },
   template: `
-    <div class="flex-1 flex flex-col w-full h-full min-h-0 overflow-hidden">
+    <div class="flex-1 flex flex-col w-full min-h-[100%]">
       <ng-content></ng-content>
     </div>
   `

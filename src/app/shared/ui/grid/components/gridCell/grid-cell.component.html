@@ -164,6 +164,16 @@
     }
     }
 
+    @case ('image') {
+    @if (rowData()[column().field]) {
+    <div class="flex items-center h-full w-full py-1">
+        <img [src]="rowData()[column().field]" class="h-8 w-8 object-cover rounded-[var(--ui-border-radius-sm)] border border-[var(--border-secondary)]" alt="thumbnail" />
+    </div>
+    } @else {
+    <span class="text-[var(--text-tertiary)]">—</span>
+    }
+    }
+
     @default {
     <span class="truncate block w-full text-[length:var(--font-size-xs)] text-[var(--text-primary)]"
         [pTooltip]="rowData()[column().field]" tooltipPosition="top" [tooltipDisabled]="!rowData()[column().field]">

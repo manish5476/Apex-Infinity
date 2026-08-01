@@ -9,87 +9,158 @@ import {
   selector: 'app-page-header',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
+
   host: {
     '[class]': 'hostClasses()'
   },
+
   template: `
-    <header
-      class="transition-all duration-200 w-full"
-      [class.rounded-2xl]="variant() === 'solid'"
-      [class.bg-[var(--bg-primary)]]="variant() === 'solid'"
-      [class.bg-transparent]="variant() === 'transparent'"
-      [class.border]="border() && variant() === 'solid'"
-      [class.border-[var(--border-secondary)]]="border() && variant() === 'solid'"
-      [class.shadow-[var(--shadow-sm)]]="shadow() === 'sm' && variant() === 'solid'"
-      [class.shadow-[var(--shadow-md)]]="shadow() === 'md' && variant() === 'solid'"
-      [class.shadow-lg]="shadow() === 'lg' && variant() === 'solid'">
+<header
+  class="w-full transition-all duration-200"
 
-      <!-- Main Header -->
-      <div
-        class="flex flex-row items-center justify-between gap-[var(--spacing-md)]"
-        [class.px-[var(--spacing-xl)]]="density() === 'compact'"
-        [class.py-[var(--spacing-md)]]="density() === 'compact'"
-        [class.px-[var(--spacing-3xl)]]="density() === 'normal'"
-        [class.py-[var(--spacing-2xl)]]="density() === 'normal'"
-        [class.px-[var(--spacing-4xl)]]="density() === 'comfortable'"
-        [class.py-[var(--spacing-3xl)]]="density() === 'comfortable'">
+  [class.rounded-2xl]="variant() === 'solid'"
+  [class.bg-[var(--bg-primary)]]="variant() === 'solid'"
+  [class.bg-transparent]="variant() === 'transparent'"
 
-        <!-- LEFT: Custom Projection or Standard Title -->
-        <div class="min-w-0 flex-1 flex flex-col justify-center">
-          <ng-content select="[header-left]"></ng-content>
+  [class.border]="border() && variant() === 'solid'"
+  [class.border-[var(--border-secondary)]]="border() && variant() === 'solid'"
 
-          @if (title()) {
-            <h1 class="text-[var(--text-primary)] font-[var(--font-weight-bold)] tracking-tight leading-tight m-0"
-                [class.text-lg]="density() === 'compact'"
-                [class.text-xl]="density() === 'normal'"
-                [class.text-2xl]="density() === 'comfortable'">
-              {{ title() }}
-            </h1>
-          }
+  [class.shadow-[var(--shadow-sm)]]="shadow() === 'sm' && variant() === 'solid'"
+  [class.shadow-[var(--shadow-md)]]="shadow() === 'md' && variant() === 'solid'"
+  [class.shadow-lg]="shadow() === 'lg' && variant() === 'solid'">
 
-          @if (subtitle()) {
-            <p class="mt-1 text-[length:var(--font-size-sm)] text-[var(--text-secondary)] m-0">
-              {{ subtitle() }}
-            </p>
-          }
-        </div>
+  <div
 
-        <!-- RIGHT: Actions & Buttons -->
-        <div class="flex flex-wrap items-center justify-end gap-[var(--spacing-md)]">
-          <ng-content></ng-content>
-          <ng-content select="[header-right]"></ng-content>
-        </div>
-      </div>
+    class="flex flex-wrap items-center justify-between gap-5"
+    [class.px-5]="density() === 'compact'"
+    [class.py-3]="density() === 'compact'"
+    [class.px-7]="density() === 'normal'"
+    [class.py-5]="density() === 'normal'"
+    [class.px-10]="density() === 'comfortable'"
+    [class.py-6]="density() === 'comfortable'">
 
-      <!-- Toolbar (Secondary Row) -->
-      @if (showToolbar()) {
-        <div class="border-t border-[var(--border-secondary)]">
-          <div class="px-[var(--spacing-3xl)] py-[var(--spacing-md)]">
-            <ng-content select="[toolbar]"></ng-content>
-          </div>
-        </div>
+    <!-- LEFT -->
+
+    <div class="flex-1 min-w-0 flex flex-col justify-center">
+
+      <ng-content select="[header-left]"></ng-content>
+
+      @if(title()){
+
+      <h1
+
+        class="m-0
+               font-bold
+               tracking-tight
+               text-[var(--text-primary)]
+               leading-tight"
+
+        [class.text-xl]="density() === 'compact'"
+        [class.text-2xl]="density() === 'normal'"
+        [class.text-3xl]="density() === 'comfortable'">
+
+        {{title()}}
+
+      </h1>
+
       }
-    </header>
-  `
+
+      @if(subtitle()){
+
+      <p
+
+        class="m-0
+               mt-1
+               text-[13px]
+               leading-5
+               text-[var(--text-secondary)]">
+
+        {{subtitle()}}
+
+      </p>
+
+      }
+
+    </div>
+
+    <!-- RIGHT -->
+
+    <div
+      class="flex
+             items-center
+             justify-end
+             gap-3
+             flex-wrap">
+
+      <ng-content></ng-content>
+
+      <ng-content select="[header-right]"></ng-content>
+
+    </div>
+
+  </div>
+
+  <!-- Toolbar -->
+
+  @if(showToolbar()){
+
+  <div class="border-t border-[var(--border-secondary)]">
+
+    <div class="px-5 py-3">
+
+      <ng-content select="[toolbar]"></ng-content>
+
+    </div>
+
+  </div>
+
+  }
+
+</header>
+`
 })
 export class PageHeaderComponent {
+
   title = input<string>();
+
   subtitle = input<string>();
 
-  density = input<'compact' | 'normal' | 'comfortable'>('normal');
+  // Compact is now default
+  density = input<'compact' | 'normal' | 'comfortable'>('compact');
+
   variant = input<'solid' | 'transparent'>('solid');
-  sticky = input<boolean>(true);
+
+  sticky = input<boolean>(false);
+
   border = input<boolean>(true);
-  shadow = input<'none' | 'sm' | 'md' | 'lg'>('sm');
+
+  shadow = input<'none' | 'sm' | 'md' | 'lg'>('none');
+
   showToolbar = input<boolean>(false);
 
   protected hostClasses = computed(() => {
-    return [
-      'block',
-      'w-full',
-      'mx-6 mt-6 mb-4',
-      this.sticky() ? 'sticky top-0 z-[var(--z-sticky)]' : ''
-    ].filter(Boolean).join(' ');
-  });
-}
 
+    return [
+
+      'block',
+
+      'w-full',
+
+      // Much smaller default spacing
+      'mx-6',
+
+      'mt-3',
+
+      'mb-4',
+
+      this.sticky()
+        ? 'sticky top-[64px] z-[var(--z-sticky)] backdrop-blur-md'
+        : ''
+
+    ]
+      .filter(Boolean)
+      .join(' ');
+
+  });
+
+}
