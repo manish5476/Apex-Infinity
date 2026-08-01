@@ -3644,14 +3644,3 @@
   }
 
 }
-
-//     /* ==========================================================================
-//  HOT-RELOAD FIX: IMPORT MISSING COMPONENT STYLES
-//  These files are missing from angular.json's styles array. Importing them
-//  here ensures they hot-reload immediately without restarting ng serve.
-//  ========================================================================== */
-//     @import './custom-components.scss';
-//     @import './common-layout.scss';
-//     @import './layout-cards.scss';
-//     @import './data-grid.scss';
-//     @import './primeng-overrides.scss';

@@ -29,48 +29,8 @@
 
     <!-- ───────────── DATA VIEWPORT ───────────── -->
     <div class="flex-1 relative overflow-hidden bg-[var(--bg-primary)]">
-
-        <!-- CSS Grid Header -->
-        <!-- <div class="apex-dg-header sticky top-0 z-30 border-b border-[var(--border-secondary)] bg-[var(--bg-secondary)]"
-            role="row" [style.grid-template-columns]="gridTemplateColumns()">
-            @if (rowSelection()) {
-            <div class="apex-dg-hcell flex items-center justify-center sticky left-0 bg-[var(--bg-secondary)] z-40"
-                role="columnheader">
-                <input type="checkbox" class="apex-checkbox" [checked]="allSelected()" [indeterminate]="indeterminate()"
-                    (change)="onSelectAll($any($event.target).checked)">
-            </div>
-            }
-
-            <div class="apex-dg-hcell text-center text-[var(--text-tertiary)] font-semibold text-[11px]"
-                role="columnheader">Sr.</div>
-
-            @for (col of visibleColumnList(); track col.field) {
-            <div class="apex-dg-hcell flex items-center gap-2 text-[var(--text-secondary)] font-semibold text-xs cursor-pointer select-none relative group/header"
-                role="columnheader" [attr.aria-sort]="'none'" [class.sticky-left]="col.sticky === 'left'"
-                [class.sticky-right]="col.sticky === 'right'">
-
-                <div class="flex items-center gap-2 flex-1 truncate"
-                    (click)="col.sortable !== false && onSort(col.field)">
-                    <span class="truncate">{{ col.header }}</span>
-                    @if (col.sortable !== false) {
-                    <i class="pi text-[10px] opacity-40 transition-[var(--transition-fast)]"
-                        [class.pi-sort-alt]="true"></i>
-                    }
-                </div>
-
-                @if (col.resizable !== false) {
-                <div class="absolute right-0 top-1/4 bottom-1/4 w-1 cursor-col-resize hover:bg-[var(--accent-primary)] group-hover/header:bg-[var(--border-secondary)] transition-colors z-50"
-                    (mousedown)="onResizeStart($event, col.field)"></div>
-                }
-            </div>
-            }
-            <div class="apex-dg-hcell sticky right-0 bg-[var(--bg-secondary)] z-40" role="columnheader"></div>
-        </div> -->
-        <!-- CSS Grid Header -->
         <div class="apex-dg-header sticky top-0 z-30 border-b border-[var(--border-secondary)] bg-[var(--bg-secondary)]"
             role="row" [style.grid-template-columns]="gridTemplateColumns()">
-
-            <!-- Conditional Checkbox Header -->
             @if (rowSelection() && !viewOnly()) {
             <div class="apex-dg-hcell flex items-center justify-center sticky left-0 bg-[var(--bg-secondary)] z-40"
                 role="columnheader">
@@ -78,15 +38,12 @@
                     (change)="onSelectAll($any($event.target).checked)">
             </div>
             }
-
             <div class="apex-dg-hcell text-center text-[var(--text-tertiary)] font-semibold text-[11px]"
                 role="columnheader">Sr.</div>
-
             @for (col of visibleColumnList(); track col.field) {
             <div class="apex-dg-hcell flex items-center gap-2 text-[var(--text-secondary)] font-semibold text-xs cursor-pointer select-none relative group/header"
                 role="columnheader" [attr.aria-sort]="'none'" [class.sticky-left]="col.sticky === 'left'"
                 [class.sticky-right]="col.sticky === 'right'">
-
                 <div class="flex items-center gap-2 flex-1 truncate"
                     (click)="col.sortable !== false && onSort(col.field)">
                     <span class="truncate">{{ col.header }}</span>
