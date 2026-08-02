@@ -53,28 +53,50 @@
     .p-cascadeselect,
     .p-treeselect,
     .p-datepicker input {
-        min-height: 2.5rem;
+        min-height: 2.75rem;
+        background-color: var(--bg-secondary);
+        color: var(--text-primary);
         line-height: var(--line-height-relaxed);
         border-radius: var(--ui-border-radius);
-        border: 1px solid var(--border-primary);
-        transition: border-color var(--transition-base), box-shadow var(--transition-base);
+        border: 1px solid var(--border-secondary);
+        transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        padding: 0.5rem 0.875rem;
+    }
+
+    .p-inputtext:enabled:hover,
+    .p-select:not(.p-disabled):hover,
+    .p-multiselect:not(.p-disabled):hover,
+    .p-password input:enabled:hover,
+    .p-inputnumber input:enabled:hover {
+        border-color: var(--border-primary);
+        background-color: var(--bg-primary);
     }
 
     .p-textarea {
-        min-height: 5rem;
+        min-height: 6rem;
+        background-color: var(--bg-secondary);
         resize: vertical;
         border-radius: var(--ui-border-radius);
-        border: 1px solid var(--border-primary);
+        border: 1px solid var(--border-secondary);
+        transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        padding: 0.75rem 0.875rem;
+    }
+
+    .p-textarea:enabled:hover {
+        border-color: var(--border-primary);
+        background-color: var(--bg-primary);
     }
 
     /* Focus States */
     .p-inputtext:enabled:focus,
+    .p-textarea:enabled:focus,
     .p-select:not(.p-disabled):not(.p-invalid).p-focus,
     .p-multiselect:not(.p-disabled):not(.p-invalid).p-focus,
     .p-password input:enabled:focus,
     .p-inputnumber input:enabled:focus {
+        background-color: var(--bg-primary);
         border-color: var(--accent-primary);
-        box-shadow: 0 0 0 4px var(--accent-focus);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary) 15%, transparent);
         outline: none;
     }
 

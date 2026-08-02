@@ -33,7 +33,7 @@ a {
 }
 
 /* ==========================================================================
-   EDITOR WIDTH (PrimeNG Overrides)
+   EDITOR WIDTH AND HEIGHT (PrimeNG Overrides)
    ========================================================================== */
 
 :host ::ng-deep .p-inputtext,
@@ -47,8 +47,26 @@ a {
 :host ::ng-deep .p-slider,
 :host ::ng-deep .p-colorpicker,
 :host ::ng-deep .p-toggleswitch,
-:host ::ng-deep .p-togglebutton {
+:host ::ng-deep .p-togglebutton,
+:host ::ng-deep p-inputnumber,
+:host ::ng-deep p-datepicker,
+:host ::ng-deep p-autocomplete,
+:host ::ng-deep p-select,
+:host ::ng-deep p-inputmask {
     width: 100%;
+}
+
+:host ::ng-deep p-inputnumber,
+:host ::ng-deep p-datepicker,
+:host ::ng-deep p-autocomplete,
+:host ::ng-deep p-select,
+:host ::ng-deep p-inputmask,
+:host ::ng-deep .p-inputnumber,
+:host ::ng-deep .p-datepicker,
+:host ::ng-deep .p-autocomplete {
+    height: 100%;
+    display: flex;
+    align-items: center;
 }
 
 /* ==========================================================================
@@ -61,8 +79,8 @@ a {
 :host ::ng-deep .p-inputmask,
 :host ::ng-deep textarea {
     width: 100%;
-    /* Use 100% height to fill the virtual scroll row perfectly, less 2px for focus rings */
-    height: calc(100% - 2px);
+    /* Use 100% height to fill the virtual scroll row perfectly, less 4px for focus rings */
+    height: calc(100% - 4px);
     min-height: 28px;
 
     border: 1px solid transparent;
@@ -308,7 +326,7 @@ app-avatar {
 :host ::ng-deep .p-inputmask,
 :host ::ng-deep textarea {
     width: 100%;
-    /* Leave a 2px gap so focus rings don't get clipped by the cell overflow */
+    /* Leave a 4px gap so focus rings don't get clipped by the cell overflow */
     height: calc(100% - 4px);
     min-height: 28px;
 
@@ -326,10 +344,6 @@ app-avatar {
     transition: all .18s ease;
     box-shadow: none;
     outline: none;
-
-    /* Ensure text vertically centers in standard inputs */
-    display: flex;
-    align-items: center;
 }
 
 textarea.apex-grid-input,

@@ -14,7 +14,6 @@
   display: block;
   width: var(--sidebar-expanded-width);
   background: var(--bg-primary);
-  border-right: 1px solid var(--border-tertiary, var(--border-primary));
   transition: width 180ms cubic-bezier(0.20, 0.90, 0.20, 1),
               transform 180ms cubic-bezier(0.20, 0.90, 0.20, 1);
 
@@ -22,11 +21,15 @@
   // Sidebar is positioned fixed (hovering over content) and mostly hidden
   // with a 6px peek on the left.
   position: fixed;
-  top: 64px; // var(--header-height)
-  bottom: 0;
+  top: calc(64px + 12px); 
+  height: calc(100vh - 64px - 24px); 
   left: 0;
   z-index: var(--z-fixed, 100);
   transform: translateX(calc(-100% + 6px));
+  border-top-right-radius: var(--ui-border-radius-xl, 20px);
+  border-bottom-right-radius: var(--ui-border-radius-xl, 20px);
+  border: 1px solid var(--border-tertiary, var(--border-primary));
+  border-left: none;
 
   // Hovering over the peek reveals it completely over the canvas
   &:hover {
@@ -38,10 +41,13 @@
   // Becomes sticky, enters document flow, pushes content.
   &.is-pinned {
     position: sticky;
-    top: 64px;
-    height: calc(100vh - 64px);
+    top: calc(64px + 12px);
+    height: calc(100vh - 64px - 24px);
+    margin-left: 12px;
+    border-radius: var(--ui-border-radius-lg, 16px);
+    border: 1px solid var(--border-tertiary, var(--border-primary));
     transform: translateX(0);
-    box-shadow: none;
+    box-shadow: var(--shadow-sm);
   }
 
   // ── MINI MODE ──────────────────────────────────────────────────────────────

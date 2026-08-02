@@ -106,4 +106,30 @@
     .has-fixed-footer {
         padding-bottom: 150px;
     }
+
+    /* === Form Field Groups === */
+    .field-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+
+        label {
+            font-size: var(--font-size-xs);
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+
+            .req {
+                color: var(--color-error);
+                font-size: 1rem;
+                line-height: 1;
+            }
+        }
+    }
 }

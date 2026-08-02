@@ -42,57 +42,60 @@
     }
 
     <!-- ───────────── DATA VIEWPORT ───────────── -->
-    <div class="flex-1 relative overflow-hidden bg-[var(--bg-primary)]">
-        <div class="apex-dg-header sticky top-0 z-30 border-b border-[var(--border-secondary)] bg-[var(--bg-secondary)]"
-            role="row" [style.grid-template-columns]="gridTemplateColumns()">
-            @if (rowSelection() && !viewOnly()) {
-            <div class="apex-dg-hcell flex items-center justify-center sticky left-0 bg-[var(--bg-secondary)] z-40"
-                role="columnheader">
-                <input type="checkbox" class="apex-checkbox" [checked]="allSelected()" [indeterminate]="indeterminate()"
-                    (change)="onSelectAll($any($event.target).checked)">
-            </div>
-            }
-            <div class="apex-dg-hcell text-center text-[var(--text-tertiary)] font-semibold text-[11px]"
-                role="columnheader">Sr.</div>
-            @for (col of visibleColumnList(); track col.field) {
-            @let meta = columnHeaderMeta().get(col.field);
-            <div class="apex-dg-hcell flex items-center gap-2 text-[var(--text-secondary)] font-semibold text-xs cursor-pointer select-none relative group/header"
-                role="columnheader"
-                [attr.aria-sort]="meta?.isSorted ? (meta?.sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'"
-                [class.apex-dg-hcell--sorted]="highlightSortedColumns() && (meta?.isSorted ?? false)"
-                [class.apex-dg-hcell--filtered]="highlightFilteredColumns() && (meta?.isFiltered ?? false)"
-                [class.apex-dg-hcell--pinned]="meta?.isPinned ?? false"
-                [class.sticky-left]="col.sticky === 'left'"
-                [class.sticky-right]="col.sticky === 'right'">
-                <div class="flex items-center gap-1.5 flex-1 truncate"
-                    (click)="col.sortable !== false && onSort(col.field)">
-                    <span class="truncate">{{ col.header }}</span>
-                    @if (col.sortable !== false) {
-                    <i class="pi text-[10px] transition-all duration-200"
-                        [class.pi-sort-alt]="!meta?.isSorted"
-                        [class.pi-sort-amount-up-alt]="meta?.sortDirection === 'asc'"
-                        [class.pi-sort-amount-down]="meta?.sortDirection === 'desc'"
-                        [class.opacity-30]="!meta?.isSorted"
-                        [class.opacity-100]="meta?.isSorted"
-                        [class.text-[var(--apex-grid-sort-icon)]]="meta?.isSorted ?? false"></i>
-                    }
-                    @if (meta?.isFiltered) {
-                    <i class="pi pi-filter-fill text-[9px] text-[var(--apex-grid-filter-icon)]
-                               animate-[apex-chip-appear_0.15s_ease-out]"></i>
+    <div class="flex-1 relative overflow-hidden bg-[var(--bg-primary)] flex flex-col">
+        
+        <div #headerWrapper class="overflow-hidden border-b border-[var(--border-secondary)] bg-[var(--bg-secondary)] z-30">
+            <div class="apex-dg-header"
+                role="row" [style.grid-template-columns]="gridTemplateColumns()">
+                @if (rowSelection() && !viewOnly()) {
+                <div class="apex-dg-hcell flex items-center justify-center sticky left-0 bg-[var(--bg-secondary)] z-40"
+                    role="columnheader">
+                    <input type="checkbox" class="apex-checkbox" [checked]="allSelected()" [indeterminate]="indeterminate()"
+                        (change)="onSelectAll($any($event.target).checked)">
+                </div>
+                }
+                <div class="apex-dg-hcell text-center text-[var(--text-tertiary)] font-semibold text-[11px]"
+                    role="columnheader">Sr.</div>
+                @for (col of visibleColumnList(); track col.field) {
+                @let meta = columnHeaderMeta().get(col.field);
+                <div class="apex-dg-hcell flex items-center gap-2 text-[var(--text-secondary)] font-semibold text-xs cursor-pointer select-none relative group/header"
+                    role="columnheader"
+                    [attr.aria-sort]="meta?.isSorted ? (meta?.sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'"
+                    [class.apex-dg-hcell--sorted]="highlightSortedColumns() && (meta?.isSorted ?? false)"
+                    [class.apex-dg-hcell--filtered]="highlightFilteredColumns() && (meta?.isFiltered ?? false)"
+                    [class.apex-dg-hcell--pinned]="meta?.isPinned ?? false"
+                    [class.sticky-left]="col.sticky === 'left'"
+                    [class.sticky-right]="col.sticky === 'right'">
+                    <div class="flex items-center gap-1.5 flex-1 truncate"
+                        (click)="col.sortable !== false && onSort(col.field)">
+                        <span class="truncate">{{ col.header }}</span>
+                        @if (col.sortable !== false) {
+                        <i class="pi text-[10px] transition-all duration-200"
+                            [class.pi-sort-alt]="!meta?.isSorted"
+                            [class.pi-sort-amount-up-alt]="meta?.sortDirection === 'asc'"
+                            [class.pi-sort-amount-down]="meta?.sortDirection === 'desc'"
+                            [class.opacity-30]="!meta?.isSorted"
+                            [class.opacity-100]="meta?.isSorted"
+                            [class.text-[var(--apex-grid-sort-icon)]]="meta?.isSorted ?? false"></i>
+                        }
+                        @if (meta?.isFiltered) {
+                        <i class="pi pi-filter-fill text-[9px] text-[var(--apex-grid-filter-icon)]
+                                   animate-[apex-chip-appear_0.15s_ease-out]"></i>
+                        }
+                    </div>
+
+                    @if (col.resizable !== false) {
+                    <div class="absolute right-0 top-1/4 bottom-1/4 w-1 cursor-col-resize hover:bg-[var(--apex-grid-resize-handle)] group-hover/header:bg-[var(--border-secondary)] transition-colors z-50"
+                        (mousedown)="onResizeStart($event, col.field)"></div>
                     }
                 </div>
+                }
 
-                @if (col.resizable !== false) {
-                <div class="absolute right-0 top-1/4 bottom-1/4 w-1 cursor-col-resize hover:bg-[var(--apex-grid-resize-handle)] group-hover/header:bg-[var(--border-secondary)] transition-colors z-50"
-                    (mousedown)="onResizeStart($event, col.field)"></div>
+                <!-- Conditional Actions Header -->
+                @if (enableRowActions() && !viewOnly()) {
+                <div class="apex-dg-hcell sticky right-0 bg-[var(--bg-secondary)] z-40" role="columnheader"></div>
                 }
             </div>
-            }
-
-            <!-- Conditional Actions Header -->
-            @if (!viewOnly()) {
-            <div class="apex-dg-hcell sticky right-0 bg-[var(--bg-secondary)] z-40" role="columnheader"></div>
-            }
         </div>
 
         @if (loading() && (paginationMode() === 'pages' || accumulatedData().length === 0)) {
@@ -102,9 +105,9 @@
         </div>
         }
 
-        <cdk-virtual-scroll-viewport #viewport [itemSize]="rowHeight()" class="h-full w-full custom-scrollbar"
-            (scroll)="showContextMenu.set(false); onGridScroll($event)">
-            <div #gridBody role="rowgroup">
+        <cdk-virtual-scroll-viewport #viewport [itemSize]="rowHeight()" class="flex-1 w-full custom-scrollbar">
+            
+            <div #gridBody role="rowgroup" class="min-w-full">
                 <!-- Inside the virtual scroll row loop: -->
                 <div *cdkVirtualFor="let row of displayData(); let i = index; trackBy: trackByRowId"
                     class="apex-dg-row group border-b border-[var(--border-secondary)] transition-colors duration-150"
@@ -141,7 +144,7 @@
                     }
 
                     <!-- Conditional Actions Cell -->
-                    @if (!viewOnly()) {
+                    @if (enableRowActions() && !viewOnly()) {
                     <div class="apex-dg-cell flex items-center justify-end sticky right-0 z-20 px-2 transition-colors"
                         role="gridcell" (click)="$event.stopPropagation()">
                         @if (editingRowIds().size <= 1) { <app-grid-actions [row]="row" [rowActions]="rowActions()"

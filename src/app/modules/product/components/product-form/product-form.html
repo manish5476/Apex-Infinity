@@ -1,203 +1,202 @@
-<div class="form-container">
-
-  <header class="form-header">
-    <div class="header-left">
-      <div class="breadcrumbs">
-        <span>Inventory</span> <i class="pi pi-angle-right" style="font-size: 0.7rem"></i>
-        <span>Products</span> <i class="pi pi-angle-right" style="font-size: 0.7rem"></i>
-        <span class="current">{{ editMode() ? 'Edit Details' : 'New Product' }}</span>
+<app-page>
+  <app-page-header [title]="formTitle()"
+    [subtitle]="editMode() ? 'Update existing product details and pricing.' : 'Add a new product to your inventory.'">
+    <div header-left>
+      <div
+        class="flex items-center justify-center w-12 h-12 rounded-xl bg-[color-mix(in_srgb,var(--accent-primary)_12%,transparent)] text-[var(--accent-primary)] mr-3">
+        <i class="pi pi-box text-xl"></i>
       </div>
-      <h1>{{ formTitle() }}</h1>
     </div>
-
-    <div class="header-actions">
-      <p-button label="Discard" severity="secondary" [text]="true" icon="pi pi-times" routerLink="/inventory/products">
+    <div header-right class="flex items-center gap-3">
+      <p-button label="Discard" severity="secondary" [text]="true" icon="pi pi-times" routerLink="/product">
       </p-button>
       <p-button [label]="editMode() ? 'Update' : 'Save Product'" icon="pi pi-check" (onClick)="onSubmit()"
         [loading]="isSubmitting()" [disabled]="productForm.invalid">
       </p-button>
     </div>
-  </header>
+  </app-page-header>
 
-  <div class="form-body">
-    <form [formGroup]="productForm" class="dashboard-grid animate-fadeIn">
+  <app-page-content>
+    <form [formGroup]="productForm" class="animate-fadeIn">
+      <app-bento-grid layout="asymmetric" density="relaxed">
 
-      <div class="col-main">
-
-        <section class="panel">
-          <div class="panel-header">
-            <h4><i class="pi pi-id-card"></i> Product Identity</h4>
-          </div>
-          <div class="panel-body">
-            <div class="grid-2">
-              <div class="field-group" style="grid-column: span 2;">
-                <label>Product Name <span class="req">*</span></label>
-                <input pInputText formControlName="name" class="highlight-input"
-                  placeholder="e.g. Premium Wireless Headphones" />
-              </div>
-
-              <div class="field-group">
-                <label>SKU / Barcode</label>
-                <div class="p-inputgroup">
-                  <span class="p-inputgroup-addon"><i class="pi pi-barcode"></i></span>
-                  <input pInputText formControlName="sku" placeholder="Auto-generated" />
+        <!-- LEFT COLUMN (Primary Content) -->
+        <app-bento-item size="md">
+          <div class="flex flex-col gap-6 w-full">
+            
+            <!-- Product Identity -->
+            <app-bento-container title="Product Information" icon="pi pi-box" variant="elevated">
+              <div class="flex flex-col gap-5">
+                <div class="field-group">
+                  <label>Product Name <span class="req">*</span></label>
+                  <input pInputText formControlName="name" class="w-full"
+                    placeholder="e.g. Premium Wireless Headphones" />
                 </div>
-              </div>
 
-              <div class="field-group">
-                <label>Product Type (Tags)</label>
-                <app-chips formControlName="tags"></app-chips>
-              </div>
-
-              <div class="field-group" style="grid-column: span 2;">
-                <label>Detailed Description</label>
-                <textarea pInputTextarea formControlName="description" rows="4" class="resize-none"></textarea>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        @if (!editMode()) {
-        <section class="panel">
-          <div class="panel-header">
-            <h4><i class="pi pi-box"></i> Opening Stock</h4>
-            <p-button label="Add Branch" icon="pi pi-plus" size="small" [text]="true" (onClick)="addInventoryItem()">
-            </p-button>
-          </div>
-
-          <div class="panel-body" style="padding: 0;">
-            @if (inventory.controls.length > 0) {
-            <div class="p-4">
-              <div class="inventory-table-header">
-                <span>Branch Location</span>
-                <span>Quantity</span>
-                <span>Re-Order Level</span>
-                <span>Action</span>
-              </div>
-              <div formArrayName="inventory">
-                @for (item of inventory.controls; track i; let i = $index) {
-                <div [formGroupName]="i" class="inventory-row animate-slideInRight">
-                  <div>
-                    <app-master-dropdown endpoint="branches" formControlName="branchId" placeholder="Select Branch">
-                    </app-master-dropdown>
-                  </div>
-                  <div>
-                    <p-inputNumber formControlName="quantity" [min]="0" inputId="qty-{{i}}"></p-inputNumber>
-                  </div>
-                  <div>
-                    <p-inputNumber formControlName="reorderLevel" [min]="0" inputId="rol-{{i}}"></p-inputNumber>
-                  </div>
-                  <div class="text-center">
-                    <i class="pi pi-trash text-red-500 cursor-pointer hover:text-red-700"
-                      (click)="removeInventoryItem(i)"></i>
+                <div class="field-group">
+                  <label>SKU / Barcode</label>
+                  <div class="p-inputgroup">
+                    <span class="p-inputgroup-addon"><i class="pi pi-barcode"></i></span>
+                    <input pInputText formControlName="sku" placeholder="Auto-generated" class="w-full" />
                   </div>
                 </div>
-                }
+
+                <div class="field-group">
+                  <label>Product Type (Tags)</label>
+                  <app-chips formControlName="tags"></app-chips>
+                </div>
               </div>
-            </div>
+            </app-bento-container>
+
+            <!-- Description -->
+            <app-bento-container title="Detailed Description" icon="pi pi-align-left" variant="surface">
+              <div class="flex flex-col gap-5 h-full">
+                <div class="field-group h-full">
+                  <textarea pInputTextarea formControlName="description"
+                    class="resize-none w-full h-full min-h-[160px]" placeholder="Enter comprehensive product details..."></textarea>
+                </div>
+              </div>
+            </app-bento-container>
+
+            <!-- Opening Stock -->
+            @if (!editMode()) {
+            <app-bento-container title="Initial Inventory" icon="pi pi-warehouse" [collapsible]="true" variant="surface">
+              <ng-container header-action>
+                <p-button label="Add Branch" icon="pi pi-plus" size="small" [text]="true" (onClick)="addInventoryItem()">
+                </p-button>
+              </ng-container>
+
+              @if (inventory.controls.length > 0) {
+              <div class="w-full">
+                <div class="inventory-table-header mb-3 text-xs font-bold text-secondary uppercase tracking-wider flex justify-between">
+                  <span class="flex-1">Branch Location</span>
+                  <span class="w-32 text-center">Quantity</span>
+                  <span class="w-12"></span>
+                </div>
+                <div formArrayName="inventory" class="flex flex-col gap-3">
+                  @for (item of inventory.controls; track i; let i = $index) {
+                  <div [formGroupName]="i" class="flex gap-3 items-center animate-slideInRight">
+                    <div class="flex-1">
+                      <app-master-dropdown endpoint="branches" formControlName="branchId" placeholder="Select Branch">
+                      </app-master-dropdown>
+                    </div>
+                    <div class="w-32">
+                      <p-inputNumber formControlName="quantity" [min]="0" inputId="qty-{{i}}"
+                        [style]="{'width': '100%'}"></p-inputNumber>
+                    </div>
+                    <div class="w-12 text-center">
+                      <p-button icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true" (onClick)="removeInventoryItem(i)"></p-button>
+                    </div>
+                  </div>
+                  }
+                </div>
+              </div>
+              }
+
+              @if (inventory.controls.length === 0) {
+              <div class="p-8 text-center text-secondary rounded-xl bg-[var(--bg-secondary)] border border-dashed border-[var(--border-secondary)]">
+                <i class="pi pi-warehouse text-3xl mb-3 opacity-40"></i>
+                <p class="text-sm m-0 font-medium">No initial stock recorded.</p>
+                <p class="text-xs mt-1 opacity-70">Add a branch to set opening quantities.</p>
+              </div>
+              }
+            </app-bento-container>
             }
-
-            @if (inventory.controls.length === 0) {
-            <div class="p-6 text-center text-secondary">
-              <i class="pi pi-warehouse text-2xl mb-2 opacity-50"></i>
-              <p class="text-sm m-0">No opening stock defined. Product will be created with 0 inventory.</p>
-            </div>
-            }
           </div>
-        </section>
-        }
+        </app-bento-item>
 
-      </div>
-      <div class="col-side">
-
-        <section class="panel">
-          <div class="panel-body flex justify-between items-center">
-            <div>
-              <h5 class="m-0 text-sm font-bold">Product Status</h5>
-              <p class="m-0 text-xs text-secondary">Visibility in sales channels</p>
-            </div>
-            <p-toggleButton formControlName="isActive" onLabel="Active" offLabel="Archived" onIcon="pi-check"
-              offIcon="pi pi-ban" styleClass="w-32 text-xs font-bold">
-            </p-toggleButton>
-          </div>
-        </section>
-
-        <section class="panel">
-          <div class="panel-header">
-            <h4><i class="pi pi-tag"></i> Pricing & Costs</h4>
-          </div>
-          <div class="panel-body">
-            <div class="field-group mb-4">
-              <label>Selling Price (MRP) <span class="req">*</span></label>
-              <p-inputNumber formControlName="sellingPrice" mode="currency" currency="INR" locale="en-IN"
-                class="highlight-input" [style]="{'font-size':'1.1rem'}">
-              </p-inputNumber>
-            </div>
-
-            <div class="grid-2 mb-4">
-              <div class="field-group">
-                <label>Cost Price</label>
-                <p-inputNumber formControlName="purchasePrice" mode="currency" currency="INR"
-                  locale="en-IN"></p-inputNumber>
+        <!-- RIGHT COLUMN (Secondary Content) -->
+        <app-bento-item size="sm">
+          <div class="flex flex-col gap-6 w-full">
+            
+            <!-- Product Status -->
+            <app-bento-container variant="flat">
+              <div class="flex items-center justify-between h-full gap-4">
+                <div class="flex flex-col gap-1">
+                  <h5 class="m-0 text-sm font-bold">Visibility Status</h5>
+                  <p class="m-0 text-xs text-secondary">Active in sales channels</p>
+                </div>
+                <p-toggleButton formControlName="isActive" onLabel="Active" offLabel="Draft" onIcon="pi-check"
+                  offIcon="pi pi-file-edit" styleClass="text-xs font-bold whitespace-nowrap">
+                </p-toggleButton>
               </div>
-              <div class="field-group">
-                <label>Tax Rate (%)</label>
-                <p-inputNumber formControlName="taxRate" suffix="%"></p-inputNumber>
+            </app-bento-container>
+
+            <!-- Pricing & Costs -->
+            <app-bento-container title="Pricing Structure" icon="pi pi-tag" variant="surface">
+              <div class="flex flex-col gap-5">
+                <div class="field-group">
+                  <label>Retail Price (MRP) <span class="req">*</span></label>
+                  <p-inputNumber formControlName="sellingPrice" mode="currency" currency="INR" locale="en-IN"
+                    class="w-full font-bold text-lg" [style]="{'width': '100%'}">
+                  </p-inputNumber>
+                </div>
+
+                <div class="field-group">
+                  <label>Cost Price</label>
+                  <p-inputNumber formControlName="purchasePrice" mode="currency" currency="INR" locale="en-IN"
+                    [style]="{'width': '100%'}"></p-inputNumber>
+                </div>
+                
+                <div class="field-group">
+                  <label>Tax Rate (%)</label>
+                  <p-inputNumber formControlName="taxRate" suffix="%" [style]="{'width': '100%'}"></p-inputNumber>
+                </div>
+
+                <div class="mt-1 pt-4 border-t border-[var(--border-secondary)]">
+                  <label for="taxInc" class="flex items-center gap-3 cursor-pointer text-sm font-medium hover:text-[var(--text-primary)] transition-colors">
+                    <p-checkbox formControlName="isTaxInclusive" [binary]="true" inputId="taxInc"></p-checkbox>
+                    Price includes tax
+                  </label>
+                </div>
               </div>
-            </div>
+            </app-bento-container>
 
-            <div class="compact-toggle">
-              <label for="taxInc">Tax Inclusive Price</label>
-              <p-checkbox formControlName="isTaxInclusive" [binary]="true" inputId="taxInc"></p-checkbox>
-            </div>
+            <!-- Organization -->
+            <app-bento-container title="Organization" icon="pi pi-sitemap" variant="surface">
+              <div class="flex flex-col gap-5">
+                <div class="field-group">
+                  <label>Department</label>
+                  <app-master-dropdown endpoint="departments" formControlName="departmentId"
+                    placeholder="Select Department">
+                  </app-master-dropdown>
+                </div>
+
+                <div class="field-group">
+                  <label>Category</label>
+                  <app-master-dropdown endpoint="categories" formControlName="categoryId" placeholder="Select Category">
+                  </app-master-dropdown>
+                </div>
+
+                <div class="field-group">
+                  <label>Base Unit</label>
+                  <app-master-dropdown endpoint="units" formControlName="unitId" placeholder="Select Unit">
+                  </app-master-dropdown>
+                </div>
+              </div>
+            </app-bento-container>
+
+            <!-- Supplier & Brand -->
+            <app-bento-container title="Supply Chain" icon="pi pi-truck" variant="surface">
+              <div class="flex flex-col gap-5">
+                <div class="field-group">
+                  <label>Primary Supplier</label>
+                  <app-master-dropdown endpoint="suppliers" formControlName="defaultSupplierId"
+                    placeholder="Select Supplier">
+                  </app-master-dropdown>
+                </div>
+                <div class="field-group">
+                  <label>Brand</label>
+                  <app-master-dropdown endpoint="brands" formControlName="brandId"
+                    placeholder="Select Brand"></app-master-dropdown>
+                </div>
+              </div>
+            </app-bento-container>
+
           </div>
-        </section>
+        </app-bento-item>
 
-        <section class="panel">
-          <div class="panel-header">
-            <h4><i class="pi pi-sitemap"></i> Organization</h4>
-          </div>
-          <div class="panel-body">
-            <div class="field-group">
-              <label>Department</label>
-              <app-master-dropdown endpoint="departments" formControlName="departmentId"
-                placeholder="Select Department">
-              </app-master-dropdown>
-
-            </div>
-
-            <div class="field-group">
-              <label>Category</label>
-              <app-master-dropdown endpoint="categories" formControlName="categoryId" placeholder="Select Category">
-              </app-master-dropdown>
-
-            </div>
-
-            <div class="field-group">
-              <label>Brand</label>
-              <app-master-dropdown endpoint="brands" formControlName="brandId"
-                placeholder="Select Brand"></app-master-dropdown>
-
-            </div>
-
-            <div class="field-group">
-              <label>Base Unit</label>
-              <app-master-dropdown endpoint="units" formControlName="unitId" placeholder="Select Unit">
-              </app-master-dropdown>
-
-            </div>
-
-            <div class="field-group">
-              <label>Primary Supplier</label>
-              <app-master-dropdown endpoint="suppliers" formControlName="defaultSupplierId"
-                placeholder="Select Supplier">
-              </app-master-dropdown>
-
-            </div>
-          </div>
-        </section>
-
-      </div>
+      </app-bento-grid>
     </form>
-  </div>
-</div>
+  </app-page-content>
+</app-page>

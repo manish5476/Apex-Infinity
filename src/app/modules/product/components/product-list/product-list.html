@@ -1,109 +1,89 @@
-<div class="app-container h-full">
-
-  <!-- Standard Header -->
-  <div class="container-header">
-    <div class="flex align-center gap-3">
-      <div class="icon-box bg-primary-light text-primary border-round p-2 flex align-center justify-center">
+<app-page>
+  <app-page-header
+    title="Product Management"
+    subtitle="Manage inventory, prices, and product details.">
+    <div header-left>
+      <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-[color-mix(in_srgb,var(--accent-primary)_12%,transparent)] text-[var(--accent-primary)] mr-3">
         <i class="pi pi-box text-xl"></i>
       </div>
-      <div class="header-titles">
-        <h2 class="container-title">Product Management</h2>
-        <p class="container-subtitle">Manage inventory, prices, and product details.</p>
-      </div>
     </div>
-
-    <div class="header-actions">
+    <div header-right class="flex items-center gap-3">
       <!-- Hidden file input -->
       <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" multiple style="display: none;">
 
       <p-button *hasPermission="PERMISSIONS.PRODUCT.UPDATE" [disabled]="selectedRows().length !== 1"
         label="Upload Image" icon="pi pi-upload" (onClick)="triggerUpload()"
-        styleClass="p-button-secondary p-button-outlined">
+        severity="secondary" [outlined]="true">
       </p-button>
 
       <p-button *hasPermission="PERMISSIONS.PRODUCT.DELETE" [disabled]="selectedRows().length !== 1"
         label="Delete Product" icon="pi pi-trash" (onClick)="deleteProduct()"
-        styleClass="p-button-danger p-button-outlined">
+        severity="danger" [outlined]="true">
       </p-button>
+
       <p-button *hasPermission="[PERMISSIONS.PRODUCT.CREATE, PERMISSIONS.PRODUCT.UPDATE]"
-        [label]="selectedRows().length > 0 ? 'Edit Product' : 'New Product'" (onClick)="bulkDialogVisible.set(true)"
-        styleClass="p-button-primary">
+        [label]="selectedRows().length > 0 ? 'Edit Product' : 'New Product'" icon="pi pi-plus" (onClick)="bulkDialogVisible.set(true)">
       </p-button>
     </div>
-  </div>
+  </app-page-header>
 
-  <div class="container-body flex flex-col h-full gap-4">
-
-    <!-- Standard Filter Panel -->
-    <div class="app-filter-panel single-row">
-
-      <div class="filter-field" style="flex: 2">
-        <label for="name">Product Name</label>
-        <input id="name" type="text" pInputText [ngModel]="productFilter().name"
-          (ngModelChange)="patchProductFilter('name', $event)" placeholder="Search by name..." class="w-full" />
-      </div>
-
-      <div class="filter-field">
-        <label for="sku">SKU</label>
-        <input id="sku" type="text" pInputText [ngModel]="productFilter().sku"
-          (ngModelChange)="patchProductFilter('sku', $event)" placeholder="Search by SKU" class="w-full" />
-      </div>
-
-      <div class="filter-field">
-        <label for="brand">Brand</label>
-        <app-master-dropdown endpoint="brands" [ngModel]="productFilter().brandId"
-          (ngModelChange)="patchProductFilter('brandId', $event)" placeholder="Select Brand">
-        </app-master-dropdown>
-      </div>
-
-      <div class="filter-field">
-        <label for="category">Category</label>
-        <app-master-dropdown endpoint="categories" [ngModel]="productFilter().categoryId"
-          (ngModelChange)="patchProductFilter('categoryId', $event)" placeholder="Select Category">
-        </app-master-dropdown>
-      </div>
-
-      <div class="filter-field">
-        <label for="subcategory">Sub-Category</label>
-        <app-master-dropdown endpoint="subcategories" [extraParams]="{ parentId: productFilter().categoryId }"
-          [ngModel]="productFilter().subCategoryId" (ngModelChange)="patchProductFilter('subCategoryId', $event)"
-          placeholder="Select Sub-Category">
-        </app-master-dropdown>
-      </div>
-
-      <div class="filter-field">
-        <label for="unit">Unit</label>
-        <app-master-dropdown endpoint="units" [ngModel]="productFilter().unitId"
-          (ngModelChange)="patchProductFilter('unitId', $event)" placeholder="Select Unit">
-        </app-master-dropdown>
-      </div>
-
-      <div class="filter-field">
-        <label for="status">Status</label>
-        <p-select appendTo="body" id="status" [options]="[
-            { label: 'All', value: null },
-            { label: 'Active', value: true },
-            { label: 'Inactive', value: false }
-          ]" [ngModel]="productFilter().isActive" (ngModelChange)="patchProductFilter('isActive', $event)"
-          [showClear]="false" placeholder="All" styleClass="w-full">
-        </p-select>
-      </div>
-
-      <div class="filter-actions">
-        <p-button label="Apply" icon="pi pi-check" (onClick)="applyFilters()"></p-button>
-        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined p-button-secondary"
-          (onClick)="resetFilters()"></p-button>
-      </div>
+  <app-page-toolbar>
+    <div class="flex-1 min-w-[200px]">
+      <input id="name" type="text" pInputText [ngModel]="productFilter().name"
+        (ngModelChange)="patchProductFilter('name', $event)" placeholder="Search by name..." class="w-full" />
     </div>
 
-    <!-- Data Grid Wrapper -->
-    <div class="flex-1 min-h-0 manish-border-1 border-secondary border-round overflow-hidden">
-      <app-data-grid [viewOnly]="true"  [columns]="column()" [data]="data()" selectionMode="multiple"
-        (gridEvent)="eventFromGrid($event)" style="height: 100%; width: 100%; display: block;">
-      </app-data-grid>
+    <div class="flex-1 min-w-[120px]">
+      <input id="sku" type="text" pInputText [ngModel]="productFilter().sku"
+        (ngModelChange)="patchProductFilter('sku', $event)" placeholder="Search by SKU" class="w-full" />
     </div>
-  </div>
-</div>
+
+    <div class="flex-1 min-w-[150px]">
+      <app-master-dropdown endpoint="brands" [ngModel]="productFilter().brandId"
+        (ngModelChange)="patchProductFilter('brandId', $event)" placeholder="Select Brand">
+      </app-master-dropdown>
+    </div>
+
+    <div class="flex-1 min-w-[150px]">
+      <app-master-dropdown endpoint="categories" [ngModel]="productFilter().categoryId"
+        (ngModelChange)="patchProductFilter('categoryId', $event)" placeholder="Select Category">
+      </app-master-dropdown>
+    </div>
+
+    <div class="flex-1 min-w-[150px]">
+      <app-master-dropdown endpoint="subcategories" [extraParams]="{ parentId: productFilter().categoryId }"
+        [ngModel]="productFilter().subCategoryId" (ngModelChange)="patchProductFilter('subCategoryId', $event)"
+        placeholder="Select Sub-Category">
+      </app-master-dropdown>
+    </div>
+
+    <div class="flex-1 min-w-[120px]">
+      <app-master-dropdown endpoint="units" [ngModel]="productFilter().unitId"
+        (ngModelChange)="patchProductFilter('unitId', $event)" placeholder="Select Unit">
+      </app-master-dropdown>
+    </div>
+
+    <div class="flex-1 min-w-[120px]">
+      <p-select appendTo="body" id="status" [options]="[
+          { label: 'All', value: null },
+          { label: 'Active', value: true },
+          { label: 'Inactive', value: false }
+        ]" [ngModel]="productFilter().isActive" (ngModelChange)="patchProductFilter('isActive', $event)"
+        [showClear]="false" placeholder="All Status" styleClass="w-full">
+      </p-select>
+    </div>
+
+    <p-button label="Apply" icon="pi pi-check" (onClick)="applyFilters()"></p-button>
+    <p-button label="Reset" icon="pi pi-refresh" severity="secondary" [text]="true"
+      (onClick)="resetFilters()"></p-button>
+  </app-page-toolbar>
+
+  <app-page-content>
+    <app-data-grid [viewOnly]="true" [columns]="column()" [data]="data()" selectionMode="multiple"
+      (gridEvent)="eventFromGrid($event)">
+    </app-data-grid>
+  </app-page-content>
+</app-page>
 
 <p-dialog [modal]="true" appendTo="body" [visible]="bulkDialogVisible()" (visibleChange)="bulkDialogVisible.set($event)"
   [modal]="true" header="Bulk Product Editor" styleClass="bulk-dialog p-dialog-full" [draggable]="false"

@@ -23,6 +23,10 @@ import { AppMessageService } from '../../../../core/services/message.service';
 // import { MasterListService } from '../../../../core/services/master-list.service';
 import { MasterDropdownComponent } from '../../../shared/components/masterFilterDropdown/master-dropdown.component';
 import { DataGridComponent, GridColumn } from '@shared/ui/grid';
+import { PageComponent } from '@shared/ui/layout/page/page.component';
+import { PageContentComponent } from '@shared/ui/layout/page-content/page-content.component';
+import { PageHeaderComponent } from '@shared/ui/layout/page-header/page-header.component';
+import { PageToolbarComponent } from '@shared/ui/layout/page-toolbar/page-toolbar.component';
 import { Dialog } from "primeng/dialog";
 import { BulkProductEntry } from "../bulk-product-entry/bulk-product-entry";
 import { finalize, Subject } from 'rxjs';
@@ -48,7 +52,11 @@ import { CommonMethodService } from '../../../../core/utils/common-method.servic
     BulkProductEntry,
     HasPermissionDirective,
     ConfirmDialogModule,
-    MasterDropdownComponent
+    MasterDropdownComponent,
+    PageComponent,
+    PageHeaderComponent,
+    PageToolbarComponent,
+    PageContentComponent
   ],
   providers: [ConfirmationService, DecimalPipe],
   templateUrl: './product-list.html',

@@ -116,14 +116,19 @@ import { SearchFilterComponent } from '@shared/ui/filters/search-filter.componen
         </p-button>
       </app-page-toolbar>
 
-      <app-page-content [padded]="false">
+      <app-page-content>
         <app-data-grid 
           [columns]="columns" 
           [data]="data()" 
           [loading]="isLoading()"
           [rowActions]="rowActions"
           selectionMode="multiple"
-          (gridEvent)="eventFromGrid($event)">
+          [lazy]="true"
+          paginationMode="infinite"
+          [totalRecords]="totalCount"
+          (rowClick)="onRowClick($event)"
+          (selectionChange)="selectedRows = $event"
+          (pageChange)="onPageChange()">
         </app-data-grid>
       </app-page-content>
     </app-page>
@@ -146,7 +151,7 @@ export class CustomerList implements OnInit, OnDestroy {
   private currentPage = 1;
   private pageSize = 50;
   readonly isLoading = signal(false);
-  private totalCount = 0;
+  totalCount = 0;
   private hasNextPage = true;
 
   readonly data = signal<any[]>([]);
@@ -324,20 +329,15 @@ export class CustomerList implements OnInit, OnDestroy {
     });
   }
 
-  eventFromGrid(event: any) {
-    if (event.type === 'cellClicked' || event.type === 'view') {
-      const customerId = event.row?._id;
-      if (customerId) {
-        this.router.navigate(['/customer', customerId]);
-      }
+  onRowClick(row: any) {
+    if (row?._id) {
+      this.router.navigate(['/customer', row._id]);
     }
-    if (event.type === 'reachedBottom') {
-      if (!this.isLoading() && this.hasNextPage) {
-        this.getData(false);
-      }
-    }
-    if (event.type === 'selectionChanged') {
-      this.selectedRows = event.rows || [];
+  }
+
+  onPageChange() {
+    if (!this.isLoading() && this.hasNextPage) {
+      this.getData(false);
     }
   }
 

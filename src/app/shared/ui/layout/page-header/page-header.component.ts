@@ -41,46 +41,49 @@ import {
 
     <!-- LEFT -->
 
-    <div class="flex-1 min-w-0 flex flex-col justify-center">
+    <div class="flex-1 min-w-0 flex items-center gap-4">
 
       <ng-content select="[header-left]"></ng-content>
 
-      @if(title()){
+      <div class="flex flex-col justify-center">
 
-      <h1
+        @if(title()){
 
-        class="m-0
-               font-bold
-               tracking-tight
-               text-[var(--text-primary)]
-               leading-tight"
+        <h1
 
-        [class.text-[18px]]="density() === 'compact'"
-        [class.text-[22px]]="density() === 'normal'"
-        [class.text-[26px]]="density() === 'comfortable'">
+          class="m-0
+                 font-bold
+                 tracking-tight
+                 text-[var(--text-primary)]
+                 leading-tight"
 
-        {{title()}}
+          [class.text-[18px]]="density() === 'compact'"
+          [class.text-[22px]]="density() === 'normal'"
+          [class.text-[26px]]="density() === 'comfortable'">
 
-      </h1>
+          {{title()}}
 
-      }
+        </h1>
 
-      @if(subtitle()){
+        }
 
-      <p
+        @if(subtitle()){
 
-        class="m-0
-               mt-1
-               text-sm
-               leading-5
-               text-[var(--text-secondary)]">
+        <p
 
-        {{subtitle()}}
+          class="m-0
+                 mt-1
+                 text-sm
+                 leading-5
+                 text-[var(--text-secondary)]">
 
-      </p>
+          {{subtitle()}}
 
-      }
+        </p>
 
+        }
+
+      </div>
     </div>
 
     <!-- RIGHT -->

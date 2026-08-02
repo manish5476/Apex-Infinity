@@ -23,6 +23,12 @@ import { MasterDropdownComponent } from '../../../shared/components/masterFilter
 
 import { AppMessageService } from '../../../../core/services/message.service';
 import { ChipsComponent } from '../../../shared/components/chips.component';
+import { PageComponent } from '@shared/ui/layout/page/page.component';
+import { PageHeaderComponent } from '@shared/ui/layout/page-header/page-header.component';
+import { PageContentComponent } from '@shared/ui/layout/page-content/page-content.component';
+import { PageToolbarComponent } from '@shared/ui/layout/page-toolbar/page-toolbar.component';
+import { BentoGridComponent, BentoItemComponent } from "@shared/ui/layout/bento-grid.component";
+import { BentoContainerComponent } from "@shared/ui/layout/bento-container.component";
 
 @Component({
   selector: 'app-product-form',
@@ -30,8 +36,8 @@ import { ChipsComponent } from '../../../shared/components/chips.component';
   imports: [ReactiveFormsModule, RouterModule, ButtonModule,
     ToggleButtonModule, InputTextModule, InputNumberModule,
     CheckboxModule, TextareaModule, SelectModule, DividerModule,
-    ChipsComponent, MasterDropdownComponent],
-
+    ChipsComponent, MasterDropdownComponent,
+    PageComponent, PageHeaderComponent, PageContentComponent, BentoItemComponent, BentoContainerComponent, BentoGridComponent],
   templateUrl: './product-form.html',
   styleUrls: ['./product-form.scss']
 })

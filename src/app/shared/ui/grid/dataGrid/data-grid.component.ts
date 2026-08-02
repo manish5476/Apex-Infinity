@@ -1,7 +1,7 @@
 import { ScrollingModule, CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
 import { CommonModule } from "@angular/common";
 import { Router } from "@angular/router";
-import { Component, ChangeDetectionStrategy, OnDestroy, ViewChild, ElementRef, inject, input, output, signal, computed, effect, untracked, HostListener } from "@angular/core";
+import { Component, ChangeDetectionStrategy, OnDestroy, AfterViewInit, ViewChild, ElementRef, inject, input, output, signal, computed, effect, untracked, HostListener } from "@angular/core";
 import { MessageService } from "primeng/api";
 import { GridActionsComponent } from "../components/grid-actions.component";
 import { GridColumnManagerComponent } from "../components/grid-column-manager.component";
@@ -38,9 +38,10 @@ import { buildGridQuery } from "../utils/grid-query-builder";
     '[attr.aria-rowcount]': 'lazy() ? totalRecords() : filteredData().length'
   }
 })
-export class DataGridComponent implements OnDestroy {
+export class DataGridComponent implements OnDestroy, AfterViewInit {
   @ViewChild(CdkVirtualScrollViewport) viewport!: CdkVirtualScrollViewport;
   @ViewChild('gridBody') gridBody!: ElementRef<HTMLElement>;
+  @ViewChild('headerWrapper') headerWrapper!: ElementRef<HTMLElement>;
 
   readonly gridService = inject(GridService);
   private stateService = inject(GridStateService);
@@ -79,7 +80,8 @@ export class DataGridComponent implements OnDestroy {
   enableExport = input<boolean>(true);
   enableSavedViews = input<boolean>(true);
   enableContextMenu = input<boolean>(true);
-  enableAdd = input<boolean>(true);
+  enableAdd = input<boolean>(false);
+  enableRowActions = input<boolean>(false);
   stripedRows = input<boolean>(true);
   // ─── Phase A: Operation Modes ─────────────────────────────────────────────
   /** When 'server': sort is not applied locally; queryChange emits. Default: 'client'. */
@@ -259,8 +261,8 @@ export class DataGridComponent implements OnDestroy {
     template += '60px '; // Sr. No.
     template += cols.map(c => `minmax(${c.minWidth ?? '100px'}, ${c.width ?? '1fr'})`).join(' ');
 
-    // Omit the actions column width entirely if viewOnly is active
-    if (!this.viewOnly()) {
+    // Omit the actions column width entirely if viewOnly is active or enableRowActions is false
+    if (this.enableRowActions() && !this.viewOnly()) {
       template += ' max-content';
     }
     return template;
@@ -442,6 +444,17 @@ export class DataGridComponent implements OnDestroy {
   ngOnDestroy(): void {
     this.plugins().forEach(p => p.onDestroy?.());
     clearTimeout(this.searchTimeout);
+  }
+
+  ngAfterViewInit(): void {
+    if (this.viewport) {
+      // Explicitly bind to the native scroll event of the viewport element to ensure
+      // horizontal scrolling reliably syncs with the header.
+      this.viewport.elementRef.nativeElement.addEventListener('scroll', (event) => {
+        this.showContextMenu.set(false);
+        this.onGridScroll(event);
+      }, { passive: true });
+    }
   }
 
   getRowId = (row: any): string => {
@@ -726,8 +739,18 @@ export class DataGridComponent implements OnDestroy {
   }
 
   onGridScroll(event: any): void {
+    // Safely get target. If event.target is document or null, fallback to viewport element.
+    const target = (event?.target as HTMLElement)?.scrollLeft !== undefined 
+      ? (event.target as HTMLElement) 
+      : this.viewport?.elementRef.nativeElement;
+    
+    // Sync horizontal scroll with header
+    if (this.headerWrapper && target) {
+      this.headerWrapper.nativeElement.scrollLeft = target.scrollLeft;
+    }
+
     if (this.paginationMode() !== 'infinite' || !this.lazy() || this.loading()) return;
-    const target = event.target as HTMLElement;
+    
     if (target.scrollHeight - target.scrollTop - target.clientHeight < 50) {
       if (this.accumulatedData().length < this.totalRecords()) {
         const nextPage = this.currentPage() + 1;

@@ -67,9 +67,15 @@
 .apex-dg-header,
 .apex-dg-row {
     display: grid;
-    width: 100%;
-    // Grid Template Columns is applied dynamically via inline styles in the template
+    min-width: 100%;
+    width: fit-content;
     align-items: center;
+}
+
+// Ensure the CDK virtual scroll wrapper expands horizontally to match the rows
+::ng-deep .cdk-virtual-scroll-content-wrapper {
+    min-width: 100%;
+    width: fit-content;
 }
 
 // Ensure inherited backgrounds support sticky shadows cleanly
