@@ -69,7 +69,7 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
   pagination = input<boolean>(true);
   pageSize = input<number>(50);
   loading = input<boolean>(false);
-  density = input<GridDensity>('compact');
+  density = input<GridDensity>('normal');
   emptyMessage = input<string>('No records found');
   rowActions = input<GridRowAction[]>([]);
   bulkActions = input<GridBulkAction[]>([]);
