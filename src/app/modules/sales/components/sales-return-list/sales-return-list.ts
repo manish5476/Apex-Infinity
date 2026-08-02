@@ -85,67 +85,89 @@ import { SalesReturnActionDialogComponent } from '../sales-return-action-dialog/
       </app-page-header>
 
       <app-page-content [padded]="true">
-        <!-- Filter Toolbar -->
-        <div class="app-filter-panel mb-4">
-          <div class="filter-field flex-[2] min-w-[250px]">
-            <label>Search</label>
-            <span class="p-input-icon-left w-full">
-              <i class="pi pi-search"></i>
-              <input
-                type="text"
-                pInputText
-                [formControl]="searchControl"
-                placeholder="Return #, Invoice #..."
-                class="w-full" />
-            </span>
+        <!-- ── Filter Bar ─────────────────────────────────────────────── -->
+        <div class="flex items-end gap-3 flex-wrap mb-4 p-3
+                    bg-[var(--bg-secondary)] border border-[var(--border-secondary)]
+                    rounded-[var(--ui-border-radius-lg)]">
+
+          <!-- Search -->
+          <div class="flex flex-col gap-1 flex-[2] min-w-[220px]">
+            <label class="text-[length:var(--font-size-xs)] font-[var(--font-weight-medium)]
+                          text-[var(--text-secondary)] uppercase tracking-wide">Search</label>
+            <div class="flex items-center gap-2 px-3 py-2
+                        bg-[var(--bg-primary)] border border-[var(--border-secondary)]
+                        rounded-[var(--ui-border-radius-md)]
+                        focus-within:border-[var(--accent-primary)]
+                        focus-within:shadow-[0_0_0_2px_color-mix(in_srgb,var(--accent-primary)_15%,transparent)]
+                        transition-all duration-150">
+              <i class="pi pi-search text-[11px] text-[var(--text-tertiary)] shrink-0"></i>
+              <input type="text" [formControl]="searchControl"
+                     placeholder="Return #, Invoice #..."
+                     class="flex-1 bg-transparent border-none outline-none
+                            text-[length:var(--font-size-sm)] text-[var(--text-primary)]
+                            placeholder:text-[var(--text-tertiary)] w-full" />
+            </div>
           </div>
 
-          <div class="filter-field">
-            <label>Status</label>
-            <p-select
-              [options]="statusOptions"
-              [(ngModel)]="filter.status"
-              (onChange)="applyFilters()"
-              placeholder="All Statuses"
-              [showClear]="true"
-              styleClass="w-full">
+          <!-- Status -->
+          <div class="flex flex-col gap-1 min-w-[160px]">
+            <label class="text-[length:var(--font-size-xs)] font-[var(--font-weight-medium)]
+                          text-[var(--text-secondary)] uppercase tracking-wide">Status</label>
+            <p-select [options]="statusOptions" [(ngModel)]="filter.status"
+                      (onChange)="applyFilters()" placeholder="All Statuses"
+                      [showClear]="true" styleClass="w-full">
             </p-select>
           </div>
 
-          <div class="filter-field">
-            <label>Branch</label>
-            <app-master-dropdown
-              endpoint="branches"
-              [(ngModel)]="filter.branchId"
-              (onChange)="applyFilters()"
-              placeholder="All Branches">
+          <!-- Branch -->
+          <div class="flex flex-col gap-1 min-w-[180px]">
+            <label class="text-[length:var(--font-size-xs)] font-[var(--font-weight-medium)]
+                          text-[var(--text-secondary)] uppercase tracking-wide">Branch</label>
+            <app-master-dropdown endpoint="branches" [(ngModel)]="filter.branchId"
+                                 (onChange)="applyFilters()" placeholder="All Branches">
             </app-master-dropdown>
           </div>
 
-          <div class="filter-field relative">
-            <label>Date Range</label>
-            <p-datepicker
-              [(ngModel)]="filter.dateRange"
-              selectionMode="range"
-              (onSelect)="applyFilters()"
-              placeholder="Start - End"
-              appendTo="body"
-              [showIcon]="true"
-              styleClass="w-full" inputStyleClass="w-full">
+          <!-- Date Range -->
+          <div class="flex flex-col gap-1 min-w-[200px] relative">
+            <label class="text-[length:var(--font-size-xs)] font-[var(--font-weight-medium)]
+                          text-[var(--text-secondary)] uppercase tracking-wide">Date Range</label>
+            <p-datepicker [(ngModel)]="filter.dateRange" selectionMode="range"
+                          (onSelect)="applyFilters()" placeholder="Start – End"
+                          appendTo="body" [showIcon]="true"
+                          styleClass="w-full" inputStyleClass="w-full">
             </p-datepicker>
             @if (filter.dateRange) {
-              <i class="pi pi-times absolute right-12 top-[34px] cursor-pointer text-gray-400 hover:text-gray-600 z-10" (click)="resetDateRange()"></i>
+              <button type="button"
+                      class="absolute right-10 bottom-[9px] text-[var(--text-tertiary)]
+                             hover:text-[var(--text-primary)] transition-colors z-10"
+                      (click)="resetDateRange()">
+                <i class="pi pi-times text-[10px]"></i>
+              </button>
             }
           </div>
 
-          <div class="filter-actions ml-auto">
-            <p-button icon="pi pi-filter-slash" styleClass="p-button-text p-button-rounded p-button-secondary" 
-              (click)="filter = { status: null, branchId: null, dateRange: null }; searchControl.setValue('', {emitEvent: false}); applyFilters()" pTooltip="Clear Filters">
-            </p-button>
+          <!-- Clear Filters -->
+          <div class="flex items-end pb-0.5">
+            <button type="button"
+                    class="flex items-center gap-1.5 px-3 py-2
+                           rounded-[var(--ui-border-radius-md)]
+                           text-[length:var(--font-size-xs)] font-[var(--font-weight-medium)]
+                           text-[var(--text-secondary)] border border-[var(--border-secondary)]
+                           bg-transparent hover:bg-[var(--component-bg-hover)]
+                           hover:text-[var(--text-primary)] transition-colors"
+                    title="Clear all filters"
+                    (click)="filter = { status: null, branchId: null, dateRange: null };
+                             searchControl.setValue('', {emitEvent: false});
+                             applyFilters()">
+              <i class="pi pi-filter-slash text-[11px]"></i>
+              Clear
+            </button>
           </div>
+
         </div>
 
-        <!-- DataGrid -->
+        <!-- ── DataGrid ───────────────────────────────────────────────── -->
         <app-data-grid
           [columns]="columns"
           [data]="data()"
@@ -164,50 +186,6 @@ import { SalesReturnActionDialogComponent } from '../sales-return-action-dialog/
       min-height: 0;
       width: 100%;
       height: 100%;
-    }
-
-    /* ── Filter Toolbar ── */
-    .filter-toolbar {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-md);
-      flex-wrap: wrap;
-      margin-bottom: var(--spacing-md);
-
-      &__search {
-        flex: 1;
-        min-width: 220px;
-        max-width: 320px;
-
-        span { width: 100%; }
-        input { width: 100%; }
-      }
-
-      &__filters {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-md);
-        flex-wrap: wrap;
-        flex: 1;
-      }
-    }
-
-    .date-field {
-      position: relative;
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-xs);
-    }
-
-    .clear-date {
-      background: none;
-      border: none;
-      padding: 0;
-      font-size: var(--font-size-xs);
-      color: var(--accent-primary);
-      cursor: pointer;
-      white-space: nowrap;
-      &:hover { text-decoration: underline; }
     }
   `]
 })
