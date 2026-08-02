@@ -88,7 +88,7 @@
     @if (rowData()[column().field]) {
     <app-status-badge [status]="rowData()[column().field]" variant="subtle" size="sm"></app-status-badge>
     } @else {
-    <span class="text-[var(--text-tertiary)]">—</span>
+    <span class="text-[var(--text-tertiary)] w-full text-center block">—</span>
     }
     }
 
@@ -151,7 +151,7 @@
             {{ rowData()[column().field] }}
         </span>
         } @else {
-        <span class="text-[var(--text-tertiary)]">—</span>
+        <span class="text-[var(--text-tertiary)] w-full text-center block">—</span>
         }
     </div>
     }
@@ -165,7 +165,7 @@
         <i class="pi pi-external-link text-[10px] opacity-0 group-hover:opacity-100 transition-opacity shrink-0"></i>
     </a>
     } @else {
-    <span class="text-[var(--text-tertiary)]">—</span>
+    <span class="text-[var(--text-tertiary)] w-full text-center block">—</span>
     }
     }
 
@@ -177,7 +177,7 @@
             alt="thumbnail" />
     </div>
     } @else {
-    <span class="text-[var(--text-tertiary)]">—</span>
+    <span class="text-[var(--text-tertiary)] w-full text-center block">—</span>
     }
     }
 
@@ -208,7 +208,7 @@
         <span class="truncate">{{ rowData()[column().field] }}</span>
     </a>
     } @else {
-    <span class="text-[var(--text-tertiary)]">—</span>
+    <span class="text-[var(--text-tertiary)] w-full text-center block">—</span>
     }
     }
 
@@ -220,7 +220,7 @@
         <span class="truncate">{{ rowData()[column().field] }}</span>
     </a>
     } @else {
-    <span class="text-[var(--text-tertiary)]">—</span>
+    <span class="text-[var(--text-tertiary)] w-full text-center block">—</span>
     }
     }
 
@@ -228,7 +228,7 @@
     @if (rowData()[column().field]) {
     <app-status-badge [status]="rowData()[column().field]" size="sm"></app-status-badge>
     } @else {
-    <span class="text-[var(--text-tertiary)]">—</span>
+    <span class="text-[var(--text-tertiary)] w-full text-center block">—</span>
     }
     }
 
@@ -239,7 +239,7 @@
         {{ rowData()[column().field] }}
     </span>
     } @else {
-    <span class="text-[var(--text-tertiary)]">—</span>
+    <span class="text-[var(--text-tertiary)] w-full text-center block">—</span>
     }
     }
 
@@ -263,11 +263,14 @@
     }
 
     @default {
+    @if ((column().formatter ? column().formatter!(rowData()[column().field], rowData()) : rowData()[column().field]) != null && (column().formatter ? column().formatter!(rowData()[column().field], rowData()) : rowData()[column().field]) !== '') {
     <span class="truncate block w-full text-[length:var(--font-size-xs)] text-[var(--text-primary)]"
         [pTooltip]="rowData()[column().field]" tooltipPosition="top" [tooltipDisabled]="!rowData()[column().field]">
-        {{ (column().formatter ? column().formatter!(rowData()[column().field], rowData()) : rowData()[column().field])
-        ?? '—' }}
+        {{ column().formatter ? column().formatter!(rowData()[column().field], rowData()) : rowData()[column().field] }}
     </span>
+    } @else {
+    <span class="text-[var(--text-tertiary)] w-full text-center block">—</span>
+    }
     }
     }
     }

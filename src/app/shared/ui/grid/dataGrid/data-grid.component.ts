@@ -1,5 +1,6 @@
 import { ScrollingModule, CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
 import { CommonModule } from "@angular/common";
+import { Router } from "@angular/router";
 import { Component, ChangeDetectionStrategy, OnDestroy, ViewChild, ElementRef, inject, input, output, signal, computed, effect, untracked, HostListener } from "@angular/core";
 import { MessageService } from "primeng/api";
 import { GridActionsComponent } from "../components/grid-actions.component";
@@ -42,6 +43,15 @@ export class DataGridComponent implements OnDestroy {
   readonly gridService = inject(GridService);
   private stateService = inject(GridStateService);
   private messageService = inject(MessageService, { optional: true });
+  private router = inject(Router, { optional: true });
+
+  private getGridStorageId(): string {
+    const id = this.gridId();
+    if (id === 'default' && this.router) {
+      return `default_${this.router.url.split('?')[0].replace(/[\/\#]/g, '_')}`;
+    }
+    return id;
+  }
 
   data = input.required<any[]>();
   columns = input.required<GridColumn[]>();
@@ -183,7 +193,7 @@ viewOnly = input<boolean>(false);
       // Persist to local storage if enabled
       if (this.persistState()) {
         const widths = this.columnsWithOverrides().reduce((acc, c) => ({ ...acc, [c.field]: c.width ?? '' }), {});
-        this.stateService.setColumnWidths(this.gridId(), widths);
+        this.stateService.setColumnWidths(this.getGridStorageId(), widths);
       }
     }
   }
@@ -529,7 +539,7 @@ onRowDoubleClick(row: any): void {
     });
     this.currentPage.set(0);
     this.sortChange.emit(this.sortState());
-    if (this.persistState()) this.stateService.setSortState(this.gridId(), this.sortState());
+    if (this.persistState()) this.stateService.setSortState(this.getGridStorageId(), this.sortState());
   }
 
   private applyFilter(row: any, f: GridFilterState): boolean {
@@ -564,7 +574,7 @@ onRowDoubleClick(row: any): void {
     this.currentPage.set(state.page);
     this.pageSizeSignal.set(state.pageSize);
     this.pageChange.emit(state);
-    if (this.persistState()) this.stateService.saveState(this.gridId(), { density: this.densitySignal() });
+    if (this.persistState()) this.stateService.saveState(this.getGridStorageId(), { density: this.densitySignal() });
   }
 
   onPageSizeChange(size: number): void {
@@ -594,7 +604,7 @@ onRowDoubleClick(row: any): void {
 
   onDensityChange(d: GridDensity): void {
     this.densitySignal.set(d);
-    if (this.persistState()) this.stateService.setDensity(this.gridId(), d);
+    if (this.persistState()) this.stateService.setDensity(this.getGridStorageId(), d);
   }
 
   onPinChange(event: { field: string; sticky: 'left' | 'right' | false }): void {
@@ -664,7 +674,7 @@ onRowDoubleClick(row: any): void {
 
   onVisibilityChange(visible: string[]): void {
     this.visibleColumnsSignal.set(visible);
-    if (this.persistState()) this.stateService.setVisibleColumns(this.gridId(), visible);
+    if (this.persistState()) this.stateService.setVisibleColumns(this.getGridStorageId(), visible);
   }
 
   onApplyView(view: GridSavedView): void {
@@ -682,13 +692,13 @@ onRowDoubleClick(row: any): void {
       columns: this.visibleColumnsSignal().length ? this.visibleColumnsSignal() : this.columns().map(c => c.field),
       sortState: this.sortState(), filterState: this.filterState(), density: this.densitySignal(),
     };
-    this.stateService.saveView(this.gridId(), view);
+    this.stateService.saveView(this.getGridStorageId(), view);
     this.savedViews.update(views => [...views, view]);
     this.activeViewId.set(view.id);
   }
 
   onDeleteView(viewId: string): void {
-    this.stateService.deleteView(this.gridId(), viewId);
+    this.stateService.deleteView(this.getGridStorageId(), viewId);
     this.savedViews.update(views => views.filter(v => v.id !== viewId));
     if (this.activeViewId() === viewId) this.activeViewId.set(null);
   }
@@ -766,7 +776,7 @@ onRowDoubleClick(row: any): void {
 
   private loadPersistedState(): void {
     if (!this.persistState()) return;
-    const state = this.stateService.loadState(this.gridId());
+    const state = this.stateService.loadState(this.getGridStorageId());
     if (!state) return;
     if (state.visibleColumns?.length) this.visibleColumnsSignal.set(state.visibleColumns);
     if (state.density) this.densitySignal.set(state.density);

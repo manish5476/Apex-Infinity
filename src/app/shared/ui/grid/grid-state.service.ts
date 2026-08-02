@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { GridPersistedState, GridSavedView, GridDensity, GridSortState } from './grid-types';
-
-const STORAGE_PREFIX = 'apex_grid_v1_';
-
+const STORAGE_PREFIX = 'apex_grid_v2_';
 function defaultState(): GridPersistedState {
   return {
     visibleColumns: [],

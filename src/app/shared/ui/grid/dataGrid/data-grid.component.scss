@@ -86,6 +86,9 @@
     background-color: var(--bg-secondary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-secondary);
     border-right: 1px solid transparent; // Prevents pixel shifting on resize
 
     &:hover {

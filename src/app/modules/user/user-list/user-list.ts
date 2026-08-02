@@ -15,6 +15,8 @@ import { HasPermissionDirective } from '@core/auth/directives/has-permission.dir
 import { PERMISSIONS } from '@core/auth/permissions.constants';
 import { DynamicDialogServices } from '../../../core/services/dynamic-dialog-services';
 import { takeUntil } from "rxjs/operators";
+import { PermissionService } from '@core/auth/services/permission.service';
+import { MasterDropdownService } from '../../../core/services/master-dropdown.service';
 
 // --- Shared UI ---
 import { PageComponent } from '../../../shared/ui/layout/page/page.component';
@@ -51,6 +53,8 @@ export class UserListComponent implements OnInit, OnDestroy {
   private confirmationService = inject(ConfirmationService);
   private router = inject(Router);
   private dynamicDialog = inject(DynamicDialogServices);
+  private permissionService = inject(PermissionService);
+  private masterDropdownService = inject(MasterDropdownService);
 
   // Pagination & Data state
   currentPage = 1;
@@ -73,6 +77,22 @@ export class UserListComponent implements OnInit, OnDestroy {
     this.setupColumns();
     this.setupActions();
     this.getData(true);
+    this.loadMasters();
+  }
+
+  loadMasters() {
+    this.masterDropdownService.getDropdownData('roles').pipe(takeUntil(this.destroy$)).subscribe(res => {
+      const col = this.column.find(c => c.field === 'role');
+      if (col) col.options = res.data || [];
+    });
+    this.masterDropdownService.getDropdownData('departments').pipe(takeUntil(this.destroy$)).subscribe(res => {
+      const col = this.column.find(c => c.field === 'employee.departmentId');
+      if (col) col.options = res.data || [];
+    });
+    this.masterDropdownService.getDropdownData('designations').pipe(takeUntil(this.destroy$)).subscribe(res => {
+      const col = this.column.find(c => c.field === 'employee.designationId');
+      if (col) col.options = res.data || [];
+    });
   }
 
   createNew() {
@@ -230,7 +250,9 @@ export class UserListComponent implements OnInit, OnDestroy {
   }
 
   setupColumns(): void {
-    this.column = [
+    const isPrivileged = this.permissionService.isOwner() || this.permissionService.isSuperAdmin() || this.permissionService.hasPermission(this.PERMISSIONS.USER.MANAGE);
+
+    const baseColumns: GridColumn[] = [
       {
         field: 'avatar',
         header: 'Avatar',
@@ -240,6 +262,16 @@ export class UserListComponent implements OnInit, OnDestroy {
         sortable: false,
         filterable: false,
         searchable: false,
+        editable: false,
+      },
+      {
+        field: 'employee.employeeId',
+        header: 'Emp ID',
+        type: 'text',
+        width: '100px',
+        filterable: true,
+        searchable: true,
+        editable: false,
       },
       {
         field: 'name',
@@ -250,38 +282,60 @@ export class UserListComponent implements OnInit, OnDestroy {
         sortable: true,
         filterable: true,
         searchable: true,
+        editable: false,
         cellClass: 'font-semibold text-[var(--text-primary)]'
       },
       {
-        field: 'role.name',
+        field: 'role',
         header: 'Role',
-        type: 'badge',
+        type: 'select',
         width: '140px',
         filterable: true,
         searchable: true,
+        editable: true,
+        formatter: (val: any) => typeof val === 'object' ? val?.name : (this.column.find(c => c.field === 'role')?.options?.find(o => o.value === val)?.label || val)
       },
       {
-        field: 'email',
-        header: 'Email',
-        type: 'email',
-        width: '220px',
-        filterable: true,
-        searchable: true,
-      },
-      {
-        field: 'phone',
-        header: 'Phone',
-        type: 'phone',
+        field: 'employee.departmentId',
+        header: 'Department',
+        type: 'select',
         width: '140px',
         filterable: true,
         searchable: true,
+        editable: true,
+        formatter: (val: any) => typeof val === 'object' ? val?.name : (this.column.find(c => c.field === 'employee.departmentId')?.options?.find(o => o.value === val)?.label || val)
+      },
+      {
+        field: 'employee.designationId',
+        header: 'Designation',
+        type: 'select',
+        width: '140px',
+        filterable: true,
+        searchable: true,
+        editable: true,
+        formatter: (val: any) => typeof val === 'object' ? val?.title : (this.column.find(c => c.field === 'employee.designationId')?.options?.find(o => o.value === val)?.label || val)
+      },
+      {
+        field: 'employee.workMode',
+        header: 'Work Mode',
+        type: 'select',
+        width: '110px',
+        filterable: true,
+        editable: true,
+        options: [
+          { label: 'Office', value: 'office' },
+          { label: 'Remote', value: 'remote' },
+          { label: 'Hybrid', value: 'hybrid' }
+        ],
+        formatter: (val: any) => val ? val.charAt(0).toUpperCase() + val.slice(1) : ''
       },
       {
         field: 'attendanceConfig.shiftId.name',
         header: 'Shift Name',
         type: 'text',
-        width: '160px',
+        width: '140px',
         filterable: false,
+        editable: false,
         formatter: (value: any, row: any) => {
           if (!row.attendanceConfig?.isAttendanceEnabled) return 'Disabled';
           return value || 'Assign Shift';
@@ -291,20 +345,47 @@ export class UserListComponent implements OnInit, OnDestroy {
         field: 'branchId.name',
         header: 'Branch',
         type: 'text',
-        width: '130px',
+        width: '120px',
         filterable: true,
+        editable: false,
         formatter: (value: any) => value || 'Global'
-      },
-      {
-        field: 'isLoginBlocked',
-        header: 'Security',
-        type: 'status',
-        width: '100px',
-        sortable: false,
-        filterable: true,
-        formatter: (value: any) => value ? 'Blocked' : 'Active'
       }
     ];
+
+    if (isPrivileged) {
+      baseColumns.push(
+        {
+          field: 'email',
+          header: 'Email',
+          type: 'email',
+          width: '200px',
+          filterable: true,
+          searchable: true,
+          editable: false,
+        },
+        {
+          field: 'phone',
+          header: 'Phone',
+          type: 'phone',
+          width: '130px',
+          filterable: true,
+          searchable: true,
+          editable: false,
+        },
+        {
+          field: 'isLoginBlocked',
+          header: 'Security',
+          type: 'status',
+          width: '100px',
+          sortable: false,
+          filterable: true,
+          editable: false,
+          formatter: (value: any) => value ? 'Blocked' : 'Active'
+        }
+      );
+    }
+
+    this.column = baseColumns;
     this.cdr.detectChanges();
   }
 

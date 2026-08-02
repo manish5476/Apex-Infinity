@@ -303,13 +303,13 @@ type FilterType = 'all' | 'favorites' | 'shared' | 'shared-by-me' | 'recent' | '
       display: flex;
       flex-direction: column;
       height: 100%;
-      z-index: var(--z-fixed);
       flex-shrink: 0;
 
       @media (max-width: 768px) {
         position: fixed;
         inset-block: 0;
         left: -260px;
+        z-index: var(--z-fixed);
         box-shadow: none;
         transition: left var(--transition-base);
 

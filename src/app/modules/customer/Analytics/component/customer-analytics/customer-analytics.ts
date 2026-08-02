@@ -96,6 +96,10 @@ interface FinancialData { salesAnalysis: any[]; paymentPatterns: any[]; overdueI
                     <p-skeleton height="12px" styleClass="flex-1"></p-skeleton>
                   </div>
                 }
+              } @else if (!overviewData()?.overview?.customerStats?.length) {
+                <div class="empty-state">
+                  <i class="pi pi-chart-pie"></i><span>No customer data</span>
+                </div>
               } @else {
                 @for (seg of overviewData()?.overview?.customerStats ?? []; track seg._id) {
                   <div class="split-item">
@@ -135,6 +139,10 @@ interface FinancialData { salesAnalysis: any[]; paymentPatterns: any[]; overdueI
             <div class="ca-card-body">
               @if (isLoading['overview']) {
                 <p-skeleton height="110px"></p-skeleton>
+              } @else if (!overviewData()?.overview?.monthlyGrowth?.length) {
+                <div class="empty-state">
+                  <i class="pi pi-chart-line"></i><span>No acquisition data</span>
+                </div>
               } @else {
                 <div class="acq-chart">
                   @for (m of overviewData()?.overview?.monthlyGrowth ?? []; track m._id.month; let i = $index) {
@@ -161,6 +169,10 @@ interface FinancialData { salesAnalysis: any[]; paymentPatterns: any[]; overdueI
             <div class="ca-card-body gap-sm">
               @if (isLoading['overview']) {
                 @for (s of [1,2,3]; track s) { <p-skeleton height="42px" styleClass="mb-1"></p-skeleton> }
+              } @else if (!overviewData()?.overview?.topCustomers?.length) {
+                <div class="empty-state success">
+                  <i class="pi pi-check-circle"></i><span>No outstanding balances</span>
+                </div>
               } @else {
                 @for (c of overviewData()?.overview?.topCustomers ?? []; track c._id; let i = $index) {
                   <div class="list-row" [style.--ri]="i">
@@ -192,6 +204,10 @@ interface FinancialData { salesAnalysis: any[]; paymentPatterns: any[]; overdueI
             <div class="ca-card-body gap-sm">
               @if (isLoading['overview']) {
                 @for (s of [1,2,3,4,5]; track s) { <p-skeleton height="34px" styleClass="mb-1"></p-skeleton> }
+              } @else if (!overviewData()?.recentCustomers?.length) {
+                <div class="empty-state">
+                  <i class="pi pi-users"></i><span>No recent customers</span>
+                </div>
               } @else {
                 @for (c of overviewData()?.recentCustomers ?? []; track c._id; let i = $index) {
                   <div class="list-row compact" [style.--ri]="i">
@@ -1387,6 +1403,7 @@ export class CustomerAnalyticsComponent implements OnInit, OnDestroy {
       {
         label: 'New This Period', value: growthCount, icon: 'pi pi-user-plus',
         iconBg: 'var(--color-success-bg)', iconColor: 'var(--color-success)',
+        sub: 'This month',
         trend: growthCount > 0 ? 1 : 0
       },
       {

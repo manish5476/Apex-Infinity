@@ -116,6 +116,21 @@
       outline: none;
       box-shadow: 0 0 0 2px var(--primary-color-transparent);
     }
+    
+    @media (max-width: 1024px) {
+      padding: 0;
+      width: 40px;
+      justify-content: center;
+      
+      .search-icon {
+        margin-right: 0;
+      }
+      
+      .search-placeholder,
+      .shortcut-keys {
+        display: none;
+      }
+    }
   }
   /* Prevents icons/profile from shrinking when tabs get wide */
 }
