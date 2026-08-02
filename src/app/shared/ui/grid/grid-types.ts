@@ -32,8 +32,15 @@ export interface SelectOption {
 export interface GridColumn {
   // Identity
   field: string;
-  header: string;
+  header?: string;
   type?: GridColumnType;
+
+  // Legacy ag-grid compat
+  headerName?: string;
+  cellRenderer?: any;
+  valueFormatter?: any;
+  valueGetter?: any;
+  cellStyle?: any;
 
   // Layout
   width?: string;
@@ -65,7 +72,7 @@ export interface GridColumn {
 
   // Custom Renderers (TemplateRef or Component class)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  cellRenderer?: Type<any> | TemplateRef<any>;
+  // cellRenderer?: Type<any> | TemplateRef<any>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   cellEditor?: Type<any> | TemplateRef<any>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -79,7 +86,7 @@ export interface GridColumn {
 
   // Formatting
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  formatter?: (value: any, row: any, isPinned?: boolean) => string;
+  formatter?: (value: any, row: any, isPinned?: boolean) => any;
 
   // Standard configs
   placeholder?: string;

@@ -218,13 +218,13 @@
             </div>
 
             <div class="grid-wrapper">
-              <app-ag-share-grid 
+              <app-data-grid [viewOnly]="true" [pagination]="true" [enableExport]="true" 
                 [columns]="inventoryColumns" 
                 [data]="inventoryData"
                 selectionMode="single" 
                 (gridEvent)="eventFromGrid($event)"
                 class="full-size-grid">
-              </app-ag-share-grid>
+              </app-data-grid>
             </div>
           </section>
 
@@ -236,3 +236,4 @@
 </div>
 
 <p-confirmDialog [style]="{width: '450px'}" appendTo="body" [breakpoints]="{'1199px': '75vw', '575px': '90vw'}"></p-confirmDialog>
+

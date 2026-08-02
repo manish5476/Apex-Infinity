@@ -4,7 +4,8 @@ import {
   OnInit,
   inject,
   signal,
-  ViewEncapsulation, OnDestroy } from '@angular/core';
+  ViewEncapsulation, OnDestroy
+} from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -16,7 +17,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { NoteService } from '../../../core/services/notes.service';
 import { AppMessageService } from '../../../core/services/message.service';
-import { AgShareGrid } from '../../shared/components/ag-shared-grid';
+import { DataGridComponent, GridColumn } from '@shared/ui/grid';
 import { DatePicker } from 'primeng/datepicker';
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
@@ -33,8 +34,8 @@ import { takeUntil } from "rxjs/operators";
     ToastModule,
     ConfirmDialogModule,
     DatePicker,
-    AgShareGrid
-],
+    DataGridComponent
+  ],
   providers: [ConfirmationService, DatePipe],
   encapsulation: ViewEncapsulation.None,
   template: `
@@ -140,13 +141,21 @@ import { takeUntil } from "rxjs/operators";
             </div>
           </div>
           <div class="list-grid-wrapper">
-            <app-ag-share-grid
+            <app-data-grid [viewOnly]="true" [pagination]="true" [enableExport]="true"
               [columns]="columnDefs"
               [data]="rowData"
               selectionMode="single"
-              (gridEvent)="onGridEvent($event)"
+              (sortChange)="onSortChange($event)"
+              (rowDelete)="onRowDelete($event)"
+              (rowClick)="onRowClick($event)"
+              (pageChange)="onPageChange($event)"
+              [lazy]="true"
+              [pagination]="true"
+              [totalRecords]="totalRecords"
+              [pageSize]="pageSize"
+              class="full-size-grid"
               >
-            </app-ag-share-grid>
+            </app-data-grid>
     
             @if (isLoading) {
               <div class="grid-loading-overlay">
@@ -396,7 +405,7 @@ import { takeUntil } from "rxjs/operators";
   ],
 })
 export class AdminNoteListComponent implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   private cdr = inject(ChangeDetectorRef);
   private noteService = inject(NoteService);
   private messageService = inject(AppMessageService);
@@ -404,7 +413,7 @@ export class AdminNoteListComponent implements OnInit, OnDestroy {
   private router = inject(Router);
 
   rowData: any[] = [];
-  columnDefs: any[] = [];
+  columnDefs: GridColumn[] = [];
   isLoading = false;
 
   currentPage = 1;
@@ -465,35 +474,30 @@ export class AdminNoteListComponent implements OnInit, OnDestroy {
     this.loadData(true);
   }
 
-  onGridEvent(event: any) {
-    switch (event.type) {
-      case 'sortChanged':
-        const sortModel = event.api.getSortModel();
-        if (sortModel.length > 0) {
-          this.filterState.sortBy = sortModel[0].colId;
-          this.filterState.order = sortModel[0].sort;
-        } else {
-          this.filterState.sortBy = 'createdAt';
-          this.filterState.order = 'desc';
-        }
-        this.loadData(true);
-        break;
+  onSortChange(sortData: any[]) {
+    if (sortData && sortData.length > 0) {
+      this.filterState.sortBy = sortData[0].field;
+      this.filterState.order = sortData[0].direction;
+    } else {
+      this.filterState.sortBy = 'createdAt';
+      this.filterState.order = 'desc';
+    }
+    this.loadData(true);
+  }
 
-      case 'reachedBottom':
-        if (!this.isLoading && this.rowData.length < this.totalRecords) {
-          this.loadData(false);
-        }
-        break;
+  onPageChange(event: any) {
+    this.currentPage = (event.page ?? 0) + 1;
+    this.pageSize = event.pageSize || this.pageSize;
+    this.loadData(true);
+  }
 
-      case 'delete':
-        this.confirmDelete(event.row);
-        break;
+  onRowDelete(row: any) {
+    this.confirmDelete(row);
+  }
 
-      case 'editStart':
-      case 'cellClicked':
-        this.router.navigate(['/notes', event.row._id]);
-
-        break;
+  onRowClick(row: any) {
+    if (row && row._id) {
+      this.router.navigate(['/notes', row._id]);
     }
   }
 
@@ -585,20 +589,20 @@ export class AdminNoteListComponent implements OnInit, OnDestroy {
       {
         field: 'title',
         headerName: 'Title',
-        width: 240,
+        width: '240px',
         pinned: 'left',
         sortable: true,
-        filter: true,
+        filterable: true,
         cellClass: 'cell-flex-center cell-title',
       },
 
       {
         field: 'noteType',
         headerName: 'Type',
-        width: 120,
+        width: '120px',
         sortable: true,
-        cellRenderer: (params: any) => {
-          const type = params.value || 'note';
+        formatter: (val: any) => {
+          const type = val || 'note';
           const iconMap: Record<string, string> = {
             meeting: 'pi-calendar',
             task: 'pi-check-square',
@@ -619,10 +623,10 @@ export class AdminNoteListComponent implements OnInit, OnDestroy {
       {
         field: 'priority',
         headerName: 'Priority',
-        width: 110,
+        width: '110px',
         sortable: true,
-        cellRenderer: (params: any) => {
-          const priority = (params.value || 'medium').toLowerCase();
+        formatter: (val: any) => {
+          const priority = (val || 'medium').toLowerCase();
           return `
             <div class="cell-flex-center">
               <span class="grid-badge badge-${priority}">
@@ -636,10 +640,10 @@ export class AdminNoteListComponent implements OnInit, OnDestroy {
       {
         field: 'owner',
         headerName: 'Owner',
-        width: 180,
-        cellRenderer: (params: any) => {
-          const name = params.data.owner?.name || 'Unknown';
-          const email = params.data.owner?.email || '';
+        width: '180px',
+        formatter: (_val: any, row: any) => {
+          const name = row?.owner?.name || 'Unknown';
+          const email = row?.owner?.email || '';
           const initial = name.charAt(0).toUpperCase();
 
           return `
@@ -657,10 +661,10 @@ export class AdminNoteListComponent implements OnInit, OnDestroy {
       {
         field: 'status',
         headerName: 'Status',
-        width: 120,
+        width: '120px',
         sortable: true,
-        cellRenderer: (params: any) => {
-          const status = (params.value || 'UNKNOWN').toLowerCase();
+        formatter: (val: any) => {
+          const status = (val || 'UNKNOWN').toLowerCase();
           const badgeClass = status === 'active' ? 'badge-success' : 'badge-neutral';
 
           return `
@@ -675,11 +679,11 @@ export class AdminNoteListComponent implements OnInit, OnDestroy {
       {
         field: 'createdAt',
         headerName: 'Created',
-        width: 140,
+        width: '140px',
         sortable: true,
-        cellRenderer: (params: any) => {
-          if (!params.value) return '-';
-          const dateObj = new Date(params.value);
+        formatter: (val: any) => {
+          if (!val) return '-';
+          const dateObj = new Date(val);
 
           return `
             <div class="cell-stack">
@@ -692,12 +696,12 @@ export class AdminNoteListComponent implements OnInit, OnDestroy {
 
       {
         field: 'dueDate',
-        headerName: 'Due Date',
-        width: 140,
+        header: 'Due Date',
+        width: '140px',
         sortable: true,
-        cellRenderer: (params: any) => {
-          if (!params.value) return `<span class="text-muted">-</span>`;
-          const date = new Date(params.value).toLocaleDateString();
+        formatter: (val: any) => {
+          if (!val) return `<span class="text-muted">-</span>`;
+          const date = new Date(val).toLocaleDateString();
           return `<span class="text-mono">${date}</span>`;
         },
       },
@@ -899,8 +903,9 @@ export class AdminNoteListComponent implements OnInit, OnDestroy {
   //     },
   //   ];
   // }
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }
+

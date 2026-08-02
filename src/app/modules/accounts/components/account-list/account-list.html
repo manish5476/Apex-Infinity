@@ -14,10 +14,11 @@
   </app-page-header>
 
   <app-page-content>
-    <app-data-grid 
+    <app-data-grid [viewOnly]="true"  
       [columns]="column" 
       [data]="data"
       [loading]="isLoading">
     </app-data-grid>
   </app-page-content>
 </app-page>
+

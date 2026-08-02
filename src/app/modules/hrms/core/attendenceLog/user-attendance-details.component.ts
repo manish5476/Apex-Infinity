@@ -18,7 +18,7 @@ import { DialogModule } from 'primeng/dialog';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TooltipModule } from 'primeng/tooltip';
 import { AvatarModule } from 'primeng/avatar';
-import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
+import { DataGridComponent, GridColumn, GridRowAction } from '@shared/ui/grid';
 
 @Component({
   selector: 'app-user-attendance-details',
@@ -32,7 +32,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
     SkeletonModule, 
     TooltipModule, 
     AvatarModule,
-    AgShareGrid
+    DataGridComponent
   ],
   providers: [MessageService, DatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -65,11 +65,12 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
         <p-card styleClass="glass-panel border-radius-xl shadow-xl overflow-hidden p-0 flex-col h-full slide-down" styleClass="animation-delay: 0.1s">
           
           <div class="grid-wrapper w-full flex-grow-1" style="min-height: 600px;">
-            <app-ag-share-grid 
+            <app-data-grid 
               [columns]="columns" 
               [data]="userLogs()"
-              (gridEvent)="onGridEvent($event)">
-            </app-ag-share-grid>
+              [rowActions]="rowActions"
+              (rowClick)="onRowClick($event)">
+            </app-data-grid>
           </div>
 
         </p-card>
@@ -320,7 +321,8 @@ export class UserAttendanceDetailsComponent implements OnInit, OnDestroy {
   userId: string = '';
   userLogs = signal<any[]>([]);
   isLoading = signal<boolean>(true);
-  columns: any[] = [];
+  columns: GridColumn[] = [];
+  rowActions: GridRowAction[] = [];
 
   // Inspection Sidebar State
   displayInspection = false;
@@ -343,14 +345,14 @@ export class UserAttendanceDetailsComponent implements OnInit, OnDestroy {
   private setupColumns() {
     this.columns = [
       {
-        headerName: 'Date & Time',
+        header: 'Date & Time',
         field: 'timestamp',
-        width: 250,
+        width: '250px',
         sortable: true,
-        cellRenderer: (params: any) => {
-          if (!params.value) return '';
-          const date = this.datePipe.transform(params.value, 'EEE, dd MMM yyyy');
-          const time = this.datePipe.transform(params.value, 'HH:mm:ss');
+        formatter: (val: any) => {
+          if (!val) return '';
+          const date = this.datePipe.transform(val, 'EEE, dd MMM yyyy');
+          const time = this.datePipe.transform(val, 'HH:mm:ss');
           return `
             <div style="display:flex; flex-direction:column; justify-content:center; height:100%; gap:4px; padding:4px 0;">
               <span style="font-weight:700; color:var(--text-primary); font-size:13px; line-height:1;">${date}</span>
@@ -359,11 +361,11 @@ export class UserAttendanceDetailsComponent implements OnInit, OnDestroy {
         }
       },
       {
-        headerName: 'Punch Type',
+        header: 'Punch Type',
         field: 'type',
-        width: 200,
-        cellRenderer: (params: any) => {
-          const type = params.value;
+        width: '200px',
+        formatter: (val: any) => {
+          const type = val;
           const typeStr = this.formatType(type);
           const icon = this.getTypeIcon(type);
           
@@ -379,11 +381,11 @@ export class UserAttendanceDetailsComponent implements OnInit, OnDestroy {
         }
       },
       {
-        headerName: 'Source',
+        header: 'Source',
         field: 'source',
-        width: 150,
-        cellRenderer: (params: any) => {
-          const source = params.value || 'unknown';
+        width: '150px',
+        formatter: (val: any) => {
+          const source = val || 'unknown';
           const icon = this.getSourceIcon(source);
           return `
             <div style="display:flex; align-items:center; gap:8px; height:100%; color:var(--text-secondary); font-size:13px; text-transform:capitalize;">
@@ -392,13 +394,13 @@ export class UserAttendanceDetailsComponent implements OnInit, OnDestroy {
         }
       },
       {
-        headerName: 'Status',
+        header: 'Status',
         field: 'processingStatus',
-        width: 180,
-        cellRenderer: (params: any) => {
-          const status = (params.value || 'UNKNOWN').toUpperCase();
-          const severity = this.getStatusSeverity(params.value);
-          const isCorrection = params.data?.isCorrection;
+        width: '180px',
+        formatter: (val: any, row: any) => {
+          const status = (val || 'UNKNOWN').toUpperCase();
+          const severity = this.getStatusSeverity(val);
+          const isCorrection = row?.isCorrection;
           
           let bg = 'var(--bg-secondary)', color = 'var(--text-secondary)', border = 'var(--border-secondary)';
           if(severity === 'success') { bg = 'var(--color-success-bg, #ecfdf5)'; color = 'var(--color-success, #16a34a)'; border = 'color-mix(in srgb, var(--color-success) 30%, transparent)'; }
@@ -414,21 +416,17 @@ export class UserAttendanceDetailsComponent implements OnInit, OnDestroy {
           html += `</div>`;
           return html;
         }
-      },
+      }
+    ];
+
+    this.rowActions = [
       {
-        headerName: 'Inspection',
-        colId: 'action',
-        width: 150,
-        pinned: 'right',
-        cellStyle: { 'padding-right': '1.5rem' },
-        cellRenderer: () => {
-          return `
-            <div style="display:flex; align-items:center; justify-content:flex-end; height:100%; cursor:pointer;">
-              <button class="ag-action-btn inspect-btn" data-action="inspect" title="Inspect Record">
-                <i class="pi pi-search-plus" style="font-size:12px;"></i> <span style="margin-left:6px; font-size:11px;">Inspect</span>
-              </button>
-            </div>`;
-        }
+        id: 'inspect',
+        icon: 'pi pi-search-plus',
+        label: 'Inspect',
+        tooltip: 'Inspect Record',
+        showWhen: 'always',
+        callback: (row) => this.inspectLog(row._id)
       }
     ];
   }
@@ -449,17 +447,10 @@ export class UserAttendanceDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
-  onGridEvent(event: any) {
-    if (event.type === 'gridReady') {
-      this.gridApi = event.api;
-    } else if (event.type === 'cellClicked' && event.colId === 'action') {
-      const nativeEvent = event.event as MouseEvent;
-      const target = nativeEvent.target as HTMLElement;
-      const btn = target.closest('.ag-action-btn');
-      
-      if (btn && btn.getAttribute('data-action') === 'inspect') {
-        this.inspectLog(event.row._id);
-      }
+  onRowClick(row: any) {
+    if (row && row._id) {
+      // By default if they click the row they might want to inspect
+      this.inspectLog(row._id);
     }
   }
 

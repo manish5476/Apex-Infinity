@@ -34,7 +34,7 @@
           <label class="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">Date Period</label>
           <p-datepicker formControlName="dateRange" selectionMode="range" [readonlyInput]="true"
             placeholder="Select Period" [showIcon]="true" [showClear]="true" [showButtonBar]="true" appendTo="body"
-            styleClass="w-60 h-[42px]" (onClose)="applyFilters()" (onClear)="onDateClear()" (onClearClick)="onDateClear()">
+            styleClass="w-60" (onClose)="applyFilters()" (onClear)="onDateClear()" (onClearClick)="onDateClear()">
           </p-datepicker>
         </div>
 
@@ -43,7 +43,7 @@
         <div class="flex flex-col gap-1 flex-1 min-w-[200px]">
           <label class="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">Search</label>
           <input pInputText formControlName="search" placeholder="Ref #, Detail..." (keyup.enter)="applyFilters()"
-            class="w-full h-[42px]" />
+            class="w-full" />
         </div>
         <div class="flex flex-col gap-1">
           <label class="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">Account</label>
@@ -55,7 +55,7 @@
           <label class="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">Type</label>
           <p-select appendTo="body" formControlName="txnType"
             [options]="[{label:'Debit', value:'debit'}, {label:'Credit', value:'credit'}]" placeholder="All Types"
-            [showClear]="true" styleClass="w-36 h-[42px] flex items-center" (onChange)="applyFilters()" [filter]="true"
+            [showClear]="true" styleClass="w-36 flex items-center" (onChange)="applyFilters()" [filter]="true"
             filterBy="label"></p-select>
         </div>
         }
@@ -83,15 +83,16 @@
             pTooltip="Reset Filters"></p-button>
         </div>
       </div>
+
+      <div class="mt-4 border-t border-[var(--border-secondary)] pt-3 -mx-5 px-5">
+        <app-tab-bar [tabs]="ledgerTabs" [activeTabId]="activeTabId()" (activeTabIdChange)="onTabChange($event)"></app-tab-bar>
+      </div>
     </ng-container>
   </app-page-header>
 
   <app-page-content>
 
-    <!-- Tabs Navigation -->
-    <div class="border-b border-[var(--border-secondary)] mb-4 pb-2">
-      <app-tab-bar [tabs]="ledgerTabs" [activeTabId]="activeTabId()" (activeTabIdChange)="onTabChange($event)"></app-tab-bar>
-    </div>
+
 
     <!-- Main Content Area -->
     <div class="flex-1 flex flex-col min-h-[500px]">
@@ -168,6 +169,9 @@
           <app-data-grid 
             [columns]="gridColumns()" 
             [data]="gridData()" 
+            [viewOnly]="true"
+            [pagination]="true"
+            [enableExport]="true"
             [loading]="isLoading()"
             [lazy]="true"
             [totalRecords]="gridData().length"

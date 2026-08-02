@@ -11,7 +11,7 @@ import { DatePicker } from 'primeng/datepicker';
 import { AdminAnalyticsService } from '../admin-analytics.service';
 import { CommonMethodService } from '../../core/utils/common-method.service';
 import { MasterListService } from '../../core/services/master-list.service';
-import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
+import { DataGridComponent, GridColumn } from '../../shared/ui/grid';
 import { MasterDropdownComponent } from '../../modules/shared/components/masterFilterDropdown/master-dropdown.component';
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
@@ -43,7 +43,7 @@ import { DataListCardComponent } from '../../shared/ui/data/list/data-list-card.
   imports: [
     CommonModule, FormsModule,
     TooltipModule, SelectModule, DatePicker,
-    AgShareGrid, MasterDropdownComponent,
+    DataGridComponent, MasterDropdownComponent,
     PageComponent, PageHeaderComponent, PageContentComponent,
     SectionComponent, WidgetRailComponent,
     StatCardComponent, CardComponent,
@@ -262,11 +262,11 @@ import { DataListCardComponent } from '../../shared/ui/data/list/data-list-card.
                  </ng-container>
                  <!-- Wrapped in a border to match the cards -->
                  <div class="border border-[var(--border-secondary)] rounded-[var(--ui-border-radius-lg)] overflow-hidden">
-                   <app-ag-share-grid
+                   <app-data-grid [viewOnly]="true" [pagination]="true" [enableExport]="true" class="full-size-grid"
                     [columns]="alertColumns"
                     [data]="dashboard()!.inventory.lowStockAlerts"
                     class="h-[320px] block">
-                   </app-ag-share-grid>
+                   </app-data-grid>
                  </div>
              </app-section>
            </div>
@@ -489,3 +489,5 @@ export class AdminDashboardUiComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 }
+
+

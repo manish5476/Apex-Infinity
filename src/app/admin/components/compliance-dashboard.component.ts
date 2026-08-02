@@ -9,7 +9,7 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
 import { CommonMethodService } from '../../core/utils/common-method.service';
 
 // Components
-import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
+import { DataGridComponent, GridColumn } from '../../shared/ui/grid';
 import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
 import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
 import { Subject } from "rxjs";
@@ -29,7 +29,7 @@ interface HealthIssue {
     ButtonModule,
     ProgressSpinnerModule,
     TooltipModule,
-    AgShareGrid,
+    DataGridComponent,
     UniversalFilterComponent // <--- Imported
   ],
   template: `
@@ -132,11 +132,11 @@ interface HealthIssue {
             </div>
 
             <div class="grid-wrapper">
-               <app-ag-share-grid 
+               <app-data-grid [viewOnly]="true" [pagination]="true" [enableExport]="true" class="full-size-grid" 
                  [columns]="auditColumns" 
                  [data]="complianceData()?.audit?.recentEvents || []" 
                  class="full-size-grid">
-               </app-ag-share-grid>
+               </app-data-grid>
             </div>
           </div>
 
@@ -364,3 +364,5 @@ export class ComplianceDashboardComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 }
+
+

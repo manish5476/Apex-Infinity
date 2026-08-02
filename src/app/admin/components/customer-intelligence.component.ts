@@ -4,7 +4,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { AdminAnalyticsService } from '../admin-analytics.service';
 import { CommonMethodService } from '../../core/utils/common-method.service';
-import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
+import { DataGridComponent, GridColumn } from '../../shared/ui/grid';
 import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
 import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
 import { Subject } from "rxjs";
@@ -16,7 +16,7 @@ import { takeUntil } from "rxjs/operators";
   imports: [
     TooltipModule,
     ProgressSpinnerModule,
-    AgShareGrid,
+    DataGridComponent,
     UniversalFilterComponent
   ],
   template: `
@@ -86,11 +86,11 @@ import { takeUntil } from "rxjs/operators";
           </span>
         </div>
         <div class="grid-wrap">
-          <app-ag-share-grid
+          <app-data-grid [viewOnly]="true" [pagination]="true" [enableExport]="true" class="full-size-grid"
             [columns]="ltvColumns"
             [data]="intelligenceData()?.valueAnalysis?.topLTV || []"
             class="fill-grid">
-          </app-ag-share-grid>
+          </app-data-grid>
         </div>
       </div>
 
@@ -687,3 +687,5 @@ export class CustomerIntelligenceComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 }
+
+

@@ -79,7 +79,7 @@ import { ButtonComponent } from '@shared/ui/form/button.component';
       </app-page-header>
 
       <app-page-content [padded]="false">
-        <app-data-grid
+        <app-data-grid [viewOnly]="true" 
           [columns]="columns"
           [data]="data()"
           [loading]="isLoading()"

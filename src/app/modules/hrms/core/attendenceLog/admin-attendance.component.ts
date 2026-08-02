@@ -23,7 +23,7 @@ import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
 
 // Shared
-import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
+import { DataGridComponent, GridColumn, GridRowAction } from '@shared/ui/grid';
 
 @Component({
   selector: 'app-admin-attendance',
@@ -43,7 +43,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
     InputIconModule,
     InputTextModule,
     ToastModule,
-    AgShareGrid
+    DataGridComponent
   ],
   providers: [MessageService, ConfirmationService, DatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -121,11 +121,12 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
         <!-- AG Grid Container -->
         <div class="table-container slide-down" style="animation-delay: 0.2s">
           <div class="grid-wrapper w-full h-full" style="min-height: 550px;">
-            <app-ag-share-grid 
+            <app-data-grid [viewOnly]="true" [pagination]="true" [enableExport]="true" 
               [columns]="columns" 
               [data]="logs()"
-              (gridEvent)="onGridEvent($event)">
-            </app-ag-share-grid>
+              [rowActions]="rowActions"
+              class="full-size-grid">
+            </app-data-grid>
           </div>
         </div>
       }
@@ -483,7 +484,8 @@ export class AdminAttendanceComponent implements OnInit, OnDestroy {
   isLoading = signal<boolean>(true);
   logs = signal<any[]>([]);
   stats = signal<any>(null);
-  columns: any[] = [];
+  columns: GridColumn[] = [];
+  rowActions: GridRowAction[] = [];
 
   isProcessing = signal<boolean>(false);
 
@@ -515,13 +517,13 @@ export class AdminAttendanceComponent implements OnInit, OnDestroy {
   private setupGridColumns() {
     this.columns = [
       {
-        headerName: 'EMPLOYEE',
+        header: 'EMPLOYEE',
         field: 'user.name',
-        width: 250,
+        width: '250px',
         sortable: true,
-        filter: true,
-        cellRenderer: (params: any) => {
-          const user = params.data?.user || {};
+        filterable: true,
+        formatter: (_val: any, row: any) => {
+          const user = row?.user || {};
           const name = user.name || 'Unknown';
           const code = user.employeeProfile?.employeeId || user._id?.substring(0, 8) || 'N/A';
           const initials = this.getInitials(name);
@@ -537,13 +539,13 @@ export class AdminAttendanceComponent implements OnInit, OnDestroy {
         }
       },
       {
-        headerName: 'LOG TIMESTAMP',
-        width: 200,
-        sortable: true,
-        cellRenderer: (params: any) => {
-          const type = params.data?.type;
-          const time = params.data?.timestamp ? this.datePipe.transform(params.data.timestamp, 'HH:mm:ss') : '--:--:--';
-          const date = params.data?.timestamp ? this.datePipe.transform(params.data.timestamp, 'dd MMM yyyy') : '--';
+        field: 'employee',
+        header: 'Employee',
+        width: '240px',
+        formatter: (_val: any, row: any) => {
+          const type = row?.type;
+          const time = row?.timestamp ? this.datePipe.transform(row.timestamp, 'HH:mm:ss') : '--:--:--';
+          const date = row?.timestamp ? this.datePipe.transform(row.timestamp, 'dd MMM yyyy') : '--';
 
           const icon = this.getTypeIcon(type);
           const colorClass = this.getTypeColorClass(type);
@@ -559,13 +561,14 @@ export class AdminAttendanceComponent implements OnInit, OnDestroy {
         }
       },
       {
-        headerName: 'CONTEXT / DEVICE',
-        width: 280,
-        cellRenderer: (params: any) => {
-          const source = params.data?.source || 'Unknown';
-          const address = params.data?.location?.address || 'Geo-Logged';
-          const ip = params.data?.ipAddress;
-          const hasGeo = !!params.data?.location?.geoJson?.coordinates;
+        field: 'context',
+        header: 'CONTEXT / DEVICE',
+        width: '280px',
+        formatter: (_val: any, row: any) => {
+          const source = row?.source || 'Unknown';
+          const address = row?.location?.address || 'Geo-Logged';
+          const ip = row?.ipAddress;
+          const hasGeo = !!row?.location?.geoJson?.coordinates;
 
           let html = `<div style="display:flex; flex-direction:column; justify-content:center; height:100%; gap:4px; font-size:12px; color:var(--c-text-muted);">`;
           html += `<span style="text-transform:capitalize; display:flex; align-items:center; gap:6px; color:var(--c-text-main); font-weight:500;"><i class="pi pi-desktop"></i> ${source} <span style="font-family:var(--font-mono); font-size:10px; color:var(--c-text-light); font-weight:normal;">(${ip || 'N/A'})</span></span>`;
@@ -577,13 +580,13 @@ export class AdminAttendanceComponent implements OnInit, OnDestroy {
         }
       },
       {
-        headerName: 'STATUS',
+        header: 'STATUS',
         field: 'processingStatus',
-        width: 160,
+        width: '160px',
         sortable: true,
-        cellRenderer: (params: any) => {
-          const status = (params.value || 'pending');
-          const isCorrection = params.data?.isCorrection;
+        formatter: (val: any, row: any) => {
+          const status = (val || 'pending');
+          const isCorrection = row?.isCorrection;
           const statusClass = this.getStatusClass(status, isCorrection);
 
           let html = `<div style="display:flex; flex-direction:column; justify-content:center; height:100%; gap:4px; align-items:flex-start;">`;
@@ -595,27 +598,29 @@ export class AdminAttendanceComponent implements OnInit, OnDestroy {
           return html;
         }
       },
+    ];
+
+    this.rowActions = [
       {
-        headerName: 'ACTION',
-        colId: 'actions',
-        width: 140,
-        pinned: 'right',
-        cellRenderer: (params: any) => {
-          const status = params.data?.processingStatus;
-
-          let html = `<div style="display:flex; gap:8px; align-items:center; height:100%;">`;
-
-          if (status !== 'processed' && status !== 'rejected') {
-            html += `<button class="action-btn verify-btn" data-action="verify" title="Verify Log"><i class="pi pi-check"></i></button>`;
-          }
-          if (status !== 'flagged') {
-            html += `<button class="action-btn flag-btn" data-action="flag" title="Flag Anomaly"><i class="pi pi-flag"></i></button>`;
-          }
-          html += `<button class="action-btn" data-action="edit" title="Correct Log"><i class="pi pi-pencil"></i></button>`;
-
-          html += `</div>`;
-          return html;
-        }
+        id: 'verify',
+        icon: 'pi pi-check',
+        label: 'Verify',
+        variant: 'primary',
+        callback: (row) => this.onVerify(row)
+      },
+      {
+        id: 'flag',
+        icon: 'pi pi-flag',
+        label: 'Flag',
+        variant: 'danger',
+        callback: (row) => this.openFlagModal(row)
+      },
+      {
+        id: 'edit',
+        icon: 'pi pi-pencil',
+        label: 'Correct',
+        variant: 'ghost',
+        callback: (row) => this.openCorrectModal(row)
       }
     ];
   }
@@ -654,20 +659,6 @@ export class AdminAttendanceComponent implements OnInit, OnDestroy {
   }
 
   onGridEvent(event: any) {
-    if (event.type === 'gridReady') {
-      this.gridApi = event.api;
-    } else if (event.type === 'cellClicked' && event.colId === 'actions') {
-      const nativeEvent = event.event as MouseEvent;
-      const target = nativeEvent.target as HTMLElement;
-      const btn = target.closest('.action-btn');
-
-      if (btn) {
-        const action = btn.getAttribute('data-action');
-        if (action === 'verify') this.onVerify(event.data);
-        if (action === 'flag') this.openFlagModal(event.data);
-        if (action === 'edit') this.openCorrectModal(event.data);
-      }
-    }
   }
 
   onVerify(log: any) {
@@ -778,3 +769,4 @@ export class AdminAttendanceComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 }
+

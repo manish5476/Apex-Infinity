@@ -17,7 +17,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { AvatarModule } from 'primeng/avatar';
-import { AgShareGrid } from '../../../../shared/components/ag-shared-grid';
+import { DataGridComponent, GridColumn } from '@shared/ui/grid';
 import { AppMessageService } from '@core/services/message.service';
 
 @Component({
@@ -27,7 +27,7 @@ import { AppMessageService } from '@core/services/message.service';
     CommonModule, RouterModule, DatePipe,
     ButtonModule, TagModule, ConfirmDialogModule,
     ToastModule, SkeletonModule, TooltipModule,
-    ProgressBarModule, AvatarModule, AgShareGrid
+    ProgressBarModule, AvatarModule, DataGridComponent
   ],
   providers: [MessageService, ConfirmationService],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -269,11 +269,11 @@ import { AppMessageService } from '@core/services/message.service';
               <div class="card-body p-0 flex-1 flex-col min-h-[400px]">
                 @if (employees().length > 0) {
                   <div class="list-grid-wrapper">
-                    <app-ag-share-grid
+                    <app-data-grid [viewOnly]="true" [pagination]="true" [enableExport]="true"
                       [columns]="gridColumns"
                       [data]="employees()"
-                      selectionMode="single">
-                    </app-ag-share-grid>
+                      class="full-size-grid">
+                    </app-data-grid>
                   </div>
                 } @else {
                   <div class="empty-glass-state h-full">
@@ -566,13 +566,13 @@ export class DepartmentDetailsComponent implements OnInit, OnDestroy {
   dept = signal<any>(null);
   employees = signal<any[]>([]);
   isLoading = signal(true);
-  gridColumns: any = [
+  gridColumns: GridColumn[] = [
     {
-      headerName: 'EMPLOYEE PROFILE',
+      field: 'profile',
+      header: 'EMPLOYEE PROFILE',
       flex: 2,
-      minWidth: 250,
-      cellRenderer: (p: any) => {
-        const emp = p.data;
+      minWidth: '250px',
+      formatter: (_val: any, emp: any) => {
         const name = emp.name || 'Unknown';
         const email = emp.email || 'No email provided';
         const avatar = emp.avatar;
@@ -599,23 +599,23 @@ export class DepartmentDetailsComponent implements OnInit, OnDestroy {
       }
     },
     {
-      headerName: 'SYSTEM ID',
+      header: 'SYSTEM ID',
       field: '_id',
-      width: 130,
-      cellRenderer: (p: any) => `
+      width: '130px',
+      formatter: (val: any) => `
         <div style="height: 100%; display: flex; align-items: center;">
           <span style="font-family: var(--font-mono); font-size: 10px; font-weight: 600; background: var(--bg-secondary); padding: 4px 8px; border-radius: var(--ui-border-radius-sm); border: var(--ui-border-width) solid var(--border-secondary); color: var(--text-secondary); line-height: 1; letter-spacing: 0.5px;">
-            ${p.value ? p.value.toString().slice(0, 8).toUpperCase() : 'N/A'}
+            ${val ? val.toString().slice(0, 8).toUpperCase() : 'N/A'}
           </span>
         </div>
       `
     },
     {
-      headerName: 'APPROVAL',
+      header: 'APPROVAL',
       field: 'status',
-      width: 140,
-      cellRenderer: (p: any) => {
-        const statusStr = (p.value || 'unknown').toLowerCase();
+      width: '140px',
+      formatter: (val: any) => {
+        const statusStr = (val || 'unknown').toLowerCase();
 
         // Default (Info/Blue)
         let bg = 'color-mix(in srgb, var(--color-info) 10%, transparent)';
@@ -642,12 +642,12 @@ export class DepartmentDetailsComponent implements OnInit, OnDestroy {
       }
     },
     {
-      headerName: 'ACCOUNT STATE',
+      header: 'ACCOUNT STATE',
       field: 'isActive',
-      width: 160,
+      width: '160px',
       pinned: 'right',
-      cellRenderer: (p: any) => {
-        const isActive = p.value;
+      formatter: (val: any) => {
+        const isActive = val;
 
         const color = isActive ? 'var(--color-success-dark, #059669)' : 'var(--color-error-dark, #dc2626)';
         const bg = isActive ? 'color-mix(in srgb, var(--color-success) 10%, transparent)' : 'color-mix(in srgb, var(--color-error) 10%, transparent)';

@@ -215,7 +215,7 @@
               <p-tabpanel value="0">
                 <div class="tab-content-wrapper">
                   <div class="grid-wrapper" style="height: 400px; width: 100%;">
-                    <app-data-grid [columns]="itemColumns" [data]="itemsData()">
+                    <app-data-grid [viewOnly]="true"  [columns]="itemColumns" [data]="itemsData()">
                     </app-data-grid>
                   </div>
 
@@ -243,7 +243,7 @@
                 <div class="tab-content-wrapper">
                   @if (paymentHistoryData().length > 0) {
                   <div class="grid-wrapper" style="height: 300px; width: 100%;">
-                    <app-data-grid [columns]="paymentColumns" [data]="paymentHistoryData()">
+                    <app-data-grid [viewOnly]="true"  [columns]="paymentColumns" [data]="paymentHistoryData()">
                     </app-data-grid>
                   </div>
                   } @else {

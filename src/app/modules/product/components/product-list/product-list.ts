@@ -22,8 +22,7 @@ import { ProductService } from '../../services/product-service';
 import { AppMessageService } from '../../../../core/services/message.service';
 // import { MasterListService } from '../../../../core/services/master-list.service';
 import { MasterDropdownComponent } from '../../../shared/components/masterFilterDropdown/master-dropdown.component';
-import { ImageCellRendererComponent } from '../../../shared/AgGrid/AgGridcomponents/image-cell-renderer/image-cell-renderer.component';
-import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
+import { DataGridComponent, GridColumn } from '@shared/ui/grid';
 import { Dialog } from "primeng/dialog";
 import { BulkProductEntry } from "../bulk-product-entry/bulk-product-entry";
 import { finalize, Subject } from 'rxjs';
@@ -44,7 +43,7 @@ import { CommonMethodService } from '../../../../core/utils/common-method.servic
     ButtonModule,
     InputTextModule,
     RouterModule,
-    AgShareGrid,
+    DataGridComponent,
     Dialog,
     BulkProductEntry,
     HasPermissionDirective,
@@ -77,7 +76,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
   bulkDialogVisible = signal(false);
   @ViewChild('fileInput') fileInput!: ElementRef;
   data = signal<any[]>([]);
-  column = signal<any[]>([]);
+  column = signal<GridColumn[]>([]);
   rowSelectionMode: any = 'single';
   isLoading = signal(false);
 
@@ -204,8 +203,8 @@ export class ProductListComponent implements OnInit, OnDestroy {
     }
   }
 
-  onGridReady(params: GridReadyEvent) {
-    this.gridApi = params.api;
+  onGridReady() {
+    // gridApi no longer used directly with DataGridComponent
   }
 
   eventFromGrid(event: any) {
@@ -283,414 +282,237 @@ export class ProductListComponent implements OnInit, OnDestroy {
   }
   getColumn(): void {
     this.column.set([
-
-      // ═══════════════════════════════════════════════════════
-      // GROUP 1 — PRODUCT DETAILS
-      // ═══════════════════════════════════════════════════════
       {
-        headerName: 'Product Details',
-        children: [
-          {
-            field: 'images',
-            headerName: '',
-            width: 60,
-            pinned: 'left',
-            cellRenderer: ImageCellRendererComponent,
-            valueGetter: (params: any) => params.data.images?.[0] || null,
-            filter: false,
-            sortable: false,
-            suppressMenu: true,
-            cellClass: 'cell-flex-center',
-          },
-
-          {
-            field: 'name',
-            headerName: 'Product Name',
-            pinned: 'left',
-            flex: 1.5,
-            minWidth: 240,
-            filter: 'agTextColumnFilter',
-            cellClass: 'cell-flex-center',
-            cellRenderer: (params: any) => {
-              const name = params.data?.name || '—';
-              const desc = params.data?.description || '';
-              const isActive = params.data?.isActive;
-              const isDeleted = params.data?.isDeleted;
-
-              const avatar = this.getAvatarStyle(name);
-              const initials = this.getInitials(name);
-
-              const statusBadge = isDeleted
-                ? `<span style="font-size:9.5px;font-weight:600;background:#FCEBEB;color:#791F1F;
-                    padding:1px 6px;border-radius:3px;">Deleted</span>`
-                : !isActive
-                  ? `<span style="font-size:9.5px;font-weight:600;background:#F1EFE8;color:#444441;
-                    padding:1px 6px;border-radius:3px;">Inactive</span>`
-                  : '';
-
-              return `
-                <div style="display:flex;align-items:center;gap:9px;width:100%;min-width:0;overflow:hidden;padding:5px 0;">
-                  <span style="
-                    width:30px;height:30px;border-radius:6px;flex-shrink:0;
-                    background:${avatar.background};color:${avatar.color};
-                    display:inline-flex;align-items:center;justify-content:center;
-                    font-size:9px;font-weight:700;letter-spacing:.02em;
-                  ">${initials}</span>
-                  <div style="min-width:0;flex:1;overflow:hidden;display:flex;flex-direction:column;gap:0;line-height:1.2;">
-                    <div style="display:flex;align-items:center;min-width:0;overflow:hidden;line-height:1.3;">
-                      <span style="font-size:12.5px;font-weight:600;color:var(--text-primary);
-                        white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0;">${name}</span>
-                      ${statusBadge
-                  ? `<span style="flex-shrink:0;margin-left:5px;">${statusBadge}</span>`
-                  : ''}
-                    </div>
-                    ${desc ? `<div style="font-size:10.5px;color:var(--text-tertiary);margin-top:1px;line-height:1.2;
-                      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${desc}</div>` : ''}
-                  </div>
-                </div>`;
-            },
-            tooltipValueGetter: (p: any) => p.data?.name ?? '',
-          },
-
-          {
-            field: 'sku',
-            headerName: 'SKU',
-            width: 140,
-            pinned: 'left',
-            filter: 'agTextColumnFilter',
-            cellClass: 'cell-flex-center',
-            cellRenderer: (params: any) => {
-              if (!params.value) return `<span style="color:var(--text-tertiary)">—</span>`;
-              return `<span style="
-                font-family:var(--font-mono);font-size:11.5px;font-weight:700;
-                color:#185FA5;background:#E6F1FB;
-                padding:2px 7px;border-radius:4px;letter-spacing:.03em;
-              ">${params.value}</span>`;
-            },
-          },
-        ],
+        field: 'images',
+        header: '',
+        width: '60px',
+        pinned: 'left',
+        formatter: (val: any, row: any) => {
+          const img = row.images?.[0];
+          return img ? `<img src="${img}" style="width:30px;height:30px;border-radius:4px;object-fit:cover;" />` : `<div style="width:30px;height:30px;border-radius:4px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;"><i class="pi pi-image" style="color:#ccc"></i></div>`;
+        }
       },
-
-      // ═══════════════════════════════════════════════════════
-      // GROUP 2 — CLASSIFICATION
-      // ═══════════════════════════════════════════════════════
       {
-        headerName: 'Classification',
-        children: [
-          {
-            field: 'brandId.name',
-            headerName: 'Brand',
-            width: 120,
-            filter: 'agSetColumnFilter',
-            cellClass: 'cell-flex-center',
-            cellRenderer: (params: any) => {
-              const brand = params.value;
-              if (!brand) return `<span style="color:var(--text-tertiary);font-size:12px;">—</span>`;
-              return `<span style="
-                font-size:11.5px;font-weight:600;
-                background:#E6F1FB;color:#0C447C;
-                padding:2px 8px;border-radius:4px;
-                white-space:nowrap;
-              ">${brand}</span>`;
-            },
-          },
+        field: 'name',
+        header: 'Product Name',
+        pinned: 'left',
+        flex: 1.5,
+        minWidth: '240px',
+        formatter: (val: any, row: any) => {
+          const name = row?.name || '—';
+          const desc = row?.description || '';
+          const isActive = row?.isActive;
+          const isDeleted = row?.isDeleted;
+          const avatar = this.getAvatarStyle(name);
+          const initials = this.getInitials(name);
+          const statusBadge = isDeleted
+            ? `<span style="font-size:9.5px;font-weight:600;background:#FCEBEB;color:#791F1F;padding:1px 6px;border-radius:3px;">Deleted</span>`
+            : !isActive
+              ? `<span style="font-size:9.5px;font-weight:600;background:#F1EFE8;color:#444441;padding:1px 6px;border-radius:3px;">Inactive</span>`
+              : '';
 
-          {
-            field: 'categoryId.name',
-            headerName: 'Category',
-            width: 130,
-            filter: 'agSetColumnFilter',
-            cellClass: 'cell-flex-center',
-            cellRenderer: (params: any) => {
-              const val = params.value;
-              if (!val) return `<span style="color:var(--text-tertiary);font-size:12px;">—</span>`;
-              return `<span style="font-size:12px;color:var(--text-secondary);font-weight:500;">${val}</span>`;
-            },
-          },
-
-          {
-            field: 'subCategoryId.name',
-            headerName: 'Sub-Category',
-            width: 140,
-            hide: true,
-            cellClass: 'cell-flex-center',
-            cellRenderer: (params: any) => {
-              const val = params.value;
-              if (!val) return `<span style="color:var(--text-tertiary);font-size:12px;">—</span>`;
-              return `<span style="font-size:12px;color:var(--text-secondary);">${val}</span>`;
-            },
-          },
-
-          {
-            field: 'unitId.code',
-            headerName: 'Unit',
-            width: 80,
-            cellClass: 'cell-flex-center',
-            cellRenderer: (params: any) => {
-              const val = params.value;
-              if (!val) return `<span style="color:var(--text-tertiary)">—</span>`;
-              return `<span style="
-                font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
-                background:#F1EFE8;color:#444441;padding:2px 7px;border-radius:4px;
-              ">${val}</span>`;
-            },
-          },
-        ],
+          return `
+            <div style="display:flex;align-items:center;gap:9px;width:100%;min-width:0;overflow:hidden;padding:5px 0;">
+              <span style="width:30px;height:30px;border-radius:6px;flex-shrink:0;background:${avatar.background};color:${avatar.color};display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;letter-spacing:.02em;">${initials}</span>
+              <div style="min-width:0;flex:1;overflow:hidden;display:flex;flex-direction:column;gap:0;line-height:1.2;">
+                <div style="display:flex;align-items:center;min-width:0;overflow:hidden;line-height:1.3;">
+                  <span style="font-size:12.5px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0;">${name}</span>
+                  ${statusBadge ? `<span style="flex-shrink:0;margin-left:5px;">${statusBadge}</span>` : ''}
+                </div>
+                ${desc ? `<div style="font-size:10.5px;color:var(--text-tertiary);margin-top:1px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${desc}</div>` : ''}
+              </div>
+            </div>`;
+        }
       },
-
-      // ═══════════════════════════════════════════════════════
-      // GROUP 3 — PRICING & MARGINS
-      // ═══════════════════════════════════════════════════════
       {
-        headerName: 'Pricing & Margins',
-        children: [
-          {
-            field: 'purchasePrice',
-            headerName: 'Buy Price',
-            width: 120,
-            sortable: true,
-            type: 'rightAligned',
-            cellClass: 'cell-flex-end',
-            cellRenderer: (params: any) => {
-              const val = params.value ?? 0;
-              return `<span style="
-                font-family:var(--font-mono);font-size:12.5px;font-weight:600;
-                color:var(--text-secondary);
-              ">${this.formatCurrency(val)}</span>`;
-            },
-          },
-
-          {
-            field: 'sellingPrice',
-            headerName: 'Sell Price',
-            width: 120,
-            sortable: true,
-            type: 'rightAligned',
-            cellClass: 'cell-flex-end',
-            cellRenderer: (params: any) => {
-              const val = params.value ?? 0;
-              return `<span style="
-                font-family:var(--font-mono);font-size:13px;font-weight:700;
-                color:#27500A;
-              ">${this.formatCurrency(val)}</span>`;
-            },
-          },
-
-          {
-            field: 'discountedPrice',
-            headerName: 'Disc. Price',
-            width: 120,
-            sortable: true,
-            type: 'rightAligned',
-            cellClass: 'cell-flex-end',
-            cellRenderer: (params: any) => {
-              const disc = params.value;
-              const sell = params.data?.sellingPrice ?? 0;
-              if (!disc || disc >= sell) {
-                return `<span style="color:var(--text-tertiary);font-size:12px;">—</span>`;
-              }
-              const saving = sell - disc;
-              return this.twoLine(
-                `<span style="font-family:var(--font-mono);font-size:12.5px;font-weight:600;color:#633806;">
-                  ${this.formatCurrency(disc)}
-                </span>`,
-                `<span style="font-size:10px;color:#854F0B;">
-                  save ${this.formatCurrency(saving)}
-                </span>`,
-                'text-align:right;',
-                'text-align:right;',
-              );
-            },
-          },
-
-          {
-            headerName: 'Margin',
-            width: 110,
-            sortable: true,
-            type: 'rightAligned',
-            cellClass: 'cell-flex-end',
-            valueGetter: (params: any) => {
-              const buy = params.data?.purchasePrice || 0;
-              const sell = params.data?.sellingPrice || 0;
-              if (sell === 0) return 0;
-              return ((sell - buy) / sell) * 100;
-            },
-            cellRenderer: (params: any) => {
-              const val: number = params.value || 0;
-              if (val === 0) return `<span style="color:var(--text-tertiary);font-size:12px;">—</span>`;
-
-              const isGood = val > 20;
-              const isLow = val < 10;
-              const color = isGood ? '#27500A' : isLow ? '#791F1F' : '#633806';
-              const bg = isGood ? '#EAF3DE' : isLow ? '#FCEBEB' : '#FAEEDA';
-              const arrow = isGood ? '↑' : isLow ? '↓' : '→';
-
-              return `<span style="
-                display:inline-flex;align-items:center;gap:3px;
-                font-family:var(--font-mono);font-size:11.5px;font-weight:700;
-                background:${bg};color:${color};
-                padding:2px 7px;border-radius:4px;
-              ">${arrow} ${val.toFixed(1)}%</span>`;
-            },
-          },
-
-          {
-            field: 'taxRate',
-            headerName: 'Tax %',
-            width: 95,
-            type: 'rightAligned',
-            cellClass: 'cell-flex-end',
-            cellRenderer: (params: any) => {
-              const val = params.value;
-              if (!val && val !== 0) return `<span style="color:var(--text-tertiary)">—</span>`;
-              const isInclusive = params.data?.isTaxInclusive;
-              return this.twoLine(
-                `<span style="font-family:var(--font-mono);font-size:12px;font-weight:600;
-                  color:var(--text-secondary);">${val}%</span>`,
-                isInclusive
-                  ? `<span style="font-size:9.5px;color:#3B6D11;">incl.</span>`
-                  : `<span style="font-size:9.5px;color:#854F0B;">excl.</span>`,
-                'text-align:right;',
-                'text-align:right;',
-              );
-            },
-          },
-        ],
+        field: 'sku',
+        header: 'SKU',
+        width: '140px',
+        pinned: 'left',
+        formatter: (val: any) => {
+          if (!val) return `<span style="color:var(--text-tertiary)">—</span>`;
+          return `<span style="font-family:var(--font-mono);font-size:11.5px;font-weight:700;color:#185FA5;background:#E6F1FB;padding:2px 7px;border-radius:4px;letter-spacing:.03em;">${val}</span>`;
+        }
       },
-
-      // ═══════════════════════════════════════════════════════
-      // GROUP 4 — INVENTORY & STATUS
-      // ═══════════════════════════════════════════════════════
       {
-        headerName: 'Inventory & Status',
-        children: [
-          {
-            headerName: 'Total Stock',
-            width: 120,
-            sortable: true,
-            type: 'rightAligned',
-            cellClass: 'cell-flex-end',
-            valueGetter: (params: any) => {
-              if (!Array.isArray(params.data?.inventory)) return 0;
-              return params.data.inventory.reduce(
-                (sum: number, item: any) => sum + (item.quantity || 0), 0
-              );
-            },
-            cellRenderer: (params: any) => {
-              const stock = params.value ?? 0;
-              const reorder = params.data?.inventory?.[0]?.reorderLevel ?? 10;
-              const isOut = stock === 0;
-              const isLow = stock > 0 && stock <= reorder;
-
-              if (isOut) {
-                return `<span style="
-                  display:inline-flex;align-items:center;gap:4px;
-                  font-family:var(--font-mono);font-size:12px;font-weight:700;
-                  background:#FCEBEB;color:#791F1F;
-                  padding:2px 8px;border-radius:4px;
-                ">0 · out</span>`;
-              }
-              if (isLow) {
-                return this.twoLine(
-                  `<span style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:#633806;">
-                    ${stock}
-                  </span>`,
-                  `<span style="font-size:9.5px;color:#854F0B;">low · reorder ${reorder}</span>`,
-                  'text-align:right;',
-                  'text-align:right;',
-                );
-              }
-              return `<span style="
-                font-family:var(--font-mono);font-size:13px;font-weight:700;
-                color:var(--text-primary);
-              ">${stock}</span>`;
-            },
-          },
-
-          {
-            field: 'defaultSupplierId.companyName',
-            headerName: 'Supplier',
-            width: 170,
-            tooltipField: 'defaultSupplierId.contactPerson',
-            cellClass: 'cell-flex-center',
-            cellRenderer: (params: any) => {
-              const name = params.value;
-              if (!name) return `<span style="color:var(--text-tertiary);font-size:12px;">—</span>`;
-              return `<span style="
-                font-size:12px;font-weight:500;
-                color:var(--text-secondary);
-                white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-              ">${name}</span>`;
-            },
-          },
-
-          {
-            field: 'isActive',
-            headerName: 'Status',
-            width: 110,
-            cellClass: 'cell-flex-center',
-            cellRenderer: (params: any) => {
-              const isDeleted = params.data?.isDeleted;
-              const isActive = params.value;
-              if (isDeleted) {
-                return `<span style="
-                  display:inline-flex;align-items:center;gap:4px;
-                  font-size:11px;font-weight:600;
-                  background:#FCEBEB;color:#791F1F;
-                  padding:3px 8px;border-radius:4px;
-                "><span style="width:5px;height:5px;border-radius:50%;background:#A32D2D;flex-shrink:0;display:inline-block;"></span>Deleted</span>`;
-              }
-              return isActive
-                ? `<span style="
-                    display:inline-flex;align-items:center;gap:4px;
-                    font-size:11px;font-weight:600;
-                    background:#EAF3DE;color:#27500A;
-                    padding:3px 8px;border-radius:4px;
-                  "><span style="width:5px;height:5px;border-radius:50%;background:#3B6D11;flex-shrink:0;display:inline-block;"></span>Active</span>`
-                : `<span style="
-                    display:inline-flex;align-items:center;gap:4px;
-                    font-size:11px;font-weight:600;
-                    background:#F1EFE8;color:#444441;
-                    padding:3px 8px;border-radius:4px;
-                  "><span style="width:5px;height:5px;border-radius:50%;background:#888780;flex-shrink:0;display:inline-block;"></span>Inactive</span>`;
-            },
-          },
-
-          {
-            field: 'updatedAt',
-            headerName: 'Last Updated',
-            width: 150,
-            sortable: true,
-            cellClass: 'cell-flex-center',
-            cellRenderer: (params: any) => {
-              if (!params.value) return `<span style="color:var(--text-tertiary)">—</span>`;
-              return this.twoLine(
-                this.common.formatDate(params.value, 'dd MMM yyyy'),
-                this.common.formatDate(params.value, 'hh:mm a'),
-                'font-size:12px;font-weight:500;color:var(--text-primary);',
-                'font-size:10px;color:var(--text-tertiary);font-family:var(--font-mono);',
-              );
-            },
-          },
-
-          {
-            field: 'createdAt',
-            headerName: 'Created',
-            width: 150,
-            hide: true,
-            cellClass: 'cell-flex-center',
-            cellRenderer: (params: any) => {
-              if (!params.value) return `<span style="color:var(--text-tertiary)">—</span>`;
-              return this.twoLine(
-                this.common.formatDate(params.value, 'dd MMM yyyy'),
-                this.common.formatDate(params.value, 'hh:mm a'),
-                'font-size:12px;font-weight:500;color:var(--text-primary);',
-                'font-size:10px;color:var(--text-tertiary);font-family:var(--font-mono);',
-              );
-            },
-          },
-        ],
+        field: 'brandId.name',
+        header: 'Brand',
+        width: '120px',
+        formatter: (val: any) => {
+          if (!val) return `<span style="color:var(--text-tertiary);font-size:12px;">—</span>`;
+          return `<span style="font-size:11.5px;font-weight:600;background:#E6F1FB;color:#0C447C;padding:2px 8px;border-radius:4px;white-space:nowrap;">${val}</span>`;
+        }
       },
+      {
+        field: 'categoryId.name',
+        header: 'Category',
+        width: '130px',
+        formatter: (val: any) => {
+          if (!val) return `<span style="color:var(--text-tertiary);font-size:12px;">—</span>`;
+          return `<span style="font-size:12px;color:var(--text-secondary);font-weight:500;">${val}</span>`;
+        }
+      },
+      {
+        field: 'subCategoryId.name',
+        header: 'Sub-Category',
+        width: '140px',
+        visible: false,
+        formatter: (val: any) => {
+          if (!val) return `<span style="color:var(--text-tertiary);font-size:12px;">—</span>`;
+          return `<span style="font-size:12px;color:var(--text-secondary);">${val}</span>`;
+        }
+      },
+      {
+        field: 'unitId.code',
+        header: 'Unit',
+        width: '80px',
+        formatter: (val: any) => {
+          if (!val) return `<span style="color:var(--text-tertiary)">—</span>`;
+          return `<span style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;background:#F1EFE8;color:#444441;padding:2px 7px;border-radius:4px;">${val}</span>`;
+        }
+      },
+      {
+        field: 'purchasePrice',
+        header: 'Buy Price',
+        width: '120px',
+        type: 'currency',
+        align: 'right'
+      },
+      {
+        field: 'sellingPrice',
+        header: 'Sell Price',
+        width: '120px',
+        type: 'currency',
+        align: 'right',
+        cellClass: () => 'text-success font-bold'
+      },
+      {
+        field: 'discountedPrice',
+        header: 'Disc. Price',
+        width: '120px',
+        align: 'right',
+        formatter: (val: any, row: any) => {
+          const disc = val;
+          const sell = row?.sellingPrice ?? 0;
+          if (!disc || disc >= sell) return `<span style="color:var(--text-tertiary);font-size:12px;">—</span>`;
+          const saving = sell - disc;
+          return this.twoLine(
+            `<span style="font-family:var(--font-mono);font-size:12.5px;font-weight:600;color:#633806;">${this.formatCurrency(disc)}</span>`,
+            `<span style="font-size:10px;color:#854F0B;">save ${this.formatCurrency(saving)}</span>`,
+            'text-align:right;', 'text-align:right;'
+          );
+        }
+      },
+      {
+        field: 'margin',
+        header: 'Margin',
+        width: '110px',
+        align: 'right',
+        formatter: (_val: any, row: any) => {
+          const buy = row?.purchasePrice || 0;
+          const sell = row?.sellingPrice || 0;
+          if (sell === 0) return `<span style="color:var(--text-tertiary);font-size:12px;">—</span>`;
+          const margin = ((sell - buy) / sell) * 100;
+          const isGood = margin > 20;
+          const isLow = margin < 10;
+          const color = isGood ? '#27500A' : isLow ? '#791F1F' : '#633806';
+          const bg = isGood ? '#EAF3DE' : isLow ? '#FCEBEB' : '#FAEEDA';
+          const arrow = isGood ? '↑' : isLow ? '↓' : '→';
+          return `<span style="display:inline-flex;align-items:center;gap:3px;font-family:var(--font-mono);font-size:11.5px;font-weight:700;background:${bg};color:${color};padding:2px 7px;border-radius:4px;">${arrow} ${margin.toFixed(1)}%</span>`;
+        }
+      },
+      {
+        field: 'taxRate',
+        header: 'Tax %',
+        width: '95px',
+        align: 'right',
+        formatter: (val: any, row: any) => {
+          if (!val && val !== 0) return `<span style="color:var(--text-tertiary)">—</span>`;
+          const isInclusive = row?.isTaxInclusive;
+          return this.twoLine(
+            `<span style="font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--text-secondary);">${val}%</span>`,
+            isInclusive ? `<span style="font-size:9.5px;color:#3B6D11;">incl.</span>` : `<span style="font-size:9.5px;color:#854F0B;">excl.</span>`,
+            'text-align:right;', 'text-align:right;'
+          );
+        }
+      },
+      {
+        field: 'stock',
+        header: 'Total Stock',
+        width: '120px',
+        align: 'right',
+        formatter: (_val: any, row: any) => {
+          const stock = Array.isArray(row?.inventory) ? row.inventory.reduce((sum: number, item: any) => sum + (item.quantity || 0), 0) : 0;
+          const reorder = row?.inventory?.[0]?.reorderLevel ?? 10;
+          const isOut = stock === 0;
+          const isLow = stock > 0 && stock <= reorder;
+
+          if (isOut) {
+            return `<span style="display:inline-flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:12px;font-weight:700;background:#FCEBEB;color:#791F1F;padding:2px 8px;border-radius:4px;">0 · out</span>`;
+          }
+          if (isLow) {
+            return this.twoLine(
+              `<span style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:#633806;">${stock}</span>`,
+              `<span style="font-size:9.5px;color:#854F0B;">low · reorder ${reorder}</span>`,
+              'text-align:right;', 'text-align:right;'
+            );
+          }
+          return `<span style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--text-primary);">${stock}</span>`;
+        }
+      },
+      {
+        field: 'defaultSupplierId.companyName',
+        header: 'Supplier',
+        width: '170px',
+        formatter: (val: any) => {
+          if (!val) return `<span style="color:var(--text-tertiary);font-size:12px;">—</span>`;
+          return `<span style="font-size:12px;font-weight:500;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${val}</span>`;
+        }
+      },
+      {
+        field: 'isActive',
+        header: 'Status',
+        width: '110px',
+        formatter: (val: any, row: any) => {
+          const isDeleted = row?.isDeleted;
+          const isActive = val;
+          if (isDeleted) {
+            return `<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;background:#FCEBEB;color:#791F1F;padding:3px 8px;border-radius:4px;"><span style="width:5px;height:5px;border-radius:50%;background:#A32D2D;flex-shrink:0;display:inline-block;"></span>Deleted</span>`;
+          }
+          return isActive
+            ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;background:#EAF3DE;color:#27500A;padding:3px 8px;border-radius:4px;"><span style="width:5px;height:5px;border-radius:50%;background:#3B6D11;flex-shrink:0;display:inline-block;"></span>Active</span>`
+            : `<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;background:#F1EFE8;color:#444441;padding:3px 8px;border-radius:4px;"><span style="width:5px;height:5px;border-radius:50%;background:#888780;flex-shrink:0;display:inline-block;"></span>Inactive</span>`;
+        }
+      },
+      {
+        field: 'updatedAt',
+        header: 'Last Updated',
+        width: '150px',
+        formatter: (val: any) => {
+          if (!val) return `<span style="color:var(--text-tertiary)">—</span>`;
+          return this.twoLine(
+            this.common.formatDate(val, 'dd MMM yyyy'),
+            this.common.formatDate(val, 'hh:mm a'),
+            'font-size:12px;font-weight:500;color:var(--text-primary);',
+            'font-size:10px;color:var(--text-tertiary);font-family:var(--font-mono);'
+          );
+        }
+      },
+      {
+        field: 'createdAt',
+        header: 'Created',
+        width: '150px',
+        visible: false,
+        formatter: (val: any) => {
+          if (!val) return `<span style="color:var(--text-tertiary)">—</span>`;
+          return this.twoLine(
+            this.common.formatDate(val, 'dd MMM yyyy'),
+            this.common.formatDate(val, 'hh:mm a'),
+            'font-size:12px;font-weight:500;color:var(--text-primary);',
+            'font-size:10px;color:var(--text-tertiary);font-family:var(--font-mono);'
+          );
+        }
+      }
     ]);
   }
 

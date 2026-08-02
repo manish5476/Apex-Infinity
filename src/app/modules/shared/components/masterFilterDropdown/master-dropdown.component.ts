@@ -103,13 +103,6 @@ import {
       width: 100%;
     }
 
-    :host ::ng-deep .master-dropdown__control .p-select-label,
-    :host ::ng-deep .master-dropdown__control .p-multiselect-label,
-    :host ::ng-deep .master-dropdown__control.p-select,
-    :host ::ng-deep .master-dropdown__control.p-multiselect {
-      min-height: 42px;
-    }
-
     :host ::ng-deep .master-dropdown__control.p-select,
     :host ::ng-deep .master-dropdown__control.p-multiselect {
       width: 100%;

@@ -248,7 +248,7 @@
         </div>
 
         <div class="grid-container">
-          <app-data-grid [columns]="txnColumns" [data]="txnData" (gridEvent)="eventFromGrid($event)">
+          <app-data-grid [viewOnly]="true"  [columns]="txnColumns" [data]="txnData" (gridEvent)="eventFromGrid($event)">
           </app-data-grid>
         </div>
 

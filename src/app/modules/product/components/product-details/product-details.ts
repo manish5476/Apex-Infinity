@@ -19,7 +19,7 @@ import { AppMessageService } from '../../../../core/services/message.service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
 import { ImageViewerDirective } from '../../../shared/directives/image-viewer.directive';
 import { ProductAnalyticsDirective } from '../../../../core/interceptors/pProductAnalyticsDirective';
-import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
+import { DataGridComponent, GridColumn } from '@shared/ui/grid';
 import { StockAdjustmentComponent } from '../stock-adjustment/stock-adjustment';
 import { StockTransferComponent } from '../stoct-transfer/stoct-transfer';
 import { ProductHistoryComponent } from '../product-history/product-history';
@@ -37,7 +37,7 @@ import { TabService } from '../../../../Tabbing';
 @Component({
   selector: 'app-product-details',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonModule, TagModule, SkeletonModule, CarouselModule, TooltipModule, ToastModule, ImageViewerDirective, ProductAnalyticsDirective, AgShareGrid, HasPermissionDirective, ConfirmDialogModule],
+  imports: [CommonModule, RouterModule, ButtonModule, TagModule, SkeletonModule, CarouselModule, TooltipModule, ToastModule, ImageViewerDirective, ProductAnalyticsDirective, DataGridComponent, HasPermissionDirective, ConfirmDialogModule],
   providers: [DialogService, ConfirmationService],
   templateUrl: './product-details.html',
   styleUrls: ['./product-details.scss'],
@@ -64,7 +64,7 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
   isError = signal(false);
 
   inventoryData: any[] = [];
-  inventoryColumns: any[] = []; productId: string | null = null;
+  inventoryColumns: GridColumn[] = []; productId: string | null = null;
 
   branchNameMap = new Map<string, string>();
 
@@ -97,43 +97,41 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
   setupInventoryColumns() {
     this.inventoryColumns = [
       {
-        headerName: 'Branch',
+        header: 'Branch',
         field: 'branchId',
-        width: 150,
-        cellRenderer: (params: any) => {
-          if (!params.value) return '';
-          const id = typeof params.value === 'object' ? params.value?._id : params.value;
+        width: '150px',
+        formatter: (val: any) => {
+          if (!val) return '';
+          const id = typeof val === 'object' ? val?._id : val;
           const name = this.branchNameMap.get(id) || 'Unknown Branch';
           return `<div style="font-weight:600;">${name}</div>`;
         }
       },
       {
-        headerName: 'Current Stock',
+        header: 'Current Stock',
         field: 'quantity',
-        width: 130,
-        cellStyle: { 'justify-content': 'flex-end', 'display': 'flex' },
-        cellRenderer: (params: any) => {
-          const val = params.value !== undefined ? params.value : 0;
-          return `<div style="font-family:monospace; font-weight:700;">${val}</div>`;
+        width: '130px',
+        align: 'right',
+        formatter: (val: any) => {
+          const v = val !== undefined ? val : 0;
+          return `<div style="font-family:monospace; font-weight:700;">${v}</div>`;
         }
       },
       {
-        headerName: 'Re-Order Level',
+        header: 'Re-Order Level',
         field: 'reorderLevel',
-        width: 130,
-        cellStyle: { 'justify-content': 'flex-end', 'display': 'flex' },
-        cellRenderer: (params: any) => params.value
+        width: '130px',
+        align: 'right'
       },
       {
-        headerName: 'Status',
-        width: 140,
-        valueGetter: (params: any) => {
-          const qty = params.data.quantity || 0;
-          const reorder = params.data.reorderLevel || 0;
-          return qty <= reorder ? 'Low' : 'OK';
-        },
-        cellRenderer: (params: any) => {
-          const isLow = params.value === 'Low';
+        field: 'status',
+        header: 'Status',
+        width: '140px',
+        formatter: (_val: any, row: any) => {
+          const qty = row?.quantity || 0;
+          const reorder = row?.reorderLevel || 0;
+          const isLow = qty <= reorder;
+
           const color = isLow ? '#d97706' : '#15803d';
           const bg = isLow ? '#fffbeb' : '#ecfdf5';
           const border = isLow ? '#fcd34d' : '#bbf7d0';

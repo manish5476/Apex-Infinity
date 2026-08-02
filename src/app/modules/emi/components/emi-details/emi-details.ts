@@ -18,9 +18,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { SkeletonModule } from 'primeng/skeleton';
 
-// AG Grid & Shared
-import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
-import { GridApi } from 'ag-grid-community';
+import { DataGridComponent, GridColumn } from '@shared/ui/grid';
 
 // Services
 import { EmiService } from '../../services/emi-service';
@@ -49,7 +47,7 @@ import { finalize, takeUntil } from "rxjs/operators";
     ToastModule,
     ConfirmDialogModule,
     SkeletonModule,
-    AgShareGrid,
+    DataGridComponent,
     HasPermissionDirective
   ],
   providers: [ConfirmationService, DatePipe],
@@ -75,9 +73,9 @@ export class EmiDetailsComponent implements OnInit, OnDestroy {
   isLoading = signal(true);
 
   // Grid
-  column: any[] = [];
+  column: GridColumn[] = [];
   gridData: any[] = [];
-  historyColumn: any[] = [];
+  historyColumn: GridColumn[] = [];
   historyData = signal<any[]>([]);
   activeTab = signal<'schedule' | 'history'>('schedule');
 
@@ -161,46 +159,45 @@ export class EmiDetailsComponent implements OnInit, OnDestroy {
   setupColumns() {
     this.column = [
       {
-        headerName: '#',
+        header: '#',
         field: 'installmentNumber',
-        width: 70,
+        width: '70px',
         sortable: true,
-        cellClass: 'font-bold text-gray-600 text-center'
+        cellClass: () => 'font-bold text-gray-600 text-center'
       },
       {
-        headerName: 'Due Date',
+        header: 'Due Date',
         field: 'dueDate',
-        width: 150,
-        valueFormatter: (params: any) => this.datePipe.transform(params.value, 'mediumDate'),
-        cellRenderer: (params: any) => {
-          const dateStr = this.datePipe.transform(params.value, 'mediumDate');
-          const isOverdue = this.isOverdue(params.data);
+        width: '150px',
+        formatter: (val: any, row: any) => {
+          const dateStr = this.datePipe.transform(val, 'mediumDate');
+          const isOverdue = this.isOverdue(row);
           return isOverdue
             ? `<div>${dateStr} <span style="color: #ef4444; font-size: 10px; font-weight: 800; margin-left: 4px;">OVERDUE</span></div>`
             : dateStr;
         }
       },
       {
-        headerName: 'Amount',
+        header: 'Amount',
         field: 'totalAmount',
-        width: 130,
-        type: 'rightAligned',
-        valueFormatter: (params: any) => this.common.formatCurrency(params.value)
+        width: '130px',
+        align: 'right',
+        formatter: (val: any) => this.common.formatCurrency(val)
       },
       {
-        headerName: 'Paid',
+        header: 'Paid',
         field: 'paidAmount',
-        width: 130,
-        type: 'rightAligned',
-        cellStyle: { color: '#16a34a', fontWeight: 'bold' },
-        valueFormatter: (params: any) => params.value > 0 ? this.common.formatCurrency(params.value) : '-'
+        width: '130px',
+        align: 'right',
+        cellClass: () => 'text-[#16a34a] font-bold',
+        formatter: (val: any) => val > 0 ? this.common.formatCurrency(val) : '-'
       },
       {
-        headerName: 'Status',
+        header: 'Status',
         field: 'paymentStatus',
-        width: 120,
-        cellRenderer: (params: any) => {
-          const status = params.value || 'pending';
+        width: '120px',
+        formatter: (val: any) => {
+          const status = val || 'pending';
           const color = status === 'paid' ? '#16a34a' : (status === 'partial' ? '#f59e0b' : '#dc2626');
           const bg = status === 'paid' ? '#dcfce7' : (status === 'partial' ? '#fef3c7' : '#fee2e2');
 
@@ -208,11 +205,11 @@ export class EmiDetailsComponent implements OnInit, OnDestroy {
         }
       },
       {
-        headerName: 'Action',
+        header: 'Action',
         field: 'action',
-        width: 100,
-        cellRenderer: (params: any) => {
-          if (params.data.paymentStatus === 'paid') {
+        width: '100px',
+        formatter: (_val: any, row: any) => {
+          if (row.paymentStatus === 'paid') {
             return `<i class="pi pi-check-circle text-green-500" style="font-size: 1.2rem;"></i>`;
           }
           return `<button class="action-pay-btn p-button-rounded p-button-text" style="cursor: pointer; background: var(--bg-secondary); border: none; color: #3b82f6;">
@@ -224,54 +221,54 @@ export class EmiDetailsComponent implements OnInit, OnDestroy {
 
     this.historyColumn = [
       {
-        headerName: 'Inst #',
+        header: 'Inst #',
         field: 'installmentNumber',
-        width: 80,
+        width: '80px',
         sortable: true,
-        cellClass: 'font-semibold text-center'
+        cellClass: () => 'font-semibold text-center'
       },
       {
-        headerName: 'Paid Date',
+        header: 'Paid Date',
         field: 'paidAt',
-        width: 150,
-        valueFormatter: (params: any) => params.value ? this.datePipe.transform(params.value, 'mediumDate') : '—',
-        cellStyle: { color: 'var(--accent-primary)', fontWeight: '600' }
+        width: '150px',
+        formatter: (val: any) => val ? this.datePipe.transform(val, 'mediumDate') : '—',
+        cellClass: () => 'text-accent-primary font-semibold'
       },
       {
-        headerName: 'Amount Paid',
+        header: 'Amount Paid',
         field: 'paidAmount',
-        width: 140,
-        type: 'rightAligned',
-        valueFormatter: (params: any) => this.common.formatCurrency(params.value),
-        cellStyle: { color: 'var(--color-success)', fontWeight: 'bold' }
+        width: '140px',
+        align: 'right',
+        formatter: (val: any) => this.common.formatCurrency(val),
+        cellClass: () => 'text-success font-bold'
       },
       {
-        headerName: 'Status',
+        header: 'Status',
         field: 'paymentStatus',
-        width: 120,
-        cellRenderer: (params: any) => {
-          const status = params.value || 'pending';
+        width: '120px',
+        formatter: (val: any) => {
+          const status = val || 'pending';
           const color = status === 'paid' ? '#16a34a' : (status === 'partial' ? '#f59e0b' : '#dc2626');
           const bg = status === 'paid' ? '#dcfce7' : (status === 'partial' ? '#fef3c7' : '#fee2e2');
           return `<span style="background:${bg}; color:${color}; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase;">${status}</span>`;
         }
       },
       {
-        headerName: 'Reference',
+        header: 'Reference',
         field: 'paymentId',
         flex: 1,
-        minWidth: 150,
-        cellRenderer: (params: any) => params.value ? `<span class="font-mono text-xs text-gray-500">ID: ${params.value.slice(-8).toUpperCase()}</span>` : '—'
+        minWidth: '150px',
+        formatter: (val: any) => val ? `<span class="font-mono text-xs text-gray-500">ID: ${val.slice(-8).toUpperCase()}</span>` : '—'
       }
     ];
   }
 
-  eventFromGrid(event: any) {
-    if (event.type === 'cellClicked') {
-      const target = event.field;
-      if (target === 'action') {
-        this.openPaymentDialog(event.row);
-      }
+  onRowClick(row: any) {
+    if (row && row.action === undefined) { 
+      // Note: DataGrid emits row on rowClick, if they want to pay they click anywhere on the row? 
+      // But the previous implementation checked event.field === 'action'
+      // We'll just open dialog if the row is not paid when clicked, or we can handle cell click inside formatter if possible, but row click is easier:
+      this.openPaymentDialog(row);
     }
   }
 

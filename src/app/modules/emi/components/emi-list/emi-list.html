@@ -112,7 +112,7 @@
 
       <!-- ─────────── GRID ─────────── -->
       <div class="flex-1 min-h-0 border border-[var(--border-secondary)] rounded-[var(--ui-border-radius-lg)] overflow-hidden">
-        <app-data-grid 
+        <app-data-grid [viewOnly]="true" [pagination]="true" [enableExport]="true" 
           [columns]="column" 
           [data]="data" 
           [rowActions]="rowActions"

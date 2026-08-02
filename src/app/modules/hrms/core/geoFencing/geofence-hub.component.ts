@@ -21,7 +21,7 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToastModule } from 'primeng/toast';
-import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
+import { DataGridComponent, GridColumn, GridRowAction } from '@shared/ui/grid';
 import { takeUntil } from "rxjs/operators";
 
 @Component({
@@ -39,7 +39,7 @@ import { takeUntil } from "rxjs/operators";
     InputIconModule,
     InputTextModule,
     ToastModule,
-    AgShareGrid
+    DataGridComponent
 ],
   providers: [MessageService, ConfirmationService, DatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -119,11 +119,12 @@ import { takeUntil } from "rxjs/operators";
                     </div>
 
                     <div class="grid-wrapper w-full flex-1 border-radius-lg border border-primary overflow-hidden" style="min-height: 400px;">
-                      <app-ag-share-grid 
+                      <app-data-grid [viewOnly]="true" [pagination]="true" [enableExport]="true" 
                         [columns]="geofenceColumns" 
                         [data]="geofences()"
-                        (gridEvent)="onGeofenceGridEvent($event)">
-                      </app-ag-share-grid>
+                        [rowActions]="geofenceActions"
+                        class="full-size-grid">
+                      </app-data-grid>
                     </div>
                     
                   </div>
@@ -143,11 +144,11 @@ import { takeUntil } from "rxjs/operators";
                     </div>
 
                     <div class="grid-wrapper w-full flex-1 border-radius-lg border border-error overflow-hidden" style="min-height: 400px;">
-                      <app-ag-share-grid 
+                      <app-data-grid [viewOnly]="true" [pagination]="true" [enableExport]="true" 
                         [columns]="violationColumns" 
                         [data]="violations()"
-                        (gridEvent)="onViolationGridEvent($event)">
-                      </app-ag-share-grid>
+                        class="full-size-grid">
+                      </app-data-grid>
                     </div>
 
                   </div>
@@ -278,8 +279,9 @@ export class GeofenceHubComponent implements OnInit, OnDestroy {
   geofences = signal<any[]>([]);
   violations = signal<any[]>([]);
 
-  geofenceColumns: any[] = [];
-  violationColumns: any[] = [];
+  geofenceColumns: GridColumn[] = [];
+  geofenceActions: GridRowAction[] = [];
+  violationColumns: GridColumn[] = [];
 
   ngOnInit() {
     this.setupGridColumns();
@@ -294,13 +296,14 @@ export class GeofenceHubComponent implements OnInit, OnDestroy {
     // 1. Geofence Active Definitions
     this.geofenceColumns = [
       {
-        headerName: 'Boundary Identity',
-        width: 280,
+        field: 'location',
+        header: 'Location / Site',
+        width: '260px',
         sortable: true,
-        filter: true,
-        cellRenderer: (params: any) => {
-          const name = params.data.name || 'Unknown';
-          const code = params.data.code || 'N/A';
+        filterable: true,
+        formatter: (_val: any, row: any) => {
+          const name = row.name || 'Unknown';
+          const code = row.code || 'N/A';
           return `
             <div style="display:flex; flex-direction:column; justify-content:center; height:100%; gap:6px; padding:4px 0;">
               <span style="font-weight:700; color:var(--text-primary); font-size:14px; line-height:1;">${name}</span>
@@ -309,12 +312,13 @@ export class GeofenceHubComponent implements OnInit, OnDestroy {
         }
       },
       {
-        headerName: 'Type & Reach',
-        width: 200,
-        cellRenderer: (params: any) => {
-          const type = params.data.type || 'circle';
+        field: 'metrics',
+        header: 'Metrics',
+        width: '180px',
+        formatter: (_val: any, row: any) => {
+          const type = row.type || 'circle';
           const icon = type === 'circle' ? 'pi-circle' : 'pi-stop';
-          const radius = type === 'circle' ? `<span style="font-size:11px; color:var(--text-tertiary);">Radius: ${params.data.radius}m</span>` : '';
+          const radius = type === 'circle' ? `<span style="font-size:11px; color:var(--text-tertiary);">Radius: ${row.radius}m</span>` : '';
           
           return `
             <div style="display:flex; flex-direction:column; justify-content:center; height:100%; gap:4px;">
@@ -326,11 +330,12 @@ export class GeofenceHubComponent implements OnInit, OnDestroy {
         }
       },
       {
-        headerName: 'Address / Location',
-        width: 280,
-        cellRenderer: (params: any) => {
-          const city = params.data.address?.city || 'Coordinates Only';
-          const tooltip = params.data.address ? `${params.data.address.line1 || ''}, ${city}` : '';
+        field: 'addressInfo',
+        header: 'Address / Location',
+        width: '240px',
+        formatter: (_val: any, row: any) => {
+          const city = row.address?.city || 'Coordinates Only';
+          const tooltip = row.address ? `${row.address.line1 || ''}, ${city}` : '';
           return `
             <div style="display:flex; align-items:center; gap:6px; height:100%; color:var(--text-secondary); font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${tooltip}">
               <i class="pi pi-map-marker text-tertiary"></i> ${city}
@@ -338,13 +343,12 @@ export class GeofenceHubComponent implements OnInit, OnDestroy {
         }
       },
       {
-        headerName: 'Status',
-        field: 'isActive',
-        width: 140,
+        field: 'status',
+        header: 'Status',
+        width: '130px',
         sortable: true,
-        cellStyle: { 'display': 'flex', 'align-items': 'center' },
-        cellRenderer: (params: any) => {
-          const isActive = params.value;
+        formatter: (val: any) => {
+          const isActive = val;
           const bg = isActive ? 'var(--color-success-bg, #ecfdf5)' : 'var(--color-error-bg, #fef2f2)';
           const color = isActive ? 'var(--color-success, #16a34a)' : 'var(--color-error, #dc2626)';
           const border = isActive ? 'color-mix(in srgb, var(--color-success) 30%, transparent)' : 'color-mix(in srgb, var(--color-error) 30%, transparent)';
@@ -355,59 +359,67 @@ export class GeofenceHubComponent implements OnInit, OnDestroy {
               ${text}
             </span>`;
         }
+      }
+    ];
+
+    this.geofenceActions = [
+      {
+        id: 'manage',
+        icon: 'pi pi-cog',
+        label: 'Manage Assignments',
+        showWhen: 'always',
+        callback: (row) => this.onManage(row._id)
       },
       {
-        headerName: 'Actions',
-        colId: 'actions',
-        width: 160,
-        pinned: 'right',
-        cellStyle: { 'padding-right': '1.5rem' },
-        cellRenderer: () => {
-          const btnStyle = `width:32px; height:32px; border-radius:50%; border:1px solid var(--border-secondary); background:var(--bg-secondary); color:var(--text-secondary); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:13px; padding:0;`;
-          return `
-            <div style="display:flex; gap:8px; justify-content:flex-end; align-items:center; height:100%;">
-              <button class="ag-action-btn" style="${btnStyle}" data-action="manage" title="Manage Assignments" onmouseover="this.style.background='var(--color-primary)'; this.style.color='#fff'; this.style.borderColor='var(--color-primary)';" onmouseout="this.style.background='var(--bg-secondary)'; this.style.color='var(--text-secondary)'; this.style.borderColor='var(--border-secondary)';"><i class="pi pi-cog"></i></button>
-              <button class="ag-action-btn" style="${btnStyle}" data-action="edit" title="Edit Fence" onmouseover="this.style.background='var(--color-info, #0ea5e9)'; this.style.color='#fff'; this.style.borderColor='var(--color-info, #0ea5e9)';" onmouseout="this.style.background='var(--bg-secondary)'; this.style.color='var(--text-secondary)'; this.style.borderColor='var(--border-secondary)';"><i class="pi pi-pencil"></i></button>
-              <button class="ag-action-btn" style="${btnStyle}" data-action="delete" title="Delete Fence" onmouseover="this.style.background='var(--color-error)'; this.style.color='#fff'; this.style.borderColor='var(--color-error)';" onmouseout="this.style.background='var(--bg-secondary)'; this.style.color='var(--text-secondary)'; this.style.borderColor='var(--border-secondary)';"><i class="pi pi-trash"></i></button>
-            </div>`;
-        }
+        id: 'edit',
+        icon: 'pi pi-pencil',
+        label: 'Edit Fence',
+        showWhen: 'always',
+        callback: (row) => this.onEdit(row._id)
+      },
+      {
+        id: 'delete',
+        icon: 'pi pi-trash',
+        label: 'Delete Fence',
+        showWhen: 'always',
+        callback: (row) => this.onDelete(row)
       }
     ];
 
     // 2. Violation Columns
     this.violationColumns = [
       {
-        headerName: 'Date & Time',
+        header: 'Date & Time',
         field: 'timestamp',
-        width: 200,
+        width: '200px',
         sortable: true,
-        cellRenderer: (params: any) => {
-          if (!params.value) return '';
-          return `<span style="font-family:var(--font-mono); font-size:13px; font-weight:700; color:var(--text-primary);">${this.datePipe.transform(params.value, 'dd MMM, HH:mm:ss')}</span>`;
+        formatter: (val: any) => {
+          if (!val) return '';
+          return `<span style="font-family:var(--font-mono); font-size:13px; font-weight:700; color:var(--text-primary);">${this.datePipe.transform(val, 'dd MMM, HH:mm:ss')}</span>`;
         }
       },
       {
-        headerName: 'Employee',
+        header: 'Employee',
         field: 'user.name',
-        width: 250,
+        width: '250px',
         sortable: true,
-        filter: true,
-        cellRenderer: (params: any) => `<span style="font-weight:700; color:var(--text-primary); font-size:13px;">${params.value || 'Unknown'}</span>`
+        filterable: true,
+        formatter: (val: any) => `<span style="font-weight:700; color:var(--text-primary); font-size:13px;">${val || 'Unknown'}</span>`
       },
       {
-        headerName: 'Assigned Fence',
+        header: 'Assigned Fence',
         field: 'expectedGeofence.name',
-        width: 250,
+        width: '250px',
         sortable: true,
-        cellRenderer: (params: any) => `<span style="color:var(--text-secondary); font-size:13px;">${params.value || 'N/A'}</span>`
+        formatter: (val: any) => `<span style="color:var(--text-secondary); font-size:13px;">${val || 'N/A'}</span>`
       },
       {
-        headerName: 'Distance from Zone',
+        header: 'Distance from Zone',
         field: 'distanceVariance',
-        width: 200,
+        width: '200px',
         pinned: 'right',
-        cellStyle: { 'text-align': 'right', 'padding-right': '1.5rem' },
-        cellRenderer: (params: any) => `<span style="font-weight:700; color:var(--color-error); font-size:14px;">${params.value || 0} meters</span>`
+        align: 'right',
+        formatter: (val: any) => `<span style="font-weight:700; color:var(--color-error); font-size:14px; padding-right:1.5rem;">${val || 0} meters</span>`
       }
     ];
   }
@@ -427,29 +439,6 @@ export class GeofenceHubComponent implements OnInit, OnDestroy {
       this.geofences.set(fences?.data?.geofences || []);
       this.violations.set(Array.isArray(viols?.data) ? viols.data : []); 
     });
-  }
-
-  onGeofenceGridEvent(event: any) {
-    if (event.type === 'gridReady') {
-      this.geofenceGridApi = event.api;
-    } else if (event.type === 'cellClicked' && event.colId === 'actions') {
-      const nativeEvent = event.event as MouseEvent;
-      const target = nativeEvent.target as HTMLElement;
-      const btn = target.closest('.ag-action-btn');
-      
-      if (btn) {
-        const action = btn.getAttribute('data-action');
-        if (action === 'manage') this.onManage(event.row._id);
-        if (action === 'edit') this.onEdit(event.row._id);
-        if (action === 'delete') this.onDelete(event.row);
-      }
-    }
-  }
-
-  onViolationGridEvent(event: any) {
-    if (event.type === 'gridReady') {
-      this.violationGridApi = event.api;
-    }
   }
 
   onSearchFences(event: Event) {

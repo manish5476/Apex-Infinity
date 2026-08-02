@@ -4,7 +4,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TooltipModule } from 'primeng/tooltip';
 import { AdminAnalyticsService } from '../admin-analytics.service';
 import { CommonMethodService } from '../../core/utils/common-method.service';
-import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
+import { DataGridComponent, GridColumn } from '../../shared/ui/grid';
 import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
 import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
 import { Subject } from "rxjs";
@@ -23,7 +23,7 @@ interface EMIData {
   standalone: true,
   imports: [
     CommonModule, ProgressSpinnerModule, TooltipModule,
-    AgShareGrid, UniversalFilterComponent
+    DataGridComponent, UniversalFilterComponent
   ],
   template: `
 <div class="emi-root">
@@ -115,11 +115,11 @@ interface EMIData {
           <span class="data-tag">Data view</span>
         </div>
         <div class="grid-wrap">
-          <app-ag-share-grid
+          <app-data-grid [viewOnly]="true" [pagination]="true" [enableExport]="true" class="full-size-grid"
             [columns]="emiColumns"
             [data]="emiRawData()"
             class="fill-grid">
-          </app-ag-share-grid>
+          </app-data-grid>
         </div>
       </div>
 
@@ -675,3 +675,4 @@ export class EmiAnalyticsComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 }
+

@@ -156,7 +156,7 @@ import { PageHeaderComponent } from '@shared/ui/layout/page-header/page-header.c
                 </div>
 
                 <div class="flex-1 min-h-[450px]">
-                  <app-data-grid
+                  <app-data-grid [viewOnly]="true" 
                     [columns]="attendanceColumns"
                     [data]="filteredAttendanceReportData()"
                     [loading]="isLoadingReport()">
@@ -213,7 +213,7 @@ import { PageHeaderComponent } from '@shared/ui/layout/page-header/page-header.c
                 </div>
 
                 <div class="flex-1 min-h-[450px]">
-                  <app-data-grid
+                  <app-data-grid [viewOnly]="true" 
                     [columns]="leaveColumns"
                     [data]="filteredLeaveReportData()"
                     [loading]="isLoadingLeave()">
@@ -417,3 +417,4 @@ export class AttendanceReportsComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 }
+

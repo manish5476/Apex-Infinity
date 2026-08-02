@@ -16,6 +16,7 @@ import { DirectoryExplorerComponent } from './directory-explorer.component';
 import { HierarchyVisualizerComponent } from './hierarchy-visualizer.component';
 import { WorkforceStatsComponent } from './workforce-stats.component';
 import { AppMessageService } from '@core/services/message.service';
+import { GridColumn } from '@shared/ui/grid';
 
 
 @Component({
@@ -214,38 +215,38 @@ export class DepartmentHubComponent implements OnInit, OnDestroy {
   stats = signal<any>(null);
 
   // AG Grid Columns
-  gridColumns = [
+  gridColumns: GridColumn[] = [
     {
       field: 'name',
-      headerName: 'DEPARTMENT',
+      header: 'DEPARTMENT',
       flex: 1.5,
-      minWidth: 220,
-      cellRenderer: (p: any) => `
+      minWidth: '220px',
+      formatter: (val: any) => `
         <div style="height: 100%; display: flex; align-items: center; gap: 8px;">
           <div style="width: 4px; height: 16px; border-radius: 2px; background: var(--accent-primary);"></div>
-          <span style="font-weight: 600; color: var(--text-primary); font-size: 14px;">${p.value}</span>
+          <span style="font-weight: 600; color: var(--text-primary); font-size: 14px;">${val}</span>
         </div>
       `
     },
     {
       field: 'code',
-      headerName: 'CODE',
-      width: 120,
-      cellRenderer: (p: any) => `
+      header: 'CODE',
+      width: '120px',
+      formatter: (val: any) => `
         <div style="height: 100%; display: flex; align-items: center;">
           <span style="font-family: var(--font-mono); font-size: 10px; background: var(--bg-secondary); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border-secondary); color: var(--text-secondary);">
-            ${p.value || 'N/A'}
+            ${val || 'N/A'}
           </span>
         </div>
       `
     },
     {
       field: 'hodName',
-      headerName: 'HEAD OF DEPT',
+      header: 'HEAD OF DEPT',
       flex: 1.5,
-      minWidth: 220,
-      cellRenderer: (p: any) => {
-        const name = p.value;
+      minWidth: '220px',
+      formatter: (val: any) => {
+        const name = val;
         return name ? `
           <div style="height: 100%; display: flex; align-items: center; gap: 8px; color: var(--text-secondary);">
             <i class="pi pi-user" style="font-size: 12px;"></i>
@@ -258,22 +259,22 @@ export class DepartmentHubComponent implements OnInit, OnDestroy {
     },
     {
       field: 'employeeCount',
-      headerName: 'WORKFORCE',
-      width: 130,
-      cellRenderer: (p: any) => `
+      header: 'WORKFORCE',
+      width: '130px',
+      formatter: (val: any) => `
         <div style="height: 100%; display: flex; align-items: center; gap: 6px;">
           <i class="pi pi-users" style="font-size: 12px; color: var(--text-tertiary);"></i>
-          <span style="font-weight: 700; color: var(--text-primary);">${p.value || 0}</span>
+          <span style="font-weight: 700; color: var(--text-primary);">${val || 0}</span>
         </div>
       `
     },
     {
       field: 'activeEmployees',
-      headerName: 'STATUS',
-      width: 140,
+      header: 'STATUS',
+      width: '140px',
       pinned: 'right',
-      cellRenderer: (p: any) => {
-        const isActive = p.value > 0;
+      formatter: (val: any) => {
+        const isActive = val > 0;
         const color = isActive ? 'var(--color-success)' : 'var(--color-error)';
         const bg = isActive ? 'var(--color-success-bg)' : 'var(--color-error-bg)';
         const text = isActive ? 'ACTIVE' : 'INACTIVE';

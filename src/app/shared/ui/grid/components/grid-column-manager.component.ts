@@ -15,9 +15,9 @@ interface ColumnToggle {
   standalone: true,
   imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { 
+  host: {
     class: 'block absolute right-4 z-[500] origin-top-right',
-    style: 'top: 52px;' 
+    style: 'top: 52px;'
   },
   template: `
     <div class="w-[280px] bg-[var(--bg-primary)] border border-[var(--border-secondary)] rounded-[var(--ui-border-radius-lg)] shadow-[var(--elevation-3)] overflow-hidden flex flex-col animate-[apex-pop-in_0.15s_ease-out]" (click)="$event.stopPropagation()">
@@ -118,15 +118,15 @@ export class GridColumnManagerComponent {
   toggles = computed<ColumnToggle[]>(() => {
     const all = this.columns();
     const vis = this.visibleColumns();
-    
+
     // Maintain visual order: Visible items in specified order, then hidden items
     const orderedVis = vis.map(v => all.find(c => c.field === v)).filter(Boolean) as GridColumn[];
     const hidden = all.filter(c => !vis.includes(c.field));
     const combined = [...orderedVis, ...hidden];
-    
+
     return combined.map(col => ({
       field: col.field,
-      header: col.header,
+      header: col.header ?? col.field ?? 'Column',
       visible: vis.includes(col.field),
       hideable: col.hideable !== false,
       sticky: col.sticky,
@@ -181,7 +181,7 @@ export class GridColumnManagerComponent {
     // Filter out only the visible ones to emit the new order
     const newVis = combined.filter(c => c.visible).map(c => c.field);
     this.visibilityChange.emit(newVis);
-    
+
     this.onDragEnd();
   }
 
@@ -190,9 +190,9 @@ export class GridColumnManagerComponent {
     // We preserve the order of the current toggles list to prevent it jumping to the bottom
     const currentOrder = this.toggles().map(t => t.field);
     const newVisSet = new Set(this.visibleColumns());
-    
+
     visible ? newVisSet.add(field) : newVisSet.delete(field);
-    
+
     // Sort the new array based on the existing `currentOrder` so it doesn't shift positions wildly
     const finalVis = currentOrder.filter(f => newVisSet.has(f));
     this.visibilityChange.emit(finalVis);
@@ -211,240 +211,7 @@ export class GridColumnManagerComponent {
   }
 
   @HostListener('document:click')
-  onDocClick(): void { 
-    this.close.emit(); 
+  onDocClick(): void {
+    this.close.emit();
   }
 }
-
-
-// import {
-//   Component, ChangeDetectionStrategy, input, output,
-//   signal, computed, HostListener
-// } from '@angular/core';
-// import { GridColumn } from '../grid-types';
-
-// interface ColumnToggle {
-//   field: string;
-//   header: string;
-//   visible: boolean;
-//   hideable: boolean;
-//   sticky?: 'left' | 'right' | false;
-// }
-
-// /**
-//  * Component: app-grid-column-manager
-//  * Popover panel for toggling column visibility.
-//  * Persists changes immediately via (visibilityChange) output.
-//  */
-// @Component({
-//   selector: 'app-grid-column-manager',
-//   standalone: true,
-//   changeDetection: ChangeDetectionStrategy.OnPush,
-//   host: {
-//     class: 'block',
-//     style: 'position: absolute; top: 44px; right: 8px; z-index: 500;',
-//   },
-//   template: `
-//     <div class="w-64 bg-[var(--bg-primary)] border border-[var(--border-secondary)]
-//                 rounded-[var(--ui-border-radius)] shadow-[var(--elevation-3)] overflow-hidden"
-//          (click)="$event.stopPropagation()">
-
-//       <!-- Header -->
-//       <div class="flex items-center justify-between px-4 py-3
-//                   border-b border-[var(--border-secondary)]">
-//         <span class="text-[length:var(--font-size-sm)] font-[var(--font-weight-semibold)]
-//                      text-[var(--text-primary)] flex items-center gap-2">
-//           <i class="pi pi-table text-[var(--accent-primary)] text-xs"></i>
-//           Columns
-//         </span>
-//         <div class="flex items-center gap-2">
-//           <button type="button" (click)="showAll()"
-//                   class="text-[10px] text-[var(--accent-primary)] hover:underline font-medium outline-none">
-//             Show all
-//           </button>
-//           <button type="button" (click)="close.emit()"
-//                   class="w-6 h-6 flex items-center justify-center rounded
-//                          text-[var(--text-tertiary)] hover:bg-[var(--bg-secondary)] outline-none">
-//             <i class="pi pi-times text-xs"></i>
-//           </button>
-//         </div>
-//       </div>
-
-//       <!-- Search -->
-//       <div class="px-3 py-2 border-b border-[var(--border-secondary)]">
-//         <div class="flex items-center gap-2 px-2 py-1 rounded-[var(--ui-border-radius-sm)]
-//                     bg-[var(--bg-secondary)] border border-[var(--border-secondary)]">
-//           <i class="pi pi-search text-[10px] text-[var(--text-tertiary)]"></i>
-//           <input type="text" placeholder="Search columns…"
-//                  class="flex-1 bg-transparent border-none outline-none
-//                         text-[length:var(--font-size-xs)] text-[var(--text-primary)]
-//                         placeholder:text-[var(--text-tertiary)]"
-//                  (input)="searchQuery.set($any($event.target).value)">
-//         </div>
-//       </div>
-
-//       <!-- Column List -->
-//       <div class="max-h-72 overflow-y-auto">
-//         @for (col of filteredColumns(); track col.field; let idx = $index) {
-//           <label class="flex items-center gap-3 px-4 py-2 cursor-pointer group
-//                         hover:bg-[var(--component-bg-hover)] transition-[var(--transition-fast)]"
-//                  [class.opacity-50]="!col.hideable && !col.visible"
-//                  draggable="true"
-//                  (dragstart)="onDragStart($event, col, idx)"
-//                  (dragover)="onDragOver($event, idx)"
-//                  (drop)="onDrop($event, col, idx)">
-                 
-//             <i class="pi pi-bars text-[10px] text-[var(--text-tertiary)] cursor-grab active:cursor-grabbing hover:text-[var(--text-primary)]"></i>
-
-//             <!-- Toggle -->
-//             <div class="relative flex items-center justify-center shrink-0">
-//               <input type="checkbox"
-//                      class="sr-only peer"
-//                      [checked]="col.visible"
-//                      [disabled]="!col.hideable && col.visible"
-//                      (change)="onToggle(col.field, $any($event.target).checked)">
-//               <div class="w-8 h-4 rounded-full transition-[var(--transition-fast)] relative
-//                           peer-checked:bg-[var(--accent-primary)]
-//                           peer-not-checked:bg-[var(--bg-ternary)]
-//                           border border-[var(--border-secondary)]">
-//                 <div class="absolute top-0.5 h-3 w-3 rounded-full bg-white shadow transition-[var(--transition-fast)]"
-//                      [class.left-0.5]="!col.visible"
-//                      [class.left-4]="col.visible"></div>
-//               </div>
-//             </div>
-
-//             <!-- Column name -->
-//             <span class="flex-1 text-[length:var(--font-size-xs)] text-[var(--text-primary)]
-//                          font-[var(--font-weight-medium)] truncate">
-//               {{ col.header }}
-//             </span>
-
-//             <!-- Sticky indicator -->
-//             @if (col.sticky) {
-//               <span class="text-[9px] px-1.5 py-0.5 rounded-full font-medium
-//                            bg-[color-mix(in_srgb,var(--accent-primary)_12%,transparent)]
-//                            text-[var(--accent-primary)]">
-//                 {{ col.sticky }}
-//               </span>
-//             }
-
-//             <div class="ml-auto flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-//               <button type="button" class="p-1 hover:bg-[var(--bg-secondary)] rounded text-[var(--text-secondary)]" 
-//                       (click)="$event.preventDefault(); onPin(col.field, col.sticky === 'left' ? false : 'left')"
-//                       [class.text-[var(--accent-primary)]]="col.sticky === 'left'"
-//                       title="Pin Left">
-//                 <i class="pi pi-angle-double-left text-[10px]"></i>
-//               </button>
-//               <button type="button" class="p-1 hover:bg-[var(--bg-secondary)] rounded text-[var(--text-secondary)]"
-//                       (click)="$event.preventDefault(); onPin(col.field, col.sticky === 'right' ? false : 'right')"
-//                       [class.text-[var(--accent-primary)]]="col.sticky === 'right'"
-//                       title="Pin Right">
-//                 <i class="pi pi-angle-double-right text-[10px]"></i>
-//               </button>
-//             </div>
-//           </label>
-//         }
-//       </div>
-
-//       <!-- Footer: stats -->
-//       <div class="px-4 py-2 border-t border-[var(--border-secondary)]
-//                   text-[10px] text-[var(--text-tertiary)] flex items-center justify-between">
-//         <span>{{ visibleCount() }} of {{ toggles().length }} visible</span>
-//         <button type="button" (click)="reset()"
-//                 class="text-[var(--accent-primary)] hover:underline outline-none font-medium">
-//           Reset
-//         </button>
-//       </div>
-//     </div>
-//   `,
-// })
-// export class GridColumnManagerComponent {
-//   columns       = input<GridColumn[]>([]);
-//   visibleColumns = input<string[]>([]);
-
-//   visibilityChange = output<string[]>();
-//   pinChange        = output<{ field: string; sticky: 'left' | 'right' | false }>();
-//   close            = output<void>();
-
-//   protected searchQuery = signal('');
-
-//   protected toggles = computed<ColumnToggle[]>(() => {
-//     const all = this.columns();
-//     const vis = this.visibleColumns();
-//     // Order based on visibility array
-//     const orderedVis = vis.map(v => all.find(c => c.field === v)).filter(Boolean) as GridColumn[];
-//     const hidden = all.filter(c => !vis.includes(c.field));
-//     const combined = [...orderedVis, ...hidden];
-    
-//     return combined.map(col => ({
-//       field:    col.field,
-//       header:   col.header,
-//       visible:  vis.includes(col.field),
-//       hideable: col.hideable !== false,
-//       sticky:   col.sticky,
-//     }));
-//   });
-
-//   protected filteredColumns = computed(() => {
-//     const q = this.searchQuery().toLowerCase();
-//     return this.toggles().filter(c => !q || c.header.toLowerCase().includes(q));
-//   });
-
-//   protected visibleCount = computed(() => this.toggles().filter(c => c.visible).length);
-
-//   protected onToggle(field: string, visible: boolean): void {
-//     const current = new Set(this.visibleColumns());
-//     if (visible) current.add(field);
-//     else current.delete(field);
-//     this.visibilityChange.emit(Array.from(current));
-//   }
-
-//   protected showAll(): void {
-//     this.visibilityChange.emit(this.columns().map(c => c.field));
-//   }
-
-//   protected reset(): void {
-//     const defaults = this.columns()
-//       .filter(c => c.visible !== false)
-//       .map(c => c.field);
-//     this.visibilityChange.emit(defaults);
-//   }
-
-//   protected onPin(field: string, sticky: 'left' | 'right' | false): void {
-//     this.pinChange.emit({ field, sticky });
-//   }
-
-//   // --- Drag and Drop ---
-//   private dragIndex: number = -1;
-
-//   protected onDragStart(event: DragEvent, col: ColumnToggle, index: number): void {
-//     this.dragIndex = index;
-//     if (event.dataTransfer) {
-//       event.dataTransfer.effectAllowed = 'move';
-//     }
-//   }
-
-//   protected onDragOver(event: DragEvent, index: number): void {
-//     event.preventDefault();
-//     if (event.dataTransfer) {
-//       event.dataTransfer.dropEffect = 'move';
-//     }
-//   }
-
-//   protected onDrop(event: DragEvent, col: ColumnToggle, dropIndex: number): void {
-//     event.preventDefault();
-//     if (this.dragIndex === -1 || this.dragIndex === dropIndex) return;
-
-//     const combined = [...this.toggles()];
-//     const item = combined.splice(this.dragIndex, 1)[0];
-//     combined.splice(dropIndex, 0, item);
-
-//     // Only emit the visible ones in their new order
-//     const newVis = combined.filter(c => c.visible).map(c => c.field);
-//     this.visibilityChange.emit(newVis);
-//     this.dragIndex = -1;
-//   }
-
-//   @HostListener('document:click')
-//   onDocClick(): void { this.close.emit(); }
-// }

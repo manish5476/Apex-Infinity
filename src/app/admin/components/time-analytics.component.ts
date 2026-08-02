@@ -10,7 +10,7 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
 import { CommonMethodService } from '../../core/utils/common-method.service';
 
 // Components
-import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
+import { DataGridComponent, GridColumn } from '../../shared/ui/grid';
 import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
 import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
 import { Subject } from "rxjs";
@@ -24,7 +24,7 @@ import { takeUntil } from "rxjs/operators";
     ButtonModule,
     ProgressSpinnerModule,
     TooltipModule,
-    AgShareGrid,
+    DataGridComponent,
     UniversalFilterComponent
   ],
   template: `
@@ -96,41 +96,41 @@ import { takeUntil } from "rxjs/operators";
               
               <p-tabpanel value="0">
                  <div class="grid-container">
-                    <app-ag-share-grid 
+                    <app-data-grid [viewOnly]="true" [pagination]="true" [enableExport]="true" class="full-size-grid" 
                       [columns]="hourlyColumns" 
                       [data]="timeData()?.hourly || []"
                       class="full-size-grid">
-                    </app-ag-share-grid>
+                    </app-data-grid>
                  </div>
               </p-tabpanel>
 
               <p-tabpanel value="1">
                  <div class="grid-container">
-                    <app-ag-share-grid 
+                    <app-data-grid [viewOnly]="true" [pagination]="true" [enableExport]="true" class="full-size-grid" 
                       [columns]="dailyColumns" 
                       [data]="timeData()?.daily || []"
                       class="full-size-grid">
-                    </app-ag-share-grid>
+                    </app-data-grid>
                  </div>
               </p-tabpanel>
 
               <p-tabpanel value="2">
                  <div class="grid-container">
-                    <app-ag-share-grid 
+                    <app-data-grid [viewOnly]="true" [pagination]="true" [enableExport]="true" class="full-size-grid" 
                       [columns]="weeklyColumns" 
                       [data]="timeData()?.weekly || []"
                       class="full-size-grid">
-                    </app-ag-share-grid>
+                    </app-data-grid>
                  </div>
               </p-tabpanel>
 
               <p-tabpanel value="3">
                  <div class="grid-container">
-                    <app-ag-share-grid 
+                    <app-data-grid [viewOnly]="true" [pagination]="true" [enableExport]="true" class="full-size-grid" 
                       [columns]="monthlyColumns" 
                       [data]="timeData()?.monthly || []"
                       class="full-size-grid">
-                    </app-ag-share-grid>
+                    </app-data-grid>
                  </div>
               </p-tabpanel>
 
@@ -437,3 +437,5 @@ export class TimeAnalyticsComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 }
+
+

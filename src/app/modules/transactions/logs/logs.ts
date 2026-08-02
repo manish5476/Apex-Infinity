@@ -95,7 +95,7 @@ import { ButtonComponent } from '@shared/ui/form/button.component';
       <app-page-content [padded]="false">
 
         <!-- DataGrid -->
-        <app-data-grid
+        <app-data-grid [viewOnly]="true" 
           [columns]="columns"
           [data]="data()"
           [loading]="isLoading()"
@@ -213,3 +213,4 @@ export class LogsComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 }
+

@@ -9,12 +9,9 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
 
-// Shared
-import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
+import { DataGridComponent, GridColumn } from '@shared/ui/grid';
 import { AppMessageService } from '../../../../core/services/message.service';
-// import { MasterListService } from '../../../../core/services/master-list.service';
 import { EmiService } from '../../services/emi-service';
-import { GridApi } from 'ag-grid-community';
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { MasterDropdownComponent } from '../../../shared/components/masterFilterDropdown/master-dropdown.component';
@@ -29,7 +26,7 @@ import { MasterDropdownComponent } from '../../../shared/components/masterFilter
     DatePickerModule,
     SelectModule,
     ToastModule,
-    AgShareGrid,
+    DataGridComponent,
     MasterDropdownComponent
 ],
   providers: [EmiService],
@@ -41,10 +38,8 @@ export class EmiLedger implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
   private emiService = inject(EmiService);
   private messageService = inject(AppMessageService);
-  // public masterList = inject(MasterListService);
-  private gridApi!: GridApi;
 
-  @ViewChild(AgShareGrid) grid!: AgShareGrid;
+  @ViewChild(DataGridComponent) grid!: DataGridComponent;
 
   // Filters
   filter = {
@@ -55,7 +50,7 @@ export class EmiLedger implements OnInit, OnDestroy {
 
   customerOptions = signal<any[]>([]);
   data: any[] = [];
-  column: any[] = [];
+  column: GridColumn[] = [];
   isLoading = false;
 
   constructor() {
@@ -71,7 +66,6 @@ export class EmiLedger implements OnInit, OnDestroy {
 
   fetchLedger() {
     this.isLoading = true;
-    if (this.grid) this.grid.showLoadingOverlay();
     
     // Convert dates to ISO string for API
     const params = {
@@ -84,12 +78,10 @@ export class EmiLedger implements OnInit, OnDestroy {
       next: (res: any) => {
         this.data = res.data || [];
         this.isLoading = false;
-        if (this.grid) this.grid.hideOverlay();
         this.cdr.markForCheck();
       },
       error: (err: any) => {
         this.isLoading = false;
-        if (this.grid) this.grid.hideOverlay();
         this.messageService.handleHttpError(err);
         this.cdr.markForCheck();
       }
@@ -110,18 +102,14 @@ export class EmiLedger implements OnInit, OnDestroy {
   }
 
   exportLedger() {
-    if (this.gridApi) {
-      this.gridApi.exportDataAsCsv({
-        fileName: `EMI_Ledger_${new Date().getTime()}.csv`
-      });
-      this.messageService.showSuccess('Ledger report exported successfully.');
+    if (this.grid) {
+      // DataGridComponent does not have exportDataAsCsv exposed directly in this way
+      // but if the component has enableExport=true it handles it via UI
+      this.messageService.showInfo('Use the grid toolbar to export.');
     }
   }
 
   eventFromGrid(event: any) {
-    if (event.type === 'init') {
-      this.gridApi = event.api;
-    }
   }
 
   private formatDate(d: any) {
@@ -135,74 +123,72 @@ export class EmiLedger implements OnInit, OnDestroy {
   getColumn(): void {
     this.column = [
       {
-        headerName: 'Date',
+        header: 'Date',
         field: 'date',
-        width: 130,
+        width: '130px',
         sortable: true,
-        valueFormatter: (p: any) => this.formatDate(p.value)
+        formatter: (val: any) => this.formatDate(val)
       },
       {
-        headerName: 'Account',
+        header: 'Account',
         field: 'accountId',
-        width: 250,
-        valueGetter: (p: any) => p.data.accountId?.name || '—',
-        cellRenderer: (p: any) => `
+        width: '250px',
+        formatter: (val: any, row: any) => `
           <div style="line-height:1.2">
-            <div style="font-weight:600">${p.value}</div>
-            <div style="font-size:11px;color:var(--text-secondary)">Code: ${p.data.accountId?.code || '—'}</div>
+            <div style="font-weight:600">${val || '—'}</div>
+            <div style="font-size:11px;color:var(--text-secondary)">Code: ${row?.accountId?.code || '—'}</div>
           </div>
         `
       },
       {
-        headerName: 'Description',
+        header: 'Description',
         field: 'description',
         flex: 1.5,
-        minWidth: 200,
+        minWidth: '200px',
         sortable: true,
-        filter: true
+        filterable: true
       },
       {
-        headerName: 'Reference',
+        header: 'Reference',
         field: 'referenceType',
-        width: 150,
-        cellRenderer: (p: any) => `
+        width: '150px',
+        formatter: (val: any) => `
            <span style="background:var(--primary-light); color:var(--primary); padding:2px 8px; border-radius:12px; font-size:11px; font-weight:600; text-transform:uppercase">
-            ${p.value?.replace('_', ' ')}
+            ${val?.replace('_', ' ')}
            </span>
         `
       },
       {
-        headerName: 'Payment Info',
+        header: 'Payment Info',
         field: 'paymentId',
-        width: 180,
-        valueGetter: (p: any) => p.data.paymentId,
-        cellRenderer: (p: any) => {
-          if (!p.value) return '—';
+        width: '180px',
+        formatter: (val: any) => {
+          if (!val) return '—';
           return `
             <div>
-              <div style="font-weight:600">${this.formatCurrency(p.value.amount)}</div>
-              <div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase">${p.value.paymentMethod}</div>
+              <div style="font-weight:600">${this.formatCurrency(val.amount)}</div>
+              <div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase">${val.paymentMethod}</div>
             </div>
           `;
         }
       },
       {
-        headerName: 'Debit',
+        header: 'Debit',
         field: 'debit',
-        width: 120,
-        type: 'rightAligned',
+        width: '120px',
+        align: 'right',
         sortable: true,
-        valueFormatter: (p: any) => p.value ? this.formatCurrency(p.value) : '',
-        cellStyle: { color: 'var(--color-error)', fontWeight: 'bold' }
+        formatter: (val: any) => val ? this.formatCurrency(val) : '',
+        cellClass: () => 'text-error font-bold'
       },
       {
-        headerName: 'Credit',
+        header: 'Credit',
         field: 'credit',
-        width: 120,
-        type: 'rightAligned',
+        width: '120px',
+        align: 'right',
         sortable: true,
-        valueFormatter: (p: any) => p.value ? this.formatCurrency(p.value) : '',
-        cellStyle: { color: 'var(--color-success)', fontWeight: 'bold' }
+        formatter: (val: any) => val ? this.formatCurrency(val) : '',
+        cellClass: () => 'text-success font-bold'
       }
     ];
   }

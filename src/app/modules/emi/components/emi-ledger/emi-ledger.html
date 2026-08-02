@@ -63,13 +63,16 @@
     </div>
 
     <div class="flex-1 min-h-0 overflow-hidden manish-border-1 border-secondary border-round shadow-1">
-      <app-ag-share-grid 
+      <app-data-grid [viewOnly]="true" [pagination]="true" [enableExport]="true" 
         [columns]="column" 
         [data]="data" 
+        [loading]="isLoading"
+        [enableExport]="true"
         (gridEvent)="eventFromGrid($event)" 
-        style="height: 100%; width: 100%; display: block;">
-      </app-ag-share-grid>
+        class="full-size-grid">
+      </app-data-grid>
     </div>
 
   </div>
 </div>
+

@@ -170,7 +170,7 @@ import { takeUntil } from "rxjs/operators";
             </ng-container>
             
             <div class="flex-1 relative min-h-0 w-full h-full">
-              <app-data-grid
+              <app-data-grid [viewOnly]="true" [pagination]="true" [enableExport]="true"
                 [columns]="logColumns"
                 [data]="monitorData()?.security?.recentEvents || []"
                 class="absolute inset-0 w-full h-full">

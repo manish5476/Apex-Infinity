@@ -5,7 +5,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { AdminAnalyticsService } from '../admin-analytics.service';
 import { CommonMethodService } from '../../core/utils/common-method.service';
-import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
+import { DataGridComponent, GridColumn } from '../../shared/ui/grid';
 import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
 import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
 import { Subject } from "rxjs";
@@ -19,7 +19,7 @@ import { takeUntil } from "rxjs/operators";
     TagModule,
     TooltipModule,
     ProgressSpinnerModule,
-    AgShareGrid,
+    DataGridComponent,
     UniversalFilterComponent
   ],
 
@@ -107,11 +107,11 @@ import { takeUntil } from "rxjs/operators";
       </div>
 
       <div class="grid-body">
-        <app-ag-share-grid
+        <app-data-grid [viewOnly]="true" [pagination]="true" [enableExport]="true" class="full-size-grid"
           [columns]="auditColumns"
           [data]="securityData()?.recentEvents || []"
           class="fill-grid">
-        </app-ag-share-grid>
+        </app-data-grid>
       </div>
 
     </div>
@@ -574,3 +574,4 @@ export class SystemAuditAlertsComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 }
+

@@ -67,7 +67,7 @@
       </div>
 
       <div class="flex-1 min-h-0 manish-border-1 border-secondary border-round overflow-hidden">
-        <app-data-grid [columns]="column" [data]="data()" [loading]="loading()" (gridEvent)="eventFromGrid($event)"
+        <app-data-grid [viewOnly]="true"  [columns]="column" [data]="data()" [loading]="loading()" (gridEvent)="eventFromGrid($event)"
           style="height: 100%; width: 100%; display: block;">
         </app-data-grid>
       </div>

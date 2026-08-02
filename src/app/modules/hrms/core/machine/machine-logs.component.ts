@@ -68,7 +68,7 @@ import { HRMSService } from '../../hrms.service';
       </app-page-header>
 
       <app-page-content [padded]="true">
-        <app-data-grid
+        <app-data-grid [viewOnly]="true" 
           [columns]="columns"
           [data]="data()"
           [loading]="isLoading()">
@@ -181,3 +181,4 @@ export class MachineLogsComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 }
+

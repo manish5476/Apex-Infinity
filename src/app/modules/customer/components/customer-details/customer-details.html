@@ -195,21 +195,21 @@
 
           <div class="grid-container">
             @if (activeTab() === 'ledger') {
-            <app-ag-share-grid [columns]="ledgerColumns" [data]="ledgerHistory()"
-              (gridEvent)="onGridEvent($event, 'ledger')" class="full-size-grid">
-            </app-ag-share-grid>
+            <app-data-grid [columns]="ledgerColumns" [data]="ledgerHistory()"
+              (gridEvent)="onGridEvent($event, 'ledger')">
+            </app-data-grid>
             }
 
             @if (activeTab() === 'invoices') {
-            <app-ag-share-grid [columns]="invoiceColumns" [data]="invoices()" [actionColumn]="invoiceActionColumn"
-              selectionMode="multiple" (gridEvent)="onGridEvent($event, 'invoices')" class="full-size-grid">
-            </app-ag-share-grid>
+            <app-data-grid [columns]="invoiceColumns" [data]="invoices()" [rowActions]="invoiceActions"
+              selectionMode="multiple" (gridEvent)="onGridEvent($event, 'invoices')">
+            </app-data-grid>
             }
 
             @if (activeTab() === 'payments') {
-            <app-ag-share-grid [columns]="paymentColumns" [data]="payments()" selectionMode="multiple"
-              (gridEvent)="onGridEvent($event, 'payments')" class="full-size-grid">
-            </app-ag-share-grid>
+            <app-data-grid [columns]="paymentColumns" [data]="payments()" selectionMode="multiple"
+              (gridEvent)="onGridEvent($event, 'payments')">
+            </app-data-grid>
             }
 
             @if (activeTab() === 'feed' && customerId()) {

@@ -98,9 +98,9 @@
 
     <!-- Data Grid Wrapper -->
     <div class="flex-1 min-h-0 manish-border-1 border-secondary border-round overflow-hidden">
-      <app-ag-share-grid [columns]="column()" [data]="data()" selectionMode="multiple"
+      <app-data-grid [viewOnly]="true"  [columns]="column()" [data]="data()" selectionMode="multiple"
         (gridEvent)="eventFromGrid($event)" style="height: 100%; width: 100%; display: block;">
-      </app-ag-share-grid>
+      </app-data-grid>
     </div>
   </div>
 </div>

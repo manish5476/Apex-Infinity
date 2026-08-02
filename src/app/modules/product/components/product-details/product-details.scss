@@ -277,7 +277,7 @@
     position: relative;
     background: var(--bg-primary);
     
-    /* 3. Target the Angular Component (<app-ag-share-grid>) */
+    /* 3. Target the Angular Component (<app-data-grid>) */
     .full-size-grid {
       display: flex;     /* Force component to be a flex container */
       flex-direction: column;

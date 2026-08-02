@@ -4,7 +4,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { AdminAnalyticsService } from '../admin-analytics.service';
 import { CommonMethodService } from '../../core/utils/common-method.service';
-import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
+import { DataGridComponent, GridColumn } from '../../shared/ui/grid';
 import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
 import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
 import { Subject } from "rxjs";
@@ -16,7 +16,7 @@ import { takeUntil } from "rxjs/operators";
   imports: [
     TooltipModule,
     ProgressSpinnerModule,
-    AgShareGrid,
+    DataGridComponent,
     UniversalFilterComponent
   ],
   template: `
@@ -146,11 +146,11 @@ import { takeUntil } from "rxjs/operators";
         <h3 class="grid-title">Detailed Breakdown</h3>
       </div>
       <div class="grid-body">
-        <app-ag-share-grid
+        <app-data-grid [viewOnly]="true" [pagination]="true" [enableExport]="true"
           [columns]="branchColumns"
           [data]="comparison()?.branches || []"
           class="fill-grid">
-        </app-ag-share-grid>
+        </app-data-grid>
       </div>
     </div>
 
@@ -544,7 +544,7 @@ export class BranchComparisonComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
   comparison = signal<any>(null);
   loading = signal(false);
-  branchColumns: any[] = [];
+  branchColumns: GridColumn[] = [];
 
   private currentFilters: Record<string, any> = {};
 
@@ -618,38 +618,28 @@ export class BranchComparisonComponent implements OnInit, OnDestroy {
   setupColumns(): void {
     this.branchColumns = [
       {
-        headerName: '#',
-        width: 56,
-        pinned: 'left',
-        valueGetter: (p: any) => p.node.rowIndex + 1,
-        cellStyle: {
-          'font-weight': 'var(--font-weight-semibold)',
-          'color': 'var(--text-tertiary)',
-          'display': 'flex',
-          'justify-content': 'center'
-        }
-      },
-      {
         field: 'branchName',
-        headerName: 'Branch',
-        minWidth: 180,
+        header: 'Branch',
+        minWidth: '180px',
         flex: 1,
-        cellRenderer: (p: any) => {
-          const isTop = p.node.rowIndex === 0;
+        formatter: (val: any, row: any) => {
+          const isTop = this.comparison()?.topPerformer?._id === row._id;
           const star = isTop
             ? `<i class="pi pi-star-fill" style="color:var(--color-warning);font-size:var(--font-size-xs);"></i>`
             : '';
           return `<div style="display:flex;align-items:center;gap:8px;height:100%;font-weight:var(--font-weight-semibold);color:var(--text-primary);">
-                    ${star}${p.value}
+                    ${star}${val}
                   </div>`;
         }
       },
       {
-        headerName: 'Performance',
-        width: 140,
-        cellRenderer: (p: any) => {
-          const pct = this.getPercentage(p.data.revenue).toFixed(0);
-          const color = p.node.rowIndex === 0 ? 'var(--color-success)' : 'var(--accent-primary)';
+        header: 'Performance',
+        field: 'revenue',
+        width: '140px',
+        formatter: (val: any, row: any) => {
+          const pct = this.getPercentage(val).toFixed(0);
+          const isTop = this.comparison()?.topPerformer?._id === row._id;
+          const color = isTop ? 'var(--color-success)' : 'var(--accent-primary)';
           return `<div style="display:flex;align-items:center;gap:8px;height:100%;">
                     <div style="flex:1;height:4px;background:var(--bg-ternary);border-radius:var(--ui-border-radius-pill);">
                       <div style="width:${pct}%;height:100%;background:${color};border-radius:var(--ui-border-radius-pill);"></div>
@@ -660,36 +650,24 @@ export class BranchComparisonComponent implements OnInit, OnDestroy {
       },
       {
         field: 'revenue',
-        headerName: 'Revenue',
-        width: 140,
-        type: 'rightAligned',
-        valueFormatter: (p: any) => this.commonService.formatCurrency(p.value),
-        cellStyle: {
-          'font-weight': 'var(--font-weight-semibold)',
-          'font-family': 'var(--font-mono)',
-          'text-align': 'right',
-          'color': 'var(--text-primary)'
-        }
+        header: 'Revenue',
+        width: '140px',
+        align: 'right',
+        formatter: (val: any) => `<div style="font-weight:var(--font-weight-semibold);font-family:var(--font-mono);text-align:right;color:var(--text-primary);width:100%;">${this.commonService.formatCurrency(val)}</div>`
       },
       {
         field: 'invoiceCount',
-        headerName: 'Orders',
-        width: 100,
-        type: 'rightAligned',
-        cellStyle: { 'color': 'var(--text-secondary)', 'text-align': 'right' }
+        header: 'Orders',
+        width: '100px',
+        align: 'right',
+        formatter: (val: any) => `<div style="color:var(--text-secondary);text-align:right;width:100%;">${val || 0}</div>`
       },
       {
         field: 'avgBasketValue',
-        headerName: 'Avg. Basket',
-        width: 130,
-        type: 'rightAligned',
-        valueFormatter: (p: any) => this.commonService.formatCurrency(p.value),
-        cellStyle: {
-          'color': 'var(--accent-primary)',
-          'font-family': 'var(--font-mono)',
-          'text-align': 'right',
-          'font-size': 'var(--font-size-xs)'
-        }
+        header: 'Avg. Basket',
+        width: '130px',
+        align: 'right',
+        formatter: (val: any) => `<div style="color:var(--accent-primary);font-family:var(--font-mono);text-align:right;font-size:var(--font-size-xs);width:100%;">${this.commonService.formatCurrency(val)}</div>`
       }
     ];
     this.cdr.detectChanges();

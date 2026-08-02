@@ -174,12 +174,12 @@
         </div>
         <div class="grid-wrapper">
           @if (activeTab() === 'schedule') {
-          <app-ag-share-grid [columns]="column" [data]="gridData" (gridEvent)="eventFromGrid($event)"
+          <app-data-grid [viewOnly]="true" [pagination]="true" [enableExport]="true" [columns]="column" [data]="gridData" (rowClick)="onRowClick($event)"
             class="full-size-grid">
-          </app-ag-share-grid>
+          </app-data-grid>
           } @else {
-          <app-ag-share-grid [columns]="historyColumn" [data]="historyData()" class="full-size-grid">
-          </app-ag-share-grid>
+          <app-data-grid [viewOnly]="true" [pagination]="true" [enableExport]="true" [columns]="historyColumn" [data]="historyData()" class="full-size-grid">
+          </app-data-grid>
           }
         </div>
       </div>

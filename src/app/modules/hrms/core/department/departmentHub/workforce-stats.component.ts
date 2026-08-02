@@ -1,12 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { TagModule } from 'primeng/tag';
-import { AgShareGrid } from '../../../../shared/components/ag-shared-grid';
+import { DataGridComponent, GridColumn } from '@shared/ui/grid';
 
 @Component({
   selector: 'app-workforce-stats',
   standalone: true,
-  imports: [CommonModule, DecimalPipe, TagModule, AgShareGrid],
+  imports: [CommonModule, DecimalPipe, TagModule, DataGridComponent],
   template: `
     <div class="stats-container">
       <!-- Stats Cards -->
@@ -65,11 +65,11 @@ import { AgShareGrid } from '../../../../shared/components/ag-shared-grid';
           
           <div class="card-body p-0">
             <div class="grid-wrapper">
-              <app-ag-share-grid 
+              <app-data-grid [viewOnly]="true" [pagination]="true" [enableExport]="true" 
                 [columns]="columns" 
                 [data]="stats.departments"
-                selectionMode="single">
-              </app-ag-share-grid>
+                class="full-size-grid">
+              </app-data-grid>
             </div>
           </div>
         </div>
@@ -318,5 +318,5 @@ import { AgShareGrid } from '../../../../shared/components/ag-shared-grid';
 })
 export class WorkforceStatsComponent {
   @Input() stats: any = null;
-  @Input() columns: any[] = [];
+  @Input() columns: GridColumn[] = [];
 }

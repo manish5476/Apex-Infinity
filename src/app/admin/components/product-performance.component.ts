@@ -15,10 +15,11 @@ import { takeUntil, finalize } from 'rxjs/operators';
 
 import { AdminAnalyticsService } from '../admin-analytics.service';
 import { CommonMethodService } from '../../core/utils/common-method.service';
-import { AgShareGrid, ActionColumnConfig } from '../../modules/shared/components/ag-shared-grid';
+import { ActionColumnConfig } from '../../modules/shared/components/ag-shared-grid';
 import { PERMISSIONS } from '../../core/auth/permissions.constants';
 import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
 import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
+import { DataGridComponent } from '@shared/ui/grid';
 
 interface HighMarginProduct {
   _id: string;
@@ -50,7 +51,7 @@ interface PerformanceData {
     DecimalPipe,
     TooltipModule,
     ProgressSpinnerModule,
-    AgShareGrid,
+    DataGridComponent,
     UniversalFilterComponent,
   ],
   template: `
@@ -65,17 +66,17 @@ interface PerformanceData {
     </app-universal-filter>
   </div>
 
-  <!-- ── Loading state ── -->
+  <!-- â”€â”€ Loading state â”€â”€ -->
   @if (loading()) {
     <div class="loader-state">
       <div class="loader-ring">
         <span></span><span></span><span></span>
       </div>
-      <span class="loader-text">Auditing product performance…</span>
+      <span class="loader-text">Auditing product performanceâ€¦</span>
     </div>
   }
 
-  <!-- ── Content ── -->
+  <!-- â”€â”€ Content â”€â”€ -->
   @if (!loading()) {
 
     <!-- Profitability Champions -->
@@ -90,7 +91,7 @@ interface PerformanceData {
           <p class="section-sub">Products delivering highest net margin per unit</p>
         </div>
         <div class="head-actions">
-          <span class="scroll-hint">Scroll to explore →</span>
+          <span class="scroll-hint">Scroll to explore â†’</span>
           <button class="export-btn" pTooltip="Export as CSV" tooltipPosition="bottom">
             <i class="pi pi-download"></i>
             Export
@@ -181,7 +182,7 @@ interface PerformanceData {
       </div>
     </section>
 
-    <!-- ── Body: dead stock + sidebar ── -->
+    <!-- â”€â”€ Body: dead stock + sidebar â”€â”€ -->
     <div class="body-grid">
 
       <!-- Dead Stock Table -->
@@ -193,7 +194,7 @@ interface PerformanceData {
               Inventory Alert
             </div>
             <h3 class="panel-title">Dead Stock Inventory</h3>
-            <p class="panel-sub">Zero-movement items · Liquidation candidates</p>
+            <p class="panel-sub">Zero-movement items Â· Liquidation candidates</p>
           </div>
           <div class="panel-head-meta">
             <span class="alert-badge">
@@ -204,13 +205,11 @@ interface PerformanceData {
         </div>
 
         <div class="grid-wrap">
-          <app-ag-share-grid
+          <app-data-grid [viewOnly]="true" [pagination]="true" [enableExport]="true" class="full-size-grid"
             [columns]="deadStockColumns"
             [data]="performanceData()?.deadStock ?? []"
-            [actionColumn]="deadStockActionColumn"
-            (gridEvent)="handleGridAction($event)"
             class="fill-grid">
-          </app-ag-share-grid>
+          </app-data-grid>
         </div>
       </div>
 
@@ -303,14 +302,14 @@ interface PerformanceData {
   `,
   styles: [`
 /* ============================================================
-   PRODUCT PERFORMANCE — 100% TOKEN-DRIVEN
+   PRODUCT PERFORMANCE â€” 100% TOKEN-DRIVEN
    All values use the canonical global token system.
    Zero hardcoded colors. Vars pulled from _tokens.scss mixin.
    ============================================================ */
 
 :host { display: block; width: 100%; }
 
-/* ── Root layout ──────────────────────────────────────────── */
+/* â”€â”€ Root layout â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .pp-root {
   display: flex;
   flex-direction: column;
@@ -324,7 +323,7 @@ interface PerformanceData {
 
 .filter-bar { flex-shrink: 0; }
 
-/* ── Loader ───────────────────────────────────────────────── */
+/* â”€â”€ Loader â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .loader-state {
   flex: 1;
   display: flex;
@@ -374,7 +373,7 @@ interface PerformanceData {
   color: var(--text-tertiary);
 }
 
-/* ── Eyebrow label ────────────────────────────────────────── */
+/* â”€â”€ Eyebrow label â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .section-eyebrow,
 .panel-eyebrow {
   display: flex;
@@ -398,9 +397,9 @@ interface PerformanceData {
   &--error { background: var(--color-error); }
 }
 
-/* ══════════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    CHAMPIONS SECTION
-   ══════════════════════════════════════════════════════════ */
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .champions-section { flex-shrink: 0; }
 
 .section-head {
@@ -470,7 +469,7 @@ interface PerformanceData {
   }
 }
 
-/* ── KPI Strip ────────────────────────────────────────────── */
+/* â”€â”€ KPI Strip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .kpi-strip {
   display: flex;
   align-items: center;
@@ -518,7 +517,7 @@ interface PerformanceData {
   flex-shrink: 0;
 }
 
-/* ── Card track ───────────────────────────────────────────── */
+/* â”€â”€ Card track â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .cards-track {
   display: flex;
   gap: var(--spacing-lg);
@@ -549,7 +548,7 @@ interface PerformanceData {
 .empty-icon { font-size: 28px; opacity: 0.35; }
 .empty-note { font-size: var(--font-size-sm); margin: 0; }
 
-/* ── Margin card ──────────────────────────────────────────── */
+/* â”€â”€ Margin card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .margin-card {
   position: relative;
   min-width: 240px;
@@ -720,9 +719,9 @@ interface PerformanceData {
   font-size: 11px;
 }
 
-/* ══════════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    BODY GRID
-   ══════════════════════════════════════════════════════════ */
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .body-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -733,7 +732,7 @@ interface PerformanceData {
   @media (min-width: 1024px) { grid-template-columns: 2fr 1fr; }
 }
 
-/* ── Shared panel ── */
+/* â”€â”€ Shared panel â”€â”€ */
 .panel {
   background: var(--bg-primary);
   border: var(--ui-border-width) solid var(--border-primary);
@@ -812,7 +811,7 @@ interface PerformanceData {
   display: block;
 }
 
-/* ── Sidebar ── */
+/* â”€â”€ Sidebar â”€â”€ */
 .side-col {
   display: flex;
   flex-direction: column;
@@ -1050,18 +1049,18 @@ interface PerformanceData {
 })
 export class ProductPerformanceComponent implements OnInit, OnDestroy {
 
-  // ─── DI ──────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€ DI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   private readonly analyticsService = inject(AdminAnalyticsService);
   public readonly common = inject(CommonMethodService);
 
-  // ─── Lifecycle ───────────────────────────────────────────────────────────────
+  // â”€â”€â”€ Lifecycle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   private readonly destroy$ = new Subject<void>();
 
-  // ─── State ───────────────────────────────────────────────────────────────────
+  // â”€â”€â”€ State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   readonly performanceData = signal<PerformanceData | null>(null);
   readonly loading = signal(false);
 
-  // ─── Derived (computed — no effects, no manual sync) ─────────────────────────
+  // â”€â”€â”€ Derived (computed â€” no effects, no manual sync) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   readonly avgMarginPercent = computed(() => {
     const list = this.performanceData()?.highMargin ?? [];
     if (!list.length) return 0;
@@ -1088,7 +1087,7 @@ export class ProductPerformanceComponent implements OnInit, OnDestroy {
       .slice(0, 3)
   );
 
-  // ─── Grid ─────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€ Grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   deadStockColumns: any[] = [];
 
   readonly deadStockActionColumn: ActionColumnConfig = {
@@ -1098,7 +1097,7 @@ export class ProductPerformanceComponent implements OnInit, OnDestroy {
     viewPermission: PERMISSIONS.PRODUCT.READ,
   };
 
-  // ─── Filters ─────────────────────────────────────────────────────────────────
+  // â”€â”€â”€ Filters â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   private currentFilters: Record<string, any> = {};
 
   readonly filterConfig: FilterField[] = [
@@ -1113,7 +1112,7 @@ export class ProductPerformanceComponent implements OnInit, OnDestroy {
     },
   ];
 
-  // ─── Lifecycle ───────────────────────────────────────────────────────────────
+  // â”€â”€â”€ Lifecycle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   ngOnInit(): void {
     this.buildColumns();
     this.loadData();
@@ -1124,7 +1123,7 @@ export class ProductPerformanceComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  // ─── Public handlers ─────────────────────────────────────────────────────────
+  // â”€â”€â”€ Public handlers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   onFilterUpdate(filters: Record<string, any>): void {
     this.currentFilters = filters;
     this.loadData();
@@ -1134,7 +1133,7 @@ export class ProductPerformanceComponent implements OnInit, OnDestroy {
     // Handle liquidate / view action from grid
   }
 
-  // ─── Data ────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€ Data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   private loadData(): void {
     this.loading.set(true);
 
@@ -1153,7 +1152,7 @@ export class ProductPerformanceComponent implements OnInit, OnDestroy {
       });
   }
 
-  // ─── Column definitions ───────────────────────────────────────────────────────
+  // â”€â”€â”€ Column definitions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   private buildColumns(): void {
     this.deadStockColumns = [
       {
@@ -1226,3 +1225,5 @@ export class ProductPerformanceComponent implements OnInit, OnDestroy {
     ];
   }
 }
+
+

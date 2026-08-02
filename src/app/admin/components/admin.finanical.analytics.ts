@@ -5,7 +5,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TagModule } from 'primeng/tag';
 import { AdminAnalyticsService } from '../admin-analytics.service';
 import { CommonMethodService } from '../../core/utils/common-method.service';
-import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
+import { DataGridComponent, GridColumn } from '../../shared/ui/grid';
 import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
 import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
 import { Subject } from "rxjs";
@@ -16,7 +16,7 @@ import { takeUntil } from "rxjs/operators";
   standalone: true,
   imports: [
     CommonModule, TooltipModule, ProgressSpinnerModule, TagModule,
-    AgShareGrid, UniversalFilterComponent
+    DataGridComponent, UniversalFilterComponent
   ],
   template: `
 <div class="fin-root">
@@ -210,11 +210,11 @@ import { takeUntil } from "rxjs/operators";
           </div>
         </div>
         <div class="grid-wrap">
-          <app-ag-share-grid
+          <app-data-grid [viewOnly]="true" [pagination]="true" [enableExport]="true" class="full-size-grid"
             [columns]="agingColumns"
             [data]="financialData()?.receivables?.aging || []"
             class="fill-grid">
-          </app-ag-share-grid>
+          </app-data-grid>
         </div>
       </article>
 
@@ -913,3 +913,4 @@ export class FinancialDashboardComponent implements OnInit, OnDestroy {
   }
 
 }
+
