@@ -4,6 +4,36 @@
     width: 100%;
     height: 100%;
     min-height: 0;
+
+    // ─── APEX GRID SEMANTIC TOKENS ────────────────────────────────────────────────────
+    // All grid-specific colors flow through these --apex-grid-* tokens.
+    // Override any token in your global theme to restyle the entire grid.
+
+    // Header — active sort state
+    --apex-grid-header-sorted-bg:      color-mix(in srgb, var(--accent-primary) 8%, var(--bg-secondary));
+    --apex-grid-header-sorted-border:  var(--accent-primary);
+    --apex-grid-header-sorted-color:   var(--accent-primary);
+
+    // Header — active filter state
+    --apex-grid-header-filtered-bg:    color-mix(in srgb, var(--color-warning) 8%, var(--bg-secondary));
+    --apex-grid-header-filtered-border:var(--color-warning);
+    --apex-grid-filter-icon:           var(--color-warning);
+
+    // Header — pinned/frozen column
+    --apex-grid-header-pinned-bg:      var(--bg-secondary);
+
+    // Interactive elements
+    --apex-grid-sort-icon:             var(--accent-primary);
+    --apex-grid-resize-handle:         var(--accent-primary);
+
+    // Row states
+    --apex-grid-row-bg:                var(--bg-primary);
+    --apex-grid-row-hover-bg:          var(--component-bg-hover);
+    --apex-grid-row-selected-bg:       var(--selection-bg);
+
+    // Borders
+    --apex-grid-border:                var(--border-secondary);
+    --apex-grid-header-border:         var(--border-secondary);
 }
 
 .apex-dg {
@@ -94,6 +124,39 @@
     &:hover {
         background-color: var(--component-bg-hover);
     }
+}
+
+// ─── FABRIC-STYLE HEADER STATE CLASSES ──────────────────────────────────────────────
+// All colors flow from --apex-grid-* tokens defined in :host.
+// To retheme: override the tokens, not these class definitions.
+
+.apex-dg-hcell--sorted {
+    background-color: var(--apex-grid-header-sorted-bg);
+    border-bottom:    2px solid var(--apex-grid-header-sorted-border);
+    color:            var(--apex-grid-header-sorted-color);
+    font-weight:      var(--font-weight-bold);
+    transition:       background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.apex-dg-hcell--filtered {
+    background-color: var(--apex-grid-header-filtered-bg);
+    border-bottom:    2px solid var(--apex-grid-header-filtered-border);
+    transition:       background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.apex-dg-hcell--pinned {
+    background-color: var(--apex-grid-header-pinned-bg);
+}
+
+// Sort icon entrance animation
+.apex-dg-hcell .pi-sort-amount-up-alt,
+.apex-dg-hcell .pi-sort-amount-down {
+    animation: apex-sort-icon-appear 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes apex-sort-icon-appear {
+    from { opacity: 0; transform: translateY(-3px) scale(0.7); }
+    to   { opacity: 1; transform: translateY(0)    scale(1); }
 }
 
 // ─── ENTERPRISE CHECKBOXES ───────────────────────────────────────────────

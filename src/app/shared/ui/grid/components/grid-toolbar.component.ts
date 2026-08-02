@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, input, output, signal, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GridBulkAction, GridDensity } from '../grid-types';
+import type { GridFilterChip } from './grid-filter-chips.component';
 
 @Component({
   selector: 'app-grid-toolbar',
@@ -14,10 +15,11 @@ import { GridBulkAction, GridDensity } from '../grid-types';
       <!-- Main Toolbar Row -->
       <div class="flex items-center justify-between gap-4 px-4 py-2.5 border-b border-[var(--border-secondary)] bg-[var(--bg-primary)]">
         
-        <!-- LEFT: Search + Filter + Count -->
-        <div class="flex items-center gap-3">
+        <!-- LEFT: Search + Filter Chips + Filter + Clear Filters + Count -->
+        <div class="flex items-center gap-2 flex-wrap min-w-0">
           
-          <div class="flex items-center gap-2 px-3 py-1.5 min-w-[240px]
+          <!-- Search -->
+          <div class="flex items-center gap-2 px-3 py-1.5 min-w-[220px]
                       bg-[var(--bg-secondary)] border border-[var(--border-secondary)]
                       rounded-[var(--ui-border-radius-pill)] transition-[var(--transition-fast)]
                       focus-within:border-[var(--accent-primary)] focus-within:bg-[var(--bg-primary)]
@@ -37,6 +39,10 @@ import { GridBulkAction, GridDensity } from '../grid-types';
             }
           </div>
 
+          <!-- Filter Chips slot (projected from DataGridComponent) -->
+          <ng-content select="[grid-chips]"></ng-content>
+
+          <!-- Filter Toggle Button -->
           <button type="button"
                   class="flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--ui-border-radius-pill)] text-[length:var(--font-size-xs)] font-[var(--font-weight-medium)] border transition-[var(--transition-fast)] outline-none"
                   [class]="filterActive() 
@@ -53,7 +59,7 @@ import { GridBulkAction, GridDensity } from '../grid-types';
           </button>
 
           <div class="h-4 w-px bg-[var(--border-secondary)] mx-1"></div>
-          <span class="text-[length:var(--font-size-xs)] text-[var(--text-tertiary)]">
+          <span class="text-[length:var(--font-size-xs)] text-[var(--text-tertiary)] shrink-0">
             <span class="font-[var(--font-weight-semibold)] text-[var(--text-primary)]">
               {{ filteredCount() !== totalCount() ? (filteredCount() | number) + ' of ' + (totalCount() | number) : (totalCount() | number) }}
             </span>
@@ -286,9 +292,14 @@ export class GridToolbarComponent {
   bulkAction = output<string>();
   paginationModeChange = output<'pages' | 'infinite'>();
 
-  startBulkEdit = output<void>(); // NEW
-  saveEdits = output<void>(); // NEW
-  cancelEdits = output<void>(); // NEW
+  startBulkEdit = output<void>();
+  saveEdits = output<void>();
+  cancelEdits = output<void>();
+  clearFilters = output<void>(); // NEW — triggers clearAllFilters() in DataGrid
+
+  // Filter chips inputs (data flows down from DataGrid via template projection)
+  filterChips = input<GridFilterChip[]>([]);
+  hasActiveFilters = input<boolean>(false);
 
   activeMenu = signal<'density' | 'export' | 'pagination' | null>(null);
 

@@ -16,8 +16,22 @@
         (savedViewsToggle)="showSavedViews.set(!showSavedViews())" (exportAs)="onExport($event)"
         (bulkAction)="onBulkActionById($event)" (refresh)="refresh.emit()"
         (paginationModeChange)="onPaginationModeChange($event)" (startBulkEdit)="startBulkEdit()"
-        (saveEdits)="saveAllEdits()" (cancelEdits)="cancelAllEdits()">
+        (saveEdits)="saveAllEdits()" (cancelEdits)="cancelAllEdits()"
+        (clearFilters)="clearAllFilters()">
         <ng-content select="[grid-actions]" ngProjectAs="[grid-actions]"></ng-content>
+        <!-- Filter Chips — projected into toolbar [grid-chips] slot -->
+        <ng-container grid-chips>
+            <app-grid-filter-chips
+                [chips]="activeFilterChips()"
+                [hasSearch]="searchQuery().length > 0"
+                [searchQuery]="searchQuery()"
+                [show]="showFilterChips()"
+                [showClearAll]="showClearFilters() && hasActiveFilters()"
+                (removeChip)="removeFilterChip($event)"
+                (clearSearch)="searchQuery.set('')"
+                (clearAll)="clearAllFilters()">
+            </app-grid-filter-chips>
+        </ng-container>
     </app-grid-toolbar>
     }
 
@@ -41,20 +55,35 @@
             <div class="apex-dg-hcell text-center text-[var(--text-tertiary)] font-semibold text-[11px]"
                 role="columnheader">Sr.</div>
             @for (col of visibleColumnList(); track col.field) {
+            @let meta = columnHeaderMeta().get(col.field);
             <div class="apex-dg-hcell flex items-center gap-2 text-[var(--text-secondary)] font-semibold text-xs cursor-pointer select-none relative group/header"
-                role="columnheader" [attr.aria-sort]="'none'" [class.sticky-left]="col.sticky === 'left'"
+                role="columnheader"
+                [attr.aria-sort]="meta?.isSorted ? (meta?.sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'"
+                [class.apex-dg-hcell--sorted]="highlightSortedColumns() && (meta?.isSorted ?? false)"
+                [class.apex-dg-hcell--filtered]="highlightFilteredColumns() && (meta?.isFiltered ?? false)"
+                [class.apex-dg-hcell--pinned]="meta?.isPinned ?? false"
+                [class.sticky-left]="col.sticky === 'left'"
                 [class.sticky-right]="col.sticky === 'right'">
-                <div class="flex items-center gap-2 flex-1 truncate"
+                <div class="flex items-center gap-1.5 flex-1 truncate"
                     (click)="col.sortable !== false && onSort(col.field)">
                     <span class="truncate">{{ col.header }}</span>
                     @if (col.sortable !== false) {
-                    <i class="pi text-[10px] opacity-40 transition-[var(--transition-fast)]"
-                        [class.pi-sort-alt]="true"></i>
+                    <i class="pi text-[10px] transition-all duration-200"
+                        [class.pi-sort-alt]="!meta?.isSorted"
+                        [class.pi-sort-amount-up-alt]="meta?.sortDirection === 'asc'"
+                        [class.pi-sort-amount-down]="meta?.sortDirection === 'desc'"
+                        [class.opacity-30]="!meta?.isSorted"
+                        [class.opacity-100]="meta?.isSorted"
+                        [class.text-[var(--apex-grid-sort-icon)]]="meta?.isSorted ?? false"></i>
+                    }
+                    @if (meta?.isFiltered) {
+                    <i class="pi pi-filter-fill text-[9px] text-[var(--apex-grid-filter-icon)]
+                               animate-[apex-chip-appear_0.15s_ease-out]"></i>
                     }
                 </div>
 
                 @if (col.resizable !== false) {
-                <div class="absolute right-0 top-1/4 bottom-1/4 w-1 cursor-col-resize hover:bg-[var(--accent-primary)] group-hover/header:bg-[var(--border-secondary)] transition-colors z-50"
+                <div class="absolute right-0 top-1/4 bottom-1/4 w-1 cursor-col-resize hover:bg-[var(--apex-grid-resize-handle)] group-hover/header:bg-[var(--border-secondary)] transition-colors z-50"
                     (mousedown)="onResizeStart($event, col.field)"></div>
                 }
             </div>

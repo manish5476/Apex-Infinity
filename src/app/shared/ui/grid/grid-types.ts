@@ -1,6 +1,10 @@
 import { Type, TemplateRef } from '@angular/core';
 import { ValidatorFn, AsyncValidatorFn } from '@angular/forms';
 
+// ─── Operation Mode ───────────────────────────────────────────────────────────
+/** Whether an operation (sort/filter/page/search) is handled client-side or server-side. */
+export type GridOperationMode = 'client' | 'server';
+
 // ─── Column Type ─────────────────────────────────────────────────────────────
 export type GridColumnType =
   // Text & Numeric
@@ -54,8 +58,11 @@ export interface GridColumn {
 
   // Visibility & Search
   visible?: boolean;
+  defaultVisible?: boolean;     // initial visibility (used by column manager reset)
   hideable?: boolean;
   searchable?: boolean;
+  searchWeight?: number;        // relative search priority (higher = ranked first)
+  highlightSearch?: boolean;    // highlight matched text in cell
 
   // Behavior
   sortable?: boolean;
@@ -64,6 +71,25 @@ export interface GridColumn {
   readOnly?: boolean;
   resizable?: boolean;
   required?: boolean;
+  pinable?: boolean;            // can be pinned/frozen (default: true)
+  draggable?: boolean;          // can be reordered via column manager (default: true)
+  persist?: boolean;            // opt-out of per-column state persistence
+
+  // Server-side mapping
+  /** Dot-notation path sent to the backend. e.g. 'employee.department.name'.
+   *  Falls back to `field` when not specified. Used by GridQueryBuilder. */
+  queryPath?: string;
+  serverSortable?: boolean;     // this column supports server-side sorting
+  serverFilterable?: boolean;   // this column supports server-side filtering
+
+  // Default state
+  defaultSort?: 'asc' | 'desc';
+  defaultFilter?: unknown;
+
+  // UX metadata
+  tooltip?: boolean;            // show full value in title tooltip
+  copyable?: boolean;           // show copy-to-clipboard action
+  clickable?: boolean;          // emit rowClick on cell click (not just row click)
 
   // Permissions
   permission?: string;
@@ -132,6 +158,9 @@ export interface GridColumn {
   // Column ordering (for column manager)
   sortOrder?: number;
   group?: string;
+
+  // Row action severity (kept here for completeness — used by GridRowAction too)
+  severity?: string;
 }
 
 // ─── Row States ───────────────────────────────────────────────────────────────
@@ -206,6 +235,47 @@ export interface GridPageState {
   page: number;
   pageSize: number;
   total: number;
+}
+
+// ─── Query Payload ────────────────────────────────────────────────────────────
+/**
+ * Backend-agnostic query payload emitted by queryChange output.
+ * Convert to HttpParams, GraphQL variables, Supabase query, etc. in your service layer.
+ */
+export interface GridQueryPayload {
+  search?: string;
+  page: number;
+  pageSize: number;
+  /** Single-sort shorthand — uses column queryPath if defined, else field name */
+  sortField?: string;
+  sortOrder?: 'asc' | 'desc';
+  /** Full multi-sort array (use when backend supports multi-column sorting) */
+  sorts?: Array<{ path: string; order: 'asc' | 'desc' }>;
+  /** Active filters mapped to their queryPath */
+  filters?: Array<{ path: string; operator: string; value: unknown }>;
+}
+
+// ─── Column Header Metadata ───────────────────────────────────────────────────
+/**
+ * Per-column computed header state. Used to drive visual highlights, icons, and
+ * accessibility attributes without scanning arrays in every template expression.
+ */
+export interface GridColumnHeaderMeta {
+  field: string;
+  isSorted: boolean;
+  sortDirection?: 'asc' | 'desc';
+  sortOrder?: number;
+  isFiltered: boolean;
+  isSearchMatched: boolean;
+  isPinned: boolean;
+  isEdited: boolean;
+  isGrouped: boolean;       // Phase C: grouping
+  isFrozen: boolean;        // Phase C: frozen columns
+  isCalculated: boolean;    // Phase C: formula columns
+  hasFormula: boolean;
+  hasErrors: boolean;       // Phase C: validation errors
+  hasWarnings: boolean;     // Phase C: validation warnings
+  isDirty: boolean;         // Phase C: unsaved edits
 }
 
 // ─── Saved Views ──────────────────────────────────────────────────────────────
@@ -286,12 +356,40 @@ export interface GridContext {
 // ─── Plugin Interface ─────────────────────────────────────────────────────────
 export interface GridPlugin {
   id: string;
+
+  // ── Lifecycle ──────────────────────────────────────────────────────────────
   onInit?(context: GridContext): void;
+  onDestroy?(): void;
+
+  // ── Row operations ─────────────────────────────────────────────────────────
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onRowEdit?(row: any, context: GridContext): void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onBeforeSave?(row: any, context: GridContext): boolean | void; // return false to cancel
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onAfterSave?(row: any, context: GridContext): void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onRowSave?(row: any, context: GridContext): void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onSelectionChange?(rows: any[], context: GridContext): void;
-  onDestroy?(): void;
+
+  // ── Cell events ────────────────────────────────────────────────────────────
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onCellClick?(field: string, row: any, context: GridContext): void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onCellDoubleClick?(field: string, row: any, context: GridContext): void;
+
+  // ── Grid query events ──────────────────────────────────────────────────────
+  onSort?(sort: GridSortState[], context: GridContext): void;
+  onFilter?(filters: GridFilterState[], context: GridContext): void;
+  onSearch?(query: string, context: GridContext): void;
+
+  // ── UI events ──────────────────────────────────────────────────────────────
+  onToolbarAction?(actionId: string, context: GridContext): void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onRowContextMenu?(row: any, context: GridContext): void;
+
+  // ── State & Export ─────────────────────────────────────────────────────────
+  onStateChange?(state: GridPersistedState, context: GridContext): void;
+  onExport?(format: 'csv' | 'json' | 'xlsx', context: GridContext): void;
 }

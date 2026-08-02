@@ -28,6 +28,10 @@ export type {
   GridContext,
   GridPlugin,
   SelectOption,
+  // ─── Phase A additions ──────────────────────────────────────────────────
+  GridOperationMode,
+  GridQueryPayload,
+  GridColumnHeaderMeta,
 } from './grid-types';
 
 // ─── Plugin System ────────────────────────────────────────────────────────────
@@ -37,7 +41,7 @@ export { BaseGridPlugin, GRID_PLUGINS } from './grid-plugin';
 export { GridService } from './grid.service';
 export { GridStateService } from './grid-state.service';
 
-// ─── Sub-Components (for advanced usage / extension) ─────────────────────────
+// ─── Sub-Components (for advanced usage / extension) ──────────────────────────────
 export { GridToolbarComponent } from './components/grid-toolbar.component';
 export { GridCellComponent } from './components/gridCell/grid-cell.component';
 export { GridActionsComponent } from './components/grid-actions.component';
@@ -48,3 +52,10 @@ export { GridFilterBarComponent } from './components/grid-filter-bar.component';
 export { GridColumnManagerComponent } from './components/grid-column-manager.component';
 export { GridSavedViewsComponent } from './components/grid-saved-views.component';
 export { GridContextMenuComponent } from './components/grid-context-menu.component';
+// Phase A — new components
+export { GridFilterChipsComponent } from './components/grid-filter-chips.component';
+export type { GridFilterChip } from './components/grid-filter-chips.component';
+
+// ─── Utilities (Phase A) ────────────────────────────────────────────────────────────
+export { buildGridQuery, toQueryString } from './utils/grid-query-builder';
+export type { GridQueryInput } from './utils/grid-query-builder';
