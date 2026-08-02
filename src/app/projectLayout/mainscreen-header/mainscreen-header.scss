@@ -60,6 +60,63 @@
   align-items: center;
   gap: var(--spacing-md);
   flex-shrink: 0;
+
+  .global-search-btn {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    padding: 0 12px;
+    margin-right: 8px;
+    background: var(--surface-hover, rgba(0,0,0,0.04));
+    border: 1px solid var(--border-primary);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    .search-icon {
+      color: var(--text-color-secondary);
+      margin-right: 8px;
+      font-size: 0.9rem;
+    }
+    
+    .search-placeholder {
+      color: var(--text-color-secondary);
+      font-size: 0.9rem;
+      margin-right: 48px;
+    }
+    
+    .shortcut-keys {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      
+      kbd {
+        background: var(--surface-card);
+        border: 1px solid var(--border-primary);
+        border-radius: 4px;
+        padding: 2px 6px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        font-family: inherit;
+        color: var(--text-color-secondary);
+      }
+      
+      span {
+        color: var(--text-color-secondary);
+        font-size: 0.75rem;
+      }
+    }
+    
+    &:hover {
+      background: var(--surface-ground);
+      border-color: var(--primary-color);
+    }
+    
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--primary-color-transparent);
+    }
+  }
   /* Prevents icons/profile from shrinking when tabs get wide */
 }
 

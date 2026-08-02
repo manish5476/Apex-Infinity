@@ -28,6 +28,18 @@
   <!-- ── Right: actions + profile ── -->
   <div class="header-right">
 
+    <!-- Global Search Trigger -->
+    <button class="global-search-btn" (click)="hotkeyService.openCommandPalette()" aria-label="Global Search">
+      <i class="pi pi-search search-icon"></i>
+      <span class="search-placeholder">Search...</span>
+      <div class="shortcut-keys">
+        <kbd>Ctrl</kbd>
+        <span>+</span>
+        <kbd>K</kbd>
+      </div>
+    </button>
+
+
     <!-- Mobile nav -->
     <button class="icon-btn mobile-only" (click)="mobileMenu.toggle($event)" aria-label="Mobile navigation">
       <i class="pi pi-compass"></i>
@@ -232,3 +244,5 @@
     }
   </div>
 </div>
+
+<app-command-palette></app-command-palette>

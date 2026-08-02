@@ -30,6 +30,9 @@ import { HasPermissionDirective } from '@core/auth/directives/has-permission.dir
 import { PERMISSIONS } from '@core/auth/permissions.constants';
 import { TabService, TabStripComponent } from "../../Tabbing";
 
+import { CommandPaletteComponent } from '../../shared/ui/command-palette/command-palette.component';
+import { HotkeyService } from '../../core/services/hotkey.service';
+
 export interface Theme {
   name: string;
   id: string;
@@ -61,7 +64,8 @@ export interface ThemeGroup {
     SliderModule,
     DialogModule,
     AnnouncementList,
-    TabStripComponent
+    TabStripComponent,
+    CommandPaletteComponent
   ],
   templateUrl: './mainscreen-header.html',
   styleUrl: './mainscreen-header.scss',
@@ -80,6 +84,7 @@ export class MainscreenHeader implements OnInit, OnDestroy {
   announcementDialogVisible = signal(false);
 
   public tabService = inject(TabService);
+  public hotkeyService = inject(HotkeyService);
   private themeService = inject(ThemeService);
   private authService = inject(AuthService);
   private notificationService = inject(NotificationService);

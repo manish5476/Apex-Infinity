@@ -25,6 +25,8 @@ import { SidebarHeaderComponent } from './components/sidebar-header/sidebar-head
 import { SidebarNavSectionComponent } from './components/sidebar-nav-section/sidebar-nav-section.component';
 import { SidebarProfileComponent } from './components/sidebar-profile/sidebar-profile.component';
 
+import { HotkeyService } from '../../core/services/hotkey.service';
+
 @Component({
   selector: 'app-mainscreen-sidebar',
   standalone: true,
@@ -44,6 +46,7 @@ export class Mainscreensidebar {
   protected readonly authService = inject(AuthService);
   protected readonly menuBuilder = inject(MenuBuilderService);
   private readonly router = inject(Router);
+  private readonly hotkeyService = inject(HotkeyService);
 
   // ── Host class bindings (drives SCSS modifiers) ───────────────────────────
   @HostBinding('class.is-pinned') get _pinned() { return this.layout.isPinned(); }
@@ -121,92 +124,17 @@ export class Mainscreensidebar {
   }
 
   // ── Spotlight search ──────────────────────────────────────────────────────
-  isSearchVisible = false;
-  searchQuery = '';
-  filteredResults: NavSearchResult[] = [];
-  focusedIndex = 0;
-
-  @ViewChild('searchInput') searchInputRef!: ElementRef<HTMLInputElement>;
-
   @HostListener('window:keydown', ['$event'])
   handleGlobalKeydown(event: KeyboardEvent): void {
-    if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
-      event.preventDefault();
-      this.openSearch();
-      return;
-    }
-    if (!this.isSearchVisible) return;
-
-    switch (event.key) {
-      case 'Escape':
-        this.closeSearch();
-        break;
-      case 'ArrowDown':
-        event.preventDefault();
-        if (this.filteredResults.length) {
-          this.focusedIndex = (this.focusedIndex + 1) % this.filteredResults.length;
-          this.scrollFocusedIntoView();
-        }
-        break;
-      case 'ArrowUp':
-        event.preventDefault();
-        if (this.filteredResults.length) {
-          this.focusedIndex =
-            (this.focusedIndex - 1 + this.filteredResults.length) % this.filteredResults.length;
-          this.scrollFocusedIntoView();
-        }
-        break;
-      case 'Enter':
-        event.preventDefault();
-        if (this.filteredResults.length) {
-          this.navigateToResult(this.filteredResults[this.focusedIndex]);
-        }
-        break;
-    }
+    // Only intercept events if needed (left empty since shortcut was removed)
   }
 
   openSearch(): void {
-    this.isSearchVisible = true;
-    this.searchQuery = '';
-    this.filteredResults = [...this.menuBuilder.searchIndex()];
-    this.focusedIndex = 0;
-    setTimeout(() => this.searchInputRef?.nativeElement.focus(), 60);
-  }
-
-  closeSearch(): void {
-    this.isSearchVisible = false;
-    this.searchQuery = '';
-  }
-
-  onSearchInput(event: Event): void {
-    const query = (event.target as HTMLInputElement).value.toLowerCase().trim();
-    this.searchQuery = query;
-    this.focusedIndex = 0;
-    const all = this.menuBuilder.searchIndex();
-    this.filteredResults = query
-      ? all.filter(
-        r => r.label.toLowerCase().includes(query) ||
-          r.breadcrumb.toLowerCase().includes(query),
-      )
-      : [...all];
-  }
-
-  navigateToResult(result: NavSearchResult): void {
-    if (!result) return;
-    this.router.navigate(result.routerLink as string[]);
-    this.closeSearch();
-    if (this.layout.isMobile()) this.layout.closeMobile();
+    this.hotkeyService.toggleCommandPalette();
   }
 
   // ── Auth ──────────────────────────────────────────────────────────────────
   logout(): void {
     this.authService.logout();
-  }
-
-  // ── Private ───────────────────────────────────────────────────────────────
-  private scrollFocusedIntoView(): void {
-    document
-      .getElementById(`sr-${this.focusedIndex}`)
-      ?.scrollIntoView({ block: 'nearest' });
   }
 }
