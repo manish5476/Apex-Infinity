@@ -48,7 +48,7 @@ import { DataListCardComponent } from '../../shared/ui/data/list/data-list-card.
     SectionComponent, WidgetRailComponent,
     StatCardComponent, CardComponent,
     DataListComponent, DataListRowComponent, DataListCardComponent,
-    GradientBannerComponent, StatusBadgeComponent, ButtonComponent, LoadingComponent, AvatarComponent
+    StatusBadgeComponent, ButtonComponent, LoadingComponent, AvatarComponent
   ],
   template: `
 <app-page>
@@ -105,9 +105,10 @@ import { DataListCardComponent } from '../../shared/ui/data/list/data-list-card.
         
         <!-- Alerts Ribbon -->
         @if ((dashboard()!.alerts.lowStockCount ?? 0) > 0) {
-          <app-gradient-banner variant="warning" icon="pi pi-exclamation-triangle" title="Action Required" size="sm">
-            <strong>{{ dashboard()!.alerts.lowStockCount }} items</strong> below reorder level — action required to prevent stockouts.
-          </app-gradient-banner>
+          <div class="flex items-center gap-3 p-[var(--spacing-md)] rounded-[var(--ui-border-radius-lg)] bg-[var(--color-warning-bg)] border border-[var(--color-warning-border)] text-[var(--color-warning)] text-[length:var(--font-size-sm)] shadow-sm">
+            <i class="pi pi-exclamation-triangle"></i>
+            <span><strong>{{ dashboard()!.alerts.lowStockCount }} items</strong> below reorder level — action required to prevent stockouts.</span>
+          </div>
         }
 
         <!-- Top KPIs -->
@@ -170,41 +171,32 @@ import { DataListCardComponent } from '../../shared/ui/data/list/data-list-card.
                       <div class="xl:col-span-2 flex flex-col gap-[var(--spacing-3xl)]">
                           <app-section title="AI Business Insights" spacing="compact">
                 <ng-container ngProjectAs="[actions]">
-                  <app-status-badge status="info" variant="subtle" size="sm" [label]="dashboard()!.insights.count + ' generated'"></app-status-badge>
+                  <app-status-badge status="info" variant="subtle" size="sm" [label]="dashboard()!.insights.count + ' insights'"></app-status-badge>
                 </ng-container>
                 
                 <div class="flex flex-col gap-[var(--spacing-md)]">
                   @for (insight of dashboard()!.insights.insights; track insight.title) {
-                    <app-card padding="md" class="border-l-4 transition-transform hover:-translate-y-0.5" 
-                      [class.border-l-[var(--color-success)]]="insight.type === 'positive'"
-                      [class.border-l-[var(--color-warning)]]="insight.type === 'warning'"
-                      [class.border-l-[var(--color-info)]]="insight.type === 'info'">
+                    <div class="p-4 rounded-lg flex items-start gap-3 border border-black/5"
+                      [class.bg-[var(--color-success-bg)]]="insight.type === 'positive'"
+                      [class.bg-[var(--color-warning-bg)]]="insight.type === 'warning'"
+                      [class.bg-[var(--color-info-bg)]]="insight.type === 'info'">
                       
-                      <div class="flex items-start gap-4">
-                         <!-- Polished Icon Wrapper -->
-                         <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
-                              [class.bg-[var(--color-success-bg)]]="insight.type === 'positive'"
-                              [class.bg-[var(--color-warning-bg)]]="insight.type === 'warning'"
-                              [class.bg-[var(--color-info-bg)]]="insight.type === 'info'">
-                           <i class="pi text-lg"
-                              [class.pi-check-circle]="insight.type === 'positive'"
-                              [class.pi-exclamation-triangle]="insight.type === 'warning'"
-                              [class.pi-info-circle]="insight.type === 'info'"
-                              [class.text-[var(--color-success)]]="insight.type === 'positive'"
-                              [class.text-[var(--color-warning)]]="insight.type === 'warning'"
-                              [class.text-[var(--color-info)]]="insight.type === 'info'"></i>
-                         </div>
+                      <i class="pi text-lg mt-0.5"
+                         [class.pi-check-circle]="insight.type === 'positive'"
+                         [class.pi-exclamation-triangle]="insight.type === 'warning'"
+                         [class.pi-info-circle]="insight.type === 'info'"
+                         [class.text-[var(--color-success)]]="insight.type === 'positive'"
+                         [class.text-[var(--color-warning)]]="insight.type === 'warning'"
+                         [class.text-[var(--color-info)]]="insight.type === 'info'"></i>
                          
-                         <!-- Insight Content -->
-                         <div class="flex-1 flex flex-col gap-1 pt-0.5">
-                            <div class="flex items-start sm:items-center justify-between flex-col sm:flex-row gap-2 mb-0.5">
-                              <h4 class="font-bold text-[length:var(--font-size-md)] text-[var(--text-primary)] tracking-tight m-0">{{ insight.title }}</h4>
-                              <app-status-badge [status]="insight.priority === 'high' ? 'error' : 'neutral'" size="sm" [label]="insight.priority"></app-status-badge>
-                            </div>
-                            <p class="text-[length:var(--font-size-sm)] text-[var(--text-secondary)] m-0 leading-relaxed max-w-3xl">{{ insight.message }}</p>
-                         </div>
+                      <div class="flex-1 flex flex-col gap-1">
+                        <div class="flex items-center justify-between">
+                          <span class="font-bold text-[var(--text-primary)] text-sm tracking-tight">{{ insight.title }}</span>
+                          <app-status-badge [status]="insight.priority === 'high' ? 'error' : 'neutral'" size="sm" [label]="insight.priority | uppercase"></app-status-badge>
+                        </div>
+                        <span class="text-[var(--text-secondary)] text-xs">{{ insight.message }}</span>
                       </div>
-                    </app-card>
+                    </div>
                   }
                 </div>
              </app-section>
@@ -258,14 +250,16 @@ import { DataListCardComponent } from '../../shared/ui/data/list/data-list-card.
              <!-- Stock Urgency Grid -->
              <app-section title="Stock Urgency Monitor" spacing="compact">
                  <ng-container ngProjectAs="[actions]">
-                    <app-status-badge status="error" variant="solid" [label]="dashboard()!.inventory.lowStockAlerts.length + ' Critical'"></app-status-badge>
+                    <div class="flex items-center gap-2">
+                      <app-status-badge status="error" variant="solid" [label]="dashboard()!.inventory.lowStockAlerts.length + ' Critical'"></app-status-badge>
+                      <app-button variant="success" size="sm" icon="pi pi-file-excel" [label]="'Export Excel ' + dashboard()!.inventory.lowStockAlerts.length"></app-button>
+                    </div>
                  </ng-container>
                  <!-- Wrapped in a border to match the cards -->
-                 <div class="border border-[var(--border-secondary)] rounded-[var(--ui-border-radius-lg)] overflow-hidden">
-                   <app-data-grid [viewOnly]="true" [pagination]="true" [enableExport]="true" class="full-size-grid"
+                 <div class="border border-[var(--border-secondary)] rounded-[var(--ui-border-radius-lg)] overflow-hidden relative h-[320px] flex flex-col">
+                   <app-data-grid [viewOnly]="true" [pagination]="true" [toolbar]="false" 
                     [columns]="alertColumns"
-                    [data]="dashboard()!.inventory.lowStockAlerts"
-                    class="h-[320px] block">
+                    [data]="dashboard()!.inventory.lowStockAlerts">
                    </app-data-grid>
                  </div>
              </app-section>

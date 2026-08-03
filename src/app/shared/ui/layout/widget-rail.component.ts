@@ -117,7 +117,7 @@ import { CommonModule } from '@angular/common';
       width: 100%;
       padding-bottom: var(--spacing-xl); /* Generous padding to prevent shadow clipping */
       padding-top: var(--spacing-sm);
-      padding-inline: 4px;
+      padding-inline: var(--spacing-xl);
     }
 
     .widget-rail-track:focus-visible {

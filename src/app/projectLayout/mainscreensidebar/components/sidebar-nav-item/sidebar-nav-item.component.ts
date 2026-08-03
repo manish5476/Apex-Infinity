@@ -89,7 +89,7 @@ import { NavItem } from '../../navigation-model';
             }
             
             <i class="pi text-[11px] flex-shrink-0 transition-transform duration-300 ease-out"
-               [class.pi-plus]="!isExpanded()" [class.pi-minus]="isExpanded()"
+               [class.pi-angle-down]="!isExpanded()" [class.pi-angle-up]="isExpanded()"
                aria-hidden="true"></i>
           }
         </button>
@@ -158,8 +158,8 @@ import { NavItem } from '../../navigation-model';
                       <span class="flex-1 truncate tracking-tight text-left">{{ child.label }}</span>
                       <i class="pi text-[10px] flex-shrink-0 text-[var(--text-muted)]
                         transition-transform duration-200 ease-out"
-                         [class.pi-plus]="!expandedKeys().has(child.label)"
-                         [class.pi-minus]="expandedKeys().has(child.label)"
+                         [class.pi-angle-down]="!expandedKeys().has(child.label)"
+                         [class.pi-angle-up]="expandedKeys().has(child.label)"
                          aria-hidden="true"></i>
                     </button>
 
@@ -210,57 +210,44 @@ import { NavItem } from '../../navigation-model';
   `,
   styles: `
     /* =========================================================
-       HIGH CONTRAST ACTIVE STATES (Matches "Threads" visual)
+       SOFT & MODERN ACTIVE STATES (Smooth Theme)
        ========================================================= */
        
-    /* 1. Expanded Level 1 Parent (Dark Inverted Pill) */
+    /* 1. Expanded Level 1 Parent (Soft Colored Text) */
     .l1-parent-expanded {
-      background-color: var(--text-primary) !important; 
-      color: var(--bg-primary) !important;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      color: var(--accent-primary) !important;
     }
-    .l1-parent-expanded i { color: var(--bg-primary) !important; }
-    
-    /* Reverse the badge colors inside an inverted active item */
-    .l1-parent-expanded span.bg-\\[var\\(--text-primary\\)\\] {
-      background-color: var(--bg-primary) !important;
-      color: var(--text-primary) !important;
-    }
+    .l1-parent-expanded i { color: var(--accent-primary) !important; }
 
-    /* 2. Active Level 1 Leaf (Dark Inverted Pill) - Standard Mode */
+    /* 2. Active Level 1 Leaf (Soft Background) - Standard Mode */
     :not(.mini-layout).l1-active {
-      background-color: var(--text-primary) !important;
-      color: var(--bg-primary) !important;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      background-color: var(--accent-focus) !important;
+      color: var(--accent-primary) !important;
     }
-    :not(.mini-layout).l1-active i { color: var(--bg-primary) !important; }
+    :not(.mini-layout).l1-active i { color: var(--accent-primary) !important; }
 
-    /* 3. Active Level 1 Leaf (White Elevated Pill) - Mini Mode */
-    /* In the image's left panel, mini active items are white pills with dark icons */
+    /* 3. Active Level 1 Leaf - Mini Mode */
     .mini-layout.l1-active {
-      background-color: var(--bg-primary) !important;
-      color: var(--text-primary) !important;
-      box-shadow: var(--shadow-md);
+      background-color: var(--accent-focus) !important;
+      color: var(--accent-primary) !important;
     }
-    .mini-layout.l1-active i { color: var(--text-primary) !important; }
+    .mini-layout.l1-active i { color: var(--accent-primary) !important; }
 
-    /* 4. Active Level 2 Child (White Elevated Pill) */
-    /* E.g., "Enlarz System" */
+    /* 4. Active Level 2 Child */
     .l2-active {
-      background-color: var(--bg-primary) !important;
-      color: var(--text-primary) !important;
-      box-shadow: var(--shadow-sm);
+      background-color: var(--accent-focus) !important;
+      color: var(--accent-primary) !important;
+      font-weight: var(--font-weight-semibold) !important;
     }
-    .l2-active i { color: var(--text-primary) !important; }
+    .l2-active i { color: var(--accent-primary) !important; }
 
     /* 5. Active Level 3 Child */
     .l3-active {
-      background-color: var(--bg-primary) !important;
-      color: var(--text-primary) !important;
+      background-color: var(--accent-focus) !important;
+      color: var(--accent-primary) !important;
       font-weight: var(--font-weight-semibold) !important;
-      box-shadow: var(--shadow-sm);
     }
-    .l3-active i { color: var(--text-primary) !important; }
+    .l3-active i { color: var(--accent-primary) !important; }
   `
 })
 export class SidebarNavItemComponent {
