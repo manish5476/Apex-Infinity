@@ -45,10 +45,11 @@ import { DataListCardComponent } from '../../shared/ui/data/list/data-list-card.
     TooltipModule, SelectModule, DatePicker,
     DataGridComponent, MasterDropdownComponent,
     PageComponent, PageHeaderComponent, PageContentComponent,
-    SectionComponent, WidgetRailComponent,
+    WidgetRailComponent,
     StatCardComponent, CardComponent,
     DataListComponent, DataListRowComponent, DataListCardComponent,
-    StatusBadgeComponent, ButtonComponent, LoadingComponent, AvatarComponent
+    StatusBadgeComponent, ButtonComponent, LoadingComponent, AvatarComponent,
+    BentoGridComponent, BentoItemComponent
   ],
   template: `
 <app-page>
@@ -166,15 +167,25 @@ import { DataListCardComponent } from '../../shared/ui/data/list/data-list-card.
           }
         </app-widget-rail>
 
-        <!-- Main Dashboard Split (Synchronized Gaps) -->
-        <div class="grid grid-cols-1 xl:grid-cols-3 gap-[var(--spacing-3xl)]">
-                      <div class="xl:col-span-2 flex flex-col gap-[var(--spacing-3xl)]">
-                          <app-section title="AI Business Insights" spacing="compact">
-                <ng-container ngProjectAs="[actions]">
-                  <app-status-badge status="info" variant="subtle" size="sm" [label]="dashboard()!.insights.count + ' insights'"></app-status-badge>
-                </ng-container>
+        <!-- Bento Grid Dashboard -->
+        <app-bento-grid layout="analytics" density="comfortable">
+          
+          <!-- AI Insights -->
+          <app-bento-item size="md" priority="high">
+            <app-card>
+              <div class="flex flex-col lg:flex-row lg:items-center gap-6 h-full">
+                <!-- Left: Title & Badge -->
+                <div class="flex flex-col gap-2 lg:w-1/3 shrink-0">
+                  <h3 class="text-[length:var(--font-size-lg)] font-[var(--font-weight-semibold)] text-[var(--text-primary)] m-0 tracking-tight">
+                    AI Business Insights
+                  </h3>
+                  <div>
+                    <app-status-badge status="info" variant="subtle" size="sm" [label]="dashboard()!.insights.count + ' insights'"></app-status-badge>
+                  </div>
+                </div>
                 
-                <div class="flex flex-col gap-[var(--spacing-md)]">
+                <!-- Right: Insights Message -->
+                <div class="flex-1 w-full">
                   @for (insight of dashboard()!.insights.insights; track insight.title) {
                     <div class="p-4 rounded-lg flex items-start gap-3 border border-black/5"
                       [class.bg-[var(--color-success-bg)]]="insight.type === 'positive'"
@@ -199,13 +210,13 @@ import { DataListCardComponent } from '../../shared/ui/data/list/data-list-card.
                     </div>
                   }
                 </div>
-             </app-section>
+              </div>
+            </app-card>
+          </app-bento-item>
 
-             <!-- Category Performance -->
-             @if (dashboard()!.topCategories?.length) {
-                <app-section title="Category Performance" icon="pi pi-chart-bar" spacing="compact">
-                   <app-card>
-                     <div class="flex flex-col divide-y divide-[var(--border-secondary)]">
+          <!-- Operations -->
+          <app-bento-item size="sm">
+            <app-data-list title="Operations" icon="pi pi-cog" maxHeight="100%">
                         @for (cat of dashboard()!.topCategories; track cat.name) {
                           <div class="py-[var(--spacing-lg)] first:pt-2 last:pb-2 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                             
@@ -242,92 +253,70 @@ import { DataListCardComponent } from '../../shared/ui/data/list/data-list-card.
                             </div>
                           </div>
                         }
-                     </div>
-                   </app-card>
-                </app-section>
-             }
+             </app-data-list>
+          </app-bento-item>
 
-             <!-- Stock Urgency Grid -->
-             <app-section title="Stock Urgency Monitor" spacing="compact">
-                 <ng-container ngProjectAs="[actions]">
+          <!-- Category Performance -->
+          @if (dashboard()!.topCategories?.length) {
+            <app-bento-item size="lg">
+               <app-card title="Category Performance">
+                 <div class="flex flex-col divide-y divide-[var(--border-secondary)]">
+
+                 </div>
+               </app-card>
+            </app-bento-item>
+          }
+
+          <!-- Top Products -->
+          @if (dashboard()!.leaders.topProducts?.length) {
+            <app-bento-item size="md">
+              <app-data-list title="Top Products" icon="pi pi-star" variant="spaced" maxHeight="100%">
+                  @for (prod of dashboard()!.leaders.topProducts; track prod._id; let i = $index) {
+                    <app-data-list-card [title]="prod.name" [subtitle]="(prod.soldQty | number) + ' sold · ₹' + (prod.profit | number:'1.0-0') + ' profit'">
+                       <div leading class="font-bold text-[var(--text-tertiary)] text-[length:var(--font-size-md)] w-6 text-center">#{{ i + 1 }}</div>
+                       <div trailing class="font-bold text-[var(--text-primary)]">₹{{ prod.revenue | number:'1.0-0' }}</div>
+                    </app-data-list-card>
+                  }
+              </app-data-list>
+            </app-bento-item>
+          }
+
+          <!-- Stock Urgency Grid -->
+          <app-bento-item size="xl">
+            <app-card title="Stock Urgency Monitor">
+                 <ng-container ngProjectAs="[card-actions]">
                     <div class="flex items-center gap-2">
                       <app-status-badge status="error" variant="solid" [label]="dashboard()!.inventory.lowStockAlerts.length + ' Critical'"></app-status-badge>
                       <app-button variant="success" size="sm" icon="pi pi-file-excel" [label]="'Export Excel ' + dashboard()!.inventory.lowStockAlerts.length"></app-button>
                     </div>
                  </ng-container>
-                 <!-- Wrapped in a border to match the cards -->
-                 <div class="border border-[var(--border-secondary)] rounded-[var(--ui-border-radius-lg)] overflow-hidden relative h-[320px] flex flex-col">
+                 <div class="rounded-[var(--ui-border-radius-lg)] overflow-hidden relative h-[320px] flex flex-col">
                    <app-data-grid [viewOnly]="true" [pagination]="true" [toolbar]="false" 
                     [columns]="alertColumns"
                     [data]="dashboard()!.inventory.lowStockAlerts">
                    </app-data-grid>
                  </div>
-             </app-section>
-           </div>
-           
-           <!-- Right Column: Lists & Quick Stats -->
-           <div class="flex flex-col gap-[var(--spacing-3xl)]">
-             
-             <!-- Operations -->
-             <app-data-list title="Operations" icon="pi pi-cog" maxHeight="320px">
-                 <app-data-list-row label="Avg Order Value">
-                   <span class="font-mono font-bold text-[var(--text-primary)]">₹{{ dashboard()!.operations.orderEfficiency.averageOrderValue | number:'1.0-0' }}</span>
-                 </app-data-list-row>
-                 <app-data-list-row label="Discount Rate">
-                   <span class="font-mono font-bold text-[var(--text-primary)]">{{ dashboard()!.operations.discountMetrics.discountRate }}%</span>
-                 </app-data-list-row>
-                 <app-data-list-row label="Cancellation Rate">
-                   <span class="font-mono font-bold text-[var(--color-error)]">{{ dashboard()!.operations.orderEfficiency.cancellationRate }}%</span>
-                 </app-data-list-row>
-                 <app-data-list-row label="Active Customers">
-                   <span class="font-mono font-bold text-[var(--text-primary)]">{{ dashboard()!.financial.customers.active | number }}</span>
-                 </app-data-list-row>
-                 <app-data-list-row label="New Customers">
-                   <span class="font-mono font-bold text-[var(--color-success)]">+{{ dashboard()!.financial.customers.new | number }}</span>
-                 </app-data-list-row>
-                 <app-data-list-row label="SKUs Sold">
-                   <span class="font-mono font-bold text-[var(--text-primary)]">{{ dashboard()!.financial.products.unique | number }}</span>
-                 </app-data-list-row>
-             </app-data-list>
+            </app-card>
+          </app-bento-item>
 
-             <!-- Top Products -->
-             @if (dashboard()!.leaders.topProducts?.length) {
-               <app-data-list title="Top Products" icon="pi pi-star" variant="spaced" maxHeight="360px" [cardStyle]="false">
-                   @for (prod of dashboard()!.leaders.topProducts; track prod._id; let i = $index) {
-                     <app-data-list-card [title]="prod.name" [subtitle]="(prod.soldQty | number) + ' sold · ₹' + (prod.profit | number:'1.0-0') + ' profit'">
-                        <div leading class="font-bold text-[var(--text-tertiary)] text-[length:var(--font-size-md)] w-6 text-center">#{{ i + 1 }}</div>
-                        <div trailing class="font-bold text-[var(--text-primary)]">₹{{ prod.revenue | number:'1.0-0' }}</div>
-                     </app-data-list-card>
-                   }
-               </app-data-list>
-             }
-
-             <!-- Top Customers -->
-             @if (dashboard()!.leaders.topCustomers?.length) {
-               <app-data-list title="Top Customers" icon="pi pi-users" variant="spaced" maxHeight="360px" [cardStyle]="false">
-                   @for (cust of dashboard()!.leaders.topCustomers; track cust._id; let i = $index) {
-                     <app-data-list-card [title]="cust.name" [subtitle]="(cust.transactions | number) + ' transaction(s)'">
-                        <div leading><app-avatar [name]="cust.name" size="sm"></app-avatar></div>
-                        <div trailing class="font-bold text-[var(--color-success)]">₹{{ cust.totalSpent | number:'1.0-0' }}</div>
-                     </app-data-list-card>
-                   }
-               </app-data-list>
-             }
-             
-             <!-- Segments -->
-             @if (dashboard()!.customers?.segmentation?.length) {
-               <app-data-list title="Segments" icon="pi pi-chart-pie" maxHeight="300px">
-                   @for (seg of dashboard()!.customers.segmentation; track seg._id) {
-                     <app-data-list-row [label]="seg._id">
-                       <span class="font-mono text-[length:var(--font-size-sm)] font-bold text-[var(--text-primary)]">{{ seg.count | number }}</span>
-                     </app-data-list-row>
-                   }
-               </app-data-list>
-             }
-             
-             <!-- Top Staff -->
-             @if (dashboard()!.operations.topStaff?.length) {
-                <app-data-list title="Top Staff" icon="pi pi-id-card" variant="spaced" maxHeight="360px" [cardStyle]="false">
+          <!-- Top Customers -->
+          @if (dashboard()!.leaders.topCustomers?.length) {
+            <app-bento-item size="sm">
+              <app-data-list title="Top Customers" icon="pi pi-users" variant="spaced" maxHeight="100%">
+                  @for (cust of dashboard()!.leaders.topCustomers; track cust._id; let i = $index) {
+                    <app-data-list-card [title]="cust.name" [subtitle]="(cust.transactions | number) + ' transaction(s)'">
+                       <div leading><app-avatar [name]="cust.name" size="sm"></app-avatar></div>
+                       <div trailing class="font-bold text-[var(--color-success)]">₹{{ cust.totalSpent | number:'1.0-0' }}</div>
+                    </app-data-list-card>
+                  }
+              </app-data-list>
+            </app-bento-item>
+          }
+          
+          <!-- Top Staff -->
+          @if (dashboard()!.operations.topStaff?.length) {
+             <app-bento-item size="sm">
+                <app-data-list title="Top Staff" icon="pi pi-id-card" variant="spaced" maxHeight="100%">
                     @for (staff of dashboard()!.operations.topStaff; track staff._id) {
                       <app-data-list-card [title]="staff.name" [subtitle]="(staff.count | number) + ' order(s)'">
                          <div leading><app-avatar [name]="staff.name" size="sm"></app-avatar></div>
@@ -335,9 +324,23 @@ import { DataListCardComponent } from '../../shared/ui/data/list/data-list-card.
                       </app-data-list-card>
                     }
                 </app-data-list>
-             }
-           </div>
-        </div>
+             </app-bento-item>
+          }
+
+          <!-- Segments -->
+          @if (dashboard()!.customers?.segmentation?.length) {
+            <app-bento-item size="sm">
+              <app-data-list title="Segments" icon="pi pi-chart-pie" maxHeight="100%">
+                  @for (seg of dashboard()!.customers.segmentation; track seg._id) {
+                    <app-data-list-row [label]="seg._id">
+                      <span class="font-mono text-[length:var(--font-size-sm)] font-bold text-[var(--text-primary)]">{{ seg.count | number }}</span>
+                    </app-data-list-row>
+                  }
+              </app-data-list>
+            </app-bento-item>
+          }
+          
+        </app-bento-grid>
       </div>
     }
   </app-page-content>
