@@ -34,7 +34,7 @@ export const NOTE_ROUTES: Routes = [
   },
   {
     path: 'calendar',
-    loadComponent: () => import('./calendar-view/calendar-view.component').then(m => m.CalendarViewComponent),
+    loadComponent: () => import('../calendar/calendar-workspace.component').then(m => m.CalendarWorkspaceComponent),
     canActivate: [TabRouterGuard, permissionGuard],
     data: { tabLabel: 'Calendar', tabIcon: 'pi pi-calendar', permissions: [PERMISSIONS.NOTE.VIEW_CALENDAR] }
   },

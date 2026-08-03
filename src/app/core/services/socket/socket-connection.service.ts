@@ -30,6 +30,12 @@ export class SocketConnectionService implements OnDestroy {
   public systemStats$ = new Subject<any>();
   public announcement$ = new Subject<any>();
 
+  // ── Field Service events ──────────────────────────────────────────────────
+  public fieldServiceAssignmentCreated$ = new Subject<any>();
+  public fieldServiceAssignmentUpdated$ = new Subject<any>();
+  public fieldServiceAssignmentCompleted$ = new Subject<any>();
+  public fieldServiceSlaBreach$ = new Subject<any>();
+
   // ── Internal state ────────────────────────────────────────────────────────
   private outboundQueue: Array<{ event: string; payload: any }> = [];
   private orgId: string = '';
@@ -232,6 +238,23 @@ export class SocketConnectionService implements OnDestroy {
 
     this.socket.on('systemStats', (stats: any) => {
       this.zone.run(() => this.systemStats$.next(stats));
+    });
+
+    // ── Field Service real-time events ──────────────────────────────────────
+    this.socket.on('field-service:assignment.created', (payload: any) => {
+      this.zone.run(() => this.fieldServiceAssignmentCreated$.next(payload));
+    });
+
+    this.socket.on('field-service:assignment.updated', (payload: any) => {
+      this.zone.run(() => this.fieldServiceAssignmentUpdated$.next(payload));
+    });
+
+    this.socket.on('field-service:assignment.completed', (payload: any) => {
+      this.zone.run(() => this.fieldServiceAssignmentCompleted$.next(payload));
+    });
+
+    this.socket.on('field-service:assignment.sla_breach', (payload: any) => {
+      this.zone.run(() => this.fieldServiceSlaBreach$.next(payload));
     });
   }
 
