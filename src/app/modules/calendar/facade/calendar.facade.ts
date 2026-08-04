@@ -94,6 +94,7 @@ export class CalendarFacade {
           const merged = this.adapter.mergeAndSort(notes, work, holidays);
 
           // Add a mock event if nothing is loaded to ensure the calendar isn't completely blank for the user
+        // Add a mock event if nothing is loaded to ensure the calendar isn't completely blank for the user
           if (merged.length === 0) {
             const now = new Date();
             const start = new Date(now.getFullYear(), now.getMonth(), 15, 10, 0);
@@ -106,13 +107,12 @@ export class CalendarFacade {
               allDay: false,
               sourceType: 'note',
               extendedProps: {
-                priority: 'normal',
+                priority: 'medium', // <--- Changed from 'normal' to 'medium'
                 status: 'pending',
                 description: 'This is a sample event to show you that the calendar UI works.'
               }
             });
           }
-
           // Run conflict detection
           const conflicts = this.conflictEngine.detect(merged);
           this.store.setConflicts(conflicts);
