@@ -94,6 +94,7 @@ export class CalendarFacade {
           const merged = this.adapter.mergeAndSort(notes, work, holidays);
 
           // Add a mock event if nothing is loaded to ensure the calendar isn't completely blank for the user
+        // Add a mock event if nothing is loaded to ensure the calendar isn't completely blank for the user
           if (merged.length === 0) {
             const now = new Date();
             const start = new Date(now.getFullYear(), now.getMonth(), 15, 10, 0);
@@ -105,9 +106,11 @@ export class CalendarFacade {
               end: end.toISOString(),
               allDay: false,
               sourceType: 'note',
+              sourceId: 'mock-source-1', // <--- ADDED missing property
+              color: '#3b82f6',          // <--- ADDED missing property (blue color)
               extendedProps: {
-                priority: 'medium', // Fixed type error
-                status: 'pending' // Fixed unknown property error
+                priority: 'medium',
+                status: 'pending' 
               }
             });
           }
