@@ -47,7 +47,7 @@ import { DataListCardComponent } from '../../shared/ui/data/list/data-list-card.
     PageComponent, PageHeaderComponent, PageContentComponent,
     WidgetRailComponent,
     StatCardComponent, CardComponent,
-    DataListComponent, DataListRowComponent, DataListCardComponent,
+    DataListComponent, DataListCardComponent,
     StatusBadgeComponent, ButtonComponent, LoadingComponent, AvatarComponent,
     BentoGridComponent, BentoItemComponent
   ],

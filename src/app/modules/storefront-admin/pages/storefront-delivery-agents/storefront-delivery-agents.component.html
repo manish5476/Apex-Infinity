@@ -5,7 +5,17 @@
         <h1>Internal Delivery Agents</h1>
         <p class="subtitle">Manage your internal fleet for storefront deliveries.</p>
       </div>
-      <div class="header-actions">
+      <div class="header-actions flex items-center gap-3">
+        <app-search-filter
+          [placeholder]="'Search agents...'"
+          [value]="searchTerm()"
+          (valueChange)="onSearchChange($event)">
+        </app-search-filter>
+        @if (hasActiveFilters()) {
+          <button class="premium-btn ghost-btn text-xs py-1.5 px-3" (click)="clearFilters()">
+            <i class="pi pi-filter-slash"></i> Clear
+          </button>
+        }
         <button class="premium-btn ghost-btn" (click)="load()">
           <i class="pi pi-refresh" [class.pi-spin]="loading()"></i> Refresh
         </button>
@@ -24,7 +34,7 @@
         </div>
       } @else {
         <div class="classic-grid-wrapper">
-          <p-table [value]="agents()" [columns]="cols" [loading]="loading()" [paginator]="true" [rows]="20"
+          <p-table [value]="agents()" [columns]="cols" [loading]="loading()" [paginator]="false"
             styleClass="premium-p-table" [rowHover]="true">
 
             <ng-template pTemplate="header" let-columns>
@@ -102,18 +112,31 @@
             <ng-template pTemplate="empty">
               <tr>
                 <td colspan="6">
-                  <div class="empty-state-block">
-                    <div class="empty-icon-wrapper"><i class="pi pi-car"></i></div>
-                    <h3>No Delivery Agents Found</h3>
-                    <p>Add an internal delivery agent to assign them to orders.</p>
-                    <button class="premium-btn primary-btn" (click)="openNew()" style="margin-top: 12px;">
-                      <i class="pi pi-plus"></i> Add Your First Agent
-                    </button>
-                  </div>
+                  <app-empty-state
+                    icon="pi pi-truck"
+                    [title]="hasActiveFilters() ? 'No matching agents' : 'No delivery agents yet'"
+                    [description]="hasActiveFilters() ? 'No agents match your search criteria. Try resetting your search.' : 'Add an internal delivery agent to assign them to orders.'"
+                    [actionLabel]="hasActiveFilters() ? 'Clear Search' : 'Add First Agent'"
+                    [actionIcon]="hasActiveFilters() ? 'pi pi-filter-slash' : 'pi pi-plus'"
+                    (action)="hasActiveFilters() ? clearFilters() : openNew()">
+                  </app-empty-state>
                 </td>
               </tr>
             </ng-template>
           </p-table>
+
+          @if (total() > 0) {
+            <div class="pagination-footer border-t border-[var(--border-secondary)] bg-[var(--bg-primary)] rounded-b-xl mt-2 px-2 py-1">
+              <app-grid-pagination
+                [total]="total()"
+                [page]="currentPage() - 1"
+                [pageSize]="pageSize()"
+                [pageSizeOptions]="[10, 20, 50]"
+                (pageChange)="onPageChange($event)"
+                (pageSizeChange)="onPageSizeChange($event)">
+              </app-grid-pagination>
+            </div>
+          }
         </div>
       }
     </div>

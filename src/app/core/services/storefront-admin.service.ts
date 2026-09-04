@@ -13,6 +13,30 @@ export interface PageListParams {
   search?: string;
   page?: number;
   limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  hasChanges?: boolean;
+}
+
+export interface StorefrontPage {
+  _id: string;
+  name: string;
+  slug: string;
+  pageType: string;
+  status: 'draft' | 'published' | 'archived';
+  isPublished: boolean;
+  isHomepage?: boolean;
+  viewCount?: number;
+  sectionsCount?: number;
+  updatedAt?: string;
+  createdAt?: string;
+  hasUnpublishedChanges?: boolean;
+  publishedVersion?: number;
+  version?: number;
+  publishedAt?: string;
+  lastEditedBy?: string;
+  publishedBy?: string;
+  draftUpdatedAt?: string;
 }
 
 export interface CreatePageDto {
@@ -47,7 +71,7 @@ export class StorefrontAdminService extends BaseApiService {
 
   private readonly base = '/v1/admin/storefront';
 
-  // ── Layout ────────────────────────────────────────────────────────────────
+  // â”€â”€ Layout â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   getLayout(): Observable<any> {
     return this.get(`${this.base}/layout`);
@@ -65,7 +89,7 @@ export class StorefrontAdminService extends BaseApiService {
     return this.delete(`${this.base}/layout/reset`);
   }
 
-  // ── Builder catalogue ─────────────────────────────────────────────────────
+  // â”€â”€ Builder catalogue â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   /** Section type definitions that drive the page-builder sidebar UI. */
   getSectionTypes(includeSystem = false): Observable<any> {
@@ -80,7 +104,7 @@ export class StorefrontAdminService extends BaseApiService {
     return this.get(`${this.base}/themes`);
   }
 
-  // ── Pages CRUD ────────────────────────────────────────────────────────────
+  // â”€â”€ Pages CRUD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   getPages(params?: PageListParams): Observable<any> {
     return this.get(`${this.base}/pages`, params ?? {});
@@ -94,7 +118,7 @@ export class StorefrontAdminService extends BaseApiService {
     return this.get(`${this.base}/pages/${pageId}`);
   }
 
-  /** Core builder save — sends partial page data (sections, seo, name, etc.) with optional expectedVersion for optimistic locking */
+  /** Core builder save â€” sends partial page data (sections, seo, name, etc.) with optional expectedVersion for optimistic locking */
   updatePage(pageId: string, data: Partial<any> & { expectedVersion?: number }): Observable<any> {
     return this.put(`${this.base}/pages/${pageId}`, data);
   }
@@ -108,7 +132,7 @@ export class StorefrontAdminService extends BaseApiService {
     return this.get(`${this.base}/pages/${pageId}/preview`);
   }
 
-  // ── Page lifecycle ────────────────────────────────────────────────────────
+  // â”€â”€ Page lifecycle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   publishPage(pageId: string): Observable<any> {
     return this.post(`${this.base}/pages/${pageId}/publish`, {});
@@ -202,7 +226,7 @@ export class StorefrontAdminService extends BaseApiService {
     return this.post(`${this.base}/customers/${customerId}/convert-to-crm`, {});
   }
 
-  // ── Coupons ───────────────────────────────────────────────────────────────
+  // â”€â”€ Coupons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   getCoupons(params?: { search?: string; page?: number; limit?: number }): Observable<any> {
     return this.get(`${this.base}/coupons`, params ?? {});
@@ -224,83 +248,3 @@ export class StorefrontAdminService extends BaseApiService {
     return this.delete(`${this.base}/coupons/${couponId}`);
   }
 }
-
-// import { Injectable, inject } from '@angular/core';
-// import { HttpClient, HttpParams } from '@angular/common/http';
-// import { Observable } from 'rxjs';
-// import { environment } from '../../../environments/environment';
-
-// @Injectable({
-//   providedIn: 'root'
-// })
-// export class StorefrontAdminService {
-//   private http = inject(HttpClient);
-
-//   // ✅ FIX: Match Backend Route structure (/api/v1/...)
-//   // Backend Mount: app.use('/api/v1/admin/storefront', storefrontAdminRoutes);
-//   // Environment: apiUrl = 'http://localhost:5000/api'
-//   // Result: http://localhost:5000/api/v1/admin/storefront
-//   private baseUrl = `${environment.apiUrl}/v1/admin/storefront`;
-
-//   // ================= PAGES CRUD =================
-
-//   getPages(params?: { status?: string; search?: string }): Observable<any> {
-//     let httpParams = new HttpParams();
-//     if (params?.status) httpParams = httpParams.set('status', params.status);
-//     if (params?.search) httpParams = httpParams.set('search', params.search);
-
-//     return this.http.get<{ results: number, data: any[] }>(`${this.baseUrl}/pages`, { params: httpParams });
-//   }
-
-//   createPage(pageData: Partial<any>): Observable<any> {
-//     return this.http.post<any>(`${this.baseUrl}/pages`, pageData);
-//   }
-
-//   getPageById(pageId: string): Observable<any> {
-//     return this.http.get<any>(`${this.baseUrl}/pages/${pageId}`);
-//   }
-
-//   updatePage(pageId: string, pageData: Partial<any>): Observable<any> {
-//     return this.http.put<any>(`${this.baseUrl}/pages/${pageId}`, pageData);
-//   }
-
-//   deletePage(pageId: string): Observable<void> {
-//     return this.http.delete<void>(`${this.baseUrl}/pages/${pageId}`);
-//   }
-
-//   // ================= ACTIONS =================
-
-//   publishPage(pageId: string): Observable<any> {
-//     return this.http.post<any>(`${this.baseUrl}/pages/${pageId}/publish`, {});
-//   }
-
-//   unpublishPage(pageId: string): Observable<any> {
-//     return this.http.post<any>(`${this.baseUrl}/pages/${pageId}/unpublish`, {});
-//   }
-
-//   duplicatePage(pageId: string, data: { newName: string; newSlug: string }): Observable<any> {
-//     return this.http.post<any>(`${this.baseUrl}/pages/${pageId}/duplicate`, data);
-//   }
-
-//   // ================= METADATA =================
-
-//   getSectionTypes(): Observable<any> {
-//     return this.http.get<any>(`${this.baseUrl}/sections`);
-//   }
-
-//   getTemplates(category?: string): Observable<any> {
-//     let params = new HttpParams();
-//     if (category) params = params.set('category', category);
-//     return this.http.get<any>(`${this.baseUrl}/templates`, { params });
-//   }
-
-//   getAvailableThemes(): Observable<any> {
-//     return this.http.get<any>(`${this.baseUrl}/themes`);
-//   }
-
-//   getPageAnalytics(pageId: string, period: '7d' | '30d' | '90d' = '30d'): Observable<any> {
-//     return this.http.get<any>(`${this.baseUrl}/pages/${pageId}/analytics`, {
-//       params: { period }
-//     });
-//   }
-// }

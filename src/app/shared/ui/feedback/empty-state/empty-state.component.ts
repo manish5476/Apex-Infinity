@@ -37,7 +37,7 @@ export class EmptyStateComponent {
   title = input<string>('No records found');
   description = input<string>('There is no data available to display at this time.');
   actionLabel = input<string>();
-  actionIcon = input<string>('');
+  actionIcon = input<any>('');
 
   action = output<void>();
 }

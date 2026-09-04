@@ -3,14 +3,14 @@ import { permissionGuard } from '@core/auth/guards/permission.guard';
 import { PERMISSIONS } from '@core/auth/permissions.constants';
 import { pageBuilderUnsavedGuard } from './guards/page-builder-unsaved.guard';
 
-const adminSurfaceRoute = (path: string, surfaceKey: string, title: string): Routes[number] => ({
+const comingSoonRoute = (path: string, surfaceKey: string, title: string): Routes[number] => ({
   path,
   loadComponent: () =>
-    import('./pages/storefront-command-center/storefront-command-center.component')
-      .then(m => m.StorefrontCommandCenterComponent),
+    import('./pages/storefront-coming-soon/storefront-coming-soon.component')
+      .then(m => m.StorefrontComingSoonComponent),
   title,
   canActivate: [permissionGuard],
-  data: { permissions: [PERMISSIONS.STOREFRONT.READ], surfaceKey }
+  data: { permissions: [PERMISSIONS.STOREFRONT.READ], surfaceKey, title }
 });
 
 export const STOREFRONT_ADMIN_ROUTES: Routes = [
@@ -19,7 +19,15 @@ export const STOREFRONT_ADMIN_ROUTES: Routes = [
     redirectTo: 'overview',
     pathMatch: 'full'
   },
-  adminSurfaceRoute('overview', 'overview', 'Storefront Overview'),
+  {
+    path: 'overview',
+    loadComponent: () =>
+      import('./pages/storefront-command-center/storefront-command-center.component')
+        .then(m => m.StorefrontCommandCenterComponent),
+    title: 'Storefront Overview',
+    canActivate: [permissionGuard],
+    data: { permissions: [PERMISSIONS.STOREFRONT.READ], surfaceKey: 'overview' }
+  },
   {
     path: 'pages',
     loadComponent: () =>
@@ -85,15 +93,20 @@ export const STOREFRONT_ADMIN_ROUTES: Routes = [
     path: 'settings/layout',
     loadComponent: () =>
       import('./pages/storefront-layout/storefront-layout.component').then(m => m.StorefrontLayoutComponent),
-    title: 'Storefront Layout',
+    title: 'Storefront Layout & Branding',
     canActivate: [permissionGuard],
     data: { permissions: [PERMISSIONS.STOREFRONT.LAYOUT_MANAGE] }
   },
+  {
+    path: 'settings',
+    redirectTo: 'settings/layout',
+    pathMatch: 'full'
+  },
+  // Surfaces currently planned on roadmap
   ...[
     ['activity', 'activity-logs', 'Activity Logs'],
     ['notifications', 'notifications-center', 'Notifications Center'],
     ['audit-history', 'audit-history', 'Audit History'],
-    ['themes', 'theme-marketplace', 'Theme Marketplace'],
     ['templates', 'templates-library', 'Templates Library'],
     ['seo', 'seo-dashboard', 'SEO Dashboard'],
     ['analytics', 'analytics-overview', 'Analytics Overview'],
@@ -109,9 +122,6 @@ export const STOREFRONT_ADMIN_ROUTES: Routes = [
     ['setup', 'setup-wizard', 'Setup Wizard'],
     ['publish-history', 'publish-history', 'Publish History'],
     ['revisions', 'page-revisions', 'Page Revisions'],
-    ['media', 'media-manager', 'Media Manager'],
-    ['settings', 'settings', 'Storefront Settings']
-  ].map(([path, surfaceKey, title]) => adminSurfaceRoute(path, surfaceKey, title))
+    ['media', 'media-manager', 'Media Manager']
+  ].map(([path, surfaceKey, title]) => comingSoonRoute(path, surfaceKey, title))
 ];
-
-

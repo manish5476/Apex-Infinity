@@ -1,11 +1,16 @@
-// src/app/features/storefront-admin/pages/page-list/page-list.component.ts
-import { Component, OnInit, inject, signal, computed, OnDestroy } from '@angular/core';
+// src/app/modules/storefront-admin/pages/page-list/page-list.component.ts
+import { Component, OnInit, inject, signal, computed, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { StorefrontAdminService, CreatePageDto } from '@core/services/storefront-admin.service';
-import { Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
+import { StorefrontAdminService, CreatePageDto, StorefrontPage } from '@core/services/storefront-admin.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { SearchFilterComponent } from '@shared/ui/filters/search-filter.component';
+import { SelectFilterComponent, SelectFilterOption } from '@shared/ui/filters/select-filter.component';
+import { GridPaginationComponent } from '@shared/ui/grid/components/grid-pagination.component';
+import { GridPageState } from '@shared/ui/grid/grid-types';
+import { EmptyStateComponent } from '@shared/ui/feedback/empty-state/empty-state.component';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -33,25 +38,66 @@ function getOrgSlug(): string {
 @Component({
   selector: 'app-page-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, DatePipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    CommonModule,
+    RouterModule,
+    ReactiveFormsModule,
+    DatePipe,
+    SearchFilterComponent,
+    SelectFilterComponent,
+    GridPaginationComponent,
+    EmptyStateComponent
+  ],
   template: `
     <main class="storefront-pages-layout" [class.panel-open]="showCreateModal()">
     
       <section class="grid-section">
+        <!-- Page Header -->
         <header class="page-header">
           <div class="header-content">
             <h1>Storefront Pages</h1>
-            <p class="subtitle">Design, publish, and optimize your storefront landing campaigns.</p>
+            <p class="subtitle">Design, publish, and manage your storefront pages.</p>
           </div>
           <div class="header-actions">
             <button type="button" (click)="loadPages()" class="premium-btn ghost-btn">
               <i class="pi pi-refresh" [class.pi-spin]="isLoading()"></i> Refresh
             </button>
             <button type="button" (click)="openCreateModal()" class="premium-btn primary-btn">
-              <i class="pi pi-plus"></i> Create New Page
+              <i class="pi pi-plus"></i> Create Page
             </button>
           </div>
         </header>
+
+        <!-- Filters Toolbar -->
+        <div class="filters-toolbar">
+          <div class="filters-group">
+            <app-search-filter
+              [placeholder]="'Search by title or slug...'"
+              [value]="searchTerm()"
+              (valueChange)="onSearchChange($event)">
+            </app-search-filter>
+            <app-select-filter
+              [options]="statusOptions"
+              [placeholder]="'All Statuses'"
+              [value]="statusFilter()"
+              [filter]="false"
+              (valueChange)="onStatusChange($event)">
+            </app-select-filter>
+            <app-select-filter
+              [options]="typeOptions"
+              [placeholder]="'All Types'"
+              [value]="typeFilter()"
+              [filter]="false"
+              (valueChange)="onTypeChange($event)">
+            </app-select-filter>
+          </div>
+          @if (hasActiveFilters()) {
+            <button type="button" class="premium-btn ghost-btn clear-filter-btn" (click)="clearFilters()">
+              <i class="pi pi-filter-slash"></i> Clear Filters
+            </button>
+          }
+        </div>
     
         <div class="grid-container">
           @if (error()) {
@@ -65,38 +111,38 @@ function getOrgSlug(): string {
           @if (isLoading()) {
             <div class="loader-container">
               <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: var(--text-secondary);"></i>
-              <span class="loading-text">Assembling workspaces...</span>
+              <span class="loading-text">Loading pages...</span>
             </div>
           } @else {
     
-            @if (pages().length > 0) {
+            @if (pages().length > 0 || hasActiveFilters()) {
               <div class="bento-metrics-row">
                 <div class="bento-block stat-box">
-                  <div class="stat-icon"><i class="pi pi-folder-open"></i></div>
+                  <div class="stat-icon"><i class="pi pi-file"></i></div>
                   <div class="stat-content">
-                    <span class="value">{{ pages().length }}</span>
-                    <span class="label">Total Folders</span>
+                    <span class="value">{{ total() }}</span>
+                    <span class="label">Total Pages</span>
                   </div>
                 </div>
                 <div class="bento-block stat-box highlight">
                   <div class="stat-icon"><i class="pi pi-globe"></i></div>
                   <div class="stat-content">
                     <span class="value">{{ publishedCount() }}</span>
-                    <span class="label">Live Channels</span>
+                    <span class="label">Published</span>
                   </div>
                 </div>
                 <div class="bento-block stat-box">
                   <div class="stat-icon"><i class="pi pi-file-edit"></i></div>
                   <div class="stat-content">
                     <span class="value">{{ draftCount() }}</span>
-                    <span class="label">Draft Profiles</span>
+                    <span class="label">Drafts</span>
                   </div>
                 </div>
                 <div class="bento-block stat-box total-views">
                   <div class="stat-icon"><i class="pi pi-chart-line"></i></div>
                   <div class="stat-content">
                     <span class="value">{{ totalViewsCount() | number }}</span>
-                    <span class="label">Total Network Views</span>
+                    <span class="label">Total Views</span>
                   </div>
                 </div>
               </div>
@@ -105,13 +151,16 @@ function getOrgSlug(): string {
             <div class="card-grid-wrapper">
               <div class="card-grid">
     
-                <button (click)="openCreateModal()" class="create-card" type="button">
-                  <div class="create-icon-ring">
-                    <i class="pi pi-plus"></i>
-                  </div>
-                  <span class="create-label">Blank Slate Workspace</span>
-                  <span class="create-hint">Start a new layout structure</span>
-                </button>
+                <!-- Blank Create Card (only shown on page 1 with no filters) -->
+                @if (!hasActiveFilters() && currentPage() === 1) {
+                  <button (click)="openCreateModal()" class="create-card" type="button">
+                    <div class="create-icon-ring">
+                      <i class="pi pi-plus"></i>
+                    </div>
+                    <span class="create-label">New Page</span>
+                    <span class="create-hint">Start from a blank canvas</span>
+                  </button>
+                }
     
                 @for (page of pages(); track page._id) {
                   <div class="page-card">
@@ -138,7 +187,7 @@ function getOrgSlug(): string {
                     <div class="card-content-segment">
                       <div class="card-header-row">
                         <h3 class="card-title" [title]="page.name">{{ page.name }}</h3>
-                        <button (click)="viewLive(page.slug)" class="icon-btn ghost-btn" title="Open external channel" type="button">
+                        <button (click)="viewLive(page.slug)" class="icon-btn ghost-btn" title="View Live" type="button">
                           <i class="pi pi-external-link"></i>
                         </button>
                       </div>
@@ -152,7 +201,7 @@ function getOrgSlug(): string {
                         </div>
                         <div class="metric-item">
                           <i class="pi pi-objects-column"></i>
-                          <span>{{ page.sectionsCount ?? 0 }} Blocks</span>
+                          <span>{{ page.sectionsCount ?? 0 }} Sections</span>
                         </div>
                         <div class="metric-item">
                           <i class="pi pi-tag"></i>
@@ -169,13 +218,13 @@ function getOrgSlug(): string {
                           <button (click)="togglePublish(page)" class="icon-btn toggle-btn" [class.active]="page.isPublished" [title]="page.isPublished ? 'Unpublish' : 'Publish'">
                             <i class="pi" [class]="page.isPublished ? 'pi-eye' : 'pi-eye-slash'"></i>
                           </button>
-                          <button (click)="duplicatePage(page)" class="icon-btn" title="Duplicate Profile">
+                          <button (click)="duplicatePage(page)" class="icon-btn" title="Duplicate Page">
                             <i class="pi pi-copy"></i>
                           </button>
                           <button
                             (click)="deletePage(page)"
                             class="icon-btn danger-btn"
-                            title="Delete Segment"
+                            title="Delete Page"
                             [disabled]="page.isHomepage || page.pageType === 'home' || page.pageType === 'products'">
                             <i class="pi pi-trash"></i>
                           </button>
@@ -192,77 +241,93 @@ function getOrgSlug(): string {
             </div>
     
             @if (pages().length === 0 && !isLoading()) {
-              <div class="empty-state-block">
-                <div class="empty-icon-wrapper"><i class="pi pi-folder-open"></i></div>
-                <h3>Workspace is Empty</h3>
-                <p>Initialize your core distribution channels by spinning up your first custom layout profile container.</p>
-                <button type="button" (click)="openCreateModal()" class="premium-btn primary-btn" style="margin-top: 12px;">
-                  <i class="pi pi-plus"></i> Create First Page
-                </button>
+              <div class="empty-state-wrapper">
+                <app-empty-state
+                  icon="pi pi-file"
+                  [title]="hasActiveFilters() ? 'No matching pages' : 'No pages yet'"
+                  [description]="hasActiveFilters() ? 'No pages match your current search and filter criteria.' : 'Create your first page to start building your storefront.'"
+                  [actionLabel]="hasActiveFilters() ? 'Clear Filters' : 'Create Page'"
+                  [actionIcon]="hasActiveFilters() ? 'pi pi-filter-slash' : 'pi pi-plus'"
+                  (action)="hasActiveFilters() ? clearFilters() : openCreateModal()">
+                </app-empty-state>
+              </div>
+            }
+
+            @if (total() > 0) {
+              <div class="pagination-container">
+                <app-grid-pagination
+                  [total]="total()"
+                  [page]="currentPage() - 1"
+                  [pageSize]="pageSize()"
+                  [pageSizeOptions]="[10, 20, 50]"
+                  (pageChange)="onPageChange($event)"
+                  (pageSizeChange)="onPageSizeChange($event)">
+                </app-grid-pagination>
               </div>
             }
           }
         </div>
       </section>
     
+      <!-- Create Page Slide-in Drawer -->
       @if (showCreateModal()) {
         <aside class="detail-panel create-panel">
           <header class="panel-header">
             <div class="title-group">
-              <span class="eyebrow">CMS Operations</span>
-              <h2>New Workspace Node</h2>
+              <span class="eyebrow">Pages</span>
+              <h2>New Page</h2>
             </div>
-            <button class="close-btn" (click)="closeCreateModal()">
+            <button class="close-btn" (click)="closeCreateModal()" aria-label="Close panel">
               <i class="pi pi-times"></i>
             </button>
           </header>
           <div class="panel-scroll panel-form-scroll">
             <form [formGroup]="createForm" (ngSubmit)="createPage()" class="agent-form-grid">
               <div class="bento-block form-block">
-                <div class="block-header-mini">Page Configuration</div>
+                <div class="block-header-mini">Page Details</div>
                 <label class="form-label">
-                  Workspace Descriptor / Title <span class="required">*</span>
-                  <input formControlName="name" class="premium-input" placeholder="e.g. Winter Catalog Launch" autocomplete="off" />
+                  Page Title <span class="required">*</span>
+                  <input formControlName="name" class="premium-input" placeholder="e.g. Summer Collection" autocomplete="off" />
                   @if (createForm.get('name')?.invalid && createForm.get('name')?.touched) {
-                    <span class="field-error">A unique descriptive name string is required.</span>
+                    <span class="field-error">Page title is required.</span>
                   }
                 </label>
                 <label class="form-label">
-                  Routing Uniform URL Slug <span class="required">*</span>
+                  URL Slug <span class="required">*</span>
                   <div class="slug-input-wrapper">
                     <span class="slug-prefix">/</span>
-                    <input formControlName="slug" class="premium-input slug-input" placeholder="winter-catalog-launch" autocomplete="off" />
+                    <input formControlName="slug" class="premium-input slug-input" placeholder="summer-collection" autocomplete="off" />
                   </div>
                   @if (createForm.get('slug')?.invalid && createForm.get('slug')?.touched) {
-                    <span class="field-error">Slugs are constrained to lowercase alphanumeric vectors and uniform hyphens.</span>
+                    <span class="field-error">Use lowercase letters, numbers, and hyphens only.</span>
                   }
                 </label>
                 <label class="form-label">
-                  Functional Page Type Module
+                  Page Type
                   <select formControlName="pageType" class="premium-select">
-                    <option value="custom">Custom Framework Layer</option>
-                    <option value="home">Primary System Home Dashboard</option>
-                    <option value="landing">Marketing Conversion Landing Target</option>
-                    <option value="about">Corporate About Matrix Profile</option>
-                    <option value="contact">Support Touchpoint Pipeline Gateway</option>
-                    <option value="products">Product Directory Module Mesh</option>
+                    <option value="custom">Custom Page</option>
+                    <option value="home">Home Page</option>
+                    <option value="landing">Landing Page</option>
+                    <option value="about">About Us</option>
+                    <option value="contact">Contact Us</option>
+                    <option value="products">Products Catalog</option>
                   </select>
                 </label>
               </div>
             </form>
           </div>
           <div class="sticky-actions">
-            <button type="button" (click)="closeCreateModal()" class="premium-btn ghost-btn">Dismiss</button>
+            <button type="button" (click)="closeCreateModal()" class="premium-btn ghost-btn">Cancel</button>
             <button type="submit" (click)="createPage()" [disabled]="createForm.invalid || isSubmitting()" class="premium-btn primary-btn">
               <i class="pi" [class.pi-spin]="isSubmitting()" [class.pi-spinner]="isSubmitting()" [class.pi-plus]="!isSubmitting()"></i>
-              Initialize Matrix Node
+              Create Page
             </button>
           </div>
         </aside>
       }
     
     </main>
-    `,
+  `,
   styles: [`
     .storefront-pages-layout {
       display: flex;
@@ -316,7 +381,7 @@ function getOrgSlug(): string {
         gap: 16px;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 24px;
+        margin-bottom: 20px;
         flex-shrink: 0;
 
         .header-content {
@@ -343,6 +408,29 @@ function getOrgSlug(): string {
         }
       }
 
+      /* Filters Toolbar */
+      .filters-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 20px;
+        flex-shrink: 0;
+
+        .filters-group {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .clear-filter-btn {
+          font-size: 12px;
+          padding: 6px 12px;
+        }
+      }
+
       /* Wrappers */
       .grid-container {
         flex: 1;
@@ -354,8 +442,21 @@ function getOrgSlug(): string {
       .card-grid-wrapper {
         flex: 1;
         overflow-y: auto;
-        padding-bottom: 24px;
+        padding-bottom: 20px;
         padding-right: 8px; /* Scrollbar padding */
+      }
+
+      .pagination-container {
+        flex-shrink: 0;
+        background: var(--bg-primary);
+        border: 1px solid var(--border-primary);
+        border-radius: 10px;
+        padding: 4px 12px;
+        margin-top: 8px;
+      }
+
+      .empty-state-wrapper {
+        padding: 40px 0;
       }
 
       /* Analytics Metrics Top Row */
@@ -363,7 +464,7 @@ function getOrgSlug(): string {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         gap: 16px;
-        margin-bottom: 24px;
+        margin-bottom: 20px;
         flex-shrink: 0;
         
         @media (max-width: 1200px) { grid-template-columns: repeat(2, 1fr); }
@@ -446,8 +547,8 @@ function getOrgSlug(): string {
       /* Dynamic CSS Gradients based on type */
       .card-cover-segment {
         position: relative; width: 100%; height: 140px; flex-shrink: 0;
-        background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--border-primary) 100%); /* Default Fallback */
-        
+        background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--border-primary) 100%);
+
         &[data-type="home"] { background: linear-gradient(135deg, #ede9fe 0%, #c4b5fd 100%); }
         &[data-type="products"] { background: linear-gradient(135deg, #e0f2fe 0%, #7dd3fc 100%); }
         &[data-type="about"] { background: linear-gradient(135deg, #ffedd5 0%, #fdba74 100%); }
@@ -524,7 +625,7 @@ function getOrgSlug(): string {
 
       /* Slide-in Drawer */
       .detail-panel {
-        display: none; // Managed by .panel-open rule block
+        display: none;
         flex-direction: column; height: 100%; padding: 24px 24px 24px 12px; min-width: 0;
 
         .panel-header {
@@ -572,7 +673,6 @@ function getOrgSlug(): string {
 
       /* Loaders & Empty States */
       .loader-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 400px; gap: 16px; .loading-text { color: var(--text-secondary); font-size: 13px; font-weight: 500; } }
-      .empty-state-block { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 24px; text-align: center; .empty-icon-wrapper { width: 64px; height: 64px; border-radius: 16px; background: var(--bg-primary); border: 1px solid var(--border-primary); color: var(--text-secondary); display: grid; place-items: center; font-size: 28px; margin-bottom: 16px; } h3 { margin: 0 0 8px 0; font-size: 16px; font-weight: 600; color: var(--text-primary); } p { margin: 0; font-size: 13px; color: var(--text-secondary); max-width: 320px; line-height: 1.5; } }
       .error-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; background: var(--bg-primary); border-radius: 14px; border: 1px solid var(--color-error-bg); color: var(--color-error); gap: 12px; text-align: center; margin-bottom: 20px; i { font-size: 24px; } p { font-size: 14px; margin: 0; font-weight: 500; } }
     }
   `]
@@ -583,13 +683,37 @@ export class PageListComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private router = inject(Router);
 
-  pages = signal<any[]>([]);
+  pages = signal<StorefrontPage[]>([]);
+  total = signal(0);
+  currentPage = signal(1);
+  pageSize = signal(20);
+  searchTerm = signal('');
+  statusFilter = signal<'published' | 'draft' | null>(null);
+  typeFilter = signal<string | null>(null);
+
   isLoading = signal(true);
   isSubmitting = signal(false);
   showCreateModal = signal(false);
   error = signal<string | null>(null);
 
-  // Computed metrics directly processing the JSON properties
+  readonly statusOptions: SelectFilterOption[] = [
+    { label: 'All Statuses', value: null },
+    { label: 'Published', value: 'published' },
+    { label: 'Draft', value: 'draft' }
+  ];
+
+  readonly typeOptions: SelectFilterOption[] = [
+    { label: 'All Types', value: null },
+    { label: 'Custom', value: 'custom' },
+    { label: 'Home', value: 'home' },
+    { label: 'Landing', value: 'landing' },
+    { label: 'About', value: 'about' },
+    { label: 'Contact', value: 'contact' },
+    { label: 'Products', value: 'products' }
+  ];
+
+  hasActiveFilters = computed(() => !!this.searchTerm() || !!this.statusFilter() || !!this.typeFilter());
+
   publishedCount = computed(() => this.pages().filter(p => p.status === 'published' || p.isPublished).length);
   draftCount = computed(() => this.pages().filter(p => p.status !== 'published' && !p.isPublished).length);
   totalViewsCount = computed(() => this.pages().reduce((sum, current) => sum + (current.viewCount || 0), 0));
@@ -614,16 +738,61 @@ export class PageListComponent implements OnInit, OnDestroy {
   loadPages(): void {
     this.isLoading.set(true);
     this.error.set(null);
-    this.adminService.getPages().pipe(takeUntil(this.destroy$)).subscribe({
+
+    this.adminService.getPages({
+      page: this.currentPage(),
+      limit: this.pageSize(),
+      search: this.searchTerm() || undefined,
+      status: this.statusFilter() || undefined,
+      pageType: this.typeFilter() || undefined
+    }).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         this.pages.set(res.data ?? []);
+        this.total.set(res.total ?? res.results ?? (res.data?.length || 0));
         this.isLoading.set(false);
       },
       error: () => {
-        this.error.set('Failed to read current storefront page matrices. Please retry.');
+        this.error.set('Failed to load storefront pages. Please try again.');
         this.isLoading.set(false);
       }
     });
+  }
+
+  onSearchChange(term: string): void {
+    this.searchTerm.set(term);
+    this.currentPage.set(1);
+    this.loadPages();
+  }
+
+  onStatusChange(status: any): void {
+    this.statusFilter.set(status || null);
+    this.currentPage.set(1);
+    this.loadPages();
+  }
+
+  onTypeChange(type: any): void {
+    this.typeFilter.set(type || null);
+    this.currentPage.set(1);
+    this.loadPages();
+  }
+
+  clearFilters(): void {
+    this.searchTerm.set('');
+    this.statusFilter.set(null);
+    this.typeFilter.set(null);
+    this.currentPage.set(1);
+    this.loadPages();
+  }
+
+  onPageChange(state: GridPageState): void {
+    this.currentPage.set(state.page + 1);
+    this.loadPages();
+  }
+
+  onPageSizeChange(size: number): void {
+    this.pageSize.set(size);
+    this.currentPage.set(1);
+    this.loadPages();
   }
 
   openCreateModal(): void { this.showCreateModal.set(true); }
@@ -649,7 +818,7 @@ export class PageListComponent implements OnInit, OnDestroy {
         this.loadPages();
       },
       error: (err: any) => {
-        this.error.set(err?.error?.message ?? 'Initialization pipeline failure.');
+        this.error.set(err?.error?.message ?? 'Failed to create page.');
         this.isSubmitting.set(false);
       }
     });
@@ -657,11 +826,14 @@ export class PageListComponent implements OnInit, OnDestroy {
 
   viewLive(slug: string): void {
     const org = getOrgSlug();
-    if (!org) { this.error.set('Target operational organization mapping token slice missing.'); return; }
+    if (!org) {
+      this.error.set('Organization details not found. Please refresh and try again.');
+      return;
+    }
     window.open(`/store/${org}/${slug}`, '_blank', 'noopener');
   }
 
-  togglePublish(page: any): void {
+  togglePublish(page: StorefrontPage): void {
     const action = page.isPublished ? 'unpublish' : 'publish';
     const request$ = page.isPublished
       ? this.adminService.unpublishPage(page._id)
@@ -673,28 +845,31 @@ export class PageListComponent implements OnInit, OnDestroy {
           list.map(p => p._id === page._id ? { ...p, isPublished: !page.isPublished, status: !page.isPublished ? 'published' : 'draft' } : p)
         );
       },
-      error: (err: any) => this.error.set(err?.error?.message ?? `Failed to complete state shift to ${action}.`)
+      error: (err: any) => this.error.set(err?.error?.message ?? `Failed to ${action} page.`)
     });
   }
 
-  duplicatePage(page: any): void {
+  duplicatePage(page: StorefrontPage): void {
     this.adminService.duplicatePage(page._id).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => this.loadPages(),
-      error: (err: any) => this.error.set(err?.error?.message ?? 'Cloning configuration error.')
+      error: (err: any) => this.error.set(err?.error?.message ?? 'Failed to duplicate page.')
     });
   }
 
-  deletePage(page: any): void {
-    if (page.isHomepage || page.pageType === 'home' || page.pageType === 'products') return; // Disabled via UI, but double-guarding
+  deletePage(page: StorefrontPage): void {
+    if (page.isHomepage || page.pageType === 'home' || page.pageType === 'products') return;
     
     if (page.isPublished || page.status === 'published') {
-      this.error.set(`Unpublish active channel segment "${page.name}" prior to executing removal sequences.`);
+      this.error.set(`Please unpublish "${page.name}" before deleting it.`);
       return;
     }
-    if (!confirm(`Permanently delete "${page.name}"? This transaction is irreversible.`)) return;
+    if (!confirm(`Are you sure you want to delete "${page.name}"? This action cannot be undone.`)) return;
     this.adminService.deletePage(page._id).pipe(takeUntil(this.destroy$)).subscribe({
-      next: () => this.pages.update(list => list.filter(p => p._id !== page._id)),
-      error: (err: any) => this.error.set(err?.error?.message ?? 'Purge execution block fault.')
+      next: () => {
+        this.pages.update(list => list.filter(p => p._id !== page._id));
+        this.total.update(t => Math.max(0, t - 1));
+      },
+      error: (err: any) => this.error.set(err?.error?.message ?? 'Failed to delete page.')
     });
   }
 

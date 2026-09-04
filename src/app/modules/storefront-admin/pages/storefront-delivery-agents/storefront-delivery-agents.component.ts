@@ -1,5 +1,5 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { Component, ChangeDetectionStrategy, OnInit, inject, signal, computed } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { StorefrontAdminService } from '@core/services/storefront-admin.service';
 import { catchError, of } from 'rxjs';
@@ -9,13 +9,28 @@ import { TooltipModule } from 'primeng/tooltip';
 import { DrawerModule } from 'primeng/drawer';
 import { AuthService } from '../../../auth/services/auth-service';
 import { AppMessageService } from '@core/services/message.service';
+import { SearchFilterComponent } from '@shared/ui/filters/search-filter.component';
+import { GridPaginationComponent } from '@shared/ui/grid/components/grid-pagination.component';
+import { GridPageState } from '@shared/ui/grid/grid-types';
+import { EmptyStateComponent } from '@shared/ui/feedback/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-storefront-delivery-agents',
   standalone: true,
-  imports: [FormsModule, TableModule, TagModule, TooltipModule, DrawerModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    TableModule,
+    TagModule,
+    TooltipModule,
+    DrawerModule,
+    SearchFilterComponent,
+    GridPaginationComponent,
+    EmptyStateComponent
+  ],
   templateUrl: './storefront-delivery-agents.component.html',
-  styleUrls: ['./storefront-delivery-agents.component.scss']
+  styleUrls: ['./storefront-delivery-agents.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StorefrontDeliveryAgentsComponent implements OnInit {
   private readonly adminService = inject(StorefrontAdminService);
@@ -24,8 +39,15 @@ export class StorefrontDeliveryAgentsComponent implements OnInit {
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly agents = signal<any[]>([]);
+  readonly total = signal(0);
+  readonly currentPage = signal(1);
+  readonly pageSize = signal(20);
+  readonly searchTerm = signal('');
   readonly drawerVisible = signal(false);
   readonly selectedAgent = signal<any | null>(null);
+
+  readonly hasActiveFilters = computed(() => !!this.searchTerm());
+
   formAgent = {
     name: '',
     phone: '',
@@ -52,15 +74,43 @@ export class StorefrontDeliveryAgentsComponent implements OnInit {
   load(): void {
     this.loading.set(true);
     this.error.set(null);
-    this.adminService.getDeliveryAgents({ limit: 100 }).pipe(
+    this.adminService.getDeliveryAgents({
+      page: this.currentPage(),
+      limit: this.pageSize(),
+      search: this.searchTerm() || undefined
+    } as any).pipe(
       catchError(err => {
         this.error.set(err?.error?.message ?? 'Unable to load agents.');
-        return of({ data: [] });
+        return of({ data: [], total: 0 });
       })
     ).subscribe((res: any) => {
       this.agents.set(res?.data ?? []);
+      this.total.set(res?.total ?? res?.data?.length ?? 0);
       this.loading.set(false);
     });
+  }
+
+  onSearchChange(term: string): void {
+    this.searchTerm.set(term);
+    this.currentPage.set(1);
+    this.load();
+  }
+
+  clearFilters(): void {
+    this.searchTerm.set('');
+    this.currentPage.set(1);
+    this.load();
+  }
+
+  onPageChange(state: GridPageState): void {
+    this.currentPage.set(state.page + 1);
+    this.load();
+  }
+
+  onPageSizeChange(size: number): void {
+    this.pageSize.set(size);
+    this.currentPage.set(1);
+    this.load();
   }
 
   openNew(): void {
@@ -162,7 +212,7 @@ export class StorefrontDeliveryAgentsComponent implements OnInit {
     }
     const origin = window.location.origin;
     const loginLink = `${origin}/store/${orgSlug}/delivery/login`;
-    
+
     // Copy to clipboard
     navigator.clipboard.writeText(loginLink).then(() => {
       this.messageService.showSuccess(`Login link copied to clipboard. You can now send it to ${agent.name}.`);
@@ -178,7 +228,7 @@ export class StorefrontDeliveryAgentsComponent implements OnInit {
       this.messageService.showError('This agent does not have an email address configured.');
       return;
     }
-    
+
     this.loading.set(true);
     this.adminService.sendDeliveryAgentInvite(agent._id).subscribe({
       next: () => {

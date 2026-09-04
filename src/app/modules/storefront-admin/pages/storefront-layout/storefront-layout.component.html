@@ -1,0 +1,432 @@
+<main class="layout-settings">
+  <!-- Page Header -->
+  <header class="page-header">
+    <div class="header-content">
+      <div class="flex items-center gap-3">
+        <div class="header-icon-badge">
+          <i class="pi pi-sliders-h"></i>
+        </div>
+        <div>
+          <h1>Storefront Layout & Branding</h1>
+          <p class="subtitle">Customize header navigation, footer content, and global brand styles.</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-actions">
+      @if (saveSuccess()) {
+        <span class="save-success-pill">
+          <i class="pi pi-check-circle"></i> Saved successfully
+        </span>
+      }
+      <button class="premium-btn primary-btn" (click)="saveLayout()" [disabled]="saving() || loading()">
+        <i class="pi" [class.pi-spin]="saving()" [class.pi-spinner]="saving()" [class.pi-check]="!saving()"></i>
+        {{ saving() ? 'Saving...' : 'Save Configuration' }}
+      </button>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <i class="pi pi-spin pi-spinner"></i>
+      <p>Loading storefront layout settings...</p>
+    </div>
+  } @else if (error()) {
+    <div class="error-state">
+      <i class="pi pi-exclamation-triangle"></i>
+      <p>{{ error() }}</p>
+      <button class="premium-btn ghost-btn" (click)="fetchCoreData()">Retry</button>
+    </div>
+  } @else {
+    <!-- Tab Navigation -->
+    <nav class="tab-nav" aria-label="Layout sections">
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeTab() === 'header'"
+        (click)="activeTab.set('header')">
+        <i class="pi pi-compass"></i>
+        <span>Header & Navigation</span>
+        <span class="tab-count">{{ headerLinks.length }}</span>
+      </button>
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeTab() === 'footer'"
+        (click)="activeTab.set('footer')">
+        <i class="pi pi-align-bottom"></i>
+        <span>Footer & Quick Links</span>
+        <span class="tab-count">{{ footerLinks.length }}</span>
+      </button>
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeTab() === 'branding'"
+        (click)="activeTab.set('branding')">
+        <i class="pi pi-palette"></i>
+        <span>Branding & Themes</span>
+      </button>
+    </nav>
+
+    <!-- Tab 1: Header & Navigation -->
+    @if (activeTab() === 'header') {
+      <div class="tab-content-grid">
+        <!-- Main: Navigation Link Builder -->
+        <section class="config-card main-card">
+          <div class="card-header">
+            <div>
+              <h2><i class="pi pi-bars"></i> Navigation Menu Links</h2>
+              <p class="card-desc">Links displayed in your storefront top navigation bar.</p>
+            </div>
+            <button class="premium-btn ghost-btn sm-btn" (click)="addHeaderLink()">
+              <i class="pi pi-plus"></i> Add Link
+            </button>
+          </div>
+          <div class="card-body">
+            @if (headerLinks.length === 0) {
+              <div class="empty-links-state">
+                <i class="pi pi-link"></i>
+                <p class="empty-title">No navigation links configured</p>
+                <p class="empty-sub">Add links so visitors can browse your pages and product catalog.</p>
+                <button class="premium-btn ghost-btn dashed-btn" (click)="addHeaderLink()">
+                  <i class="pi pi-plus"></i> Add First Navigation Link
+                </button>
+              </div>
+            } @else {
+              <div class="link-builder">
+                @for (link of headerLinks; track $index; let i = $index) {
+                  <div class="link-row">
+                    <div class="row-order-badge">{{ i + 1 }}</div>
+                    <div class="input-group">
+                      <label class="sr-only">Label</label>
+                      <input
+                        type="text"
+                        [(ngModel)]="link.label"
+                        placeholder="Link Label (e.g. Shop All)"
+                        class="premium-input" />
+                    </div>
+                    <div class="input-group suggestion-container">
+                      <label class="sr-only">URL</label>
+                      <input
+                        type="text"
+                        [(ngModel)]="link.url"
+                        (focus)="activeSuggestionIndex.set('header-' + i)"
+                        (input)="filterPages(link.url)"
+                        placeholder="URL (e.g. /products)"
+                        class="premium-input mono-input" />
+                      @if (activeSuggestionIndex() === 'header-' + i && filteredPages().length > 0) {
+                        <div class="suggestions-dropdown">
+                          <div class="suggestion-header">Storefront Pages</div>
+                          @for (p of filteredPages(); track p._id) {
+                            <div class="suggestion-item" (click)="selectSuggestion(p, link)">
+                              <div class="s-main"><i class="pi pi-file"></i> {{ p.name }}</div>
+                              <span class="s-slug">/{{ p.slug }}</span>
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                    <button
+                      type="button"
+                      class="icon-btn danger"
+                      title="Remove Link"
+                      (click)="removeHeaderLink(i)">
+                      <i class="pi pi-trash"></i>
+                    </button>
+                  </div>
+                }
+
+                <button class="premium-btn ghost-btn dashed-btn mt-3" (click)="addHeaderLink()">
+                  <i class="pi pi-plus"></i> Add Another Link
+                </button>
+              </div>
+            }
+          </div>
+        </section>
+
+        <!-- Sidebar: Page Reference Shortcuts -->
+        <aside class="config-card side-card">
+          <div class="card-header">
+            <div>
+              <h2><i class="pi pi-file"></i> Available Pages</h2>
+              <p class="card-desc">Click a page to add it as a navigation link.</p>
+            </div>
+            <span class="badge">{{ pages().length }} pages</span>
+          </div>
+          <div class="card-body scrollable-body">
+            @if (pages().length === 0) {
+              <p class="empty-hint">No pages found. Create pages in the Page Manager first.</p>
+            } @else {
+              <div class="page-list-compact">
+                @for (page of pages(); track page._id) {
+                  <div class="compact-page-row">
+                    <div class="page-ident">
+                      <div class="flex items-center gap-2">
+                        <span class="p-name">{{ page.name }}</span>
+                        <span class="status-pill" [class.published]="page.isPublished">
+                          {{ page.isPublished ? 'Live' : 'Draft' }}
+                        </span>
+                      </div>
+                      <span class="p-slug">/{{ page.slug }}</span>
+                    </div>
+                    <div class="compact-page-actions">
+                      <button
+                        type="button"
+                        class="icon-btn sm-icon"
+                        title="Add to navigation links"
+                        (click)="addPageAsHeaderLink(page)">
+                        <i class="pi pi-plus"></i>
+                      </button>
+                      <button
+                        type="button"
+                        class="icon-action-btn"
+                        [class.active]="page.isPublished"
+                        (click)="togglePagePublishState(page)"
+                        [title]="page.isPublished ? 'Unpublish page' : 'Publish page'">
+                        <i class="pi" [class]="page.isPublished ? 'pi-eye' : 'pi-eye-slash'"></i>
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </aside>
+      </div>
+    }
+
+    <!-- Tab 2: Footer & Quick Links -->
+    @if (activeTab() === 'footer') {
+      <div class="tab-content-stack">
+        <!-- Copyright & Store Info -->
+        <section class="config-card">
+          <div class="card-header">
+            <div>
+              <h2><i class="pi pi-info-circle"></i> Footer Information</h2>
+              <p class="card-desc">General copyright and attribution text displayed across the bottom bar.</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="form-group max-w-xl">
+              <label for="copyrightInput">Copyright Text</label>
+              <input
+                id="copyrightInput"
+                type="text"
+                [(ngModel)]="footerCopyright"
+                placeholder="e.g. © 2026 Your Company Name. All rights reserved."
+                class="premium-input" />
+              <p class="hint">Displayed at the bottom of every page on your storefront.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Footer Quick Links -->
+        <section class="config-card">
+          <div class="card-header">
+            <div>
+              <h2><i class="pi pi-link"></i> Footer Links</h2>
+              <p class="card-desc">Quick links, policy links, and navigation items displayed in the footer.</p>
+            </div>
+            <button class="premium-btn ghost-btn sm-btn" (click)="addFooterLink()">
+              <i class="pi pi-plus"></i> Add Link
+            </button>
+          </div>
+          <div class="card-body">
+            @if (footerLinks.length === 0) {
+              <div class="empty-links-state">
+                <i class="pi pi-link"></i>
+                <p class="empty-title">No footer links configured</p>
+                <p class="empty-sub">Add policy links, help pages, or category shortcuts to your footer.</p>
+                <button class="premium-btn ghost-btn dashed-btn" (click)="addFooterLink()">
+                  <i class="pi pi-plus"></i> Add First Footer Link
+                </button>
+              </div>
+            } @else {
+              <div class="link-builder">
+                @for (link of footerLinks; track $index; let i = $index) {
+                  <div class="link-row">
+                    <div class="row-order-badge">{{ i + 1 }}</div>
+                    <div class="input-group">
+                      <label class="sr-only">Label</label>
+                      <input
+                        type="text"
+                        [(ngModel)]="link.label"
+                        placeholder="Link Label (e.g. Privacy Policy)"
+                        class="premium-input" />
+                    </div>
+                    <div class="input-group suggestion-container">
+                      <label class="sr-only">URL</label>
+                      <input
+                        type="text"
+                        [(ngModel)]="link.url"
+                        (focus)="activeSuggestionIndex.set('footer-' + i)"
+                        (input)="filterPages(link.url)"
+                        placeholder="URL (e.g. /privacy)"
+                        class="premium-input mono-input" />
+                      @if (activeSuggestionIndex() === 'footer-' + i && filteredPages().length > 0) {
+                        <div class="suggestions-dropdown">
+                          <div class="suggestion-header">Storefront Pages</div>
+                          @for (p of filteredPages(); track p._id) {
+                            <div class="suggestion-item" (click)="selectSuggestion(p, link)">
+                              <div class="s-main"><i class="pi pi-file"></i> {{ p.name }}</div>
+                              <span class="s-slug">/{{ p.slug }}</span>
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                    <button
+                      type="button"
+                      class="icon-btn danger"
+                      title="Remove Link"
+                      (click)="removeFooterLink(i)">
+                      <i class="pi pi-trash"></i>
+                    </button>
+                  </div>
+                }
+
+                <button class="premium-btn ghost-btn dashed-btn mt-3" (click)="addFooterLink()">
+                  <i class="pi pi-plus"></i> Add Another Link
+                </button>
+              </div>
+            }
+          </div>
+        </section>
+      </div>
+    }
+
+    <!-- Tab 3: Branding & Themes -->
+    @if (activeTab() === 'branding') {
+      <div class="tab-content-grid">
+        <!-- Brand & Commerce Settings -->
+        <section class="config-card main-card">
+          <div class="card-header">
+            <div>
+              <h2><i class="pi pi-cog"></i> Store Identity & Settings</h2>
+              <p class="card-desc">Configure brand identity, storefront currency, and checkout policies.</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="shopNameInput">Store Name</label>
+                <input
+                  id="shopNameInput"
+                  type="text"
+                  [(ngModel)]="shopName"
+                  class="premium-input"
+                  placeholder="e.g. My Store" />
+                <p class="hint">Displayed in storefront header and page titles.</p>
+              </div>
+
+              <div class="form-group">
+                <label for="currencyInput">Store Currency</label>
+                <input
+                  id="currencyInput"
+                  type="text"
+                  [(ngModel)]="commerce.currency"
+                  class="premium-input uppercase-input"
+                  placeholder="e.g. INR" />
+                <p class="hint">Three-letter ISO currency code (e.g. USD, EUR, INR).</p>
+              </div>
+            </div>
+
+            <div class="form-group mt-5">
+              <label>Primary Brand Color</label>
+              <div class="color-picker-wrapper">
+                <input type="color" [(ngModel)]="colors.primary" class="color-wheel" />
+                <input type="text" [(ngModel)]="colors.primary" class="premium-input hex-input" />
+                <div class="color-swatch-preview" [style.background]="colors.primary"></div>
+              </div>
+              <p class="hint">Used for primary buttons, active navigation, and key accents.</p>
+            </div>
+
+            <div class="form-group mt-5">
+              <label for="minOrderInput">Minimum Order Amount</label>
+              <input
+                id="minOrderInput"
+                type="number"
+                min="0"
+                [(ngModel)]="commerce.minOrderAmount"
+                class="premium-input"
+                placeholder="0" />
+              <p class="hint">Minimum cart subtotal required to proceed to checkout. Set 0 for no limit.</p>
+            </div>
+
+            <hr class="divider my-6" />
+
+            <!-- Commerce Toggles -->
+            <div class="toggles-list">
+              <div class="toggle-row">
+                <div class="toggle-text">
+                  <span class="toggle-title">Guest Checkout</span>
+                  <span class="toggle-desc">Allow customers to place orders without creating or signing into an account.</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" [(ngModel)]="commerce.allowGuestCheckout">
+                  <span class="slider round"></span>
+                </label>
+              </div>
+
+              <div class="toggle-row">
+                <div class="toggle-text">
+                  <span class="toggle-title">Catalog Mode</span>
+                  <span class="toggle-desc">Disable online checkout and turn your store into a showcase catalog.</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" [(ngModel)]="commerce.catalogMode">
+                  <span class="slider round"></span>
+                </label>
+              </div>
+
+              <div class="toggle-row">
+                <div class="toggle-text">
+                  <span class="toggle-title">Apex Delivery Network</span>
+                  <span class="toggle-desc">Enable global platform delivery partners to fulfill customer orders.</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" [(ngModel)]="platformDeliveryEnabled">
+                  <span class="slider round"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Theme Presets -->
+        <aside class="config-card side-card">
+          <div class="card-header">
+            <div>
+              <h2><i class="pi pi-sparkles"></i> Theme Presets</h2>
+              <p class="card-desc">Select a preset to apply a curated color palette.</p>
+            </div>
+            <span class="badge">{{ themes().length }} presets</span>
+          </div>
+          <div class="card-body">
+            @if (themes().length === 0) {
+              <div class="empty-hint">No theme presets available.</div>
+            } @else {
+              <div class="themes-grid">
+                @for (theme of themes(); track theme.id) {
+                  <div
+                    class="theme-card"
+                    [class.active]="colors.primary === theme.color"
+                    (click)="applyThemeLocally(theme)">
+                    <div class="theme-preview" [style.background]="theme.gradient || theme.color">
+                      @if (colors.primary === theme.color) {
+                        <div class="active-indicator"><i class="pi pi-check"></i></div>
+                      }
+                    </div>
+                    <div class="theme-info">
+                      <span class="t-name">{{ theme.name || 'Theme Preset' }}</span>
+                      <span class="t-hex">{{ theme.color }}</span>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </aside>
+      </div>
+    }
+  }
+</main>

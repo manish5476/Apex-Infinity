@@ -6,253 +6,269 @@
         <p class="subtitle">Manage shoppers, view live carts, and migrate profiles.</p>
       </div>
       <div class="header-actions">
-        <div class="filters">
-          <div class="search-box">
-            <i class="pi pi-search"></i>
-            <input type="text" placeholder="Search..." [ngModel]="search()"
-              (ngModelChange)="search.set($event); load()" />
-            </div>
-            <button class="filter-chip" [class.active]="guestOnly()" (click)="toggleGuest()">
-              Guest
-            </button>
-            <button class="filter-chip" [class.active]="unconvertedOnly()" (click)="toggleUnconverted()">
-              Unlinked
-            </button>
-          </div>
-          <button class="premium-btn ghost-btn" (click)="load()">
-            <i class="pi pi-refresh" [class.pi-spin]="loading()"></i>
+        <div class="filters flex items-center gap-2">
+          <app-search-filter [placeholder]="'Search customers...'" [value]="search()"
+            (valueChange)="onSearchChange($event)">
+          </app-search-filter>
+          <button class="filter-chip" [class.active]="guestOnly()" (click)="toggleGuest()">
+            Guest
           </button>
+          <button class="filter-chip" [class.active]="unconvertedOnly()" (click)="toggleUnconverted()">
+            Unlinked
+          </button>
+          @if (hasActiveFilters()) {
+          <button class="filter-chip clear-btn" (click)="clearFilters()">
+            <i class="pi pi-filter-slash"></i> Clear
+          </button>
+          }
         </div>
-      </header>
+        <button class="premium-btn ghost-btn" (click)="load()" title="Refresh">
+          <i class="pi pi-refresh" [class.pi-spin]="loading()"></i>
+        </button>
+      </div>
+    </header>
 
-      <div class="grid-container">
-        @if (error()) {
-          <div class="error-state">
-            <i class="pi pi-exclamation-triangle"></i>
-            <p>{{ error() }}</p>
-            <button class="premium-btn" (click)="load()">Try Again</button>
+    <div class="grid-container">
+      @if (error()) {
+      <div class="error-state">
+        <i class="pi pi-exclamation-triangle"></i>
+        <p>{{ error() }}</p>
+        <button class="premium-btn" (click)="load()">Try Again</button>
+      </div>
+      } @else {
+      <div class="classic-list-wrapper">
+        <div class="classic-list">
+          @for (customer of customers(); track customer._id || customer.id) {
+          <article class="customer-row"
+            [class.active]="(selected()?._id || selected()?.id) === (customer._id || customer.id)"
+            (click)="open(customer)">
+            <div class="avatar">{{ customer.displayName.charAt(0).toUpperCase() }}</div>
+            <div class="info">
+              <h3>{{ customer.displayName }}</h3>
+              <p>{{ customer.email || customer.phone || 'Guest Shopper' }}</p>
+            </div>
+            <span class="status-badge" [class.converted]="customer.convertedToMainCustomer">
+              {{ customer.convertedToMainCustomer ? 'CRM' : 'Store' }}
+            </span>
+          </article>
+          } @empty {
+          <div class="p-6">
+            <app-empty-state icon="pi pi-users"
+              [title]="hasActiveFilters() ? 'No matching customers' : 'No customers yet'"
+              [description]="hasActiveFilters() ? 'No customers match your current search and filter criteria.' : 'Shoppers and customers who interact with your storefront will appear here.'"
+              [actionLabel]="hasActiveFilters() ? 'Clear Filters' : undefined"
+              [actionIcon]="hasActiveFilters() ? 'pi pi-filter-slash' : undefined" (action)="clearFilters()">
+            </app-empty-state>
           </div>
-        } @else {
-          <div class="classic-list-wrapper">
-            <div class="classic-list">
-              @for (customer of customers(); track customer._id || customer.id) {
-                <article class="customer-row"
-                  [class.active]="(selected()?._id || selected()?.id) === (customer._id || customer.id)"
-                  (click)="open(customer)">
-                  <div class="avatar">{{ customer.displayName.charAt(0).toUpperCase() }}</div>
-                  <div class="info">
-                    <h3>{{ customer.displayName }}</h3>
-                    <p>{{ customer.email || customer.phone || 'Guest Shopper' }}</p>
-                  </div>
-                  <span class="status-badge" [class.converted]="customer.convertedToMainCustomer">
-                    {{ customer.convertedToMainCustomer ? 'CRM' : 'Store' }}
-                  </span>
-                </article>
-                } @empty {
-                <div class="empty-panel">No customers found.</div>
-              }
+          }
+        </div>
+      </div>
+
+      @if (total() > 0) {
+      <div
+        class="pagination-container border-t border-[var(--border-secondary)] bg-[var(--bg-primary)] rounded-b-xl mt-2 px-2 py-1">
+        <app-grid-pagination [total]="total()" [page]="currentPage() - 1" [pageSize]="pageSize()"
+          [pageSizeOptions]="[10, 25, 50]" (pageChange)="onPageChange($event)"
+          (pageSizeChange)="onPageSizeChange($event)">
+        </app-grid-pagination>
+      </div>
+      }
+      }
+    </div>
+  </section>
+
+  @if (selected(); as customer) {
+  <aside class="detail-panel">
+    <header class="panel-header">
+      <div class="title-group">
+        <h2>Customer Profile</h2>
+      </div>
+      <button class="close-btn" (click)="closePanel()">
+        <i class="pi pi-times"></i>
+      </button>
+    </header>
+    @if (detail(); as d) {
+    <div class="panel-scroll">
+      <div class="bento-top-row">
+        <section class="bento-block profile-card">
+          <div class="avatar-large">{{ customer.displayName.charAt(0).toUpperCase() }}</div>
+          <div class="profile-info">
+            <h3>{{ customer.displayName }}</h3>
+            @if (d.customer?.email || customer.email) {
+            <p class="email">
+              <i class="pi pi-envelope"></i> {{ d.customer?.email || customer.email }}
+            </p>
+            }
+            @if (d.customer?.phone || customer.phone) {
+            <p class="phone">
+              <i class="pi pi-phone"></i> {{ d.customer?.phone || customer.phone }}
+            </p>
+            }
+            <div class="crm-badge" [class.linked]="d.customer?.convertedToMainCustomer">
+              <i class="pi" [class.pi-check-circle]="d.customer?.convertedToMainCustomer"
+                [class.pi-sync]="!d.customer?.convertedToMainCustomer"></i>
+              {{ d.customer?.convertedToMainCustomer ? 'Linked to CRM' : 'Storefront Only' }}
             </div>
           </div>
+        </section>
+        @if (!d.customer?.convertedToMainCustomer) {
+        <section class="bento-block action-block">
+          <div class="info-banner">
+            <i class="pi pi-shield"></i>
+            <div>
+              <h4>Link to CRM</h4>
+              <p>Create invoices, track lifetime purchases, and manage this customer in the CRM.</p>
+            </div>
+          </div>
+          <button class="premium-btn full-width-action" (click)="convert(customer)"
+            [disabled]="converting() === customer._id">
+            <i class="pi pi-sync" [class.pi-spin]="converting() === customer._id"></i>
+            Link to CRM Customer
+          </button>
+        </section>
         }
       </div>
-    </section>
-
-    @if (selected(); as customer) {
-      <aside class="detail-panel">
-        <header class="panel-header">
-          <div class="title-group">
-            <h2>Customer Profile Workspace</h2>
+      <div class="bento-metrics-row">
+        <div class="bento-block stat-box highlight">
+          <span class="label">Total Spent</span>
+          <span class="value">{{ (d.customer?.totalSpent || 0) | currency:'INR':'symbol':'1.0-0' }}</span>
+        </div>
+        <div class="bento-block stat-box">
+          <span class="label">Orders</span>
+          <span class="value">{{ d.customer?.orderCount || 0 }}</span>
+        </div>
+        <div class="bento-block stat-box">
+          <span class="label">Last Active</span>
+          <span class="value date">{{ (d.customer?.lastSeenAt || customer.lastSeenAt) | date:'mediumDate' }}</span>
+        </div>
+      </div>
+      <div class="bento-dashboard-grid">
+        @if (d.carts && d.carts.length > 0 && d.carts[0].cartItems?.length > 0) {
+        <section class="bento-block functional-list-block">
+          <div class="block-header">
+            <h3><i class="pi pi-shopping-cart"></i> Current Cart</h3>
+            <span class="cart-total-badge">{{ d.carts[0].totals?.grandTotal | currency:'INR':'symbol':'1.0-0' }}</span>
           </div>
-          <button class="close-btn" (click)="closePanel()">
-            <i class="pi pi-times"></i>
-          </button>
-        </header>
-        @if (detail(); as d) {
-          <div class="panel-scroll">
-            <div class="bento-top-row">
-              <section class="bento-block profile-card">
-                <div class="avatar-large">{{ customer.displayName.charAt(0).toUpperCase() }}</div>
-                <div class="profile-info">
-                  <h3>{{ customer.displayName }}</h3>
-                  @if (d.customer?.email || customer.email) {
-                    <p class="email">
-                      <i class="pi pi-envelope"></i> {{ d.customer?.email || customer.email }}
-                    </p>
-                  }
-                  @if (d.customer?.phone || customer.phone) {
-                    <p class="phone">
-                      <i class="pi pi-phone"></i> {{ d.customer?.phone || customer.phone }}
-                    </p>
-                  }
-                  <div class="crm-badge" [class.linked]="d.customer?.convertedToMainCustomer">
-                    <i class="pi" [class.pi-check-circle]="d.customer?.convertedToMainCustomer"
-                    [class.pi-sync]="!d.customer?.convertedToMainCustomer"></i>
-                    {{ d.customer?.convertedToMainCustomer ? 'Linked to CRM' : 'Storefront Only' }}
-                  </div>
+          <div class="item-list">
+            @for (item of d.carts[0].cartItems; track item) {
+            <div class="order-item">
+              <div class="item-image">
+                @if (item.snapshot?.image) {
+                <img [src]="item.snapshot.image" alt="Product Image">
+                } @else {
+                <div class="img-placeholder"><i class="pi pi-box"></i></div>
+                }
+              </div>
+              <div class="item-details">
+                <strong>{{ item.snapshot?.name || 'Product Item' }}</strong>
+                <div class="qty-price">
+                  <span>Quantity: {{ item.quantity }} × {{ item.unitPrice | currency:'INR':'symbol':'1.0-0' }}</span>
                 </div>
-              </section>
-              @if (!d.customer?.convertedToMainCustomer) {
-                <section class="bento-block action-block">
-                  <div class="info-banner">
-                    <i class="pi pi-shield"></i>
-                    <div>
-                      <h4>Convert Profile</h4>
-                      <p>Issue manual invoices, track comprehensive lifetime values, and manage customer ledgers directly.</p>
-                    </div>
-                  </div>
-                  <button class="premium-btn full-width-action" (click)="convert(customer)"
-                    [disabled]="converting() === customer._id">
-                    <i class="pi pi-sync" [class.pi-spin]="converting() === customer._id"></i>
-                    Convert to CRM Customer
-                  </button>
-                </section>
-              }
-            </div>
-            <div class="bento-metrics-row">
-              <div class="bento-block stat-box highlight">
-                <span class="label">Total Value Spent</span>
-                <span class="value">{{ (d.customer?.totalSpent || 0) | currency:'INR':'symbol':'1.0-0' }}</span>
-              </div>
-              <div class="bento-block stat-box">
-                <span class="label">Completed Orders</span>
-                <span class="value">{{ d.customer?.orderCount || 0 }} Orders</span>
-              </div>
-              <div class="bento-block stat-box">
-                <span class="label">Last Activity Tracking</span>
-                <span class="value date">{{ (d.customer?.lastSeenAt || customer.lastSeenAt) | date:'mediumDate' }}</span>
               </div>
             </div>
-            <div class="bento-dashboard-grid">
-              @if (d.carts && d.carts.length > 0 && d.carts[0].cartItems?.length > 0) {
-                <section class="bento-block functional-list-block"
-                  >
-                  <div class="block-header">
-                    <h3><i class="pi pi-shopping-cart"></i> Live Shopping Cart Items</h3>
-                    <span class="cart-total-badge">{{ d.carts[0].totals?.grandTotal | currency:'INR':'symbol':'1.0-0' }}</span>
-                  </div>
-                  <div class="item-list">
-                    @for (item of d.carts[0].cartItems; track item) {
-                      <div class="order-item">
-                        <div class="item-image">
-                          @if (item.snapshot?.image) {
-                            <img [src]="item.snapshot.image" alt="Product Image">
-                          } @else {
-                            <div class="img-placeholder"><i class="pi pi-box"></i></div>
-                          }
-                        </div>
-                        <div class="item-details">
-                          <strong>{{ item.snapshot?.name || 'Product Item' }}</strong>
-                          <div class="qty-price">
-                            <span>Quantity: {{ item.quantity }} × {{ item.unitPrice | currency:'INR':'symbol':'1.0-0' }}</span>
-                          </div>
-                        </div>
-                      </div>
-                    }
-                  </div>
-                </section>
-              } @else {
-                <section class="bento-block functional-list-block empty-state-block">
-                  <h3><i class="pi pi-shopping-cart"></i> Live Shopping Cart</h3>
-                  <div class="empty-msg"><i class="pi pi-info-circle"></i> No items inside current cart session.</div>
-                </section>
-              }
-              @if (d.orders && d.orders.length > 0) {
-                <section class="bento-block functional-list-block">
-                  <div class="block-header">
-                    <h3><i class="pi pi-history"></i> Recent Order History</h3>
-                  </div>
-                  <div class="mini-order-list">
-                    @for (order of d.orders | slice:0:3; track order) {
-                      <div class="mini-order">
-                        <div class="order-head">
-                          <span class="order-number">{{ order.orderNumber }}</span>
-                          <span class="order-date">{{ order.createdAt | date:'shortDate' }}</span>
-                        </div>
-                        <div class="order-foot">
-                          <span class="badge" [attr.data-status]="order.paymentStatus">
-                            <span class="status-dot"></span> {{ order.paymentStatus | titlecase }}
-                          </span>
-                          <strong class="order-price">{{ order.totals?.grandTotal | currency:'INR':'symbol':'1.0-0' }}</strong>
-                        </div>
-                      </div>
-                    }
-                  </div>
-                </section>
-              } @else {
-                <section class="bento-block functional-list-block empty-state-block">
-                  <h3><i class="pi pi-history"></i> Recent Order History</h3>
-                  <div class="empty-msg"><i class="pi pi-calendar"></i> No recent purchases linked to this user.</div>
-                </section>
-              }
-              @if (d.addresses && d.addresses.length > 0) {
-                <section class="bento-block functional-list-block"
-                  >
-                  <div class="block-header">
-                    <h3><i class="pi pi-map-marker"></i> Saved Shipping Addresses</h3>
-                  </div>
-                  <div class="address-grid">
-                    @for (addr of d.addresses; track addr) {
-                      <div class="address-card" [class.default]="addr.isDefault">
-                        <div class="address-header">
-                          <span class="type-tag">{{ addr.addressType || 'Home' }}</span>
-                          @if (addr.isDefault) {
-                            <span class="default-badge">Default</span>
-                          }
-                        </div>
-                        <p class="address-text">{{ addr.addressLine1 }}</p>
-                        <p class="city-zip">{{ addr.city }}, {{ addr.state }} - {{ addr.postalCode }}</p>
-                      </div>
-                    }
-                  </div>
-                </section>
-              } @else {
-                <section class="bento-block functional-list-block empty-state-block">
-                  <h3><i class="pi pi-map-marker"></i> Saved Addresses</h3>
-                  <div class="empty-msg"><i class="pi pi-map"></i> No registered profile addresses found.</div>
-                </section>
-              }
-              @if (d.wishlist && d.wishlist.length > 0) {
-                <section class="bento-block functional-list-block"
-                  >
-                  <div class="block-header">
-                    <h3><i class="pi pi-heart"></i> Saved Wishlist ({{ d.wishlist.length }})</h3>
-                  </div>
-                  <div class="item-list">
-                    @for (item of d.wishlist | slice:0:3; track item) {
-                      <div class="order-item">
-                        <div class="item-image">
-                          @if (item.productId?.images?.[0]) {
-                            <img [src]="item.productId.images[0]"
-                              alt="Product Image">
-                          } @else {
-                            <div class="img-placeholder"><i class="pi pi-image"></i></div>
-                          }
-                        </div>
-                        <div class="item-details">
-                          <strong>{{ item.productId?.name || 'Product Title' }}</strong>
-                          <div class="qty-price">
-                            <span>{{ (item.productId?.discountedPrice || item.productId?.sellingPrice || 0) |
-                            currency:'INR':'symbol':'1.0-0' }}</span>
-                          </div>
-                        </div>
-                      </div>
-                    }
-                  </div>
-                </section>
-              } @else {
-                <section class="bento-block functional-list-block empty-state-block">
-                  <h3><i class="pi pi-heart"></i> Saved Wishlist</h3>
-                  <div class="empty-msg"><i class="pi pi-heart"></i> Wishlist folder is currently empty.</div>
-                </section>
-              }
-            </div>
+            }
           </div>
+        </section>
         } @else {
-          <div class="panel-loading">
-            <i class="pi pi-spin pi-spinner"></i>
-            <p>Loading Customer Context Workspace...</p>
-          </div>
+        <section class="bento-block functional-list-block empty-state-block">
+          <h3><i class="pi pi-shopping-cart"></i> Live Shopping Cart</h3>
+          <div class="empty-msg"><i class="pi pi-info-circle"></i> No items inside current cart session.</div>
+        </section>
         }
-      </aside>
+        @if (d.orders && d.orders.length > 0) {
+        <section class="bento-block functional-list-block">
+          <div class="block-header">
+            <h3><i class="pi pi-history"></i> Recent Order History</h3>
+          </div>
+          <div class="mini-order-list">
+            @for (order of d.orders | slice:0:3; track order) {
+            <div class="mini-order">
+              <div class="order-head">
+                <span class="order-number">{{ order.orderNumber }}</span>
+                <span class="order-date">{{ order.createdAt | date:'shortDate' }}</span>
+              </div>
+              <div class="order-foot">
+                <span class="badge" [attr.data-status]="order.paymentStatus">
+                  <span class="status-dot"></span> {{ order.paymentStatus | titlecase }}
+                </span>
+                <strong class="order-price">{{ order.totals?.grandTotal | currency:'INR':'symbol':'1.0-0' }}</strong>
+              </div>
+            </div>
+            }
+          </div>
+        </section>
+        } @else {
+        <section class="bento-block functional-list-block empty-state-block">
+          <h3><i class="pi pi-history"></i> Recent Order History</h3>
+          <div class="empty-msg"><i class="pi pi-calendar"></i> No recent purchases linked to this user.</div>
+        </section>
+        }
+        @if (d.addresses && d.addresses.length > 0) {
+        <section class="bento-block functional-list-block">
+          <div class="block-header">
+            <h3><i class="pi pi-map-marker"></i> Saved Shipping Addresses</h3>
+          </div>
+          <div class="address-grid">
+            @for (addr of d.addresses; track addr) {
+            <div class="address-card" [class.default]="addr.isDefault">
+              <div class="address-header">
+                <span class="type-tag">{{ addr.addressType || 'Home' }}</span>
+                @if (addr.isDefault) {
+                <span class="default-badge">Default</span>
+                }
+              </div>
+              <p class="address-text">{{ addr.addressLine1 }}</p>
+              <p class="city-zip">{{ addr.city }}, {{ addr.state }} - {{ addr.postalCode }}</p>
+            </div>
+            }
+          </div>
+        </section>
+        } @else {
+        <section class="bento-block functional-list-block empty-state-block">
+          <h3><i class="pi pi-map-marker"></i> Saved Addresses</h3>
+          <div class="empty-msg"><i class="pi pi-map"></i> No registered profile addresses found.</div>
+        </section>
+        }
+        @if (d.wishlist && d.wishlist.length > 0) {
+        <section class="bento-block functional-list-block">
+          <div class="block-header">
+            <h3><i class="pi pi-heart"></i> Saved Wishlist ({{ d.wishlist.length }})</h3>
+          </div>
+          <div class="item-list">
+            @for (item of d.wishlist | slice:0:3; track item) {
+            <div class="order-item">
+              <div class="item-image">
+                @if (item.productId?.images?.[0]) {
+                <img [src]="item.productId.images[0]" alt="Product Image">
+                } @else {
+                <div class="img-placeholder"><i class="pi pi-image"></i></div>
+                }
+              </div>
+              <div class="item-details">
+                <strong>{{ item.productId?.name || 'Product Title' }}</strong>
+                <div class="qty-price">
+                  <span>{{ (item.productId?.discountedPrice || item.productId?.sellingPrice || 0) |
+                    currency:'INR':'symbol':'1.0-0' }}</span>
+                </div>
+              </div>
+            </div>
+            }
+          </div>
+        </section>
+        } @else {
+        <section class="bento-block functional-list-block empty-state-block">
+          <h3><i class="pi pi-heart"></i> Saved Wishlist</h3>
+          <div class="empty-msg"><i class="pi pi-heart"></i> Wishlist folder is currently empty.</div>
+        </section>
+        }
+      </div>
+    </div>
+    } @else {
+    <div class="panel-loading">
+      <i class="pi pi-spin pi-spinner"></i>
+      <p>Loading Customer Context Workspace...</p>
+    </div>
     }
-  </main>
+  </aside>
+  }
+</main>

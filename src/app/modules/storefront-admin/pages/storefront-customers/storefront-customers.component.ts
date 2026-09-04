@@ -1,10 +1,12 @@
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { StorefrontAdminService } from '@core/services/storefront-admin.service';
 import { catchError, of } from 'rxjs';
-import { AppSharedGrid } from '../../../shared/AgGrid/grid/app-shared-grid/app-shared-grid';
-import { GridColDef } from '../../../shared/AgGrid/grid/grid.types';
+import { SearchFilterComponent } from '@shared/ui/filters/search-filter.component';
+import { EmptyStateComponent } from "@shared/ui/feedback/empty-state/empty-state.component";
+import { GridPageState } from '@shared/ui/grid/grid-types';
+import { GridPaginationComponent } from '@shared/ui/grid/components/grid-pagination.component';
 
 export interface CustomerDetail {
   customer?: any;
@@ -16,9 +18,16 @@ export interface CustomerDetail {
 }
 
 @Component({
-  selector: 'app-storefront-customers',
   standalone: true,
-  imports: [CommonModule, FormsModule, CurrencyPipe, DatePipe],
+  imports: [
+    CommonModule,
+    FormsModule,
+    CurrencyPipe,
+    DatePipe,
+    SearchFilterComponent,
+    GridPaginationComponent,
+    EmptyStateComponent
+  ],
   templateUrl: './storefront-customers.component.html',
   styleUrls: ['./storefront-customers.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -30,6 +39,9 @@ export class StorefrontCustomersComponent implements OnInit {
   readonly converting = signal<string | null>(null);
   readonly error = signal<string | null>(null);
   readonly customers = signal<any[]>([]);
+  readonly total = signal(0);
+  readonly currentPage = signal(1);
+  readonly pageSize = signal(25);
   readonly selected = signal<any | null>(null);
   readonly detail = signal<CustomerDetail | null>(null);
 
@@ -38,53 +50,7 @@ export class StorefrontCustomersComponent implements OnInit {
   readonly guestOnly = signal(false);
   readonly unconvertedOnly = signal(false);
 
-  readonly columns: GridColDef[] = [
-    {
-      headerName: 'Customer',
-      field: 'displayName',
-      flex: 1.5,
-      minWidth: 200,
-      cellConfig: { type: 'avatar' }
-    },
-    {
-      headerName: 'Email',
-      field: 'email',
-      flex: 1.2,
-      minWidth: 180,
-      cellConfig: { type: 'text' }
-    },
-    {
-      headerName: 'Orders',
-      field: 'orderCount',
-      flex: 0.8,
-      minWidth: 100,
-      cellConfig: { type: 'text' }
-    },
-    {
-      headerName: 'Total Spent',
-      field: 'totalSpent',
-      flex: 1,
-      minWidth: 120,
-      cellConfig: { type: 'currency', currencyCode: 'INR' }
-    },
-    {
-      headerName: 'CRM Status',
-      field: 'crmStatus',
-      flex: 1,
-      minWidth: 130,
-      cellConfig: {
-        type: 'badge',
-        badgeMap: { linked: 'success', pending: 'warning' }
-      }
-    },
-    {
-      headerName: 'Last Seen',
-      field: 'lastSeenAt',
-      flex: 1,
-      minWidth: 140,
-      cellConfig: { type: 'datetime' }
-    }
-  ];
+  readonly hasActiveFilters = computed(() => !!this.search() || this.guestOnly() || this.unconvertedOnly());
 
   ngOnInit(): void {
     this.load();
@@ -97,11 +63,12 @@ export class StorefrontCustomersComponent implements OnInit {
       search: this.search() || undefined,
       guest: this.guestOnly() ? true : undefined,
       converted: this.unconvertedOnly() ? false : undefined,
-      limit: 50
+      page: this.currentPage(),
+      limit: this.pageSize()
     }).pipe(
       catchError(err => {
         this.error.set(err?.error?.message ?? 'Unable to load storefront customers.');
-        return of({ data: [] });
+        return of({ data: [], pagination: { total: 0 } });
       })
     ).subscribe((res: any) => {
       const mapped = (res?.data ?? []).map((c: any) => ({
@@ -110,19 +77,34 @@ export class StorefrontCustomersComponent implements OnInit {
         crmStatus: c.convertedToMainCustomer ? 'linked' : 'pending'
       }));
       this.customers.set(mapped);
+      this.total.set(res?.pagination?.total ?? res?.total ?? mapped.length);
       this.loading.set(false);
     });
   }
 
-  onGridEvent(event: any): void {
-    if (event.type === 'selectionChanged') {
-      const selectedCustomer = event.rows[0];
-      if (selectedCustomer) {
-        this.open(selectedCustomer);
-      } else {
-        this.closePanel();
-      }
-    }
+  onSearchChange(term: string): void {
+    this.search.set(term);
+    this.currentPage.set(1);
+    this.load();
+  }
+
+  onPageChange(state: GridPageState): void {
+    this.currentPage.set(state.page + 1);
+    this.load();
+  }
+
+  onPageSizeChange(size: number): void {
+    this.pageSize.set(size);
+    this.currentPage.set(1);
+    this.load();
+  }
+
+  clearFilters(): void {
+    this.search.set('');
+    this.guestOnly.set(false);
+    this.unconvertedOnly.set(false);
+    this.currentPage.set(1);
+    this.load();
   }
 
   open(customer: any): void {
@@ -179,11 +161,13 @@ export class StorefrontCustomersComponent implements OnInit {
 
   toggleGuest(): void {
     this.guestOnly.set(!this.guestOnly());
+    this.currentPage.set(1);
     this.load();
   }
 
   toggleUnconverted(): void {
     this.unconvertedOnly.set(!this.unconvertedOnly());
+    this.currentPage.set(1);
     this.load();
   }
 }

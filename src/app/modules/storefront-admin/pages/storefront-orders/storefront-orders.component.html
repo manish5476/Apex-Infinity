@@ -31,106 +31,121 @@
     </article>
   </section>
 
-  <section class="network-strip-compact">
-    <div class="strip-info">
-      <span class="eyebrow muted">Apex Public Network</span>
-      <h2>Partner routing is available during order acceptance</h2>
-    </div>
-    <div class="partner-pills">
-      @for (partner of publicPartners; track partner.id) {
-        <button type="button" (click)="selectPartner(partner)" [class.active]="selectedPartnerId() === partner.id">
-          <strong>{{ partner.name }}</strong>
-          <span>{{ partner.eta }} · {{ partner.sla }}</span>
-        </button>
-      }
-    </div>
-  </section>
 
   <section class="orders-workbench">
     @if (error()) {
-      <div class="error-state">
-        <i class="pi pi-exclamation-triangle"></i>
-        <p>{{ error() }}</p>
-        <button class="primary-button" type="button" (click)="load()">Try again</button>
-      </div>
+    <div class="error-state">
+      <i class="pi pi-exclamation-triangle"></i>
+      <p>{{ error() }}</p>
+      <button class="primary-button" type="button" (click)="load()">Try again</button>
+    </div>
     }
 
     @if (!error()) {
-      <p-table [value]="orders()" selectionMode="single" dataKey="_id" [selection]="selectedOrder()"
-        (onRowSelect)="openOrder($event.data)" styleClass="operations-table" [paginator]="true" [rows]="20"
-        [scrollable]="true" scrollHeight="flex" [showCurrentPageReport]="true"
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} orders">
-        <ng-template pTemplate="header">
-          <tr>
-            <th>Order</th>
-            <th>Customer</th>
-            <th>Fulfillment path</th>
-            <th>State</th>
-            <th>Payment</th>
-            <th>Total</th>
-            <th class="text-right">Action</th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-order>
-          <tr [pSelectableRow]="order">
-            <td>
-              <div class="order-cell">
-                <strong>{{ order.orderNumber }}</strong>
-                <span>{{ order.createdAt | date:'mediumDate' }}</span>
-              </div>
-            </td>
-            <td>
-              <div class="order-cell">
-                <strong>{{ order.customerName }}</strong>
-                <span>{{ order.shippingAddress?.city || 'No city' }}, {{ order.shippingAddress?.state || 'No state'
+    <div class="filters-toolbar flex flex-wrap items-center justify-between gap-3 mb-4">
+      <div class="flex flex-wrap items-center gap-3">
+        <app-search-filter [placeholder]="'Search by order #...'" [value]="searchTerm()"
+          (valueChange)="onSearchChange($event)">
+        </app-search-filter>
+        <app-select-filter [options]="statusOptions" [placeholder]="'All Order Statuses'" [value]="statusFilter()"
+          [filter]="false" (valueChange)="onStatusChange($event)">
+        </app-select-filter>
+        <app-select-filter [options]="paymentOptions" [placeholder]="'All Payment Statuses'" [value]="paymentFilter()"
+          [filter]="false" (valueChange)="onPaymentChange($event)">
+        </app-select-filter>
+      </div>
+      @if (hasActiveFilters()) {
+      <button type="button" class="secondary-button text-xs py-1.5 px-3" (click)="clearFilters()">
+        <i class="pi pi-filter-slash"></i> Clear Filters
+      </button>
+      }
+    </div>
+
+    <p-table [value]="orders()" selectionMode="single" dataKey="_id" [selection]="selectedOrder()"
+      (onRowSelect)="openOrder($event.data)" styleClass="operations-table" [paginator]="false" [scrollable]="true"
+      scrollHeight="flex">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Order</th>
+          <th>Customer</th>
+          <th>Fulfillment path</th>
+          <th>State</th>
+          <th>Payment</th>
+          <th>Total</th>
+          <th class="text-right">Action</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-order>
+        <tr [pSelectableRow]="order">
+          <td>
+            <div class="order-cell">
+              <strong>{{ order.orderNumber }}</strong>
+              <span>{{ order.createdAt | date:'mediumDate' }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="order-cell">
+              <strong>{{ order.customerName }}</strong>
+              <span>{{ order.shippingAddress?.city || 'No city' }}, {{ order.shippingAddress?.state || 'No state'
                 }}</span>
-              </div>
-            </td>
-            <td>
-              <span class="route-chip" [attr.data-mode]="order.logisticsMode">
-                {{ order.logisticsMode === 'public_partner' ? 'Apex partner' : order.logisticsMode === 'external_carrier'
-                ? 'External carrier' : order.logisticsMode === 'pickup_only' ? 'Pickup' : 'Internal fleet' }}
-              </span>
-              <small class="muted-text">{{ order.carrierName || order.metadata?.logistics?.publicPartnerName || 'Not
-              planned' }}</small>
-            </td>
-            <td>
-              <div class="state-stack">
-                <p-tag [value]="order.orderStatus | uppercase" [severity]="getOrderSeverity(order.orderStatus)"></p-tag>
-                <p-tag [value]="(order.fulfillmentStatus || 'unfulfilled') | uppercase"
+            </div>
+          </td>
+          <td>
+            <span class="route-chip" [attr.data-mode]="order.logisticsMode">
+              {{ order.logisticsMode === 'external_carrier' ? 'External Carrier' : order.logisticsMode === 'pickup_only'
+              ? 'Store Pickup' : 'Internal Fleet' }}
+            </span>
+            <small class="muted-text">{{ order.deliveryAgent?.name || order.carrierName || 'Not planned' }}</small>
+          </td>
+          <td>
+            <div class="state-stack">
+              <p-tag [value]="order.orderStatus | uppercase" [severity]="getOrderSeverity(order.orderStatus)"></p-tag>
+              <p-tag [value]="(order.fulfillmentStatus || 'unfulfilled') | uppercase"
                 [severity]="getFulfillmentSeverity(order.fulfillmentStatus || 'unfulfilled')"></p-tag>
-              </div>
-            </td>
-            <td>
-              <p-tag [value]="order.paymentStatus | uppercase"
+            </div>
+          </td>
+          <td>
+            <p-tag [value]="order.paymentStatus | uppercase"
               [severity]="getPaymentSeverity(order.paymentStatus)"></p-tag>
-            </td>
-            <td><strong>{{ order.totals?.grandTotal | currency:'INR' }}</strong></td>
-            <td class="text-right quick-actions">
-              @if (order.orderStatus === 'placed' || order.orderStatus === 'draft') {
-                <button class="row-button accept"
-                  type="button" pTooltip="Accept order" tooltipPosition="left" (click)="acceptOrder(order, $event)">
-                  <i class="pi pi-check"></i>
-                </button>
-              }
-              <button class="row-button" type="button" pTooltip="Open cockpit" tooltipPosition="left"
-                (click)="openOrder(order)">
-                <i class="pi pi-arrow-right"></i>
-              </button>
-            </td>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="empty">
-          <tr>
-            <td colspan="7">
-              <div class="empty-state">
-                <i class="pi pi-inbox"></i>
-                <h3>No storefront orders yet</h3>
-              </div>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
+          </td>
+          <td><strong>{{ order.totals?.grandTotal | currency:'INR' }}</strong></td>
+          <td class="text-right quick-actions">
+            @if (order.orderStatus === 'placed' || order.orderStatus === 'draft') {
+            <button class="row-button accept" type="button" pTooltip="Accept order" tooltipPosition="left"
+              (click)="acceptOrder(order, $event)">
+              <i class="pi pi-check"></i>
+            </button>
+            }
+            <button class="row-button" type="button" pTooltip="Open cockpit" tooltipPosition="left"
+              (click)="openOrder(order)">
+              <i class="pi pi-arrow-right"></i>
+            </button>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="empty">
+        <tr>
+          <td colspan="7">
+            <app-empty-state icon="pi pi-shopping-bag"
+              [title]="hasActiveFilters() ? 'No matching orders' : 'No storefront orders yet'"
+              [description]="hasActiveFilters() ? 'No orders match your filter criteria. Try resetting your filters.' : 'Orders placed on your storefront will appear here.'"
+              [actionLabel]="hasActiveFilters() ? 'Clear Filters' : undefined"
+              [actionIcon]="hasActiveFilters() ? 'pi pi-filter-slash' : undefined" (action)="clearFilters()">
+            </app-empty-state>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    @if (total() > 0) {
+    <div
+      class="pagination-footer border-t border-[var(--border-secondary)] bg-[var(--bg-primary)] rounded-b-xl mt-2 px-2 py-1">
+      <app-grid-pagination [total]="total()" [page]="currentPage() - 1" [pageSize]="pageSize()"
+        [pageSizeOptions]="[10, 20, 50]" (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)">
+      </app-grid-pagination>
+    </div>
+    }
     }
   </section>
 
@@ -138,311 +153,284 @@
     styleClass="fulfillment-drawer" (onHide)="closePanel()" [showCloseIcon]="false">
     <ng-template pTemplate="header">
       @if (selectedOrder(); as order) {
-        <div class="drawer-header">
-          <div class="header-info">
-            <span class="eyebrow muted">Fulfillment cockpit</span>
-            <h2>{{ order.orderNumber }}</h2>
-            <p>{{ order.customerName }} · {{ order.createdAt | date:'medium' }}</p>
-          </div>
-          <button class="icon-button subtle" type="button" (click)="closePanel()"><i class="pi pi-times"></i></button>
+      <div class="drawer-header">
+        <div class="header-info">
+          <span class="eyebrow muted">Fulfillment cockpit</span>
+          <h2>{{ order.orderNumber }}</h2>
+          <p>{{ order.customerName }} · {{ order.createdAt | date:'medium' }}</p>
         </div>
+        <button class="icon-button subtle" type="button" (click)="closePanel()"><i class="pi pi-times"></i></button>
+      </div>
       }
     </ng-template>
 
     @if (selectedOrder(); as order) {
-      <div class="drawer-body">
-        <nav class="flow-stepper" aria-label="Order fulfillment flow">
-          <button type="button" [class.active]="activeStage() === 'intake'" (click)="activeStage.set('intake')">
-            <span>1</span> Intake
-          </button>
-          <button type="button" [class.active]="activeStage() === 'strategy'" (click)="activeStage.set('strategy')">
-            <span>2</span> Strategy
-          </button>
-          <button type="button" [class.active]="activeStage() === 'dispatch'" (click)="activeStage.set('dispatch')">
-            <span>3</span> Dispatch
-          </button>
-          <button type="button" [class.active]="activeStage() === 'tracking'" (click)="activeStage.set('tracking')">
-            <span>4</span> Tracking
-          </button>
-        </nav>
-        <section class="cockpit-grid">
-          <article class="summary-panel">
-            <div class="panel-title">
-              <span class="eyebrow muted">Customer promise</span>
-              <h3>Delivery context</h3>
+    <div class="drawer-body">
+      <nav class="flow-stepper" aria-label="Order fulfillment flow">
+        <button type="button" [class.active]="activeStage() === 'intake'" (click)="activeStage.set('intake')">
+          <span>1</span> Intake
+        </button>
+        <button type="button" [class.active]="activeStage() === 'strategy'" (click)="activeStage.set('strategy')">
+          <span>2</span> Strategy
+        </button>
+        <button type="button" [class.active]="activeStage() === 'dispatch'" (click)="activeStage.set('dispatch')">
+          <span>3</span> Dispatch
+        </button>
+        <button type="button" [class.active]="activeStage() === 'tracking'" (click)="activeStage.set('tracking')">
+          <span>4</span> Tracking
+        </button>
+      </nav>
+      <section class="cockpit-grid">
+        <article class="summary-panel">
+          <div class="panel-title">
+            <span class="eyebrow muted">Customer promise</span>
+            <h3>Delivery context</h3>
+          </div>
+          <div class="address-pair">
+            <div>
+              <span>Pickup</span>
+              <strong>Store warehouse</strong>
+              <p>{{ order.billingAddress?.city || 'Store city' }}, {{ order.billingAddress?.state || 'State' }}</p>
             </div>
-            <div class="address-pair">
-              <div>
-                <span>Pickup</span>
-                <strong>Store warehouse</strong>
-                <p>{{ order.billingAddress?.city || 'Store city' }}, {{ order.billingAddress?.state || 'State' }}</p>
-              </div>
-              <i class="pi pi-arrow-right"></i>
-              <div>
-                <span>Dropoff</span>
-                <strong>{{ order.shippingAddress?.fullName || order.customerName }}</strong>
-                <p>{{ order.shippingAddress?.addressLine1 }}</p>
-                <p>{{ order.shippingAddress?.city }}, {{ order.shippingAddress?.state }} {{
+            <i class="pi pi-arrow-right"></i>
+            <div>
+              <span>Dropoff</span>
+              <strong>{{ order.shippingAddress?.fullName || order.customerName }}</strong>
+              <p>{{ order.shippingAddress?.addressLine1 }}</p>
+              <p>{{ order.shippingAddress?.city }}, {{ order.shippingAddress?.state }} {{
                 order.shippingAddress?.postalCode }}</p>
-              </div>
             </div>
-            <div class="mini-metrics">
-              <div><span>Items</span><strong>{{ order.items?.length || 0 }}</strong></div>
-              <div><span>COD</span><strong>{{ order.paymentMethod === 'COD' ? 'Yes' : 'No' }}</strong></div>
-              <div><span>Shipping</span><strong>{{ order.totals?.shipping | currency:'INR' }}</strong></div>
-            </div>
-          </article>
-          <article class="summary-panel">
-            <div class="panel-title">
-              <span class="eyebrow muted">Current state</span>
-              <h3>Order health</h3>
-            </div>
-            <div class="health-list">
-              <div><span>Order</span><p-tag [value]="order.orderStatus | uppercase"
-            [severity]="getOrderSeverity(order.orderStatus)"></p-tag></div>
+          </div>
+          <div class="mini-metrics">
+            <div><span>Items</span><strong>{{ order.items?.length || 0 }}</strong></div>
+            <div><span>COD</span><strong>{{ order.paymentMethod === 'COD' ? 'Yes' : 'No' }}</strong></div>
+            <div><span>Shipping</span><strong>{{ order.totals?.shipping | currency:'INR' }}</strong></div>
+          </div>
+        </article>
+        <article class="summary-panel">
+          <div class="panel-title">
+            <span class="eyebrow muted">Current state</span>
+            <h3>Order health</h3>
+          </div>
+          <div class="health-list">
+            <div><span>Order</span><p-tag [value]="order.orderStatus | uppercase"
+                [severity]="getOrderSeverity(order.orderStatus)"></p-tag></div>
             <div><span>Payment</span><p-tag [value]="order.paymentStatus | uppercase"
-          [severity]="getPaymentSeverity(order.paymentStatus)"></p-tag></div>
-          <div><span>Fulfillment</span><p-tag [value]="(order.fulfillmentStatus || 'unfulfilled') | uppercase"
-        [severity]="getFulfillmentSeverity(order.fulfillmentStatus || 'unfulfilled')"></p-tag></div>
-      </div>
-    </article>
-  </section>
-  @if (activeStage() === 'intake') {
-    <section class="flow-panel">
-      <div class="panel-title">
-        <span class="eyebrow muted">Step 1</span>
-        <h3>Accept or reject the order</h3>
-        <p>Accepting the order moves it into fulfillment planning. Cancellation releases the order from the operations
-        queue.</p>
-      </div>
-      <div class="action-grid">
-        <button class="decision-card accept" type="button" (click)="acceptOrder(order)"
-          [disabled]="order.orderStatus === 'confirmed'">
-          <i class="pi pi-check-circle"></i>
-          <div>
-            <strong>Accept order</strong>
-            <span>Confirm inventory, reserve promise, and start logistics planning.</span>
+                [severity]="getPaymentSeverity(order.paymentStatus)"></p-tag></div>
+            <div><span>Fulfillment</span><p-tag [value]="(order.fulfillmentStatus || 'unfulfilled') | uppercase"
+                [severity]="getFulfillmentSeverity(order.fulfillmentStatus || 'unfulfilled')"></p-tag></div>
           </div>
-        </button>
-        <button class="decision-card danger" type="button" (click)="cancelOrder(order)"
-          [disabled]="order.orderStatus === 'cancelled'">
-          <i class="pi pi-times-circle"></i>
-          <div>
-            <strong>Cancel order</strong>
-            <span>Stop fulfillment and release any reserved operational capacity.</span>
-          </div>
-        </button>
-      </div>
-    </section>
-  }
-  @if (activeStage() === 'strategy') {
-    <section class="flow-panel">
-      <div class="panel-title">
-        <span class="eyebrow muted">Step 2</span>
-        <h3>Choose fulfillment strategy</h3>
-        <p>Select how this order should move. Apex can route through public partners, your internal fleet, or a manual
-        carrier.</p>
-      </div>
-      <div class="mode-grid">
-        <button type="button" [class.active]="fulfillmentMode() === 'public_partner'"
-          (click)="setMode('public_partner')">
-          <i class="pi pi-globe"></i><strong>Apex partner</strong><span>Marketplace provider with SLA.</span>
-        </button>
-        <button type="button" [class.active]="fulfillmentMode() === 'internal_fleet'"
-          (click)="setMode('internal_fleet')">
-          <i class="pi pi-users"></i><strong>Internal fleet</strong><span>Your tenant-bound drivers.</span>
-        </button>
-        <button type="button" [class.active]="fulfillmentMode() === 'external_carrier'"
-          (click)="setMode('external_carrier')">
-          <i class="pi pi-truck"></i><strong>External carrier</strong><span>Manual tracking entry.</span>
-        </button>
-        <button type="button" [class.active]="fulfillmentMode() === 'pickup_only'" (click)="setMode('pickup_only')">
-          <i class="pi pi-map-marker"></i><strong>Pickup only</strong><span>Customer or store pickup.</span>
-        </button>
-      </div>
-      @if (fulfillmentMode() === 'public_partner') {
-        <div class="partner-grid">
-          @for (partner of publicPartners; track partner.id) {
-            <button type="button" class="partner-card" [class.active]="selectedPartnerId() === partner.id"
-              (click)="selectPartner(partner)">
-              <div class="partner-header">
-                <div>
-                  <strong>{{ partner.name }}</strong>
-                  <span>{{ partner.type }}</span>
-                </div>
-                <div class="partner-score">{{ partnerScoreFor(order) }}</div>
-              </div>
-              <ul>
-                <li><i class="pi pi-clock"></i>{{ partner.eta }}</li>
-                <li><i class="pi pi-wallet"></i>{{ partner.price | currency:'INR' }}</li>
-                <li><i class="pi pi-star"></i>{{ partner.rating }}</li>
-              </ul>
-              <p>{{ partner.coverage }} · {{ partner.features.join(' / ') }}</p>
-            </button>
-          }
+        </article>
+      </section>
+      @if (activeStage() === 'intake') {
+      <section class="flow-panel">
+        <div class="panel-title">
+          <span class="eyebrow muted">Step 1</span>
+          <h3>Accept or reject the order</h3>
+          <p>Accepting the order moves it into fulfillment planning. Cancellation releases the order from the operations
+            queue.</p>
         </div>
+        <div class="action-grid">
+          <button class="decision-card accept" type="button" (click)="acceptOrder(order)"
+            [disabled]="order.orderStatus === 'confirmed'">
+            <i class="pi pi-check-circle"></i>
+            <div>
+              <strong>Accept order</strong>
+              <span>Confirm inventory, reserve promise, and start logistics planning.</span>
+            </div>
+          </button>
+          <button class="decision-card danger" type="button" (click)="cancelOrder(order)"
+            [disabled]="order.orderStatus === 'cancelled'">
+            <i class="pi pi-times-circle"></i>
+            <div>
+              <strong>Cancel order</strong>
+              <span>Stop fulfillment and release any reserved operational capacity.</span>
+            </div>
+          </button>
+        </div>
+      </section>
       }
-      @if (fulfillmentMode() === 'internal_fleet') {
+      @if (activeStage() === 'strategy') {
+      <section class="flow-panel">
+        <div class="panel-title">
+          <span class="eyebrow muted">Step 2</span>
+          <h3>Choose fulfillment strategy</h3>
+          <p>Select how this order should move. Apex can route through public partners, your internal fleet, or a manual
+            carrier.</p>
+        </div>
+        <div class="mode-grid">
+          <button type="button" [class.active]="fulfillmentMode() === 'internal_fleet'"
+            (click)="setMode('internal_fleet')">
+            <i class="pi pi-users"></i><strong>Internal fleet</strong><span>Your registered delivery agents.</span>
+          </button>
+          <button type="button" [class.active]="fulfillmentMode() === 'external_carrier'"
+            (click)="setMode('external_carrier')">
+            <i class="pi pi-truck"></i><strong>External carrier</strong><span>Manual tracking entry.</span>
+          </button>
+          <button type="button" [class.active]="fulfillmentMode() === 'pickup_only'" (click)="setMode('pickup_only')">
+            <i class="pi pi-map-marker"></i><strong>Pickup only</strong><span>Customer or store pickup.</span>
+          </button>
+        </div>
+        @if (fulfillmentMode() === 'internal_fleet') {
         <div class="assignment-form">
           <label>Internal delivery driver</label>
           <select [(ngModel)]="deliveryAssignment.deliveryAgent">
             <option [ngValue]="null">Select available driver</option>
             @for (agent of availableAgents(); track agent) {
-              <option [ngValue]="agent._id">{{ agent.name }} · {{ agent.phone }} ·
+            <option [ngValue]="agent._id">{{ agent.name }} · {{ agent.phone }} ·
               {{ agent.vehicleType }}</option>
             }
           </select>
         </div>
-      }
-      @if (fulfillmentMode() === 'external_carrier') {
+        }
+        @if (fulfillmentMode() === 'external_carrier') {
         <div class="assignment-form">
           <label>Carrier name</label>
           <input type="text" [(ngModel)]="deliveryAssignment.carrierName" placeholder="Delhivery, DTDC, Blue Dart" />
           <label>Tracking number</label>
           <input type="text" [(ngModel)]="deliveryAssignment.trackingNumber" placeholder="Carrier tracking ID" />
         </div>
+        }
+        <div class="assignment-form two-col">
+          <div>
+            <label>Service level</label>
+            <select [(ngModel)]="deliveryAssignment.serviceLevel">
+              <option value="standard">Standard</option>
+              <option value="express">Express</option>
+              <option value="same_day">Same day</option>
+              <option value="scheduled">Scheduled</option>
+            </select>
+          </div>
+          <div>
+            <label>Dispatch priority</label>
+            <select [(ngModel)]="deliveryAssignment.dispatchPriority">
+              <option value="low">Low</option>
+              <option value="normal">Normal</option>
+              <option value="high">High</option>
+              <option value="urgent">Urgent</option>
+            </select>
+          </div>
+        </div>
+        <div class="quote-panel">
+          <div class="panel-title compact">
+            <span class="eyebrow muted">Delivery charge estimate</span>
+            <h3>{{ deliveryQuote().estimatedCost | currency:'INR' }}</h3>
+            <p>Priority and service level directly affect the operational cost before dispatch.</p>
+          </div>
+          <div class="quote-grid">
+            <div><span>Base route</span><strong>{{ deliveryQuote().baseRate | currency:'INR' }}</strong></div>
+            <div><span>COD handling</span><strong>{{ deliveryQuote().codFee | currency:'INR' }}</strong></div>
+            <div><span>Handling</span><strong>{{ deliveryQuote().handlingFee | currency:'INR' }}</strong></div>
+            <div><span>Priority factor</span><strong>{{ deliveryQuote().priorityMultiplier }}×</strong></div>
+            <div><span>Service factor</span><strong>{{ deliveryQuote().serviceMultiplier }}×</strong></div>
+            <div><span>Customer paid</span><strong>{{ deliveryQuote().customerShippingPaid | currency:'INR' }}</strong>
+            </div>
+          </div>
+          <div class="quote-footer" [class.loss]="deliveryQuote().margin < 0">
+            <span>{{ deliveryQuote().margin < 0 ? 'Undercharged by' : 'Estimated margin' }}</span>
+                <strong>{{ deliveryQuote().margin | currency:'INR' }}</strong>
+          </div>
+        </div>
+        <button class="primary-button wide" type="button" (click)="saveFulfillmentPlan()">Save fulfillment plan</button>
+      </section>
       }
-      <div class="assignment-form two-col">
-        <div>
-          <label>Service level</label>
-          <select [(ngModel)]="deliveryAssignment.serviceLevel">
-            <option value="standard">Standard</option>
-            <option value="express">Express</option>
-            <option value="same_day">Same day</option>
-            <option value="scheduled">Scheduled</option>
-          </select>
+      @if (activeStage() === 'dispatch') {
+      <section class="flow-panel">
+        <div class="panel-title">
+          <span class="eyebrow muted">Step 3</span>
+          <h3>Dispatch readiness</h3>
+          <p>Review the selected route, set ETA, and move the order into active delivery.</p>
         </div>
-        <div>
-          <label>Dispatch priority</label>
-          <select [(ngModel)]="deliveryAssignment.dispatchPriority">
-            <option value="low">Low</option>
-            <option value="normal">Normal</option>
-            <option value="high">High</option>
-            <option value="urgent">Urgent</option>
-          </select>
+        <div class="dispatch-card">
+          <div>
+            <span>Selected path</span>
+            <strong>{{ fulfillmentMode() === 'internal_fleet' ? 'Internal fleet'
+              : fulfillmentMode() === 'external_carrier' ? (deliveryAssignment.carrierName || 'External carrier')
+              : 'Pickup only' }}</strong>
+          </div>
+          <div>
+            <span>SLA</span>
+            <strong>{{ deliveryAssignment.serviceLevel }}</strong>
+          </div>
+          <div>
+            <span>Priority</span>
+            <strong>{{ deliveryAssignment.dispatchPriority | titlecase }}</strong>
+          </div>
         </div>
-      </div>
-      <div class="quote-panel">
-        <div class="panel-title compact">
-          <span class="eyebrow muted">Delivery charge estimate</span>
-          <h3>{{ deliveryQuote().estimatedCost | currency:'INR' }}</h3>
-          <p>Priority and service level directly affect the operational cost before dispatch.</p>
+        <div class="assignment-form">
+          <label>Estimated delivery date</label>
+          <input type="date" [(ngModel)]="deliveryAssignment.estimatedDeliveryDate" />
+          <label>Dispatcher notes</label>
+          <textarea [(ngModel)]="deliveryAssignment.deliveryNotes"
+            placeholder="Pickup instructions, packing notes, customer constraints"></textarea>
         </div>
-        <div class="quote-grid">
-          <div><span>Base route</span><strong>{{ deliveryQuote().baseRate | currency:'INR' }}</strong></div>
-          <div><span>COD handling</span><strong>{{ deliveryQuote().codFee | currency:'INR' }}</strong></div>
-          <div><span>Handling</span><strong>{{ deliveryQuote().handlingFee | currency:'INR' }}</strong></div>
-          <div><span>Priority factor</span><strong>{{ deliveryQuote().priorityMultiplier }}×</strong></div>
-          <div><span>Service factor</span><strong>{{ deliveryQuote().serviceMultiplier }}×</strong></div>
-          <div><span>Customer paid</span><strong>{{ deliveryQuote().customerShippingPaid | currency:'INR' }}</strong>
+        <div class="button-row" style="margin-top: 14px;">
+          <button class="secondary-button" type="button" (click)="saveFulfillmentPlan()">Update dispatch plan</button>
+          <button class="primary-button" type="button" (click)="markReadyForPickup()">Mark out for delivery</button>
         </div>
-      </div>
-      <div class="quote-footer" [class.loss]="deliveryQuote().margin < 0">
-        <span>{{ deliveryQuote().margin < 0 ? 'Undercharged by' : 'Estimated margin' }}</span>
-        <strong>{{ deliveryQuote().margin | currency:'INR' }}</strong>
-      </div>
-    </div>
-    <button class="primary-button wide" type="button" (click)="saveFulfillmentPlan()">Save fulfillment plan</button>
-  </section>
-}
-@if (activeStage() === 'dispatch') {
-  <section class="flow-panel">
-    <div class="panel-title">
-      <span class="eyebrow muted">Step 3</span>
-      <h3>Dispatch readiness</h3>
-      <p>Review the selected route, set ETA, and move the order into active delivery.</p>
-    </div>
-    <div class="dispatch-card">
-      <div>
-        <span>Selected path</span>
-        <strong>{{ fulfillmentMode() === 'public_partner' ? selectedPartner().name : fulfillmentMode() ===
-          'internal_fleet' ? 'Internal fleet' : fulfillmentMode() === 'external_carrier' ?
-        deliveryAssignment.carrierName || 'External carrier' : 'Pickup only' }}</strong>
-      </div>
-      <div>
-        <span>SLA</span>
-        <strong>{{ fulfillmentMode() === 'public_partner' ? selectedPartner().sla : deliveryAssignment.serviceLevel
-        }}</strong>
-      </div>
-      <div>
-        <span>Priority</span>
-        <strong>{{ deliveryAssignment.dispatchPriority | titlecase }}</strong>
-      </div>
-    </div>
-    <div class="assignment-form">
-      <label>Estimated delivery date</label>
-      <input type="date" [(ngModel)]="deliveryAssignment.estimatedDeliveryDate" />
-      <label>Dispatcher notes</label>
-      <textarea [(ngModel)]="deliveryAssignment.deliveryNotes"
-      placeholder="Pickup instructions, packing notes, customer constraints"></textarea>
-    </div>
-    <div class="button-row" style="margin-top: 14px;">
-      <button class="secondary-button" type="button" (click)="saveFulfillmentPlan()">Update dispatch plan</button>
-      <button class="primary-button" type="button" (click)="markReadyForPickup()">Mark out for delivery</button>
-    </div>
-  </section>
-}
-@if (activeStage() === 'tracking') {
-  <section class="flow-panel">
-    <div class="panel-title">
-      <span class="eyebrow muted">Step 4</span>
-      <h3>Tracking and proof</h3>
-      <p>Track delivery milestones, payment collection, and final delivery proof.</p>
-    </div>
-    <div class="timeline">
-      <div class="timeline-item done"><span></span><strong>Order placed</strong>
-      <p>Customer checkout completed.</p>
-    </div>
-    <div class="timeline-item"
-      [class.done]="order.orderStatus === 'confirmed' || order.orderStatus === 'processing' || order.fulfillmentStatus === 'shipped' || order.fulfillmentStatus === 'delivered'">
-      <span></span><strong>Accepted</strong>
-      <p>Merchant accepted the order.</p>
-    </div>
-    <div class="timeline-item" [class.done]="order.carrierName || order.deliveryAgent">
-      <span></span><strong>Assigned</strong>
-      <p>{{ order.carrierName || order.metadata?.logistics?.publicPartnerName || 'Driver or partner pending' }}
-      </p>
-    </div>
-    <div class="timeline-item"
-      [class.done]="order.fulfillmentStatus === 'shipped' || order.fulfillmentStatus === 'delivered'">
-      <span></span><strong>In transit</strong>
-      <p>Delivery has started.</p>
-    </div>
-    <div class="timeline-item" [class.done]="order.fulfillmentStatus === 'delivered'">
-      <span></span><strong>Delivered</strong>
-      <p>Proof and final settlement ready.</p>
-    </div>
-  </div>
-  <button class="primary-button wide" type="button" (click)="markDelivered()"
-    [disabled]="order.fulfillmentStatus === 'delivered'">
-    Mark delivered
-  </button>
-</section>
-}
-<section class="items-panel">
-  <div class="panel-title">
-    <span class="eyebrow muted">Parcel contents</span>
-    <h3>Order items</h3>
-  </div>
-  @for (item of order.items; track item) {
-    <div class="item-row">
-      <div class="item-thumb">
-        @if (item.snapshot?.image) {
-          <img [src]="item.snapshot.image" alt="" />
+      </section>
+      }
+      @if (activeStage() === 'tracking') {
+      <section class="flow-panel">
+        <div class="panel-title">
+          <span class="eyebrow muted">Step 4</span>
+          <h3>Tracking and proof</h3>
+          <p>Track delivery milestones, payment collection, and final delivery proof.</p>
+        </div>
+        <div class="timeline">
+          <div class="timeline-item done"><span></span><strong>Order placed</strong>
+            <p>Customer checkout completed.</p>
+          </div>
+          <div class="timeline-item"
+            [class.done]="order.orderStatus === 'confirmed' || order.orderStatus === 'processing' || order.fulfillmentStatus === 'shipped' || order.fulfillmentStatus === 'delivered'">
+            <span></span><strong>Accepted</strong>
+            <p>Merchant accepted the order.</p>
+          </div>
+          <div class="timeline-item" [class.done]="order.carrierName || order.deliveryAgent">
+            <span></span><strong>Assigned</strong>
+            <p>{{ order.carrierName || order.metadata?.logistics?.publicPartnerName || 'Driver or partner pending' }}
+            </p>
+          </div>
+          <div class="timeline-item"
+            [class.done]="order.fulfillmentStatus === 'shipped' || order.fulfillmentStatus === 'delivered'">
+            <span></span><strong>In transit</strong>
+            <p>Delivery has started.</p>
+          </div>
+          <div class="timeline-item" [class.done]="order.fulfillmentStatus === 'delivered'">
+            <span></span><strong>Delivered</strong>
+            <p>Proof and final settlement ready.</p>
+          </div>
+        </div>
+        <button class="primary-button wide" type="button" (click)="markDelivered()"
+          [disabled]="order.fulfillmentStatus === 'delivered'">
+          Mark delivered
+        </button>
+      </section>
+      }
+      <section class="items-panel">
+        <div class="panel-title">
+          <span class="eyebrow muted">Parcel contents</span>
+          <h3>Order items</h3>
+        </div>
+        @for (item of order.items; track item) {
+        <div class="item-row">
+          <div class="item-thumb">
+            @if (item.snapshot?.image) {
+            <img [src]="item.snapshot.image" alt="" />
+            }
+            @if (!item.snapshot?.image) {
+            <i class="pi pi-image"></i>
+            }
+          </div>
+          <div>
+            <strong>{{ item.snapshot?.name }}</strong>
+            <span>{{ item.quantity }} × {{ item.unitPrice | currency:'INR' }}</span>
+          </div>
+          <strong>{{ item.lineTotal | currency:'INR' }}</strong>
+        </div>
         }
-        @if (!item.snapshot?.image) {
-          <i class="pi pi-image"></i>
-        }
-      </div>
-      <div>
-        <strong>{{ item.snapshot?.name }}</strong>
-        <span>{{ item.quantity }} × {{ item.unitPrice | currency:'INR' }}</span>
-      </div>
-      <strong>{{ item.lineTotal | currency:'INR' }}</strong>
+      </section>
     </div>
-  }
-</section>
-</div>
-}
-</p-drawer>
+    }
+  </p-drawer>
 </main>

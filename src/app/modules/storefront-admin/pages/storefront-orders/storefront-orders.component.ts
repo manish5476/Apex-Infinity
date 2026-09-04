@@ -7,26 +7,32 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { DrawerModule } from 'primeng/drawer';
+import { SearchFilterComponent } from '@shared/ui/filters/search-filter.component';
+import { SelectFilterComponent, SelectFilterOption } from '@shared/ui/filters/select-filter.component';
+import { GridPaginationComponent } from '@shared/ui/grid/components/grid-pagination.component';
+import { GridPageState } from '@shared/ui/grid/grid-types';
+import { EmptyStateComponent } from '@shared/ui/feedback/empty-state/empty-state.component';
 
-type FulfillmentMode = 'internal_fleet' | 'public_partner' | 'external_carrier' | 'pickup_only';
-
-interface PublicDeliveryPartner {
-  id: string;
-  name: string;
-  type: string;
-  eta: string;
-  price: number;
-  rating: number;
-  sla: string;
-  coverage: string;
-  features: string[];
-  score: number;
-}
+/** Real backend-supported fulfillment modes. 'public_partner' removed — was backed by fake hardcoded data only. */
+type FulfillmentMode = 'internal_fleet' | 'external_carrier' | 'pickup_only';
 
 @Component({
   selector: 'app-storefront-orders',
   standalone: true,
-  imports: [CommonModule, TableModule, TagModule, TooltipModule, DrawerModule, CurrencyPipe, DatePipe, FormsModule],
+  imports: [
+    CommonModule,
+    TableModule,
+    TagModule,
+    TooltipModule,
+    DrawerModule,
+    CurrencyPipe,
+    DatePipe,
+    FormsModule,
+    SearchFilterComponent,
+    SelectFilterComponent,
+    GridPaginationComponent,
+    EmptyStateComponent
+  ],
   templateUrl: './storefront-orders.component.html',
   styleUrls: ['./storefront-orders.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -37,52 +43,37 @@ export class StorefrontOrdersComponent implements OnInit {
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly orders = signal<any[]>([]);
+  readonly total = signal(0);
+  readonly currentPage = signal(1);
+  readonly pageSize = signal(20);
+  readonly searchTerm = signal('');
+  readonly statusFilter = signal<string | null>(null);
+  readonly paymentFilter = signal<string | null>(null);
   readonly selectedOrder = signal<any | null>(null);
   readonly sidebarVisible = signal(false);
   readonly availableAgents = signal<any[]>([]);
 
-  readonly fulfillmentMode = signal<FulfillmentMode>('public_partner');
-  readonly selectedPartnerId = signal('apex-express');
-  readonly activeStage = signal<'intake' | 'strategy' | 'dispatch' | 'tracking'>('intake');
-
-  readonly publicPartners: PublicDeliveryPartner[] = [
-    {
-      id: 'apex-express',
-      name: 'Apex Express Network',
-      type: 'Hyperlocal + Last mile',
-      eta: '2-4 hrs',
-      price: 86,
-      rating: 4.8,
-      sla: '96% on-time',
-      coverage: 'Metro + Tier 1',
-      features: ['COD', 'Live tracking', 'Returns'],
-      score: 94
-    },
-    {
-      id: 'delhivery-grid',
-      name: 'Delhivery Grid',
-      type: 'Regional courier',
-      eta: '1-2 days',
-      price: 72,
-      rating: 4.6,
-      sla: '93% on-time',
-      coverage: 'Pan India',
-      features: ['Bulk', 'RTO', 'Webhook'],
-      score: 89
-    },
-    {
-      id: 'porter-rapid',
-      name: 'Porter Rapid',
-      type: 'Fleet operator',
-      eta: 'Same day',
-      price: 118,
-      rating: 4.7,
-      sla: '95% on-time',
-      coverage: 'City clusters',
-      features: ['Van', 'Scheduled', 'Proof'],
-      score: 91
-    }
+  readonly statusOptions: SelectFilterOption[] = [
+    { label: 'All Order Statuses', value: null },
+    { label: 'Placed', value: 'placed' },
+    { label: 'Confirmed', value: 'confirmed' },
+    { label: 'Processing', value: 'processing' },
+    { label: 'Cancelled', value: 'cancelled' },
+    { label: 'Closed', value: 'closed' }
   ];
+
+  readonly paymentOptions: SelectFilterOption[] = [
+    { label: 'All Payment Statuses', value: null },
+    { label: 'Pending', value: 'pending' },
+    { label: 'Paid', value: 'paid' },
+    { label: 'Failed', value: 'failed' }
+  ];
+
+  readonly hasActiveFilters = computed(() => !!this.searchTerm() || !!this.statusFilter() || !!this.paymentFilter());
+
+  /** Default to internal_fleet — only real agents from getDeliveryAgents() API are used */
+  readonly fulfillmentMode = signal<FulfillmentMode>('internal_fleet');
+  readonly activeStage = signal<'intake' | 'strategy' | 'dispatch' | 'tracking'>('intake');
 
   deliveryAssignment = {
     deliveryAgent: null as string | null,
@@ -110,25 +101,17 @@ export class StorefrontOrdersComponent implements OnInit {
     this.orders().filter(order => ['cancelled', 'returned'].includes(order.orderStatus) || order.fulfillmentStatus === 'returned').length
   );
 
-  readonly selectedPartner = computed(() =>
-    this.publicPartners.find(partner => partner.id === this.selectedPartnerId()) || this.publicPartners[0]
-  );
-
   readonly deliveryQuote = computed(() => {
     const order = this.selectedOrder();
     const mode = this.fulfillmentMode();
-    const partner = this.selectedPartner();
     const orderValue = Number(order?.totals?.grandTotal || 0);
     const shippingPaid = Number(order?.totals?.shipping || 0);
     const priorityMultiplier = this.priorityMultiplier(this.deliveryAssignment.dispatchPriority);
     const serviceMultiplier = this.serviceMultiplier(this.deliveryAssignment.serviceLevel);
-    const baseRate = mode === 'public_partner'
-      ? partner.price
-      : mode === 'internal_fleet'
-        ? 54
-        : mode === 'external_carrier'
-          ? 70
-          : 0;
+    // Base rates are indicative only — not from external APIs. Shown for internal ops reference.
+    const baseRate = mode === 'internal_fleet' ? 54
+      : mode === 'external_carrier' ? 70
+        : 0; // pickup_only has no delivery cost
     const codFee = order?.paymentMethod === 'COD' ? Math.max(12, Math.round(orderValue * 0.006)) : 0;
     const handlingFee = mode === 'pickup_only' ? 0 : 18;
     const estimatedCost = Math.round((baseRate + codFee + handlingFee) * priorityMultiplier * serviceMultiplier);
@@ -154,20 +137,68 @@ export class StorefrontOrdersComponent implements OnInit {
   load(): void {
     this.loading.set(true);
     this.error.set(null);
-    this.adminService.getStorefrontOrders({ limit: 50 }).pipe(
+    this.adminService.getStorefrontOrders({
+      page: this.currentPage(),
+      limit: this.pageSize(),
+      search: this.searchTerm() || undefined,
+      status: this.statusFilter() || undefined,
+      paymentStatus: this.paymentFilter() || undefined
+    }).pipe(
       catchError(err => {
         this.error.set(err?.error?.message ?? 'Unable to load orders.');
-        return of({ data: [] });
+        return of({ data: [], total: 0 });
       })
     ).subscribe((res: any) => {
       const mapped = (res?.data ?? []).map((order: any) => ({
         ...order,
         customerName: order.customerId ? `${order.customerId.firstName} ${order.customerId.lastName}` : 'Guest',
-        logisticsMode: order.metadata?.logistics?.fulfillmentMode || (order.fulfilledBy === 'platform' ? 'public_partner' : 'internal_fleet')
+        logisticsMode: (() => {
+          const m = order.metadata?.logistics?.fulfillmentMode;
+          if (m === 'internal_fleet' || m === 'external_carrier' || m === 'pickup_only') return m;
+          return 'internal_fleet';
+        })()
       }));
       this.orders.set(mapped);
+      this.total.set(res?.total ?? res?.results ?? mapped.length);
       this.loading.set(false);
     });
+  }
+
+  onSearchChange(term: string): void {
+    this.searchTerm.set(term);
+    this.currentPage.set(1);
+    this.load();
+  }
+
+  onStatusChange(status: any): void {
+    this.statusFilter.set(status || null);
+    this.currentPage.set(1);
+    this.load();
+  }
+
+  onPaymentChange(payment: any): void {
+    this.paymentFilter.set(payment || null);
+    this.currentPage.set(1);
+    this.load();
+  }
+
+  clearFilters(): void {
+    this.searchTerm.set('');
+    this.statusFilter.set(null);
+    this.paymentFilter.set(null);
+    this.currentPage.set(1);
+    this.load();
+  }
+
+  onPageChange(state: GridPageState): void {
+    this.currentPage.set(state.page + 1);
+    this.load();
+  }
+
+  onPageSizeChange(size: number): void {
+    this.pageSize.set(size);
+    this.currentPage.set(1);
+    this.load();
   }
 
   loadAgents(): void {
@@ -181,9 +212,12 @@ export class StorefrontOrdersComponent implements OnInit {
     this.selectedOrder.set(order);
     this.sidebarVisible.set(true);
     this.activeStage.set(this.stageFor(order));
-    const logisticsMode = order.metadata?.logistics?.fulfillmentMode || (order.fulfilledBy === 'platform' ? 'public_partner' : 'internal_fleet');
-    this.fulfillmentMode.set(logisticsMode);
-    this.selectedPartnerId.set(order.metadata?.logistics?.publicPartnerId || 'apex-express');
+    // Only real modes: internal_fleet, external_carrier, pickup_only
+    const savedMode = order.metadata?.logistics?.fulfillmentMode;
+    const safeMode: FulfillmentMode = (savedMode === 'internal_fleet' || savedMode === 'external_carrier' || savedMode === 'pickup_only')
+      ? savedMode
+      : 'internal_fleet';
+    this.fulfillmentMode.set(safeMode);
     this.deliveryAssignment = {
       deliveryAgent: typeof order.deliveryAgent === 'string' ? order.deliveryAgent : order.deliveryAgent?._id || null,
       carrierName: order.carrierName || '',
@@ -201,18 +235,9 @@ export class StorefrontOrdersComponent implements OnInit {
 
   setMode(mode: FulfillmentMode): void {
     this.fulfillmentMode.set(mode);
-    if (mode === 'public_partner') {
-      const partner = this.selectedPartner();
-      this.deliveryAssignment.carrierName = partner.name;
-    }
     if (mode === 'internal_fleet') {
       this.deliveryAssignment.carrierName = '';
     }
-  }
-
-  selectPartner(partner: PublicDeliveryPartner): void {
-    this.selectedPartnerId.set(partner.id);
-    this.deliveryAssignment.carrierName = partner.name;
   }
 
   acceptOrder(order: any, event?: Event): void {
@@ -261,13 +286,10 @@ export class StorefrontOrdersComponent implements OnInit {
     if (!order) return;
 
     const mode = this.fulfillmentMode();
-    const partner = this.selectedPartner();
     const payload = {
       ...this.deliveryAssignment,
       fulfillmentMode: mode,
-      publicPartnerId: mode === 'public_partner' ? partner.id : null,
-      publicPartnerName: mode === 'public_partner' ? partner.name : '',
-      carrierName: mode === 'public_partner' ? partner.name : this.deliveryAssignment.carrierName,
+      carrierName: this.deliveryAssignment.carrierName,
       deliveryAgent: mode === 'internal_fleet' ? this.deliveryAssignment.deliveryAgent : null,
       deliveryQuote: this.deliveryQuote()
     };
@@ -327,11 +349,6 @@ export class StorefrontOrdersComponent implements OnInit {
     }
   }
 
-  partnerScoreFor(order: any): number {
-    const city = order?.shippingAddress?.city || '';
-    const base = this.selectedPartner().score;
-    return city ? Math.min(base + 2, 99) : base;
-  }
 
   priorityMultiplier(priority: string): number {
     switch (priority) {
