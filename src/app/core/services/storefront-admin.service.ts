@@ -94,13 +94,18 @@ export class StorefrontAdminService extends BaseApiService {
     return this.get(`${this.base}/pages/${pageId}`);
   }
 
-  /** Core builder save — sends partial page data (sections, seo, name, etc.) */
-  updatePage(pageId: string, data: Partial<any>): Observable<any> {
+  /** Core builder save — sends partial page data (sections, seo, name, etc.) with optional expectedVersion for optimistic locking */
+  updatePage(pageId: string, data: Partial<any> & { expectedVersion?: number }): Observable<any> {
     return this.put(`${this.base}/pages/${pageId}`, data);
   }
 
   deletePage(pageId: string): Observable<any> {
     return this.delete(`${this.base}/pages/${pageId}`);
+  }
+
+  /** Returns draft snapshot preview with full hydration for unpublished changes */
+  getDraftPreview(pageId: string): Observable<any> {
+    return this.get(`${this.base}/pages/${pageId}/preview`);
   }
 
   // ── Page lifecycle ────────────────────────────────────────────────────────

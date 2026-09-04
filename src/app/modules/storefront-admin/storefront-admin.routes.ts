@@ -1,7 +1,7 @@
-// src/app/features/storefront-admin/storefront-admin.routes.ts
 import { Routes } from '@angular/router';
 import { permissionGuard } from '@core/auth/guards/permission.guard';
 import { PERMISSIONS } from '@core/auth/permissions.constants';
+import { pageBuilderUnsavedGuard } from './guards/page-builder-unsaved.guard';
 
 const adminSurfaceRoute = (path: string, surfaceKey: string, title: string): Routes[number] => ({
   path,
@@ -34,6 +34,7 @@ export const STOREFRONT_ADMIN_ROUTES: Routes = [
       import('./pages/page-builder/page-builder.component').then(m => m.PageBuilderComponent),
     title: 'Page Builder',
     canActivate: [permissionGuard],
+    canDeactivate: [pageBuilderUnsavedGuard],
     data: { permissions: [PERMISSIONS.STOREFRONT.PAGE_MANAGE] }
   },
   {

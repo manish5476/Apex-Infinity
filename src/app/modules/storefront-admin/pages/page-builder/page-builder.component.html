@@ -1,42 +1,99 @@
 <div class="builder-layout builder-workbench h-full flex flex-col">
 
+  <!-- =========================================================================
+       BUILDER HEADER
+       ========================================================================= -->
   <header
-    class="builder-header builder-workbench__header shrink-0 h-14 bg-white border-b border-surface-200 px-5 flex items-center justify-between shadow-sm z-20">
+    class="builder-header builder-workbench__header shrink-0 h-14 bg-white border-b border-surface-200 px-4 md:px-5 flex items-center justify-between shadow-sm z-20 gap-3">
 
-    <div class="flex items-center gap-3">
+    <!-- Left: Navigation & Page Identity + Tri-State Badge -->
+    <div class="flex items-center gap-3 min-w-0">
       <a routerLink="../../"
-        class="flex items-center justify-center w-7 h-7 text-surface-400 hover:text-primary-600 hover:bg-surface-50 rounded-full transition-colors">
+        class="flex items-center justify-center w-7 h-7 text-surface-400 hover:text-primary-600 hover:bg-surface-50 rounded-full transition-colors shrink-0">
         <i class="pi pi-arrow-left text-xs"></i>
       </a>
 
-      <div class="flex flex-col">
+      <div class="flex flex-col min-w-0">
         <h1
-          class="builder-workbench__title text-[13px] font-heading font-bold text-surface-800 leading-none tracking-tight">
+          class="builder-workbench__title text-[13px] font-heading font-bold text-surface-800 leading-none tracking-tight truncate">
           {{ page()?.name || 'Untitled Page' }}
         </h1>
-        <div class="flex items-center gap-1.5 mt-1">
-          <span class="flex h-1.5 w-1.5 relative">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
-              [ngClass]="page()?.isPublished ? 'bg-green-400' : 'bg-amber-400'"></span>
-            <span class="relative inline-flex rounded-full h-1.5 w-1.5"
-              [ngClass]="page()?.isPublished ? 'bg-green-500' : 'bg-amber-500'"></span>
+        <div class="flex items-center gap-2 mt-1">
+          <!-- Tri-State Status Badge -->
+          @if (lifecycleState() === 'draft') {
+          <span
+            class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-semibold tracking-wide">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+            Draft
           </span>
-          <span class="text-[9px] font-bold text-surface-400 uppercase tracking-widest">
-            {{ page()?.status || 'Draft' }}
+          } @else if (lifecycleState() === 'live') {
+          <span
+            class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-semibold tracking-wide">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            Live (v{{ page()?.publishedVersion || page()?.version || 1 }})
           </span>
+          } @else {
+          <span
+            class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-[10px] font-semibold tracking-wide"
+            pTooltip="Page is live, but your draft has unpublished modifications" tooltipPosition="bottom">
+            <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
+            Live (Unpublished Changes)
+          </span>
+          }
+
+          @if (hasUnsavedChanges()) {
+          <span class="text-[10px] font-medium text-amber-600 flex items-center gap-1">
+            <i class="pi pi-pencil text-[9px]"></i> Unsaved
+          </span>
+          }
         </div>
       </div>
     </div>
 
-    <div class="flex gap-2 items-center">
+    <!-- Center: Viewport Mode Switcher -->
+    <div class="hidden md:flex items-center bg-surface-100 rounded-lg p-0.5 border border-surface-200 shrink-0">
+      <button type="button" (click)="setViewportMode('desktop')"
+        [class.bg-white]="viewportMode() === 'desktop'"
+        [class.shadow-sm]="viewportMode() === 'desktop'"
+        [class.text-primary-700]="viewportMode() === 'desktop'"
+        [class.text-surface-500]="viewportMode() !== 'desktop'"
+        class="flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold rounded-md transition-all">
+        <i class="pi pi-desktop text-[10px]"></i>
+        <span>Desktop</span>
+      </button>
+
+      <button type="button" (click)="setViewportMode('tablet')"
+        [class.bg-white]="viewportMode() === 'tablet'"
+        [class.shadow-sm]="viewportMode() === 'tablet'"
+        [class.text-primary-700]="viewportMode() === 'tablet'"
+        [class.text-surface-500]="viewportMode() !== 'tablet'"
+        class="flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold rounded-md transition-all">
+        <i class="pi pi-tablet text-[10px]"></i>
+        <span>Tablet (768px)</span>
+      </button>
+
+      <button type="button" (click)="setViewportMode('mobile')"
+        [class.bg-white]="viewportMode() === 'mobile'"
+        [class.shadow-sm]="viewportMode() === 'mobile'"
+        [class.text-primary-700]="viewportMode() === 'mobile'"
+        [class.text-surface-500]="viewportMode() !== 'mobile'"
+        class="flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold rounded-md transition-all">
+        <i class="pi pi-mobile text-[10px]"></i>
+        <span>Mobile (375px)</span>
+      </button>
+    </div>
+
+    <!-- Right: Actions Toolbar -->
+    <div class="flex gap-2 items-center shrink-0">
 
       @if (saveError()) {
       <div
         class="flex items-center gap-2 px-2.5 py-1 bg-red-50 border border-red-200 rounded-md text-red-600 text-[10px] font-medium mr-1">
         <i class="pi pi-exclamation-triangle text-[10px] shrink-0"></i>
         <span class="truncate max-w-[150px]">{{ saveError() }}</span>
-        <button (click)="saveError.set(null)" class="shrink-0 hover:text-red-800"><i
-            class="pi pi-times text-[10px]"></i></button>
+        <button (click)="saveError.set(null)" class="shrink-0 hover:text-red-800">
+          <i class="pi pi-times text-[10px]"></i>
+        </button>
       </div>
       }
 
@@ -46,32 +103,60 @@
       </span>
       }
 
+      <!-- Draft Preview Button -->
+      <button (click)="openDraftPreview()" [disabled]="isSaving() || isLoadingPreview()"
+        class="action-btn-secondary text-surface-600 flex items-center gap-1.5 px-2.5 text-[11px]"
+        pTooltip="Preview Draft Hydration" tooltipPosition="bottom">
+        <i class="pi" [ngClass]="isLoadingPreview() ? 'pi-spin pi-spinner' : 'pi-eye'" text-[10px]></i>
+        <span class="hidden sm:inline">Preview</span>
+      </button>
+
+      <!-- Delete Page Button -->
       <button (click)="deletePage()" [disabled]="isSaving()"
         class="action-btn-secondary text-surface-400 hover:text-red-600 hover:bg-red-50" pTooltip="Delete Page"
         tooltipPosition="bottom">
         <i class="pi pi-trash text-[11px]"></i>
       </button>
 
-      <button (click)="togglePublish()" [disabled]="isSaving()"
-        class="action-btn-secondary flex items-center gap-1.5 px-3 text-[11px]">
-        <i class="pi text-[10px]" [ngClass]="page()?.isPublished ? 'pi-eye-slash' : 'pi-cloud-upload'"></i>
-        <span>{{ page()?.isPublished ? 'Unpublish' : 'Publish' }}</span>
+      <!-- Unpublish (if published) -->
+      @if (page()?.isPublished) {
+      <button (click)="unpublishPage()" [disabled]="isSaving()"
+        class="action-btn-secondary text-surface-500 hover:text-amber-700 hover:bg-amber-50 flex items-center gap-1 px-2.5 text-[11px]"
+        pTooltip="Take page offline" tooltipPosition="bottom">
+        <i class="pi pi-eye-slash text-[10px]"></i>
+        <span class="hidden sm:inline">Unpublish</span>
+      </button>
+      }
+
+      <!-- Save Draft Button -->
+      <button (click)="savePage()" [disabled]="isSaving()"
+        class="action-btn-secondary flex items-center gap-1.5 px-3 text-[11px] font-semibold"
+        [ngClass]="hasUnsavedChanges() ? 'border-primary-400 text-primary-700 bg-primary-50/50' : ''"
+        pTooltip="Save your draft edits without affecting live visitors" tooltipPosition="bottom">
+        <i class="pi pi-save text-[10px]"></i>
+        <span>Save Draft</span>
       </button>
 
-      <button (click)="savePage()" [disabled]="isSaving()"
-        class="action-btn-primary flex items-center gap-1.5 px-3.5 shadow-md shadow-primary-500/20 text-[11px]">
-        <i class="pi pi-save text-[10px]"></i>
-        <span>Save</span>
+      <!-- Publish to Live Button -->
+      <button (click)="promptPublish()" [disabled]="isSaving() || (!page()?.isPublished && sections().length === 0)"
+        class="action-btn-primary flex items-center gap-1.5 px-3.5 shadow-md shadow-emerald-600/20 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold"
+        pTooltip="Push all draft changes to the live website" tooltipPosition="bottom">
+        <i class="pi pi-cloud-upload text-[10px]"></i>
+        <span>{{ page()?.isPublished ? 'Publish Changes' : 'Publish Live' }}</span>
       </button>
 
     </div>
   </header>
 
+  <!-- =========================================================================
+       WORKBENCH SPLITTER (LAYERS + CANVAS)
+       ========================================================================= -->
   <div class="flex-1 overflow-hidden relative min-h-0 bg-surface-100">
 
     <p-splitter [panelSizes]="[25, 75]" [minSizes]="[20, 50]" [gutterSize]="4" stateKey="builder-main-splitter"
       stateStorage="local" styleClass="h-full border-none custom-splitter">
 
+      <!-- LEFT PANEL: LAYERS & COMPONENT CONFIG -->
       <ng-template pTemplate>
         <div
           class="builder-workbench__sidebar h-full w-full flex flex-col bg-white border-r border-surface-200 z-10 overflow-hidden">
@@ -148,6 +233,7 @@
         </div>
       </ng-template>
 
+      <!-- RIGHT PANEL: RESPONSIVE CANVAS & FOOTER CONTROLS -->
       <ng-template pTemplate>
         <p-splitter layout="vertical" [panelSizes]="[94, 6]" [minSizes]="[50, 4]" [gutterSize]="4"
           stateKey="builder-canvas-splitter" stateStorage="local"
@@ -157,10 +243,15 @@
             <main id="preview-container"
               class="builder-workbench__canvas h-full w-full min-h-0 overflow-y-auto relative custom-scrollbar scroll-smooth">
 
-              <div class="px-4 pt-4 pb-20">
-                <div
-                  class="w-full max-w-[1024px] mx-auto flex flex-col shadow-xl bg-white rounded-lg overflow-hidden ring-1 ring-surface-200 transition-all duration-300">
+              <div class="px-4 pt-4 pb-20 flex justify-center">
+                <div [ngClass]="{
+                    'w-full max-w-[1024px]': viewportMode() === 'desktop',
+                    'w-[768px] max-w-full': viewportMode() === 'tablet',
+                    'w-[375px] max-w-full': viewportMode() === 'mobile'
+                  }"
+                  class="mx-auto flex flex-col shadow-xl bg-white rounded-lg overflow-hidden ring-1 ring-surface-200 transition-all duration-300">
 
+                  <!-- Canvas Browser Chrome -->
                   <div
                     class="h-8 border-b border-surface-100 flex items-center px-3 justify-between bg-surface-50 shrink-0">
                     <div class="flex gap-1.5">
@@ -174,9 +265,12 @@
                         <span class="text-[9px] text-surface-400 font-mono">/{{ page()?.slug || 'page' }}</span>
                       </div>
                     </div>
-                    <div class="w-12"></div>
+                    <div class="text-[9px] font-mono text-surface-400">
+                      {{ viewportMode() === 'desktop' ? '100%' : (viewportMode() === 'tablet' ? '768px' : '375px') }}
+                    </div>
                   </div>
 
+                  <!-- Canvas Section Flow -->
                   <div class="bg-white relative min-h-[400px]">
                     @if (sections().length === 0) {
                     <div class="flex flex-col items-center justify-center text-surface-300 gap-3 py-32">
@@ -234,6 +328,9 @@
                 </span>
               </div>
               <div class="w-px h-3 bg-surface-200"></div>
+              <span class="text-[10px] text-surface-400 font-mono">
+                Version: {{ page()?.version || 1 }}
+              </span>
               <div class="flex-1"></div>
               <button (click)="scrollToTop()"
                 class="text-[9px] font-bold text-surface-400 hover:text-primary-600 flex items-center gap-1 transition-colors uppercase tracking-wider"
@@ -250,7 +347,10 @@
   </div>
 </div>
 
-<p-dialog [modal]="true" [(visible)]="showAddMenu" (visibleChange)="showAddMenu.set($event)" [modal]="true"
+<!-- =========================================================================
+     MODAL: COMPONENT LIBRARY
+     ========================================================================= -->
+<p-dialog [modal]="true" [(visible)]="showAddMenu" (visibleChange)="showAddMenu.set($event)"
   appendTo="body" [draggable]="false" [resizable]="false" styleClass="component-library-dialog"
   [style]="{ width: '850px', maxWidth: '95vw' }" [breakpoints]="{ '960px': '75vw', '640px': '100vw' }"
   [blockScroll]="true" [dismissableMask]="true">
@@ -285,4 +385,146 @@
     </div>
     }
   </div>
+</p-dialog>
+
+<!-- =========================================================================
+     MODAL: PUBLISH CONFIRMATION
+     ========================================================================= -->
+<p-dialog [(visible)]="showPublishModal" [modal]="true" appendTo="body" [draggable]="false" [resizable]="false"
+  [style]="{ width: '480px', maxWidth: '95vw' }" [dismissableMask]="true">
+
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-2.5">
+      <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+        <i class="pi pi-cloud-upload text-sm"></i>
+      </div>
+      <div>
+        <h3 class="font-bold text-base text-surface-900 leading-none m-0">Publish to Live Storefront</h3>
+        <p class="text-[11px] text-surface-500 mt-1 mb-0">Push draft updates to public visitors</p>
+      </div>
+    </div>
+  </ng-template>
+
+  <div class="py-3 text-sm text-surface-600 space-y-3">
+    <p>
+      You are about to publish <strong>"{{ page()?.name }}"</strong> (<code>/{{ page()?.slug }}</code>)
+      with <strong>{{ sections().length }} section{{ sections().length !== 1 ? 's' : '' }}</strong>.
+    </p>
+
+    <div class="p-3 bg-surface-50 border border-surface-200 rounded-lg text-xs space-y-1">
+      <div class="flex justify-between">
+        <span class="text-surface-500">Draft Version:</span>
+        <span class="font-mono font-bold text-surface-800">v{{ page()?.version || 1 }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-surface-500">Live Version:</span>
+        <span class="font-mono font-bold text-surface-800">
+          {{ page()?.publishedVersion ? 'v' + page()?.publishedVersion : 'Not published yet' }}
+        </span>
+      </div>
+    </div>
+
+    @if (hasUnsavedChanges()) {
+    <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-xs flex items-start gap-2">
+      <i class="pi pi-info-circle text-amber-600 mt-0.5 shrink-0"></i>
+      <span>You have unsaved edits on your canvas. It is recommended to click <strong>Save Draft</strong> before publishing.</span>
+    </div>
+    }
+
+    <p class="text-xs text-surface-500">
+      Publishing will immediately regenerate the public cache and render this page on your live domain.
+    </p>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-end gap-2">
+      <button type="button" (click)="showPublishModal.set(false)"
+        class="px-3 py-1.5 text-xs font-semibold rounded-md border border-surface-300 text-surface-700 hover:bg-surface-50 transition-colors">
+        Cancel
+      </button>
+      <button type="button" (click)="confirmPublish()" [disabled]="isSaving()"
+        class="px-4 py-1.5 text-xs font-bold rounded-md bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-sm">
+        Confirm & Publish Live
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- =========================================================================
+     MODAL: OPTIMISTIC CONCURRENCY CONFLICT (HTTP 409)
+     ========================================================================= -->
+<p-dialog [(visible)]="showConflictModal" [modal]="true" appendTo="body" [draggable]="false" [resizable]="false"
+  [style]="{ width: '480px', maxWidth: '95vw' }" [closable]="false">
+
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-2.5 text-amber-700">
+      <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+        <i class="pi pi-exclamation-triangle text-amber-600 text-sm"></i>
+      </div>
+      <div>
+        <h3 class="font-bold text-base text-surface-900 leading-none m-0">Version Conflict Detected</h3>
+        <p class="text-[11px] text-surface-500 mt-1 mb-0">Another session modified this page</p>
+      </div>
+    </div>
+  </ng-template>
+
+  <div class="py-3 text-sm text-surface-600 space-y-3">
+    <p>
+      This page was modified by another administrator or in another tab while you were editing.
+    </p>
+
+    <div class="p-3 bg-surface-50 border border-surface-200 rounded-lg text-xs space-y-1 font-mono">
+      <div class="flex justify-between">
+        <span class="text-surface-500">Your Base Version:</span>
+        <span class="text-surface-800 font-bold">v{{ conflictData()?.yourVersion ?? page()?.version }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-surface-500">Server Latest Version:</span>
+        <span class="text-red-600 font-bold">v{{ conflictData()?.serverVersion ?? (page()?.version || 1) + 1 }}</span>
+      </div>
+    </div>
+
+    <p class="text-xs text-surface-500">
+      To prevent accidentally overwriting the newest changes, please reload the latest version.
+    </p>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-end gap-2">
+      <button type="button" (click)="showConflictModal.set(false)"
+        class="px-3 py-1.5 text-xs font-semibold rounded-md border border-surface-300 text-surface-700 hover:bg-surface-50">
+        Keep Local Draft
+      </button>
+      <button type="button" (click)="reloadPage()"
+        class="px-4 py-1.5 text-xs font-bold rounded-md bg-primary-600 hover:bg-primary-700 text-white shadow-sm">
+        Reload Latest Version
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- =========================================================================
+     MODAL: DRAFT PREVIEW HYDRATION
+     ========================================================================= -->
+<p-dialog [(visible)]="showPreviewModal" [modal]="true" appendTo="body" [draggable]="false" [resizable]="false"
+  [style]="{ width: '700px', maxWidth: '95vw' }" [dismissableMask]="true">
+
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-2">
+      <i class="pi pi-eye text-primary-600"></i>
+      <h3 class="font-bold text-base text-surface-900 leading-none m-0">Draft Hydration Preview</h3>
+    </div>
+  </ng-template>
+
+  <div class="py-2 text-xs text-surface-600 space-y-2 max-h-[60vh] overflow-y-auto custom-scrollbar font-mono bg-surface-50 p-3 rounded-md border border-surface-200">
+    <div class="font-bold text-surface-800">Hydrated Draft Sections: {{ previewData()?.sections?.length || 0 }}</div>
+    <pre class="text-[11px] whitespace-pre-wrap break-all">{{ previewData() | json }}</pre>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button type="button" (click)="showPreviewModal.set(false)"
+      class="px-3 py-1.5 text-xs font-semibold rounded-md bg-surface-100 hover:bg-surface-200 text-surface-700">
+      Close
+    </button>
+  </ng-template>
 </p-dialog>

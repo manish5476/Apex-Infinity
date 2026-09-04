@@ -612,6 +612,11 @@ export interface AdminPage extends StorefrontPage {
   status: 'draft' | 'published' | 'archived';
   isPublished: boolean;
   isHomepage: boolean;
+  hasUnpublishedChanges?: boolean;
+  publishedVersion?: number;
+  publishedBy?: any;
+  lastEditedBy?: any;
+  draftUpdatedAt?: string;
   publishedAt?: string;
   viewCount: number;
   lastViewedAt?: string;

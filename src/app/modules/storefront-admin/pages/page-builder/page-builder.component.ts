@@ -1,6 +1,6 @@
 // src/app/features/storefront-admin/pages/page-builder/page-builder.component.ts
 import {
-  Component, OnInit, inject, signal, computed, ViewEncapsulation, OnDestroy
+  Component, OnInit, inject, signal, computed, ViewEncapsulation, OnDestroy, HostListener
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
@@ -17,26 +17,15 @@ import { MasterListService } from '../../../../core/services/master-list.service
 import { AdminPage, PageSection, SectionDefinition } from '@core/models/storefront.model';
 import { StorefrontAdminService } from '@core/services/storefront-admin.service';
 import { StorefrontPublicService } from '@core/services/storefront-public.service';
-import { Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
+import { AuthService } from '../../../auth/services/auth-service';
+import { CanComponentDeactivate } from '../../guards/page-builder-unsaved.guard';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import {
   SECTION_COMPONENT_REGISTRY,
   SECTION_RUNTIME_TYPES
 } from '../../../storefront-public/dynamic-page/section-component.registry';
 import { StorefrontSectionRendererComponent } from '../../../storefront-public/dynamic-page/storefront-section-renderer.component';
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-function getOrgSlug(): string {
-  try {
-    const raw = window.localStorage.getItem('orgSlug');
-    return raw ? JSON.parse(raw) : '';
-  } catch {
-    return window.localStorage.getItem('orgSlug') ?? '';
-  }
-}
 
 function buildDefaultConfig(schema: Record<string, any>): Record<string, any> {
   const config: Record<string, any> = {};
@@ -52,10 +41,6 @@ function buildDefaultConfig(schema: Record<string, any>): Record<string, any> {
   return config;
 }
 
-// ---------------------------------------------------------------------------
-// Component
-// ---------------------------------------------------------------------------
-
 @Component({
   selector: 'app-page-builder',
   standalone: true,
@@ -69,43 +54,76 @@ function buildDefaultConfig(schema: Record<string, any>): Record<string, any> {
   styleUrls: ['./page-builder.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class PageBuilderComponent implements OnInit, OnDestroy {
+export class PageBuilderComponent implements OnInit, OnDestroy, CanComponentDeactivate {
   private readonly destroy$ = new Subject<void>();
   private route = inject(ActivatedRoute);
   private adminService = inject(StorefrontAdminService);
   private publicService = inject(StorefrontPublicService);
   private masterListService = inject(MasterListService);
+  private authService = inject(AuthService);
 
   // ── Data ──────────────────────────────────────────────────────────────────
   page = signal<AdminPage | null>(null);
   sections = signal<PageSection[]>([]);
   selectedSection = signal<PageSection | null>(null);
-  
+
   private _storeEnums = signal<any>({ categories: [], brands: [], tags: [], products: [] });
   mastersData = computed(() => ({
     ...this._storeEnums()
   }));
-  // ── View state ────────────────────────────────────────────────────────────
-  viewMode = signal<'sidebar' | 'dialog'>('sidebar');
-  sidebarState = signal<'split' | 'full'>('split');
+
+  // ── Lifecycle & Concurrency ───────────────────────────────────────────────
+  hasUnsavedChanges = signal(false);
+  viewportMode = signal<'desktop' | 'tablet' | 'mobile'>('desktop');
   showAddMenu = signal(false);
   isSaving = signal(false);
   saveError = signal<string | null>(null);
 
+  showPublishModal = signal(false);
+  showConflictModal = signal(false);
+  conflictData = signal<{ serverVersion?: number; yourVersion?: number } | null>(null);
+
+  showPreviewModal = signal(false);
+  previewData = signal<any>(null);
+  isLoadingPreview = signal(false);
+
+  // ── Tri-State Lifecycle Indicator ─────────────────────────────────────────
+  lifecycleState = computed<'draft' | 'live' | 'live_modified'>(() => {
+    const p = this.page();
+    if (!p) return 'draft';
+    if (!p.isPublished) return 'draft';
+    if (p.hasUnpublishedChanges || this.hasUnsavedChanges()) return 'live_modified';
+    return 'live';
+  });
+
+  // ── View state ────────────────────────────────────────────────────────────
+  viewMode = signal<'sidebar' | 'dialog'>('sidebar');
+  sidebarState = signal<'split' | 'full'>('split');
+
   // ── Registry ──────────────────────────────────────────────────────────────
-  /** Map of type → SectionDefinition — used in template */
   sectionRegistry: Record<string, SectionDefinition> = {};
-  /** Flat list for the component library panel (excludes system sections) */
   availableTypes: SectionDefinition[] = [];
-  /** Grouped by category for the library overlay */
   groupedTypes: Array<{ category: string; items: SectionDefinition[] }> = [];
 
-  // ───────────────────────────────────────────────────────────────────────────
+  // ── Dirty State & Navigation Protection ───────────────────────────────────
+  @HostListener('window:beforeunload', ['$event'])
+  onBeforeUnload(event: BeforeUnloadEvent): void {
+    if (this.hasUnsavedChanges()) {
+      event.preventDefault();
+      event.returnValue = true;
+    }
+  }
+
+  canDeactivate(): boolean {
+    if (!this.hasUnsavedChanges()) return true;
+    return window.confirm(
+      'You have unsaved changes in your draft. Leaving this page will discard these edits.\n\nAre you sure you want to leave?'
+    );
+  }
 
   ngOnInit(): void {
     const pageId = this.route.snapshot.paramMap.get('id');
 
-    // Load section type catalogue first, then the page
     this.adminService.getSectionTypes().pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         const types: SectionDefinition[] = res.data ?? (Array.isArray(res) ? res : []);
@@ -116,7 +134,6 @@ export class PageBuilderComponent implements OnInit, OnDestroy {
           return acc;
         }, {});
 
-        // Group non-system types by category for the library panel
         const grouped = new Map<string, SectionDefinition[]>();
         this.availableTypes.forEach(t => {
           const cat = t.category ?? 'other';
@@ -141,19 +158,34 @@ export class PageBuilderComponent implements OnInit, OnDestroy {
         const data: AdminPage = res.data;
         this.page.set(data);
 
-        // Only keep sections whose type exists in the registry
         const valid = (data.sections ?? [])
           .filter((s: PageSection) => !!this.sectionRegistry[s.type] && this.hasRuntimeSupport(s.type))
           .map((s: PageSection) => ({ ...s, id: s.id || crypto.randomUUID() }));
 
         this.sections.set(valid);
+        this.hasUnsavedChanges.set(false);
+        this.showConflictModal.set(false);
+        this.conflictData.set(null);
       },
       error: () => this.saveError.set('Failed to load page.')
     });
   }
 
+  reloadPage(): void {
+    const id = this.page()?._id;
+    if (id) {
+      this.loadPage(id);
+    }
+  }
+
   loadStoreMetadata(): void {
-    const orgSlug = getOrgSlug();
+    let orgSlug = '';
+    try {
+      const user = this.authService.currentUser() as any;
+      orgSlug = user?.organization?.uniqueShopId || window.localStorage.getItem('orgSlug') || '';
+    } catch {
+      orgSlug = '';
+    }
     if (!orgSlug) return;
 
     this.publicService.getStoreMetadata(orgSlug).pipe(takeUntil(this.destroy$)).subscribe({
@@ -169,7 +201,11 @@ export class PageBuilderComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ── UI actions ────────────────────────────────────────────────────────────
+  // ── Viewport & View Actions ───────────────────────────────────────────────
+
+  setViewportMode(mode: 'desktop' | 'tablet' | 'mobile'): void {
+    this.viewportMode.set(mode);
+  }
 
   toggleViewMode(): void {
     this.viewMode.update(m => m === 'sidebar' ? 'dialog' : 'sidebar');
@@ -183,6 +219,8 @@ export class PageBuilderComponent implements OnInit, OnDestroy {
     this.viewMode.set('sidebar');
     this.selectedSection.set(null);
   }
+
+  // ── Section Actions ───────────────────────────────────────────────────────
 
   addSection(type: string): void {
     const def = this.sectionRegistry[type];
@@ -199,27 +237,41 @@ export class PageBuilderComponent implements OnInit, OnDestroy {
     };
 
     this.sections.update(s => [...s, newSection]);
+    this.hasUnsavedChanges.set(true);
     this.selectSection(newSection);
     this.showAddMenu.set(false);
 
-    // Scroll canvas to new section
     setTimeout(() => {
       document.getElementById('preview-container')
         ?.scrollTo({ top: 999999, behavior: 'smooth' });
     }, 80);
   }
 
-  // selectSection(section: PageSection): void {
-  //   if (this.viewMode() === 'sidebar' && this.sidebarState() === 'full') {
-  //     this.sidebarState.set('split');
-  //   }
-  //   // Deep-clone to prevent direct mutation before explicit save
-  //   try {
-  //     this.selectedSection.set(JSON.parse(JSON.stringify(section)));
-  //   } catch {
-  //     this.selectedSection.set(section);
-  //   }
-  // }
+  selectSection(section: PageSection): void {
+    if (this.viewMode() === 'sidebar' && this.sidebarState() === 'full') {
+      this.sidebarState.set('split');
+    }
+
+    if (this.selectedSection()?.id === section.id) return;
+
+    try {
+      this.selectedSection.set(JSON.parse(JSON.stringify(section)));
+    } catch {
+      this.selectedSection.set(section);
+    }
+
+    setTimeout(() => {
+      const sidebarPanel = document.querySelector<HTMLElement>(
+        '.builder-workbench__sidebar .p-tabpanels'
+      );
+      if (sidebarPanel) sidebarPanel.scrollTop = 0;
+
+      const dialogPanel = document.querySelector<HTMLElement>(
+        '.builder-floating-panel .p-dialog-content'
+      );
+      if (dialogPanel) dialogPanel.scrollTop = 0;
+    }, 0);
+  }
 
   deselectSection(): void {
     this.selectedSection.set(null);
@@ -229,6 +281,7 @@ export class PageBuilderComponent implements OnInit, OnDestroy {
     event.stopPropagation();
     if (!confirm('Remove this section?')) return;
     this.sections.update(list => list.filter(s => s.id !== id));
+    this.hasUnsavedChanges.set(true);
     if (this.selectedSection()?.id === id) {
       this.selectedSection.set(null);
     }
@@ -238,48 +291,46 @@ export class PageBuilderComponent implements OnInit, OnDestroy {
     const list = [...this.sections()];
     moveItemInArray(list, event.previousIndex, event.currentIndex);
     this.sections.set(list);
+    this.hasUnsavedChanges.set(true);
   }
 
-  // onConfigChange(newConfig: Record<string, any>): void {
-  //   const current = this.selectedSection();
-  //   if (!current) return;
+  onConfigChange(newConfig: Record<string, any>): void {
+    const current = this.selectedSection();
+    if (!current) return;
 
-  //   // ✅ FIX: Only overwrite keys where newConfig has a real value.
-  //   // If the form emits null/undefined for a key (e.g. an optional field
-  //   // left blank), we keep the section's existing saved value instead of
-  //   // wiping it out. This is critical for preserving items[] arrays after
-  //   // selecting a section that has pre-saved content.
-  //   const merged: Record<string, any> = { ...current.config };
-  //   for (const [k, v] of Object.entries(newConfig)) {
-  //     if (v !== null && v !== undefined) {
-  //       merged[k] = v;
-  //     }
-  //   }
+    for (const [k, v] of Object.entries(newConfig)) {
+      if (v !== null && v !== undefined) {
+        current.config[k] = v;
+      }
+    }
 
-  //   const updated: PageSection = { ...current, config: merged };
-  //   this.selectedSection.set(updated);
-  //   this.sections.update(list => list.map(s => s.id === updated.id ? updated : s));
-  // }
+    this.hasUnsavedChanges.set(true);
 
-  // ── API actions ───────────────────────────────────────────────────────────
+    this.sections.update(list =>
+      list.map(s =>
+        s.id === current.id
+          ? { ...s, config: { ...current.config } }
+          : s
+      )
+    );
+  }
+
+  // ── Draft Save (With Optimistic Concurrency) ──────────────────────────────
 
   savePage(): void {
-    const pageId = this.page()?._id;
+    const currentPage = this.page();
+    const pageId = currentPage?._id;
     if (!pageId) return;
 
     this.isSaving.set(true);
     this.saveError.set(null);
 
-    // ✅ FIX: Only send fields the backend actually expects.
-    // 'position' and 'dataSource' are NOT in the section schema — removed.
     const sections = this.sections().map(s => {
-      // Strip null/empty string values from config to keep payload clean
       const config: Record<string, any> = {};
       for (const [k, v] of Object.entries(s.config ?? {})) {
         if (v !== null && v !== '') config[k] = v;
       }
 
-      // Type coercions that the backend validators require
       if (s.type === 'product_grid' && config['columns']) {
         config['columns'] = Number(config['columns']);
       }
@@ -306,36 +357,96 @@ export class PageBuilderComponent implements OnInit, OnDestroy {
       };
     });
 
-    this.adminService.updatePage(pageId, { sections }).pipe(takeUntil(this.destroy$)).subscribe({
-      next: () => this.isSaving.set(false),
+    this.adminService.updatePage(pageId, {
+      sections,
+      expectedVersion: currentPage.version
+    }).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (res: any) => {
+        this.isSaving.set(false);
+        if (res.data) {
+          this.page.set(res.data);
+        }
+        this.hasUnsavedChanges.set(false);
+      },
       error: (err: any) => {
         this.isSaving.set(false);
-        this.saveError.set(err?.error?.message ?? 'Save failed. Please try again.');
+        if (err.status === 409) {
+          const conflict = err.error?.data ?? {
+            serverVersion: (currentPage.version ?? 1) + 1,
+            yourVersion: currentPage.version ?? 1
+          };
+          this.conflictData.set(conflict);
+          this.showConflictModal.set(true);
+          this.saveError.set('Conflict: Another user or tab modified this page. Please review.');
+        } else {
+          this.saveError.set(err?.error?.message ?? 'Save failed. Please try again.');
+        }
       }
     });
   }
 
-  togglePublish(): void {
+  // ── Publishing Lifecycle ──────────────────────────────────────────────────
+
+  promptPublish(): void {
+    this.showPublishModal.set(true);
+  }
+
+  confirmPublish(): void {
     const page = this.page();
     if (!page?._id) return;
 
-    const action = page.isPublished ? 'unpublish' : 'publish';
-    const request$ = page.isPublished
-      ? this.adminService.unpublishPage(page._id)
-      : this.adminService.publishPage(page._id);
-
     this.isSaving.set(true);
-    request$.pipe(takeUntil(this.destroy$)).subscribe({
+    this.adminService.publishPage(page._id).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         this.page.set(res.data);
+        this.hasUnsavedChanges.set(false);
+        this.isSaving.set(false);
+        this.showPublishModal.set(false);
+      },
+      error: (err: any) => {
+        this.isSaving.set(false);
+        this.saveError.set(err?.error?.message ?? 'Failed to publish page.');
+      }
+    });
+  }
+
+  unpublishPage(): void {
+    const page = this.page();
+    if (!page?._id) return;
+    if (!confirm('Are you sure you want to unpublish this page? It will no longer be visible to public visitors.')) return;
+
+    this.isSaving.set(true);
+    this.adminService.unpublishPage(page._id).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (res: any) => {
+        this.page.set(res.data);
+        this.hasUnsavedChanges.set(false);
         this.isSaving.set(false);
       },
       error: (err: any) => {
         this.isSaving.set(false);
-        this.saveError.set(err?.error?.message ?? `Failed to ${action} page.`);
+        this.saveError.set(err?.error?.message ?? 'Failed to unpublish page.');
       }
     });
   }
+
+  openDraftPreview(): void {
+    const pageId = this.page()?._id;
+    if (!pageId) return;
+
+    this.isLoadingPreview.set(true);
+    this.adminService.getDraftPreview(pageId).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (res: any) => {
+        this.isLoadingPreview.set(false);
+        this.previewData.set(res.data);
+        this.showPreviewModal.set(true);
+      },
+      error: (err: any) => {
+        this.isLoadingPreview.set(false);
+        this.saveError.set(err?.error?.message ?? 'Failed to generate draft preview.');
+      }
+    });
+  }
+
   scrollToTop(): void {
     document.getElementById('preview-container')?.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -367,6 +478,7 @@ export class PageBuilderComponent implements OnInit, OnDestroy {
     existing.forEach(add);
     return Array.from(ids);
   }
+
   deletePage(): void {
     const page = this.page();
     if (!page?._id) return;
@@ -385,86 +497,5 @@ export class PageBuilderComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-  }
-
-
-  // ============================================================================
-// Drop these two methods into PageBuilderComponent, replacing the originals.
-// ============================================================================
-
-  // ── selectSection ─────────────────────────────────────────────────────────
-  //
-  // Key changes vs original:
-  //   1. Guard: skip if the same section is already selected (no-op).
-  //      Prevents unnecessary form rebuilds when clicking the active layer.
-  //   2. Scroll reset targets the PrimeNG .p-tabpanels element (the actual
-  //      scroll container) instead of the outer wrapper.
-  //   3. Reset happens AFTER Angular renders the new form (setTimeout 0).
-
-  selectSection(section: PageSection): void {
-    if (this.viewMode() === 'sidebar' && this.sidebarState() === 'full') {
-      this.sidebarState.set('split');
-    }
-
-    // No-op: clicking the already-selected layer should not rebuild the form.
-    if (this.selectedSection()?.id === section.id) return;
-
-    try {
-      this.selectedSection.set(JSON.parse(JSON.stringify(section)));
-    } catch {
-      this.selectedSection.set(section);
-    }
-
-    // Scroll the config panel back to top only when switching sections.
-    // Wait one tick so Angular has rendered the new section's form.
-    setTimeout(() => {
-      // PrimeNG Tabs: the .p-tabpanels div is the real scroll surface.
-      const sidebarPanel = document.querySelector<HTMLElement>(
-        '.builder-workbench__sidebar .p-tabpanels'
-      );
-      if (sidebarPanel) sidebarPanel.scrollTop = 0;
-
-      // Floating dialog mode: PrimeNG wraps content in .p-dialog-content.
-      const dialogPanel = document.querySelector<HTMLElement>(
-        '.builder-floating-panel .p-dialog-content'
-      );
-      if (dialogPanel) dialogPanel.scrollTop = 0;
-    }, 0);
-  }
-
-
-  // ── onConfigChange ────────────────────────────────────────────────────────
-  //
-  // KEY FIX — this is the root cause of the scroll-to-top bug.
-  //
-  // Original called selectedSection.set(updated) with a new object reference
-  // on every keystroke. Angular's @if block detected the new reference,
-  // destroyed and recreated the config panel DOM, resetting scrollTop to 0.
-  //
-  // Fix: mutate current.config in place instead of replacing the signal.
-  // The @if block sees the same object → no DOM teardown → scroll preserved.
-  // The canvas sections() list is still updated immutably for live preview.
-
-  onConfigChange(newConfig: Record<string, any>): void {
-    const current = this.selectedSection();
-    if (!current) return;
-
-    // Merge incoming values into the existing config object IN PLACE.
-    // Skips null/undefined so optional fields don't wipe previously saved data.
-    for (const [k, v] of Object.entries(newConfig)) {
-      if (v !== null && v !== undefined) {
-        current.config[k] = v;
-      }
-    }
-
-    // Update the canvas sections list (immutable spread drives live preview).
-    // selectedSection signal reference is intentionally NOT updated here.
-    this.sections.update(list =>
-      list.map(s =>
-        s.id === current.id
-          ? { ...s, config: { ...current.config } }
-          : s
-      )
-    );
   }
 }
