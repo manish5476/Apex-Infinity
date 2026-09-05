@@ -7,6 +7,8 @@ import { takeUntil } from 'rxjs/operators';
 import { AutoCompleteCompleteEvent, AutoCompleteModule } from 'primeng/autocomplete';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { ToastModule } from "primeng/toast";
@@ -36,6 +38,8 @@ import { SearchFilterComponent } from '@shared/ui/filters/search-filter.componen
     ConfirmDialogModule,
     RouterModule,
     InputTextModule,
+    IconFieldModule,
+    InputIconModule,
     ToastModule,
     HasPermissionDirective,
     MasterDropdownComponent,
@@ -84,7 +88,8 @@ import { SearchFilterComponent } from '@shared/ui/filters/search-filter.componen
           endpoint="customers" 
           [(ngModel)]="customerFilter._id" 
           (onSelect)="applyFilters()" 
-          placeholder="Select Customer">
+          placeholder="Select Customer"
+          class="w-56">
         </app-master-dropdown>
 
         <p-autoComplete 
@@ -95,14 +100,18 @@ import { SearchFilterComponent } from '@shared/ui/filters/search-filter.componen
           (keyup.enter)="applyFilters()"
           [forceSelection]="false" 
           placeholder="Email" 
-          styleClass="w-full">
+          styleClass="w-48">
         </p-autoComplete>
 
-        <input type="text" pInputText
-          [(ngModel)]="customerFilter.phone" 
-          (keydown.enter)="applyFilters()" 
-          (blur)="applyFilters()" 
-          placeholder="Phone" />
+        <p-iconField iconPosition="left" class="w-44">
+          <p-inputIcon styleClass="pi pi-phone text-[var(--text-tertiary)] text-xs"></p-inputIcon>
+          <input type="text" pInputText
+            [(ngModel)]="customerFilter.phone" 
+            (keydown.enter)="applyFilters()" 
+            (blur)="applyFilters()" 
+            placeholder="Phone"
+            class="w-full h-[38px] text-sm" />
+        </p-iconField>
 
         <app-search-filter
           [value]="customerFilter.search"

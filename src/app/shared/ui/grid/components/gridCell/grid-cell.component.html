@@ -189,9 +189,17 @@
         }
 
         @case ('rightAligned') {
-          <span class="text-[length:var(--font-size-xs)] text-[var(--text-primary)] w-full block truncate text-right">
-            {{ formattedValue() || '—' }}
-          </span>
+          @if (isHtmlFormatted()) {
+            <div class="w-full h-full flex items-center min-w-0 justify-end text-right" [innerHTML]="safeFormattedHtml()"></div>
+          } @else {
+            <span class="text-[length:var(--font-size-xs)] text-[var(--text-primary)] w-full block truncate text-right">
+              {{ formattedValue() || '—' }}
+            </span>
+          }
+        }
+
+        @case ('html') {
+          <div class="w-full h-full flex items-center min-w-0" [ngClass]="alignClass()" [innerHTML]="safeFormattedHtml()"></div>
         }
 
         @case ('boolean') {
@@ -344,13 +352,17 @@
         <!-- Default: Text / Formatted / Raw -->
         @default {
           @if (formattedValue()) {
-            <span
-              class="truncate block w-full text-[length:var(--font-size-xs)] text-[var(--text-primary)]"
-              [pTooltip]="formattedValue()"
-              tooltipPosition="top"
-              [tooltipDisabled]="!formattedValue()">
-              {{ formattedValue() }}
-            </span>
+            @if (isHtmlFormatted()) {
+              <div class="w-full h-full flex items-center min-w-0" [ngClass]="alignClass()" [innerHTML]="safeFormattedHtml()"></div>
+            } @else {
+              <span
+                class="truncate block w-full text-[length:var(--font-size-xs)] text-[var(--text-primary)]"
+                [pTooltip]="formattedValue()"
+                tooltipPosition="top"
+                [tooltipDisabled]="!formattedValue()">
+                {{ formattedValue() }}
+              </span>
+            }
           } @else {
             <span class="text-[var(--text-tertiary)] w-full text-center block">—</span>
           }

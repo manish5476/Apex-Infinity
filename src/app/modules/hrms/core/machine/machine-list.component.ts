@@ -14,7 +14,10 @@ import { takeUntil } from 'rxjs/operators';
 
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 import { SelectModule } from 'primeng/select';
+import { TooltipModule } from 'primeng/tooltip';
 
 import { DataGridComponent, GridColumn, GridRowAction } from '@shared/ui/grid';
 import { PageComponent } from '@shared/ui/layout/page/page.component';
@@ -33,7 +36,10 @@ import { HRMSService } from '../../hrms.service';
     RouterModule,
     ButtonModule,
     InputTextModule,
+    IconFieldModule,
+    InputIconModule,
     SelectModule,
+    TooltipModule,
     DataGridComponent,
     PageComponent,
     PageHeaderComponent,
@@ -62,50 +68,73 @@ import { HRMSService } from '../../hrms.service';
       </app-page-header>
 
       <app-page-content [padded]="true">
-        <div class="filter-toolbar">
-          <div class="filter-toolbar__search">
-            <input type="text" pInputText
-              [(ngModel)]="filter.search"
-              (keydown.enter)="applyFilters()"
-              (blur)="applyFilters()"
-              placeholder="Name, Serial or IP..." />
+        <div class="flex flex-row flex-wrap items-end gap-3 p-3.5 bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl shadow-xs w-full mb-3">
+          <div class="flex flex-col gap-1.5 flex-[1.5] min-w-[200px]">
+            <label class="text-[11px] font-bold text-[var(--text-tertiary)] uppercase tracking-wider pl-0.5">Search</label>
+            <p-iconField iconPosition="left" class="w-full relative flex items-center">
+              <p-inputIcon styleClass="pi pi-search text-[var(--text-tertiary)] text-xs"></p-inputIcon>
+              <input type="text" pInputText
+                [(ngModel)]="filter.search"
+                (keydown.enter)="applyFilters()"
+                (blur)="applyFilters()"
+                placeholder="Name, Serial or IP..."
+                class="w-full h-[38px] text-sm pl-8 pr-3 rounded-lg bg-[var(--bg-primary)] border-[var(--border-secondary)]" />
+            </p-iconField>
           </div>
-          <div class="filter-toolbar__filters">
+
+          <div class="flex flex-col gap-1.5 flex-1 min-w-[160px]">
+            <label class="text-[11px] font-bold text-[var(--text-tertiary)] uppercase tracking-wider pl-0.5">Connection</label>
             <p-select
               [options]="connectionOptions"
               [(ngModel)]="filter.connectionStatus"
               [showClear]="true"
-              placeholder="Connection"
+              placeholder="All Connections"
+              appendTo="body"
+              styleClass="w-full h-[38px] text-sm rounded-lg"
               (onChange)="applyFilters()">
             </p-select>
+          </div>
+
+          <div class="flex flex-col gap-1.5 flex-1 min-w-[140px]">
+            <label class="text-[11px] font-bold text-[var(--text-tertiary)] uppercase tracking-wider pl-0.5">State</label>
             <p-select
               [options]="statusOptions"
               [(ngModel)]="filter.status"
               [showClear]="true"
-              placeholder="State"
+              placeholder="All States"
+              appendTo="body"
+              styleClass="w-full h-[38px] text-sm rounded-lg"
               (onChange)="applyFilters()">
             </p-select>
-            <p-button icon="pi pi-times" [text]="true" severity="secondary"
-              pTooltip="Reset" (onClick)="resetFilters()">
+          </div>
+
+          <div class="flex items-center gap-2 pb-0.5 ml-auto">
+            <p-button
+              icon="pi pi-filter-slash"
+              label="Reset"
+              [text]="true"
+              severity="secondary"
+              pTooltip="Reset Filters"
+              styleClass="h-[38px] px-3 text-sm rounded-lg"
+              (onClick)="resetFilters()">
             </p-button>
           </div>
         </div>
 
-        <app-data-grid
-          [columns]="columns"
-          [data]="data()"
-          [loading]="isLoading()"
-          [rowActions]="rowActions"
-          (gridEvent)="eventFromGrid($event)">
-        </app-data-grid>
+        <div class="flex-1 min-h-0 overflow-hidden">
+          <app-data-grid
+            [columns]="columns"
+            [data]="data()"
+            [loading]="isLoading()"
+            [rowActions]="rowActions"
+            (gridEvent)="eventFromGrid($event)">
+          </app-data-grid>
+        </div>
       </app-page-content>
     </app-page>
   `,
   styles: [`
     :host { display: flex; flex-direction: column; flex: 1; min-height: 0; width: 100%; height: 100%; }
-    .filter-toolbar { display: flex; align-items: center; gap: var(--spacing-md); flex-wrap: wrap; margin-bottom: var(--spacing-md); }
-    .filter-toolbar__search { min-width: 200px; max-width: 300px; flex: 1; }
-    .filter-toolbar__filters { display: flex; align-items: center; gap: var(--spacing-md); flex-wrap: wrap; flex: 1; }
   `]
 })
 export class MachineListComponent implements OnInit, OnDestroy {

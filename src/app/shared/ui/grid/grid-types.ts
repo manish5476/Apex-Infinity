@@ -23,7 +23,8 @@ export type GridColumnType =
   // Links & Actions
   | 'email' | 'phone' | 'url' | 'action'
   // Advanced & Aliases
-  | 'formula' | 'custom' | 'rightAligned' | 'numeric';
+  | 'formula' | 'custom' | 'rightAligned' | 'numeric' | 'html'
+  | (string & {});
 
 // ─── Select Option ────────────────────────────────────────────────────────────
 export interface SelectOption {
@@ -49,7 +50,7 @@ export interface GridColumn<T = any> {
   // Identity
   field: string;
   header?: string;
-  type?: GridColumnType | string;
+  type?: GridColumnType;
 
   // Legacy ag-grid compat
   headerName?: string;

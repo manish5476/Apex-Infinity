@@ -18,7 +18,8 @@ export interface StatusOption {
                 (ngModelChange)="valueChange.emit($event)"
                 [showClear]="true" 
                 [placeholder]="placeholder()"
-                styleClass="w-full sm:w-40 h-9 text-sm">
+                appendTo="body"
+                styleClass="w-full sm:w-40 h-[38px] text-sm rounded-[var(--ui-border-radius)]">
     </p-select>
   `,
 })

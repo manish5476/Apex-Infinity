@@ -18,6 +18,8 @@ import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 import { ProductService } from '../../services/product-service';
 import { AppMessageService } from '../../../../core/services/message.service';
 // import { MasterListService } from '../../../../core/services/master-list.service';
@@ -46,6 +48,8 @@ import { CommonMethodService } from '../../../../core/utils/common-method.servic
     FormsModule,
     ButtonModule,
     InputTextModule,
+    IconFieldModule,
+    InputIconModule,
     RouterModule,
     DataGridComponent,
     Dialog,
@@ -55,7 +59,6 @@ import { CommonMethodService } from '../../../../core/utils/common-method.servic
     MasterDropdownComponent,
     PageComponent,
     PageHeaderComponent,
-    PageToolbarComponent,
     PageContentComponent
   ],
   providers: [ConfirmationService, DecimalPipe],

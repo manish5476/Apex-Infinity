@@ -20,6 +20,7 @@ import { Component, ChangeDetectionStrategy, input } from '@angular/core';
     <div class="app-page-toolbar" [class.app-page-toolbar--padded]="padded()">
       <div class="app-page-toolbar__left">
         <ng-content select="[toolbar-left]"></ng-content>
+        <ng-content></ng-content>
       </div>
       <div class="app-page-toolbar__right">
         <ng-content select="[toolbar-right]"></ng-content>
@@ -45,11 +46,12 @@ import { Component, ChangeDetectionStrategy, input } from '@angular/core';
       .app-page-toolbar {
         flex-direction: row;
         align-items: center;
+        flex-wrap: wrap;
       }
     }
 
     .app-page-toolbar--padded {
-      padding: var(--spacing-lg) var(--spacing-3xl);
+      padding: var(--spacing-md) var(--spacing-2xl);
     }
 
     .app-page-toolbar__left {
@@ -58,6 +60,7 @@ import { Component, ChangeDetectionStrategy, input } from '@angular/core';
       gap: var(--spacing-md);
       flex: 1;
       min-width: 0;
+      flex-wrap: wrap;
     }
 
     .app-page-toolbar__right {

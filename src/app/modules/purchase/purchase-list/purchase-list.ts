@@ -97,14 +97,16 @@ import { MasterDropdownComponent } from '../../shared/components/masterFilterDro
           endpoint="suppliers"
           [(ngModel)]="purchaseFilter.supplierId"
           (onChange)="applyFilters()"
-          placeholder="Supplier">
+          placeholder="Supplier"
+          class="w-48">
         </app-master-dropdown>
 
         <app-master-dropdown
           endpoint="branches"
           [(ngModel)]="purchaseFilter.branchId"
           (onChange)="applyFilters()"
-          placeholder="Branch">
+          placeholder="Branch"
+          class="w-48">
         </app-master-dropdown>
 
         <app-select-filter

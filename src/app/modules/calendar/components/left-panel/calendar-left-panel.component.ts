@@ -6,7 +6,7 @@ import { CalendarFacade } from '../../facade/calendar.facade';
 @Component({
   selector: 'app-calendar-left-panel',
   standalone: true,
-  imports: [CommonModule, DatePipe],
+  imports: [CommonModule],
   template: `
     <aside class="w-64 h-full bg-slate-50 dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 hidden xl:flex flex-col">
       <!-- Mini Calendar -->
@@ -114,16 +114,16 @@ export class CalendarLeftPanelComponent {
   miniCalendarDays = computed(() => {
     const start = this.store.rangeStart();
     if (!start) return [];
-    
+
     const monthStart = new Date(start.getFullYear(), start.getMonth(), 1);
     const startDate = new Date(monthStart);
     const dayOfWeek = startDate.getDay();
     startDate.setDate(startDate.getDate() - dayOfWeek);
-    
+
     const days = [];
     const today = new Date();
-    today.setHours(0,0,0,0);
-    
+    today.setHours(0, 0, 0, 0);
+
     for (let i = 0; i < 42; i++) {
       const current = new Date(startDate);
       days.push({

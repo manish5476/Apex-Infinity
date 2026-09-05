@@ -3,11 +3,11 @@
     title="Product Management"
     subtitle="Manage inventory, prices, and product details.">
     <div header-left>
-      <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-[color-mix(in_srgb,var(--accent-primary)_12%,transparent)] text-[var(--accent-primary)] mr-3">
-        <i class="pi pi-box text-xl"></i>
+      <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-[color-mix(in_srgb,var(--accent-primary)_12%,transparent)] text-[var(--accent-primary)] mr-3">
+        <i class="pi pi-box text-lg"></i>
       </div>
     </div>
-    <div header-right class="flex items-center gap-3">
+    <div header-right class="flex items-center gap-2.5">
       <!-- Hidden file input -->
       <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" multiple style="display: none;">
 
@@ -17,7 +17,7 @@
       </p-button>
 
       <p-button *hasPermission="PERMISSIONS.PRODUCT.DELETE" [disabled]="selectedRows().length !== 1"
-        label="Delete Product" icon="pi pi-trash" (onClick)="deleteProduct()"
+        label="Delete" icon="pi pi-trash" (onClick)="deleteProduct()"
         severity="danger" [outlined]="true">
       </p-button>
 
@@ -27,58 +27,126 @@
     </div>
   </app-page-header>
 
-  <app-page-toolbar>
-    <div class="flex-1 min-w-[200px]">
-      <input id="name" type="text" pInputText [ngModel]="productFilter().name"
-        (ngModelChange)="patchProductFilter('name', $event)" placeholder="Search by name..." class="w-full" />
+  <app-page-content [padded]="true">
+    <!-- Sleek Filter Bar -->
+    <div class="flex flex-row flex-wrap items-end gap-3 p-3.5 bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl shadow-xs w-full mb-3">
+      <!-- Product Name -->
+      <div class="flex flex-col gap-1.5 flex-[1.4] min-w-[170px]">
+        <label class="text-[11px] font-bold text-[var(--text-tertiary)] uppercase tracking-wider pl-0.5">Product Name</label>
+        <p-iconField iconPosition="left" class="w-full relative flex items-center">
+          <p-inputIcon styleClass="pi pi-search text-[var(--text-tertiary)] text-xs"></p-inputIcon>
+          <input
+            id="name"
+            type="text"
+            pInputText
+            [ngModel]="productFilter().name"
+            (ngModelChange)="patchProductFilter('name', $event)"
+            (keydown.enter)="applyFilters()"
+            placeholder="Search name..."
+            class="w-full h-[38px] text-sm pl-8 pr-3 rounded-lg bg-[var(--bg-primary)] border-[var(--border-secondary)]" />
+        </p-iconField>
+      </div>
+
+      <!-- SKU -->
+      <div class="flex flex-col gap-1.5 flex-1 min-w-[130px]">
+        <label class="text-[11px] font-bold text-[var(--text-tertiary)] uppercase tracking-wider pl-0.5">SKU</label>
+        <p-iconField iconPosition="left" class="w-full relative flex items-center">
+          <p-inputIcon styleClass="pi pi-barcode text-[var(--text-tertiary)] text-xs"></p-inputIcon>
+          <input
+            id="sku"
+            type="text"
+            pInputText
+            [ngModel]="productFilter().sku"
+            (ngModelChange)="patchProductFilter('sku', $event)"
+            (keydown.enter)="applyFilters()"
+            placeholder="SKU code..."
+            class="w-full h-[38px] text-sm pl-8 pr-3 rounded-lg bg-[var(--bg-primary)] border-[var(--border-secondary)]" />
+        </p-iconField>
+      </div>
+
+      <!-- Brand -->
+      <div class="flex flex-col gap-1.5 flex-1 min-w-[140px]">
+        <label class="text-[11px] font-bold text-[var(--text-tertiary)] uppercase tracking-wider pl-0.5">Brand</label>
+        <app-master-dropdown
+          endpoint="brands"
+          [ngModel]="productFilter().brandId"
+          (ngModelChange)="patchProductFilter('brandId', $event)"
+          placeholder="Select Brand">
+        </app-master-dropdown>
+      </div>
+
+      <!-- Category -->
+      <div class="flex flex-col gap-1.5 flex-1 min-w-[140px]">
+        <label class="text-[11px] font-bold text-[var(--text-tertiary)] uppercase tracking-wider pl-0.5">Category</label>
+        <app-master-dropdown
+          endpoint="categories"
+          [ngModel]="productFilter().categoryId"
+          (ngModelChange)="patchProductFilter('categoryId', $event)"
+          placeholder="Select Category">
+        </app-master-dropdown>
+      </div>
+
+      <!-- Sub-Category -->
+      <div class="flex flex-col gap-1.5 flex-1 min-w-[140px]">
+        <label class="text-[11px] font-bold text-[var(--text-tertiary)] uppercase tracking-wider pl-0.5">Sub-Category</label>
+        <app-master-dropdown
+          endpoint="subcategories"
+          [extraParams]="{ parentId: productFilter().categoryId }"
+          [ngModel]="productFilter().subCategoryId"
+          (ngModelChange)="patchProductFilter('subCategoryId', $event)"
+          placeholder="Select Sub-Category">
+        </app-master-dropdown>
+      </div>
+
+      <!-- Unit -->
+      <div class="flex flex-col gap-1.5 flex-[0.8] min-w-[110px]">
+        <label class="text-[11px] font-bold text-[var(--text-tertiary)] uppercase tracking-wider pl-0.5">Unit</label>
+        <app-master-dropdown
+          endpoint="units"
+          [ngModel]="productFilter().unitId"
+          (ngModelChange)="patchProductFilter('unitId', $event)"
+          placeholder="Select Unit">
+        </app-master-dropdown>
+      </div>
+
+      <!-- Status -->
+      <div class="flex flex-col gap-1.5 flex-[0.8] min-w-[120px]">
+        <label class="text-[11px] font-bold text-[var(--text-tertiary)] uppercase tracking-wider pl-0.5">Status</label>
+        <p-select
+          appendTo="body"
+          id="status"
+          [options]="[
+            { label: 'All Status', value: null },
+            { label: 'Active', value: true },
+            { label: 'Inactive', value: false }
+          ]"
+          [ngModel]="productFilter().isActive"
+          (ngModelChange)="patchProductFilter('isActive', $event)"
+          [showClear]="false"
+          placeholder="All Status"
+          styleClass="w-full h-[38px] flex items-center rounded-lg bg-[var(--bg-primary)] border-[var(--border-secondary)]">
+        </p-select>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex items-center gap-2 self-end h-[38px] shrink-0">
+        <p-button
+          label="Apply"
+          icon="pi pi-filter"
+          (onClick)="applyFilters()"
+          styleClass="h-[38px] px-4 rounded-lg shadow-xs font-semibold">
+        </p-button>
+        <p-button
+          label="Reset"
+          icon="pi pi-refresh"
+          severity="secondary"
+          [text]="true"
+          (onClick)="resetFilters()"
+          styleClass="h-[38px] px-3 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]">
+        </p-button>
+      </div>
     </div>
 
-    <div class="flex-1 min-w-[120px]">
-      <input id="sku" type="text" pInputText [ngModel]="productFilter().sku"
-        (ngModelChange)="patchProductFilter('sku', $event)" placeholder="Search by SKU" class="w-full" />
-    </div>
-
-    <div class="flex-1 min-w-[150px]">
-      <app-master-dropdown endpoint="brands" [ngModel]="productFilter().brandId"
-        (ngModelChange)="patchProductFilter('brandId', $event)" placeholder="Select Brand">
-      </app-master-dropdown>
-    </div>
-
-    <div class="flex-1 min-w-[150px]">
-      <app-master-dropdown endpoint="categories" [ngModel]="productFilter().categoryId"
-        (ngModelChange)="patchProductFilter('categoryId', $event)" placeholder="Select Category">
-      </app-master-dropdown>
-    </div>
-
-    <div class="flex-1 min-w-[150px]">
-      <app-master-dropdown endpoint="subcategories" [extraParams]="{ parentId: productFilter().categoryId }"
-        [ngModel]="productFilter().subCategoryId" (ngModelChange)="patchProductFilter('subCategoryId', $event)"
-        placeholder="Select Sub-Category">
-      </app-master-dropdown>
-    </div>
-
-    <div class="flex-1 min-w-[120px]">
-      <app-master-dropdown endpoint="units" [ngModel]="productFilter().unitId"
-        (ngModelChange)="patchProductFilter('unitId', $event)" placeholder="Select Unit">
-      </app-master-dropdown>
-    </div>
-
-    <div class="flex-1 min-w-[120px]">
-      <p-select appendTo="body" id="status" [options]="[
-          { label: 'All', value: null },
-          { label: 'Active', value: true },
-          { label: 'Inactive', value: false }
-        ]" [ngModel]="productFilter().isActive" (ngModelChange)="patchProductFilter('isActive', $event)"
-        [showClear]="false" placeholder="All Status" styleClass="w-full">
-      </p-select>
-    </div>
-
-    <p-button label="Apply" icon="pi pi-check" (onClick)="applyFilters()"></p-button>
-    <p-button label="Reset" icon="pi pi-refresh" severity="secondary" [text]="true"
-      (onClick)="resetFilters()"></p-button>
-  </app-page-toolbar>
-
-  <app-page-content>
     <app-data-grid [viewOnly]="true" [columns]="column()" [data]="data()" selectionMode="multiple"
       (gridEvent)="eventFromGrid($event)">
     </app-data-grid>

@@ -14,11 +14,11 @@
       </div>
     </ng-container>
 
-    <div class="flex items-center gap-2">
-      <span class="p-input-icon-left">
-        <i class="pi pi-search"></i>
-        <input type="text" pInputText [(ngModel)]="branchFilter.name" (keydown.enter)="applyFilters()" placeholder="Search by name..." class="w-64" />
-      </span>
+    <div class="flex items-center gap-3">
+      <p-iconField iconPosition="left" class="w-64">
+        <p-inputIcon styleClass="pi pi-search text-[var(--text-tertiary)] text-xs"></p-inputIcon>
+        <input type="text" pInputText [(ngModel)]="branchFilter.name" (keydown.enter)="applyFilters()" placeholder="Search by name..." class="w-full h-[38px] text-sm" />
+      </p-iconField>
       <p-button *hasPermission="PERMISSIONS.BRANCH.MANAGE" label="New Branch" icon="pi pi-plus" routerLink="create"></p-button>
     </div>
   </app-page-header>

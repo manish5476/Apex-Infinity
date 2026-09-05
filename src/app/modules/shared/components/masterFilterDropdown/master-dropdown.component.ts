@@ -97,22 +97,42 @@ import {
     :host {
       display: block;
       width: 100%;
+      min-width: 0;
     }
 
     .master-dropdown {
       width: 100%;
+      min-width: 0;
+      position: relative;
     }
 
     :host ::ng-deep .master-dropdown__control.p-select,
     :host ::ng-deep .master-dropdown__control.p-multiselect {
       width: 100%;
+      min-width: 0;
       align-items: center;
+      border-radius: var(--ui-border-radius);
+      transition: all var(--transition-fast);
     }
 
     :host ::ng-deep .master-dropdown__control .p-select-label,
     :host ::ng-deep .master-dropdown__control .p-multiselect-label {
       display: flex;
       align-items: center;
+      font-size: var(--font-size-sm);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    :host ::ng-deep .master-dropdown__control .p-multiselect-token {
+      padding: 1px 6px;
+      margin: 1px 2px;
+      border-radius: var(--ui-border-radius-sm);
+      font-size: 11px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-secondary);
+      color: var(--text-primary);
     }
   `],
   providers: [

@@ -171,6 +171,20 @@ export class GridCellComponent implements OnChanges {
     return val != null ? String(val) : '';
   });
 
+  readonly isHtmlFormatted = computed<boolean>(() => {
+    const col = this.column();
+    if (col.type === 'html') return true;
+    const val = this.formattedValue();
+    if (!val || typeof val !== 'string') return false;
+    return val.includes('<') && val.includes('>');
+  });
+
+  readonly safeFormattedHtml = computed<SafeHtml | null>(() => {
+    const val = this.formattedValue();
+    if (!val) return null;
+    return this.sanitizer.bypassSecurityTrustHtml(val);
+  });
+
   // ─── Alignment Resolution ──────────────────────────────────────────────────
   readonly alignClass = computed<string>(() => {
     const col = this.column();

@@ -63,6 +63,32 @@
         padding: 0.5rem 0.875rem;
     }
 
+    /* Compact / Filter Bar Context Overrides */
+    .app-page-toolbar .p-inputtext,
+    .app-page-toolbar .p-select,
+    .app-page-toolbar .p-multiselect,
+    .app-page-toolbar .p-datepicker input,
+    .app-page-toolbar .p-autocomplete input,
+    .app-filter-panel .p-inputtext,
+    .app-filter-panel .p-select,
+    .app-filter-panel .p-multiselect,
+    .app-filter-panel .p-datepicker input,
+    .app-filter-panel .p-autocomplete input,
+    .filter-toolbar .p-inputtext,
+    .filter-toolbar .p-select,
+    .filter-toolbar .p-multiselect,
+    .filter-toolbar .p-datepicker input,
+    .filter-toolbar .p-autocomplete input,
+    .p-inputtext.h-9,
+    .p-select.h-9,
+    .p-multiselect.h-9,
+    .p-datepicker.h-9 input {
+        min-height: 38px;
+        height: 38px;
+        padding: 0.4rem 0.75rem;
+        font-size: var(--font-size-sm);
+    }
+
     .p-inputtext:enabled:hover,
     .p-select:not(.p-disabled):hover,
     .p-multiselect:not(.p-disabled):hover,

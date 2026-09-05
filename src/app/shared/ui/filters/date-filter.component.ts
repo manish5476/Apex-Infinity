@@ -13,7 +13,10 @@ import { DatePickerModule } from 'primeng/datepicker';
                   [selectionMode]="selectionMode()" 
                   [placeholder]="placeholder()"
                   [showClear]="true"
-                  styleClass="w-full sm:w-56 h-9 text-sm">
+                  [showIcon]="true"
+                  appendTo="body"
+                  styleClass="w-full sm:w-56 h-[38px] text-sm rounded-[var(--ui-border-radius)]"
+                  inputStyleClass="h-[38px] text-sm">
     </p-datepicker>
   `,
 })

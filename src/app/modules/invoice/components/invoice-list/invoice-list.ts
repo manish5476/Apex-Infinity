@@ -15,9 +15,12 @@ import { finalize, takeUntil } from 'rxjs/operators';
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
+import { TooltipModule } from 'primeng/tooltip';
 
 // Shared UI
 import { DataGridComponent, GridColumn, GridRowAction } from '@shared/ui/grid';
@@ -43,9 +46,12 @@ import { MasterDropdownComponent } from '../../../shared/components/masterFilter
     RouterModule,
     ButtonModule,
     InputTextModule,
+    IconFieldModule,
+    InputIconModule,
     SelectModule,
     DatePickerModule,
     ToastModule,
+    TooltipModule,
     HasPermissionDirective,
     MasterDropdownComponent,
     DataGridComponent,
@@ -80,69 +86,106 @@ import { MasterDropdownComponent } from '../../../shared/components/masterFilter
       </app-page-header>
 
       <app-page-content [padded]="true">
-        <!-- Filter Toolbar -->
-        <div class="filter-toolbar">
-          <div class="filter-toolbar__search">
-            <input
-              type="text"
-              pInputText
-              [(ngModel)]="invoiceFilter.invoiceNumber"
-              placeholder="Invoice No..."
-              (keydown.enter)="applyFilters()"
-              class="w-full" />
+        <!-- ── Ultra-Sleek Filter Bar ─────────────────────────────────────────────── -->
+        <div class="flex flex-row flex-wrap items-end gap-3 p-3.5 bg-[var(--bg-secondary)] border border-[var(--border-secondary)] rounded-xl shadow-xs w-full mb-3">
+          <!-- Search -->
+          <div class="flex flex-col gap-1.5 flex-[1.5] min-w-[200px]">
+            <label class="text-[11px] font-bold text-[var(--text-tertiary)] uppercase tracking-wider pl-0.5">Invoice #</label>
+            <p-iconField iconPosition="left" class="w-full relative flex items-center">
+              <p-inputIcon styleClass="pi pi-search text-[var(--text-tertiary)] text-xs"></p-inputIcon>
+              <input
+                type="text"
+                pInputText
+                [(ngModel)]="invoiceFilter.invoiceNumber"
+                placeholder="Search Invoice #..."
+                (keydown.enter)="applyFilters()"
+                class="w-full h-[38px] text-sm pl-8 pr-3 rounded-lg bg-[var(--bg-primary)] border-[var(--border-secondary)]" />
+            </p-iconField>
           </div>
 
-          <div class="filter-toolbar__filters">
+          <!-- Customer -->
+          <div class="flex flex-col gap-1.5 flex-1 min-w-[180px]">
+            <label class="text-[11px] font-bold text-[var(--text-tertiary)] uppercase tracking-wider pl-0.5">Customer</label>
             <app-master-dropdown
               endpoint="customers"
               [(ngModel)]="invoiceFilter.customerId"
               (onSelect)="applyFilters()"
-              placeholder="Customer">
+              placeholder="All Customers"
+              class="w-full">
             </app-master-dropdown>
+          </div>
 
+          <!-- Status -->
+          <div class="flex flex-col gap-1.5 flex-1 min-w-[140px]">
+            <label class="text-[11px] font-bold text-[var(--text-tertiary)] uppercase tracking-wider pl-0.5">Status</label>
             <p-select
               [options]="statusOptions"
               [(ngModel)]="invoiceFilter.status"
               [showClear]="true"
-              placeholder="Status"
+              placeholder="All Statuses"
+              appendTo="body"
+              styleClass="w-full h-[38px] text-sm rounded-lg"
               (onChange)="applyFilters()">
             </p-select>
+          </div>
 
+          <!-- Payment Status -->
+          <div class="flex flex-col gap-1.5 flex-1 min-w-[140px]">
+            <label class="text-[11px] font-bold text-[var(--text-tertiary)] uppercase tracking-wider pl-0.5">Payment</label>
             <p-select
               [options]="paymentStatusOptions"
               [(ngModel)]="invoiceFilter.paymentStatus"
               [showClear]="true"
-              placeholder="Payment"
+              placeholder="All Payments"
+              appendTo="body"
+              styleClass="w-full h-[38px] text-sm rounded-lg"
               (onChange)="applyFilters()">
             </p-select>
+          </div>
 
+          <!-- Date Range -->
+          <div class="flex flex-col gap-1.5 flex-1 min-w-[210px]">
+            <label class="text-[11px] font-bold text-[var(--text-tertiary)] uppercase tracking-wider pl-0.5">Date Range</label>
             <p-datepicker
               [(ngModel)]="dateRange"
               selectionMode="range"
               [readonlyInput]="true"
-              placeholder="Date Range"
+              placeholder="Start – End Date"
               appendTo="body"
-              (onClose)="applyFilters()">
+              [showIcon]="true"
+              [showClear]="true"
+              styleClass="w-full h-[38px] text-sm rounded-lg"
+              inputStyleClass="w-full h-[38px] text-sm"
+              (onClose)="applyFilters()"
+              (onClear)="applyFilters()"
+              (onClearClick)="applyFilters()">
             </p-datepicker>
+          </div>
 
+          <!-- Actions -->
+          <div class="flex items-center gap-2 pb-0.5 ml-auto">
             <p-button
-              icon="pi pi-times"
+              icon="pi pi-filter-slash"
+              label="Reset"
               [text]="true"
               severity="secondary"
               pTooltip="Reset Filters"
+              styleClass="h-[38px] px-3 text-sm rounded-lg"
               (onClick)="resetFilters()">
             </p-button>
           </div>
         </div>
 
         <!-- DataGrid -->
-        <app-data-grid
-          [columns]="columns"
-          [data]="data()"
-          [loading]="isLoading()"
-          [rowActions]="rowActions"
-          (gridEvent)="eventFromGrid($event)">
-        </app-data-grid>
+        <div class="flex-1 min-h-0 overflow-hidden">
+          <app-data-grid
+            [columns]="columns"
+            [data]="data()"
+            [loading]="isLoading()"
+            [rowActions]="rowActions"
+            (gridEvent)="eventFromGrid($event)">
+          </app-data-grid>
+        </div>
       </app-page-content>
     </app-page>
   `,
@@ -154,28 +197,6 @@ import { MasterDropdownComponent } from '../../../shared/components/masterFilter
       min-height: 0;
       width: 100%;
       height: 100%;
-    }
-
-    .filter-toolbar {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-md);
-      flex-wrap: wrap;
-      margin-bottom: var(--spacing-md);
-
-      &__search {
-        min-width: 200px;
-        max-width: 280px;
-        flex: 1;
-      }
-
-      &__filters {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-md);
-        flex-wrap: wrap;
-        flex: 2;
-      }
     }
   `]
 })

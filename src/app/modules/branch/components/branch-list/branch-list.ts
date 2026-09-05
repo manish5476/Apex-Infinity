@@ -8,6 +8,8 @@ import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { BranchService } from '../../services/branch-service';
 import { Toast } from "primeng/toast";
@@ -28,6 +30,8 @@ import { takeUntil } from "rxjs/operators";
     FormsModule,
     ButtonModule,
     InputTextModule,
+    IconFieldModule,
+    InputIconModule,
     RouterModule,
     Toast,
     DataGridComponent,
