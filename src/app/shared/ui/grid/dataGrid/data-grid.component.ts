@@ -1,7 +1,11 @@
 import { ScrollingModule, CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
 import { CommonModule } from "@angular/common";
 import { Router } from "@angular/router";
-import { Component, ChangeDetectionStrategy, OnDestroy, AfterViewInit, ViewChild, ElementRef, inject, input, output, signal, computed, effect, untracked, HostListener } from "@angular/core";
+import {
+  Component, ChangeDetectionStrategy, OnDestroy, AfterViewInit,
+  ViewChild, ElementRef, inject, input, output, signal, computed,
+  effect, untracked, HostListener
+} from "@angular/core";
 import { MessageService } from "primeng/api";
 import { GridActionsComponent } from "../components/grid-actions.component";
 import { GridColumnManagerComponent } from "../components/grid-column-manager.component";
@@ -15,9 +19,24 @@ import { GridSavedViewsComponent } from "../components/grid-saved-views.componen
 import { GridToolbarComponent } from "../components/grid-toolbar.component";
 import { GridCellComponent } from "../components/gridCell/grid-cell.component";
 import { GridStateService } from "../grid-state.service";
-import { GridColumn, GridDensity, GridRowAction, GridBulkAction, GridPlugin, GridRowSaveEvent, GridBulkActionEvent, GridPageState, GridSortState, GridFilterState, GridSavedView, GridCellChangeEvent, GridContext, GridPersistedState, GridOperationMode, GridQueryPayload, GridColumnHeaderMeta } from "../grid-types";
+import {
+  GridColumn, GridDensity, GridRowAction, GridBulkAction, GridPlugin,
+  GridRowSaveEvent, GridBulkActionEvent, GridPageState, GridSortState,
+  GridFilterState, GridSavedView, GridCellChangeEvent, GridContext,
+  GridPersistedState, GridOperationMode, GridQueryPayload, GridColumnHeaderMeta,
+  SharedGridEvent, GridSelectionMode
+} from "../grid-types";
 import { GridService } from "../grid.service";
 import { buildGridQuery } from "../utils/grid-query-builder";
+
+/** Formats track dimensions into valid CSS units (number -> px, '120' -> '120px', '1fr' -> '1fr') */
+export function formatTrackSize(val: string | number | undefined, defaultVal: string): string {
+  if (val == null || val === '') return defaultVal;
+  if (typeof val === 'number') return `${val}px`;
+  const trimmed = String(val).trim();
+  if (/^\d+$/.test(trimmed)) return `${trimmed}px`;
+  return trimmed;
+}
 
 @Component({
   selector: 'app-data-grid',
@@ -38,7 +57,7 @@ import { buildGridQuery } from "../utils/grid-query-builder";
     '[attr.aria-rowcount]': 'lazy() ? totalRecords() : filteredData().length'
   }
 })
-export class DataGridComponent implements OnDestroy, AfterViewInit {
+export class DataGridComponent<T = any> implements OnDestroy, AfterViewInit {
   @ViewChild(CdkVirtualScrollViewport) viewport!: CdkVirtualScrollViewport;
   @ViewChild('gridBody') gridBody!: ElementRef<HTMLElement>;
   @ViewChild('headerWrapper') headerWrapper!: ElementRef<HTMLElement>;
@@ -48,6 +67,8 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
   private messageService = inject(MessageService, { optional: true });
   private router = inject(Router, { optional: true });
 
+  private isSyncingScroll = false;
+
   private getGridStorageId(): string {
     const id = this.gridId();
     if (id === 'default' && this.router) {
@@ -56,25 +77,30 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
     return id;
   }
 
-  data = input.required<any[]>();
-  columns = input.required<GridColumn[]>();
+  // ─── Inputs ─────────────────────────────────────────────────────────────────
+  data = input.required<T[]>();
+  columns = input.required<GridColumn<T>[]>();
   viewOnly = input<boolean>(false);
   gridId = input<string>('default');
   dataKey = input<string>('id');
   lazy = input<boolean>(false);
   totalRecords = input<number>(0);
   toolbar = input<boolean>(true);
+
+  // Selection Inputs
   rowSelection = input<boolean>(true);
   multipleSelection = input<boolean>(true);
+  selectionMode = input<GridSelectionMode | string | undefined>(undefined);
+
   pagination = input<boolean>(true);
   pageSize = input<number>(50);
   loading = input<boolean>(false);
-  density = input<GridDensity>('normal');
+  density = input<GridDensity>('compact');
   emptyMessage = input<string>('No records found');
-  rowActions = input<GridRowAction[]>([]);
-  bulkActions = input<GridBulkAction[]>([]);
+  rowActions = input<GridRowAction<T>[]>([]);
+  bulkActions = input<GridBulkAction<T>[]>([]);
   persistState = input<boolean>(true);
-  plugins = input<GridPlugin[]>([]);
+  plugins = input<GridPlugin<T>[]>([]);
   enableUndo = input<boolean>(true);
   enableClipboard = input<boolean>(true);
   enableExport = input<boolean>(true);
@@ -83,42 +109,40 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
   enableAdd = input<boolean>(false);
   enableRowActions = input<boolean>(false);
   stripedRows = input<boolean>(true);
-  // ─── Phase A: Operation Modes ─────────────────────────────────────────────
-  /** When 'server': sort is not applied locally; queryChange emits. Default: 'client'. */
+
+  // Operation Modes
   sortingMode = input<GridOperationMode>('client');
-  /** When 'server': filter is not applied locally; queryChange emits. Default: 'client'. */
   filteringMode = input<GridOperationMode>('client');
-  /** When 'server': pagination does not slice locally; queryChange emits. Default: 'client'. */
   serverPaginationMode = input<GridOperationMode>('client');
-  /** When 'server': search is not applied locally; queryChange emits. Default: 'client'. */
   searchMode = input<GridOperationMode>('client');
-  // ─── Phase A: Visual Controls ─────────────────────────────────────────────
-  /** Show accent background + border on sorted column headers. Default: true. */
+
+  // Visual Controls
   highlightSortedColumns = input<boolean>(true);
-  /** Show warning background + border on filtered column headers. Default: true. */
   highlightFilteredColumns = input<boolean>(true);
-  /** Show active filter chips in the toolbar. Default: true. */
   showFilterChips = input<boolean>(true);
-  /** Show 'Clear all' button in chip row when filters are active. Default: true. */
   showClearFilters = input<boolean>(true);
 
-  rowSave = output<GridRowSaveEvent>();
-  bulkSave = output<GridRowSaveEvent[]>();
-  rowDelete = output<any>();
-  rowDuplicate = output<any>();
-  bulkAction = output<GridBulkActionEvent>();
+  // ─── Outputs ────────────────────────────────────────────────────────────────
+  rowSave = output<GridRowSaveEvent<T>>();
+  bulkSave = output<GridRowSaveEvent<T>[]>();
+  rowDelete = output<T>();
+  rowDuplicate = output<T>();
+  bulkAction = output<GridBulkActionEvent<T>>();
   pageChange = output<GridPageState>();
   pageSizeChange = output<number>();
   sortChange = output<GridSortState[]>();
   filterChange = output<GridFilterState[]>();
   searchChange = output<string>();
-  selectionChange = output<any[]>();
-  rowClick = output<any>();
-  rowDoubleClick = output<any>();
+  selectionChange = output<T[]>();
+  rowClick = output<T>();
+  rowDoubleClick = output<T>();
   refresh = output<void>();
   addNew = output<void>();
-  // ─── New Phase A Outputs ──────────────────────────────────────────────────
-  /** Emits the full unified state snapshot on every meaningful state change. */
+
+  // Shared / Legacy Event Bus
+  gridEvent = output<SharedGridEvent<T>>();
+
+  // Unified State Outputs
   gridStateChange = output<{
     search: string;
     filters: GridFilterState[];
@@ -127,13 +151,13 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
     density: GridDensity;
     visibleColumns: string[];
   }>();
-  /** Emits ONLY when the relevant operation mode is 'server'. Use this as your single API call trigger. */
+
   queryChange = output<GridQueryPayload>();
 
-  // ─── Bulk Edit State Engine ───────────────────────────────────────────────
+  // ─── Internal Signals & State ───────────────────────────────────────────────
   editingRowIds = signal<Set<string>>(new Set());
-  editDrafts = signal<Map<string, any>>(new Map());
-  originalSnapshots = signal<Map<string, any>>(new Map());
+  editDrafts = signal<Map<string, T>>(new Map());
+  originalSnapshots = signal<Map<string, T>>(new Map());
 
   selectedRowIds = signal<Set<string>>(new Set());
   modifiedRowIds = signal<Set<string>>(new Set());
@@ -151,21 +175,20 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
   activeViewId = signal<string | null>(null);
   paginationMode = signal<'pages' | 'infinite'>('pages');
 
-  columnOverrides = signal<Record<string, Partial<GridColumn>>>({});
-  accumulatedData = signal<any[]>([]);
+  columnOverrides = signal<Record<string, Partial<GridColumn<T>>>>({});
+  accumulatedData = signal<T[]>([]);
 
   showFilterBar = signal(false);
   showColumnManager = signal(false);
   showSavedViews = signal(false);
   showContextMenu = signal(false);
   contextMenuPos = signal<{ x: number; y: number }>({ x: 0, y: 0 });
-  contextMenuRow = signal<any>(null);
+  contextMenuRow = signal<T | null>(null);
 
   private searchTimeout: any;
   private lastClickedId: string | null = null;
 
-
-  // ─── Native CSS Grid Column Resizing (Optimized & Crash-Proof) ─────────────
+  // ─── Native CSS Grid Column Resizing ───────────────────────────────────────
   private resizeState = {
     isResizing: false,
     field: '',
@@ -178,7 +201,6 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
     event.preventDefault();
     event.stopPropagation();
 
-    // Safely find the parent header cell using .closest()
     const th = (event.target as HTMLElement).closest('.apex-dg-hcell') as HTMLElement;
     if (!th) return;
 
@@ -200,8 +222,6 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
 
     const delta = event.clientX - this.resizeState.startX;
     const newWidth = Math.max(60, this.resizeState.startWidth + delta);
-
-    // Update DOM directly during drag for zero lag (No signal spam)
     this.resizeState.thElement.style.width = `${newWidth}px`;
   }
 
@@ -218,57 +238,75 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
     document.body.style.userSelect = '';
 
     if (finalWidth > 0 && field) {
-      // Commit to signal state ONCE when dragging finishes
       this.columnOverrides.update(o => ({
         ...o,
         [field]: { ...o[field], width: `${finalWidth}px` }
       }));
 
-      // Persist to local storage if enabled
       if (this.persistState()) {
-        const widths = this.columnsWithOverrides().reduce((acc, c) => ({ ...acc, [c.field]: c.width ?? '' }), {});
+        const widths = this.columnsWithOverrides().reduce((acc, c) => ({
+          ...acc,
+          [c.field]: typeof c.width === 'number' ? `${c.width}px` : (c.width ?? '')
+        }), {});
         this.stateService.setColumnWidths(this.getGridStorageId(), widths);
       }
     }
   }
 
+  // ─── Selection Mode Computation ───────────────────────────────────────────
+  readonly effectiveSelectionMode = computed<GridSelectionMode>(() => {
+    const mode = this.selectionMode();
+    if (mode === 'none') return 'none';
+    if (mode === 'single') return 'single';
+    if (mode === 'multiple') return 'multiple';
+    if (!this.rowSelection()) return 'none';
+    return this.multipleSelection() ? 'multiple' : 'single';
+  });
 
-  // ─── Computed Properties ──────────────────────────────────────────────────
-  columnsWithOverrides = computed<GridColumn[]>(() => {
+  readonly isSelectionEnabled = computed<boolean>(() => {
+    return this.effectiveSelectionMode() !== 'none';
+  });
+
+  readonly isMultipleSelection = computed<boolean>(() => {
+    return this.effectiveSelectionMode() === 'multiple';
+  });
+
+  // ─── Computed Column Layout & Data ─────────────────────────────────────────
+  columnsWithOverrides = computed<GridColumn<T>[]>(() => {
     const cols = this.columns();
     const overrides = this.columnOverrides();
     return cols.map(c => overrides[c.field] ? { ...c, ...overrides[c.field] } : c);
   });
 
-  visibleColumnList = computed<GridColumn[]>(() => {
+  visibleColumnList = computed<GridColumn<T>[]>(() => {
     const all = this.columnsWithOverrides();
     const vis = this.visibleColumnsSignal();
     if (!vis.length) return all.filter(c => c.visible !== false);
-    return vis.map(v => all.find(c => c.field === v)).filter(Boolean) as GridColumn[];
+    return vis.map(v => all.find(c => c.field === v)).filter(Boolean) as GridColumn<T>[];
   });
 
-  // gridTemplateColumns = computed(() => {
-  //   const cols = this.visibleColumnList();
-  //   let template = this.rowSelection() ? '48px ' : '';
-  //   template += '60px '; 
-  //   template += cols.map(c => `minmax(${c.minWidth ?? '100px'}, ${c.width ?? '1fr'})`).join(' ');
-  //   template += ' 80px'; 
-  //   return template;
-  // });
   gridTemplateColumns = computed(() => {
     const cols = this.visibleColumnList();
-    let template = (this.rowSelection() && !this.viewOnly()) ? '48px ' : '';
+    let template = (this.isSelectionEnabled() && !this.viewOnly()) ? '48px ' : '';
     template += '60px '; // Sr. No.
-    template += cols.map(c => `minmax(${c.minWidth ?? '100px'}, ${c.width ?? '1fr'})`).join(' ');
 
-    // Omit the actions column width entirely if viewOnly is active or enableRowActions is false
+    template += cols.map(c => {
+      const min = formatTrackSize(c.minWidth, '100px');
+      const w = formatTrackSize(c.width, '1fr');
+      return `minmax(${min}, ${w})`;
+    }).join(' ');
+
     if (this.enableRowActions() && !this.viewOnly()) {
       template += ' max-content';
     }
     return template;
   });
 
-  filteredData = computed<any[]>(() => {
+  loadingColWidths = computed<string[]>(() =>
+    this.visibleColumnList().map(c => formatTrackSize(c.width, '150px'))
+  );
+
+  filteredData = computed<T[]>(() => {
     if (this.lazy()) return this.data();
 
     let result = this.data();
@@ -276,10 +314,9 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
     const filters = this.filterState();
     const sort = this.sortState();
 
-    // Skip client-side processing when the operation is delegated to the server
     if (this.searchMode() === 'client' && query) {
       const searchCols = this.columnsWithOverrides().filter(c => c.searchable !== false && c.type !== 'action');
-      result = result.filter(row => searchCols.some(col => String(row[col.field] ?? '').toLowerCase().includes(query)));
+      result = result.filter(row => searchCols.some(col => String((row as any)?.[col.field] ?? '').toLowerCase().includes(query)));
     }
     if (this.filteringMode() === 'client' && filters.length > 0) {
       result = result.filter(row => filters.every(f => this.applyFilter(row, f)));
@@ -290,8 +327,8 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
 
     const editingIds = this.editingRowIds();
     if (editingIds.size > 0) {
-      const editingRows: any[] = [];
-      const normalRows: any[] = [];
+      const editingRows: T[] = [];
+      const normalRows: T[] = [];
       for (const row of result) {
         if (editingIds.has(this.getRowId(row))) editingRows.push(row);
         else normalRows.push(row);
@@ -302,7 +339,7 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
     return result;
   });
 
-  displayData = computed<any[]>(() => {
+  displayData = computed<T[]>(() => {
     if (this.lazy() && this.paginationMode() === 'infinite') return this.accumulatedData();
     if (this.lazy() || !this.pagination() || this.paginationMode() === 'infinite') return this.filteredData();
     const start = this.currentPage() * this.pageSizeSignal();
@@ -328,9 +365,6 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
     }
   });
 
-  // ─── Phase A: New Computed Properties ─────────────────────────────────────
-
-  /** Read-only unified state snapshot assembled from existing signals. */
   readonly gridStateSnapshot = computed(() => ({
     search: this.searchQuery(),
     filters: this.filterState(),
@@ -344,10 +378,6 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
     visibleColumns: this.visibleColumnsSignal(),
   }));
 
-  /**
-   * Per-column header metadata map — built once per signal change.
-   * O(1) lookups in template via columnHeaderMeta().get(col.field).
-   */
   readonly columnHeaderMeta = computed<Map<string, GridColumnHeaderMeta>>(() => {
     const sorts = this.sortState();
     const filters = this.filterState();
@@ -375,7 +405,6 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
     return map;
   });
 
-  /** Active filter chips for display in the toolbar. */
   readonly activeFilterChips = computed<Array<{ label: string; field: string; value: string }>>(() =>
     this.filterState().map(f => {
       const col = this.columnsWithOverrides().find(c => c.field === f.field);
@@ -387,7 +416,6 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
     })
   );
 
-  /** True when any filter or search is active. Controls 'Clear all' visibility. */
   readonly hasActiveFilters = computed<boolean>(() =>
     this.filterState().length > 0 || this.searchQuery().length > 0
   );
@@ -448,13 +476,31 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
 
   ngAfterViewInit(): void {
     if (this.viewport) {
-      // Explicitly bind to the native scroll event of the viewport element to ensure
-      // horizontal scrolling reliably syncs with the header.
       this.viewport.elementRef.nativeElement.addEventListener('scroll', (event) => {
-        this.showContextMenu.set(false);
-        this.onGridScroll(event);
+        this.onBodyScroll(event);
       }, { passive: true });
     }
+
+    // Emit init event for consumers relying on gridApi bridge (e.g. payment-list, sales-list)
+    this.gridEvent.emit({
+      type: 'init',
+      api: {
+        applyTransaction: (tx: any) => {
+          if (tx?.add && Array.isArray(tx.add)) {
+            const cur = this.data();
+            if (Array.isArray(cur)) {
+              (cur as any).push(...tx.add);
+            }
+          }
+        },
+        getSelectedRows: () => {
+          const ids = this.selectedRowIds();
+          return this.data().filter(r => ids.has(this.getRowId(r)));
+        },
+        deselectAll: () => this.clearSelection(),
+        refresh: () => this.refresh.emit()
+      }
+    });
   }
 
   getRowId = (row: any): string => {
@@ -472,9 +518,8 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
     return String(row?.[this.dataKey()] ?? index);
   };
 
-
-  // ─── Bulk Editing Engine ──────────────────────────────────────────────────
-  startEditRow(row: any): void {
+  // ─── Bulk & Row Editing Engine ────────────────────────────────────────────
+  startEditRow(row: T): void {
     if (this.editingRowIds().size > 0) this.cancelAllEdits();
 
     const id = this.getRowId(row);
@@ -482,14 +527,15 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
     this.editDrafts.set(new Map([[id, structuredClone(row)]]));
     this.originalSnapshots.set(new Map([[id, structuredClone(row)]]));
     this.gridService.clearHistory();
+    this.gridEvent.emit({ type: 'edit', row });
   }
 
   startBulkEdit(): void {
     const ids = this.selectedRowIds();
     if (ids.size === 0) return;
 
-    const drafts = new Map<string, any>();
-    const snaps = new Map<string, any>();
+    const drafts = new Map<string, T>();
+    const snaps = new Map<string, T>();
 
     this.data().forEach(row => {
       const id = this.getRowId(row);
@@ -505,7 +551,7 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
     this.gridService.clearHistory();
     this.selectedRowIds.set(new Set());
 
-    setTimeout(() => this.viewport.scrollToIndex(0, 'smooth'), 50);
+    setTimeout(() => this.viewport?.scrollToIndex(0, 'smooth'), 50);
   }
 
   saveAllEdits(): void {
@@ -513,20 +559,27 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
     const snaps = this.originalSnapshots();
     const ids = this.editingRowIds();
 
-    const savedEvents: GridRowSaveEvent[] = [];
+    const savedEvents: GridRowSaveEvent<T>[] = [];
 
     ids.forEach(id => {
       const draft = drafts.get(id);
       const original = snaps.get(id);
       if (draft && original) {
-        const dirtyFields = Object.keys(draft).filter(k => JSON.stringify(draft[k]) !== JSON.stringify(original[k]));
+        const dirtyFields = Object.keys(draft as any).filter(
+          k => JSON.stringify((draft as any)[k]) !== JSON.stringify((original as any)[k])
+        );
         savedEvents.push({ row: draft, originalRow: original, isNew: id.startsWith('new_'), dirtyFields });
         this.modifiedRowIds.update(s => new Set(s).add(id));
       }
     });
 
-    if (savedEvents.length === 1) this.rowSave.emit(savedEvents[0]);
-    else if (savedEvents.length > 1) this.bulkSave.emit(savedEvents);
+    if (savedEvents.length === 1) {
+      this.rowSave.emit(savedEvents[0]);
+      this.gridEvent.emit({ type: 'save', row: savedEvents[0].row, data: savedEvents[0].row });
+    } else if (savedEvents.length > 1) {
+      this.bulkSave.emit(savedEvents);
+      this.gridEvent.emit({ type: 'bulkSave', rows: savedEvents.map(e => e.row) });
+    }
 
     this.editingRowIds.set(new Set());
     this.editDrafts.set(new Map());
@@ -537,6 +590,11 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
   cancelAllEdits(): void {
     const newRows = Array.from(this.editingRowIds()).filter(id => id.startsWith('new_'));
     if (newRows.length > 0) this.refresh.emit();
+
+    const firstDraft = this.editDrafts().values().next().value;
+    if (firstDraft) {
+      this.gridEvent.emit({ type: 'cancel', row: firstDraft });
+    }
 
     this.editingRowIds.set(new Set());
     this.editDrafts.set(new Map());
@@ -549,7 +607,7 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
       const drafts = new Map(this.editDrafts());
       const draft = drafts.get(rowId);
       if (draft) {
-        draft[event.field] = event.newValue;
+        (draft as any)[event.field] = event.newValue;
         drafts.set(rowId, draft);
         this.editDrafts.set(drafts);
       }
@@ -562,37 +620,55 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
     });
   }
 
-  // ─── Selection Logic ──────────────────────────────────────────────────────
-  onRowClick(row: any, event: MouseEvent): void {
-    if (!this.rowSelection()) {
+  // ─── Cell & Row Interactions ───────────────────────────────────────────────
+  onCellClick(row: T, col: GridColumn<T>, event: MouseEvent): void {
+    this.gridEvent.emit({
+      type: 'cellClicked',
+      row,
+      field: col.field,
+      colId: col.field,
+      value: (row as any)?.[col.field],
+      event
+    });
+  }
+
+  onRowClick(row: T, event: MouseEvent): void {
+    this.gridEvent.emit({ type: 'rowClicked', row, event });
+
+    if (!this.isSelectionEnabled()) {
       this.rowClick.emit(row);
       return;
     }
     if (this.editingRowIds().has(this.getRowId(row))) return;
 
-    if (this.multipleSelection() && event.shiftKey && this.lastClickedId) this.rangeSelect(row);
-    else if (this.multipleSelection() && (event.ctrlKey || event.metaKey)) this.toggleSelectRow(row);
-    else this.rowClick.emit(row);
+    if (this.isMultipleSelection() && event.shiftKey && this.lastClickedId) {
+      this.rangeSelect(row);
+    } else if (this.isMultipleSelection() && (event.ctrlKey || event.metaKey)) {
+      this.toggleSelectRow(row);
+    } else if (this.effectiveSelectionMode() === 'single') {
+      this.selectSingleRow(row);
+    } else {
+      this.rowClick.emit(row);
+    }
   }
 
-  onRowDoubleClick(row: any): void {
+  onRowDoubleClick(row: T): void {
+    this.gridEvent.emit({ type: 'rowDoubleClicked', row });
     if (this.viewOnly()) {
       this.rowDoubleClick.emit(row);
-      return; // Block editing entirely in view-only mode
+      return;
     }
     this.startEditRow(row);
     this.rowDoubleClick.emit(row);
   }
 
-  // onRowDoubleClick(row: any): void {
-  //   this.startEditRow(row);
-  //   this.rowDoubleClick.emit(row);
-  // }
-
-  onCheckboxClick(row: any, event: MouseEvent): void {
+  onCheckboxClick(row: T, event: MouseEvent): void {
     event.stopPropagation();
-    if (event.shiftKey && this.lastClickedId && this.multipleSelection()) this.rangeSelect(row);
-    else this.toggleSelectRow(row);
+    if (event.shiftKey && this.lastClickedId && this.isMultipleSelection()) {
+      this.rangeSelect(row);
+    } else {
+      this.toggleSelectRow(row);
+    }
   }
 
   onSelectAll(checked: boolean): void {
@@ -610,18 +686,29 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
     this.emitSelection();
   }
 
-  private toggleSelectRow(row: any): void {
+  private selectSingleRow(row: T): void {
     const id = this.getRowId(row);
-    this.selectedRowIds.update(ids => {
-      const n = new Set(ids);
-      n.has(id) ? n.delete(id) : n.add(id);
-      return n;
-    });
+    this.selectedRowIds.set(new Set([id]));
     this.lastClickedId = id;
     this.emitSelection();
   }
 
-  private rangeSelect(toRow: any): void {
+  private toggleSelectRow(row: T): void {
+    const id = this.getRowId(row);
+    if (!this.isMultipleSelection()) {
+      this.selectedRowIds.update(ids => ids.has(id) ? new Set() : new Set([id]));
+    } else {
+      this.selectedRowIds.update(ids => {
+        const n = new Set(ids);
+        n.has(id) ? n.delete(id) : n.add(id);
+        return n;
+      });
+    }
+    this.lastClickedId = id;
+    this.emitSelection();
+  }
+
+  private rangeSelect(toRow: T): void {
     const data = this.displayData();
     const fromIdx = data.findIndex(r => this.getRowId(r) === this.lastClickedId);
     const toIdx = data.findIndex(r => this.getRowId(r) === this.getRowId(toRow));
@@ -640,10 +727,11 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
     const ids = this.selectedRowIds();
     const rows = this.data().filter(r => ids.has(this.getRowId(r)));
     this.selectionChange.emit(rows);
+    this.gridEvent.emit({ type: 'selectionChanged', rows });
     this.plugins().forEach(p => p.onSelectionChange?.(rows, this.buildContext()));
   }
 
-  // ─── Sort, Filter, Scroll, Overlays ───────────────────────────────────────
+  // ─── Sort & Filter Handlers ────────────────────────────────────────────────
   onSort(field: string): void {
     this.sortState.update(state => {
       const existing = state.find(s => s.field === field);
@@ -657,21 +745,22 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
   }
 
   private applyFilter(row: any, f: GridFilterState): boolean {
-    const val = String(row[f.field] ?? '').toLowerCase();
+    const val = String(row?.[f.field] ?? '').toLowerCase();
     const target = String(f.value ?? '').toLowerCase();
     switch (f.operator) {
       case 'equals': return val === target;
       case 'startsWith': return val.startsWith(target);
       case 'endsWith': return val.endsWith(target);
-      case 'gt': return Number(row[f.field]) > Number(f.value);
-      case 'lt': return Number(row[f.field]) < Number(f.value);
+      case 'gt': return Number(row?.[f.field]) > Number(f.value);
+      case 'lt': return Number(row?.[f.field]) < Number(f.value);
       case 'contains': default: return val.includes(target);
     }
   }
 
   private applySort(a: any, b: any, sort: GridSortState[]): number {
     for (const s of sort) {
-      const av = a[s.field]; const bv = b[s.field];
+      const av = a?.[s.field];
+      const bv = b?.[s.field];
       const cmp = av < bv ? -1 : av > bv ? 1 : 0;
       if (cmp !== 0) return s.direction === 'asc' ? cmp : -cmp;
     }
@@ -682,11 +771,8 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
     this.filterState.set(filters);
     this.currentPage.set(0);
 
-    // Legacy emit — always fires (backward compat)
     this.filterChange.emit(filters);
-    // Unified state — always fires
     this.gridStateChange.emit(this.gridStateSnapshot());
-    // Server query — only fires when mode is 'server'
     if (this.filteringMode() === 'server') {
       this.queryChange.emit(buildGridQuery(this.gridStateSnapshot(), this.columns()));
     }
@@ -694,10 +780,6 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
     this.plugins().forEach(p => p.onFilter?.(filters, this.buildContext()));
   }
 
-  /**
-   * Clears all active filters AND the search query in one atomic operation.
-   * Emits legacy outputs, gridStateChange, and queryChange (if any mode is server).
-   */
   clearAllFilters(): void {
     this.filterState.set([]);
     this.searchQuery.set('');
@@ -710,18 +792,18 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
     }
   }
 
-  /**
-   * Removes a single filter chip by field name.
-   * Delegates to onFilterChange so all emissions and mode logic are applied.
-   */
   removeFilterChip(field: string): void {
     this.onFilterChange(this.filterState().filter(f => f.field !== field));
   }
 
+  // ─── Pagination Handlers ───────────────────────────────────────────────────
   onPageChange(state: GridPageState): void {
     this.currentPage.set(state.page);
     this.pageSizeSignal.set(state.pageSize);
-    this.pageChange.emit(state);
+    this.pageChange.emit({
+      ...state,
+      pageNumber: state.page + 1
+    });
     if (this.persistState()) this.stateService.saveState(this.getGridStorageId(), { density: this.densitySignal() });
   }
 
@@ -735,27 +817,53 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
     this.paginationMode.set(mode);
     this.currentPage.set(0);
     this.accumulatedData.set([...this.data()]);
-    this.pageChange.emit({ page: 0, pageSize: this.pageSizeSignal(), total: this.totalRecords() });
+    this.pageChange.emit({
+      page: 0,
+      pageSize: this.pageSizeSignal(),
+      total: this.totalRecords(),
+      pageNumber: 1
+    });
   }
 
-  onGridScroll(event: any): void {
-    // Safely get target. If event.target is document or null, fallback to viewport element.
-    const target = (event?.target as HTMLElement)?.scrollLeft !== undefined 
-      ? (event.target as HTMLElement) 
-      : this.viewport?.elementRef.nativeElement;
-    
-    // Sync horizontal scroll with header
-    if (this.headerWrapper && target) {
+  // ─── Bi-directional Scroll Synchronization ─────────────────────────────────
+  onBodyScroll(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (!target) return;
+
+    if (!this.isSyncingScroll && this.headerWrapper) {
+      this.isSyncingScroll = true;
       this.headerWrapper.nativeElement.scrollLeft = target.scrollLeft;
+      this.isSyncingScroll = false;
     }
 
-    if (this.paginationMode() !== 'infinite' || !this.lazy() || this.loading()) return;
-    
+    this.checkInfiniteScroll(target);
+  }
+
+  onHeaderScroll(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (!target) return;
+
+    if (!this.isSyncingScroll && this.viewport?.elementRef?.nativeElement) {
+      this.isSyncingScroll = true;
+      this.viewport.elementRef.nativeElement.scrollLeft = target.scrollLeft;
+      this.isSyncingScroll = false;
+    }
+  }
+
+  private checkInfiniteScroll(target: HTMLElement): void {
+    if (this.paginationMode() !== 'infinite' || this.loading()) return;
+
     if (target.scrollHeight - target.scrollTop - target.clientHeight < 50) {
-      if (this.accumulatedData().length < this.totalRecords()) {
+      this.gridEvent.emit({ type: 'reachedBottom' });
+      if (this.lazy() && this.accumulatedData().length < this.totalRecords()) {
         const nextPage = this.currentPage() + 1;
         this.currentPage.set(nextPage);
-        this.pageChange.emit({ page: nextPage, pageSize: this.pageSizeSignal(), total: this.totalRecords() });
+        this.pageChange.emit({
+          page: nextPage,
+          pageSize: this.pageSizeSignal(),
+          total: this.totalRecords(),
+          pageNumber: nextPage + 1
+        });
       }
     }
   }
@@ -787,9 +895,18 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
     this.addNew.emit();
   }
 
-  onDeleteRow(row: any): void { this.rowDelete.emit(row); }
-  onDuplicateRow(row: any): void { this.rowDuplicate.emit(row); }
-  onCustomRowAction(action: GridRowAction, row: any): void { action.callback(row, this.buildContext()); }
+  onDeleteRow(row: T): void {
+    this.rowDelete.emit(row);
+    this.gridEvent.emit({ type: 'delete', row });
+  }
+
+  onDuplicateRow(row: T): void {
+    this.rowDuplicate.emit(row);
+  }
+
+  onCustomRowAction(action: GridRowAction<T>, row: T): void {
+    action.callback(row, this.buildContext());
+  }
 
   onBulkActionById(actionId: string): void {
     const action = this.bulkActions().find(a => a.id === actionId);
@@ -799,7 +916,7 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
     this.bulkAction.emit({ actionId, rows });
   }
 
-  onContextMenu(event: MouseEvent, row: any): void {
+  onContextMenu(event: MouseEvent, row: T): void {
     if (!this.enableContextMenu()) return;
     event.preventDefault();
     this.contextMenuPos.set({ x: event.clientX, y: event.clientY });
@@ -885,7 +1002,7 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
 
   private navigateGrid(direction: string, currentCell: HTMLElement): void {
     const row = currentCell.closest('.apex-dg-row') as HTMLElement;
-    const allRows = Array.from(this.gridBody.nativeElement.querySelectorAll('.apex-dg-row'));
+    const allRows = Array.from(this.gridBody?.nativeElement?.querySelectorAll('.apex-dg-row') ?? []);
     const allCells = Array.from(row.querySelectorAll('.apex-dg-cell'));
 
     let rowIdx = allRows.indexOf(row);
@@ -913,7 +1030,7 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
     const drafts = new Map(this.editDrafts());
     const draft = drafts.get(entry.rowId);
     if (draft) {
-      draft[entry.field] = entry.previousValue;
+      (draft as any)[entry.field] = entry.previousValue;
       drafts.set(entry.rowId, draft);
       this.editDrafts.set(drafts);
     }
@@ -926,7 +1043,7 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
     const drafts = new Map(this.editDrafts());
     const draft = drafts.get(entry.rowId);
     if (draft) {
-      draft[entry.field] = entry.nextValue;
+      (draft as any)[entry.field] = entry.nextValue;
       drafts.set(entry.rowId, draft);
       this.editDrafts.set(drafts);
     }
@@ -948,7 +1065,7 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
     }
   }
 
-  private buildContext(): GridContext {
+  private buildContext(): GridContext<T> {
     return {
       getData: () => this.data(),
       getColumns: () => this.columns(),
@@ -976,7 +1093,10 @@ export class DataGridComponent implements OnDestroy, AfterViewInit {
       getGridState: (): GridPersistedState => ({
         visibleColumns: this.visibleColumnsSignal(),
         columnOrder: this.columns().map(c => c.field),
-        columnWidths: this.columnsWithOverrides().reduce((acc, c) => ({ ...acc, [c.field]: c.width ?? '' }), {}),
+        columnWidths: this.columnsWithOverrides().reduce((acc, c) => ({
+          ...acc,
+          [c.field]: typeof c.width === 'number' ? `${c.width}px` : (c.width ?? '')
+        }), {}),
         sortState: this.sortState(),
         density: this.densitySignal(),
         savedViews: this.savedViews(),

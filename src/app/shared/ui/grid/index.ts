@@ -28,10 +28,12 @@ export type {
   GridContext,
   GridPlugin,
   SelectOption,
-  // ─── Phase A additions ──────────────────────────────────────────────────
   GridOperationMode,
+  GridSelectionMode,
   GridQueryPayload,
   GridColumnHeaderMeta,
+  CellRendererParams,
+  SharedGridEvent,
 } from './grid-types';
 
 // ─── Plugin System ────────────────────────────────────────────────────────────

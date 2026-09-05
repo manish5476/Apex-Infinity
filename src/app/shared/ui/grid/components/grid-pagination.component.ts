@@ -163,7 +163,12 @@ export class GridPaginationComponent {
 
   protected goToPage(p: number): void {
     const clamped = Math.max(0, Math.min(p, this.totalPages() - 1));
-    this.pageChange.emit({ page: clamped, pageSize: this.pageSize(), total: this.total() });
+    this.pageChange.emit({
+      page: clamped,
+      pageSize: this.pageSize(),
+      total: this.total(),
+      pageNumber: clamped + 1
+    });
   }
 
   protected onPageSizeChange(val: string): void {

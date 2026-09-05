@@ -62,13 +62,15 @@ import { GridDensity } from '../grid-types';
 export class GridLoadingComponent {
   rowCount = input<number>(15);
   density = input<GridDensity>('compact');
-  colWidths = input<string[]>([]);
+  colWidths = input<(string | number)[]>([]);
 
   protected skeletonRows = computed(() => Array.from({ length: this.rowCount() }, (_, i) => i));
 
   protected columnWidths = computed(() => {
     const w = this.colWidths();
-    return w.length ? w : ['180px', '200px', '140px', '120px', '100px'];
+    return w.length
+      ? w.map(width => (typeof width === 'number' ? `${width}px` : String(width)))
+      : ['180px', '200px', '140px', '120px', '100px'];
   });
 
   protected rowHeight = computed(() => {

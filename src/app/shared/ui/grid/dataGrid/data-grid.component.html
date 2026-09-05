@@ -16,20 +16,14 @@
         (savedViewsToggle)="showSavedViews.set(!showSavedViews())" (exportAs)="onExport($event)"
         (bulkAction)="onBulkActionById($event)" (refresh)="refresh.emit()"
         (paginationModeChange)="onPaginationModeChange($event)" (startBulkEdit)="startBulkEdit()"
-        (saveEdits)="saveAllEdits()" (cancelEdits)="cancelAllEdits()"
-        (clearFilters)="clearAllFilters()">
+        (saveEdits)="saveAllEdits()" (cancelEdits)="cancelAllEdits()" (clearFilters)="clearAllFilters()">
         <ng-content select="[grid-actions]" ngProjectAs="[grid-actions]"></ng-content>
         <!-- Filter Chips — projected into toolbar [grid-chips] slot -->
         <ng-container grid-chips>
-            <app-grid-filter-chips
-                [chips]="activeFilterChips()"
-                [hasSearch]="searchQuery().length > 0"
-                [searchQuery]="searchQuery()"
-                [show]="showFilterChips()"
-                [showClearAll]="showClearFilters() && hasActiveFilters()"
-                (removeChip)="removeFilterChip($event)"
-                (clearSearch)="searchQuery.set('')"
-                (clearAll)="clearAllFilters()">
+            <app-grid-filter-chips [chips]="activeFilterChips()" [hasSearch]="searchQuery().length > 0"
+                [searchQuery]="searchQuery()" [show]="showFilterChips()"
+                [showClearAll]="showClearFilters() && hasActiveFilters()" (removeChip)="removeFilterChip($event)"
+                (clearSearch)="searchQuery.set('')" (clearAll)="clearAllFilters()">
             </app-grid-filter-chips>
         </ng-container>
     </app-grid-toolbar>
@@ -43,15 +37,16 @@
 
     <!-- ───────────── DATA VIEWPORT ───────────── -->
     <div class="flex-1 relative overflow-hidden bg-[var(--bg-primary)] flex flex-col">
-        
-        <div #headerWrapper class="overflow-hidden border-b border-[var(--border-secondary)] bg-[var(--bg-secondary)] z-30">
-            <div class="apex-dg-header"
-                role="row" [style.grid-template-columns]="gridTemplateColumns()">
+
+        <div #headerWrapper
+            class="overflow-x-auto overflow-y-hidden border-b border-[var(--border-secondary)] bg-[var(--bg-secondary)] z-30 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            (scroll)="onHeaderScroll($event)">
+            <div class="apex-dg-header" role="row" [style.grid-template-columns]="gridTemplateColumns()">
                 @if (rowSelection() && !viewOnly()) {
                 <div class="apex-dg-hcell flex items-center justify-center sticky left-0 bg-[var(--bg-secondary)] z-40"
                     role="columnheader">
-                    <input type="checkbox" class="apex-checkbox" [checked]="allSelected()" [indeterminate]="indeterminate()"
-                        (change)="onSelectAll($any($event.target).checked)">
+                    <input type="checkbox" class="apex-checkbox" [checked]="allSelected()"
+                        [indeterminate]="indeterminate()" (change)="onSelectAll($any($event.target).checked)">
                 </div>
                 }
                 <div class="apex-dg-hcell text-center text-[var(--text-tertiary)] font-semibold text-[11px]"
@@ -63,19 +58,16 @@
                     [attr.aria-sort]="meta?.isSorted ? (meta?.sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'"
                     [class.apex-dg-hcell--sorted]="highlightSortedColumns() && (meta?.isSorted ?? false)"
                     [class.apex-dg-hcell--filtered]="highlightFilteredColumns() && (meta?.isFiltered ?? false)"
-                    [class.apex-dg-hcell--pinned]="meta?.isPinned ?? false"
-                    [class.sticky-left]="col.sticky === 'left'"
+                    [class.apex-dg-hcell--pinned]="meta?.isPinned ?? false" [class.sticky-left]="col.sticky === 'left'"
                     [class.sticky-right]="col.sticky === 'right'">
                     <div class="flex items-center gap-1.5 flex-1 truncate"
                         (click)="col.sortable !== false && onSort(col.field)">
                         <span class="truncate">{{ col.header }}</span>
                         @if (col.sortable !== false) {
-                        <i class="pi text-[10px] transition-all duration-200"
-                            [class.pi-sort-alt]="!meta?.isSorted"
+                        <i class="pi text-[10px] transition-all duration-200" [class.pi-sort-alt]="!meta?.isSorted"
                             [class.pi-sort-amount-up-alt]="meta?.sortDirection === 'asc'"
                             [class.pi-sort-amount-down]="meta?.sortDirection === 'desc'"
-                            [class.opacity-30]="!meta?.isSorted"
-                            [class.opacity-100]="meta?.isSorted"
+                            [class.opacity-30]="!meta?.isSorted" [class.opacity-100]="meta?.isSorted"
                             [class.text-[var(--apex-grid-sort-icon)]]="meta?.isSorted ?? false"></i>
                         }
                         @if (meta?.isFiltered) {
@@ -101,12 +93,13 @@
         @if (loading() && (paginationMode() === 'pages' || accumulatedData().length === 0)) {
         <div class="absolute inset-0 z-20 bg-[var(--bg-primary)] overflow-hidden">
             <app-grid-loading [rowCount]="pageSizeSignal()" [density]="densitySignal()"
-                [colWidths]="visibleColumnList().map(c => c.width ?? '150px')"></app-grid-loading>
+                [colWidths]="loadingColWidths()"></app-grid-loading>
         </div>
         }
 
-        <cdk-virtual-scroll-viewport #viewport [itemSize]="rowHeight()" class="flex-1 w-full custom-scrollbar">
-            
+        <cdk-virtual-scroll-viewport #viewport [itemSize]="rowHeight()" class="flex-1 w-full custom-scrollbar"
+            (scroll)="onBodyScroll($event)">
+
             <div #gridBody role="rowgroup" class="min-w-full">
                 <!-- Inside the virtual scroll row loop: -->
                 <div *cdkVirtualFor="let row of displayData(); let i = index; trackBy: trackByRowId"
@@ -134,8 +127,10 @@
 
                     @for (col of visibleColumnList(); track col.field) {
                     <div class="apex-dg-cell flex items-center truncate px-3" role="gridcell" tabindex="0"
-                        [class.sticky-left]="col.sticky === 'left'" [class.sticky-right]="col.sticky === 'right'">
+                        [class.sticky-left]="col.sticky === 'left'" [class.sticky-right]="col.sticky === 'right'"
+                        (click)="onCellClick(row, col, $event)">
                         <app-grid-cell class="w-full truncate" [column]="col"
+                            [rowIndex]="paginationMode() === 'infinite' ? i : (currentPage() * pageSizeSignal()) + i"
                             [rowData]="editingRowIds().has(getRowId(row)) ? editDrafts().get(getRowId(row)) : row"
                             [isEditing]="!viewOnly() && editingRowIds().has(getRowId(row))"
                             (cellChange)="onCellChange($event, getRowId(row))">

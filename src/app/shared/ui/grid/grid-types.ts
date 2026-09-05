@@ -5,6 +5,9 @@ import { ValidatorFn, AsyncValidatorFn } from '@angular/forms';
 /** Whether an operation (sort/filter/page/search) is handled client-side or server-side. */
 export type GridOperationMode = 'client' | 'server';
 
+// ─── Selection Mode ───────────────────────────────────────────────────────────
+export type GridSelectionMode = 'single' | 'multiple' | 'none';
+
 // ─── Column Type ─────────────────────────────────────────────────────────────
 export type GridColumnType =
   // Text & Numeric
@@ -19,37 +22,47 @@ export type GridColumnType =
   | 'rating' | 'slider' | 'knob'
   // Links & Actions
   | 'email' | 'phone' | 'url' | 'action'
-  // Advanced
-  | 'formula' | 'custom';
+  // Advanced & Aliases
+  | 'formula' | 'custom' | 'rightAligned' | 'numeric';
 
 // ─── Select Option ────────────────────────────────────────────────────────────
 export interface SelectOption {
   label: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: any;
   icon?: string;
   color?: string;
   disabled?: boolean;
 }
 
+// ─── Cell Renderer Parameters ────────────────────────────────────────────────
+export interface CellRendererParams<T = any> {
+  value: any;
+  data: T;
+  row: T;
+  colDef: GridColumn<T>;
+  column: GridColumn<T>;
+  index?: number;
+}
+
 // ─── Grid Column Definition ───────────────────────────────────────────────────
-export interface GridColumn {
+export interface GridColumn<T = any> {
   // Identity
   field: string;
   header?: string;
-  type?: GridColumnType;
+  type?: GridColumnType | string;
 
   // Legacy ag-grid compat
   headerName?: string;
-  cellRenderer?: any;
-  valueFormatter?: any;
-  valueGetter?: any;
+  cellRenderer?: ((params: CellRendererParams<T>) => string) | TemplateRef<any> | Type<any> | any;
+  cellRendererSelector?: (params: CellRendererParams<T>) => { component?: any; template?: any } | undefined;
+  valueFormatter?: ((params: { value: any; data: T; row: T }) => string) | ((val: any) => string) | any;
+  valueGetter?: ((params: { data: T; row: T; colDef: GridColumn<T> }) => any) | string | any;
   cellStyle?: any;
 
   // Layout
-  width?: string;
-  minWidth?: string;
-  maxWidth?: string;
+  width?: string | number;
+  minWidth?: string | number;
+  maxWidth?: string | number;
   flex?: number | string;
   align?: 'left' | 'center' | 'right';
   sticky?: 'left' | 'right' | false;
@@ -97,22 +110,16 @@ export interface GridColumn {
   roleEditable?: string[];
 
   // Custom Renderers (TemplateRef or Component class)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  // cellRenderer?: Type<any> | TemplateRef<any>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   cellEditor?: Type<any> | TemplateRef<any>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   headerRenderer?: Type<any> | TemplateRef<any>;
 
   // Validation
   validators?: ValidatorFn[];
   asyncValidators?: AsyncValidatorFn[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  crossFieldValidator?: (row: any) => string | null;
+  crossFieldValidator?: (row: T) => string | null;
 
   // Formatting
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  formatter?: (value: any, row: any, isPinned?: boolean) => any;
+  formatter?: (value: any, row: T, isPinned?: boolean) => any;
 
   // Standard configs
   placeholder?: string;
@@ -147,13 +154,11 @@ export interface GridColumn {
   colorFormat?: 'hex' | 'rgb' | 'hsb';
 
   // Formula (Phase 2)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  formula?: (row: any) => any;
+  formula?: (row: T) => any;
 
   // Styling
   headerClass?: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  cellClass?: string | ((row: any) => string);
+  cellClass?: string | ((row: T) => string);
 
   // Column ordering (for column manager)
   sortOrder?: number;
@@ -170,7 +175,7 @@ export type GridRowState =
   | 'saving' | 'error' | 'locked' | 'readonly' | 'pending';
 
 // ─── Row Action ───────────────────────────────────────────────────────────────
-export interface GridRowAction {
+export interface GridRowAction<T = any> {
   id: string;
   icon: string;
   label?: string;
@@ -178,44 +183,53 @@ export interface GridRowAction {
   permission?: string;
   showWhen?: 'always' | 'hover' | 'editing' | 'selected';
   variant?: 'primary' | 'danger' | 'ghost' | 'success';
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  callback: (row: any, context: GridContext) => void;
+  callback: (row: T, context: GridContext<T>) => void;
 }
 
 // ─── Bulk Action ──────────────────────────────────────────────────────────────
-export interface GridBulkAction {
+export interface GridBulkAction<T = any> {
   id: string;
   icon: string;
   label: string;
   permission?: string;
   variant?: 'primary' | 'danger' | 'ghost';
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  callback: (rows: any[], context: GridContext) => void;
+  callback: (rows: T[], context: GridContext<T>) => void;
 }
 
 // ─── Events ──────────────────────────────────────────────────────────────────
-export interface GridRowSaveEvent {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  row: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  originalRow: any;
+export interface GridRowSaveEvent<T = any> {
+  row: T;
+  originalRow: T;
   isNew: boolean;
   dirtyFields: string[];
 }
 
-export interface GridBulkActionEvent {
+export interface GridBulkActionEvent<T = any> {
   actionId: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  rows: any[];
+  rows: T[];
 }
 
 export interface GridCellChangeEvent {
   field: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   previousValue: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   newValue: any;
 }
+
+// ─── Shared Grid Event Bus (Backward-Compatibility) ──────────────────────────
+export type SharedGridEvent<T = any> =
+  | { type: 'init'; api: any }
+  | { type: 'cellClicked'; row: T; field?: string; colId?: string; value?: any; event?: MouseEvent }
+  | { type: 'rowClicked'; row: T; event?: MouseEvent }
+  | { type: 'rowDoubleClicked'; row: T }
+  | { type: 'reachedBottom'; [key: string]: any }
+  | { type: 'edit'; row: T }
+  | { type: 'save'; row: T; data?: T }
+  | { type: 'bulkSave'; rows: T[] }
+  | { type: 'cancel'; row: T }
+  | { type: 'delete'; row: T }
+  | { type: 'bulkDelete'; rows: T[] }
+  | { type: 'selectionChanged'; rows: T[] }
+  | { type: 'notes'; row: T };
 
 // ─── State Types ──────────────────────────────────────────────────────────────
 export interface GridSortState {
@@ -227,14 +241,14 @@ export interface GridSortState {
 export interface GridFilterState {
   field: string;
   operator: 'contains' | 'equals' | 'startsWith' | 'endsWith' | 'gt' | 'lt' | 'between' | 'in';
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: any;
 }
 
 export interface GridPageState {
-  page: number;
-  pageSize: number;
-  total: number;
+  page: number;         // 0-indexed page index (UI convention)
+  pageSize: number;     // number of rows per page
+  total: number;        // total records count
+  pageNumber?: number;  // 1-indexed convenience property (page + 1)
 }
 
 // ─── Query Payload ────────────────────────────────────────────────────────────
@@ -269,13 +283,13 @@ export interface GridColumnHeaderMeta {
   isSearchMatched: boolean;
   isPinned: boolean;
   isEdited: boolean;
-  isGrouped: boolean;       // Phase C: grouping
-  isFrozen: boolean;        // Phase C: frozen columns
-  isCalculated: boolean;    // Phase C: formula columns
+  isGrouped: boolean;
+  isFrozen: boolean;
+  isCalculated: boolean;
   hasFormula: boolean;
-  hasErrors: boolean;       // Phase C: validation errors
-  hasWarnings: boolean;     // Phase C: validation warnings
-  isDirty: boolean;         // Phase C: unsaved edits
+  hasErrors: boolean;
+  hasWarnings: boolean;
+  isDirty: boolean;
 }
 
 // ─── Saved Views ──────────────────────────────────────────────────────────────
@@ -306,39 +320,30 @@ export interface GridPersistedState {
 }
 
 // ─── Undo Entry ───────────────────────────────────────────────────────────────
-export interface GridUndoEntry {
+export interface GridUndoEntry<T = any> {
   type: 'cell' | 'row' | 'bulk';
   rowId: string;
   field?: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   previousValue: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   nextValue: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  rowSnapshot?: any;
+  rowSnapshot?: T;
 }
 
 // ─── Context (Plugin API contract) ───────────────────────────────────────────
-export interface GridContext {
+export interface GridContext<T = any> {
   // Data access
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getData(): any[];
-  getColumns(): GridColumn[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getSelectedRows(): any[];
+  getData(): T[];
+  getColumns(): GridColumn<T>[];
+  getSelectedRows(): T[];
   getEditingRowId(): string | null;
 
   // Row operations
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  startEditRow(row: any): void;
+  startEditRow(row: T): void;
   saveEditRow(): void;
   cancelEditRow(): void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  addRow(row?: Partial<any>): void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  deleteRow(row: any): void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  duplicateRow(row: any): void;
+  addRow(row?: Partial<T>): void;
+  deleteRow(row: T): void;
+  duplicateRow(row: T): void;
 
   // History
   undo(): void;
@@ -354,42 +359,34 @@ export interface GridContext {
 }
 
 // ─── Plugin Interface ─────────────────────────────────────────────────────────
-export interface GridPlugin {
+export interface GridPlugin<T = any> {
   id: string;
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
-  onInit?(context: GridContext): void;
+  onInit?(context: GridContext<T>): void;
   onDestroy?(): void;
 
   // ── Row operations ─────────────────────────────────────────────────────────
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onRowEdit?(row: any, context: GridContext): void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onBeforeSave?(row: any, context: GridContext): boolean | void; // return false to cancel
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onAfterSave?(row: any, context: GridContext): void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onRowSave?(row: any, context: GridContext): void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onSelectionChange?(rows: any[], context: GridContext): void;
+  onRowEdit?(row: T, context: GridContext<T>): void;
+  onBeforeSave?(row: T, context: GridContext<T>): boolean | void; // return false to cancel
+  onAfterSave?(row: T, context: GridContext<T>): void;
+  onRowSave?(row: T, context: GridContext<T>): void;
+  onSelectionChange?(rows: T[], context: GridContext<T>): void;
 
   // ── Cell events ────────────────────────────────────────────────────────────
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onCellClick?(field: string, row: any, context: GridContext): void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onCellDoubleClick?(field: string, row: any, context: GridContext): void;
+  onCellClick?(field: string, row: T, context: GridContext<T>): void;
+  onCellDoubleClick?(field: string, row: T, context: GridContext<T>): void;
 
   // ── Grid query events ──────────────────────────────────────────────────────
-  onSort?(sort: GridSortState[], context: GridContext): void;
-  onFilter?(filters: GridFilterState[], context: GridContext): void;
-  onSearch?(query: string, context: GridContext): void;
+  onSort?(sort: GridSortState[], context: GridContext<T>): void;
+  onFilter?(filters: GridFilterState[], context: GridContext<T>): void;
+  onSearch?(query: string, context: GridContext<T>): void;
 
   // ── UI events ──────────────────────────────────────────────────────────────
-  onToolbarAction?(actionId: string, context: GridContext): void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onRowContextMenu?(row: any, context: GridContext): void;
+  onToolbarAction?(actionId: string, context: GridContext<T>): void;
+  onRowContextMenu?(row: T, context: GridContext<T>): void;
 
   // ── State & Export ─────────────────────────────────────────────────────────
-  onStateChange?(state: GridPersistedState, context: GridContext): void;
-  onExport?(format: 'csv' | 'json' | 'xlsx', context: GridContext): void;
+  onStateChange?(state: GridPersistedState, context: GridContext<T>): void;
+  onExport?(format: 'csv' | 'json' | 'xlsx', context: GridContext<T>): void;
 }
