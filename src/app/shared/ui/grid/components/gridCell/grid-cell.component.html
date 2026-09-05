@@ -2,372 +2,316 @@
 
   <!-- ======================= EDIT MODE ======================= -->
   @if (isEditing() && column().editable !== false && !column().readOnly) {
-    @switch (column().type) {
+  @switch (column().type) {
 
-      @case ('number') {
-        <p-inputNumber
-          [ngModel]="editValue()"
-          [minFractionDigits]="column().minFractionDigits ?? 0"
-          [maxFractionDigits]="column().maxFractionDigits ?? 2"
-          [min]="column().min ?? null"
-          [max]="column().max ?? null"
-          inputStyleClass="apex-grid-input"
-          class="w-full"
-          (ngModelChange)="onValueChange($event)">
-        </p-inputNumber>
-      }
+  @case ('number') {
+  <p-inputNumber [ngModel]="editValue()" [minFractionDigits]="column().minFractionDigits ?? 0"
+    [maxFractionDigits]="column().maxFractionDigits ?? 2" [min]="column().min ?? null" [max]="column().max ?? null"
+    inputStyleClass="apex-grid-input" class="w-full" (ngModelChange)="onValueChange($event)">
+  </p-inputNumber>
+  }
 
-      @case ('currency') {
-        <p-inputNumber
-          [ngModel]="editValue()"
-          mode="currency"
-          [currency]="column().currencyCode ?? 'USD'"
-          inputStyleClass="apex-grid-input"
-          class="w-full"
-          (ngModelChange)="onValueChange($event)">
-        </p-inputNumber>
-      }
+  @case ('currency') {
+  <p-inputNumber [ngModel]="editValue()" mode="currency" [currency]="column().currencyCode ?? 'USD'"
+    inputStyleClass="apex-grid-input" class="w-full" (ngModelChange)="onValueChange($event)">
+  </p-inputNumber>
+  }
 
-      @case ('percentage') {
-        <p-inputNumber
-          [ngModel]="editValue()"
-          suffix="%"
-          [min]="column().min ?? 0"
-          [max]="column().max ?? 100"
-          inputStyleClass="apex-grid-input"
-          class="w-full"
-          (ngModelChange)="onValueChange($event)">
-        </p-inputNumber>
-      }
+  @case ('percentage') {
+  <p-inputNumber [ngModel]="editValue()" suffix="%" [min]="column().min ?? 0" [max]="column().max ?? 100"
+    inputStyleClass="apex-grid-input" class="w-full" (ngModelChange)="onValueChange($event)">
+  </p-inputNumber>
+  }
 
-      @case ('select') {
-        <p-select
-          [ngModel]="editValue()"
-          [options]="column().options ?? []"
-          optionLabel="label"
-          optionValue="value"
-          appendTo="body"
-          [placeholder]="column().placeholder ?? 'Select…'"
-          styleClass="apex-grid-dropdown"
-          class="w-full"
-          (ngModelChange)="onValueChange($event)">
-        </p-select>
-      }
+  @case ('select') {
+  <p-select [ngModel]="editValue()" [options]="column().options ?? []" optionLabel="label" optionValue="value"
+    appendTo="body" [placeholder]="column().placeholder ?? 'Select…'" styleClass="apex-grid-dropdown" class="w-full"
+    (ngModelChange)="onValueChange($event)">
+  </p-select>
+  }
 
-      @case ('date') {
-        <p-datepicker
-          [ngModel]="editValue()"
-          appendTo="body"
-          [dateFormat]="column().dateFormat ?? 'yy-mm-dd'"
-          [timeOnly]="column().timeOnly ?? false"
-          [showTime]="column().showTime ?? false"
-          [selectionMode]="column().selectionMode ?? 'single'"
-          inputStyleClass="apex-grid-input"
-          class="w-full"
-          (ngModelChange)="onValueChange($event)">
-        </p-datepicker>
-      }
+  @case ('date') {
+  <p-datepicker [ngModel]="editValue()" appendTo="body" [dateFormat]="column().dateFormat ?? 'yy-mm-dd'"
+    [timeOnly]="column().timeOnly ?? false" [showTime]="column().showTime ?? false"
+    [selectionMode]="column().selectionMode ?? 'single'" inputStyleClass="apex-grid-input" class="w-full"
+    (ngModelChange)="onValueChange($event)">
+  </p-datepicker>
+  }
 
-      @case ('boolean') {
-        <div class="flex items-center w-full px-2">
-          <p-checkbox
-            [ngModel]="editValue()"
-            [binary]="true"
-            (ngModelChange)="onValueChange($event)">
-          </p-checkbox>
-        </div>
-      }
+  @case ('boolean') {
+  <div class="flex items-center w-full px-2">
+    <p-checkbox [ngModel]="editValue()" [binary]="true" (ngModelChange)="onValueChange($event)">
+    </p-checkbox>
+  </div>
+  }
 
-      @case ('color') {
-        <div class="flex items-center gap-2.5 w-full px-2">
-          <p-colorPicker
-            [ngModel]="editValue()"
-            [format]="column().colorFormat ?? 'hex'"
-            appendTo="body"
-            (ngModelChange)="onValueChange($event)">
-          </p-colorPicker>
-          <span class="text-[11px] font-mono text-[var(--text-secondary)] uppercase tracking-wider">
-            {{ editValue() || '—' }}
-          </span>
-        </div>
-      }
+  @case ('color') {
+  <div class="flex items-center gap-2.5 w-full px-2">
+    <p-colorPicker [ngModel]="editValue()" [format]="column().colorFormat ?? 'hex'" appendTo="body"
+      (ngModelChange)="onValueChange($event)">
+    </p-colorPicker>
+    <span class="text-[11px] font-mono text-[var(--text-secondary)] uppercase tracking-wider">
+      {{ editValue() || '—' }}
+    </span>
+  </div>
+  }
 
-      @case ('tags') {
-        <p-autoComplete
-          [ngModel]="editValue()"
-          [multiple]="true"
-          [placeholder]="column().placeholder ?? 'Add tags…'"
-          appendTo="body"
-          styleClass="apex-grid-autocomplete"
-          class="w-full"
-          (ngModelChange)="onValueChange($event)">
-        </p-autoComplete>
-      }
+  @case ('tags') {
+  <p-autoComplete [ngModel]="editValue()" [multiple]="true" [placeholder]="column().placeholder ?? 'Add tags…'"
+    appendTo="body" styleClass="apex-grid-autocomplete" class="w-full" (ngModelChange)="onValueChange($event)">
+  </p-autoComplete>
+  }
 
-      @default {
-        <input
-          type="text"
-          class="apex-grid-input w-full"
-          [ngModel]="editValue()"
-          [placeholder]="column().placeholder ?? ''"
-          (ngModelChange)="onValueChange($event)">
-      }
-    }
+  @default {
+  <input type="text" class="apex-grid-input w-full" [ngModel]="editValue()" [placeholder]="column().placeholder ?? ''"
+    (ngModelChange)="onValueChange($event)">
+  }
+  }
 
   <!-- ======================= VIEW MODE ======================= -->
   } @else {
 
-    <!-- 1. Custom TemplateRef Renderer -->
-    @if (isCustomTemplate()) {
-      <ng-container
-        *ngTemplateOutlet="asTemplate(column().cellRenderer); context: cellTemplateContext()">
-      </ng-container>
+  <!-- 1. Custom TemplateRef Renderer -->
+  @if (isCustomTemplate()) {
+  <ng-container *ngTemplateOutlet="asTemplate(column().cellRenderer); context: cellTemplateContext()">
+  </ng-container>
 
-    <!-- 2. Custom Function Renderer (HTML / String) -->
-    } @else if (isCustomFunction()) {
-      <div class="w-full h-full flex items-center min-w-0" [ngClass]="alignClass()" [innerHTML]="customHtml()"></div>
+  <!-- 2. Custom Function Renderer (HTML / String) -->
+  } @else if (isCustomFunction()) {
+  <div class="w-full h-full flex items-center min-w-0" [ngClass]="alignClass()" [innerHTML]="customHtml()"></div>
 
-    <!-- 3. Standard Type Renderers -->
+  <!-- 3. Standard Type Renderers -->
+  } @else {
+  @switch (column().type) {
+
+  @case ('user') {
+  <div class="flex items-center gap-2.5 min-w-0 w-full group">
+    <app-avatar [imageUrl]="rowData()[column().field + 'Avatar']" [name]="rawCellValue() || 'Unknown'" size="sm"
+      class="transition-transform group-hover:scale-105">
+    </app-avatar>
+    <span
+      class="truncate text-[length:var(--font-size-xs)] font-[var(--font-weight-medium)] text-[var(--text-primary)] group-hover:text-[var(--accent-primary)] transition-colors">
+      {{ rawCellValue() }}
+    </span>
+  </div>
+  }
+
+  @case ('badge') {
+  @if (rawCellValue()) {
+  <app-status-badge [status]="rawCellValue()" variant="subtle" size="sm"></app-status-badge>
+  } @else {
+  <span class="text-[var(--text-tertiary)] w-full text-center block">—</span>
+  }
+  }
+
+  @case ('status') {
+  @if (rawCellValue()) {
+  <app-status-badge [status]="rawCellValue()" size="sm"></app-status-badge>
+  } @else {
+  <span class="text-[var(--text-tertiary)] w-full text-center block">—</span>
+  }
+  }
+
+  @case ('currency') {
+  <span class="font-mono text-[13px] font-[var(--font-weight-medium)] w-full block truncate tracking-tight"
+    [class.text-[var(--color-error)]]="rawCellValue() < 0" [class.text-[var(--text-primary)]]="rawCellValue() >= 0">
+    {{ rawCellValue() | currency:(column().currencyCode ?? 'USD'):'symbol':'1.2-2' }}
+  </span>
+  }
+
+  @case ('percentage') {
+  <span
+    class="font-mono text-[13px] font-[var(--font-weight-medium)] text-[var(--text-primary)] w-full block truncate tracking-tight">
+    {{ (rawCellValue() ?? 0) / 100 | percent:'1.1-2' }}
+  </span>
+  }
+
+  @case ('number') {
+  <span class="font-mono text-[13px] text-[var(--text-primary)] w-full block truncate tracking-tight">
+    {{ rawCellValue() | number:(column().minFractionDigits ? ('1.' + column().minFractionDigits + '-' +
+    (column().maxFractionDigits ?? 2)) : '1.0-2') }}
+  </span>
+  }
+
+  @case ('numeric') {
+  <span class="font-mono text-[13px] text-[var(--text-primary)] w-full block truncate tracking-tight">
+    {{ rawCellValue() | number:(column().minFractionDigits ? ('1.' + column().minFractionDigits + '-' +
+    (column().maxFractionDigits ?? 2)) : '1.0-2') }}
+  </span>
+  }
+
+  @case ('rightAligned') {
+  @if (isHtmlFormatted()) {
+  <div class="w-full h-full flex items-center min-w-0 justify-end text-right" [innerHTML]="safeFormattedHtml()"></div>
+  } @else {
+  <span class="text-[length:var(--font-size-xs)] text-[var(--text-primary)] w-full block truncate text-right">
+    {{ formattedValue() || '—' }}
+  </span>
+  }
+  }
+
+  @case ('html') {
+  <div class="w-full h-full flex items-center min-w-0" [ngClass]="alignClass()" [innerHTML]="safeFormattedHtml()"></div>
+  }
+
+  @case ('boolean') {
+  <div class="flex items-center w-full">
+    @if (rawCellValue()) {
+    <div
+      class="flex items-center justify-center w-5 h-5 rounded-[var(--ui-border-radius-sm)] bg-[color-mix(in_srgb,var(--color-success)_15%,transparent)] text-[var(--color-success)]">
+      <i class="pi pi-check text-[10px] font-bold"></i>
+    </div>
     } @else {
-      @switch (column().type) {
-
-        @case ('user') {
-          <div class="flex items-center gap-2.5 min-w-0 w-full group">
-            <app-avatar
-              [imageUrl]="rowData()[column().field + 'Avatar']"
-              [name]="rawCellValue() || 'Unknown'"
-              size="sm"
-              class="transition-transform group-hover:scale-105">
-            </app-avatar>
-            <span class="truncate text-[length:var(--font-size-xs)] font-[var(--font-weight-medium)] text-[var(--text-primary)] group-hover:text-[var(--accent-primary)] transition-colors">
-              {{ rawCellValue() }}
-            </span>
-          </div>
-        }
-
-        @case ('badge') {
-          @if (rawCellValue()) {
-            <app-status-badge [status]="rawCellValue()" variant="subtle" size="sm"></app-status-badge>
-          } @else {
-            <span class="text-[var(--text-tertiary)] w-full text-center block">—</span>
-          }
-        }
-
-        @case ('status') {
-          @if (rawCellValue()) {
-            <app-status-badge [status]="rawCellValue()" size="sm"></app-status-badge>
-          } @else {
-            <span class="text-[var(--text-tertiary)] w-full text-center block">—</span>
-          }
-        }
-
-        @case ('currency') {
-          <span
-            class="font-mono text-[13px] font-[var(--font-weight-medium)] w-full block truncate tracking-tight"
-            [class.text-[var(--color-error)]]="rawCellValue() < 0"
-            [class.text-[var(--text-primary)]]="rawCellValue() >= 0">
-            {{ rawCellValue() | currency:(column().currencyCode ?? 'USD'):'symbol':'1.2-2' }}
-          </span>
-        }
-
-        @case ('percentage') {
-          <span class="font-mono text-[13px] font-[var(--font-weight-medium)] text-[var(--text-primary)] w-full block truncate tracking-tight">
-            {{ (rawCellValue() ?? 0) / 100 | percent:'1.1-2' }}
-          </span>
-        }
-
-        @case ('number') {
-          <span class="font-mono text-[13px] text-[var(--text-primary)] w-full block truncate tracking-tight">
-            {{ rawCellValue() | number:(column().minFractionDigits ? ('1.' + column().minFractionDigits + '-' + (column().maxFractionDigits ?? 2)) : '1.0-2') }}
-          </span>
-        }
-
-        @case ('numeric') {
-          <span class="font-mono text-[13px] text-[var(--text-primary)] w-full block truncate tracking-tight">
-            {{ rawCellValue() | number:(column().minFractionDigits ? ('1.' + column().minFractionDigits + '-' + (column().maxFractionDigits ?? 2)) : '1.0-2') }}
-          </span>
-        }
-
-        @case ('rightAligned') {
-          @if (isHtmlFormatted()) {
-            <div class="w-full h-full flex items-center min-w-0 justify-end text-right" [innerHTML]="safeFormattedHtml()"></div>
-          } @else {
-            <span class="text-[length:var(--font-size-xs)] text-[var(--text-primary)] w-full block truncate text-right">
-              {{ formattedValue() || '—' }}
-            </span>
-          }
-        }
-
-        @case ('html') {
-          <div class="w-full h-full flex items-center min-w-0" [ngClass]="alignClass()" [innerHTML]="safeFormattedHtml()"></div>
-        }
-
-        @case ('boolean') {
-          <div class="flex items-center w-full">
-            @if (rawCellValue()) {
-              <div class="flex items-center justify-center w-5 h-5 rounded-[var(--ui-border-radius-sm)] bg-[color-mix(in_srgb,var(--color-success)_15%,transparent)] text-[var(--color-success)]">
-                <i class="pi pi-check text-[10px] font-bold"></i>
-              </div>
-            } @else {
-              <div class="flex items-center justify-center w-5 h-5 rounded-[var(--ui-border-radius-sm)] bg-[color-mix(in_srgb,var(--text-tertiary)_15%,transparent)] text-[var(--text-tertiary)]">
-                <i class="pi pi-minus text-[10px]"></i>
-              </div>
-            }
-          </div>
-        }
-
-        @case ('tags') {
-          <div class="flex flex-wrap items-center gap-1.5 min-w-0">
-            @for (tag of (rawCellValue() ?? []).slice(0, column().maxTags ?? 2); track tag) {
-              <span class="px-2 py-0.5 rounded-[var(--ui-border-radius-sm)] text-[10px] font-[var(--font-weight-medium)] bg-[var(--bg-secondary)] text-[var(--text-secondary)] border border-[var(--border-secondary)] truncate max-w-[90px] transition-colors hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)]">
-                {{ tag }}
-              </span>
-            }
-            @if ((rawCellValue() ?? []).length > (column().maxTags ?? 2)) {
-              <span
-                class="px-2 py-0.5 rounded-[var(--ui-border-radius-sm)] text-[10px] font-[var(--font-weight-semibold)] bg-[color-mix(in_srgb,var(--accent-primary)_10%,transparent)] text-[var(--accent-primary)] cursor-pointer hover:bg-[color-mix(in_srgb,var(--accent-primary)_15%,transparent)] transition-colors"
-                [pTooltip]="(rawCellValue() ?? []).slice(column().maxTags ?? 2).join(', ')"
-                tooltipPosition="top">
-                +{{ (rawCellValue()).length - (column().maxTags ?? 2) }}
-              </span>
-            }
-          </div>
-        }
-
-        @case ('color') {
-          <div class="flex items-center gap-2.5 min-w-0 w-full group">
-            @if (rawCellValue()) {
-              <div
-                class="w-4 h-4 rounded-full border border-[var(--border-secondary)] shadow-sm shrink-0 transition-transform group-hover:scale-110"
-                [style.background-color]="rawCellValue()">
-              </div>
-              <span class="font-mono text-[11px] text-[var(--text-secondary)] uppercase tracking-wider truncate">
-                {{ rawCellValue() }}
-              </span>
-            } @else {
-              <span class="text-[var(--text-tertiary)] w-full text-center block">—</span>
-            }
-          </div>
-        }
-
-        @case ('url') {
-          @if (rawCellValue()) {
-            <a
-              [href]="rawCellValue()"
-              target="_blank"
-              rel="noopener"
-              class="inline-flex items-center gap-1.5 text-[length:var(--font-size-xs)] text-[var(--accent-primary)] hover:text-[var(--accent-hover)] truncate max-w-full group transition-colors"
-              (click)="$event.stopPropagation()">
-              <span class="truncate">{{ rawCellValue() }}</span>
-              <i class="pi pi-external-link text-[10px] opacity-0 group-hover:opacity-100 transition-opacity shrink-0"></i>
-            </a>
-          } @else {
-            <span class="text-[var(--text-tertiary)] w-full text-center block">—</span>
-          }
-        }
-
-        @case ('image') {
-          @if (rawCellValue()) {
-            <div class="flex items-center h-full w-full py-1">
-              <img
-                [src]="rawCellValue()"
-                class="h-8 w-8 object-cover rounded-[var(--ui-border-radius-sm)] border border-[var(--border-secondary)]"
-                alt="thumbnail" />
-            </div>
-          } @else {
-            <span class="text-[var(--text-tertiary)] w-full text-center block">—</span>
-          }
-        }
-
-        @case ('date') {
-          <span class="text-[length:var(--font-size-xs)] text-[var(--text-primary)] w-full block truncate">
-            {{ rawCellValue() | date:(column().dateFormat ?? 'MMM d, yyyy') }}
-          </span>
-        }
-
-        @case ('datetime') {
-          <span class="text-[length:var(--font-size-xs)] text-[var(--text-primary)] w-full block truncate">
-            {{ rawCellValue() | date:(column().dateFormat ?? 'MMM d, yyyy, h:mm a') }}
-          </span>
-        }
-
-        @case ('email') {
-          @if (rawCellValue()) {
-            <a
-              [href]="'mailto:' + rawCellValue()"
-              class="inline-flex items-center gap-1.5 text-[length:var(--font-size-xs)] text-[var(--accent-primary)] hover:text-[var(--accent-hover)] truncate max-w-full transition-colors"
-              (click)="$event.stopPropagation()">
-              <span class="truncate">{{ rawCellValue() }}</span>
-            </a>
-          } @else {
-            <span class="text-[var(--text-tertiary)] w-full text-center block">—</span>
-          }
-        }
-
-        @case ('phone') {
-          @if (rawCellValue()) {
-            <a
-              [href]="'tel:' + rawCellValue()"
-              class="inline-flex items-center gap-1.5 text-[length:var(--font-size-xs)] text-[var(--text-primary)] hover:text-[var(--accent-primary)] truncate max-w-full transition-colors"
-              (click)="$event.stopPropagation()">
-              <span class="truncate">{{ rawCellValue() }}</span>
-            </a>
-          } @else {
-            <span class="text-[var(--text-tertiary)] w-full text-center block">—</span>
-          }
-        }
-
-        @case ('chip') {
-          @if (rawCellValue()) {
-            <span class="px-2 py-0.5 rounded-[var(--ui-border-radius-sm)] text-[10px] font-[var(--font-weight-medium)] bg-[var(--bg-secondary)] text-[var(--text-secondary)] border border-[var(--border-secondary)] truncate transition-colors">
-              {{ rawCellValue() }}
-            </span>
-          } @else {
-            <span class="text-[var(--text-tertiary)] w-full text-center block">—</span>
-          }
-        }
-
-        @case ('avatar') {
-          @if (rawCellValue()) {
-            <app-avatar [imageUrl]="rawCellValue()" size="sm" [name]="''"></app-avatar>
-          } @else {
-            <app-avatar [name]="'?'" size="sm"></app-avatar>
-          }
-        }
-
-        @case ('progress') {
-          <div class="w-full flex items-center gap-2">
-            <div class="flex-grow h-1.5 bg-[var(--bg-secondary)] rounded-full overflow-hidden">
-              <div
-                class="h-full bg-[var(--accent-primary)] rounded-full"
-                [style.width.%]="rawCellValue() || 0">
-              </div>
-            </div>
-            <span class="text-[10px] font-mono text-[var(--text-secondary)] w-8 text-right">
-              {{ rawCellValue() || 0 }}%
-            </span>
-          </div>
-        }
-
-        <!-- Default: Text / Formatted / Raw -->
-        @default {
-          @if (formattedValue()) {
-            @if (isHtmlFormatted()) {
-              <div class="w-full h-full flex items-center min-w-0" [ngClass]="alignClass()" [innerHTML]="safeFormattedHtml()"></div>
-            } @else {
-              <span
-                class="truncate block w-full text-[length:var(--font-size-xs)] text-[var(--text-primary)]"
-                [pTooltip]="formattedValue()"
-                tooltipPosition="top"
-                [tooltipDisabled]="!formattedValue()">
-                {{ formattedValue() }}
-              </span>
-            }
-          } @else {
-            <span class="text-[var(--text-tertiary)] w-full text-center block">—</span>
-          }
-        }
-      }
+    <div
+      class="flex items-center justify-center w-5 h-5 rounded-[var(--ui-border-radius-sm)] bg-[color-mix(in_srgb,var(--text-tertiary)_15%,transparent)] text-[var(--text-tertiary)]">
+      <i class="pi pi-minus text-[10px]"></i>
+    </div>
     }
+  </div>
+  }
+
+  @case ('tags') {
+  <div class="flex flex-wrap items-center gap-1.5 min-w-0">
+    @for (tag of (rawCellValue() ?? []).slice(0, column().maxTags ?? 2); track tag) {
+    <span
+      class="px-2 py-0.5 rounded-[var(--ui-border-radius-sm)] text-[10px] font-[var(--font-weight-medium)] bg-[var(--bg-secondary)] text-[var(--text-secondary)] border border-[var(--border-secondary)] truncate max-w-[90px] transition-colors hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)]">
+      {{ tag }}
+    </span>
+    }
+    @if ((rawCellValue() ?? []).length > (column().maxTags ?? 2)) {
+    <span
+      class="px-2 py-0.5 rounded-[var(--ui-border-radius-sm)] text-[10px] font-[var(--font-weight-semibold)] bg-[color-mix(in_srgb,var(--accent-primary)_10%,transparent)] text-[var(--accent-primary)] cursor-pointer hover:bg-[color-mix(in_srgb,var(--accent-primary)_15%,transparent)] transition-colors"
+      [pTooltip]="(rawCellValue() ?? []).slice(column().maxTags ?? 2).join(', ')" tooltipPosition="top">
+      +{{ (rawCellValue()).length - (column().maxTags ?? 2) }}
+    </span>
+    }
+  </div>
+  }
+
+  @case ('color') {
+  <div class="flex items-center gap-2.5 min-w-0 w-full group">
+    @if (rawCellValue()) {
+    <div
+      class="w-4 h-4 rounded-full border border-[var(--border-secondary)] shadow-sm shrink-0 transition-transform group-hover:scale-110"
+      [style.background-color]="rawCellValue()">
+    </div>
+    <span class="font-mono text-[11px] text-[var(--text-secondary)] uppercase tracking-wider truncate">
+      {{ rawCellValue() }}
+    </span>
+    } @else {
+    <span class="text-[var(--text-tertiary)] w-full text-center block">—</span>
+    }
+  </div>
+  }
+
+  @case ('url') {
+  @if (rawCellValue()) {
+  <a [href]="rawCellValue()" target="_blank" rel="noopener"
+    class="inline-flex items-center gap-1.5 text-[length:var(--font-size-xs)] text-[var(--accent-primary)] hover:text-[var(--accent-hover)] truncate max-w-full group transition-colors"
+    (click)="$event.stopPropagation()">
+    <span class="truncate">{{ rawCellValue() }}</span>
+    <i class="pi pi-external-link text-[10px] opacity-0 group-hover:opacity-100 transition-opacity shrink-0"></i>
+  </a>
+  } @else {
+  <span class="text-[var(--text-tertiary)] w-full text-center block">—</span>
+  }
+  }
+
+  @case ('image') {
+  @if (rawCellValue()) {
+  <div class="flex items-center h-full w-full py-1">
+    <img [src]="rawCellValue()"
+      class="h-8 w-8 object-cover rounded-[var(--ui-border-radius-sm)] border border-[var(--border-secondary)]"
+      alt="thumbnail" />
+  </div>
+  } @else {
+  <span class="text-[var(--text-tertiary)] w-full text-center block">—</span>
+  }
+  }
+
+  @case ('date') {
+  <span class="text-[length:var(--font-size-xs)] text-[var(--text-primary)] w-full block truncate">
+    {{ rawCellValue() | date:(column().dateFormat ?? 'MMM d, yyyy') }}
+  </span>
+  }
+
+  @case ('datetime') {
+  <span class="text-[length:var(--font-size-xs)] text-[var(--text-primary)] w-full block truncate">
+    {{ rawCellValue() | date:(column().dateFormat ?? 'MMM d, yyyy, h:mm a') }}
+  </span>
+  }
+
+  @case ('email') {
+  @if (rawCellValue()) {
+  <a [href]="'mailto:' + rawCellValue()"
+    class="inline-flex items-center gap-1.5 text-[length:var(--font-size-xs)] text-[var(--accent-primary)] hover:text-[var(--accent-hover)] truncate max-w-full transition-colors"
+    (click)="$event.stopPropagation()">
+    <span class="truncate">{{ rawCellValue() }}</span>
+  </a>
+  } @else {
+  <span class="text-[var(--text-tertiary)] w-full text-center block">—</span>
+  }
+  }
+
+  @case ('phone') {
+  @if (rawCellValue()) {
+  <a [href]="'tel:' + rawCellValue()"
+    class="inline-flex items-center gap-1.5 text-[length:var(--font-size-xs)] text-[var(--text-primary)] hover:text-[var(--accent-primary)] truncate max-w-full transition-colors"
+    (click)="$event.stopPropagation()">
+    <span class="truncate">{{ rawCellValue() }}</span>
+  </a>
+  } @else {
+  <span class="text-[var(--text-tertiary)] w-full text-center block">—</span>
+  }
+  }
+
+  @case ('chip') {
+  @if (rawCellValue()) {
+  <span
+    class="px-2 py-0.5 rounded-[var(--ui-border-radius-sm)] text-[10px] font-[var(--font-weight-medium)] bg-[var(--bg-secondary)] text-[var(--text-secondary)] border border-[var(--border-secondary)] truncate transition-colors">
+    {{ rawCellValue() }}
+  </span>
+  } @else {
+  <span class="text-[var(--text-tertiary)] w-full text-center block">—</span>
+  }
+  }
+
+  @case ('avatar') {
+  @if (rawCellValue()) {
+  <app-avatar [imageUrl]="rawCellValue()" size="sm" [name]="''"></app-avatar>
+  } @else {
+  <app-avatar [name]="'?'" size="sm"></app-avatar>
+  }
+  }
+
+  @case ('progress') {
+  <div class="w-full flex items-center gap-2">
+    <div class="flex-grow h-1.5 bg-[var(--bg-secondary)] rounded-full overflow-hidden">
+      <div class="h-full bg-[var(--accent-primary)] rounded-full" [style.width.%]="rawCellValue() || 0">
+      </div>
+    </div>
+    <span class="text-[10px] font-mono text-[var(--text-secondary)] w-8 text-right">
+      {{ rawCellValue() || 0 }}%
+    </span>
+  </div>
+  }
+
+  <!-- Default: Text / Formatted / Raw -->
+  @default {
+  @if (formattedValue()) {
+  @if (isHtmlFormatted()) {
+  <div class="w-full h-full flex items-center min-w-0" [ngClass]="alignClass()" [innerHTML]="safeFormattedHtml()"></div>
+  } @else {
+  <span class="truncate block w-full text-[length:var(--font-size-xs)] text-[var(--text-primary)]"
+    [pTooltip]="formattedValue()" tooltipPosition="top" [tooltipDisabled]="!formattedValue()">
+    {{ formattedValue() }}
+  </span>
+  }
+  } @else {
+  <span class="text-[var(--text-tertiary)] w-full text-center block">—</span>
+  }
+  }
+  }
+  }
   }
 </div>

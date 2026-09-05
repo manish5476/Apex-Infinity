@@ -427,7 +427,7 @@ export class LeaveDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-  onBack() { this.router.navigate(['/leave']); }
+  onBack() { this.router.navigate(['/hrms/leave/hub']); }
 
   ngOnDestroy(): void {
     this.destroy$.next();

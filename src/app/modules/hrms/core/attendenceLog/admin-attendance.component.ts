@@ -15,8 +15,6 @@ import { DialogModule } from 'primeng/dialog';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { DatePickerModule } from 'primeng/datepicker';
 import { SelectModule } from 'primeng/select';
@@ -39,8 +37,6 @@ import { DataGridComponent, GridColumn, GridRowAction } from '@shared/ui/grid';
     SkeletonModule,
     TooltipModule,
     ConfirmDialogModule,
-    IconFieldModule,
-    InputIconModule,
     InputTextModule,
     ToastModule,
     DataGridComponent
@@ -107,13 +103,6 @@ import { DataGridComponent, GridColumn, GridRowAction } from '@shared/ui/grid';
                 <span class="stat-label">Remote / Web</span>
                 <div class="stat-circle" [ngClass]="{'status-yellow': s.remoteCount > 0}">{{ s.remoteCount || 0 }}</div>
               </div>
-            </div>
-
-            <div class="stat-group ml-auto">
-              <p-iconField iconPosition="left">
-                <p-inputIcon styleClass="pi pi-search text-muted"></p-inputIcon>
-                <input type="text" pInputText placeholder="Search ledger..." (input)="onSearch($event)" class="pill-input" style="width: 250px;" />
-              </p-iconField>
             </div>
           </div>
         }
@@ -524,8 +513,8 @@ export class AdminAttendanceComponent implements OnInit, OnDestroy {
         filterable: true,
         formatter: (_val: any, row: any) => {
           const user = row?.user || {};
-          const name = user.name || 'Unknown';
-          const code = user.employeeProfile?.employeeId || user._id?.substring(0, 8) || 'N/A';
+          const name = user.name || row?.employeeRef?.displayName || 'Staff Member';
+          const code = row?.employeeRef?.employeeId || user.employeeProfile?.employeeId || (user._id ? `EMP-${user._id.slice(-4).toUpperCase()}` : 'EMP');
           const initials = this.getInitials(name);
 
           return `
@@ -539,8 +528,8 @@ export class AdminAttendanceComponent implements OnInit, OnDestroy {
         }
       },
       {
-        field: 'employee',
-        header: 'Employee',
+        field: 'type',
+        header: 'PUNCH TIME & TYPE',
         width: '240px',
         formatter: (_val: any, row: any) => {
           const type = row?.type;

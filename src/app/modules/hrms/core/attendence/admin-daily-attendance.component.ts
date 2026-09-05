@@ -203,8 +203,8 @@ import { takeUntil } from "rxjs/operators";
                           <tr class="table-row-hover">
                             <td>
                               <div class="flex align-items-center gap-3">
-                                <p-avatar [label]="getInitials(record.user?.name)" shape="circle" styleClass="bg-primary-light text-primary font-bold"></p-avatar>
-                                <span class="font-bold text-primary">{{ record.user?.name || 'Unknown' }}</span>
+                                <p-avatar [label]="getInitials(record.user?.name || record.employeeRef?.displayName || 'EM')" shape="circle" styleClass="bg-primary-light text-primary font-bold"></p-avatar>
+                                <span class="font-bold text-primary">{{ record.user?.name || record.employeeRef?.displayName || 'Staff Member' }}</span>
                               </div>
                             </td>
                             <td>

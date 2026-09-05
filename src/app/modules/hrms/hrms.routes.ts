@@ -68,11 +68,15 @@ import { ShiftGroupListComponent } from './core/shift/shift-group-list.component
 import { ShiftListComponent } from './core/shift/shift-list.component';
 import { ShiftValidatorComponent } from './core/shift/shift-validator.component';
 
-import { UserDetailsComponent } from '../user/user-details/user-details';
-import { UserFormComponent } from '../user/user-form/user-form';
-import { UserListComponent } from '../user/user-list/user-list';
+import { EmployeeListComponent } from './core/employee/employee-list.component';
+import { EmployeeFormComponent } from './core/employee/employee-form.component';
+import { EmployeeWorkspaceComponent } from './core/employee/employee-workspace.component';
 import { OrgHierarchyComponent } from '../user/organization-heirachy-component/organization-heirachy-component';
 import { RoleManagementComponent } from '../organization/components/role-management/role-management';
+import { PayrollHubComponent } from './core/payroll/payroll-hub.component';
+import { AssetAdminHubComponent } from './core/assets/asset-admin-hub.component';
+import { DocumentAdminHubComponent } from './core/documents/document-admin-hub.component';
+import { ExpenseAdminHubComponent } from './core/expenses/expense-admin-hub.component';
 
 import { TabRouterGuard } from '../../Tabbing';
 
@@ -80,14 +84,15 @@ export const HRMS_ROUTES: Routes = [
   {
     path: 'employees',
     canActivateChild: [TabRouterGuard, permissionGuard],
-    data: { permissions: [PERMISSIONS.USER.READ] },
+    data: { permissions: [PERMISSIONS.EMPLOYEE.READ] },
     children: [
       { path: '', redirectTo: 'list', pathMatch: 'full' },
-      { path: 'list', component: UserListComponent, data: { tabLabel: 'Employees', tabIcon: 'pi pi-users', permissions: [PERMISSIONS.USER.READ] } },
-      { path: 'new', component: UserFormComponent, data: { tabLabel: 'Onboard Employee', tabIcon: 'pi pi-user-plus', permissions: [PERMISSIONS.USER.MANAGE] } },
-      { path: 'edit/:id', component: UserFormComponent, data: { tabLabel: 'Edit Employee', tabIcon: 'pi pi-user-edit', permissions: [PERMISSIONS.USER.MANAGE] } },
-      { path: 'details/:id', component: UserDetailsComponent, data: { tabLabel: 'Employee Details', tabIcon: 'pi pi-id-card', permissions: [PERMISSIONS.USER.READ] } },
-      { path: 'hierarchy', component: OrgHierarchyComponent, data: { tabLabel: 'Employee Hierarchy', tabIcon: 'pi pi-sitemap', permissions: [PERMISSIONS.USER.READ] } },
+      { path: 'list', component: EmployeeListComponent, data: { tabLabel: 'Employee Directory', tabIcon: 'pi pi-users', permissions: [PERMISSIONS.EMPLOYEE.READ] } },
+      { path: 'new', component: EmployeeFormComponent, data: { tabLabel: 'Onboard Employee', tabIcon: 'pi pi-user-plus', permissions: [PERMISSIONS.EMPLOYEE.MANAGE] } },
+      { path: 'edit/:id', component: EmployeeFormComponent, data: { tabLabel: 'Edit Employee', tabIcon: 'pi pi-user-edit', permissions: [PERMISSIONS.EMPLOYEE.MANAGE] } },
+      { path: 'workspace/:id', component: EmployeeWorkspaceComponent, data: { tabLabel: 'Employee Workspace', tabIcon: 'pi pi-id-card', permissions: [PERMISSIONS.EMPLOYEE.READ] } },
+      { path: 'details/:id', redirectTo: 'workspace/:id', pathMatch: 'full' },
+      { path: 'hierarchy', component: OrgHierarchyComponent, data: { tabLabel: 'Employee Hierarchy', tabIcon: 'pi pi-sitemap', permissions: [PERMISSIONS.EMPLOYEE.READ] } },
     ]
   },
   {
@@ -226,5 +231,29 @@ export const HRMS_ROUTES: Routes = [
       { path: 'new', component: HolidayFormComponent, data: { tabLabel: 'Add Holiday', tabIcon: 'pi pi-plus' } },
       { path: 'edit/:id', component: HolidayFormComponent, data: { tabLabel: 'Edit Holiday', tabIcon: 'pi pi-pencil' } }
     ]
+  },
+  {
+    path: 'payroll',
+    component: PayrollHubComponent,
+    canActivate: [TabRouterGuard, permissionGuard],
+    data: { tabLabel: 'Payroll Engine', tabIcon: 'pi pi-money-bill', permissions: [PERMISSIONS.PAYROLL.READ] }
+  },
+  {
+    path: 'assets',
+    component: AssetAdminHubComponent,
+    canActivate: [TabRouterGuard, permissionGuard],
+    data: { tabLabel: 'Company Assets', tabIcon: 'pi pi-desktop', permissions: [PERMISSIONS.HRMS_ASSET.READ] }
+  },
+  {
+    path: 'documents',
+    component: DocumentAdminHubComponent,
+    canActivate: [TabRouterGuard, permissionGuard],
+    data: { tabLabel: 'Compliance Docs', tabIcon: 'pi pi-file', permissions: [PERMISSIONS.HRMS_DOCUMENT.READ] }
+  },
+  {
+    path: 'expenses',
+    component: ExpenseAdminHubComponent,
+    canActivate: [TabRouterGuard, permissionGuard],
+    data: { tabLabel: 'Expense Claims', tabIcon: 'pi pi-receipt', permissions: [PERMISSIONS.EXPENSE.CLAIM] }
   }
 ];

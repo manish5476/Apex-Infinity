@@ -467,18 +467,38 @@ export class DataGridComponent<T = any> implements OnDestroy, AfterViewInit {
         }
       });
     });
+
+    effect(() => {
+      this.displayData();
+      untracked(() => {
+        setTimeout(() => this.viewport?.checkViewportSize(), 0);
+      });
+    });
   }
+
+  private resizeObserver?: any;
 
   ngOnDestroy(): void {
     this.plugins().forEach(p => p.onDestroy?.());
     clearTimeout(this.searchTimeout);
+    this.resizeObserver?.disconnect();
   }
 
   ngAfterViewInit(): void {
     if (this.viewport) {
-      this.viewport.elementRef.nativeElement.addEventListener('scroll', (event) => {
+      this.viewport.elementRef.nativeElement.addEventListener('scroll', (event: any) => {
         this.onBodyScroll(event);
       }, { passive: true });
+
+      // Ensure viewport measures size properly
+      setTimeout(() => this.viewport?.checkViewportSize(), 50);
+
+      if (typeof window !== 'undefined' && 'ResizeObserver' in window) {
+        this.resizeObserver = new (window as any).ResizeObserver(() => {
+          this.viewport?.checkViewportSize();
+        });
+        this.resizeObserver.observe(this.viewport.elementRef.nativeElement);
+      }
     }
 
     // Emit init event for consumers relying on gridApi bridge (e.g. payment-list, sales-list)
@@ -505,17 +525,17 @@ export class DataGridComponent<T = any> implements OnDestroy, AfterViewInit {
 
   getRowId = (row: any): string => {
     if (!row) return '';
-    return String(row?.[this.dataKey()] ?? '');
+    return String(row?.[this.dataKey()] ?? row?._id ?? row?.id ?? '');
   };
 
   isNewRow(row: any): boolean {
     if (!row) return false;
-    return String(row?.[this.dataKey()] ?? '').startsWith('new_');
+    return String(row?.[this.dataKey()] ?? row?._id ?? row?.id ?? '').startsWith('new_');
   }
 
   trackByRowId = (index: number, row: any): string => {
     if (!row) return String(index);
-    return String(row?.[this.dataKey()] ?? index);
+    return String(row?.[this.dataKey()] ?? row?._id ?? row?.id ?? index);
   };
 
   // ─── Bulk & Row Editing Engine ────────────────────────────────────────────

@@ -252,7 +252,7 @@ export class DesignationListComponent implements OnInit {
       })
     ).subscribe(res => {
       if (res) {
-        const newData = res.data?.designations ?? res.data?.data ?? [];
+        const newData = Array.isArray(res.data) ? res.data : (res.data?.designations ?? res.data?.data ?? []);
         this.totalCount.set(res.pagination?.totalResults ?? res.total ?? newData.length);
         this.data.set(isReset ? newData : [...this.data(), ...newData]);
       }

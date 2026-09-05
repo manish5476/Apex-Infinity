@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, computed, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
@@ -37,20 +37,42 @@ import { AppMessageService } from '@core/services/message.service';
           <h1 class="page-title">My Attendance</h1>
           
           <div class="nav-pills hidden-mobile">
-            <span class="nav-pill active">Timesheet</span>
-            <span class="nav-pill">Requests</span>
-            <span class="nav-pill">Overtime</span>
+            <button type="button" class="nav-pill" [class.active]="activeTab() === 'timesheet'" (click)="setTab('timesheet')">
+              Timesheet
+              <span class="pill-badge">{{ records().length }}</span>
+            </button>
+            <button type="button" class="nav-pill" [class.active]="activeTab() === 'requests'" (click)="setTab('requests')">
+              Requests
+              @if (requestsCount() > 0) {
+                <span class="pill-badge highlight">{{ requestsCount() }}</span>
+              }
+            </button>
+            <button type="button" class="nav-pill" [class.active]="activeTab() === 'overtime'" (click)="setTab('overtime')">
+              Overtime
+              @if (overtimeCount() > 0) {
+                <span class="pill-badge">{{ overtimeCount() }}</span>
+              }
+            </button>
           </div>
         </div>
         
         <div class="header-controls">
+          <button type="button" class="nav-month-btn" (click)="navigateMonth(-1)" pTooltip="Previous Month" tooltipPosition="bottom">
+            <i class="pi pi-chevron-left"></i>
+          </button>
+          <button type="button" class="nav-month-btn nav-today" (click)="goToCurrentMonth()" pTooltip="Go to Current Month" tooltipPosition="bottom">
+            Today
+          </button>
+          <button type="button" class="nav-month-btn" (click)="navigateMonth(1)" pTooltip="Next Month" tooltipPosition="bottom">
+            <i class="pi pi-chevron-right"></i>
+          </button>
           <p-datepicker
             [(ngModel)]="selectedMonth"
             view="month"
             dateFormat="MM yy"
             [readonlyInput]="true"
             (onSelect)="loadMyAttendance()"
-            styleClass="pill-datepicker w-15rem">
+            styleClass="pill-datepicker w-12rem">
           </p-datepicker>
         </div>
       </header>
@@ -89,7 +111,7 @@ import { AppMessageService } from '@core/services/message.service';
     
         <div class="table-container slide-down" style="animation-delay: 0.2s">
           <p-table
-            [value]="records()"
+            [value]="displayedRecords()"
             [rows]="31"
             responsiveLayout="scroll"
             styleClass="crextio-table">
@@ -137,7 +159,7 @@ import { AppMessageService } from '@core/services/message.service';
                 </td>
     
                 <td>
-                  <span class="font-bold">{{ record.netWorkHours | number:'1.1-1' }}h</span>
+                  <span class="font-bold">{{ (record.netWorkHours ?? record.totalWorkHours ?? 0) | number:'1.1-1' }}h</span>
                 </td>
     
                 <td>
@@ -148,17 +170,35 @@ import { AppMessageService } from '@core/services/message.service';
                 </td>
     
                 <td class="text-center">
-                  @if (canRegularize(record)) {
-                    <button class="action-btn" (click)="openRegularizeDialog(record)" pTooltip="Regularize">
+                  @if (record.isRegularized) {
+                    <span class="badge-regularized" pTooltip="Regularized" tooltipPosition="left">
+                      <i class="pi pi-check"></i>
+                    </span>
+                  } @else if (canRegularize(record)) {
+                    <button class="action-btn" (click)="openRegularizeDialog(record)" pTooltip="Regularize" tooltipPosition="left">
                       <i class="pi pi-sliders-h"></i>
                     </button>
+                  } @else {
+                    <span class="text-secondary text-xs">&mdash;</span>
                   }
                 </td>
               </tr>
             </ng-template>
     
             <ng-template pTemplate="emptymessage">
-              <tr><td colspan="8" class="text-center py-6 text-secondary">No attendance records found.</td></tr>
+              <tr>
+                <td colspan="8" class="text-center py-8">
+                  <div class="flex-col items-center gap-2" style="align-items: center; justify-content: center;">
+                    <i class="pi pi-calendar-times" style="font-size: 2rem; color: var(--c-text-muted);"></i>
+                    <div class="text-secondary font-medium">No records found for {{ selectedMonth | date:'MMMM yyyy' }}.</div>
+                    @if (records().length === 0) {
+                      <button type="button" class="quick-jump-pill mt-2" (click)="jumpToMonth(2026, 5)">
+                        <i class="pi pi-history mr-1"></i> View June 2026 Records
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
             </ng-template>
           </p-table>
         </div>
@@ -203,7 +243,7 @@ import { AppMessageService } from '@core/services/message.service';
       width: 100%;
       min-height: 100vh;
       background-color: #9AA3AD; 
-      padding: 2rem;
+      padding: 1.5rem 1.5rem 1.5rem 4rem; /* Generous left padding to clear floating sidebar toggle */
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       
       --c-bg-app: #F5F6F8;
@@ -298,21 +338,97 @@ import { AppMessageService } from '@core/services/message.service';
     }
 
     .header-controls { display: flex; align-items: center; gap: var(--spacing-md); }
-    .nav-pills { display: flex; background: transparent; gap: 8px; margin-left: 1rem; }
+    .nav-pills { display: flex; background: transparent; gap: 8px; margin-left: 1rem; align-items: center; }
 
     .nav-pill {
-      padding: 10px 20px;
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 18px;
       border-radius: var(--radius-pill);
+      border: 1px solid transparent;
+      background: transparent;
       color: var(--c-text-muted);
       font-size: 14px;
       cursor: pointer;
       transition: all 0.2s;
     }
-
+    .nav-pill:hover {
+      background: rgba(0,0,0,0.04);
+      color: var(--c-text-main);
+    }
     .nav-pill.active {
       background: var(--c-text-main);
       color: #FFF;
       font-weight: 500;
+    }
+    .pill-badge {
+      background: rgba(0,0,0,0.08);
+      color: var(--c-text-main);
+      border-radius: 12px;
+      font-size: 0.72rem;
+      padding: 1px 7px;
+      margin-left: 6px;
+      font-weight: 600;
+    }
+    .nav-pill.active .pill-badge {
+      background: rgba(255,255,255,0.25);
+      color: #fff;
+    }
+    .pill-badge.highlight {
+      background: #ef4444;
+      color: white;
+    }
+    .nav-month-btn {
+      width: 2.25rem;
+      height: 2.25rem;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--c-border);
+      background: #ffffff;
+      color: var(--c-text-main);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.85rem;
+    }
+    .nav-month-btn:hover {
+      background: #f0f1f4;
+      border-color: #cbd0d8;
+    }
+    .nav-month-btn.nav-today {
+      width: auto;
+      padding: 0 0.85rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .quick-jump-pill {
+      background: #ffffff;
+      border: 1px solid var(--c-border);
+      border-radius: var(--radius-pill);
+      padding: 6px 14px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--c-text-main);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      transition: all 0.2s;
+    }
+    .quick-jump-pill:hover {
+      background: #f0f1f4;
+      border-color: #a0a6b0;
+    }
+    .badge-regularized {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.85rem;
+      height: 1.85rem;
+      border-radius: 50%;
+      background: #ecfdf5;
+      color: #059669;
+      font-weight: bold;
     }
 
     /* =========================================================
@@ -570,9 +686,30 @@ export class MyDailyAttendanceComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
 
   isLoading = signal(true);
-  selectedMonth: Date = new Date('2026-06-01'); // Adjusted based on context
+  selectedMonth: Date = new Date(); // Defaults to current month
   records = signal<any[]>([]);
   summary = signal<any>(null);
+  activeTab = signal<'timesheet' | 'requests' | 'overtime'>('timesheet');
+
+  requestsCount = computed(() => {
+    return this.records().filter(r => r.isRegularized || r.regularizationStatus || this.canRegularize(r)).length;
+  });
+
+  overtimeCount = computed(() => {
+    return this.records().filter(r => r.isOvertime || (r.overtimeHours && r.overtimeHours > 0)).length;
+  });
+
+  displayedRecords = computed(() => {
+    const tab = this.activeTab();
+    const all = this.records();
+    if (tab === 'requests') {
+      return all.filter(r => r.isRegularized || r.regularizationStatus || this.canRegularize(r));
+    }
+    if (tab === 'overtime') {
+      return all.filter(r => r.isOvertime || (r.overtimeHours && r.overtimeHours > 0));
+    }
+    return all;
+  });
 
   displayRegularize = false;
   selectedRecord: any = null;
@@ -592,6 +729,27 @@ export class MyDailyAttendanceComponent implements OnInit, OnDestroy {
     });
   }
 
+  setTab(tab: 'timesheet' | 'requests' | 'overtime') {
+    this.activeTab.set(tab);
+  }
+
+  navigateMonth(delta: number) {
+    const nextDate = new Date(this.selectedMonth);
+    nextDate.setMonth(nextDate.getMonth() + delta);
+    this.selectedMonth = nextDate;
+    this.loadMyAttendance();
+  }
+
+  goToCurrentMonth() {
+    this.selectedMonth = new Date();
+    this.loadMyAttendance();
+  }
+
+  jumpToMonth(year: number, monthZeroIndexed: number) {
+    this.selectedMonth = new Date(year, monthZeroIndexed, 1);
+    this.loadMyAttendance();
+  }
+
   loadMyAttendance() {
     this.isLoading.set(true);
 
@@ -600,7 +758,7 @@ export class MyDailyAttendanceComponent implements OnInit, OnDestroy {
 
     this.hrmsService.getMyAttendance({ fromDate: start, toDate: end }).pipe(
       catchError((err) => {
-        this.messageService.handleHttpError(err)
+        this.messageService.handleHttpError(err);
         return of({ data: { records: [], summary: {} } });
       }),
       finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
@@ -629,11 +787,20 @@ export class MyDailyAttendanceComponent implements OnInit, OnDestroy {
     if (this.regForm.invalid || !this.selectedRecord) return;
 
     this.isSubmitting.set(true);
-    const payload = this.regForm.value;
+    const formVal = this.regForm.value;
+    const payload: any = {
+      reason: formVal.reason
+    };
+    if (formVal.firstIn) {
+      payload.firstIn = new Date(formVal.firstIn).toISOString();
+    }
+    if (formVal.lastOut) {
+      payload.lastOut = new Date(formVal.lastOut).toISOString();
+    }
 
     this.hrmsService.regularizeAttendance(this.selectedRecord._id, payload).pipe(
       catchError(err => {
-        this.messageService.handleHttpError(err)
+        this.messageService.handleHttpError(err);
         return of(null);
       }),
       finalize(() => {
@@ -642,7 +809,7 @@ export class MyDailyAttendanceComponent implements OnInit, OnDestroy {
       }), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       if (res) {
-        this.messageService.showSuccess(res.message || 'Attendance regularization submitted.')
+        this.messageService.showSuccess(res.message || 'Attendance regularization submitted.');
         this.loadMyAttendance();
       }
     });

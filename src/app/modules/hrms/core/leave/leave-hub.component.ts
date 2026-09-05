@@ -17,6 +17,9 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { AvatarModule } from 'primeng/avatar';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressBarModule } from 'primeng/progressbar';
+import { PageComponent } from '@shared/ui/layout/page/page.component';
+import { PageContentComponent } from '@shared/ui/layout/page-content/page-content.component';
+import { PageHeaderComponent } from '@shared/ui/layout/page-header/page-header.component';
 import { HRMSService } from '../../hrms.service';
 import { AppMessageService } from '@core/services/message.service';
 
@@ -26,32 +29,26 @@ import { AppMessageService } from '@core/services/message.service';
   imports: [
     CommonModule, TabsModule, TableModule, CardModule,
     ButtonModule, TagModule, SkeletonModule, AvatarModule,
-    TooltipModule, ProgressBarModule
+    TooltipModule, ProgressBarModule,
+    PageComponent, PageHeaderComponent, PageContentComponent
   ],
   providers: [MessageService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="apex-page fade-in flex-col h-screen">
-      
-      <header class="apex-header apex-header--elevated flex-shrink-0">
-        <div class="flex-align gap-4">
-          <div class="apex-card__icon" style="width: 48px; height: 48px; font-size: 20px;"><i class="pi pi-calendar-minus"></i></div>
-          <div class="flex-col">
-            <h1 class="apex-page-header__title m-0" style="font-size: var(--font-size-2xl);">Leave & Time Off</h1>
-            <p class="apex-page-header__subtitle m-0 text-sm text-tertiary">Manage your time off requests, balances, and team approvals.</p>
-          </div>
-        </div>
-        <div class="header-right ml-auto">
+    <app-page>
+      <app-page-header
+        title="Leave & Time Off"
+        subtitle="Manage your time off requests, balances, and team approvals">
+        <div header-right>
           <p-button 
             label="Apply for Leave" 
             icon="pi pi-plus" 
-            styleClass="apex-btn apex-btn--primary"
             (onClick)="onApplyLeave()">
           </p-button>
         </div>
-      </header>
+      </app-page-header>
 
-      <main class="apex-content flex-1 overflow-auto flex-col p-4 sm:p-5">
+      <app-page-content [padded]="false" class="pl-6 sm:pl-8 pr-4 sm:pr-6 pb-6 flex-1 flex flex-col min-h-0">
         @if (isLoading()) {
           <div class="flex-col gap-4 h-full">
             <div class="apex-grid apex-grid--3">
@@ -84,36 +81,69 @@ import { AppMessageService } from '@core/services/message.service';
                     
                     @if (balances(); as bal) {
                       <div class="apex-grid apex-grid--3 mb-5">
-                        <div class="apex-card casual-card p-4">
-                          <div class="flex-between">
-                            <span class="text-sm font-bold uppercase tracking-wider text-slate-600">Casual Leave (CL)</span>
-                            <i class="pi pi-sun text-xl text-slate-500"></i>
+                        <!-- Casual Leave -->
+                        <div class="balance-card balance-card--casual p-5 border rounded-2xl bg-[var(--bg-primary)] shadow-sm">
+                          <div class="flex-between mb-3">
+                            <div>
+                              <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Casual Leave</span>
+                              <h4 class="m-0 text-base font-bold text-[var(--text-primary)]">CL Balance</h4>
+                            </div>
+                            <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex-center">
+                              <i class="pi pi-sun text-lg"></i>
+                            </div>
                           </div>
-                          <div class="mt-4">
-                            <div class="text-3xl font-bold text-slate-700 m-0">{{ bal.casual?.available || 0 }} <span class="text-lg text-slate-500 font-medium">/ {{ bal.casual?.total || 0 }}</span></div>
-                            <p-progressBar [value]="getPercentage(bal.casual?.available, bal.casual?.total)" [showValue]="false" styleClass="mt-2 h-2"></p-progressBar>
+                          <div class="flex items-baseline gap-2 mb-2">
+                            <span class="text-3xl font-extrabold text-[var(--text-primary)]">{{ bal.casual?.available ?? bal.casualLeave?.available ?? 0 }}</span>
+                            <span class="text-sm font-medium text-[var(--text-tertiary)]">/ {{ bal.casual?.total ?? bal.casualLeave?.total ?? 0 }} days</span>
+                          </div>
+                          <p-progressBar [value]="getPercentage(bal.casual?.available ?? bal.casualLeave?.available, bal.casual?.total ?? bal.casualLeave?.total)" [showValue]="false" styleClass="h-2 rounded-full mb-3"></p-progressBar>
+                          <div class="flex-between text-xs text-[var(--text-secondary)]">
+                            <span>Used: <strong>{{ bal.casual?.used ?? bal.casualLeave?.used ?? 0 }}</strong></span>
+                            <span>Available: <strong>{{ bal.casual?.available ?? bal.casualLeave?.available ?? 0 }}</strong></span>
                           </div>
                         </div>
 
-                        <div class="apex-card sick-card p-4">
-                          <div class="flex-between">
-                            <span class="text-sm font-bold uppercase tracking-wider text-sky-700">Sick Leave (SL)</span>
-                            <i class="pi pi-heart-fill text-xl text-sky-600"></i>
+                        <!-- Sick Leave -->
+                        <div class="balance-card balance-card--sick p-5 border rounded-2xl bg-[var(--bg-primary)] shadow-sm">
+                          <div class="flex-between mb-3">
+                            <div>
+                              <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Medical & Sick</span>
+                              <h4 class="m-0 text-base font-bold text-[var(--text-primary)]">SL Balance</h4>
+                            </div>
+                            <div class="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 flex-center">
+                              <i class="pi pi-heart-fill text-lg"></i>
+                            </div>
                           </div>
-                          <div class="mt-4">
-                            <div class="text-3xl font-bold text-sky-800 m-0">{{ bal.sick?.available || 0 }} <span class="text-lg text-sky-600 font-medium">/ {{ bal.sick?.total || 0 }}</span></div>
-                            <p-progressBar [value]="getPercentage(bal.sick?.available, bal.sick?.total)" [showValue]="false" styleClass="mt-2 h-2"></p-progressBar>
+                          <div class="flex items-baseline gap-2 mb-2">
+                            <span class="text-3xl font-extrabold text-[var(--text-primary)]">{{ bal.sick?.available ?? bal.sickLeave?.available ?? 0 }}</span>
+                            <span class="text-sm font-medium text-[var(--text-tertiary)]">/ {{ bal.sick?.total ?? bal.sickLeave?.total ?? 0 }} days</span>
+                          </div>
+                          <p-progressBar [value]="getPercentage(bal.sick?.available ?? bal.sickLeave?.available, bal.sick?.total ?? bal.sickLeave?.total)" [showValue]="false" styleClass="h-2 rounded-full mb-3"></p-progressBar>
+                          <div class="flex-between text-xs text-[var(--text-secondary)]">
+                            <span>Used: <strong>{{ bal.sick?.used ?? bal.sickLeave?.used ?? 0 }}</strong></span>
+                            <span>Available: <strong>{{ bal.sick?.available ?? bal.sickLeave?.available ?? 0 }}</strong></span>
                           </div>
                         </div>
 
-                        <div class="apex-card earned-card p-4">
-                          <div class="flex-between">
-                            <span class="text-sm font-bold uppercase tracking-wider text-orange-700">Earned Leave (EL)</span>
-                            <i class="pi pi-star-fill text-xl text-orange-600"></i>
+                        <!-- Earned Leave -->
+                        <div class="balance-card balance-card--earned p-5 border rounded-2xl bg-[var(--bg-primary)] shadow-sm">
+                          <div class="flex-between mb-3">
+                            <div>
+                              <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Privilege & Earned</span>
+                              <h4 class="m-0 text-base font-bold text-[var(--text-primary)]">EL Balance</h4>
+                            </div>
+                            <div class="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex-center">
+                              <i class="pi pi-star-fill text-lg"></i>
+                            </div>
                           </div>
-                          <div class="mt-4">
-                            <div class="text-3xl font-bold text-orange-800 m-0">{{ bal.earned?.available || 0 }} <span class="text-lg text-orange-600 font-medium">/ {{ bal.earned?.total || 0 }}</span></div>
-                            <p-progressBar [value]="getPercentage(bal.earned?.available, bal.earned?.total)" [showValue]="false" styleClass="mt-2 h-2"></p-progressBar>
+                          <div class="flex items-baseline gap-2 mb-2">
+                            <span class="text-3xl font-extrabold text-[var(--text-primary)]">{{ bal.earned?.available ?? bal.earnedLeave?.available ?? 0 }}</span>
+                            <span class="text-sm font-medium text-[var(--text-tertiary)]">/ {{ bal.earned?.total ?? bal.earnedLeave?.total ?? 0 }} days</span>
+                          </div>
+                          <p-progressBar [value]="getPercentage(bal.earned?.available ?? bal.earnedLeave?.available, bal.earned?.total ?? bal.earnedLeave?.total)" [showValue]="false" styleClass="h-2 rounded-full mb-3"></p-progressBar>
+                          <div class="flex-between text-xs text-[var(--text-secondary)]">
+                            <span>Used: <strong>{{ bal.earned?.used ?? bal.earnedLeave?.used ?? 0 }}</strong></span>
+                            <span>Available: <strong>{{ bal.earned?.available ?? bal.earnedLeave?.available ?? 0 }}</strong></span>
                           </div>
                         </div>
                       </div>
@@ -193,10 +223,10 @@ import { AppMessageService } from '@core/services/message.service';
                               
                               <div class="flex-between border-bottom pb-3">
                                 <div class="flex-align gap-3">
-                                  <p-avatar [label]="getInitials(approval.user?.name)" shape="circle" size="large" [style]="{'background-color': 'var(--accent-focus)', 'color': 'var(--accent-primary)'}"></p-avatar>
+                                  <p-avatar [label]="getInitials(approval.employee?.displayName || approval.user?.name || 'EM')" shape="circle" size="large" [style]="{'background-color': 'var(--accent-focus)', 'color': 'var(--accent-primary)'}"></p-avatar>
                                   <div class="flex-col">
-                                    <span class="font-bold text-primary-color">{{ approval.user?.name || 'Employee' }}</span>
-                                    <span class="text-xs text-secondary">{{ approval.user?.employeeProfile?.employeeId || 'ID N/A' }}</span>
+                                    <span class="font-bold text-primary-color">{{ approval.employee?.displayName || (approval.employee?.firstName ? (approval.employee?.firstName + ' ' + (approval.employee?.lastName || '')) : null) || approval.user?.name || 'Employee' }}</span>
+                                    <span class="text-xs text-secondary">{{ approval.employee?.employeeId || approval.user?.employeeId || approval.employeeId || 'ID N/A' }}</span>
                                   </div>
                                 </div>
                                 <span class="badge-mono-sm">{{ approval.leaveRequestId }}</span>
@@ -248,8 +278,7 @@ import { AppMessageService } from '@core/services/message.service';
             </p-tabs>
           </div>
         }
-      </main>
-    </div>
+   
   `,
   styles: [`
     :host {
@@ -276,6 +305,28 @@ import { AppMessageService } from '@core/services/message.service';
     
     .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); }
     .span-2 { grid-column: span 2; }
+    
+    .apex-grid { display: grid; gap: 1.25rem; }
+    .apex-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .apex-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .apex-grid--auto { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem; }
+    @media (max-width: 1024px) {
+      .apex-grid--3 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+      .apex-grid--2 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+    }
+
+    .balance-card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-primary);
+    }
+    .balance-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .balance-card--casual ::ng-deep .p-progressbar-value { background: #3b82f6; }
+    .balance-card--sick ::ng-deep .p-progressbar-value { background: #f43f5e; }
+    .balance-card--earned ::ng-deep .p-progressbar-value { background: #f59e0b; }
     
     .gap-1 { gap: var(--spacing-xs); }
     .gap-2 { gap: var(--spacing-sm); }
@@ -418,7 +469,10 @@ export class LeaveHubComponent implements OnInit, OnDestroy {
 
     forkJoin({
       balances: this.hrmsService.getLeaveBalanceSummary().pipe(
-        map(res => res?.data || {}),
+        map(res => {
+          const d = res?.data || {};
+          return d.balance || d;
+        }),
         catchError(() => of({}))
       ),
       myReqs: this.hrmsService.getMyLeaveRequests().pipe(
@@ -440,21 +494,28 @@ export class LeaveHubComponent implements OnInit, OnDestroy {
 
   // --- Actions ---
   onApplyLeave() {
-    this.router.navigate(['/leave/apply']);
+    this.router.navigate(['/hrms/leave/apply']);
   }
 
   viewDetails(id: string) {
-    this.router.navigate(['/leave/details', id]);
+    this.router.navigate(['/hrms/leave/details', id]);
   }
 
   actionRequest(id: string, action: 'approve' | 'reject') {
-    // Stub for approval workflow endpoint integration
-    const summaryMsg = action === 'approve' ? 'Leave Approved' : 'Leave Rejected';
-    const severity = action === 'approve' ? 'success' : 'warn';
+    const apiCall = action === 'approve'
+      ? this.hrmsService.approveLeaveRequest(id, 'Approved via Leave Hub')
+      : this.hrmsService.rejectLeaveRequest(id, 'Rejected via Leave Hub');
 
-    // Optimistic UI update
-    this.pendingApprovals.update(apps => apps.filter(a => a._id !== id));
-    // this.messageService.add({ severity, summary: summaryMsg, detail: `The request has been processed.` });
+    apiCall.pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.messageService.showSuccess(`Leave request ${action === 'approve' ? 'approved' : 'rejected'} successfully.`);
+        this.pendingApprovals.update(apps => apps.filter(a => a._id !== id));
+        this.loadDashboardData();
+      },
+      error: (err: any) => {
+        this.messageService.handleHttpError(err);
+      }
+    });
   }
 
   // --- Helpers ---

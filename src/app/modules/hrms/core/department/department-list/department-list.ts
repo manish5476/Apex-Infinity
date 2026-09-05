@@ -198,8 +198,8 @@ export class DepartmentListComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe({
       next: (res: any) => {
-        const newData = res.data?.data ?? [];
-        this.totalCount.set(res.pagination?.totalResults ?? 0);
+        const newData = Array.isArray(res.data) ? res.data : (res.data?.departments ?? res.data?.data ?? []);
+        this.totalCount.set(res.pagination?.totalResults ?? res.total ?? (Array.isArray(res.data) ? res.data.length : 0));
         this.data.update(prev => isReset ? newData : [...prev, ...newData]);
         if (newData.length > 0) this.currentPage++;
       },

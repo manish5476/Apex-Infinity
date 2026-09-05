@@ -3,6 +3,287 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { BaseApiService } from '../../core/services/base-api.service';
 
+// Employee Master Interfaces
+export interface EmployeePersonal {
+  dateOfBirth?: Date | string;
+  gender?: 'male' | 'female' | 'other' | 'prefer_not_to_say';
+  maritalStatus?: 'single' | 'married' | 'divorced' | 'widowed';
+  bloodGroup?: string;
+  secondaryPhone?: string;
+}
+
+export interface EmployeeEmergencyContact {
+  name: string;
+  relationship: string;
+  phone: string;
+  alternatePhone?: string;
+}
+
+export interface EmployeeAttendanceConfig {
+  machineUserId?: string;
+  shiftId?: string;
+  shiftGroupId?: string;
+  isAttendanceEnabled?: boolean;
+  allowWebPunch?: boolean;
+  allowMobilePunch?: boolean;
+  enforceGeoFence?: boolean;
+  geoFenceId?: string;
+  geoFenceRadius?: number;
+  biometricVerified?: boolean;
+}
+
+export interface EmployeeBankDetails {
+  accountName?: string;
+  accountNumber?: string;
+  ifscCode?: string;
+  bankName?: string;
+  panCard?: string;
+  uanNumber?: string;
+  esiNumber?: string;
+  pfNumber?: string;
+}
+
+export interface EmployeeCompensation {
+  salaryStructureId?: string;
+  payCycle?: 'monthly' | 'weekly' | 'daily';
+  ctcAnnual?: number;
+  currency?: string;
+  bankDetails?: EmployeeBankDetails;
+}
+
+export interface Employee {
+  _id: string;
+  user?: {
+    _id: string;
+    name?: string;
+    email?: string;
+    phone?: string;
+    avatar?: string;
+    role?: string;
+  } | null;
+  organizationId: string;
+  branchId?: string | { _id: string; name: string };
+  firstName?: string;
+  lastName?: string;
+  displayName?: string;
+  officialEmail?: string;
+  phone?: string;
+  employeeId: string;
+  departmentId?: string | { _id: string; name: string; code?: string };
+  designationId?: string | { _id: string; title: string; code?: string; level?: number };
+  reportingManagerId?: string | { _id: string; name: string; email: string };
+  employmentType: 'permanent' | 'contract' | 'intern' | 'probation' | 'consultant';
+  workMode: 'office' | 'remote' | 'hybrid' | 'field';
+  status: 'active' | 'probation' | 'notice_period' | 'relieved' | 'terminated' | 'inactive';
+  dateOfJoining?: Date | string;
+  probationEndDate?: Date | string;
+  confirmationDate?: Date | string;
+  dateOfExit?: Date | string;
+  exitReason?: string;
+  personal?: EmployeePersonal;
+  emergencyContacts?: EmployeeEmergencyContact[];
+  attendanceConfig?: EmployeeAttendanceConfig;
+  compensation?: EmployeeCompensation;
+  serviceYears?: number;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+}
+
+export interface CreateEmployeeDto {
+  user?: string | null;
+  branchId?: string;
+  firstName: string;
+  lastName?: string;
+  officialEmail?: string;
+  phone?: string;
+  employeeId?: string;
+  departmentId: string;
+  designationId: string;
+  reportingManagerId?: string;
+  employmentType?: 'permanent' | 'contract' | 'intern' | 'probation' | 'consultant';
+  workMode?: 'office' | 'remote' | 'hybrid' | 'field';
+  status?: 'active' | 'probation' | 'notice_period' | 'relieved' | 'terminated' | 'inactive';
+  dateOfJoining?: Date | string;
+  probationEndDate?: Date | string;
+  confirmationDate?: Date | string;
+  personal?: EmployeePersonal;
+  emergencyContacts?: EmployeeEmergencyContact[];
+  attendanceConfig?: EmployeeAttendanceConfig;
+  compensation?: EmployeeCompensation;
+  createUser?: {
+    name: string;
+    email: string;
+    password?: string;
+    phone?: string;
+    roleId?: string;
+  };
+}
+
+export interface UpdateEmployeeDto extends Partial<CreateEmployeeDto> {}
+
+export interface DeactivateEmployeeDto {
+  dateOfExit?: Date | string;
+  exitReason?: string;
+  disableLoginAccess?: boolean;
+}
+
+export interface InviteUserDto {
+  email: string;
+  name: string;
+  phone?: string;
+  roleId?: string;
+}
+
+export interface CompanyAsset {
+  _id: string;
+  organizationId: string;
+  assetTag: string;
+  name: string;
+  category: 'laptop' | 'desktop' | 'mobile' | 'sim' | 'vehicle' | 'access_card' | 'key' | 'furniture' | 'other';
+  brand?: string;
+  modelNumber?: string;
+  serialNumber?: string;
+  purchaseDate?: Date | string;
+  purchaseCost?: number;
+  warrantyExpiry?: Date | string;
+  condition: 'new' | 'good' | 'fair' | 'damaged' | 'disposed';
+  status: 'available' | 'assigned' | 'under_maintenance' | 'retired' | 'lost';
+  assignedTo?: {
+    employeeId: string | { _id: string; employeeId: string; displayName?: string; firstName?: string; lastName?: string };
+    assignedAt: Date | string;
+    assignedBy?: string;
+    notes?: string;
+  } | null;
+  history?: Array<{
+    action: string;
+    employeeId?: string;
+    date: Date | string;
+    notes?: string;
+  }>;
+  notes?: string;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+}
+
+export interface EmployeeDocument {
+  _id: string;
+  organizationId: string;
+  employeeId: string | { _id: string; employeeId: string; displayName?: string; firstName?: string; lastName?: string };
+  documentType: 'aadhar' | 'pan' | 'passport' | 'voter_id' | 'driving_license' | 'offer_letter' | 'appointment_letter' | 'resignation_letter' | 'relieving_letter' | 'experience_letter' | 'education_certificate' | 'payslip' | 'medical_record' | 'nda' | 'other';
+  title: string;
+  documentNumber?: string;
+  fileUrl: string;
+  fileName?: string;
+  fileSize?: number;
+  mimeType?: string;
+  status: 'pending' | 'verified' | 'rejected' | 'expired';
+  expiryDate?: Date | string;
+  verifiedBy?: string;
+  verifiedAt?: Date | string;
+  verificationNotes?: string;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+}
+
+export interface EmployeeWorkspace360 {
+  employee: Employee;
+  todayAttendance: any;
+  leaveBalances: any[];
+  assignedAssets: CompanyAsset[];
+  documents: EmployeeDocument[];
+  recentPunches: any[];
+  isConfidentialViewer: boolean;
+}
+
+export interface SalaryComponent {
+  name: string;
+  code: string;
+  category: 'earning' | 'deduction' | 'benefit' | 'reimbursement';
+  calculationType: 'fixed' | 'percentage';
+  amount: number;
+  percentageOf?: string;
+  taxable?: boolean;
+  affectsPF?: boolean;
+  affectsESI?: boolean;
+  isVariable?: boolean;
+}
+
+export interface SalaryStructure {
+  _id: string;
+  structureCode?: string;
+  title: string;
+  currency: string;
+  payFrequency: 'monthly' | 'weekly' | 'daily';
+  effectiveFrom: Date | string;
+  effectiveTo?: Date | string;
+  status: 'draft' | 'active' | 'superseded' | 'archived';
+  components: SalaryComponent[];
+  grossMonthly?: number;
+  fixedDeductionsMonthly?: number;
+  netFixedMonthly?: number;
+  user?: any;
+  employeeId?: any;
+  createdAt?: Date | string;
+}
+
+export interface Payslip {
+  _id: string;
+  payslipNumber: string;
+  month: number;
+  year: number;
+  periodStart: Date | string;
+  periodEnd: Date | string;
+  attendanceSnapshot: {
+    paidDays: number;
+    presentDays: number;
+    leaveDays: number;
+    unpaidLeaveDays: number;
+    overtimeHours: number;
+    lateCount: number;
+  };
+  earnings: Array<{ code: string; name: string; amount: number; taxable?: boolean }>;
+  deductions: Array<{ code: string; name: string; amount: number }>;
+  reimbursements: Array<{ code: string; name: string; amount: number }>;
+  grossPay: number;
+  deductionTotal: number;
+  reimbursementTotal: number;
+  netPay: number;
+  currency: string;
+  payment?: {
+    status: 'pending' | 'processing' | 'paid' | 'failed' | 'on_hold';
+    paidAt?: Date | string;
+    paymentMode?: string;
+    referenceNo?: string;
+  };
+  status: 'draft' | 'approved' | 'locked' | 'paid' | 'cancelled';
+  user?: any;
+  employeeId?: any;
+  createdAt?: Date | string;
+}
+
+export interface ExpenseClaim {
+  _id: string;
+  claimNumber: string;
+  title: string;
+  items: Array<{
+    category: 'travel' | 'food' | 'lodging' | 'fuel' | 'phone' | 'office' | 'client' | 'other';
+    description?: string;
+    expenseDate: Date | string;
+    amount: number;
+    taxAmount?: number;
+  }>;
+  totalAmount: number;
+  approvedAmount?: number;
+  currency: string;
+  status: 'draft' | 'submitted' | 'approved' | 'partially_approved' | 'rejected' | 'reimbursed' | 'cancelled';
+  user?: any;
+  employeeId?: any;
+  submittedAt?: Date | string;
+  approvedBy?: any;
+  approvedAt?: Date | string;
+  createdAt?: Date | string;
+}
+
 export interface Department {
   _id?: string;
   name: string;
@@ -1383,5 +1664,241 @@ export class HRMSService extends BaseApiService {
    */
   copyHolidaysFromYear(fromYear: number, toYear: number, branchId?: string): Observable<{ status: string; data: any }> {
     return this.post<{ status: string; data: any }>('/v1/hrms/attendance/holidays/copy-year', { fromYear, toYear, branchId });
+  }
+
+  // ======================================================
+  // EMPLOYEE MASTER & WORKSPACE ENDPOINTS
+  // ======================================================
+
+  /**
+   * Get paginated employees list with filters
+   */
+  getEmployees(params?: Record<string, unknown>): Observable<{ status: string; results: number; pagination: any; data: { employees: Employee[] } }> {
+    return this.get<{ status: string; results: number; pagination: any; data: { employees: Employee[] } }>('/v1/hrms/employees', params);
+  }
+
+  /**
+   * Get single employee by ID
+   */
+  getEmployee(id: string): Observable<{ status: string; data: { employee: Employee } }> {
+    return this.get<{ status: string; data: { employee: Employee } }>(`/v1/hrms/employees/${id}`);
+  }
+
+  /**
+   * Get employee by User ID
+   */
+  getEmployeeByUser(userId: string): Observable<{ status: string; data: { employee: Employee } }> {
+    return this.get<{ status: string; data: { employee: Employee } }>(`/v1/hrms/employees/by-user/${userId}`);
+  }
+
+  /**
+   * Get authenticated user's own employee profile
+   */
+  getMyEmployeeProfile(): Observable<{ status: string; data: { employee: Employee } }> {
+    return this.get<{ status: string; data: { employee: Employee } }>('/v1/hrms/employees/me/profile');
+  }
+
+  /**
+   * Create new employee (with optional user creation or user linking)
+   */
+  createEmployee(dto: CreateEmployeeDto): Observable<{ status: string; data: { employee: Employee } }> {
+    return this.post<{ status: string; data: { employee: Employee } }>('/v1/hrms/employees', dto);
+  }
+
+  /**
+   * Update employee
+   */
+  updateEmployee(id: string, dto: UpdateEmployeeDto): Observable<{ status: string; data: { employee: Employee } }> {
+    return this.patch<{ status: string; data: { employee: Employee } }>(`/v1/hrms/employees/${id}`, dto);
+  }
+
+  /**
+   * Deactivate/offboard employee
+   */
+  deactivateEmployee(id: string, payload: DeactivateEmployeeDto): Observable<{ status: string; message: string; data: { employee: Employee } }> {
+    return this.patch<{ status: string; message: string; data: { employee: Employee } }>(`/v1/hrms/employees/${id}/deactivate`, payload);
+  }
+
+  /**
+   * Provision/invite user account for unlinked employee
+   */
+  inviteUserForEmployee(id: string, dto: InviteUserDto): Observable<{ status: string; message: string; data: { employee: Employee } }> {
+    return this.post<{ status: string; message: string; data: { employee: Employee } }>(`/v1/hrms/employees/${id}/invite-user`, dto);
+  }
+
+  /**
+   * Get 360-degree Employee Workspace Cockpit
+   */
+  getEmployeeWorkspace(id: string): Observable<{ status: string; data: EmployeeWorkspace360 }> {
+    return this.get<{ status: string; data: EmployeeWorkspace360 }>(`/v1/hrms/employees/workspace/${id}`);
+  }
+
+  // ======================================================
+  // COMPANY ASSETS ENDPOINTS
+  // ======================================================
+
+  /**
+   * Get paginated company assets
+   */
+  getCompanyAssets(params?: Record<string, unknown>): Observable<{ status: string; results: number; pagination: any; data: { assets: CompanyAsset[] } }> {
+    return this.get<{ status: string; results: number; pagination: any; data: { assets: CompanyAsset[] } }>('/v1/hrms/assets', params);
+  }
+
+  /**
+   * Get single asset by ID
+   */
+  getCompanyAsset(id: string): Observable<{ status: string; data: { asset: CompanyAsset } }> {
+    return this.get<{ status: string; data: { asset: CompanyAsset } }>(`/v1/hrms/assets/${id}`);
+  }
+
+  /**
+   * Create new company asset
+   */
+  createCompanyAsset(dto: Partial<CompanyAsset>): Observable<{ status: string; data: { asset: CompanyAsset } }> {
+    return this.post<{ status: string; data: { asset: CompanyAsset } }>('/v1/hrms/assets', dto);
+  }
+
+  /**
+   * Update company asset
+   */
+  updateCompanyAsset(id: string, dto: Partial<CompanyAsset>): Observable<{ status: string; data: { asset: CompanyAsset } }> {
+    return this.patch<{ status: string; data: { asset: CompanyAsset } }>(`/v1/hrms/assets/${id}`, dto);
+  }
+
+  /**
+   * Assign asset to employee
+   */
+  assignCompanyAsset(id: string, payload: { employeeId: string; notes?: string }): Observable<{ status: string; data: { asset: CompanyAsset } }> {
+    return this.post<{ status: string; data: { asset: CompanyAsset } }>(`/v1/hrms/assets/${id}/assign`, payload);
+  }
+
+  /**
+   * Return asset from employee
+   */
+  returnCompanyAsset(id: string, payload: { conditionAfter?: string; notes?: string }): Observable<{ status: string; data: { asset: CompanyAsset } }> {
+    return this.post<{ status: string; data: { asset: CompanyAsset } }>(`/v1/hrms/assets/${id}/return`, payload);
+  }
+
+  // ======================================================
+  // EMPLOYEE COMPLIANCE DOCUMENTS ENDPOINTS
+  // ======================================================
+
+  /**
+   * Get employee compliance documents
+   */
+  getEmployeeDocuments(params?: Record<string, unknown>): Observable<{ status: string; results: number; pagination: any; data: { documents: EmployeeDocument[] } }> {
+    return this.get<{ status: string; results: number; pagination: any; data: { documents: EmployeeDocument[] } }>('/v1/hrms/documents', params);
+  }
+
+  /**
+   * Get single compliance document
+   */
+  getEmployeeDocument(id: string): Observable<{ status: string; data: { document: EmployeeDocument } }> {
+    return this.get<{ status: string; data: { document: EmployeeDocument } }>(`/v1/hrms/documents/${id}`);
+  }
+
+  /**
+   * Upload/create compliance document
+   */
+  uploadEmployeeDocument(dto: Partial<EmployeeDocument>): Observable<{ status: string; data: { document: EmployeeDocument } }> {
+    return this.post<{ status: string; data: { document: EmployeeDocument } }>('/v1/hrms/documents', dto);
+  }
+
+  /**
+   * Verify or reject compliance document
+   */
+  verifyEmployeeDocument(id: string, payload: { status: 'verified' | 'rejected'; verificationNotes?: string }): Observable<{ status: string; data: { document: EmployeeDocument } }> {
+    return this.patch<{ status: string; data: { document: EmployeeDocument } }>(`/v1/hrms/documents/${id}/verify`, payload);
+  }
+
+  /**
+   * Delete compliance document
+   */
+  deleteEmployeeDocument(id: string): Observable<{ status: string; data: null }> {
+    return this.delete<{ status: string; data: null }>(`/v1/hrms/documents/${id}`);
+  }
+
+  // ======================================================
+  // SALARY STRUCTURE & COMPENSATION ENDPOINTS
+  // ======================================================
+
+  getSalaryStructures(params?: Record<string, unknown>): Observable<{ status: string; results: number; pagination: any; data: { salaryStructures: SalaryStructure[] } }> {
+    return this.get<{ status: string; results: number; pagination: any; data: { salaryStructures: SalaryStructure[] } }>('/v1/hrms/salary-structures', params);
+  }
+
+  getSalaryStructure(id: string): Observable<{ status: string; data: { salaryStructure: SalaryStructure } }> {
+    return this.get<{ status: string; data: { salaryStructure: SalaryStructure } }>(`/v1/hrms/salary-structures/${id}`);
+  }
+
+  createSalaryStructure(dto: Partial<SalaryStructure>): Observable<{ status: string; data: { salaryStructure: SalaryStructure } }> {
+    return this.post<{ status: string; data: { salaryStructure: SalaryStructure } }>('/v1/hrms/salary-structures', dto);
+  }
+
+  updateSalaryStructure(id: string, dto: Partial<SalaryStructure>): Observable<{ status: string; data: { salaryStructure: SalaryStructure } }> {
+    return this.patch<{ status: string; data: { salaryStructure: SalaryStructure } }>(`/v1/hrms/salary-structures/${id}`, dto);
+  }
+
+  deleteSalaryStructure(id: string): Observable<{ status: string; data: null }> {
+    return this.delete<{ status: string; data: null }>(`/v1/hrms/salary-structures/${id}`);
+  }
+
+  // ======================================================
+  // PAYROLL & PAYSLIP ENDPOINTS
+  // ======================================================
+
+  runMonthlyPayroll(payload: { month: number; year: number; branchId?: string }): Observable<{ status: string; data: any }> {
+    return this.post<{ status: string; data: any }>('/v1/hrms/payroll/runs', payload);
+  }
+
+  getPayslips(params?: Record<string, unknown>): Observable<{ status: string; results: number; pagination: any; data: { payslips: Payslip[] } }> {
+    return this.get<{ status: string; results: number; pagination: any; data: { payslips: Payslip[] } }>('/v1/hrms/payroll/payslips', params);
+  }
+
+  getMyPayslips(params?: Record<string, unknown>): Observable<{ status: string; results: number; pagination: any; data: { payslips: Payslip[] } }> {
+    return this.get<{ status: string; results: number; pagination: any; data: { payslips: Payslip[] } }>('/v1/hrms/payroll/my-payslips', params);
+  }
+
+  getPayslip(id: string): Observable<{ status: string; data: { payslip: Payslip } }> {
+    return this.get<{ status: string; data: { payslip: Payslip } }>(`/v1/hrms/payroll/payslips/${id}`);
+  }
+
+  updatePayslipStatus(id: string, payload: { status: string; paymentMode?: string; referenceNo?: string }): Observable<{ status: string; data: { payslip: Payslip } }> {
+    return this.patch<{ status: string; data: { payslip: Payslip } }>(`/v1/hrms/payroll/payslips/${id}`, payload);
+  }
+
+  bulkUpdatePayslipStatus(payload: { ids: string[]; status: string; paymentMode?: string }): Observable<{ status: string; data: any }> {
+    return this.patch<{ status: string; data: any }>('/v1/hrms/payroll/payslips/bulk-status', payload);
+  }
+
+  // ======================================================
+  // EXPENSE CLAIM ENDPOINTS
+  // ======================================================
+
+  getExpenseClaims(params?: Record<string, unknown>): Observable<{ status: string; results: number; pagination: any; data: { expenseClaims: ExpenseClaim[] } }> {
+    return this.get<{ status: string; results: number; pagination: any; data: { expenseClaims: ExpenseClaim[] } }>('/v1/hrms/expenses', params);
+  }
+
+  getExpenseClaim(id: string): Observable<{ status: string; data: { expenseClaim: ExpenseClaim } }> {
+    return this.get<{ status: string; data: { expenseClaim: ExpenseClaim } }>(`/v1/hrms/expenses/${id}`);
+  }
+
+  createExpenseClaim(dto: Partial<ExpenseClaim>): Observable<{ status: string; data: { expenseClaim: ExpenseClaim } }> {
+    return this.post<{ status: string; data: { expenseClaim: ExpenseClaim } }>('/v1/hrms/expenses', dto);
+  }
+
+  updateExpenseClaim(id: string, dto: Partial<ExpenseClaim>): Observable<{ status: string; data: { expenseClaim: ExpenseClaim } }> {
+    return this.patch<{ status: string; data: { expenseClaim: ExpenseClaim } }>(`/v1/hrms/expenses/${id}`, dto);
+  }
+
+  approveExpenseClaim(id: string, payload: { approvedAmount?: number; comments?: string }): Observable<{ status: string; data: { expenseClaim: ExpenseClaim } }> {
+    return this.patch<{ status: string; data: { expenseClaim: ExpenseClaim } }>(`/v1/hrms/expenses/${id}/approve`, payload);
+  }
+
+  rejectExpenseClaim(id: string, payload: { comments?: string }): Observable<{ status: string; data: { expenseClaim: ExpenseClaim } }> {
+    return this.patch<{ status: string; data: { expenseClaim: ExpenseClaim } }>(`/v1/hrms/expenses/${id}/reject`, payload);
+  }
+
+  deleteExpenseClaim(id: string): Observable<{ status: string; data: null }> {
+    return this.delete<{ status: string; data: null }>(`/v1/hrms/expenses/${id}`);
   }
 }

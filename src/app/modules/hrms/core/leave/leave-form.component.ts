@@ -359,7 +359,7 @@ export class LeaveFormComponent implements OnInit, OnDestroy {
       finalize(() => this.isSaving.set(false)), takeUntil(this.destroy$)
     ).subscribe(res => {
       if (res) {
-        // this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Leave request submitted.' });
+        this.messageService.showSuccess(this.isEditMode() ? 'Leave request updated successfully.' : 'Leave request submitted successfully.');
         setTimeout(() => this.onCancel(), 1000);
       }
     });

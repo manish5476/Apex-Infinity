@@ -17,9 +17,6 @@ import { TabsModule } from 'primeng/tabs';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
-import { InputTextModule } from 'primeng/inputtext';
 import { ToastModule } from 'primeng/toast';
 import { DataGridComponent, GridColumn, GridRowAction } from '@shared/ui/grid';
 import { takeUntil } from "rxjs/operators";
@@ -35,9 +32,6 @@ import { takeUntil } from "rxjs/operators";
     SkeletonModule,
     TooltipModule,
     ConfirmDialogModule,
-    IconFieldModule,
-    InputIconModule,
-    InputTextModule,
     ToastModule,
     DataGridComponent
 ],
@@ -103,22 +97,8 @@ import { takeUntil } from "rxjs/operators";
               <p-tabpanels styleClass="hub-tabpanels p-0 flex-1 overflow-hidden">
                 
                 <p-tabpanel value="0" class="h-full">
-                  <div class="panel-content p-4 flex-col h-full gap-4">
-                    
-                    <div class="flex-between flex-wrap gap-4 px-4 py-3 bg-secondary border-radius-lg border border-primary">
-                      <h3 class="m-0 font-heading text-lg font-bold text-primary-color">Established Boundaries</h3>
-                      <p-iconField iconPosition="left">
-                        <p-inputIcon styleClass="pi pi-search text-tertiary"></p-inputIcon>
-                        <input 
-                          type="text" 
-                          pInputText 
-                          placeholder="Search fences..." 
-                          (input)="onSearchFences($event)" 
-                          class="w-full sm:w-20rem premium-input" />
-                      </p-iconField>
-                    </div>
-
-                    <div class="grid-wrapper w-full flex-1 border-radius-lg border border-primary overflow-hidden" style="min-height: 400px;">
+                  <div class="panel-content p-4 flex-col h-full gap-3">
+                    <div class="grid-wrapper w-full flex-1 overflow-hidden" style="min-height: 450px;">
                       <app-data-grid [viewOnly]="true" [pagination]="true" [enableExport]="true" 
                         [columns]="geofenceColumns" 
                         [data]="geofences()"
@@ -126,31 +106,28 @@ import { takeUntil } from "rxjs/operators";
                         class="full-size-grid">
                       </app-data-grid>
                     </div>
-                    
                   </div>
                 </p-tabpanel>
 
                 <p-tabpanel value="1" class="h-full">
-                  <div class="panel-content p-4 bg-error-faded h-full flex-col gap-4">
-                    
-                    <div class="flex-between flex-wrap gap-4">
+                  <div class="panel-content p-4 h-full flex-col gap-3">
+                    <div class="flex-between flex-wrap gap-4 px-3 py-2 bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900 rounded-xl">
                       <div class="flex-align gap-3">
-                        <i class="pi pi-shield text-error text-2xl"></i>
+                        <i class="pi pi-shield text-rose-600 text-xl"></i>
                         <div class="flex-col">
-                          <h3 class="m-0 font-heading text-lg font-bold text-error">Out-of-Bounds Punches</h3>
-                          <span class="text-sm text-secondary">Showing violation data for the last 30 days.</span>
+                          <h4 class="m-0 text-sm font-bold text-rose-700 dark:text-rose-400">Out-of-Bounds Violations</h4>
+                          <span class="text-xs text-[var(--text-tertiary)]">Geofence breaches recorded during punch-in/out attempts</span>
                         </div>
                       </div>
                     </div>
 
-                    <div class="grid-wrapper w-full flex-1 border-radius-lg border border-error overflow-hidden" style="min-height: 400px;">
+                    <div class="grid-wrapper w-full flex-1 overflow-hidden" style="min-height: 450px;">
                       <app-data-grid [viewOnly]="true" [pagination]="true" [enableExport]="true" 
                         [columns]="violationColumns" 
                         [data]="violations()"
                         class="full-size-grid">
                       </app-data-grid>
                     </div>
-
                   </div>
                 </p-tabpanel>
 

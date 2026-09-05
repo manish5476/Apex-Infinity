@@ -109,6 +109,41 @@ export const PERMISSIONS = {
     ADMIN: 'leave:admin',
   },
 
+  // ── HR Employee Master & Workspace ─────────────────────────────────
+  EMPLOYEE: {
+    READ: 'employee:read',
+    MANAGE: 'employee:manage',
+    VIEW_CONFIDENTIAL: 'employee:view_confidential',
+  },
+
+  // ── HR Payroll & Compensation ─────────────────────────────────────
+  PAYROLL: {
+    READ: 'payroll:read',
+    MANAGE: 'payroll:manage',
+  },
+  PAYSLIP: {
+    VIEW_SELF: 'payslip:view_self',
+    VIEW_ALL: 'payslip:view_all',
+  },
+
+  // ── HR Equipment & Compliance ─────────────────────────────────────
+  HRMS_ASSET: {
+    READ: 'asset:hrms_read',
+    MANAGE: 'asset:hrms_manage',
+  },
+  HRMS_DOCUMENT: {
+    READ: 'document:read',
+    MANAGE: 'document:manage',
+  },
+  EXPENSE: {
+    CLAIM: 'expense:claim',
+    APPROVE: 'expense:approve',
+  },
+  PERFORMANCE: {
+    READ: 'performance:read',
+    MANAGE: 'performance:manage',
+  },
+
   // ── Finance & Billing ─────────────────────────────────────────────
   STATEMENT: {
     READ: 'statement:read',

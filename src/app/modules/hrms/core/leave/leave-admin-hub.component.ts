@@ -1,6 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { forkJoin, of, Subject } from 'rxjs';
 import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
 
@@ -23,12 +22,13 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { HRMSService } from '../../hrms.service';
 import { AppMessageService } from '@core/services/message.service';
+import { MasterDropdownService } from '@core/services/master-dropdown.service';
 
 @Component({
   selector: 'app-leave-admin-hub',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule, DatePipe,
+    CommonModule, DatePipe, DecimalPipe,
     TabsModule, TableModule, CardModule, ButtonModule, TagModule,
     SkeletonModule, AvatarModule, TooltipModule, SelectModule,
     ChartModule, IconFieldModule, InputIconModule, InputTextModule
@@ -47,7 +47,7 @@ import { AppMessageService } from '@core/services/message.service';
           </div>
         </div>
         <div class="header-right flex-align gap-3 ml-auto">
-          <p-select [options]="departments" optionLabel="label" optionValue="value" [filter]="true" filterBy="label" placeholder="Filter by Department" styleClass="premium-dropdown"></p-select>
+          <p-select [options]="departments()" optionLabel="label" optionValue="value" [filter]="true" filterBy="label" placeholder="Filter by Department" styleClass="premium-dropdown"></p-select>
           <p-button icon="pi pi-download" [outlined]="true" label="Export Report" styleClass="apex-btn apex-btn--secondary"></p-button>
         </div>
       </header>
@@ -119,10 +119,10 @@ import { AppMessageService } from '@core/services/message.service';
                         <tr class="table-row-hover">
                           <td>
                             <div class="flex-align gap-3">
-                              <p-avatar [label]="getInitials(req.user?.name)" shape="circle" size="large" [style]="{'background-color': 'var(--color-primary-bg)', 'color': 'var(--color-primary)'}"></p-avatar>
+                              <p-avatar [label]="getInitials(req.employee?.displayName || req.user?.name || 'EM')" shape="circle" size="large" [style]="{'background-color': 'var(--color-primary-bg)', 'color': 'var(--color-primary)'}"></p-avatar>
                               <div class="flex-col gap-1">
-                                <span class="font-bold text-primary-color">{{ req.user?.name || 'Unknown' }}</span>
-                                <span class="text-xs text-secondary">{{ req.departmentId?.name || 'Dept N/A' }}</span>
+                                <span class="font-bold text-primary-color">{{ req.employee?.displayName || (req.employee?.firstName ? (req.employee?.firstName + ' ' + (req.employee?.lastName || '')) : null) || req.user?.name || 'Employee' }}</span>
+                                <span class="text-xs text-secondary">{{ req.departmentId?.name || req.employee?.departmentId?.name || '—' }}</span>
                               </div>
                             </div>
                           </td>
@@ -163,9 +163,9 @@ import { AppMessageService } from '@core/services/message.service';
                     <div class="flex-between mb-4">
                       <h3 class="font-heading m-0 text-primary-color">Team Availability</h3>
                       <div class="flex-align gap-2">
-                        <p-button icon="pi pi-chevron-left" [text]="true" [rounded]="true" severity="secondary"></p-button>
+                      <p-button icon="pi pi-chevron-left" [text]="true" [rounded]="true" severity="secondary" (onClick)="prevMonth()"></p-button>
                         <span class="font-bold text-lg mx-2">{{ currentMonthText }}</span>
-                        <p-button icon="pi pi-chevron-right" [text]="true" [rounded]="true" severity="secondary"></p-button>
+                        <p-button icon="pi pi-chevron-right" [text]="true" [rounded]="true" severity="secondary" (onClick)="nextMonth()"></p-button>
                       </div>
                     </div>
 
@@ -205,7 +205,7 @@ import { AppMessageService } from '@core/services/message.service';
                         <div class="apex-card p-4 border-top-primary">
                           <span class="kpi-label">Total Leaves Taken</span>
                           <div class="kpi-val">{{ stats.totalLeavesTaken || 0 }} <span class="text-sm text-secondary font-normal">days</span></div>
-                          <span class="text-xs text-success flex-align gap-1 mt-2"><i class="pi pi-arrow-down"></i> 12% vs last month</span>
+                          <span class="text-xs text-tertiary mt-2">{{ stats.totalRequests || 0 }} approved requests</span>
                         </div>
                         <div class="apex-card p-4 border-top-warning">
                           <span class="kpi-label">Pending Requests</span>
@@ -226,30 +226,24 @@ import { AppMessageService } from '@core/services/message.service';
                       </div>
 
                       <div class="apex-card p-4">
-                        <h4 class="font-heading m-0 mb-4 text-primary-color">High Leave Utilization</h4>
-                        <ul class="absentee-list">
-                          <li class="flex-between py-2 border-bottom">
-                            <div class="flex-align gap-2">
-                              <p-avatar label="JD" shape="circle" [style]="{'background-color': '#fef2f2', 'color': '#ef4444'}"></p-avatar>
-                              <span class="font-semibold text-secondary">John Doe</span>
-                            </div>
-                            <span class="font-bold text-error">18 Days</span>
-                          </li>
-                          <li class="flex-between py-2 border-bottom">
-                            <div class="flex-align gap-2">
-                              <p-avatar label="SJ" shape="circle" [style]="{'background-color': '#fff7ed', 'color': '#f97316'}"></p-avatar>
-                              <span class="font-semibold text-secondary">Sarah Jenkins</span>
-                            </div>
-                            <span class="font-bold text-warning">14 Days</span>
-                          </li>
-                          <li class="flex-between py-2">
-                            <div class="flex-align gap-2">
-                              <p-avatar label="MS" shape="circle" [style]="{'background-color': '#eff6ff', 'color': '#3b82f6'}"></p-avatar>
-                              <span class="font-semibold text-secondary">Mukesh Singh</span>
-                            </div>
-                            <span class="font-bold text-primary">10 Days</span>
-                          </li>
-                        </ul>
+                        <h4 class="font-heading m-0 mb-4 text-primary-color">Leave by Type</h4>
+                        @if (analyticsData(); as stats) {
+                          @if (stats.byLeaveType?.length > 0) {
+                            <ul class="absentee-list">
+                              @for (lt of stats.byLeaveType; track lt._id; let last = $last) {
+                                <li class="flex-between py-2" [class.border-bottom]="!last">
+                                  <div class="flex-align gap-2">
+                                    <span class="font-semibold text-secondary capitalize">{{ lt._id }} Leave</span>
+                                    <span class="text-xs text-tertiary">({{ lt.count }} requests)</span>
+                                  </div>
+                                  <span class="font-bold text-primary">{{ lt.totalDays | number:'1.0-1' }} Days</span>
+                                </li>
+                              }
+                            </ul>
+                          } @else {
+                            <div class="text-center py-6 text-secondary text-sm">No approved leave data for the selected period.</div>
+                          }
+                        }
                       </div>
                     </div>
 
@@ -347,6 +341,15 @@ import { AppMessageService } from '@core/services/message.service';
     .overflow-hidden { overflow: hidden; }
     .overflow-auto { overflow-y: auto; overflow-x: hidden; }
 
+    .apex-grid { display: grid; gap: 1.25rem; }
+    .apex-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .apex-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .apex-grid--auto { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem; }
+    @media (max-width: 1024px) {
+      .apex-grid--3 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+      .apex-grid--2 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+    }
+
     /* Dropdown */
     ::ng-deep .premium-dropdown .p-select { background: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: var(--ui-border-radius-md); transition: var(--transition-base); }
 
@@ -404,54 +407,130 @@ import { AppMessageService } from '@core/services/message.service';
   `]
 })
 export class LeaveAdminHubComponent implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
+  private masterDropdownService = inject(MasterDropdownService);
 
   // State
   isLoading = signal<boolean>(true);
 
-  // Tab 0 State
+  // Tab 0 — All Requests
   allRequests = signal<any[]>([]);
-  departments = [{ label: 'All Departments', value: null }, { label: 'Engineering', value: 'eng' }, { label: 'Sales', value: 'sal' }];
+  /** Loaded from master-dropdown endpoint; starts with the "All" option. */
+  departments = signal<{ label: string; value: string | null }[]>([{ label: 'All Departments', value: null }]);
 
-  // Tab 1 State
-  currentMonthText = 'October 2026'; // Mock
+  // Tab 1 — Team Calendar: tracks the month being viewed (defaults to current month)
+  private calendarMonth = signal<{ month: number; year: number }>({
+    month: new Date().getMonth() + 1,
+    year: new Date().getFullYear()
+  });
   calendarData = signal<any[]>([]);
 
-  // Tab 2 State
+  /** Human-readable month label derived from the currently displayed month. */
+  get currentMonthText(): string {
+    const { month, year } = this.calendarMonth();
+    return new Date(year, month - 1, 1).toLocaleString('default', { month: 'long', year: 'numeric' });
+  }
+
+  // Tab 2 — Leave Analytics
   analyticsData = signal<any>(null);
   trendChartData: any;
   chartOptions: any;
 
-  ngOnInit() {
-    this.initChart();
+  // Approval toolbar
+  selectedApprovals = signal<any[]>([]);
+  isBulkApproving = signal<boolean>(false);
+
+  ngOnInit(): void {
+    this._initChartOptions();
     this.loadAdminData();
   }
 
-  private loadAdminData() {
+  private loadAdminData(): void {
     this.isLoading.set(true);
+    const { month, year } = this.calendarMonth();
 
     forkJoin({
       all: this.hrmsService.getLeaveRequests().pipe(
-        map(res => res?.data?.leaveRequests || []),
+        map(res => res?.data?.leaveRequests ?? []),
         catchError(() => of([]))
       ),
-      calendar: this.hrmsService.getTeamLeaveCalendar(10, 2026).pipe( // Mocking Oct 2026
-        map(res => res?.data || this.generateMockCalendar()),
-        catchError(() => of(this.generateMockCalendar()))
+      calendar: this.hrmsService.getTeamLeaveCalendar(month, year).pipe(
+        map(res => {
+          // Backend returns { calendar: [{ date, count, leaves }] }
+          const raw: any[] = res?.data?.calendar ?? res?.data ?? [];
+          return raw.map(item => ({
+            ...item,
+            date: new Date(item.date)
+          }));
+        }),
+        catchError(() => of(this._emptyCalendarFallback(month, year)))
       ),
       analytics: this.hrmsService.getLeaveAnalytics().pipe(
-        map(res => res?.data || { totalLeavesTaken: 142, pendingRequests: 8, mostUsedType: 'casual' }),
-        catchError(() => of({ totalLeavesTaken: 142, pendingRequests: 8, mostUsedType: 'casual' }))
+        map(res => {
+          // Backend returns { financialYear, analytics: { byLeaveType, byMonth, byDepartment, overall } }
+          const a = res?.data?.analytics ?? res?.data ?? null;
+          return a;
+        }),
+        catchError(() => of(null))
+      ),
+      departments: this.masterDropdownService.getDropdownData('departments').pipe(
+        map(res => res?.data ?? []),
+        catchError(() => of([]))
       )
     }).pipe(
-      finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
-    ).subscribe(({ all, calendar, analytics }) => {
+      finalize(() => this.isLoading.set(false)),
+      takeUntil(this.destroy$)
+    ).subscribe(({ all, calendar, analytics, departments }) => {
       this.allRequests.set(all);
       this.calendarData.set(calendar);
-      this.analyticsData.set(analytics);
+
+      // Update departments dropdown from master data
+      const deptOptions = [
+        { label: 'All Departments', value: null },
+        ...departments.map((d: any) => ({ label: d.label ?? d.name, value: d.value ?? d._id }))
+      ];
+      this.departments.set(deptOptions);
+
+      // Build analytics stats + chart from real aggregation data
+      if (analytics) {
+        const overall = analytics.overall?.[0] ?? {};
+        const mostUsed = [...(analytics.byLeaveType ?? [])]
+          .sort((a: any, b: any) => (b.totalDays ?? 0) - (a.totalDays ?? 0))[0];
+
+        this.analyticsData.set({
+          totalLeavesTaken: overall.totalLeaveDays ?? 0,
+          totalRequests: overall.totalRequests ?? 0,
+          pendingRequests: (all as any[]).filter((r: any) => r.status === 'pending').length,
+          mostUsedType: mostUsed?._id ?? 'N/A',
+          avgLeaveDays: Math.round((overall.avgLeaveDays ?? 0) * 10) / 10,
+          byLeaveType: analytics.byLeaveType ?? [],
+          byMonth: analytics.byMonth ?? [],
+          byDepartment: analytics.byDepartment ?? []
+        });
+
+        this._buildChartFromAnalytics(analytics.byMonth ?? [], analytics.byLeaveType ?? []);
+      } else {
+        this.analyticsData.set(null);
+      }
     });
+  }
+
+  /** Navigate team calendar to previous month */
+  prevMonth(): void {
+    const { month, year } = this.calendarMonth();
+    const d = new Date(year, month - 2, 1);
+    this.calendarMonth.set({ month: d.getMonth() + 1, year: d.getFullYear() });
+    this.loadAdminData();
+  }
+
+  /** Navigate team calendar to next month */
+  nextMonth(): void {
+    const { month, year } = this.calendarMonth();
+    const d = new Date(year, month, 1);
+    this.calendarMonth.set({ month: d.getMonth() + 1, year: d.getFullYear() });
+    this.loadAdminData();
   }
 
   // --- Helpers ---
@@ -466,87 +545,95 @@ export class LeaveAdminHubComponent implements OnInit, OnDestroy {
     }
   }
 
-
-  selectedApprovals = signal<any[]>([]);
-  isBulkApproving = signal<boolean>(false);
-  bulkApprove() {
+  bulkApprove(): void {
     const selected = this.selectedApprovals();
-    if (!selected || selected.length === 0) return;
-
+    if (!selected.length) return;
     const requestIds = selected.map(req => req._id);
     this.isBulkApproving.set(true);
 
     this.hrmsService.bulkApproveLeaves(requestIds, 'Bulk approved by manager').pipe(
-      catchError(err => {
-        this.messageService.handleHttpError(err)
-        return of(null);
-      }),
-      finalize(() => this.isBulkApproving.set(false)), takeUntil(this.destroy$)
+      catchError(err => { this.messageService.handleHttpError(err); return of(null); }),
+      finalize(() => this.isBulkApproving.set(false)),
+      takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       if (res) {
-        this.messageService.showSuccess(res.message)
-        this.selectedApprovals.set([]); // Clear selection
-        // this.loadDashboardData(); // Refresh the lists
+        this.messageService.showSuccess(res.message);
+        this.selectedApprovals.set([]);
+        this.loadAdminData();
       }
     });
   }
 
   getInitials(name: string): string {
-    if (!name || name.trim() === '') return '?';
+    if (!name?.trim()) return '?';
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   }
 
-  // --- Mocks & Chart Config ---
-  private initChart() {
-    const documentStyle = getComputedStyle(document.documentElement);
-    const textColor = documentStyle.getPropertyValue('--text-primary') || '#333';
-    const textColorSecondary = documentStyle.getPropertyValue('--text-secondary') || '#666';
-    const surfaceBorder = documentStyle.getPropertyValue('--border-primary') || '#ddd';
+  // --- Private: Chart / Calendar ---
 
-    this.trendChartData = {
-      labels: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
-      datasets: [
-        { label: 'Casual', backgroundColor: '#3b82f6', data: [20, 15, 30, 25, 22, 18] },
-        { label: 'Sick', backgroundColor: '#ef4444', data: [12, 10, 8, 14, 18, 9] }
-      ]
-    };
+  /** Build chart options once; colors come from CSS custom properties. */
+  private _initChartOptions(): void {
+    const s = getComputedStyle(document.documentElement);
+    const textColor = s.getPropertyValue('--text-primary') || '#333';
+    const textSec = s.getPropertyValue('--text-secondary') || '#666';
+    const border = s.getPropertyValue('--border-primary') || '#ddd';
 
     this.chartOptions = {
       maintainAspectRatio: false,
       aspectRatio: 0.8,
       plugins: { legend: { labels: { color: textColor } } },
       scales: {
-        x: { ticks: { color: textColorSecondary }, grid: { color: surfaceBorder, drawBorder: false } },
-        y: { ticks: { color: textColorSecondary }, grid: { color: surfaceBorder, drawBorder: false } }
+        x: { ticks: { color: textSec }, grid: { color: border, drawBorder: false } },
+        y: { ticks: { color: textSec }, grid: { color: border, drawBorder: false } }
       }
     };
+
+    // Placeholder until real data arrives
+    this.trendChartData = { labels: [], datasets: [] };
   }
 
-  private generateMockCalendar() {
-    // Generates a mock timeline for UI demonstration
-    return [
-      {
-        date: new Date('2026-10-12'), leaves: [
-          { id: 1, userName: 'Mukesh Singh', type: 'casual' },
-          { id: 2, userName: 'Sarah Jenkins', type: 'sick' }
-        ]
-      },
-      {
-        date: new Date('2026-10-13'), leaves: [
-          { id: 2, userName: 'Sarah Jenkins', type: 'sick' }
-        ]
-      },
-      { date: new Date('2026-10-14'), leaves: [] },
-      {
-        date: new Date('2026-10-15'), leaves: [
-          { id: 3, userName: 'David Chen', type: 'earned' }
-        ]
-      }
-    ];
+  /** Build bar-chart data from the real backend aggregation. */
+  private _buildChartFromAnalytics(byMonth: any[], byLeaveType: any[]): void {
+    const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const COLORS: Record<string, string> = {
+      casual: '#3b82f6', sick: '#ef4444', earned: '#f59e0b',
+      compensatory: '#8b5cf6', paternity: '#10b981', maternity: '#ec4899',
+      unpaid: '#6b7280', paid: '#06b6d4'
+    };
+    const DEFAULT_COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4'];
+
+    // Sort months ascending
+    const sorted = [...byMonth].sort((a, b) => (a._id ?? 0) - (b._id ?? 0));
+    const labels = sorted.map(m => MONTH_NAMES[(m._id ?? 1) - 1]);
+
+    // Build a dataset per leave type using month totals
+    const datasets = byLeaveType.map((lt: any, i: number) => ({
+      label: (lt._id as string).charAt(0).toUpperCase() + (lt._id as string).slice(1),
+      backgroundColor: COLORS[lt._id as string] ?? DEFAULT_COLORS[i % DEFAULT_COLORS.length],
+      data: sorted.map(() => lt.totalDays ?? 0) // Real per-type/per-month breakdown needs a 2-level facet; use overall totals for now
+    }));
+
+    // Fallback: if no type breakdown, show total days per month
+    const finalDatasets = datasets.length > 0
+      ? datasets
+      : [{ label: 'Total Leave Days', backgroundColor: '#3b82f6', data: sorted.map(m => m.totalDays ?? 0) }];
+
+    this.trendChartData = { labels, datasets: finalDatasets };
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
+  /** Returns an empty calendar week for the given month so the UI isn't blank. */
+  private _emptyCalendarFallback(month: number, year: number): any[] {
+    const result: any[] = [];
+    const daysInMonth = new Date(year, month, 0).getDate();
+    // Show first 7 days of the month as empty slots
+    for (let d = 1; d <= Math.min(7, daysInMonth); d++) {
+      result.push({ date: new Date(year, month - 1, d), count: 0, leaves: [] });
     }
+    return result;
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

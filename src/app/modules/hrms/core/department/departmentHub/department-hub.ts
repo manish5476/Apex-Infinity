@@ -327,9 +327,10 @@ export class DepartmentHubComponent implements OnInit, OnDestroy {
     });
   }
 
-  private transformHierarchy(data: any[]): any[] {
-    if (!data) return [];
-    return data.map(node => ({
+  private transformHierarchy(data: any[], isRoot = true): any[] {
+    if (!data || data.length === 0) return [];
+
+    const mappedNodes = data.map(node => ({
       expanded: true,
       data: {
         name: node.name,
@@ -337,8 +338,24 @@ export class DepartmentHubComponent implements OnInit, OnDestroy {
         hod: node.headOfDepartment?.name || '',
         employeeCount: node.employeeCount || 0
       },
-      children: this.transformHierarchy(node.children)
+      children: this.transformHierarchy(node.children || [], false)
     }));
+
+    if (isRoot && data.length > 1) {
+      const totalWorkforce = data.reduce((sum, d) => sum + (d.employeeCount || 0), 0);
+      return [{
+        expanded: true,
+        data: {
+          name: 'Apex Infinity HQ',
+          code: 'CORP',
+          hod: 'Executive Leadership',
+          employeeCount: totalWorkforce
+        },
+        children: mappedNodes
+      }];
+    }
+
+    return mappedNodes;
   }
 
   private showError(detail: string) {

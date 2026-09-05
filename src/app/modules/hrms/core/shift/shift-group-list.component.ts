@@ -198,8 +198,8 @@ export class ShiftGroupListComponent implements OnInit, OnDestroy {
 
     this.hrmsService.getShiftGroups(params).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
-        const newData = res.data?.shiftGroups ?? res.data?.data ?? [];
-        this.totalCount = res.pagination?.totalResults ?? this.totalCount;
+        const newData = Array.isArray(res.data) ? res.data : (res.data?.shiftGroups ?? res.data?.data ?? []);
+        this.totalCount = res.pagination?.totalResults ?? (Array.isArray(res.data) ? res.data.length : this.totalCount);
         this.data.update(prev => isReset ? newData : [...prev, ...newData]);
         if (newData.length > 0) this.currentPage++;
         this.isLoading.set(false);

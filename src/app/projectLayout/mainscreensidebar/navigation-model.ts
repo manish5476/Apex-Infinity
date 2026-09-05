@@ -806,6 +806,11 @@ export const NAVIGATION_GROUPS: readonly NavGroup[] = [
           PERMISSIONS.SHIFT.READ,
           PERMISSIONS.ATTENDANCE.READ,
           PERMISSIONS.LEAVE.READ,
+          PERMISSIONS.EMPLOYEE.READ,
+          PERMISSIONS.PAYROLL.READ,
+          PERMISSIONS.HRMS_ASSET.READ,
+          PERMISSIONS.HRMS_DOCUMENT.READ,
+          PERMISSIONS.EXPENSE.CLAIM,
         ],
         items: [
           {
@@ -835,13 +840,13 @@ export const NAVIGATION_GROUPS: readonly NavGroup[] = [
           {
             label: 'Workforce & Time',
             icon: 'pi pi-users',
-            permissions: [PERMISSIONS.USER.READ, PERMISSIONS.ATTENDANCE.MANAGE],
+            permissions: [PERMISSIONS.EMPLOYEE.READ, PERMISSIONS.ATTENDANCE.MANAGE],
             items: [
               {
                 label: 'Employee Directory',
                 icon: 'pi pi-users',
-                routerLink: ['/user/list'],
-                permissions: [PERMISSIONS.USER.READ],
+                routerLink: ['/hrms/employees/list'],
+                permissions: [PERMISSIONS.EMPLOYEE.READ],
               },
               {
                 label: 'Live Punches',
@@ -915,6 +920,44 @@ export const NAVIGATION_GROUPS: readonly NavGroup[] = [
                 icon: 'pi pi-calendar-ext',
                 routerLink: ['/hrms/holidays/hub'],
                 permissions: [PERMISSIONS.DEPARTMENT.READ],
+              },
+            ],
+          },
+          {
+            label: 'Payroll & Claims',
+            icon: 'pi pi-dollar',
+            permissions: [PERMISSIONS.PAYROLL.READ, PERMISSIONS.EXPENSE.CLAIM],
+            items: [
+              {
+                label: 'Payroll Engine',
+                icon: 'pi pi-money-bill',
+                routerLink: ['/hrms/payroll'],
+                permissions: [PERMISSIONS.PAYROLL.READ],
+              },
+              {
+                label: 'Expense Claims',
+                icon: 'pi pi-receipt',
+                routerLink: ['/hrms/expenses'],
+                permissions: [PERMISSIONS.EXPENSE.CLAIM],
+              },
+            ],
+          },
+          {
+            label: 'Assets & Compliance',
+            icon: 'pi pi-shield',
+            permissions: [PERMISSIONS.HRMS_ASSET.READ, PERMISSIONS.HRMS_DOCUMENT.READ],
+            items: [
+              {
+                label: 'Company Assets',
+                icon: 'pi pi-desktop',
+                routerLink: ['/hrms/assets'],
+                permissions: [PERMISSIONS.HRMS_ASSET.READ],
+              },
+              {
+                label: 'Compliance Docs',
+                icon: 'pi pi-file',
+                routerLink: ['/hrms/documents'],
+                permissions: [PERMISSIONS.HRMS_DOCUMENT.READ],
               },
             ],
           },

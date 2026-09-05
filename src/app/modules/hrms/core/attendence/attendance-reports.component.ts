@@ -13,13 +13,11 @@ import { Subject, of } from 'rxjs';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 
 import { AppMessageService } from '@core/services/message.service';
+import { MasterDropdownService } from '@core/services/master-dropdown.service';
 import { HRMSService } from '../../hrms.service';
 
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
-import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TabsModule } from 'primeng/tabs';
 
@@ -39,9 +37,6 @@ import { PageHeaderComponent } from '@shared/ui/layout/page-header/page-header.c
     ReactiveFormsModule,
     ButtonModule,
     DatePickerModule,
-    IconFieldModule,
-    InputIconModule,
-    InputTextModule,
     SelectModule,
     TabsModule,
     DataGridComponent,
@@ -56,7 +51,7 @@ import { PageHeaderComponent } from '@shared/ui/layout/page-header/page-header.c
         subtitle="Consolidated analytics for enterprise attendance tracking and leave liability">
       </app-page-header>
 
-      <app-page-content [padded]="false">
+      <app-page-content [padded]="false" class="pl-6 sm:pl-8 pr-4 sm:pr-6 pb-6 flex-1 flex flex-col min-h-0">
         <p-tabs value="0" class="flex-1 flex flex-col min-h-0">
           <p-tablist>
             <p-tab value="0">
@@ -111,55 +106,42 @@ import { PageHeaderComponent } from '@shared/ui/layout/page-header/page-header.c
 
                 <!-- Aggregated Stats Bar -->
                 @if (attendanceSummary(); as s) {
-                  <div class="flex flex-wrap items-center justify-between gap-6 px-2">
-                    <div class="flex items-center gap-6">
-                      <div class="flex flex-col items-center gap-2">
-                        <span class="text-xs font-medium text-[var(--text-secondary)]">Total Emp.</span>
-                        <div class="stat-circle bg-primary-subtle text-primary">{{ s.totalEmployees || 0 }}</div>
-                      </div>
-                      <div class="w-8 h-1 bg-[var(--border-secondary)] rounded"></div>
-                      <div class="flex flex-col items-center gap-2">
-                        <span class="text-xs font-medium text-[var(--text-secondary)]">Total Absent</span>
-                        <div class="stat-circle bg-danger-subtle text-danger">{{ s.totalAbsent || 0 }}</div>
-                      </div>
-                      <div class="w-8 h-1 bg-[var(--border-secondary)] rounded"></div>
-                      <div class="flex flex-col items-center gap-2">
-                        <span class="text-xs font-medium text-[var(--text-secondary)]">Total Late</span>
-                        <div class="stat-circle bg-warning-subtle text-warning-dark">{{ s.totalLate || 0 }}</div>
-                      </div>
-                      <div class="w-8 h-1 bg-[var(--border-secondary)] rounded"></div>
-                      <div class="flex flex-col items-center gap-2">
-                        <span class="text-xs font-medium text-[var(--text-secondary)]">Half Days</span>
-                        <div class="stat-circle bg-[var(--bg-secondary)] text-[var(--text-secondary)] border border-[var(--border-primary)]">{{ s.totalHalfDay || 0 }}</div>
-                      </div>
+                  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                    <div class="p-3 bg-[var(--bg-primary)] border border-[var(--border-primary)] rounded-xl shadow-xs">
+                      <span class="text-xs text-[var(--text-tertiary)] font-semibold uppercase tracking-wider">Total Emp</span>
+                      <div class="text-xl font-bold text-[var(--text-primary)] mt-1">{{ s.totalEmployees || 0 }}</div>
                     </div>
-
-                    <div class="flex items-center gap-6">
-                      <div class="flex flex-col items-center gap-2">
-                        <span class="text-xs font-medium text-[var(--text-secondary)]">Avg Attendance</span>
-                        <div class="stat-pill bg-success-subtle text-success">{{ s.avgAttendancePercentage || 0 }}%</div>
-                      </div>
-                      <div class="flex flex-col items-center gap-2">
-                        <span class="text-xs font-medium text-[var(--text-secondary)]">Total Work Hours</span>
-                        <div class="stat-pill bg-[var(--bg-secondary)] text-[var(--text-secondary)] border border-[var(--border-primary)]">{{ s.totalWorkHours || 0 }}h</div>
-                      </div>
+                    <div class="p-3 bg-[var(--bg-primary)] border border-[var(--border-primary)] rounded-xl shadow-xs">
+                      <span class="text-xs text-rose-600 font-semibold uppercase tracking-wider">Total Absent</span>
+                      <div class="text-xl font-bold text-rose-600 mt-1">{{ s.totalAbsent || 0 }}</div>
+                    </div>
+                    <div class="p-3 bg-[var(--bg-primary)] border border-[var(--border-primary)] rounded-xl shadow-xs">
+                      <span class="text-xs text-amber-600 font-semibold uppercase tracking-wider">Total Late</span>
+                      <div class="text-xl font-bold text-amber-600 mt-1">{{ s.totalLate || 0 }}</div>
+                    </div>
+                    <div class="p-3 bg-[var(--bg-primary)] border border-[var(--border-primary)] rounded-xl shadow-xs">
+                      <span class="text-xs text-[var(--text-tertiary)] font-semibold uppercase tracking-wider">Half Days</span>
+                      <div class="text-xl font-bold text-[var(--text-secondary)] mt-1">{{ s.totalHalfDay || 0 }}</div>
+                    </div>
+                    <div class="p-3 bg-[var(--bg-primary)] border border-[var(--border-primary)] rounded-xl shadow-xs">
+                      <span class="text-xs text-emerald-600 font-semibold uppercase tracking-wider">Avg Attendance</span>
+                      <div class="text-xl font-bold text-emerald-600 mt-1">{{ s.avgAttendancePercentage || 0 }}%</div>
+                    </div>
+                    <div class="p-3 bg-[var(--bg-primary)] border border-[var(--border-primary)] rounded-xl shadow-xs">
+                      <span class="text-xs text-blue-600 font-semibold uppercase tracking-wider">Work Hours</span>
+                      <div class="text-xl font-bold text-blue-600 mt-1">{{ s.totalWorkHours || 0 }}h</div>
                     </div>
                   </div>
                 }
 
-                <div class="flex justify-between items-center mt-2">
-                  <h3 class="font-bold text-lg text-[var(--text-primary)] m-0">Generated Report</h3>
-                  <p-iconField iconPosition="left">
-                    <p-inputIcon styleClass="pi pi-search text-[var(--text-tertiary)]"></p-inputIcon>
-                    <input type="text" pInputText placeholder="Search records..." [(ngModel)]="attendanceSearch" class="w-[20rem]" />
-                  </p-iconField>
-                </div>
-
-                <div class="flex-1 min-h-[450px]">
+                <div class="flex-1 min-h-[480px] flex flex-col w-full">
                   <app-data-grid [viewOnly]="true" 
+                    [pagination]="true"
+                    [enableExport]="true"
                     [columns]="attendanceColumns"
-                    [data]="filteredAttendanceReportData()"
-                    [loading]="isLoadingReport()">
+                    [data]="attendanceReportData()"
+                    [loading]="isLoadingReport()"
+                    class="flex-1 min-h-[480px] w-full">
                   </app-data-grid>
                 </div>
               </div>
@@ -191,32 +173,36 @@ import { PageHeaderComponent } from '@shared/ui/layout/page-header/page-header.c
                 </div>
 
                 @if (leaveReportSummary(); as summary) {
-                  <div class="flex items-center gap-6 px-2">
-                    <div class="flex flex-col items-center gap-2">
-                      <span class="text-xs font-medium text-[var(--text-secondary)]">Total Employees</span>
-                      <div class="stat-circle bg-primary-subtle text-primary">{{ summary.totalEmployees || 0 }}</div>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl">
+                    <div class="p-4 bg-[var(--bg-primary)] border border-[var(--border-primary)] rounded-xl shadow-xs flex items-center justify-between">
+                      <div>
+                        <span class="text-xs text-[var(--text-tertiary)] font-semibold uppercase tracking-wider">Total Employees</span>
+                        <div class="text-2xl font-bold text-[var(--text-primary)] mt-1">{{ summary.totalEmployees || 0 }}</div>
+                      </div>
+                      <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center">
+                        <i class="pi pi-users text-lg"></i>
+                      </div>
                     </div>
-                    <div class="w-8 h-1 bg-[var(--border-secondary)] rounded"></div>
-                    <div class="flex flex-col items-center gap-2">
-                      <span class="text-xs font-medium text-[var(--text-secondary)]">Total Enterprise Liability</span>
-                      <div class="stat-pill bg-danger-subtle text-danger font-bold">{{ summary.totalLeaveBalance || 0 }} Days</div>
+                    <div class="p-4 bg-[var(--bg-primary)] border border-[var(--border-primary)] rounded-xl shadow-xs flex items-center justify-between">
+                      <div>
+                        <span class="text-xs text-rose-600 font-semibold uppercase tracking-wider">Enterprise Liability</span>
+                        <div class="text-2xl font-bold text-rose-600 mt-1">{{ summary.totalLeaveBalance || 0 }} Days</div>
+                      </div>
+                      <div class="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-900/30 text-rose-600 flex items-center justify-center">
+                        <i class="pi pi-briefcase text-lg"></i>
+                      </div>
                     </div>
                   </div>
                 }
 
-                <div class="flex justify-between items-center mt-2">
-                  <h3 class="font-bold text-lg text-[var(--text-primary)] m-0">Leave Balances</h3>
-                  <p-iconField iconPosition="left">
-                    <p-inputIcon styleClass="pi pi-search text-[var(--text-tertiary)]"></p-inputIcon>
-                    <input type="text" pInputText placeholder="Search employees..." [(ngModel)]="leaveSearch" class="w-[20rem]" />
-                  </p-iconField>
-                </div>
-
-                <div class="flex-1 min-h-[450px]">
+                <div class="flex-1 min-h-[480px] flex flex-col w-full">
                   <app-data-grid [viewOnly]="true" 
+                    [pagination]="true"
+                    [enableExport]="true"
                     [columns]="leaveColumns"
-                    [data]="filteredLeaveReportData()"
-                    [loading]="isLoadingLeave()">
+                    [data]="leaveReportData()"
+                    [loading]="isLoadingLeave()"
+                    class="flex-1 min-h-[480px] w-full">
                   </app-data-grid>
                 </div>
               </div>
@@ -233,10 +219,11 @@ import { PageHeaderComponent } from '@shared/ui/layout/page-header/page-header.c
     ::ng-deep .p-tablist {
       background: var(--bg-primary);
       border-bottom: 1px solid var(--border-primary);
+      padding-left: 0.5rem;
     }
     ::ng-deep .p-tabpanel { padding: 0 !important; display: flex; flex-direction: column; flex: 1; min-height: 0; }
     ::ng-deep .p-tabs { display: flex; flex-direction: column; flex: 1; min-height: 0; }
-    ::ng-deep .p-tabpanels { padding: var(--spacing-lg) !important; flex: 1; min-height: 0; overflow-y: auto; background-color: var(--bg-secondary); }
+    ::ng-deep .p-tabpanels { padding: var(--spacing-lg) 0.5rem !important; flex: 1; min-height: 0; overflow-y: auto; background-color: var(--bg-secondary); }
 
     .stat-circle {
       width: 44px; height: 44px;
@@ -267,71 +254,60 @@ import { PageHeaderComponent } from '@shared/ui/layout/page-header/page-header.c
 export class AttendanceReportsComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
   private readonly hrmsService = inject(HRMSService);
+  private readonly masterDropdownService = inject(MasterDropdownService);
   private readonly messageService = inject(AppMessageService);
 
   dateRange: Date[] | null = null;
-  departments = [
-    { label: 'Administration', value: '69eef9935011d1bea4120a26' },
-    { label: 'Engineering', value: 'dept_eng' }
-  ];
+  departments: { label: string; value: string }[] = [];
   selectedDept: string | null = null;
-  financialYears = [
-    { label: '2023-2024', value: '2023-2024' },
-    { label: '2024-2025', value: '2024-2025' }
-  ];
-  selectedFy = '2024-2025';
+  financialYears: { label: string; value: string }[] = [];
+  selectedFy = '';
 
   readonly isLoadingReport = signal(false);
   readonly attendanceReportData = signal<any[]>([]);
   readonly attendanceSummary = signal<any>(null);
-  
-  attendanceSearch = signal('');
-  readonly filteredAttendanceReportData = computed(() => {
-    const data = this.attendanceReportData();
-    const search = this.attendanceSearch().toLowerCase();
-    if (!search) return data;
-    return data.filter(r => 
-      (r.employeeName ?? '').toLowerCase().includes(search) || 
-      (r.departmentName ?? '').toLowerCase().includes(search) ||
-      (r.employeeId ?? '').toLowerCase().includes(search)
-    );
-  });
 
   readonly isLoadingLeave = signal(false);
   readonly leaveReportData = signal<any[]>([]);
   readonly leaveReportSummary = signal<any>(null);
 
-  leaveSearch = signal('');
-  readonly filteredLeaveReportData = computed(() => {
-    const data = this.leaveReportData();
-    const search = this.leaveSearch().toLowerCase();
-    if (!search) return data;
-    return data.filter(r => 
-      (r.user?.name ?? '').toLowerCase().includes(search) || 
-      (r.department?.name ?? '').toLowerCase().includes(search)
-    );
-  });
-
   readonly attendanceColumns: GridColumn[] = [
     {
       field: 'employeeName', header: 'Employee', minWidth: '250px', sticky: 'left', sortable: true,
-      formatter: (_v: any, row: any) => `${row?.employeeName || 'Unknown'} (EMP ID: ${row?.employeeId || 'N/A'})`
+      formatter: (_v: any, row: any) => {
+        const name = row?.employeeName || 'Staff Member';
+        const code = row?.employeeId || (row?._id ? `EMP-${String(row._id).slice(-4).toUpperCase()}` : '—');
+        return `
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-full bg-[var(--primary-color)] text-white font-bold text-xs flex items-center justify-center shrink-0">
+              ${name.charAt(0).toUpperCase()}
+            </div>
+            <div class="flex flex-col min-w-0">
+              <span class="font-semibold text-[var(--text-primary)] text-sm truncate">${name}</span>
+              <span class="text-xs text-[var(--text-secondary)] font-mono">${code}</span>
+            </div>
+          </div>
+        `;
+      }
     },
-    { field: 'departmentName', header: 'Department', width: '180px', sortable: true },
+    {
+      field: 'departmentName', header: 'Department', width: '180px', sortable: true,
+      formatter: (v: any) => v || 'General Department'
+    },
     { field: 'totalDays', header: 'Total Days', width: '120px', align: 'center' },
-    { 
+    {
       field: 'present', header: 'Present', width: '100px', align: 'center', type: 'badge',
-      formatter: (v: any) => String(v ?? 0) 
+      formatter: (v: any) => String(v ?? 0)
     },
-    { 
+    {
       field: 'absent', header: 'Absent', width: '100px', align: 'center',
       formatter: (v: any) => String(v ?? 0)
     },
-    { 
+    {
       field: 'late', header: 'Late', width: '100px', align: 'center',
       formatter: (v: any) => String(v ?? 0)
     },
-    { 
+    {
       field: 'totalWorkHours', header: 'Work Hrs', width: '120px', align: 'center',
       formatter: (v: any) => `${(v || 0).toFixed(1)}h`
     },
@@ -343,33 +319,74 @@ export class AttendanceReportsComponent implements OnInit, OnDestroy {
 
   readonly leaveColumns: GridColumn[] = [
     {
-      field: 'user.name', header: 'Employee', minWidth: '250px', sticky: 'left', sortable: true,
-      formatter: (_v: any, row: any) => row?.user?.name || 'Unknown'
+      field: 'employeeName', header: 'Employee', minWidth: '250px', sticky: 'left', sortable: true,
+      formatter: (_v: any, row: any) => {
+        const name = row?.employeeName || row?.user?.name || row?.employeeRef?.displayName || row?.employee?.displayName || 'Employee';
+        const code = row?.employeeId || (row?.userId ? `EMP-${String(row.userId).slice(-4).toUpperCase()}` : '—');
+        return `
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-full bg-[var(--primary-color)] text-white font-bold text-xs flex items-center justify-center shrink-0">
+              ${name.charAt(0).toUpperCase()}
+            </div>
+            <div class="flex flex-col min-w-0">
+              <span class="font-semibold text-[var(--text-primary)] text-sm truncate">${name}</span>
+              <span class="text-xs text-[var(--text-secondary)] font-mono">${code}</span>
+            </div>
+          </div>
+        `;
+      }
     },
     {
-      field: 'department.name', header: 'Department', width: '200px', sortable: true,
-      formatter: (_v: any, row: any) => row?.department?.name || 'N/A'
+      field: 'departmentName', header: 'Department & Role', width: '200px', sortable: true,
+      formatter: (_v: any, row: any) => {
+        const dept = row?.departmentName || row?.department?.name || 'General Department';
+        const desig = row?.designationTitle || row?.designation?.title || 'Staff Member';
+        return `
+          <div class="flex flex-col">
+            <span class="font-medium text-[var(--text-primary)] text-xs truncate">${dept}</span>
+            <span class="text-[11px] text-[var(--text-secondary)] truncate">${desig}</span>
+          </div>
+        `;
+      }
     },
     {
-      field: 'clRemaining', header: 'CL Remaining', width: '140px', align: 'center',
-      formatter: (_v: any, row: any) => String((row?.casualLeave?.total || 0) - (row?.casualLeave?.used || 0))
+      field: 'casualLeave.available', header: 'CL Available', width: '130px', align: 'center', type: 'badge',
+      formatter: (_v: any, row: any) => String(row?.casualLeave?.available ?? ((row?.casualLeave?.total || 0) - (row?.casualLeave?.used || 0)))
     },
     {
-      field: 'slRemaining', header: 'SL Remaining', width: '140px', align: 'center',
-      formatter: (_v: any, row: any) => String((row?.sickLeave?.total || 0) - (row?.sickLeave?.used || 0))
+      field: 'sickLeave.available', header: 'SL Available', width: '130px', align: 'center', type: 'badge',
+      formatter: (_v: any, row: any) => String(row?.sickLeave?.available ?? ((row?.sickLeave?.total || 0) - (row?.sickLeave?.used || 0)))
     },
     {
-      field: 'elRemaining', header: 'EL Remaining', width: '140px', align: 'center',
-      formatter: (_v: any, row: any) => String((row?.earnedLeave?.total || 0) - (row?.earnedLeave?.used || 0))
+      field: 'earnedLeave.available', header: 'EL Available', width: '130px', align: 'center', type: 'badge',
+      formatter: (_v: any, row: any) => String(row?.earnedLeave?.available ?? ((row?.earnedLeave?.total || 0) - (row?.earnedLeave?.used || 0)))
     },
     {
-      field: 'availableLeaves.total', header: 'Total Liability', width: '160px', align: 'right', sticky: 'right', type: 'badge',
-      formatter: (v: any) => String(v || 0)
+      field: 'totalAvailable', header: 'Total Balance', width: '150px', align: 'right', sticky: 'right', type: 'badge',
+      formatter: (_v: any, row: any) => String(row?.totalAvailable ?? row?.availableLeaves?.total ?? 0)
     }
   ];
 
   ngOnInit(): void {
-    this.dateRange = [new Date(2026, 4, 31), new Date(2026, 5, 29)];
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    this.dateRange = [startOfMonth, now];
+
+    const currentYear = now.getFullYear();
+    this.financialYears = [
+      { label: `${currentYear - 1}-${currentYear}`, value: `${currentYear - 1}-${currentYear}` },
+      { label: `${currentYear}-${currentYear + 1}`, value: `${currentYear}-${currentYear + 1}` },
+    ];
+    this.selectedFy = `${currentYear}-${currentYear + 1}`;
+
+    this.masterDropdownService.getDropdownData('departments').pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(res => {
+      if (res?.data) {
+        this.departments = res.data.map(d => ({ label: d.label, value: d.value }));
+      }
+    });
+
     this.loadAttendanceReport();
     this.loadLeaveReport();
   }
