@@ -1,25 +1,77 @@
 <!-- ═══════════════════════════════════════════════════════════════════════
-     APEX Sidebar — Orchestrator Template
-     Visual markup lives in sub-components and SCSS.
-     This template only wires inputs/outputs.
+     APEX Sidebar — Modern Sleek Dashboard Theme
      ═══════════════════════════════════════════════════════════════════════ -->
 
 <aside class="sidebar-panel" role="navigation" aria-label="Main navigation">
 
-  <!-- ── Header ─────────────────────────────────────────────────────────── -->
-  <app-sidebar-header [isMini]="layout.isMiniMode()" [isPinned]="layout.isPinned()" [isMobile]="layout.isMobile()"
-    (searchOpen)="openSearch()" (togglePin)="layout.togglePin()" (toggleMini)="layout.toggleMiniMode()"
-    (closeMobile)="layout.closeMobile()" />
+  <!-- ── Header with User Greeting & Actions ────────────────────────── -->
+  <app-sidebar-header
+    [user]="authService.currentUser()"
+    [isMini]="layout.isMiniMode()"
+    [isPinned]="layout.isPinned()"
+    [isMobile]="layout.isMobile()"
+    (searchOpen)="openSearch()"
+    (togglePin)="layout.togglePin()"
+    (toggleMini)="layout.toggleMiniMode()"
+    (closeMobile)="layout.closeMobile()"
+  />
 
   <!-- ── Navigation scroll area ─────────────────────────────────────────── -->
   <nav class="nav-scroll" aria-label="Site navigation">
     @for (group of menuBuilder.navigationGroups(); track group.groupLabel) {
-    <app-sidebar-nav-section [group]="group" [isMini]="layout.isMiniMode()" [expandedKeys]="expandedKeys()"
-      [activeParentLabels]="activeParentLabels()" (toggle)="handleToggle($event)" />
+      <app-sidebar-nav-section
+        [group]="group"
+        [isMini]="layout.isMiniMode()"
+        [expandedKeys]="expandedKeys()"
+        [activeParentLabels]="activeParentLabels()"
+        (toggle)="handleToggle($event)"
+      />
     }
   </nav>
 
-  <!-- ── User profile footer ────────────────────────────────────────────── -->
-  <app-sidebar-profile [user]="authService.currentUser()" [isMini]="layout.isMiniMode()" (signOut)="logout()" />
+  <!-- ── Quick Action Button (Image 2 style) ────────────────────────────── -->
+  @if (!layout.isMiniMode()) {
+    <div class="p-3 pt-1 flex-shrink-0">
+      <button
+        type="button"
+        (click)="openSearch()"
+        class="w-full h-[40px] px-3.5 rounded-xl bg-[var(--component-bg-hover)] hover:bg-[var(--component-bg-active)] text-[var(--text-primary)] border border-[var(--border-secondary)] font-bold text-[12px] flex items-center justify-center gap-2.5 shadow-xs hover:shadow-sm cursor-pointer transition-all active:scale-[0.98] select-none group"
+      >
+        <div class="w-5 h-5 rounded-md bg-[var(--accent-focus)] text-[var(--accent-primary)] flex items-center justify-center transition-colors">
+          <i class="pi pi-plus text-[10px] font-bold"></i>
+        </div>
+        <div class="flex flex-col text-left leading-tight">
+          <span class="text-[12px] font-bold tracking-tight text-[var(--text-primary)]">Create new</span>
+          <span class="text-[9.5px] font-normal text-[var(--text-tertiary)]">Or use invite link / Ctrl+K</span>
+        </div>
+      </button>
+    </div>
+  } @else {
+    <div class="p-2 flex justify-center flex-shrink-0">
+      <button
+        type="button"
+        (click)="openSearch()"
+        class="w-9 h-9 rounded-xl bg-[var(--component-bg-hover)] hover:bg-[var(--component-bg-active)] text-[var(--text-primary)] border border-[var(--border-secondary)] font-bold flex items-center justify-center shadow-xs cursor-pointer transition-all active:scale-[0.95]"
+        pTooltip="Create new (Ctrl+K)"
+        tooltipPosition="right"
+      >
+        <i class="pi pi-plus text-[12px] font-bold text-[var(--accent-primary)]"></i>
+      </button>
+    </div>
+  }
+
+  <!-- ── Edge Floating Toggle Tab (Image 2 style) ────────────────────────── -->
+  @if (!layout.isMobile()) {
+    <button
+      type="button"
+      class="sidebar-floating-toggle"
+      (click)="layout.toggleMiniMode()"
+      [pTooltip]="layout.isMiniMode() ? 'Expand sidebar' : 'Collapse sidebar'"
+      tooltipPosition="right"
+      aria-label="Toggle sidebar width"
+    >
+      <i class="pi text-[8px]" [class.pi-chevron-left]="!layout.isMiniMode()" [class.pi-chevron-right]="layout.isMiniMode()"></i>
+    </button>
+  }
 
 </aside>

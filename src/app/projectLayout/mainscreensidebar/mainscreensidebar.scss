@@ -1,59 +1,47 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// APEX Sidebar — SCSS
-//
-// Philosophy: SCSS handles ONLY what Tailwind cannot.
-//   ✅ Host width & transition
-//   ✅ Mobile drawer overlay positioning
-//   ✅ Custom scrollbars
-//   ✅ Spotlight search dialog styles
-//
-// Everything visual (colour, padding, etc.) is in Tailwind utilities.
+// APEX Sidebar — Theme Token Responsive SCSS
 // ═══════════════════════════════════════════════════════════════════════════
 
 :host {
   display: block;
-  width: var(--sidebar-expanded-width);
+  width: 250px;
   background: var(--bg-primary);
-  transition: width 180ms cubic-bezier(0.20, 0.90, 0.20, 1),
-              transform 180ms cubic-bezier(0.20, 0.90, 0.20, 1);
+  color: var(--text-primary);
+  transition: width 200ms cubic-bezier(0.20, 0.90, 0.20, 1),
+              transform 200ms cubic-bezier(0.20, 0.90, 0.20, 1);
 
   // ── UNPINNED (Default) ─────────────────────────────────────────────────────
-  // Sidebar is positioned fixed (hovering over content) and mostly hidden
-  // with a 6px peek on the left.
   position: fixed;
-  top: calc(64px + 12px); 
-  height: calc(100vh - 64px - 24px); 
+  top: calc(64px + 10px); 
+  height: calc(100vh - 64px - 20px); 
   left: 0;
   z-index: var(--z-fixed, 100);
   transform: translateX(calc(-100% + 6px));
   border-top-right-radius: var(--ui-border-radius-xl, 20px);
   border-bottom-right-radius: var(--ui-border-radius-xl, 20px);
-  border: 1px solid var(--border-tertiary, var(--border-primary));
+  border: 1px solid var(--border-secondary, var(--border-primary));
   border-left: none;
 
-  // Hovering over the peek reveals it completely over the canvas
   &:hover {
     transform: translateX(0);
-    box-shadow: var(--elevation-3, 0 10px 40px rgba(0,0,0,0.1));
+    box-shadow: var(--elevation-3, 0 16px 48px rgba(0, 0, 0, 0.25));
   }
 
   // ── PINNED (Takes up space) ────────────────────────────────────────────────
-  // Becomes sticky, enters document flow, pushes content.
   &.is-pinned {
     position: sticky;
-    top: calc(64px + 12px);
-    height: calc(100vh - 64px - 24px);
-    margin-left: 12px;
-    border-radius: var(--ui-border-radius-lg, 16px);
-    border: 1px solid var(--border-tertiary, var(--border-primary));
+    top: calc(64px + 10px);
+    height: calc(100vh - 64px - 20px);
+    margin-left: 10px;
+    border-radius: var(--ui-border-radius-xl, 20px);
+    border: 1px solid var(--border-secondary, var(--border-primary));
     transform: translateX(0);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--elevation-2, var(--shadow-md));
   }
 
   // ── MINI MODE ──────────────────────────────────────────────────────────────
   &.is-mini {
-    width: var(--sidebar-mini-width);
-    // Usually mini mode implies it is pinned, but we handle the width here.
+    width: 62px;
   }
 
   // ── MOBILE DRAWER ──────────────────────────────────────────────────────────
@@ -62,20 +50,20 @@
     top: 0;
     bottom: 0;
     left: 0;
-    width: var(--sidebar-mobile-width);
+    width: min(280px, 85vw);
     height: 100vh !important; 
     transform: translateX(-100%);
     z-index: var(--z-modal, 300);
+    border-radius: 0;
     
     &:hover {
-      // Don't auto-expand on hover for mobile
       transform: translateX(-100%);
       box-shadow: none;
     }
 
     &.is-mobile-open {
       transform: translateX(0) !important;
-      box-shadow: var(--elevation-3, 0 20px 60px rgba(0,0,0,0.35));
+      box-shadow: var(--elevation-3, 0 20px 60px rgba(0, 0, 0, 0.35));
     }
   }
 }
@@ -85,6 +73,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 // ── Navigation scroll area ────────────────────────────────────────────────
@@ -93,7 +82,7 @@
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 8px;
+  padding: 8px 8px 4px 8px;
 
   // Scrollbar hidden by default — appears on hover
   scrollbar-width: none;
@@ -112,7 +101,32 @@
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// END OF SIDEBAR SCSS
-// Spotlight search moved to Tailwind in the HTML template.
-// ═══════════════════════════════════════════════════════════════════════════
+// ── Edge Floating Toggle Button ───────────────────────────────────────────
+.sidebar-floating-toggle {
+  position: absolute;
+  top: 50%;
+  right: -15px;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 32px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-secondary);
+  border-left: none;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
+  z-index: 40;
+  box-shadow: var(--shadow-sm, 2px 0 8px rgba(0, 0, 0, 0.15));
+
+  &:hover {
+    background: var(--component-bg-hover, var(--bg-secondary));
+    color: var(--text-primary);
+    width: 18px;
+    right: -17px;
+  }
+}

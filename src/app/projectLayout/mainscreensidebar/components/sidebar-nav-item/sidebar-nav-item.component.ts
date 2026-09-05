@@ -8,64 +8,69 @@ import {
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { TooltipModule } from 'primeng/tooltip';
+import { CommonModule } from '@angular/common';
 import { LayoutService } from '../../../layout.service';
 import { NavItem } from '../../navigation-model';
 
 @Component({
   selector: 'app-sidebar-nav-item',
   standalone: true,
-  imports: [RouterModule, TooltipModule],
+  imports: [CommonModule, RouterModule, TooltipModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <!-- ── Level 1 item ─────────────────────────────────────────────────────── -->
-    <div class="relative mb-1">
-
+    <!-- ── Level 1 Item ──────────────────────────────────────────────────────── -->
+    <div class="relative mb-0.5">
       @if (isLeaf()) {
-        <!-- LEAF: <a> for navigation -->
+        <!-- L1 Leaf Link -->
         <a
           [routerLink]="item().routerLink"
-          routerLinkActive="l1-active"
+          routerLinkActive="nav-item-active"
           [routerLinkActiveOptions]="{ exact: false }"
-          class="group relative flex items-center gap-3.5 w-full h-[44px] px-4 rounded-[20px]
-                 text-[14.5px] font-[var(--font-weight-medium)]
-                 text-[var(--text-primary)] no-underline cursor-pointer
-                 transition-all duration-300 ease-out
-                 hover:bg-black/5 dark:hover:bg-white/5
-                 focus-visible:outline-none focus-visible:ring-2
-                 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-offset-1"
+          class="nav-item-row group relative flex items-center gap-2.5 w-full h-[36px] px-3 rounded-xl
+                 text-[12.5px] font-[var(--font-weight-medium)]
+                 text-[var(--text-secondary)] no-underline cursor-pointer
+                 transition-all duration-200 ease-out
+                 hover:bg-[var(--component-bg-hover)] hover:text-[var(--text-primary)]
+                 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-primary)]"
           [class.mini-layout]="isMini()"
           [pTooltip]="isMini() ? item().label : ''"
           tooltipPosition="right"
           [attr.aria-label]="item().label"
           (click)="onMobileClose()"
         >
-          <i [class]="item().icon"
-             class="text-[1.15rem] flex-shrink-0 w-5 flex justify-center transition-colors duration-300"
-             aria-hidden="true"></i>
-             
+          <!-- Active Left Vertical Indicator Bar (rendered via CSS or pill) -->
+          <span class="active-bar hidden w-[3.5px] h-4 rounded-full bg-[var(--accent-primary)] mr-0.5 shrink-0"></span>
+
+          <i
+            [class]="item().icon"
+            class="text-[14px] flex-shrink-0 w-4 flex justify-center text-[var(--text-tertiary)] group-hover:text-[var(--text-secondary)] transition-colors"
+            aria-hidden="true"
+          ></i>
+
           @if (!isMini()) {
-            <span class="flex-1 truncate leading-snug tracking-tight">{{ item().label }}</span>
+            <span class="flex-1 truncate leading-snug tracking-tight font-medium">{{ item().label }}</span>
             @if (item().badge) {
-              <span class="min-w-[22px] h-[22px] flex items-center justify-center rounded-full 
-                           bg-[var(--text-primary)] text-[var(--bg-primary)] 
-                           text-[10px] font-bold px-1.5 shadow-sm transition-colors duration-300">
+              <span
+                class="min-w-[18px] h-[18px] flex items-center justify-center rounded-full
+                       bg-[var(--accent-focus)] text-[var(--accent-primary)] border border-[var(--accent-primary)]/30
+                       text-[9.5px] font-bold px-1.5 shadow-xs transition-colors"
+              >
                 {{ item().badge }}
               </span>
             }
           }
         </a>
       } @else {
-        <!-- ACCORDION PARENT: <button> for toggle action -->
+        <!-- L1 Parent Accordion Toggle -->
         <button
           type="button"
-          class="group relative flex items-center gap-3.5 w-full h-[44px] px-4 rounded-[20px]
-                 text-[14.5px] font-[var(--font-weight-medium)]
-                 text-[var(--text-primary)] cursor-pointer
-                 transition-all duration-300 ease-out
-                 hover:bg-black/5 dark:hover:bg-white/5
-                 focus-visible:outline-none focus-visible:ring-2
-                 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-offset-1"
-          [class.l1-parent-expanded]="!isMini() && isExpanded()"
+          class="nav-item-row group relative flex items-center gap-2.5 w-full h-[36px] px-3 rounded-xl
+                 text-[12.5px] font-[var(--font-weight-medium)]
+                 text-[var(--text-secondary)] cursor-pointer
+                 transition-all duration-200 ease-out
+                 hover:bg-[var(--component-bg-hover)] hover:text-[var(--text-primary)]
+                 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-primary)]"
+          [class.nav-parent-open]="!isMini() && isExpanded()"
           [class.mini-layout]="isMini()"
           [pTooltip]="isMini() ? item().label : ''"
           tooltipPosition="right"
@@ -73,130 +78,118 @@ import { NavItem } from '../../navigation-model';
           [attr.aria-label]="item().label + ' submenu'"
           (click)="handleParentClick()"
         >
-          <i [class]="item().icon"
-             class="text-[1.15rem] flex-shrink-0 w-5 flex justify-center transition-colors duration-300"
-             aria-hidden="true"></i>
-             
+          <span class="active-bar hidden w-[3.5px] h-4 rounded-full bg-[var(--accent-primary)] mr-0.5 shrink-0"></span>
+
+          <i
+            [class]="item().icon"
+            class="text-[14px] flex-shrink-0 w-4 flex justify-center text-[var(--text-tertiary)] group-hover:text-[var(--text-secondary)] transition-colors"
+            aria-hidden="true"
+          ></i>
+
           @if (!isMini()) {
-            <span class="flex-1 truncate leading-snug tracking-tight text-left">{{ item().label }}</span>
-            
+            <span class="flex-1 truncate leading-snug tracking-tight text-left font-medium">
+              {{ item().label }}
+            </span>
+
             @if (item().badge) {
-              <span class="min-w-[22px] h-[22px] flex items-center justify-center rounded-full 
-                           bg-[var(--text-primary)] text-[var(--bg-primary)] 
-                           text-[10px] font-bold px-1.5 shadow-sm mr-1 transition-colors duration-300">
+              <span
+                class="min-w-[18px] h-[18px] flex items-center justify-center rounded-full
+                       bg-[var(--accent-focus)] text-[var(--accent-primary)] border border-[var(--accent-primary)]/30
+                       text-[9.5px] font-bold px-1.5 mr-1 shadow-xs"
+              >
                 {{ item().badge }}
               </span>
             }
-            
-            <i class="pi text-[11px] flex-shrink-0 transition-transform duration-300 ease-out"
-               [class.pi-angle-down]="!isExpanded()" [class.pi-angle-up]="isExpanded()"
-               aria-hidden="true"></i>
+
+            <i
+              class="pi text-[9.5px] text-[var(--text-tertiary)] group-hover:text-[var(--text-secondary)] flex-shrink-0 transition-transform duration-200 ease-out"
+              [class.pi-chevron-down]="!isExpanded()"
+              [class.pi-chevron-up]="isExpanded()"
+              aria-hidden="true"
+            ></i>
           }
         </button>
 
-        <!-- ── Level 2 accordion (File Tree Structure) ──────────────────────── -->
+        <!-- ── Level 2 Accordion List ────────────────────────────────────── -->
         @if (!isMini()) {
-          <div class="nav-accordion overflow-hidden transition-all duration-300 ease-in-out"
-               [class.max-h-0]="!isExpanded()"
-               [class.max-h-[800px]]="isExpanded()">
-            
-            <!-- Structural Vertical Line -->
-            <div class="ml-[26px] mt-2 pl-5 pb-2 border-l border-[var(--border-secondary)] relative" role="group">
-
+          <div
+            class="overflow-hidden transition-all duration-200 ease-in-out pl-2.5"
+            [class.max-h-0]="!isExpanded()"
+            [class.max-h-[1000px]]="isExpanded()"
+          >
+            <div class="space-y-[2px] pt-1 pb-1" role="group">
               @for (child of item().items; track child.label) {
                 @if (!child.items?.length) {
-                  <!-- LV2 LEAF -->
-                  <div class="relative l2-wrapper mb-1">
-                    <!-- Structural Horizontal Branch -->
-                    <div class="absolute left-[-20px] top-1/2 w-[14px] h-[1px] bg-[var(--border-secondary)] z-0"></div>
-                    
-                    <a
-                      [routerLink]="child.routerLink"
-                      routerLinkActive="l2-active"
-                      [routerLinkActiveOptions]="{ exact: true }"
-                      class="relative z-10 group flex items-center gap-3 w-full h-[40px] px-3.5 rounded-[16px]
-                             text-[13.5px] font-[var(--font-weight-medium)]
-                             text-[var(--text-secondary)] no-underline cursor-pointer
-                             transition-all duration-200 ease-out
-                             hover:bg-black/5 dark:hover:bg-white/5
-                             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
-                      (click)="onMobileClose()"
-                    >
-                      @if (child.icon) {
-                        <i [class]="child.icon" class="text-[1.1rem] flex-shrink-0 transition-colors"></i>
-                      }
-                      <span class="flex-1 truncate tracking-tight">{{ child.label }}</span>
-                      
-                      @if (child.badge) {
-                        <i class="pi pi-thumbtack text-[11px] text-[var(--text-muted)]"></i> <!-- E.g. pinned icon -->
-                      }
-                    </a>
-                  </div>
+                  <!-- Level 2 Leaf Link -->
+                  <a
+                    [routerLink]="child.routerLink"
+                    routerLinkActive="nav-item-active"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                    class="nav-item-row group flex items-center gap-2 w-full h-[32px] pl-5 pr-2.5 rounded-lg
+                           text-[11.5px] font-normal
+                           text-[var(--text-secondary)] no-underline cursor-pointer
+                           transition-all duration-150 ease-out
+                           hover:bg-[var(--component-bg-hover)] hover:text-[var(--text-primary)]"
+                    (click)="onMobileClose()"
+                  >
+                    <span class="active-bar hidden w-[3px] h-3.5 rounded-full bg-[var(--accent-primary)] mr-0.5 shrink-0"></span>
+                    @if (child.icon) {
+                      <i [class]="child.icon" class="text-[12px] flex-shrink-0 text-[var(--text-tertiary)] group-hover:text-[var(--text-secondary)] transition-colors"></i>
+                    }
+                    <span class="flex-1 truncate tracking-tight">{{ child.label }}</span>
+                  </a>
                 } @else {
-                  <!-- LV2 ACCORDION PARENT -->
-                  <div class="relative l2-wrapper mb-1">
-                    <!-- Structural Horizontal Branch -->
-                    <div class="absolute left-[-20px] top-1/2 w-[14px] h-[1px] bg-[var(--border-secondary)] z-0"></div>
-                    
+                  <!-- Level 2 Parent Accordion -->
+                  <div class="relative">
                     <button
                       type="button"
-                      class="relative z-10 group flex items-center gap-3 w-full h-[40px] px-3.5 rounded-[16px]
-                             text-[13.5px] font-[var(--font-weight-medium)]
+                      class="nav-item-row group flex items-center gap-2 w-full h-[32px] pl-5 pr-2.5 rounded-lg
+                             text-[11.5px] font-normal
                              text-[var(--text-secondary)] cursor-pointer
-                             transition-all duration-200 ease-out
-                             hover:bg-black/5 dark:hover:bg-white/5
-                             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
-                      [class.font-semibold]="activeParentLabels().has(child.label)"
+                             transition-all duration-150 ease-out
+                             hover:bg-[var(--component-bg-hover)] hover:text-[var(--text-primary)]"
                       [class.text-[var(--text-primary)]]="activeParentLabels().has(child.label)"
+                      [class.font-semibold]="activeParentLabels().has(child.label)"
                       [attr.aria-expanded]="expandedKeys().has(child.label)"
-                      [attr.aria-label]="child.label + ' submenu'"
                       (click)="toggle.emit(child.label)"
                     >
                       @if (child.icon) {
-                        <i [class]="child.icon" class="text-[1.1rem] flex-shrink-0 transition-colors" [class.text-[var(--text-primary)]]="activeParentLabels().has(child.label)"></i>
+                        <i [class]="child.icon" class="text-[12px] flex-shrink-0 text-[var(--text-tertiary)] group-hover:text-[var(--text-secondary)] transition-colors"></i>
                       }
                       <span class="flex-1 truncate tracking-tight text-left">{{ child.label }}</span>
-                      <i class="pi text-[10px] flex-shrink-0 text-[var(--text-muted)]
-                        transition-transform duration-200 ease-out"
-                         [class.pi-angle-down]="!expandedKeys().has(child.label)"
-                         [class.pi-angle-up]="expandedKeys().has(child.label)"
-                         aria-hidden="true"></i>
+                      <i
+                        class="pi text-[8.5px] text-[var(--text-tertiary)] group-hover:text-[var(--text-secondary)] flex-shrink-0 transition-transform duration-200"
+                        [class.pi-chevron-down]="!expandedKeys().has(child.label)"
+                        [class.pi-chevron-up]="expandedKeys().has(child.label)"
+                      ></i>
                     </button>
 
-                    <!-- ── Level 3 accordion ──────────────────────────────────── -->
-                    <div class="overflow-hidden transition-all duration-300 ease-in-out w-full"
-                         [class.max-h-0]="!expandedKeys().has(child.label)"
-                         [class.max-h-[500px]]="expandedKeys().has(child.label)">
-                      <div class="ml-[18px] mt-1 pl-4 pb-1 border-l border-[var(--border-secondary)] relative"
-                           role="group"
-                           [attr.aria-label]="child.label + ' items'">
-
+                    <!-- Level 3 Accordion Items -->
+                    <div
+                      class="overflow-hidden transition-all duration-200 ease-in-out pl-3"
+                      [class.max-h-0]="!expandedKeys().has(child.label)"
+                      [class.max-h-[600px]]="expandedKeys().has(child.label)"
+                    >
+                      <div class="space-y-[2px] pt-1 pb-1" role="group">
                         @for (deep of child.items; track deep.label) {
-                          <div class="relative l3-wrapper mb-1">
-                            <!-- Structural Horizontal Branch -->
-                            <div class="absolute left-[-16px] top-1/2 w-[10px] h-[1px] bg-[var(--border-secondary)] z-0"></div>
-                            <a
-                              [routerLink]="deep.routerLink"
-                              routerLinkActive="l3-active"
-                              [routerLinkActiveOptions]="{ exact: true }"
-                              class="relative z-10 group flex items-center gap-2 w-full h-[36px] px-3 rounded-[14px]
-                                     text-[13px] font-[var(--font-weight-normal)]
-                                     text-[var(--text-secondary)] no-underline cursor-pointer
-                                     transition-all duration-200 ease-out
-                                     hover:bg-black/5 dark:hover:bg-white/5
-                                     focus-visible:outline-none focus-visible:ring-2
-                                     focus-visible:ring-[var(--accent-primary)] focus-visible:ring-offset-1"
-                              [attr.aria-label]="deep.label"
-                              (click)="onMobileClose()"
-                            >
-                              @if (deep.icon) {
-                                <i [class]="deep.icon" class="text-[1rem] flex-shrink-0 transition-colors"></i>
-                              }
-                              <span class="flex-1 truncate leading-snug">{{ deep.label }}</span>
-                            </a>
-                          </div>
+                          <a
+                            [routerLink]="deep.routerLink"
+                            routerLinkActive="nav-item-active"
+                            [routerLinkActiveOptions]="{ exact: true }"
+                            class="nav-item-row group flex items-center gap-2 w-full h-[28px] pl-5 pr-2 rounded-md
+                                   text-[11px] font-normal
+                                   text-[var(--text-secondary)] no-underline cursor-pointer
+                                   transition-all duration-150 ease-out
+                                   hover:bg-[var(--component-bg-hover)] hover:text-[var(--text-primary)]"
+                            (click)="onMobileClose()"
+                          >
+                            <span class="active-bar hidden w-[2.5px] h-3 rounded-full bg-[var(--accent-primary)] mr-0.5 shrink-0"></span>
+                            @if (deep.icon) {
+                              <i [class]="deep.icon" class="text-[11px] flex-shrink-0 text-[var(--text-tertiary)] group-hover:text-[var(--text-secondary)]"></i>
+                            }
+                            <span class="flex-1 truncate tracking-tight">{{ deep.label }}</span>
+                          </a>
                         }
-
                       </div>
                     </div>
                   </div>
@@ -210,44 +203,44 @@ import { NavItem } from '../../navigation-model';
   `,
   styles: `
     /* =========================================================
-       SOFT & MODERN ACTIVE STATES (Smooth Theme)
+       THEME-TOKEN ACCENT PILL ACTIVE STATES
        ========================================================= */
-       
-    /* 1. Expanded Level 1 Parent (Soft Colored Text) */
-    .l1-parent-expanded {
-      color: var(--accent-primary) !important;
-    }
-    .l1-parent-expanded i { color: var(--accent-primary) !important; }
 
-    /* 2. Active Level 1 Leaf (Soft Background) - Standard Mode */
-    :not(.mini-layout).l1-active {
-      background-color: var(--accent-focus) !important;
+    /* Active Item Highlight */
+    .nav-item-active {
+      background: var(--accent-focus, color-mix(in srgb, var(--accent-primary) 18%, transparent)) !important;
       color: var(--accent-primary) !important;
+      font-weight: 700 !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     }
-    :not(.mini-layout).l1-active i { color: var(--accent-primary) !important; }
 
-    /* 3. Active Level 1 Leaf - Mini Mode */
-    .mini-layout.l1-active {
-      background-color: var(--accent-focus) !important;
+    .nav-item-active i {
       color: var(--accent-primary) !important;
     }
-    .mini-layout.l1-active i { color: var(--accent-primary) !important; }
 
-    /* 4. Active Level 2 Child */
-    .l2-active {
-      background-color: var(--accent-focus) !important;
-      color: var(--accent-primary) !important;
-      font-weight: var(--font-weight-semibold) !important;
+    /* Show Left Accent Bar on Active Item */
+    .nav-item-active .active-bar {
+      display: inline-block !important;
     }
-    .l2-active i { color: var(--accent-primary) !important; }
 
-    /* 5. Active Level 3 Child */
-    .l3-active {
-      background-color: var(--accent-focus) !important;
+    /* Active Item in Mini Mode */
+    .mini-layout.nav-item-active {
+      background: var(--accent-focus, color-mix(in srgb, var(--accent-primary) 18%, transparent)) !important;
       color: var(--accent-primary) !important;
-      font-weight: var(--font-weight-semibold) !important;
     }
-    .l3-active i { color: var(--accent-primary) !important; }
+
+    .mini-layout.nav-item-active i {
+      color: var(--accent-primary) !important;
+    }
+
+    /* Open parent soft highlight */
+    .nav-parent-open {
+      color: var(--text-primary) !important;
+    }
+
+    .nav-parent-open i {
+      color: var(--accent-primary) !important;
+    }
   `
 })
 export class SidebarNavItemComponent {
@@ -276,3 +269,4 @@ export class SidebarNavItemComponent {
     }
   }
 }
+

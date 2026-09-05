@@ -14,7 +14,9 @@ import {
 import { Router, NavigationEnd } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs/operators';
+import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
+import { TooltipModule } from 'primeng/tooltip';
 
 import { LayoutService } from '../layout.service';
 import { AuthService } from '../../modules/auth/services/auth-service';
@@ -32,10 +34,11 @@ import { HotkeyService } from '../../core/services/hotkey.service';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    CommonModule,
     DialogModule,
+    TooltipModule,
     SidebarHeaderComponent,
     SidebarNavSectionComponent,
-    SidebarProfileComponent,
   ],
   templateUrl: './mainscreensidebar.html',
   styleUrl: './mainscreensidebar.scss',
