@@ -23,6 +23,8 @@ import { storefrontErrorInterceptor } from './storefront/core/api/storefront-err
 import { loggingInterceptor } from './core/interceptors/logging.interceptor';
 import { AuthService } from './modules/auth/services/auth-service';
 import { DialogService } from 'primeng/dynamicdialog';
+import { RouteReuseStrategy } from '@angular/router';
+import { TabRouteReuseStrategy } from './tab-workspace/tab-route-reuse.strategy';
 // import { ConfirmationService } from '@core/services/confirmationService';
 
 export const appConfig: ApplicationConfig = {
@@ -32,6 +34,7 @@ export const appConfig: ApplicationConfig = {
       withFetch()
     ),
     provideRouter(routes),
+    { provide: RouteReuseStrategy, useClass: TabRouteReuseStrategy },
     provideClientHydration(
       withEventReplay(),
       withIncrementalHydration(),

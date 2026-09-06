@@ -8,7 +8,7 @@ import { AppMessageService } from '../../../core/services/message.service';
 import { ApiService } from '../../../core/services/api';
 import { OrganizationService } from './../../organization/organization.service';
 import { User, Session, LoginResponse, SignupResponse, VerifyTokenResponse } from './auth.types';
-import { TabService } from '../../../Tabbing/Service/tab.service';
+import { TabWorkspaceService } from '../../../tab-workspace/tab-workspace.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService implements OnDestroy {
@@ -29,7 +29,7 @@ export class AuthService implements OnDestroy {
   private OrganizationService = inject(OrganizationService);
   private messageService = inject(AppMessageService);
   private router = inject(Router);
-  private tabService = inject(TabService);
+  private tabWorkspace = inject(TabWorkspaceService);
   private _token: string | null = null;
   private isLoggingOut = signal(false)
 
@@ -146,7 +146,7 @@ export class AuthService implements OnDestroy {
       localStorage.removeItem('orgSlug');
     }
 
-    this.tabService.reset();
+    this.tabWorkspace.clear();
 
     this._token = null; // ✅ Kill the token state
     this._currentUser.set(null); // ✅ Triggers app.component socket disconnect

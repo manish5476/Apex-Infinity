@@ -49,8 +49,9 @@ export class FooterComplexComponent {
         ]
       },
       {
-        title: 'Logistics',
+        title: 'Portals',
         links: [
+          { label: 'Merchant / Staff Login', url: '/auth/login', absolute: true },
           { label: 'In-house Delivery Login', url: 'delivery/login' },
           { label: 'Apex Network Login', url: '/apex-delivery/login', absolute: true }
         ]

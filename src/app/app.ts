@@ -11,7 +11,7 @@ import { MasterListService } from './core/services/master-list.service';
 import { AppMessageService } from './core/services/message.service';
 import { LoadingComponent } from "./modules/shared/components/loader.component";
 import { AnnouncementListenerComponent } from "./modules/shared/components/announcement-banner/announcement-banner.component";
-import { TabKeyboardService } from './Tabbing';
+import { TabWorkspaceKeyboardService } from './tab-workspace/tab-workspace-keyboard.service';
 
 @Component({
   selector: 'app-root',
@@ -34,7 +34,7 @@ export class App implements OnInit, OnDestroy {
   private notificationService = inject(NotificationService);
   private masterList = inject(MasterListService);
   private messageService = inject(AppMessageService);
-  private readonly tabKeyboardService = inject(TabKeyboardService);
+  private readonly tabKeyboardService = inject(TabWorkspaceKeyboardService);
   private destroy$ = new Subject<void>();
 
   constructor() {

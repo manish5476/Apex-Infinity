@@ -5,7 +5,7 @@ import { RouterOutlet } from '@angular/router';
 import { LayoutService } from '../layout.service';
 import { MainscreenHeader } from '../mainscreen-header/mainscreen-header';
 import { Mainscreensidebar } from '../mainscreensidebar/mainscreensidebar';
-import { TabStripComponent, TabService } from '../../Tabbing';
+import { TabWorkspaceService } from '../../tab-workspace';
 import { Toast } from "primeng/toast";
 @Component({
   selector: 'app-main-dashboard',
@@ -16,7 +16,7 @@ import { Toast } from "primeng/toast";
 })
 export class MainDashboardComponent {
   public layout = inject(LayoutService);
-  public tabService = inject(TabService);
+  public tabService = inject(TabWorkspaceService);
   private platformId = inject(PLATFORM_ID);
 
   constructor() {

@@ -56,6 +56,9 @@ type PortalMode =
           <span class="sep">·</span>
           <a (click)="goTo('register')">Create account</a>
         </div>
+        <div style="margin-top: 1.25rem; font-size: 0.75rem; color: #888; text-align: center;">
+          Store staff or merchant? <a [routerLink]="['/auth/login']" style="color: #6366f1; text-decoration: underline;">Apex Infinity Staff Sign In</a>
+        </div>
       </ng-container>
 
       <!-- Register -->

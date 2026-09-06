@@ -89,6 +89,8 @@ import { Subject, catchError, debounceTime, distinctUntilChanged, filter, of, sw
             <a [routerLink]="['/store', slug(), 'account', 'orders']"><i class="pi pi-history"></i> Orders</a>
             <a [routerLink]="['/store', slug(), 'wishlist']"><i class="pi pi-heart"></i> Wishlist</a>
             <a [routerLink]="['/store', slug(), 'login']"><i class="pi pi-sign-in"></i> Sign in</a>
+            <div style="border-top: 1px solid var(--border-secondary, rgba(255,255,255,0.1)); margin: 4px 0;"></div>
+            <a [routerLink]="['/auth/login']"><i class="pi pi-shield"></i> Staff / Merchant Login</a>
           </div>
         }
       </nav>

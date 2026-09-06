@@ -28,7 +28,7 @@ import { SIDEBAR_MENU } from '../mainscreensidebar/menu-items.constants';
 import { CommonMethodService } from '@core/utils/common-method.service';
 import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '@core/auth/permissions.constants';
-import { TabService, TabStripComponent } from "../../Tabbing";
+import { TabWorkspaceService, TabStripComponent } from '../../tab-workspace';
 
 import { CommandPaletteComponent } from '../../shared/ui/command-palette/command-palette.component';
 import { HotkeyService } from '../../core/services/hotkey.service';
@@ -83,7 +83,7 @@ export class MainscreenHeader implements OnInit, OnDestroy {
   profileDialogVisible = false;
   announcementDialogVisible = signal(false);
 
-  public tabService = inject(TabService);
+  public tabService = inject(TabWorkspaceService);
   public hotkeyService = inject(HotkeyService);
   private themeService = inject(ThemeService);
   private authService = inject(AuthService);

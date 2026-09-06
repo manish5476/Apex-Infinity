@@ -1,0 +1,188 @@
+<!-- src/app/tab-workspace/tab-strip/tab-strip.component.html -->
+<nav class="apex-tab-strip" role="tablist" aria-label="Application Workspace Tabs">
+
+  <!-- Left Scroll Control -->
+  @if (canScrollLeft()) {
+    <button
+      type="button"
+      class="tab-scroll-btn tab-scroll-btn--left"
+      (click)="scrollLeft()"
+      aria-label="Scroll tabs left"
+      pTooltip="Scroll left"
+      tooltipPosition="bottom"
+    >
+      <i class="pi pi-chevron-left"></i>
+    </button>
+  }
+
+  <!-- Tab Scrollable Viewport -->
+  <div
+    class="tab-strip__viewport"
+    #scrollContainer
+    (scroll)="onContainerScroll()"
+    (wheel)="onWheelScroll($event)"
+  >
+    @for (tab of tabs(); track tab.id; let i = $index) {
+      <button
+        type="button"
+        class="tab-item"
+        [id]="'tab-' + tab.id"
+        [class.tab-item--active]="tab.active"
+        [class.tab-item--pinned]="tab.pinned"
+        [class.tab-item--dirty]="tab.dirty"
+        [class.tab-item--loading]="tab.loading"
+        role="tab"
+        [attr.aria-selected]="tab.active"
+        [attr.tabindex]="tab.active ? 0 : -1"
+        [attr.aria-label]="tab.title + (tab.dirty ? ' (unsaved changes)' : '')"
+        [pTooltip]="tab.title"
+        tooltipPosition="bottom"
+        [tooltipOptions]="{ showDelay: 600 }"
+        (click)="onTabClick(tab.id)"
+        (mousedown)="onMouseDown($event, tab.id)"
+        (contextmenu)="onContextMenu($event, tab)"
+        draggable="true"
+        (dragstart)="onDragStart($event, i)"
+        (dragover)="onDragOver($event)"
+        (drop)="onDrop($event, i)"
+      >
+        <!-- Loading Shimmer -->
+        @if (tab.loading) {
+          <span class="tab-item__shimmer" aria-hidden="true"></span>
+        }
+
+        <!-- Tab Icon -->
+        @if (tab.icon && !tab.loading) {
+          <i class="tab-item__icon" [ngClass]="tab.icon" aria-hidden="true"></i>
+        }
+
+        <!-- Tab Label -->
+        <span class="tab-item__label">{{ tab.title }}</span>
+
+        <!-- Dirty Indicator -->
+        @if (tab.dirty) {
+          <span class="tab-item__dirty-dot" pTooltip="Unsaved changes" tooltipPosition="bottom" aria-hidden="true">●</span>
+        }
+
+        <!-- Badge -->
+        @if (tab.badge !== undefined) {
+          <span class="tab-item__badge">{{ tab.badge }}</span>
+        }
+
+        <!-- Pinned Indicator -->
+        @if (tab.pinned) {
+          <i class="tab-item__pin pi pi-thumbtack" aria-hidden="true"></i>
+        }
+
+        <!-- Close Button -->
+        @if (tab.closable && !tab.pinned) {
+          <span
+            class="tab-item__close"
+            role="button"
+            tabindex="0"
+            aria-label="Close tab"
+            (click)="onTabClose($event, tab.id)"
+            (keydown.enter)="onTabClose($event, tab.id)"
+            (mousedown)="$event.stopPropagation()"
+          >
+            <i class="pi pi-times"></i>
+          </span>
+        }
+      </button>
+    }
+  </div>
+
+  <!-- Right Scroll Control -->
+  @if (canScrollRight()) {
+    <button
+      type="button"
+      class="tab-scroll-btn tab-scroll-btn--right"
+      (click)="scrollRight()"
+      aria-label="Scroll tabs right"
+      pTooltip="Scroll right"
+      tooltipPosition="bottom"
+    >
+      <i class="pi pi-chevron-right"></i>
+    </button>
+  }
+
+  <!-- Tab Actions & Overflow Menu -->
+  <div class="tab-strip__controls">
+    <!-- All Tabs Switcher -->
+    @if (isOverflowing() || tabs().length > 5) {
+      <button
+        type="button"
+        class="tab-ctrl-btn"
+        (click)="toggleAllTabsDropdown($event)"
+        aria-label="All open tabs"
+        pTooltip="All open tabs"
+        tooltipPosition="bottom"
+      >
+        <i class="pi pi-clone"></i>
+        <span class="tab-count-pill">{{ tabs().length }}</span>
+      </button>
+    }
+
+    <!-- Close All Unpinned -->
+    <button
+      type="button"
+      class="tab-ctrl-btn tab-ctrl-btn--close-all"
+      (click)="tabService.closeAll()"
+      [disabled]="tabs().length === 0"
+      aria-label="Close all tabs"
+      pTooltip="Close all tabs"
+      tooltipPosition="bottom"
+    >
+      <i class="pi pi-times-circle"></i>
+    </button>
+  </div>
+
+  <!-- All Tabs Dropdown Overlay -->
+  @if (showAllTabsDropdown()) {
+    <div class="tab-overflow-panel" (click)="$event.stopPropagation()">
+      <div class="tab-overflow-header">
+        <i class="pi pi-search"></i>
+        <input
+          type="text"
+          placeholder="Filter open tabs..."
+          [value]="filterQuery()"
+          (input)="filterQuery.set($any($event.target).value)"
+          autofocus
+        />
+      </div>
+
+      <div class="tab-overflow-list">
+        @for (item of filteredTabs(); track item.id) {
+          <div
+            class="tab-overflow-item"
+            [class.active]="item.active"
+            (click)="selectFromDropdown(item.id)"
+          >
+            <i [ngClass]="item.icon || 'pi pi-file'"></i>
+            <span class="overflow-title">{{ item.title }}</span>
+            @if (item.dirty) {
+              <span class="dirty-marker">●</span>
+            }
+            @if (!item.pinned) {
+              <button
+                type="button"
+                class="overflow-close"
+                (click)="onTabClose($event, item.id)"
+                aria-label="Close"
+              >
+                <i class="pi pi-times"></i>
+              </button>
+            }
+          </div>
+        }
+        @if (filteredTabs().length === 0) {
+          <div class="tab-overflow-empty">No matching tabs</div>
+        }
+      </div>
+    </div>
+  }
+
+</nav>
+
+<!-- Context Menu -->
+<p-contextMenu #ctxMenu [model]="contextMenuItems()" appendTo="body"></p-contextMenu>

@@ -312,6 +312,9 @@
                                               </label>
                                               <button class="checkout-button" type="submit" [disabled]="submitting()">Sign in</button>
                                               <a [routerLink]="['/store', orgSlug(), 'register']">Create a storefront account</a>
+                                              <div style="margin-top: 1.25rem; padding-top: 0.75rem; border-top: 1px solid var(--border-secondary, rgba(255,255,255,0.08)); font-size: 0.8125rem; color: var(--text-secondary); text-align: center;">
+                                                Store staff or manager? <a [routerLink]="['/auth/login']" style="color: var(--primary-color, #6366f1); font-weight: 600; text-decoration: underline;">Apex Infinity Staff Sign In</a>
+                                              </div>
                                             </form>
                                           } @else if (mode() === 'forgot') {
                                             <form class="checkout-form auth-card" (ngSubmit)="submitForgot()">
