@@ -12,8 +12,8 @@
 
   // ── UNPINNED (Default) ─────────────────────────────────────────────────────
   position: fixed;
-  top: calc(64px + 10px); 
-  height: calc(100vh - 64px - 20px); 
+  top: calc(56px + 8px); 
+  height: calc(100vh - 56px - 16px); 
   left: 0;
   z-index: var(--z-fixed, 100);
   transform: translateX(calc(-100% + 6px));
@@ -30,9 +30,9 @@
   // ── PINNED (Takes up space) ────────────────────────────────────────────────
   &.is-pinned {
     position: sticky;
-    top: calc(64px + 10px);
-    height: calc(100vh - 64px - 20px);
-    margin-left: 10px;
+    top: calc(56px + 8px);
+    height: calc(100vh - 56px - 16px);
+    margin-left: 8px;
     border-radius: var(--ui-border-radius-xl, 20px);
     border: 1px solid var(--border-secondary, var(--border-primary));
     transform: translateX(0);

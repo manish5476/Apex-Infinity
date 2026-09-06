@@ -163,8 +163,7 @@ export class MainscreenHeader implements OnInit, OnDestroy {
   }
 
   onMenuToggle() {
-    if (this.layout.isMobile()) this.layout.toggleMobile();
-    else this.layout.togglePin();
+    this.layout.toggleSidebar();
     this.toggleSidebar.emit();
   }
 

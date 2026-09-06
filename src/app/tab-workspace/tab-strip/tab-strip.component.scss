@@ -10,7 +10,7 @@
 .apex-tab-strip {
   display: flex;
   align-items: center;
-  height: 40px;
+  height: 36px;
   width: 100%;
   min-width: 0;
   position: relative;
@@ -22,7 +22,7 @@
 // ── Viewport & Scroll Container ───────────────────────────────────────────────
 .tab-strip__viewport {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   flex: 1 1 auto;
   min-width: 0;
   height: 100%;
@@ -31,6 +31,7 @@
   scroll-behavior: smooth;
   scrollbar-width: none; // Firefox
   -ms-overflow-style: none; // IE/Edge
+  gap: 3px;
 
   &::-webkit-scrollbar {
     display: none; // Chrome/Safari
@@ -42,51 +43,54 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  height: 34px;
-  max-width: 210px;
-  min-width: 100px;
+  height: 32px;
+  max-width: 200px;
+  min-width: 90px;
   padding: 0 10px;
   font-size: 0.8125rem;
   font-weight: 500;
-  color: var(--text-color-secondary, #94a3b8);
+  font-family: var(--font-body);
+  color: var(--text-secondary);
   background: transparent;
   border: 1px solid transparent;
-  border-bottom: none;
-  border-top-left-radius: 6px;
-  border-top-right-radius: 6px;
+  border-radius: var(--ui-border-radius, 6px);
   cursor: pointer;
   white-space: nowrap;
   position: relative;
-  transition: all 0.15s ease-in-out;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
   flex-shrink: 0;
 
-  &:hover {
-    color: var(--text-color, #f8fafc);
-    background: rgba(255, 255, 255, 0.04);
+  &:hover:not(.tab-item--active) {
+    color: var(--text-primary);
+    background: var(--component-bg-hover, rgba(125, 125, 125, 0.08));
   }
 
   &:focus-visible {
-    box-shadow: inset 0 0 0 1px var(--primary-color, #3b82f6);
+    box-shadow: 0 0 0 2px var(--accent-focus, rgba(59, 130, 246, 0.35));
   }
 
-  // Active state
+  // Active state - Browser style elevated tab
   &--active {
-    color: var(--text-color, #f8fafc);
-    background: var(--surface-card, #1e293b);
-    border-color: var(--border-primary, rgba(255, 255, 255, 0.08));
+    color: var(--text-primary);
+    background: var(--bg-primary, var(--surface-card, #ffffff));
+    border-color: var(--border-primary);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.03);
     font-weight: 600;
 
-    &::after {
+    &::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
+      top: -1px;
+      left: 6px;
+      right: 6px;
       height: 2px;
-      background: var(--primary-color, #3b82f6);
-      border-top-left-radius: 6px;
-      border-top-right-radius: 6px;
+      background: var(--accent-primary, #3b82f6);
+      border-radius: 2px 2px 0 0;
+    }
+
+    .tab-item__icon {
+      color: var(--accent-primary, #3b82f6);
     }
   }
 
@@ -95,11 +99,11 @@
     min-width: auto;
     max-width: 140px;
     padding: 0 8px;
-    background: rgba(255, 255, 255, 0.02);
 
     .tab-item__pin {
       font-size: 0.75rem;
       opacity: 0.7;
+      color: var(--accent-primary, #3b82f6);
     }
   }
 
@@ -112,6 +116,8 @@
 .tab-item__icon {
   font-size: 0.875rem;
   flex-shrink: 0;
+  color: var(--text-secondary);
+  transition: color 0.15s ease;
 }
 
 .tab-item__label {
@@ -119,6 +125,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   flex: 1 1 auto;
+  line-height: 1.2;
 }
 
 .tab-item__dirty-dot {
@@ -129,7 +136,7 @@
 }
 
 .tab-item__badge {
-  background: var(--primary-color, #3b82f6);
+  background: var(--accent-primary, #3b82f6);
   color: #ffffff;
   font-size: 0.6875rem;
   font-weight: 700;
@@ -145,7 +152,7 @@
   height: 18px;
   border-radius: 4px;
   margin-left: 2px;
-  color: var(--text-color-secondary, #94a3b8);
+  color: var(--text-secondary);
   opacity: 0;
   transition: all 0.12s ease;
   flex-shrink: 0;
@@ -163,7 +170,11 @@
 // Show close button on hover or when tab is active
 .tab-item:hover .tab-item__close,
 .tab-item--active .tab-item__close {
-  opacity: 1;
+  opacity: 0.65;
+
+  &:hover {
+    opacity: 1;
+  }
 }
 
 // ── Scroll Controls ───────────────────────────────────────────────────────────
@@ -171,23 +182,24 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 28px;
-  border: none;
-  background: transparent;
-  color: var(--text-color-secondary, #94a3b8);
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--border-primary);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: var(--ui-border-radius-sm, 6px);
   flex-shrink: 0;
-  transition: background 0.15s;
+  transition: var(--transition-fast, all 0.15s ease);
 
   i {
     font-size: 0.75rem;
   }
 
   &:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: var(--text-color, #f8fafc);
+    background: var(--component-bg-hover);
+    color: var(--text-primary);
+    border-color: var(--border-secondary);
   }
 }
 
@@ -195,9 +207,9 @@
 .tab-strip__controls {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 3px;
   padding-left: 4px;
-  border-left: 1px solid var(--border-primary, rgba(255, 255, 255, 0.08));
+  border-left: 1px solid var(--border-primary);
   flex-shrink: 0;
 }
 
@@ -205,23 +217,25 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 28px;
-  padding: 0 6px;
-  border: none;
-  background: transparent;
-  color: var(--text-color-secondary, #94a3b8);
-  border-radius: 4px;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid var(--border-primary);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border-radius: var(--ui-border-radius-sm, 6px);
   cursor: pointer;
-  gap: 4px;
-  transition: all 0.15s ease;
+  gap: 3px;
+  transition: var(--transition-fast, all 0.15s ease);
 
   i {
     font-size: 0.8125rem;
   }
 
   &:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: var(--text-color, #f8fafc);
+    background: var(--component-bg-hover);
+    color: var(--text-primary);
+    border-color: var(--border-secondary);
   }
 
   &:disabled {
@@ -231,15 +245,18 @@
 
   &--close-all:hover {
     color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.3);
   }
 }
 
 .tab-count-pill {
-  font-size: 0.6875rem;
+  font-size: 0.65rem;
   font-weight: 700;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--accent-primary);
+  color: #fff;
   padding: 1px 4px;
-  border-radius: 8px;
+  border-radius: 6px;
 }
 
 // ── Overflow Dropdown Panel ───────────────────────────────────────────────────
@@ -250,14 +267,14 @@
   z-index: 1000;
   width: 280px;
   max-height: 380px;
-  background: var(--surface-card, #1e293b);
-  border: 1px solid var(--border-primary, rgba(255, 255, 255, 0.1));
-  border-radius: 8px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--ui-border-radius-lg, 8px);
+  box-shadow: var(--shadow-lg, 0 10px 25px -5px rgba(0, 0, 0, 0.25));
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  margin-top: 4px;
+  margin-top: 6px;
 }
 
 .tab-overflow-header {
@@ -265,23 +282,23 @@
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  border-bottom: 1px solid var(--border-primary, rgba(255, 255, 255, 0.08));
+  border-bottom: 1px solid var(--border-primary);
 
   i {
     font-size: 0.8125rem;
-    color: var(--text-color-secondary, #94a3b8);
+    color: var(--text-secondary);
   }
 
   input {
     flex: 1;
     border: none;
     background: transparent;
-    color: var(--text-color, #f8fafc);
+    color: var(--text-primary);
     font-size: 0.8125rem;
     outline: none;
 
     &::placeholder {
-      color: var(--text-color-secondary, #94a3b8);
+      color: var(--text-tertiary);
     }
   }
 }
@@ -299,17 +316,17 @@
   padding: 8px 12px;
   cursor: pointer;
   font-size: 0.8125rem;
-  color: var(--text-color-secondary, #94a3b8);
+  color: var(--text-secondary);
   transition: background 0.12s;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--text-color, #f8fafc);
+    background: var(--component-bg-hover);
+    color: var(--text-primary);
   }
 
   &.active {
-    color: var(--primary-color, #3b82f6);
-    background: rgba(59, 130, 246, 0.1);
+    color: var(--accent-primary);
+    background: var(--color-primary-bg, rgba(59, 130, 246, 0.1));
     font-weight: 600;
   }
 
@@ -350,7 +367,7 @@
   padding: 16px;
   text-align: center;
   font-size: 0.8125rem;
-  color: var(--text-color-secondary, #94a3b8);
+  color: var(--text-secondary);
 }
 
 // ── Responsive Density & Breakpoints ──────────────────────────────────────────

@@ -124,17 +124,19 @@
     }
 
     <!-- Close All Unpinned -->
-    <button
-      type="button"
-      class="tab-ctrl-btn tab-ctrl-btn--close-all"
-      (click)="tabService.closeAll()"
-      [disabled]="tabs().length === 0"
-      aria-label="Close all tabs"
-      pTooltip="Close all tabs"
-      tooltipPosition="bottom"
-    >
-      <i class="pi pi-times-circle"></i>
-    </button>
+    @if (tabs().length > 1) {
+      <button
+        type="button"
+        class="tab-ctrl-btn tab-ctrl-btn--close-all"
+        (click)="tabService.closeAll()"
+        [disabled]="tabs().length === 0"
+        aria-label="Close all tabs"
+        pTooltip="Close all tabs"
+        tooltipPosition="bottom"
+      >
+        <i class="pi pi-times-circle"></i>
+      </button>
+    }
   </div>
 
   <!-- All Tabs Dropdown Overlay -->

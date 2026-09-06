@@ -4,7 +4,7 @@
    ========================================================================== */
 
 // ── Structural constants ─────────────────────────────────────────────────────
-$header-height: 64px; // Slightly taller for modern breathing room
+$header-height: 56px;
 
 // ── 1. Host ──────────────────────────────────────────────────────────────────
 :host {
@@ -30,10 +30,6 @@ app-mainscreen-header {
   position: sticky;
   top: 0;
   z-index: var(--z-fixed);
-
-  /* Visual distinction */
-  background: var(--bg-secondary);
-  border-bottom: var(--ui-border-width) solid var(--border-primary);
 }
 
 // ── 4. Body row (sidebar + content column) ───────────────────────────────────

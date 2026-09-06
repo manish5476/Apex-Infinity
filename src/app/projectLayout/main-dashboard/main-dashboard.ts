@@ -28,12 +28,4 @@ export class MainDashboardComponent {
     if (!isPlatformBrowser(this.platformId)) return;
     this.layout.screenWidth.set(window.innerWidth);
   }
-
-  onMenuToggle() {
-    if (this.layout.isDesktop()) {
-      this.layout.togglePin();
-    } else {
-      this.layout.toggleMobile();
-    }
-  }
 }

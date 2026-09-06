@@ -38,7 +38,9 @@ export class LayoutService {
 
   // ── Responsive breakpoints ──────────────────────────────────────────────────
 
-  readonly screenWidth = signal<number>(0);
+  readonly screenWidth = signal<number>(
+    this.isBrowser ? window.innerWidth : 1200
+  );
 
   readonly isMobile  = computed(() => this.screenWidth() < 768);
   readonly isTablet  = computed(() => this.screenWidth() >= 768 && this.screenWidth() < 1024);
@@ -62,6 +64,12 @@ export class LayoutService {
   // ── Persistence ─────────────────────────────────────────────────────────────
 
   constructor() {
+    if (this.isBrowser) {
+      window.addEventListener('resize', () => {
+        this.screenWidth.set(window.innerWidth);
+      });
+    }
+
     // One effect owns all sidebar localStorage writes.
     effect(() => {
       if (!this.isBrowser) return;
@@ -71,6 +79,14 @@ export class LayoutService {
   }
 
   // ── Actions ─────────────────────────────────────────────────────────────────
+
+  toggleSidebar(): void {
+    if (this.isMobile() || this.isTablet()) {
+      this.toggleMobile();
+    } else {
+      this.togglePin();
+    }
+  }
 
   togglePin():      void { this.isPinned.update(v => !v); }
   toggleMiniMode(): void { this.isMiniMode.update(v => !v); }
