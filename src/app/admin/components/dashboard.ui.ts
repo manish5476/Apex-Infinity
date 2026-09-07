@@ -1,4 +1,4 @@
-ts
+
 import {
   Component,
   OnInit,
@@ -29,11 +29,8 @@ import { PageComponent } from '../../shared/ui/layout/page/page.component';
 import { PageHeaderComponent } from '../../shared/ui/layout/page-header/page-header.component';
 import { PageContentComponent } from '../../shared/ui/layout/page-content/page-content.component';
 
-import { StatCardComponent } from '../../shared/ui/data/stat-card.component';
-import { CardComponent } from '../../shared/ui/data/card/card.component';
 import { StatusBadgeComponent } from '../../shared/ui/badge/status-badge.component';
 import { ButtonComponent } from '../../shared/ui/form/button.component';
-import { LoadingComponent } from '../../shared/ui/feedback/loading/loading.component';
 import { AvatarComponent } from '../../shared/ui/media/avatar.component';
 
 @Component({
@@ -55,11 +52,8 @@ import { AvatarComponent } from '../../shared/ui/media/avatar.component';
     PageHeaderComponent,
     PageContentComponent,
 
-    StatCardComponent,
-    CardComponent,
     StatusBadgeComponent,
     ButtonComponent,
-    LoadingComponent,
     AvatarComponent
   ],
 
@@ -1821,6 +1815,8 @@ import { AvatarComponent } from '../../shared/ui/media/avatar.component';
 })
 export class AdminDashboardUiComponent
   implements OnInit, OnDestroy {
+
+  readonly Math = Math;
 
   private readonly destroy$ = new Subject<void>();
 
