@@ -1,4 +1,4 @@
-```ts
+ts
 import {
   Component,
   OnInit,
@@ -1995,7 +1995,7 @@ export class AdminDashboardUiComponent
   }
 
 }
-```
+
 
 
 // import {
